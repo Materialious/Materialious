@@ -53,7 +53,7 @@
 			</div>
 			<button class="inverse-surface">Subscribe</button>
 			<div class="max"></div>
-			<nav class="no-space">
+			<nav class="no-space m l">
 				<button style="cursor: default;" class="border left-round">
 					<i class="small">thumb_up</i>
 					<span>{humanNumber(data.returnYTDislikes.likes, cleanRound)}</span>
@@ -63,7 +63,7 @@
 					<span>{humanNumber(data.returnYTDislikes.dislikes, cleanRound)}</span>
 				</button>
 			</nav>
-			<button class="border" data-ui="#share"
+			<button class="border m l" data-ui="#share"
 				><i>share</i> Share
 				<menu class="left no-wrap" id="share" data-ui="#share">
 					<a class="row"> <div class="min">Copy Materialious link</div></a><a class="row">
@@ -73,8 +73,21 @@
 			>
 		</nav>
 
+		<nav class="no-space s">
+			<button style="cursor: default;" class="border left-round">
+				<i class="small">thumb_up</i>
+				<span>{humanNumber(data.returnYTDislikes.likes, cleanRound)}</span>
+			</button>
+			<button style="cursor: default;" class="border right-round">
+				<i class="small">thumb_down_alt</i>
+				<span>{humanNumber(data.returnYTDislikes.dislikes, cleanRound)}</span>
+			</button>
+		</nav>
+
 		<article>
-			<p>{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}</p>
+			<p class="bold">
+				{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
+			</p>
 			<p style="white-space: pre-line;word-wrap: break-word;">{data.video.description}</p>
 		</article>
 	</div>
@@ -90,9 +103,13 @@
 		--plyr-color-main: var(--primary);
 	}
 
-	@media screen and (min-width: 1560px) {
+	.grid {
+		padding: 1em 10em;
+	}
+
+	@media screen and (max-width: 1646px) {
 		.grid {
-			margin: 20px 140px;
+			padding: 0;
 		}
 	}
 </style>

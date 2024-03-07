@@ -3,6 +3,7 @@
 
 	import 'beercss';
 	import 'material-dynamic-colors';
+	import { onMount } from 'svelte';
 
 	const pages = [
 		{
@@ -31,6 +32,12 @@
 			name: 'History'
 		}
 	];
+
+	onMount(() => {
+		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			ui('mode', 'dark');
+		}
+	});
 </script>
 
 <nav class="left m l small">

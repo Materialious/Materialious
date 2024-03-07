@@ -1,22 +1,15 @@
 <script lang="ts">
-	import { getTrending } from '$lib/Api';
-	import type { Video } from '$lib/Api/model';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { onMount } from 'svelte';
 
-	let trending: Video[];
-
-	onMount(async () => {
-		trending = await getTrending();
-	});
+	export let data;
 </script>
 
-{#if trending}
+{#if data.trending}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each trending as video}
+			{#each data.trending as video}
 				<div class="s12 m6 l2">
 					<Thumbnail {video} />
 				</div>

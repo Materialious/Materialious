@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Video, VideoBase } from './Api/model';
 	import { truncate } from './misc';
 
@@ -11,6 +12,24 @@
 
 		return `${hours}:${minutes}:${seconds}`;
 	}
+
+	let loading = true;
+	let loaded = false;
+	let failed = false;
+
+	onMount(() => {
+		const img = new Image();
+		img.src = video.videoThumbnails[3].url;
+
+		img.onload = () => {
+			loading = false;
+			loaded = true;
+		};
+		img.onerror = () => {
+			loading = false;
+			failed = true;
+		};
+	});
 </script>
 
 <article class="no-padding transparent">
@@ -18,12 +37,19 @@
 		class="wave"
 		style="width: 100%; height: 155px; overflow: hidden;"
 		href={`/watch/${video.videoId}`}
-		><img
-			class="responsive"
-			style="object-fit: crop;"
-			src={video.videoThumbnails[3].url}
-			alt="Thumbnail for video"
-		/>
+	>
+		{#if loading}
+			<progress class="circle"></progress>
+		{:else if loaded}
+			<img
+				class="responsive"
+				style="object-fit: crop;"
+				src={video.videoThumbnails[3].url}
+				alt="Thumbnail for video"
+			/>
+		{:else}
+			<p>Failed to load image</p>
+		{/if}
 		{#if !('liveVideo' in video) || !video.liveVideo}
 			<div class="absolute right bottom small-margin black white-text small-text">
 				&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
@@ -40,7 +66,7 @@
 	<div class="small-padding">
 		<nav>
 			<div class="max">
-				<div class="bold">{truncate(video.title)}</div>
+				<a href={`/watch/${video.videoId}`}><div class="bold">{truncate(video.title)}</div></a>
 				<div>
 					{video.author}{#if !('publishedText' in video)}
 						&nbsp;• {video.viewCountText}{/if}

@@ -1,30 +1,21 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { getVideo } from '$lib/Api';
-	import type { VideoPlay } from '$lib/Api/model';
-	import PageLoading from '$lib/PageLoading.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { onMount } from 'svelte';
+	import { numberWithCommas } from '$lib/misc.js';
 
-	let video: VideoPlay;
-
-	onMount(async () => {
-		video = await getVideo($page.params.slug);
-	});
+	export let data;
 </script>
 
-{#if video}
-	<div class="grid large-margin">
-		<div class="s12 m10 l10">
-			<h5>{video.title}</h5>
-			<p style="white-space: pre-line">{video.description}</p>
-		</div>
-		<div class="m4 l2">
-			{#each video.recommendedVideos as recommendedVideo}
-				<Thumbnail video={recommendedVideo} />
-			{/each}
-		</div>
+<div class="grid large-margin">
+	<div class="s12 m10 l10">
+		<h5>{data.video.title}</h5>
+		<article>
+			<p>{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}</p>
+			<p style="white-space: pre-line">{data.video.description}</p>
+		</article>
 	</div>
-{:else}
-	<PageLoading />
-{/if}
+	<div class="m4 l2">
+		{#each data.video.recommendedVideos as recommendedVideo}
+			<Thumbnail video={recommendedVideo} />
+		{/each}
+	</div>
+</div>

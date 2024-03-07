@@ -6,7 +6,7 @@
 	const pages = [
 		{
 			icon: 'home',
-			href: '/home',
+			href: '/',
 			name: 'Home'
 		},
 		{

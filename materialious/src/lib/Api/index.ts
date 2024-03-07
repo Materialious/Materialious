@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import { invidiousInstance, returnYTDislikesInstance } from '../../store';
 import type { ReturnYTDislikes, Video, VideoPlay } from './model';
 
-function buildPath(path: string): string {
+export function buildPath(path: string): string {
   return `${get(invidiousInstance)}/api/v1/${path}`;
 }
 

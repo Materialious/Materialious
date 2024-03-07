@@ -28,7 +28,7 @@
 		{
 			icon: 'history',
 			href: '/history',
-			name: 'history'
+			name: 'History'
 		}
 	];
 </script>

@@ -1,15 +1,48 @@
 <script lang="ts">
+	import humanNumber from 'human-number';
+
+	import { get } from 'svelte/store';
+
+	import Plyr from 'plyr';
+	import 'plyr/dist/plyr.css';
+
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { numberWithCommas } from '$lib/misc.js';
-	import humanNumber from 'human-number';
+	import { onMount } from 'svelte';
+
+	import { invidiousInstance } from '../../../store';
 
 	export let data;
 
 	const cleanRound = (number: number) => Number.parseFloat(number.toString()).toFixed(1);
+
+	let player;
+	onMount(() => {
+		player = new Plyr('#player');
+		player.source = {
+			type: 'video',
+			previewThumbnails: {
+				src: data.video.videoThumbnails[0].url
+			},
+			poster: data.video.videoThumbnails[0].url,
+			tracks: data.video.captions.map((caption) => {
+				return {
+					kind: 'captions',
+					label: caption.label,
+					srcLang: caption.languageCode,
+					src: `${get(invidiousInstance)}${caption.url}`
+				};
+			}),
+			sources: data.video.formatStreams.map((format) => {
+				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
+			})
+		};
+	});
 </script>
 
-<div class="grid large-margin">
+<div class="grid">
 	<div class="s12 m12 l10">
+		<video width="100%" id="player" playsinline controls> </video>
 		<h5>{data.video.title}</h5>
 
 		<nav>
@@ -51,3 +84,15 @@
 		{/each}
 	</div>
 </div>
+
+<style>
+	:root {
+		--plyr-color-main: var(--primary);
+	}
+
+	@media screen and (min-width: 1560px) {
+		.grid {
+			margin: 20px 140px;
+		}
+	}
+</style>

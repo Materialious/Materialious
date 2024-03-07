@@ -92,9 +92,10 @@ export interface VideoPlay extends Video {
   genreUrl: string;
   hlsUrl?: string;
   adaptiveFormats: AdaptiveFormats[];
-  formatStreams: FormatStreams;
+  formatStreams: FormatStreams[];
   recommendedVideos: VideoBase[];
   authorThumbnails: AuthorThumbnails[];
+  captions: Captions[];
 }
 
 export interface ReturnYTDislikes {

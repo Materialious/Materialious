@@ -1,6 +1,9 @@
 <script lang="ts">
 	import Logo from '$lib/Logo.svelte';
 
+	import 'beercss';
+	import 'material-dynamic-colors';
+
 	const pages = [
 		{
 			icon: 'home',

@@ -16,6 +16,7 @@
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "^8.56.0",
+		"@types/human-number": "^1.0.2",
 		"@typescript-eslint/eslint-plugin": "^7.0.0",
 		"@typescript-eslint/parser": "^7.0.0",
 		"eslint": "^8.56.0",
@@ -32,6 +33,7 @@
 	"type": "module",
 	"dependencies": {
 		"beercss": "^3.5.1",
+		"human-number": "^2.0.4",
 		"svelte-persisted-store": "^0.9.1"
 	}
 }

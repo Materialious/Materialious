@@ -72,6 +72,12 @@ export interface Captions {
   url: string;
 };
 
+export interface AuthorThumbnails {
+  url: string;
+  width: string;
+  height: string;
+}
+
 export interface VideoPlay extends Video {
   keywords: string[];
   likeCount: number;
@@ -88,4 +94,15 @@ export interface VideoPlay extends Video {
   adaptiveFormats: AdaptiveFormats[];
   formatStreams: FormatStreams;
   recommendedVideos: VideoBase[];
+  authorThumbnails: AuthorThumbnails[];
+}
+
+export interface ReturnYTDislikes {
+  id: string;
+  dateCreated: string;
+  likes: number;
+  dislikes: number;
+  rating: number;
+  viewCount: number;
+  deleted: boolean;
 }

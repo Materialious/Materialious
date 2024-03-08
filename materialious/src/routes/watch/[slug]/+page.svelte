@@ -1,22 +1,17 @@
 <script lang="ts">
-	import humanNumber from 'human-number';
-
 	import { get } from 'svelte/store';
 
 	import Plyr from 'plyr';
 	import 'plyr/dist/plyr.css';
 
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { numberWithCommas } from '$lib/misc.js';
+	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
 	import { onMount } from 'svelte';
 
 	import { invidiousInstance } from '../../../store';
 
 	export let data;
 
-	const cleanRound = (number: number) => Number.parseFloat(number.toString()).toFixed(1);
-
-	$: video = data.video;
 	let player;
 	onMount(() => {
 		player = new Plyr('#player');
@@ -65,11 +60,11 @@
 			<nav class="no-space m l">
 				<button style="cursor: default;" class="border left-round">
 					<i class="small">thumb_up</i>
-					<span>{humanNumber(data.returnYTDislikes.likes, cleanRound)}</span>
+					<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
 				</button>
 				<button style="cursor: default;" class="border right-round">
 					<i class="small">thumb_down_alt</i>
-					<span>{humanNumber(data.returnYTDislikes.dislikes, cleanRound)}</span>
+					<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
 				</button>
 			</nav>
 			<button class="border m l" data-ui="#share"
@@ -85,11 +80,11 @@
 		<nav class="no-space s">
 			<button style="cursor: default;" class="border left-round">
 				<i class="small">thumb_up</i>
-				<span>{humanNumber(data.returnYTDislikes.likes, cleanRound)}</span>
+				<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
 			</button>
 			<button style="cursor: default;" class="border right-round">
 				<i class="small">thumb_down_alt</i>
-				<span>{humanNumber(data.returnYTDislikes.dislikes, cleanRound)}</span>
+				<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
 			</button>
 		</nav>
 

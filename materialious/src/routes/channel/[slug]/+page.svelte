@@ -24,6 +24,14 @@
 		<button class="inverse-surface large">Subscribe</button>
 	</div>
 
+	<div class="tabs left-align">
+		{#each data.channel.tabs as tab}
+			<a href={`?tab=${tab}`}>
+				<span>{tab}</span>
+			</a>
+		{/each}
+	</div>
+
 	<div class="divider"></div>
 
 	<div class="grid padding">
@@ -40,5 +48,9 @@
 		display: flex;
 		padding: 1em 0;
 		justify-content: center;
+	}
+
+	.tabs {
+		text-transform: capitalize;
 	}
 </style>

@@ -101,10 +101,20 @@
 			<div class="comment">
 				<img class="circle small" src={comment.authorThumbnails[1].url} alt="comment profile" />
 				<div>
-					<p>
-						<span class="bold">{comment.author}</span>
-						<span class="secondary-text">{comment.publishedText}</span>
-					</p>
+					<div class="row">
+						<p>
+							<span class:bold={true} class:channel-owner={comment.authorIsChannelOwner}
+								>{comment.author}</span
+							>
+							<span class="secondary-text">{comment.publishedText}</span>
+						</p>
+						{#if comment.isPinned}
+							<i>push_pin</i>
+						{/if}
+						{#if comment.isEdited}
+							<i>edit</i>
+						{/if}
+					</div>
 					<p>
 						{comment.content}
 					</p>
@@ -151,6 +161,13 @@
 
 	.grid {
 		padding: 1em 10em;
+	}
+
+	.channel-owner {
+		background-color: var(--primary);
+		padding: 0 0.5em;
+		border-radius: 1em;
+		color: var(--surface-variant);
 	}
 
 	@media screen and (max-width: 1646px) {

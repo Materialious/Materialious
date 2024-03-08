@@ -1,0 +1,3 @@
+.plyr--full-ui.plyr--video .plyr__control--overlaid {
+    display: flex !important;
+}

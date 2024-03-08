@@ -68,7 +68,7 @@
 			<div class="max">
 				<a href={`/watch/${video.videoId}`}><div class="bold">{truncate(video.title)}</div></a>
 				<div>
-					{video.author}{#if !('publishedText' in video)}
+					<a href={`/channel/${video.authorId}`}>{video.author}</a>{#if !('publishedText' in video)}
 						&nbsp;• {video.viewCountText}{/if}
 				</div>
 				{#if 'publishedText' in video}
@@ -76,12 +76,6 @@
 						{video.viewCountText} • {video.publishedText}
 					</div>{/if}
 			</div>
-			<button class="circle transparent" data-ui="#menu-1"
-				><i>more_vert</i><menu class="left no-wrap" id="menu-1" data-ui="#menu-1"
-					><a>Save to paylist</a>
-					<a>Download</a></menu
-				></button
-			>
 		</nav>
 	</div>
 </article>

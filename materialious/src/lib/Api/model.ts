@@ -17,6 +17,7 @@ export interface VideoBase {
   title: string;
   videoThumbnails: Thumbnail[];
   author: string;
+  authorId: string;
   lengthSeconds: number;
   viewCountText: string;
 }
@@ -24,7 +25,6 @@ export interface VideoBase {
 export interface Video extends VideoBase {
   type: "video";
   title: string;
-  authorId: string;
   authorUrl: string;
   authorVerified: boolean;
   description: string;
@@ -106,4 +106,34 @@ export interface ReturnYTDislikes {
   rating: number;
   viewCount: number;
   deleted: boolean;
+}
+
+export interface Comment {
+  author: string;
+  authorThumbnails: AuthorThumbnails[];
+  authorID: string;
+  authorUrl: string;
+  isEdited: boolean;
+  isPinned: boolean;
+  content: string;
+  contentHtml: string;
+  published: number;
+  publishedText: string;
+  likeCount: number;
+  authorIsChannelOwner: boolean;
+  creatorHeart: {
+    creatorThumbnail: string;
+    creatorName: string;
+  };
+  replies: {
+    replyCount: number;
+    continuation: string;
+  };
+}
+
+export interface Comments {
+  commentCount: number;
+  videoId: string;
+  continuation?: string;
+  comments: Comment[];
 }

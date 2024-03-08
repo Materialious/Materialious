@@ -16,6 +16,7 @@
 
 	const cleanRound = (number: number) => Number.parseFloat(number.toString()).toFixed(1);
 
+	$: video = data.video;
 	let player;
 	onMount(() => {
 		player = new Plyr('#player');
@@ -46,11 +47,19 @@
 		<h5>{data.video.title}</h5>
 
 		<nav>
-			<img class="circle large" src={data.video.authorThumbnails[2].url} alt="Channel profile" />
-			<div>
-				<p class="bold">{data.video.author}</p>
-				<p>{data.video.subCountText}</p>
-			</div>
+			<a href={`/channel/${data.video.authorId}`}>
+				<nav>
+					<img
+						class="circle large"
+						src={data.video.authorThumbnails[2].url}
+						alt="Channel profile"
+					/>
+					<div>
+						<p class="bold">{data.video.author}</p>
+						<p>{data.video.subCountText}</p>
+					</div>
+				</nav>
+			</a>
 			<button class="inverse-surface">Subscribe</button>
 			<div class="max"></div>
 			<nav class="no-space m l">
@@ -84,12 +93,46 @@
 			</button>
 		</nav>
 
-		<article>
+		<article class="medium scroll">
 			<p class="bold">
 				{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
 			</p>
 			<p style="white-space: pre-line;word-wrap: break-word;">{data.video.description}</p>
 		</article>
+
+		<div class="space"></div>
+		<h6>{numberWithCommas(data.comments.commentCount)} comments</h6>
+		{#each data.comments.comments as comment}
+			<div class="comment">
+				<img class="circle small" src={comment.authorThumbnails[1].url} alt="comment profile" />
+				<div>
+					<p>
+						<span class="bold">{comment.author}</span>
+						<span class="secondary-text">{comment.publishedText}</span>
+					</p>
+					<p>
+						{comment.content}
+					</p>
+					<div style="display: flex;">
+						<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
+						{#if comment.creatorHeart}
+							<div>
+								<img
+									class="circle"
+									style="width: 25px; height: 25px"
+									src={comment.creatorHeart.creatorThumbnail}
+									alt="Creator profile"
+								/>
+								<i
+									style="font-size: 20px;margin-left: 5px;"
+									class="absolute left red-text bottom fill">favorite</i
+								>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+		{/each}
 	</div>
 	<div class="s12 m12 l2">
 		{#each data.video.recommendedVideos as recommendedVideo}
@@ -101,6 +144,14 @@
 <style>
 	:root {
 		--plyr-color-main: var(--primary);
+	}
+
+	.comment {
+		display: flex;
+	}
+
+	.comment img {
+		margin: 0.5em 1em 0 1em;
 	}
 
 	.grid {

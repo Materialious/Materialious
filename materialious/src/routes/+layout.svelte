@@ -1,11 +1,37 @@
 <script lang="ts">
 	import Logo from '$lib/Logo.svelte';
-
 	import 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import { darkMode, themeColor } from '../store';
+	import {
+		activePage,
+		darkMode,
+		playerAlwaysLoop,
+		playerAutoPlay,
+		playerDash,
+		playerListenByDefault,
+		playerProxyVideos,
+		playerSavePlaybackPosition,
+		themeColor
+	} from '../store';
+
+	let currentPage: string | null = '';
+	activePage.subscribe((page) => (currentPage = page));
+
+	let autoplay = false;
+	let alwaysLoop = false;
+	let proxyVideos = false;
+	let savePlayerPackPos = false;
+	let dash = false;
+	let listenByDefault = false;
+
+	playerAutoPlay.subscribe((value) => (autoplay = value));
+	playerAlwaysLoop.subscribe((value) => (alwaysLoop = value));
+	playerProxyVideos.subscribe((value) => (proxyVideos = value));
+	playerSavePlaybackPosition.subscribe((value) => (savePlayerPackPos = value));
+	playerDash.subscribe((value) => (dash = value));
+	playerListenByDefault.subscribe((value) => (listenByDefault = value));
 
 	const pages = [
 		{
@@ -91,7 +117,7 @@
 <nav class="left m l small">
 	<header></header>
 	{#each pages as page}
-		<a href={page.href}
+		<a href={page.href} class:active={currentPage === page.name.toLowerCase()}
 			><i>{page.icon}</i>
 			<div>{page.name}</div>
 		</a>
@@ -120,24 +146,123 @@
 
 <dialog class="right" id="dialog-settings">
 	<nav>
-		<h5 class="max">Settings</h5>
+		<h4 class="max">Settings</h4>
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
 	</nav>
 	<p>Customize Materialious</p>
-	<button on:click={toggleDarkMode} class="no-margin">
-		{#if !$darkMode}
-			<i>dark_mode</i>
-			<span>Dark mode</span>
-		{:else}
-			<i>light_mode</i>
-			<span>Light mode</span>
-		{/if}
-	</button>
-	<button>
-		<i>palette</i>
-		<span>Color</span>
-		<input on:change={setColor} type="color" />
-	</button>
+
+	<div class="settings">
+		<h6>Theme</h6>
+		<button on:click={toggleDarkMode} class="no-margin">
+			{#if !$darkMode}
+				<i>dark_mode</i>
+				<span>Dark mode</span>
+			{:else}
+				<i>light_mode</i>
+				<span>Light mode</span>
+			{/if}
+		</button>
+		<button>
+			<i>palette</i>
+			<span>Color</span>
+			<input on:change={setColor} type="color" />
+		</button>
+	</div>
+
+	<div class="settings">
+		<h6>Player</h6>
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Autoplay</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={autoplay}
+						on:click={() => playerAutoPlay.set(!autoplay)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Always loop</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={alwaysLoop}
+						on:click={() => playerAlwaysLoop.set(!alwaysLoop)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Proxy videos</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={proxyVideos}
+						on:click={() => playerProxyVideos.set(!proxyVideos)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Save playback position</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={savePlayerPackPos}
+						on:click={() => playerSavePlaybackPosition.set(!savePlayerPackPos)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Listen by default</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={listenByDefault}
+						on:click={() => playerListenByDefault.set(!listenByDefault)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Dash</div>
+				</div>
+				<label class="switch">
+					<input type="checkbox" bind:checked={dash} on:click={() => playerDash.set(!dash)} />
+					<span></span>
+				</label>
+			</nav>
+		</div>
+	</div>
 </dialog>
 
 <dialog class="right" id="dialog-notifications">
@@ -173,5 +298,9 @@
 <style>
 	nav.left a {
 		font-size: 0.8em;
+	}
+
+	.settings h6 {
+		margin: 1em 0 0.3em 0;
 	}
 </style>

@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { cleanNumber } from '$lib/misc';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import { activePage } from '../../../store.js';
 
 	export let data;
+
+	activePage.set(null);
 </script>
 
 <div class="padding">

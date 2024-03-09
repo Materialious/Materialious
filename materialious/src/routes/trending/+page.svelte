@@ -1,11 +1,14 @@
 <script lang="ts">
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import { activePage } from '../../store.js';
 
 	export let data;
+
+	activePage.set('trending');
 </script>
 
-{#if data.trending}
+{#if data}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">

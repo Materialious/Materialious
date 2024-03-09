@@ -1,16 +1,33 @@
 <script lang="ts">
-	import Plyr from 'plyr';
+	import Plyr, { type PlyrEvent } from 'plyr';
 	import 'plyr/dist/plyr.css';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
-	import { invidiousInstance } from '../store';
+	import {
+		invidiousInstance,
+		playerAlwaysLoop,
+		playerAutoPlay,
+		playerSavePlaybackPosition
+	} from '../store';
 	import type { VideoPlay } from './Api/model';
 	export let data: { video: VideoPlay };
 
 	let player: Plyr | undefined;
-	onMount(() => {
+	onMount(async () => {
+		const playerPos = localStorage.getItem(data.video.videoId);
+
 		player = new Plyr('#player');
+
+		player.on('loadeddata', (event: PlyrEvent) => {
+			if (get(playerSavePlaybackPosition) && playerPos) {
+				event.detail.plyr.currentTime = Number(playerPos);
+			}
+		});
+
+		player.autoplay = get(playerAutoPlay);
+		player.loop = get(playerAlwaysLoop);
+
 		player.source = {
 			type: 'video',
 			previewThumbnails: {
@@ -32,9 +49,11 @@
 	});
 
 	onDestroy(async () => {
+		if (get(playerSavePlaybackPosition) && player?.currentTime) {
+			localStorage.setItem(data.video.videoId, player.currentTime.toString());
+		}
+
 		player = undefined;
-		await tick();
-		console.log(document);
 		document.getElementsByClassName('plyr')[0]?.remove();
 	});
 </script>

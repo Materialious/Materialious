@@ -4,6 +4,8 @@
 	import 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
+	import { darkMode } from '../store';
 
 	const pages = [
 		{
@@ -33,9 +35,43 @@
 		}
 	];
 
-	onMount(() => {
-		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+	function toggleDarkMode() {
+		const isDark = get(darkMode);
+
+		if (isDark) {
+			ui('mode', 'light');
+			darkMode.set(false);
+		} else {
 			ui('mode', 'dark');
+			darkMode.set(true);
+		}
+	}
+
+	darkMode.subscribe((isDark) => {
+		if (isDark) {
+			ui('mode', 'dark');
+		} else {
+			ui('mode', 'light');
+		}
+	});
+
+	onMount(() => {
+		const isDark = get(darkMode);
+
+		if (isDark === null) {
+			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				darkMode.set(true);
+				ui('mode', 'dark');
+			} else {
+				darkMode.set(false);
+				ui('mode', 'light');
+			}
+		} else {
+			if (isDark) {
+				ui('mode', 'dark');
+			} else {
+				ui('mode', 'light');
+			}
 		}
 	});
 </script>
@@ -76,6 +112,15 @@
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
 	</nav>
 	<p>Customize Materialious</p>
+	<button on:click={toggleDarkMode} class="no-margin">
+		{#if !$darkMode}
+			<i>dark_mode</i>
+			<span>Dark mode</span>
+		{:else}
+			<i>light_mode</i>
+			<span>Light mode</span>
+		{/if}
+	</button>
 </dialog>
 
 <dialog class="right" id="dialog-notifications">

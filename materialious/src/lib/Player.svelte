@@ -30,23 +30,25 @@
 		if (currentCategories.length > 0) {
 			sponsorBlock = new SponsorBlock('');
 
-			const segments = await sponsorBlock.getSegments(
-				data.video.videoId,
-				get(sponsorBlockCategories) as Category[]
-			);
+			try {
+				const segments = await sponsorBlock.getSegments(
+					data.video.videoId,
+					get(sponsorBlockCategories) as Category[]
+				);
 
-			player.on('timeupdate', (event: PlyrEvent) => {
-				segments.forEach((segment) => {
-					if (
-						event.detail.plyr.currentTime >= segment.startTime &&
-						event.detail.plyr.currentTime <= segment.endTime
-					) {
-						categoryBeingSkipped = segment.category;
-						event.detail.plyr.currentTime = segment.endTime + 1;
-						ui('#sponsorblock-alert');
-					}
+				player.on('timeupdate', (event: PlyrEvent) => {
+					segments.forEach((segment) => {
+						if (
+							event.detail.plyr.currentTime >= segment.startTime &&
+							event.detail.plyr.currentTime <= segment.endTime
+						) {
+							categoryBeingSkipped = segment.category;
+							event.detail.plyr.currentTime = segment.endTime + 1;
+							ui('#sponsorblock-alert');
+						}
+					});
 				});
-			});
+			} catch {}
 		}
 
 		player.on('loadeddata', (event: PlyrEvent) => {

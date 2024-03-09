@@ -26,7 +26,7 @@ export async function getDislikes(videoId: string): Promise<ReturnYTDislikes> {
   return await resp.json();
 }
 
-export async function getComments(videoId: string, parameters: { sortBy: "top" | "new", source: "youtube" | "reddit", continuation?: string; }): Promise<Comments> {
+export async function getComments(videoId: string, parameters: { sort_by: "top" | "new", source: "youtube" | "reddit", continuation?: string; }): Promise<Comments> {
   const path = new URL(buildPath(`comments/${videoId}`));
   path.search = new URLSearchParams(parameters).toString();
   const resp = await fetch(path);
@@ -41,6 +41,15 @@ export async function getChannel(channelId: string): Promise<Channel> {
 export async function getSearchSuggestions(search: string): Promise<SearchSuggestion> {
   const path = new URL(buildPath("search/suggestions"));
   path.search = new URLSearchParams({ q: search }).toString();
+  const resp = await fetch(path);
+  return await resp.json();
+}
+
+export async function getSearch(search: string, options: {
+  sort_by: "relevance" | "rating" | "upload_date" | "view_count", type: "video" | "playlist" | "channel" | "all";
+}): Promise<Video[]> {
+  const path = new URL(buildPath("search"));
+  path.search = new URLSearchParams({ ...options, q: search }).toString();
   const resp = await fetch(path);
   return await resp.json();
 }

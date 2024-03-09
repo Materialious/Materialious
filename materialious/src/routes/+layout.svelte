@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { getSearchSuggestions } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
 	import 'beercss';
@@ -38,6 +39,8 @@
 
 	let searchSuggestions = false;
 	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
+
+	let search = '';
 
 	let suggestionsForSearch: string[] = [];
 
@@ -183,26 +186,29 @@
 	<h6 class="m l">Materialious</h6>
 
 	<div class="max"></div>
-	<div class="max field round suffix prefix small no-margin m l white black-text">
-		<i class="front">search</i><input
-			data-ui="search-suggestions"
-			type="text"
-			placeholder="Search..."
-			on:keyup={(target) => debouncedSearch(target)}
-		/>
-		{#if searchSuggestions}
-			<menu
-				class="no-wrap"
-				style="width: 100%;"
-				id="search-suggestions"
-				data-ui="#search-suggestions"
-			>
-				{#each suggestionsForSearch as suggestion}
-					<a href={`/search/${suggestion}`}>{suggestion}</a>
-				{/each}
-			</menu>
-		{/if}
-	</div>
+	<form on:submit|preventDefault={() => goto(`/search/${encodeURIComponent(search)}`)}>
+		<div class="max field round suffix prefix small no-margin m l white black-text">
+			<i class="front">search</i><input
+				data-ui="search-suggestions"
+				type="text"
+				placeholder="Search..."
+				bind:value={search}
+				on:keyup={(target) => debouncedSearch(target)}
+			/>
+			{#if searchSuggestions}
+				<menu
+					class="no-wrap"
+					style="width: 100%;"
+					id="search-suggestions"
+					data-ui="#search-suggestions"
+				>
+					{#each suggestionsForSearch as suggestion}
+						<a href={`/search/${encodeURIComponent(suggestion)}`}>{suggestion}</a>
+					{/each}
+				</menu>
+			{/if}
+		</div>
+	</form>
 	<div class="max"></div>
 	<a
 		href="https://github.com/WardPearce/Materialious"

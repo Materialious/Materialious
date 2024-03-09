@@ -48,9 +48,34 @@
 				<button class="border m l" data-ui="#share"
 					><i>share</i> Share
 					<menu class="left no-wrap" id="share" data-ui="#share">
-						<a class="row"> <div class="min">Copy Materialious link</div></a><a class="row">
+						<a
+							class="row"
+							href="#copy"
+							on:click={async () =>
+								await navigator.clipboard.writeText(
+									`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
+								)}
+						>
+							<div class="min">Copy Materialious link</div></a
+						><a
+							href="#copy"
+							class="row"
+							on:click={async () =>
+								await navigator.clipboard.writeText(
+									`https://redirect.invidious.io/watch?v=${data.video.videoId}`
+								)}
+						>
 							<div class="min">Copy Invidious redirect link</div></a
-						><a class="row"> <div class="min">Copy Youtube link</div></a></menu
+						><a
+							class="row"
+							href="#copy"
+							on:click={async () =>
+								await navigator.clipboard.writeText(
+									`https://www.youtube.com/watch?v=${data.video.videoId}`
+								)}
+						>
+							<div class="min">Copy Youtube link</div></a
+						></menu
 					></button
 				>
 			</nav>

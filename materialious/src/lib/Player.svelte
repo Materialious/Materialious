@@ -50,7 +50,11 @@
 
 	onDestroy(async () => {
 		if (get(playerSavePlaybackPosition) && player?.currentTime) {
-			localStorage.setItem(data.video.videoId, player.currentTime.toString());
+			if (player.currentTime < player.duration - 10) {
+				localStorage.setItem(data.video.videoId, player.currentTime.toString());
+			} else {
+				localStorage.removeItem(data.video.videoId);
+			}
 		}
 
 		player = undefined;

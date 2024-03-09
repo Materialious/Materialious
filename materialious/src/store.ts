@@ -8,7 +8,7 @@ export const themeColor: Writable<null | string> = persisted("themeColor", null)
 
 export const activePage: Writable<string | null> = writable("home");
 
-export const playerAutoPlay = persisted("autoPlay", false);
+export const playerAutoPlay = persisted("autoPlay", true);
 export const playerAlwaysLoop = persisted("alwaysLoop", false);
 export const playerProxyVideos = persisted("proxyVideos", false);
 export const playerListenByDefault = persisted("listenByDefault", false);
@@ -17,4 +17,4 @@ export const playerDash = persisted("dash", true);
 
 export const interfaceSearchSuggestions = persisted("searchSuggestions", true);
 
-export const authToken = persisted("authToken", "");
+export const auth: Writable<null | { username: string, token: string; }> = persisted("authToken", null);

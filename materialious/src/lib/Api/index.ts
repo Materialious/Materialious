@@ -11,6 +11,11 @@ export async function getTrending(): Promise<Video[]> {
   return await resp.json();
 }
 
+export async function getPopular(): Promise<Video[]> {
+  const resp = await fetch(buildPath('popular'));
+  return await resp.json();
+}
+
 export async function getVideo(videoId: string): Promise<VideoPlay> {
   const resp = await fetch(buildPath(`videos/${videoId}`));
   return await resp.json();

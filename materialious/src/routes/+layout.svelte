@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { getSearchSuggestions } from '$lib/Api/index';
+	import { buildPath, getSearchSuggestions } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
 	import 'beercss';
+	import { EventSourcePolyfill } from 'event-source-polyfill';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import {
 		activePage,
+		auth,
 		darkMode,
 		interfaceSearchSuggestions,
 		playerAlwaysLoop,
@@ -46,9 +48,18 @@
 
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(async () => {
+			if (event.target.value === '') {
+				suggestionsForSearch = [];
+				return;
+			}
 			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
 		}, 250);
 	};
+
+	let isLoggedIn = false;
+	auth.subscribe((value) => {
+		isLoggedIn = value !== null;
+	});
 
 	const pages = [
 		{
@@ -105,6 +116,21 @@
 		}
 	});
 
+	function login() {
+		const path = new URL(`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/authorize_token`);
+		path.search = new URLSearchParams({
+			scopes: 'scopes=:feed,:subscriptions*,:playlists*,:history*',
+			callback_url: `${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/auth`,
+			expire: '2629800'
+		}).toString();
+
+		document.location.href = path.toString();
+	}
+
+	function logout() {
+		auth.set(null);
+	}
+
 	onMount(async () => {
 		const isDark = get(darkMode);
 
@@ -128,6 +154,14 @@
 		if (themeHex) {
 			await ui('theme', themeHex);
 		}
+
+		if (isLoggedIn) {
+			const notifications = new EventSourcePolyfill(buildPath('auth/notifications?topics=ucid'), {
+				headers: { Authentication: `Bearer ${get(auth)?.token}` },
+				withCredentials: true
+			});
+			notifications.addEventListener('notice', (event) => console.log(event));
+		}
 	});
 </script>
 
@@ -142,7 +176,7 @@
 </nav>
 
 <nav class="top">
-	<button class="circle large transparent s m l small-margin" data-ui="#dialog-expanded"
+	<button class="circle large transparent s m l small-margin" data-ui="#dia1-expanded"
 		><i>menu</i></button
 	>
 
@@ -171,11 +205,26 @@
 		{/if}
 	</div>
 	<div class="max"></div>
-	<button class="circle large transparent" data-ui="#dialog-notifications"
-		><i>notifications</i></button
+	<a
+		href="https://github.com/WardPearce/Materialious"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="button circle large transparent"
 	>
+		<i>code</i>
+	</a>
+	{#if isLoggedIn}
+		<button class="circle large transparent" data-ui="#dialog-notifications"
+			><i>notifications</i></button
+		>
+	{/if}
 	<button class="circle large transparent" data-ui="#dialog-settings"><i>settings</i></button>
-	<button class="circle large transparent"><i>login</i></button>
+
+	{#if !isLoggedIn}
+		<button on:click={login} class="circle large transparent"><i>login</i></button>
+	{:else}
+		<button on:click={logout} class="circle large transparent"><i>logout</i></button>
+	{/if}
 </nav>
 
 <dialog class="right" id="dialog-settings">

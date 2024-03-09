@@ -32,10 +32,10 @@
 	});
 </script>
 
-<article class="no-padding transparent">
+<article class="no-padding transparent" style="width: 100%;">
 	<a
 		class="wave"
-		style="width: 100%; height: 155px; overflow: hidden;"
+		style="width: 100%;height: 155px; overflow: hidden;"
 		href={`/watch/${video.videoId}`}
 	>
 		{#if loading}
@@ -64,7 +64,10 @@
 		{/if}
 	</a>
 	<div class="small-padding">
-		<nav>
+		{#if localStorage.getItem(video.videoId)}
+			<progress value={localStorage.getItem(video.videoId)} max={video.lengthSeconds}></progress>
+		{/if}
+		<nav class="no-margin">
 			<div class="max">
 				<a href={`/watch/${video.videoId}`}><div class="bold">{truncate(video.title)}</div></a>
 				<div>

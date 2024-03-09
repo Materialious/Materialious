@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Plyr, { type PlyrEvent } from 'plyr';
 	import 'plyr/dist/plyr.css';
+	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
@@ -8,16 +9,45 @@
 		invidiousInstance,
 		playerAlwaysLoop,
 		playerAutoPlay,
-		playerSavePlaybackPosition
+		playerSavePlaybackPosition,
+		sponsorBlockCategories
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
+
 	export let data: { video: VideoPlay };
 
+	let categoryBeingSkipped = 'sponsorblock-alert';
+
 	let player: Plyr | undefined;
+	let sponsorBlock: SponsorBlock | undefined;
 	onMount(async () => {
 		const playerPos = localStorage.getItem(data.video.videoId);
 
 		player = new Plyr('#player');
+
+		const currentCategories = get(sponsorBlockCategories);
+
+		if (currentCategories.length > 0) {
+			sponsorBlock = new SponsorBlock('');
+
+			const segments = await sponsorBlock.getSegments(
+				data.video.videoId,
+				get(sponsorBlockCategories) as Category[]
+			);
+
+			player.on('timeupdate', (event: PlyrEvent) => {
+				segments.forEach((segment) => {
+					if (
+						event.detail.plyr.currentTime >= segment.startTime &&
+						event.detail.plyr.currentTime <= segment.endTime
+					) {
+						categoryBeingSkipped = segment.category;
+						event.detail.plyr.currentTime = segment.endTime + 1;
+						ui('#sponsorblock-alert');
+					}
+				});
+			});
+		}
 
 		player.on('loadeddata', (event: PlyrEvent) => {
 			if (get(playerSavePlaybackPosition) && playerPos) {
@@ -58,8 +88,16 @@
 		}
 
 		player = undefined;
+		sponsorBlock = undefined;
 		document.getElementsByClassName('plyr')[0]?.remove();
 	});
 </script>
+
+<div class="snackbar" id="sponsorblock-alert">
+	<span
+		>Skipping <span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span
+		></span
+	>
+</div>
 
 <video width="100%" id="player" playsinline controls> </video>

@@ -38,6 +38,7 @@
 		"eventsource": "^2.0.2",
 		"human-number": "^2.0.4",
 		"plyr": "^3.7.8",
+		"sponsorblock-api": "^0.2.4",
 		"svelte-persisted-store": "^0.9.1"
 	}
 }

@@ -18,3 +18,5 @@ export const playerDash = persisted("dash", true);
 export const interfaceSearchSuggestions = persisted("searchSuggestions", true);
 
 export const auth: Writable<null | { username: string, token: string; }> = persisted("authToken", null);
+
+export const sponsorBlockCategories: Writable<string[]> = persisted("sponsorBlockCategories", []);

@@ -17,6 +17,7 @@
 		playerListenByDefault,
 		playerProxyVideos,
 		playerSavePlaybackPosition,
+		sponsorBlockCategories,
 		themeColor
 	} from '../store';
 
@@ -39,6 +40,9 @@
 
 	let searchSuggestions = false;
 	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
+
+	let sponsorCategoriesList: string[] = [];
+	sponsorBlockCategories.subscribe((value) => (sponsorCategoriesList = value));
 
 	let search = '';
 
@@ -90,6 +94,25 @@
 			name: 'History'
 		}
 	];
+
+	const sponsorCategories = [
+		{ name: 'Sponsor', category: 'sponsor' },
+		{ name: 'Unpaid/Self Promotion', category: 'selfpromo' },
+		{ name: 'Interaction Reminder (Subscribe)', category: 'interaction' },
+		{ name: 'Intermission/Intro Animation', category: 'intro' },
+		{ name: 'Endcards/Credits', category: 'outro' },
+		{ name: 'Preview/Recap/Hook', category: 'preview' },
+		{ name: 'Filler Tangent/Jokes', category: 'filler' }
+	];
+
+	function toggleSponsor(category: string) {
+		if (sponsorCategoriesList.includes(category)) {
+			sponsorBlockCategories.set(sponsorCategoriesList.filter((value) => value !== category));
+		} else {
+			sponsorCategoriesList.push(category);
+			sponsorBlockCategories.set(sponsorCategoriesList);
+		}
+	}
 
 	async function setColor(color: any) {
 		const target = color.target;
@@ -369,6 +392,28 @@
 				</label>
 			</nav>
 		</div>
+	</div>
+
+	<div class="settings">
+		<h6>Sponsorblock</h6>
+
+		{#each sponsorCategories as sponsor}
+			<div class="field middle-align no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<p>{sponsor.name}</p>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							checked={sponsorCategoriesList.includes(sponsor.category)}
+							on:click={() => toggleSponsor(sponsor.category)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+		{/each}
 	</div>
 </dialog>
 

@@ -5,7 +5,7 @@
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import { darkMode } from '../store';
+	import { darkMode, themeColor } from '../store';
 
 	const pages = [
 		{
@@ -35,6 +35,13 @@
 		}
 	];
 
+	async function setColor(color: any) {
+		const target = color.target;
+		const hex = (target as { value: string }).value;
+		await ui('theme', hex);
+		themeColor.set(hex);
+	}
+
 	function toggleDarkMode() {
 		const isDark = get(darkMode);
 
@@ -55,7 +62,7 @@
 		}
 	});
 
-	onMount(() => {
+	onMount(async () => {
 		const isDark = get(darkMode);
 
 		if (isDark === null) {
@@ -72,6 +79,11 @@
 			} else {
 				ui('mode', 'light');
 			}
+		}
+
+		const themeHex = get(themeColor);
+		if (themeHex) {
+			await ui('theme', themeHex);
 		}
 	});
 </script>
@@ -120,6 +132,11 @@
 			<i>light_mode</i>
 			<span>Light mode</span>
 		{/if}
+	</button>
+	<button>
+		<i>palette</i>
+		<span>Color</span>
+		<input on:change={setColor} type="color" />
 	</button>
 </dialog>
 

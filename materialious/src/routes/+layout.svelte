@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { buildPath, getSearchSuggestions } from '$lib/Api/index';
+	import { getSearchSuggestions } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
 	import 'beercss';
-	import { EventSourcePolyfill } from 'event-source-polyfill';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
@@ -155,13 +154,13 @@
 			await ui('theme', themeHex);
 		}
 
-		if (isLoggedIn) {
-			const notifications = new EventSourcePolyfill(buildPath('auth/notifications?topics=ucid'), {
-				headers: { Authentication: `Bearer ${get(auth)?.token}` },
-				withCredentials: true
-			});
-			notifications.addEventListener('notice', (event) => console.log(event));
-		}
+		// if (isLoggedIn) {
+		// 	const notifications = new EventSourcePolyfill(buildPath('auth/notifications?topics=ucid'), {
+		// 		headers: { Authentication: `Bearer ${get(auth)?.token}` },
+		// 		withCredentials: true
+		// 	});
+		// 	notifications.addEventListener('notice', (event) => console.log(event));
+		// }
 	});
 </script>
 
@@ -176,7 +175,7 @@
 </nav>
 
 <nav class="top">
-	<button class="circle large transparent s m l small-margin" data-ui="#dia1-expanded"
+	<button class="circle large transparent s m l small-margin" data-ui="#menu-expanded"
 		><i>menu</i></button
 	>
 
@@ -375,10 +374,10 @@
 	<p>No new notifications here</p>
 </dialog>
 
-<dialog class="left small" id="dialog-expanded">
+<dialog class="left small" id="menu-expanded">
 	<header class="fixed">
 		<nav>
-			<button class="transparent circle large" data-ui="#dialog-expanded"><i>menu</i></button>
+			<button class="transparent circle large" data-ui="#menu-expanded"><i>menu</i></button>
 			<div style="width: 20%;">
 				<Logo />
 			</div>
@@ -388,7 +387,7 @@
 	{#each pages as page}
 		<a
 			class="row round"
-			data-ui="#dialog-expanded"
+			data-ui="#menu-expanded"
 			href={page.href}
 			class:active={currentPage === page.name.toLowerCase()}
 			><i>{page.icon}</i>

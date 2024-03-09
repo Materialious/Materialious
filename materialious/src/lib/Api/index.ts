@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { invidiousInstance, returnYTDislikesInstance } from '../../store';
-import type { Channel, Comments, ReturnYTDislikes, Video, VideoPlay } from './model';
+import type { Channel, Comments, ReturnYTDislikes, SearchSuggestion, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${get(invidiousInstance)}/api/v1/${path}`;
@@ -30,5 +30,12 @@ export async function getComments(videoId: string, parameters: { sortBy: "top" |
 
 export async function getChannel(channelId: string): Promise<Channel> {
   const resp = await fetch(buildPath(`channels/${channelId}`));
+  return await resp.json();
+}
+
+export async function getSearchSuggestions(search: string): Promise<SearchSuggestion> {
+  const path = new URL(buildPath("search/suggestions"));
+  path.search = new URLSearchParams({ q: search }).toString();
+  const resp = await fetch(path);
   return await resp.json();
 }

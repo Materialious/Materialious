@@ -150,3 +150,8 @@ export interface Channel {
   tabs: string[];
   latestVideos: Video[];
 }
+
+export interface SearchSuggestion {
+  query: string;
+  suggestions: string[];
+}

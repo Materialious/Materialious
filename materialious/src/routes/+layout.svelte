@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getSearchSuggestions } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
 	import 'beercss';
 	import 'material-dynamic-colors';
@@ -7,6 +8,7 @@
 	import {
 		activePage,
 		darkMode,
+		interfaceSearchSuggestions,
 		playerAlwaysLoop,
 		playerAutoPlay,
 		playerDash,
@@ -32,6 +34,21 @@
 	playerSavePlaybackPosition.subscribe((value) => (savePlayerPackPos = value));
 	playerDash.subscribe((value) => (dash = value));
 	playerListenByDefault.subscribe((value) => (listenByDefault = value));
+
+	let searchSuggestions = false;
+	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
+
+	let suggestionsForSearch: string[] = [];
+
+	let debounceTimer = 0;
+	const debouncedSearch = (event: any) => {
+		if (!searchSuggestions) return;
+
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(async () => {
+			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
+		}, 250);
+	};
 
 	const pages = [
 		{
@@ -134,7 +151,24 @@
 
 	<div class="max"></div>
 	<div class="max field round suffix prefix small no-margin m l white black-text">
-		<i class="front">search</i><input type="text" placeholder="Search..." />
+		<i class="front">search</i><input
+			data-ui="search-suggestions"
+			type="text"
+			placeholder="Search..."
+			on:keyup={(target) => debouncedSearch(target)}
+		/>
+		{#if searchSuggestions}
+			<menu
+				class="no-wrap"
+				style="width: 100%;"
+				id="search-suggestions"
+				data-ui="#search-suggestions"
+			>
+				{#each suggestionsForSearch as suggestion}
+					<a href={`/search/${suggestion}`}>{suggestion}</a>
+				{/each}
+			</menu>
+		{/if}
 	</div>
 	<div class="max"></div>
 	<button class="circle large transparent" data-ui="#dialog-notifications"
@@ -167,6 +201,25 @@
 			<span>Color</span>
 			<input on:change={setColor} type="color" />
 		</button>
+	</div>
+
+	<div class="settings">
+		<h6>Interface</h6>
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Search suggestions</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={searchSuggestions}
+						on:click={() => interfaceSearchSuggestions.set(!searchSuggestions)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
 	</div>
 
 	<div class="settings">
@@ -284,7 +337,11 @@
 		</nav>
 	</header>
 	{#each pages as page}
-		<a class="row round" data-ui="#dialog-expanded" href={page.href}
+		<a
+			class="row round"
+			data-ui="#dialog-expanded"
+			href={page.href}
+			class:active={currentPage === page.name.toLowerCase()}
 			><i>{page.icon}</i>
 			<div>{page.name}</div></a
 		>

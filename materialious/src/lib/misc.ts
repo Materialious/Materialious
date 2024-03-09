@@ -5,6 +5,7 @@ export function truncate(value: string, maxLength: number = 50): string {
 }
 
 export function numberWithCommas(number: number) {
+  if (typeof number === "undefined") return;
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 

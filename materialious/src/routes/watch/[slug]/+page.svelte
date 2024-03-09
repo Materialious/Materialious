@@ -1,44 +1,17 @@
 <script lang="ts">
-	import { get } from 'svelte/store';
-
-	import Plyr from 'plyr';
-	import 'plyr/dist/plyr.css';
-
+	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
-	import { onMount } from 'svelte';
-
-	import { invidiousInstance } from '../../../store';
 
 	export let data;
-
-	let player;
-	onMount(() => {
-		player = new Plyr('#player');
-		player.source = {
-			type: 'video',
-			previewThumbnails: {
-				src: data.video.videoThumbnails[0].url
-			},
-			poster: data.video.videoThumbnails[0].url,
-			tracks: data.video.captions.map((caption) => {
-				return {
-					kind: 'captions',
-					label: caption.label,
-					srcLang: caption.languageCode,
-					src: `${get(invidiousInstance)}${caption.url}`
-				};
-			}),
-			sources: data.video.formatStreams.map((format) => {
-				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
-			})
-		};
-	});
 </script>
 
 <div class="grid">
 	<div class="s12 m12 l10">
-		<video width="100%" id="player" playsinline controls> </video>
+		{#key data.video.videoId}
+			<Player {data} />
+		{/key}
+
 		<h5>{data.video.title}</h5>
 
 		<nav>
@@ -138,6 +111,7 @@
 				</div>
 			</div>
 		{/each}
+		<button class="margin">Load more</button>
 	</div>
 	<div class="s12 m12 l2">
 		{#each data.video.recommendedVideos as recommendedVideo}

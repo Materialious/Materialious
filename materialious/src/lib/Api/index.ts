@@ -1,9 +1,13 @@
 import { get } from 'svelte/store';
-import { invidiousInstance, returnYTDislikesInstance } from '../../store';
+import { auth, invidiousInstance, returnYTDislikesInstance } from '../../store';
 import type { Channel, Comments, ReturnYTDislikes, SearchSuggestion, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${get(invidiousInstance)}/api/v1/${path}`;
+}
+
+export function buildAuthHeaders(): { headers: { Authorization: string; }; } {
+  return { headers: { Authorization: `Bearer ${get(auth)?.token}` } };
 }
 
 export async function getTrending(): Promise<Video[]> {

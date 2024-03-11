@@ -71,27 +71,32 @@
 		{
 			icon: 'home',
 			href: '/',
-			name: 'Home'
+			name: 'Home',
+			requiresAuth: false
 		},
 		{
 			icon: 'whatshot',
 			href: '/trending',
-			name: 'Trending'
+			name: 'Trending',
+			requiresAuth: false
 		},
 		{
 			icon: 'subscriptions',
 			href: '/subscriptions',
-			name: 'Subscriptions'
+			name: 'Subscriptions',
+			requiresAuth: true
 		},
 		{
 			icon: 'video_library',
 			href: '/playlists',
-			name: 'Playlists'
+			name: 'Playlists',
+			requiresAuth: true
 		},
 		{
 			icon: 'history',
 			href: '/history',
-			name: 'History'
+			name: 'History',
+			requiresAuth: true
 		}
 	];
 
@@ -144,9 +149,8 @@
 	function login() {
 		const path = new URL(`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/authorize_token`);
 		path.search = new URLSearchParams({
-			scopes: 'scopes=:feed,:subscriptions*,:playlists*,:history*',
-			callback_url: `${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/auth`,
-			expire: '2629800'
+			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*',
+			callback_url: `${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/auth`
 		}).toString();
 
 		document.location.href = path.toString();
@@ -180,23 +184,20 @@
 			await ui('theme', themeHex);
 		}
 
-		// if (isLoggedIn) {
-		// 	const notifications = new EventSourcePolyfill(buildPath('auth/notifications?topics=ucid'), {
-		// 		headers: { Authentication: `Bearer ${get(auth)?.token}` },
-		// 		withCredentials: true
-		// 	});
-		// 	notifications.addEventListener('notice', (event) => console.log(event));
-		// }
+		if (isLoggedIn) {
+		}
 	});
 </script>
 
 <nav class="left m l small">
 	<header></header>
 	{#each pages as page}
-		<a href={page.href} class:active={currentPage === page.name.toLowerCase()}
-			><i>{page.icon}</i>
-			<div>{page.name}</div>
-		</a>
+		{#if !page.requiresAuth || isLoggedIn}
+			<a href={page.href} class:active={currentPage === page.name.toLowerCase()}
+				><i>{page.icon}</i>
+				<div>{page.name}</div>
+			</a>
+		{/if}
 	{/each}
 </nav>
 
@@ -436,14 +437,16 @@
 		</nav>
 	</header>
 	{#each pages as page}
-		<a
-			class="row round"
-			data-ui="#menu-expanded"
-			href={page.href}
-			class:active={currentPage === page.name.toLowerCase()}
-			><i>{page.icon}</i>
-			<div>{page.name}</div></a
-		>
+		{#if !page.requiresAuth || isLoggedIn}
+			<a
+				class="row round"
+				data-ui="#menu-expanded"
+				href={page.href}
+				class:active={currentPage === page.name.toLowerCase()}
+				><i>{page.icon}</i>
+				<div>{page.name}</div></a
+			>
+		{/if}
 	{/each}
 </dialog>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Video, VideoBase } from './Api/model';
-	import { truncate } from './misc';
+	import { cleanNumber, truncate } from './misc';
 
 	export let video: VideoBase | Video;
 
@@ -76,7 +76,7 @@
 				</div>
 				{#if 'publishedText' in video}
 					<div>
-						{video.viewCountText} • {video.publishedText}
+						{cleanNumber(video.viewCount)} • {video.publishedText}
 					</div>{/if}
 			</div>
 		</nav>

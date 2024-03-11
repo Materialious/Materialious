@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { auth, invidiousInstance, returnYTDislikesInstance } from '../../store';
-import type { Channel, Comments, ReturnYTDislikes, SearchSuggestion, Video, VideoPlay } from './model';
+import type { Channel, Comments, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${get(invidiousInstance)}/api/v1/${path}`;
@@ -63,4 +63,14 @@ export async function getFeed(maxResults: number, page: number) {
   path.search = new URLSearchParams({ max_results: maxResults.toString(), page: page.toString() }).toString();
   const resp = await fetch(path, buildAuthHeaders());
   return await resp.json();
+}
+
+export async function getSubscriptions(): Promise<Subscription[]> {
+  const resp = await fetch(buildPath("auth/subscriptions"), buildAuthHeaders());
+  return await resp.json();
+}
+
+export async function amSubscribed(authorId: string): Promise<boolean> {
+  const subscriptions = (await getSubscriptions()).filter(sub => sub.authorId === authorId);
+  return subscriptions.length === 1;
 }

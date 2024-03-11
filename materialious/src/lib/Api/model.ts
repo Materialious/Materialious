@@ -164,3 +164,8 @@ export interface Feed {
   notifications: Notification[];
   videos: Video[];
 }
+
+export interface Subscription {
+  author: string;
+  authorId: string;
+}

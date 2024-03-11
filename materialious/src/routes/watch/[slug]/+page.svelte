@@ -33,7 +33,13 @@
 						</div>
 					</nav>
 				</a>
-				<button class="inverse-surface">Subscribe</button>
+				<button class:inverse-surface={!data.subscribed} class:border={data.subscribed}>
+					{#if !data.subscribed}
+						Subscribe
+					{:else}
+						Unsubscribe
+					{/if}
+				</button>
 				<div class="max"></div>
 				<nav class="no-space m l">
 					<button style="cursor: default;" class="border left-round">

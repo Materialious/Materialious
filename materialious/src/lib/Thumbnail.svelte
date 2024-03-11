@@ -3,7 +3,7 @@
 	import type { Video, VideoBase } from './Api/model';
 	import { cleanNumber, truncate } from './misc';
 
-	export let video: VideoBase | Video;
+	export let video: VideoBase | Video | Notification;
 
 	function videoLength(lengthSeconds: number): string {
 		const hours = Math.floor(lengthSeconds / 3600);

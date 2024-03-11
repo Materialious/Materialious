@@ -57,3 +57,10 @@ export async function getSearch(search: string, options: {
   const resp = await fetch(path);
   return await resp.json();
 }
+
+export async function getFeed(maxResults: number, page: number) {
+  const path = new URL(buildPath("auth/feed"));
+  path.search = new URLSearchParams({ max_results: maxResults.toString(), page: page.toString() }).toString();
+  const resp = await fetch(path, buildAuthHeaders());
+  return await resp.json();
+}

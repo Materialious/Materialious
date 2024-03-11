@@ -155,3 +155,12 @@ export interface SearchSuggestion {
   query: string;
   suggestions: string[];
 }
+
+export interface Notification extends VideoBase {
+  type: "video" | "shortVideo" | "stream";
+}
+
+export interface Feed {
+  notifications: Notification[];
+  videos: Video[];
+}

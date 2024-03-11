@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getSearchSuggestions } from '$lib/Api/index';
+	import { getFeed, getSearchSuggestions } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
+	import Thumbnail from '$lib/Thumbnail.svelte';
 	import 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
@@ -66,6 +67,8 @@
 	auth.subscribe((value) => {
 		isLoggedIn = value !== null;
 	});
+
+	let notifications: Notification[] = [];
 
 	const pages = [
 		{
@@ -160,6 +163,11 @@
 		auth.set(null);
 	}
 
+	async function loadNotifications() {
+		const feed = await getFeed(15, 1);
+		notifications = feed.notifications;
+	}
+
 	onMount(async () => {
 		const isDark = get(darkMode);
 
@@ -185,6 +193,11 @@
 		}
 
 		if (isLoggedIn) {
+			try {
+				loadNotifications();
+			} catch {
+				auth.set(null);
+			}
 		}
 	});
 </script>
@@ -423,7 +436,13 @@
 		<h5 class="max">Notifications</h5>
 		<button class="circle transparent" data-ui="#dialog-notifications"><i>close</i></button>
 	</nav>
-	<p>No new notifications here</p>
+	{#if notifications.length === 0}
+		<p>No new notifications here</p>
+	{:else}
+		{#each notifications as notification}
+			<Thumbnail video={notification}></Thumbnail>
+		{/each}
+	{/if}
 </dialog>
 
 <dialog class="left small" id="menu-expanded">

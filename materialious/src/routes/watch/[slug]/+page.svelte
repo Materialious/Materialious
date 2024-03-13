@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { deleteUnsubscribe, postSubscribe } from '$lib/Api/index.js';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
@@ -8,6 +9,16 @@
 	export let data;
 
 	activePage.set(null);
+
+	async function toggleSubscribed() {
+		if (data.subscribed) {
+			await deleteUnsubscribe(data.video.authorId);
+		} else {
+			await postSubscribe(data.video.authorId);
+		}
+
+		data.subscribed = !data.subscribed;
+	}
 </script>
 
 {#if data}
@@ -33,7 +44,11 @@
 						</div>
 					</nav>
 				</a>
-				<button class:inverse-surface={!data.subscribed} class:border={data.subscribed}>
+				<button
+					on:click={toggleSubscribed}
+					class:inverse-surface={!data.subscribed}
+					class:border={data.subscribed}
+				>
 					{#if !data.subscribed}
 						Subscribe
 					{:else}

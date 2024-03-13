@@ -74,3 +74,17 @@ export async function amSubscribed(authorId: string): Promise<boolean> {
   const subscriptions = (await getSubscriptions()).filter(sub => sub.authorId === authorId);
   return subscriptions.length === 1;
 }
+
+export async function postSubscribe(authorId: string) {
+  await fetch(buildPath(`auth/subscriptions/${authorId}`), {
+    method: "POST",
+    ...buildAuthHeaders()
+  });
+}
+
+export async function deleteUnsubscribe(authorId: string) {
+  await fetch(buildPath(`auth/subscriptions/${authorId}`), {
+    method: 'DELETE',
+    ...buildAuthHeaders()
+  });
+}

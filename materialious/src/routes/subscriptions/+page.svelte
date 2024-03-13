@@ -12,7 +12,7 @@
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each data.feed.videos as video}
+			{#each [...data.feed.notifications, ...data.feed.videos] as video}
 				<div class="s12 m6 l2">
 					<Thumbnail {video} />
 				</div>

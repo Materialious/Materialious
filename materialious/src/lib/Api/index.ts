@@ -88,3 +88,15 @@ export async function deleteUnsubscribe(authorId: string) {
     ...buildAuthHeaders()
   });
 }
+
+export async function getHistory(page: number = 1): Promise<string[]> {
+  const resp = await fetch(buildPath(`auth/history?page=${page}`), buildAuthHeaders());
+  return await resp.json();
+}
+
+export async function postHistory(videoId: string) {
+  await fetch(buildPath(`auth/history/${videoId}`), {
+    method: 'POST',
+    ...buildAuthHeaders()
+  });
+}

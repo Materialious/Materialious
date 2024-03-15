@@ -13,9 +13,11 @@
 
 	async function loadPageHistory(page: number = 1) {
 		const videoIds = await getHistory(page);
+		let promises = [];
 		for (const videoId of videoIds) {
-			history = [...history, await getVideo(videoId)];
+			promises.push(getVideo(videoId));
 		}
+		history = [...history, ...(await Promise.all(promises))];
 	}
 
 	onMount(async () => {

@@ -90,9 +90,16 @@
 			})
 		};
 
+		const currentTheme = await getDynamicTheme();
+
+		document.documentElement.style.setProperty('--plyr-color-main', currentTheme['--primary']);
 		document.documentElement.style.setProperty(
-			'--plyr-color-main',
-			(await getDynamicTheme())['--primary']
+			'--plyr-menu-background',
+			currentTheme['--secondary-container']
+		);
+		document.documentElement.style.setProperty(
+			'--plyr-menu-color',
+			currentTheme['--secondary-text']
 		);
 	});
 

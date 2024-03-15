@@ -170,7 +170,9 @@
 		</div>
 		<div class="s12 m12 l2">
 			{#each data.video.recommendedVideos as recommendedVideo}
-				<Thumbnail video={recommendedVideo} />
+				<article class="no-padding">
+					<Thumbnail video={recommendedVideo} />
+				</article>
 			{/each}
 		</div>
 	</div>

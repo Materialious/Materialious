@@ -33,11 +33,7 @@
 </script>
 
 <article class="no-padding transparent" style="width: 100%;">
-	<a
-		class="wave"
-		style="width: 100%;height: 155px; overflow: hidden;"
-		href={`/watch/${video.videoId}`}
-	>
+	<a class="wave" style="width: 100%; overflow: hidden;" href={`/watch/${video.videoId}`}>
 		{#if loading}
 			<progress class="circle"></progress>
 		{:else if loaded}

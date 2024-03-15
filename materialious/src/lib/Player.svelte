@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Plyr, { type PlyrEvent } from 'plyr';
+	import Plyr, { type PlyrEvent, type Track } from 'plyr';
 	// Needed to overwrite Beercss styles.
 	import 'plyr/dist/plyr.css';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
@@ -62,20 +62,29 @@
 		player.autoplay = get(playerAutoPlay);
 		player.loop = get(playerAlwaysLoop);
 
+		const tracks: Track[] = [];
+
+		for (const caption of data.video.captions) {
+			// Have to preload captions, due to cors issue with how plyr
+			// grabs captions
+			const captions = await fetch(`${get(invidiousInstance)}${caption.url}`);
+			if (captions.status === 200) {
+				tracks.push({
+					kind: 'captions',
+					label: caption.label,
+					srcLang: caption.languageCode,
+					src: URL.createObjectURL(await captions.blob())
+				});
+			}
+		}
+
 		player.source = {
 			type: 'video',
 			previewThumbnails: {
 				src: data.video.videoThumbnails[0].url
 			},
 			poster: data.video.videoThumbnails[0].url,
-			tracks: data.video.captions.map((caption) => {
-				return {
-					kind: 'captions',
-					label: caption.label,
-					srcLang: caption.languageCode,
-					src: `${get(invidiousInstance)}${caption.url}`
-				};
-			}),
+			tracks: tracks,
 			sources: data.video.formatStreams.map((format) => {
 				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
 			})

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Plyr, { type PlyrEvent } from 'plyr';
+	// Needed to overwrite Beercss styles.
 	import 'plyr/dist/plyr.css';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
@@ -13,6 +14,7 @@
 		sponsorBlockCategories
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
+	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay };
 
@@ -78,6 +80,11 @@
 				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
 			})
 		};
+
+		document.documentElement.style.setProperty(
+			'--plyr-color-main',
+			(await getDynamicTheme())['--primary']
+		);
 	});
 
 	onDestroy(async () => {

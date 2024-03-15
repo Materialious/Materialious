@@ -440,7 +440,9 @@
 		<p>No new notifications here</p>
 	{:else}
 		{#each notifications as notification}
-			<Thumbnail video={notification}></Thumbnail>
+			<article class="no-padding">
+				<Thumbnail video={notification}></Thumbnail>
+			</article>
 		{/each}
 	{/if}
 </dialog>

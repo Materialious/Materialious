@@ -17,6 +17,15 @@ Modern material design for Invidious
 - Dash support (WIP).
 - PWA support.
 
+## Todo
+- Port to [vidstack](https://www.vidstack.io/) once dash is supported.
+- Complete channel view.
+- Add different search filters.
+- Playlist support.
+- History deletion.
+- Comment replies.
+- Load more for comments, history, subscriptions & search results.
+
 ## Previews
 ![Preview of player](./previews/player-preview.png)
 ![Preview of settings](./previews/setting-preview.png)

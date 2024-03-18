@@ -8,6 +8,7 @@ Modern material design for Invidious
 ## Features
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
+- Video progress tracking & resuming.
 - No ads.
 - No tracking.
 - Light/Dark themes.

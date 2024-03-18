@@ -28,6 +28,7 @@ Modern material design for Invidious
 - Load more for comments, history, subscriptions & search results.
 - Editing used instance for Return Dislikes & Sponsorblock.
 - Allow disabling Return Dislikes.
+- Audio only mode.
 
 ## Previews
 ![Preview of player](./previews/player-preview.png)

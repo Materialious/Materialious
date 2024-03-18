@@ -1,3 +1,11 @@
 .plyr--full-ui.plyr--video .plyr__control--overlaid, .plyr__control {
     display: flex !important;
 }
+
+video {
+    max-height: 720px;
+}
+
+.plyr:fullscreen video {
+    max-height: initial !important;
+}

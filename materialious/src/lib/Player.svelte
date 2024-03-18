@@ -23,7 +23,7 @@
 
 	export let data: { video: VideoPlay };
 
-	let categoryBeingSkipped = 'sponsorblock-alert';
+	let categoryBeingSkipped = '';
 
 	let player: Plyr | undefined;
 	let sponsorBlock: SponsorBlock | undefined;
@@ -186,5 +186,5 @@
 {:else if !data.video.isListed}
 	<h3>Video isn't listed</h3>
 {:else}
-	<video width="100%" id="player" playsinline controls> </video>
+	<video id="player" playsinline controls> </video>
 {/if}

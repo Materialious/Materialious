@@ -34,8 +34,10 @@
 	"type": "module",
 	"dependencies": {
 		"beercss": "^3.5.1",
+		"dashjs": "^4.7.4",
 		"event-source-polyfill": "^1.0.31",
 		"eventsource": "^2.0.2",
+		"hls.js": "^1.5.7",
 		"human-number": "^2.0.4",
 		"plyr": "^3.7.8",
 		"sponsorblock-api": "^0.2.4",

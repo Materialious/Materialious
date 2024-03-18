@@ -13,7 +13,7 @@ export const playerAlwaysLoop = persisted("alwaysLoop", false);
 export const playerProxyVideos = persisted("proxyVideos", false);
 export const playerListenByDefault = persisted("listenByDefault", false);
 export const playerSavePlaybackPosition = persisted("savePlaybackPosition", true);
-export const playerDash = persisted("dash", true);
+export const playerDash = persisted("dashEnabled", false);
 
 export const interfaceSearchSuggestions = persisted("searchSuggestions", true);
 

@@ -1,6 +1,7 @@
 <script lang="ts">
-	import Plyr, { type PlyrEvent, type Track } from 'plyr';
+	import Plyr, { type PlyrEvent, type SourceInfo, type Track } from 'plyr';
 	// Needed to overwrite Beercss styles.
+	import Dash from 'dashjs';
 	import Hls from 'hls.js';
 	import 'plyr/dist/plyr.css';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
@@ -11,6 +12,8 @@
 		invidiousInstance,
 		playerAlwaysLoop,
 		playerAutoPlay,
+		playerDash,
+		playerProxyVideos,
 		playerSavePlaybackPosition,
 		sponsorBlockCategories
 	} from '../store';
@@ -85,7 +88,7 @@
 			}
 		}
 
-		player.source = {
+		const sourceInfo: SourceInfo = {
 			type: 'video',
 			previewThumbnails: {
 				src: data.video.videoThumbnails[0].url
@@ -96,14 +99,26 @@
 		};
 
 		if (!data.video.hlsUrl) {
-			player.source.sources = data.video.formatStreams.map((format) => {
-				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
-			});
+			if (get(playerDash)) {
+				const dash = Dash.MediaPlayer().create();
+				dash.initialize(videoElement, data.video.dashUrl + '?local=true', true);
+			} else {
+				const proxyVideos = get(playerProxyVideos);
+				sourceInfo.sources = data.video.formatStreams.map((format) => {
+					return {
+						src: format.url + (proxyVideos ? '?local=true' : ''),
+						size: Number(format.size.split('x')[1]),
+						type: format.type
+					};
+				});
+			}
 		} else {
 			const hls = new Hls();
 			hls.loadSource(data.video.hlsUrl + '?local=true');
 			hls.attachMedia(videoElement);
 		}
+
+		player.source = sourceInfo;
 
 		const currentTheme = await getDynamicTheme();
 

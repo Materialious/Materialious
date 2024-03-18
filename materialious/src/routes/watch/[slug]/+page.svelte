@@ -120,7 +120,7 @@
 			</article>
 
 			<div class="space"></div>
-			{#if data.comments}
+			{#if data.comments && data.comments.comments.length > 0}
 				<h6>{numberWithCommas(data.comments.commentCount)} comments</h6>
 				{#each data.comments.comments as comment}
 					<div class="comment">

@@ -10,7 +10,7 @@ export async function load({ params }) {
   return {
     video: video,
     returnYTDislikes: await getDislikes(params.slug),
-    comments: await getComments(params.slug, { sort_by: "top", source: "youtube" }),
+    comments: video.liveNow ? null : await getComments(params.slug, { sort_by: "top", source: "youtube" }),
     subscribed: await amSubscribed(video.authorId)
   };
 };

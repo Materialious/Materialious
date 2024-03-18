@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Plyr, { type PlyrEvent, type Track } from 'plyr';
 	// Needed to overwrite Beercss styles.
+	import Hls from 'hls.js';
 	import 'plyr/dist/plyr.css';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
@@ -25,7 +26,9 @@
 	onMount(async () => {
 		const playerPos = localStorage.getItem(data.video.videoId);
 
-		player = new Plyr('#player');
+		const videoElement = document.getElementById('player') as HTMLMediaElement;
+
+		player = new Plyr(videoElement);
 
 		const currentCategories = get(sponsorBlockCategories);
 
@@ -67,6 +70,10 @@
 		for (const caption of data.video.captions) {
 			// Have to preload captions, due to cors issue with how plyr
 			// grabs captions
+			if (!caption) {
+				continue;
+			}
+
 			const captions = await fetch(`${get(invidiousInstance)}${caption.url}`);
 			if (captions.status === 200) {
 				tracks.push({
@@ -85,10 +92,18 @@
 			},
 			poster: data.video.videoThumbnails[0].url,
 			tracks: tracks,
-			sources: data.video.formatStreams.map((format) => {
-				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
-			})
+			sources: []
 		};
+
+		if (!data.video.hlsUrl) {
+			player.source.sources = data.video.formatStreams.map((format) => {
+				return { src: format.url, size: Number(format.size.split('x')[1]), type: format.type };
+			});
+		} else {
+			const hls = new Hls();
+			hls.loadSource(data.video.hlsUrl + '?local=true');
+			hls.attachMedia(videoElement);
+		}
 
 		const currentTheme = await getDynamicTheme();
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Video, VideoBase } from './Api/model';
+	import type { Notification, Video, VideoBase } from './Api/model';
 	import { cleanNumber, truncate } from './misc';
 
 	export let video: VideoBase | Video | Notification;
@@ -22,8 +22,8 @@
 		img.src = video.videoThumbnails[3].url;
 
 		img.onload = () => {
-			loading = false;
 			loaded = true;
+			loading = false;
 		};
 		img.onerror = () => {
 			loading = false;
@@ -76,7 +76,8 @@
 			{#if 'publishedText' in video}
 				<div>
 					{cleanNumber(video.viewCount)} • {video.publishedText}
-				</div>{/if}
+				</div>
+			{/if}
 		</div>
 	</nav>
 </div>

@@ -25,6 +25,8 @@ Modern material design for Invidious
 - History deletion.
 - Comment replies.
 - Load more for comments, history, subscriptions & search results.
+- Editing used instance for Return Dislikes & Sponsorblock.
+- Allow disabling Return Dislikes.
 
 ## Previews
 ![Preview of player](./previews/player-preview.png)

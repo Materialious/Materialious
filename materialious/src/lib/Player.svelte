@@ -8,6 +8,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
+	import type { MediaPlayerClass } from 'dashjs';
 	import {
 		invidiousInstance,
 		playerAlwaysLoop,
@@ -27,6 +28,7 @@
 	let player: Plyr | undefined;
 	let sponsorBlock: SponsorBlock | undefined;
 	let hls: Hls | undefined;
+	let dash: MediaPlayerClass | undefined;
 	onMount(async () => {
 		if (data.video.isUpcoming || !data.video.isListed) {
 			return;
@@ -122,7 +124,7 @@
 
 		if (!data.video.hlsUrl) {
 			if (get(playerDash)) {
-				const dash = Dash.MediaPlayer().create();
+				dash = Dash.MediaPlayer().create();
 				dash.initialize(videoElement, data.video.dashUrl + '?local=true', get(playerAutoPlay));
 			} else {
 				const proxyVideos = get(playerProxyVideos);
@@ -167,6 +169,7 @@
 		player = undefined;
 		sponsorBlock = undefined;
 		hls = undefined;
+		dash = undefined;
 		document.getElementsByClassName('plyr')[0]?.remove();
 	});
 </script>

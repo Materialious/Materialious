@@ -26,7 +26,12 @@
 
 	let player: Plyr | undefined;
 	let sponsorBlock: SponsorBlock | undefined;
+	let hls: Hls | undefined;
 	onMount(async () => {
+		if (data.video.isUpcoming || !data.video.isListed) {
+			return;
+		}
+
 		const playerPos = localStorage.getItem(data.video.videoId);
 
 		const videoElement = document.getElementById('player') as HTMLMediaElement;
@@ -101,7 +106,7 @@
 		if (!data.video.hlsUrl) {
 			if (get(playerDash)) {
 				const dash = Dash.MediaPlayer().create();
-				dash.initialize(videoElement, data.video.dashUrl + '?local=true', true);
+				dash.initialize(videoElement, data.video.dashUrl + '?local=true', get(playerAutoPlay));
 			} else {
 				const proxyVideos = get(playerProxyVideos);
 				sourceInfo.sources = data.video.formatStreams.map((format) => {
@@ -113,7 +118,7 @@
 				});
 			}
 		} else {
-			const hls = new Hls();
+			hls = new Hls();
 			hls.loadSource(data.video.hlsUrl + '?local=true');
 			hls.attachMedia(videoElement);
 		}
@@ -144,6 +149,7 @@
 
 		player = undefined;
 		sponsorBlock = undefined;
+		hls = undefined;
 		document.getElementsByClassName('plyr')[0]?.remove();
 	});
 </script>
@@ -155,4 +161,10 @@
 	>
 </div>
 
-<video width="100%" id="player" playsinline controls> </video>
+{#if data.video.isUpcoming}
+	<h3>Video hasn't premiered yet</h3>
+{:else if !data.video.isListed}
+	<h3>Video isn't listed</h3>
+{:else}
+	<video width="100%" id="player" playsinline controls> </video>
+{/if}

@@ -1,9 +1,9 @@
 import { amSubscribed, getComments, getDislikes, getVideo, postHistory } from '$lib/Api/index.js';
 import { get } from 'svelte/store';
-import { auth } from '../../../store';
+import { auth, playerProxyVideos } from '../../../store';
 
 export async function load({ params }) {
-  const video = await getVideo(params.slug);
+  const video = await getVideo(params.slug, get(playerProxyVideos));
   if (get(auth)) {
     postHistory(video.videoId);
   }

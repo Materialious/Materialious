@@ -20,8 +20,8 @@ export async function getPopular(): Promise<Video[]> {
   return await resp.json();
 }
 
-export async function getVideo(videoId: string): Promise<VideoPlay> {
-  const resp = await fetch(buildPath(`videos/${videoId}`));
+export async function getVideo(videoId: string, local: boolean = false): Promise<VideoPlay> {
+  const resp = await fetch(buildPath(`videos/${videoId}?local=${local}`));
   return await resp.json();
 }
 

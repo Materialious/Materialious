@@ -40,20 +40,16 @@
 
 		player = new Plyr(videoElement, {
 			controls: [
-				'play-large', // The large play button in the center
-				'restart', // Restart playback
-				'rewind', // Rewind by the seek time (default 10 seconds)
-				'play', // Play/pause playback
-				'fast-forward', // Fast forward by the seek time (default 10 seconds)
-				'progress', // The progress bar and scrubber for playback and buffering
-				'current-time', // The current time of playback
-				'duration', // The full duration of the media
-				'mute', // Toggle mute
-				'volume', // Volume control
-				'captions', // Toggle captions
-				'settings', // Settings menu
-				'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
-				'fullscreen' // Toggle fullscreen
+				'play-large',
+				'play',
+				'progress',
+				'current-time',
+				'duration',
+				'volume',
+				'captions',
+				'settings',
+				'download',
+				'fullscreen'
 			]
 		});
 
@@ -128,9 +124,22 @@
 				dash.initialize(videoElement, data.video.dashUrl + '?local=true', get(playerAutoPlay));
 			} else {
 				const proxyVideos = get(playerProxyVideos);
+
+				let src;
 				sourceInfo.sources = data.video.formatStreams.map((format) => {
+					if (proxyVideos) {
+						const rawSrc = new URL(format.url);
+						rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
+							'http://',
+							''
+						).replace('https://', '');
+
+						src = rawSrc.toString();
+					} else {
+						src = format.url;
+					}
 					return {
-						src: format.url + (proxyVideos ? '?local=true' : ''),
+						src: src,
 						size: Number(format.size.split('x')[1]),
 						type: format.type
 					};

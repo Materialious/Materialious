@@ -18,6 +18,8 @@
 		playerListenByDefault,
 		playerProxyVideos,
 		playerSavePlaybackPosition,
+		returnYtDislikes,
+		sponsorBlock,
 		sponsorBlockCategories,
 		themeColor
 	} from '../store';
@@ -409,7 +411,39 @@
 	</div>
 
 	<div class="settings">
+		<h6>Return YT Dislikes</h6>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>Enabled</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$returnYtDislikes}
+					on:click={() => returnYtDislikes.set(!get(returnYtDislikes))}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+
+	<div class="settings">
 		<h6>Sponsorblock</h6>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>Enabled</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$sponsorBlock}
+					on:click={() => sponsorBlock.set(!get(sponsorBlock))}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
 
 		{#each sponsorCategories as sponsor}
 			<div class="field middle-align no-margin">

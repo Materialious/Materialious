@@ -26,7 +26,6 @@ Modern material design for Invidious
 - History deletion.
 - Load more for comments, history, subscriptions & search results.
 - Editing used instance for Return Dislikes & Sponsorblock.
-- Allow disabling Return Dislikes.
 - Audio only mode.
 - PWA support.
 

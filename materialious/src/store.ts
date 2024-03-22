@@ -15,8 +15,11 @@ export const playerListenByDefault = persisted("listenByDefault", false);
 export const playerSavePlaybackPosition = persisted("savePlaybackPosition", true);
 export const playerDash = persisted("dashEnabled", false);
 
+export const returnYtDislikes = persisted("returnYtDislikes", true);
+
 export const interfaceSearchSuggestions = persisted("searchSuggestions", true);
 
 export const auth: Writable<null | { username: string, token: string; }> = persisted("authToken", null);
 
+export const sponsorBlock = persisted("sponsorBlock", true);
 export const sponsorBlockCategories: Writable<string[]> = persisted("sponsorBlockCategories", []);

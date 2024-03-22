@@ -5,12 +5,9 @@
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
-	import type Plyr from 'plyr';
 	import { activePage } from '../../../store.js';
 
 	export let data;
-
-	let player: Plyr | undefined;
 
 	activePage.set(null);
 
@@ -63,16 +60,18 @@
 					{/if}
 				</button>
 				<div class="max"></div>
-				<nav class="no-space m l">
-					<button style="cursor: default;" class="border left-round">
-						<i class="small">thumb_up</i>
-						<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
-					</button>
-					<button style="cursor: default;" class="border right-round">
-						<i class="small">thumb_down_alt</i>
-						<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
-					</button>
-				</nav>
+				{#if data.returnYTDislikes}
+					<nav class="no-space m l">
+						<button style="cursor: default;" class="border left-round">
+							<i class="small">thumb_up</i>
+							<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
+						</button>
+						<button style="cursor: default;" class="border right-round">
+							<i class="small">thumb_down_alt</i>
+							<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
+						</button>
+					</nav>
+				{/if}
 				<button class="border m l" data-ui="#share"
 					><i>share</i> Share
 					<menu class="left no-wrap" id="share" data-ui="#share">
@@ -108,16 +107,18 @@
 				>
 			</nav>
 
-			<nav class="no-space s">
-				<button style="cursor: default;" class="border left-round">
-					<i class="small">thumb_up</i>
-					<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
-				</button>
-				<button style="cursor: default;" class="border right-round">
-					<i class="small">thumb_down_alt</i>
-					<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
-				</button>
-			</nav>
+			{#if data.returnYTDislikes}
+				<nav class="no-space s">
+					<button style="cursor: default;" class="border left-round">
+						<i class="small">thumb_up</i>
+						<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
+					</button>
+					<button style="cursor: default;" class="border right-round">
+						<i class="small">thumb_down_alt</i>
+						<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
+					</button>
+				</nav>
+			{/if}
 
 			<article class="medium scroll">
 				<p class="bold">

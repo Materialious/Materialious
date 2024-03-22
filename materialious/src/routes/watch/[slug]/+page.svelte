@@ -124,15 +124,17 @@
 				</p>
 				<p style="white-space: pre-line;word-wrap: break-word;">{data.content.description}</p>
 				{#if data.content}
-					<h6 style="margin-bottom: .3em;">Chapters</h6>
-					{#each data.content.timestamps as timestamp}
-						<button
-							on:click={() => seekTo(timestamp.time)}
-							class="timestamps"
-							class:primary={timestamp.time <= currentTime}
-							>{timestamp.title} - {timestamp.timePretty}</button
-						>
-					{/each}
+					{#if data.content.timestamps.length > 0}
+						<h6 style="margin-bottom: .3em;">Chapters</h6>
+						{#each data.content.timestamps as timestamp}
+							<button
+								on:click={() => seekTo(timestamp.time)}
+								class="timestamps"
+								class:primary={timestamp.time <= currentTime}
+								>{timestamp.title} - {timestamp.timePretty}</button
+							>
+						{/each}
+					{/if}
 				{/if}
 			</article>
 

@@ -16,7 +16,7 @@ Modern material design for Invidious
 - Integrates with Invidious subscriptions, watch history & more.
 - Live stream support.
 - Dash support (WIP).
-- PWA support.
+- Chapters.
 
 ## Todo
 - Port to [vidstack](https://www.vidstack.io/) once dash is supported.
@@ -24,11 +24,11 @@ Modern material design for Invidious
 - Add different search filters.
 - Playlist support.
 - History deletion.
-- Comment replies.
 - Load more for comments, history, subscriptions & search results.
 - Editing used instance for Return Dislikes & Sponsorblock.
 - Allow disabling Return Dislikes.
 - Audio only mode.
+- PWA support.
 
 ## Previews
 ![Preview of player](./previews/player-preview.png)

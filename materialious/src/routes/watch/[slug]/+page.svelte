@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { deleteUnsubscribe, postSubscribe } from '$lib/Api/index.js';
+	import Comment from '$lib/Comment.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
@@ -142,45 +143,7 @@
 			{#if data.comments && typeof data.comments.comments !== 'undefined' && data.comments.comments.length > 0}
 				<h6>{numberWithCommas(data.comments.commentCount)} comments</h6>
 				{#each data.comments.comments as comment}
-					<div class="comment">
-						<img class="circle small" src={comment.authorThumbnails[1].url} alt="comment profile" />
-						<div>
-							<div class="row">
-								<p>
-									<span class:bold={true} class:channel-owner={comment.authorIsChannelOwner}
-										>{comment.author}</span
-									>
-									<span class="secondary-text">{comment.publishedText}</span>
-								</p>
-								{#if comment.isPinned}
-									<i>push_pin</i>
-								{/if}
-								{#if comment.isEdited}
-									<i>edit</i>
-								{/if}
-							</div>
-							<p>
-								{comment.content}
-							</p>
-							<div style="display: flex;">
-								<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
-								{#if comment.creatorHeart}
-									<div>
-										<img
-											class="circle"
-											style="width: 25px; height: 25px"
-											src={comment.creatorHeart.creatorThumbnail}
-											alt="Creator profile"
-										/>
-										<i
-											style="font-size: 20px;margin-left: 5px;"
-											class="absolute left red-text bottom fill">favorite</i
-										>
-									</div>
-								{/if}
-							</div>
-						</div>
-					</div>
+					<Comment {comment} videoId={data.video.videoId}></Comment>
 				{/each}
 				<button class="margin">Load more</button>
 			{:else}
@@ -206,23 +169,8 @@
 		--plyr-color-main: var(--primary);
 	}
 
-	.comment {
-		display: flex;
-	}
-
-	.comment img {
-		margin: 0.5em 1em 0 1em;
-	}
-
 	.grid {
 		padding: 1em 10em;
-	}
-
-	.channel-owner {
-		background-color: var(--primary);
-		padding: 0 0.5em;
-		border-radius: 1em;
-		color: var(--surface-variant);
 	}
 
 	@media screen and (max-width: 1646px) {

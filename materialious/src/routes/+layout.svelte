@@ -219,7 +219,7 @@
 		><i>menu</i></button
 	>
 
-	<Logo />
+	<Logo classes="m l" />
 	<h6 class="m l">Materialious</h6>
 
 	<div class="max"></div>

@@ -1,4 +1,5 @@
 import { amSubscribed, getComments, getDislikes, getVideo, postHistory } from '$lib/Api/index.js';
+import { phaseDescription } from '$lib/misc';
 import { get } from 'svelte/store';
 import { auth, playerProxyVideos } from '../../../store';
 
@@ -11,6 +12,7 @@ export async function load({ params }) {
     video: video,
     returnYTDislikes: await getDislikes(params.slug),
     comments: video.liveNow ? null : await getComments(params.slug, { sort_by: "top", source: "youtube" }),
-    subscribed: await amSubscribed(video.authorId)
+    subscribed: await amSubscribed(video.authorId),
+    content: phaseDescription(video.description)
   };
 };

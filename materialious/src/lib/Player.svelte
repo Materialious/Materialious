@@ -22,10 +22,18 @@
 	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay };
+	export let currentTime: number = 0;
+
+	export function seekTo(time: number) {
+		if (typeof player !== 'undefined') {
+			player.currentTime = time;
+		}
+	}
+
+	let player: Plyr | undefined = undefined;
 
 	let categoryBeingSkipped = '';
 
-	let player: Plyr | undefined;
 	let sponsorBlock: SponsorBlock | undefined;
 	let hls: Hls | undefined;
 	let dash: MediaPlayerClass | undefined;
@@ -83,6 +91,10 @@
 			if (get(playerSavePlaybackPosition) && playerPos) {
 				event.detail.plyr.currentTime = Number(playerPos);
 			}
+		});
+
+		player.on('timeupdate', (event: PlyrEvent) => {
+			currentTime = event.detail.plyr.currentTime;
 		});
 
 		player.autoplay = get(playerAutoPlay);

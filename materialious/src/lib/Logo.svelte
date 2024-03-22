@@ -1,5 +1,9 @@
+<script lang="ts">
+	export let classes = '';
+</script>
+
 <svg
-	class="m l"
+	class={classes}
 	height="100%"
 	version="1.0"
 	viewBox="0 0 512 512"

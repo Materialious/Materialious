@@ -4,9 +4,12 @@
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
+	import type Plyr from 'plyr';
 	import { activePage } from '../../../store.js';
 
 	export let data;
+
+	let player: Plyr | undefined;
 
 	activePage.set(null);
 
@@ -19,13 +22,16 @@
 
 		data.subscribed = !data.subscribed;
 	}
+
+	let currentTime: number;
+	let seekTo: (time: number) => void;
 </script>
 
 {#if data}
 	<div class="grid">
 		<div class="s12 m12 l10">
 			{#key data.video.videoId}
-				<Player {data} />
+				<Player {data} bind:seekTo bind:currentTime />
 			{/key}
 
 			<h5>{data.video.title}</h5>
@@ -116,11 +122,22 @@
 				<p class="bold">
 					{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
 				</p>
-				<p style="white-space: pre-line;word-wrap: break-word;">{data.video.description}</p>
+				<p style="white-space: pre-line;word-wrap: break-word;">{data.content.description}</p>
+				{#if data.content}
+					<h6 style="margin-bottom: .3em;">Chapters</h6>
+					{#each data.content.timestamps as timestamp}
+						<button
+							on:click={() => seekTo(timestamp.time)}
+							class="timestamps"
+							class:primary={timestamp.time <= currentTime}
+							>{timestamp.title} - {timestamp.timePretty}</button
+						>
+					{/each}
+				{/if}
 			</article>
 
 			<div class="space"></div>
-			{#if data.comments && data.comments.comments.length > 0}
+			{#if data.comments && typeof data.comments.comments !== 'undefined' && data.comments.comments.length > 0}
 				<h6>{numberWithCommas(data.comments.commentCount)} comments</h6>
 				{#each data.comments.comments as comment}
 					<div class="comment">
@@ -169,44 +186,54 @@
 			{/if}
 		</div>
 		<div class="s12 m12 l2">
-			{#each data.video.recommendedVideos as recommendedVideo}
-				<article class="no-padding">
-					<Thumbnail video={recommendedVideo} />
-				</article>
-			{/each}
+			{#if data.video.recommendedVideos}
+				{#each data.video.recommendedVideos as recommendedVideo}
+					<article class="no-padding">
+						<Thumbnail video={recommendedVideo} />
+					</article>
+				{/each}
+			{/if}
 		</div>
 	</div>
-
-	<style>
-		:root {
-			--plyr-color-main: var(--primary);
-		}
-
-		.comment {
-			display: flex;
-		}
-
-		.comment img {
-			margin: 0.5em 1em 0 1em;
-		}
-
-		.grid {
-			padding: 1em 10em;
-		}
-
-		.channel-owner {
-			background-color: var(--primary);
-			padding: 0 0.5em;
-			border-radius: 1em;
-			color: var(--surface-variant);
-		}
-
-		@media screen and (max-width: 1646px) {
-			.grid {
-				padding: 0;
-			}
-		}
-	</style>
 {:else}
 	<PageLoading />
 {/if}
+
+<style>
+	:root {
+		--plyr-color-main: var(--primary);
+	}
+
+	.comment {
+		display: flex;
+	}
+
+	.comment img {
+		margin: 0.5em 1em 0 1em;
+	}
+
+	.grid {
+		padding: 1em 10em;
+	}
+
+	.channel-owner {
+		background-color: var(--primary);
+		padding: 0 0.5em;
+		border-radius: 1em;
+		color: var(--surface-variant);
+	}
+
+	@media screen and (max-width: 1646px) {
+		.grid {
+			padding: 0;
+		}
+	}
+
+	.timestamps {
+		margin-left: 0;
+		margin-bottom: 0.4em;
+		display: block;
+		background-color: var(--secondary-container);
+		color: var(--on-secondary-container);
+	}
+</style>

@@ -16,6 +16,7 @@ Modern material design for Invidious
 - Integrates with Invidious subscriptions, watch history & more.
 - Live stream support.
 - Dash support (WIP).
+- Support for higher qualities if not proxying.
 - Chapters.
 - Audio only mode.
 

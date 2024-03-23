@@ -16,9 +16,16 @@ export async function load({ params }) {
     comments = null;
   }
 
+  let returnYTDislikes;
+  try {
+    returnYTDislikes = get(returnYtDislikes) ? await getDislikes(params.slug) : null;
+  } catch {
+    returnYTDislikes = null;
+  }
+
   return {
     video: video,
-    returnYTDislikes: get(returnYtDislikes) ? await getDislikes(params.slug) : null,
+    returnYTDislikes: returnYTDislikes,
     comments: comments,
     subscribed: await amSubscribed(video.authorId),
     content: phaseDescription(video.description)

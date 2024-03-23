@@ -5,7 +5,8 @@
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
-	import { activePage } from '../../../store.js';
+	import { get } from 'svelte/store';
+	import { activePage, playerListenByDefault } from '../../../store.js';
 
 	export let data;
 
@@ -21,6 +22,7 @@
 		data.subscribed = !data.subscribed;
 	}
 
+	let audioMode = get(playerListenByDefault);
 	let currentTime: number;
 	let seekTo: (time: number) => void;
 </script>
@@ -29,7 +31,7 @@
 	<div class="grid">
 		<div class="s12 m12 l10">
 			{#key data.video.videoId}
-				<Player {data} bind:seekTo bind:currentTime />
+				<Player {data} {audioMode} bind:seekTo bind:currentTime />
 			{/key}
 
 			<h5>{data.video.title}</h5>
@@ -72,6 +74,10 @@
 						</button>
 					</nav>
 				{/if}
+				<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
+					<i>headphones</i>
+					<span>Audio only </span>
+				</button>
 				<button class="border m l" data-ui="#share"
 					><i>share</i> Share
 					<menu class="left no-wrap" id="share" data-ui="#share">

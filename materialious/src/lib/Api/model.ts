@@ -48,10 +48,11 @@ export interface AdaptiveFormats {
   clen: string;
   lmt: string;
   projectionType: number;
-  container: string;
+  container?: string;
   encoding: string;
   qualityLabel?: string;
   resolution?: string;
+  audioQuality?: string;
 }
 
 export interface FormatStreams {

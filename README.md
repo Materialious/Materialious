@@ -17,6 +17,7 @@ Modern material design for Invidious
 - Live stream support.
 - Dash support (WIP).
 - Chapters.
+- Audio only mode.
 
 ## Todo
 - Port to [vidstack](https://www.vidstack.io/) once dash is supported.
@@ -25,7 +26,6 @@ Modern material design for Invidious
 - Playlist support.
 - History deletion.
 - Load more for comments, history, subscriptions & search results.
-- Audio only mode.
 - PWA support.
 
 ## Previews

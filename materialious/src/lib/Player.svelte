@@ -5,7 +5,7 @@
 	import Hls from 'hls.js';
 	import 'plyr/dist/plyr.css';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { get } from 'svelte/store';
 	import { sponsorBlock as sponsorBlockStore, sponsorBlockUrl } from '../store';
 
@@ -24,6 +24,9 @@
 
 	export let data: { video: VideoPlay };
 	export let currentTime: number = 0;
+	export let audioMode = false;
+
+	let previousMode = structuredClone(audioMode);
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -38,28 +41,95 @@
 	let sponsorBlock: SponsorBlock | undefined;
 	let hls: Hls | undefined;
 	let dash: MediaPlayerClass | undefined;
-	onMount(async () => {
+
+	$: {
+		if (previousMode !== audioMode) {
+			tick().then(async () => {
+				document.getElementsByClassName('plyr')[0]?.remove();
+				await createPlayer();
+				previousMode = structuredClone(audioMode);
+			});
+		}
+	}
+
+	async function createPlayer() {
 		if (data.video.isUpcoming || !data.video.isListed) {
 			return;
 		}
 
 		const playerPos = localStorage.getItem(data.video.videoId);
 
+		const tracks: Track[] = [];
+
+		for (const caption of data.video.captions) {
+			// Have to preload captions, due to cors issue with how plyr
+			// grabs captions
+			if (!caption) {
+				continue;
+			}
+
+			const captions = await fetch(`${get(invidiousInstance)}${caption.url}`);
+			if (captions.status === 200) {
+				tracks.push({
+					kind: 'captions',
+					label: caption.label,
+					srcLang: caption.languageCode,
+					src: URL.createObjectURL(await captions.blob())
+				});
+			}
+		}
+
+		const sourceInfo: SourceInfo = {
+			type: !audioMode ? 'video' : 'audio',
+			previewThumbnails: {
+				src: data.video.videoThumbnails[0].url
+			},
+			poster: data.video.videoThumbnails[0].url,
+			tracks: tracks,
+			sources: []
+		};
+
 		const videoElement = document.getElementById('player') as HTMLMediaElement;
 
+		const controls = [
+			'play-large',
+			'play',
+			'progress',
+			'current-time',
+			'duration',
+			'volume',
+			'captions',
+			'settings',
+			'download',
+			'fullscreen'
+		];
+
+		const qualitySettings = {
+			default: 720,
+			options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
+		};
+
+		if (audioMode) {
+			qualitySettings.options = [];
+
+			data.video.adaptiveFormats.forEach((source) => {
+				if (typeof source.audioQuality !== 'undefined') {
+					const bitrate = Number(source.bitrate);
+					qualitySettings.options.push(bitrate);
+					sourceInfo.sources.push({
+						src: source.url,
+						type: source.type,
+						size: bitrate
+					});
+				}
+			});
+
+			qualitySettings.default = qualitySettings.options[0];
+		}
+
 		player = new Plyr(videoElement, {
-			controls: [
-				'play-large',
-				'play',
-				'progress',
-				'current-time',
-				'duration',
-				'volume',
-				'captions',
-				'settings',
-				'download',
-				'fullscreen'
-			]
+			controls: controls,
+			quality: qualitySettings
 		});
 
 		if (get(sponsorBlockStore)) {
@@ -103,67 +173,39 @@
 		player.autoplay = get(playerAutoPlay);
 		player.loop = get(playerAlwaysLoop);
 
-		const tracks: Track[] = [];
+		if (!audioMode) {
+			if (!data.video.hlsUrl) {
+				if (get(playerDash)) {
+					dash = Dash.MediaPlayer().create();
+					dash.initialize(videoElement, data.video.dashUrl + '?local=true', get(playerAutoPlay));
+				} else {
+					const proxyVideos = get(playerProxyVideos);
 
-		for (const caption of data.video.captions) {
-			// Have to preload captions, due to cors issue with how plyr
-			// grabs captions
-			if (!caption) {
-				continue;
-			}
+					let src;
+					sourceInfo.sources = data.video.formatStreams.map((format) => {
+						if (proxyVideos) {
+							const rawSrc = new URL(format.url);
+							rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
+								'http://',
+								''
+							).replace('https://', '');
 
-			const captions = await fetch(`${get(invidiousInstance)}${caption.url}`);
-			if (captions.status === 200) {
-				tracks.push({
-					kind: 'captions',
-					label: caption.label,
-					srcLang: caption.languageCode,
-					src: URL.createObjectURL(await captions.blob())
-				});
-			}
-		}
-
-		const sourceInfo: SourceInfo = {
-			type: 'video',
-			previewThumbnails: {
-				src: data.video.videoThumbnails[0].url
-			},
-			poster: data.video.videoThumbnails[0].url,
-			tracks: tracks,
-			sources: []
-		};
-
-		if (!data.video.hlsUrl) {
-			if (get(playerDash)) {
-				dash = Dash.MediaPlayer().create();
-				dash.initialize(videoElement, data.video.dashUrl + '?local=true', get(playerAutoPlay));
+							src = rawSrc.toString();
+						} else {
+							src = format.url;
+						}
+						return {
+							src: src,
+							size: Number(format.size.split('x')[1]),
+							type: format.type
+						};
+					});
+				}
 			} else {
-				const proxyVideos = get(playerProxyVideos);
-
-				let src;
-				sourceInfo.sources = data.video.formatStreams.map((format) => {
-					if (proxyVideos) {
-						const rawSrc = new URL(format.url);
-						rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
-							'http://',
-							''
-						).replace('https://', '');
-
-						src = rawSrc.toString();
-					} else {
-						src = format.url;
-					}
-					return {
-						src: src,
-						size: Number(format.size.split('x')[1]),
-						type: format.type
-					};
-				});
+				hls = new Hls();
+				hls.loadSource(data.video.hlsUrl + '?local=true');
+				hls.attachMedia(videoElement);
 			}
-		} else {
-			hls = new Hls();
-			hls.loadSource(data.video.hlsUrl + '?local=true');
-			hls.attachMedia(videoElement);
 		}
 
 		player.source = sourceInfo;
@@ -179,6 +221,10 @@
 			'--plyr-menu-color',
 			currentTheme['--secondary-text']
 		);
+	}
+
+	onMount(async () => {
+		await createPlayer();
 	});
 
 	onDestroy(async () => {
@@ -210,5 +256,11 @@
 {:else if !data.video.isListed}
 	<h3>Video isn't listed</h3>
 {:else}
-	<video id="player" playsinline controls> </video>
+	{#if audioMode}
+		<div style="margin-top: 50vh;"></div>
+	{/if}
+
+	{#key audioMode}
+		<video id="player" playsinline controls> </video>
+	{/key}
 {/if}

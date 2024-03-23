@@ -116,7 +116,7 @@
 			qualitySettings.options = [];
 
 			data.video.adaptiveFormats.forEach((source) => {
-				if (typeof source.audioQuality !== 'undefined') {
+				if (typeof source.audioQuality !== 'undefined' && source.container === 'm4a') {
 					const bitrate = Number(source.bitrate);
 					qualitySettings.options.push(bitrate);
 					sourceInfo.sources.push({
@@ -255,7 +255,9 @@
 						player.on('seeked', (event: PlyrEvent) => {
 							if (!audio) return;
 							audio.currentTime = event.detail.plyr.currentTime;
-							audio.play();
+							if (player?.playing) {
+								audio.play();
+							}
 						});
 
 						player.on('ratechange', (event: PlyrEvent) => {

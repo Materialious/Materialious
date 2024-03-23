@@ -7,7 +7,6 @@
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { get } from 'svelte/store';
-	import { sponsorBlock as sponsorBlockStore, sponsorBlockUrl } from '../store';
 
 	import type { MediaPlayerClass } from 'dashjs';
 	import {
@@ -17,7 +16,9 @@
 		playerDash,
 		playerProxyVideos,
 		playerSavePlaybackPosition,
-		sponsorBlockCategories
+		sponsorBlockCategories,
+		sponsorBlock as sponsorBlockStore,
+		sponsorBlockUrl
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
 	import { getDynamicTheme } from './theme';
@@ -35,6 +36,7 @@
 	}
 
 	let player: Plyr | undefined = undefined;
+	let audio: HTMLAudioElement | undefined = undefined;
 
 	let categoryBeingSkipped = '';
 
@@ -186,25 +188,91 @@
 				} else {
 					const proxyVideos = get(playerProxyVideos);
 
-					let src;
-					sourceInfo.sources = data.video.formatStreams.map((format) => {
-						if (proxyVideos) {
-							const rawSrc = new URL(format.url);
-							rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
-								'http://',
-								''
-							).replace('https://', '');
+					if (proxyVideos) {
+						let src;
+						sourceInfo.sources = data.video.formatStreams.map((format) => {
+							if (proxyVideos) {
+								const rawSrc = new URL(format.url);
+								rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
+									'http://',
+									''
+								).replace('https://', '');
 
-							src = rawSrc.toString();
-						} else {
-							src = format.url;
+								src = rawSrc.toString();
+							} else {
+								src = format.url;
+							}
+							return {
+								src: src,
+								size: Number(format.size.split('x')[1]),
+								type: format.type
+							};
+						});
+					} else {
+						data.video.adaptiveFormats.forEach((format) => {
+							if (typeof format.resolution !== 'undefined') {
+								const size = Number(format.resolution.replace('p', ''));
+								sourceInfo.sources.push({
+									type: format.type,
+									src: format.url,
+									size: size
+								});
+							}
+						});
+
+						let audioSrc = data.video.adaptiveFormats.filter((audioFormat) => {
+							if (audioFormat.audioQuality === 'AUDIO_QUALITY_MEDIUM') {
+								return true;
+							} else {
+								return false;
+							}
+						});
+
+						if (audioSrc.length === 0) {
+							audioSrc = data.video.adaptiveFormats.filter((audioFormat) => {
+								if (audioFormat.audioQuality === 'AUDIO_QUALITY_LOW') {
+									return true;
+								} else {
+									return false;
+								}
+							});
 						}
-						return {
-							src: src,
-							size: Number(format.size.split('x')[1]),
-							type: format.type
-						};
-					});
+
+						audio = new Audio(audioSrc[0].url);
+						audio.load();
+						audio.volume = player.volume;
+
+						player.on('volumechange', (event: PlyrEvent) => {
+							if (!audio) return;
+							audio.volume = event.detail.plyr.volume;
+						});
+
+						player.on('waiting', () => {
+							if (!audio) return;
+							audio.pause();
+						});
+
+						player.on('seeked', (event: PlyrEvent) => {
+							if (!audio) return;
+							audio.currentTime = event.detail.plyr.currentTime;
+							audio.play();
+						});
+
+						player.on('ratechange', (event: PlyrEvent) => {
+							if (!audio) return;
+							audio.playbackRate = event.detail.plyr.speed;
+						});
+
+						player.on('playing', () => {
+							if (!audio) return;
+							audio.play();
+						});
+
+						player.on('pause', () => {
+							if (!audio) return;
+							audio.pause();
+						});
+					}
 				}
 			} else {
 				hls = new Hls();
@@ -249,6 +317,7 @@
 		sponsorBlock = undefined;
 		hls = undefined;
 		dash = undefined;
+		audio = undefined;
 		document.getElementsByClassName('plyr')[0]?.remove();
 	});
 </script>

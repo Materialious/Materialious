@@ -49,7 +49,7 @@ export interface AdaptiveFormats {
   lmt: string;
   projectionType: number;
   container?: string;
-  encoding: string;
+  encoding?: string;
   qualityLabel?: string;
   resolution?: string;
   audioQuality?: string;

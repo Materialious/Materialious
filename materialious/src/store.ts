@@ -22,4 +22,5 @@ export const interfaceSearchSuggestions = persisted("searchSuggestions", true);
 export const auth: Writable<null | { username: string, token: string; }> = persisted("authToken", null);
 
 export const sponsorBlock = persisted("sponsorBlock", true);
+export const sponsorBlockUrl = persisted("sponsorBlockUrl", import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE);
 export const sponsorBlockCategories: Writable<string[]> = persisted("sponsorBlockCategories", []);

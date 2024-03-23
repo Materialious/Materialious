@@ -25,7 +25,6 @@ Modern material design for Invidious
 - Playlist support.
 - History deletion.
 - Load more for comments, history, subscriptions & search results.
-- Editing used instance for Return Dislikes & Sponsorblock.
 - Audio only mode.
 - PWA support.
 
@@ -33,3 +32,4 @@ Modern material design for Invidious
 ![Preview of player](./previews/player-preview.png)
 ![Preview of settings](./previews/setting-preview.png)
 ![Preview of channel](./previews/channel-preview.png)
+![Preview of chapters](./previews/chapter-previews.png)

@@ -7,7 +7,7 @@
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import { sponsorBlock as sponsorBlockStore } from '../store';
+	import { sponsorBlock as sponsorBlockStore, sponsorBlockUrl } from '../store';
 
 	import type { MediaPlayerClass } from 'dashjs';
 	import {
@@ -66,7 +66,7 @@
 			const currentCategories = get(sponsorBlockCategories);
 
 			if (currentCategories.length > 0) {
-				sponsorBlock = new SponsorBlock('');
+				sponsorBlock = new SponsorBlock('', { baseURL: get(sponsorBlockUrl) });
 
 				try {
 					const segments = await sponsorBlock.getSegments(

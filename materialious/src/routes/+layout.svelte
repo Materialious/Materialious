@@ -18,9 +18,11 @@
 		playerListenByDefault,
 		playerProxyVideos,
 		playerSavePlaybackPosition,
+		returnYTDislikesInstance,
 		returnYtDislikes,
 		sponsorBlock,
 		sponsorBlockCategories,
+		sponsorBlockUrl,
 		themeColor
 	} from '../store';
 
@@ -71,6 +73,9 @@
 	});
 
 	let notifications: Notification[] = [];
+
+	let sponsorBlockInstance = get(sponsorBlockUrl);
+	let returnYTInstance = get(returnYTDislikesInstance);
 
 	const pages = [
 		{
@@ -413,6 +418,18 @@
 	<div class="settings">
 		<h6>Return YT Dislikes</h6>
 
+		<form on:submit|preventDefault={() => returnYTDislikesInstance.set(returnYTInstance)}>
+			<nav>
+				<div class="field label border">
+					<input bind:value={returnYTInstance} name="returnyt-instance" type="text" />
+					<label for="returnyt-instance">Instance URL</label>
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+
 		<nav class="no-padding">
 			<div class="max">
 				<p>Enabled</p>
@@ -430,6 +447,18 @@
 
 	<div class="settings">
 		<h6>Sponsorblock</h6>
+
+		<form on:submit|preventDefault={() => sponsorBlockUrl.set(sponsorBlockInstance)}>
+			<nav>
+				<div class="field label border">
+					<input bind:value={sponsorBlockInstance} name="sponsorblock-instance" type="text" />
+					<label for="sponsorblock-instance">Instance URL</label>
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
 
 		<nav class="no-padding">
 			<div class="max">
@@ -516,5 +545,9 @@
 
 	.settings h6 {
 		margin: 1em 0 0.3em 0;
+	}
+
+	form {
+		margin: 1em 0;
 	}
 </style>

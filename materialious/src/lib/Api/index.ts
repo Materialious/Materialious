@@ -71,8 +71,12 @@ export async function getSubscriptions(): Promise<Subscription[]> {
 }
 
 export async function amSubscribed(authorId: string): Promise<boolean> {
-  const subscriptions = (await getSubscriptions()).filter(sub => sub.authorId === authorId);
-  return subscriptions.length === 1;
+  try {
+    const subscriptions = (await getSubscriptions()).filter(sub => sub.authorId === authorId);
+    return subscriptions.length === 1;
+  } catch {
+    return false;
+  }
 }
 
 export async function postSubscribe(authorId: string) {

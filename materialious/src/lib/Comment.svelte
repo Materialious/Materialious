@@ -9,11 +9,13 @@
 	let replies: Comments;
 
 	async function loadReplies(continuation: string) {
-		replies = await getComments(videoId, {
-			continuation: continuation,
-			sort_by: 'top',
-			source: 'youtube'
-		});
+		try {
+			replies = await getComments(videoId, {
+				continuation: continuation,
+				sort_by: 'top',
+				source: 'youtube'
+			});
+		} catch {}
 	}
 </script>
 
@@ -56,7 +58,7 @@
 
 		{#if replies}
 			{#each replies.comments as reply}
-				<svelte:self comment={reply} />
+				<svelte:self comment={reply} {videoId} />
 			{/each}
 		{/if}
 

@@ -9,10 +9,17 @@ export async function load({ params }) {
     postHistory(video.videoId);
   }
 
+  let comments;
+  try {
+    comments = video.liveNow ? null : await getComments(params.slug, { sort_by: "top", source: "youtube" });
+  } catch {
+    comments = null;
+  }
+
   return {
     video: video,
     returnYTDislikes: get(returnYtDislikes) ? await getDislikes(params.slug) : null,
-    comments: video.liveNow ? null : await getComments(params.slug, { sort_by: "top", source: "youtube" }),
+    comments: comments,
     subscribed: await amSubscribed(video.authorId),
     content: phaseDescription(video.description)
   };

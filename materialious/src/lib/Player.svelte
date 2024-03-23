@@ -93,20 +93,6 @@
 		};
 
 		const videoElement = document.getElementById('player') as HTMLMediaElement;
-
-		const controls = [
-			'play-large',
-			'play',
-			'progress',
-			'current-time',
-			'duration',
-			'volume',
-			'captions',
-			'settings',
-			'download',
-			'fullscreen'
-		];
-
 		const qualitySettings = {
 			default: 720,
 			options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
@@ -131,7 +117,18 @@
 		}
 
 		player = new Plyr(videoElement, {
-			controls: controls,
+			controls: [
+				'play-large',
+				'play',
+				'progress',
+				'current-time',
+				'duration',
+				'volume',
+				'captions',
+				'settings',
+				'download',
+				'fullscreen'
+			],
 			quality: qualitySettings
 		});
 

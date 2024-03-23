@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deleteUnsubscribe, postSubscribe } from '$lib/Api/index.js';
+	import { deleteUnsubscribe, getComments, postSubscribe } from '$lib/Api/index.js';
 	import Comment from '$lib/Comment.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Player from '$lib/Player.svelte';
@@ -10,7 +10,23 @@
 
 	export let data;
 
+	let comments = data.comments;
+
 	activePage.set(null);
+
+	async function loadMoreComments() {
+		if (!comments) {
+			return;
+		}
+
+		const loadedComments = await getComments(data.video.videoId, {
+			continuation: comments?.continuation
+		});
+
+		comments.continuation = loadedComments.continuation;
+
+		comments.comments = [...comments.comments, ...loadedComments.comments];
+	}
 
 	async function toggleSubscribed() {
 		if (data.subscribed) {
@@ -147,12 +163,14 @@
 			</article>
 
 			<div class="space"></div>
-			{#if data.comments && data.comments.comments.length > 0}
-				<h6>{numberWithCommas(data.comments.commentCount)} comments</h6>
-				{#each data.comments.comments as comment}
+			{#if comments && comments.comments.length > 0}
+				<h6>{numberWithCommas(comments.commentCount)} comments</h6>
+				{#each comments.comments as comment}
 					<Comment {comment} videoId={data.video.videoId}></Comment>
 				{/each}
-				<button class="margin">Load more</button>
+				{#if comments.continuation}
+					<button on:click={loadMoreComments} class="margin">Load more</button>
+				{/if}
 			{:else}
 				<h6>Comments disabled</h6>
 			{/if}

@@ -25,7 +25,6 @@ Modern material design for Invidious
 - Add different search filters.
 - Playlist support.
 - History deletion.
-- Load more for comments, history, subscriptions & search results.
 - PWA support.
 
 ## Previews

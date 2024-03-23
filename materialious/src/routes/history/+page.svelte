@@ -2,7 +2,7 @@
 	import { getHistory, getVideo } from '$lib/Api';
 	import type { VideoPlay } from '$lib/Api/model';
 	import VideoList from '$lib/VideoList.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { activePage } from '../../store';
 
 	activePage.set('history');
@@ -10,18 +10,36 @@
 	let history: VideoPlay[] = [];
 	let loaded = false;
 
-	async function loadPageHistory(page: number = 1) {
-		const videoIds = await getHistory(page);
+	let currentPage = 1;
+
+	async function loadPageHistory() {
+		const videoIds = await getHistory(currentPage);
 		let promises = [];
 		for (const videoId of videoIds) {
 			promises.push(getVideo(videoId));
 		}
-		history = [...history, ...(await Promise.all(promises))];
+
+		const loadedHistory = await Promise.all(promises);
+		history = [...history, ...loadedHistory];
+	}
+
+	async function handleScroll() {
+		const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+		if (scrollTop + clientHeight >= scrollHeight - 5) {
+			currentPage += 1;
+			await loadPageHistory();
+		}
 	}
 
 	onMount(async () => {
 		await loadPageHistory();
 		loaded = true;
+
+		window.addEventListener('scroll', handleScroll);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('scroll', handleScroll);
 	});
 </script>
 

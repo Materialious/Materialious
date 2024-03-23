@@ -30,7 +30,19 @@ export async function getDislikes(videoId: string): Promise<ReturnYTDislikes> {
   return await resp.json();
 }
 
-export async function getComments(videoId: string, parameters: { sort_by: "top" | "new", source: "youtube" | "reddit", continuation?: string; }): Promise<Comments> {
+export async function getComments(videoId: string, parameters: {
+  sort_by?: "top" | "new",
+  source?: "youtube" | "reddit",
+  continuation?: string;
+}): Promise<Comments> {
+  if (typeof parameters.sort_by === "undefined") {
+    parameters.sort_by = "top";
+  }
+
+  if (typeof parameters.source === "undefined") {
+    parameters.source = "youtube";
+  }
+
   const path = new URL(buildPath(`comments/${videoId}`));
   path.search = new URLSearchParams(parameters).toString();
   const resp = await fetch(path);
@@ -50,8 +62,22 @@ export async function getSearchSuggestions(search: string): Promise<SearchSugges
 }
 
 export async function getSearch(search: string, options: {
-  sort_by: "relevance" | "rating" | "upload_date" | "view_count", type: "video" | "playlist" | "channel" | "all";
+  sort_by?: "relevance" | "rating" | "upload_date" | "view_count",
+  type?: "video" | "playlist" | "channel" | "all";
+  page?: string;
 }): Promise<Video[]> {
+  if (typeof options.sort_by === "undefined") {
+    options.sort_by = "relevance";
+  }
+
+  if (typeof options.type === "undefined") {
+    options.type = "video";
+  }
+
+  if (typeof options.page === "undefined") {
+    options.page = "1";
+  }
+
   const path = new URL(buildPath("search"));
   path.search = new URLSearchParams({ ...options, q: search }).toString();
   const resp = await fetch(path);

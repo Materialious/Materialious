@@ -45,6 +45,7 @@
 	$: {
 		if (previousMode !== audioMode) {
 			tick().then(async () => {
+				savePlayerPos();
 				document.getElementsByClassName('plyr')[0]?.remove();
 				await createPlayer();
 				previousMode = structuredClone(audioMode);
@@ -170,6 +171,10 @@
 			currentTime = event.detail.plyr.currentTime;
 		});
 
+		player.on('pause', () => {
+			savePlayerPos();
+		});
+
 		player.autoplay = get(playerAutoPlay);
 		player.loop = get(playerAlwaysLoop);
 
@@ -223,11 +228,7 @@
 		);
 	}
 
-	onMount(async () => {
-		await createPlayer();
-	});
-
-	onDestroy(async () => {
+	function savePlayerPos() {
 		if (get(playerSavePlaybackPosition) && player?.currentTime) {
 			if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
 				localStorage.setItem(data.video.videoId, player.currentTime.toString());
@@ -235,6 +236,14 @@
 				localStorage.removeItem(data.video.videoId);
 			}
 		}
+	}
+
+	onMount(async () => {
+		await createPlayer();
+	});
+
+	onDestroy(async () => {
+		savePlayerPos();
 
 		player = undefined;
 		sponsorBlock = undefined;

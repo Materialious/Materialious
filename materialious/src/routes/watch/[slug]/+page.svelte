@@ -155,7 +155,11 @@
 								on:click={() => seekTo(timestamp.time)}
 								class="timestamps"
 								class:primary={timestamp.time <= currentTime}
-								>{timestamp.title} - {timestamp.timePretty}</button
+								>{timestamp.timePretty}
+								{#if !timestamp.title.startsWith('-')}
+									-
+								{/if}
+								{timestamp.title}</button
 							>
 						{/each}
 					{/if}

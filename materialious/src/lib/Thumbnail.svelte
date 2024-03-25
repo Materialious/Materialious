@@ -63,8 +63,9 @@
 	{/if}
 </a>
 <div class="small-padding">
-	{#if localStorage.getItem(video.videoId)}
-		<progress value={localStorage.getItem(video.videoId)} max={video.lengthSeconds}></progress>
+	{#if localStorage.getItem(`v_${video.videoId}`)}
+		<progress value={localStorage.getItem(`v_${video.videoId}`)} max={video.lengthSeconds}
+		></progress>
 	{/if}
 	<nav class="no-margin">
 		<div class="max">

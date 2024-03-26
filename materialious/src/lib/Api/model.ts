@@ -69,7 +69,7 @@ export interface FormatStreams {
 
 export interface Captions {
   label: string;
-  languageCode: string;
+  language_code: string;
   url: string;
 };
 

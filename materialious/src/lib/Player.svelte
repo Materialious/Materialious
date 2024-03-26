@@ -6,8 +6,6 @@
 	import { get } from 'svelte/store';
 	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
-	import { MediaQualityRadioGroupElement, defineCustomElement } from 'vidstack/elements';
-	import 'vidstack/icons';
 	import {
 		playerAlwaysLoop,
 		playerAutoPlay,
@@ -19,8 +17,6 @@
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
 
-	defineCustomElement(MediaQualityRadioGroupElement);
-
 	export let data: { video: VideoPlay };
 	export let currentTime: number = 0;
 	export let audioMode = false;
@@ -28,6 +24,7 @@
 	let player: MediaPlayerElement;
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
+	let captions: { label: string; srcLang: string; src: string }[] = [];
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -39,6 +36,17 @@
 
 	onMount(async () => {
 		if (!data.video.hlsUrl) {
+			if (data.video.captions) {
+				data.video.captions.forEach(async (caption) => {
+					player.textTracks.add({
+						label: caption.label,
+						kind: 'captions',
+						language: caption.language_code,
+						src: `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}${caption.url}`
+					});
+				});
+			}
+
 			player.addEventListener('time-update', () => {
 				currentTime = player.currentTime;
 			});
@@ -141,14 +149,17 @@
 	{src}
 >
 	<media-provider>
-		<media-poster class="vds-poster" src={data.video.videoThumbnails[0].url}></media-poster>
+		{#if !audioMode}
+			<media-poster class="vds-poster" src={data.video.videoThumbnails[0].url}></media-poster>
+		{/if}
 	</media-provider>
 	<media-audio-layout></media-audio-layout>
-	<media-video-layout></media-video-layout>
 	{#if data.video.storyboards && data.video.storyboards.length > 3}
 		<media-video-layout
 			thumbnails={`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}${data.video.storyboards[3].url}`}
 		></media-video-layout>
+	{:else}
+		<media-video-layout></media-video-layout>
 	{/if}
 </media-player>
 

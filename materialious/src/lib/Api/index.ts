@@ -1,9 +1,9 @@
 import { get } from 'svelte/store';
-import { auth, invidiousInstance, returnYTDislikesInstance } from '../../store';
+import { auth, returnYTDislikesInstance } from '../../store';
 import type { Channel, Comments, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
-  return `${get(invidiousInstance)}/api/v1/${path}`;
+  return `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/api/v1/${path}`;
 }
 
 export function buildAuthHeaders(): { headers: { Authorization: string; }; } {

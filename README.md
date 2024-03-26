@@ -20,7 +20,6 @@ Modern material design for Invidious
 - Audio only mode.
 
 ## Todo
-- Port to [vidstack](https://www.vidstack.io/) once dash is supported.
 - Complete channel view.
 - Add different search filters.
 - Playlist support.

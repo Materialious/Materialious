@@ -15,8 +15,17 @@ export function cleanNumber(number: number): string {
 
 export function videoLength(lengthSeconds: number): string {
   const hours = Math.floor(lengthSeconds / 3600);
-  const minutes = Math.floor((lengthSeconds % 3600) / 60);
-  const seconds = lengthSeconds % 60;
+  let minutes: number | string = Math.floor((lengthSeconds % 3600) / 60);
+  let seconds: number | string = lengthSeconds % 60;
+
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+
+  if (seconds < 10) {
+    seconds = `0${seconds}`;
+  }
+
 
   if (hours !== 0) {
     return `${hours}:${minutes}:${seconds}`;

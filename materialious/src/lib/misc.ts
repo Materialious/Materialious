@@ -13,9 +13,23 @@ export function cleanNumber(number: number): string {
   return humanNumber(number, (number: number) => Number.parseFloat(number.toString()).toFixed(1));
 }
 
-export function phaseDescription(content: string): {
+export function videoLength(lengthSeconds: number): string {
+  const hours = Math.floor(lengthSeconds / 3600);
+  const minutes = Math.floor((lengthSeconds % 3600) / 60);
+  const seconds = lengthSeconds % 60;
+
+  if (hours !== 0) {
+    return `${hours}:${minutes}:${seconds}`;
+  } else {
+    return `${minutes}:${seconds}`;
+  }
+}
+
+export interface PhasedDescription {
   description: string, timestamps: { title: string; time: number; timePretty: string; }[];
-} {
+}
+
+export function phaseDescription(content: string): PhasedDescription {
   const timestamps: { title: string; time: number; timePretty: string; }[] = [];
   const lines = content.split('\n');
 

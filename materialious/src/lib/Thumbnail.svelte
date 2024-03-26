@@ -1,17 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Notification, Video, VideoBase } from './Api/model';
-	import { cleanNumber, truncate } from './misc';
+	import { cleanNumber, truncate, videoLength } from './misc';
 
 	export let video: VideoBase | Video | Notification;
-
-	function videoLength(lengthSeconds: number): string {
-		const hours = Math.floor(lengthSeconds / 3600);
-		const minutes = Math.floor((lengthSeconds % 3600) / 60);
-		const seconds = lengthSeconds % 60;
-
-		return `${hours}:${minutes}:${seconds}`;
-	}
 
 	let loading = true;
 	let loaded = false;

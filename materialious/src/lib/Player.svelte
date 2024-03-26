@@ -16,15 +16,15 @@
 		sponsorBlockUrl
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
+	import { videoLength, type PhasedDescription } from './misc';
 
-	export let data: { video: VideoPlay };
+	export let data: { video: VideoPlay; content: PhasedDescription };
 	export let currentTime: number = 0;
 	export let audioMode = false;
 
 	let player: MediaPlayerElement;
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
-	let captions: { label: string; srcLang: string; src: string }[] = [];
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -44,6 +44,30 @@
 						language: caption.language_code,
 						src: `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}${caption.url}`
 					});
+				});
+			}
+
+			if (data.content.timestamps) {
+				let chapterWebVTT = 'WEBVTT\n\n';
+
+				let timestampIndex = 0;
+				data.content.timestamps.forEach((timestamp) => {
+					let endTime: string;
+					if (timestampIndex === data.content.timestamps.length - 1) {
+						endTime = videoLength(data.video.lengthSeconds);
+					} else {
+						endTime = data.content.timestamps[timestampIndex + 1].timePretty;
+					}
+
+					chapterWebVTT += `${timestamp.timePretty} --> ${endTime}\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
+
+					timestampIndex += 1;
+				});
+
+				player.textTracks.add({
+					kind: 'chapters',
+					src: URL.createObjectURL(new Blob([chapterWebVTT])),
+					default: true
 				});
 			}
 

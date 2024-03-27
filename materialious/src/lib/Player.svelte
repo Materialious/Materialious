@@ -162,6 +162,10 @@
 	});
 </script>
 
+{#if audioMode}
+	<div style="margin-top: 5em;"></div>
+{/if}
+
 <media-player
 	bind:this={player}
 	autoPlay={$playerAutoPlay}

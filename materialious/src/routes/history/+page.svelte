@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getHistory, getVideo } from '$lib/Api';
+	import { deleteHistory, getHistory, getVideo } from '$lib/Api';
 	import type { VideoPlay } from '$lib/Api/model';
 	import VideoList from '$lib/VideoList.svelte';
 	import { onDestroy, onMount } from 'svelte';
@@ -19,7 +19,9 @@
 			promises.push(getVideo(videoId));
 		}
 
-		const loadedHistory = await Promise.all(promises);
+		const loadedHistory = (await Promise.all(promises)).sort((a: VideoPlay, b: VideoPlay) => {
+			return a.published > b.published ? -1 : 1;
+		});
 		history = [...history, ...loadedHistory];
 	}
 
@@ -42,5 +44,17 @@
 		window.removeEventListener('scroll', handleScroll);
 	});
 </script>
+
+<div style="display: flex;margin-top: 1em;" class="space">
+	<button
+		on:click={async () => {
+			await deleteHistory();
+			history = [];
+		}}
+	>
+		<i>delete_sweep</i>
+		<span>Delete all history</span>
+	</button>
+</div>
 
 <VideoList videos={history} />

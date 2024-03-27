@@ -15,7 +15,7 @@ Modern material design for Invidious
 - Custom colour themes.
 - Integrates with Invidious subscriptions, watch history & more.
 - Live stream support.
-- Dash support (WIP).
+- Dash support.
 - Chapters.
 - Audio only mode.
 
@@ -23,7 +23,6 @@ Modern material design for Invidious
 - Complete channel view.
 - Add different search filters.
 - Playlist support.
-- History deletion.
 - PWA support.
 
 ## Previews

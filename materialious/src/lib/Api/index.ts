@@ -124,6 +124,18 @@ export async function getHistory(page: number = 1): Promise<string[]> {
   return await resp.json();
 }
 
+export async function deleteHistory(videoId: string | undefined = undefined) {
+  let url = '/api/v1/auth/history';
+  if (typeof videoId !== 'undefined') {
+    url += `/${videoId}`;
+  }
+
+  await fetch(buildPath(url), {
+    method: 'DELETE',
+    ...buildAuthHeaders()
+  });
+}
+
 export async function postHistory(videoId: string) {
   await fetch(buildPath(`auth/history/${videoId}`), {
     method: 'POST',

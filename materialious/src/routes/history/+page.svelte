@@ -48,6 +48,12 @@
 		on:click={async () => {
 			await deleteHistory();
 			history = [];
+			Object.keys(localStorage).forEach((key) => {
+				let content = localStorage.getItem(key);
+				if (content && content.startsWith('v_')) {
+					localStorage.removeItem(key);
+				}
+			});
 		}}
 	>
 		<i>delete_sweep</i>

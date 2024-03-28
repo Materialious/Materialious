@@ -49,8 +49,7 @@
 			await deleteHistory();
 			history = [];
 			Object.keys(localStorage).forEach((key) => {
-				let content = localStorage.getItem(key);
-				if (content && content.startsWith('v_')) {
+				if (key.startsWith('v_')) {
 					localStorage.removeItem(key);
 				}
 			});

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
+	import { playerSavePlaybackPosition } from '../store';
 	import type { Notification, Video, VideoBase } from './Api/model';
 	import { cleanNumber, truncate, videoLength } from './misc';
 
@@ -8,6 +10,13 @@
 	let loading = true;
 	let loaded = false;
 	let failed = false;
+
+	let progress: string | null;
+	if (get(playerSavePlaybackPosition)) {
+		progress = localStorage.getItem(`v_${video.videoId}`);
+	} else {
+		progress = null;
+	}
 
 	onMount(() => {
 		const img = new Image();
@@ -41,6 +50,14 @@
 	{:else}
 		<p>Failed to load image</p>
 	{/if}
+	{#if progress}
+		<progress
+			class="absolute right bottom"
+			style="z-index: 1;"
+			value={progress}
+			max={video.lengthSeconds}
+		></progress>
+	{/if}
 	{#if !('liveVideo' in video) || !video.liveVideo}
 		<div class="absolute right bottom small-margin black white-text small-text">
 			&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
@@ -55,10 +72,6 @@
 	{/if}
 </a>
 <div class="small-padding">
-	{#if localStorage.getItem(`v_${video.videoId}`)}
-		<progress value={localStorage.getItem(`v_${video.videoId}`)} max={video.lengthSeconds}
-		></progress>
-	{/if}
 	<nav class="no-margin">
 		<div class="max">
 			<a href={`/watch/${video.videoId}`}><div class="bold">{truncate(video.title)}</div></a>

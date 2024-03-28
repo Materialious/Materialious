@@ -167,7 +167,7 @@
 			</article>
 
 			<div class="space"></div>
-			{#if comments && comments.comments.length > 0}
+			{#if comments !== null && comments.comments !== undefined && comments.comments.length > 0}
 				<h6>{numberWithCommas(comments.commentCount)} comments</h6>
 				{#each comments.comments as comment}
 					<Comment {comment} videoId={data.video.videoId}></Comment>

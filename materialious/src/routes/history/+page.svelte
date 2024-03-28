@@ -19,9 +19,7 @@
 			promises.push(getVideo(videoId));
 		}
 
-		const loadedHistory = (await Promise.all(promises)).sort((a: VideoPlay, b: VideoPlay) => {
-			return a.published > b.published ? -1 : 1;
-		});
+		const loadedHistory = await Promise.all(promises);
 		history = [...history, ...loadedHistory];
 	}
 

@@ -159,6 +159,25 @@ export interface Channel {
   authorThumbnails: Image[];
 }
 
+export interface PlaylistVideo {
+  title: string;
+  videoId: string;
+  lengthSeconds: number;
+  videoThumbnails: Thumbnail[];
+}
+
+export interface Playlist {
+  type: "playlist";
+  title: string;
+  playlistId: string;
+  playlistThumbnail: string;
+  author: string;
+  authorId: string;
+  authorVerified: boolean;
+  videoCount: number;
+  videos: PlaylistVideo[];
+}
+
 export interface ChannelPage extends Channel {
   allowedRegions: string[];
   tabs: string[];

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { auth, returnYTDislikesInstance } from '../../store';
-import type { Channel, ChannelPage, Comments, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
+import type { Channel, ChannelPage, Comments, Playlist, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/api/v1/${path}`;
@@ -65,7 +65,7 @@ export async function getSearch(search: string, options: {
   sort_by?: "relevance" | "rating" | "upload_date" | "view_count",
   type?: "video" | "playlist" | "channel" | "all";
   page?: string;
-}): Promise<(Channel | Video)[]> {
+}): Promise<(Channel | Video | Playlist)[]> {
   if (typeof options.sort_by === "undefined") {
     options.sort_by = "relevance";
   }

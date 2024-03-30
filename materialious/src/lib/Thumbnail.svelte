@@ -11,6 +11,8 @@
 	let loaded = false;
 	let failed = false;
 
+	let img: HTMLImageElement;
+
 	let progress: string | null;
 	if (get(playerSavePlaybackPosition)) {
 		progress = localStorage.getItem(`v_${video.videoId}`);
@@ -19,8 +21,8 @@
 	}
 
 	onMount(() => {
-		const img = new Image();
-		img.src = video.videoThumbnails[3].url;
+		img = new Image();
+		img.src = video.videoThumbnails[4].url;
 
 		img.onload = () => {
 			loaded = true;
@@ -44,7 +46,7 @@
 		<img
 			class="responsive"
 			style="max-width: 100%;height: 100%;"
-			src={video.videoThumbnails[4].url}
+			src={img.src}
 			alt="Thumbnail for video"
 		/>
 	{:else}
@@ -59,14 +61,11 @@
 		></progress>
 	{/if}
 	{#if !('liveVideo' in video) || !video.liveVideo}
-		<div class="absolute right bottom small-margin black white-text small-text">
+		<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
 			&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
 		</div>
 	{:else}
-		<div
-			class="absolute right bottom small-margin red white-text small-text"
-			style="padding: 0 1em;"
-		>
+		<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
 			LIVE
 		</div>
 	{/if}

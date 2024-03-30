@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getSearch } from '$lib/Api';
-	import Channel from '$lib/Channel.svelte';
+	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
+	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { activePage } from '../../../store';
@@ -9,7 +10,7 @@
 
 	let currentPage = 1;
 
-	let search = data.search;
+	$: search = data.search;
 
 	activePage.set(null);
 
@@ -60,7 +61,9 @@
 					{#if item.type === 'video'}
 						<Thumbnail video={item} />
 					{:else if item.type === 'channel'}
-						<Channel channel={item} />
+						<ChannelThumbnail channel={item} />
+					{:else if item.type === 'playlist'}
+						<PlaylistThumbnail playlist={item} />
 					{/if}
 				</article>
 			</div>

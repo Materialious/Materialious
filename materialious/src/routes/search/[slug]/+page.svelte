@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getSearch } from '$lib/Api';
-	import VideoList from '$lib/VideoList.svelte';
+	import Channel from '$lib/Channel.svelte';
+	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { activePage } from '../../../store';
 
@@ -50,4 +51,19 @@
 	</div>
 </div>
 
-<VideoList videos={search} />
+<div class="page right active">
+	<div class="space"></div>
+	<div class="grid">
+		{#each search as item}
+			<div class="s12 m6 l2">
+				<article class="no-padding" style="height: 100%;">
+					{#if item.type === 'video'}
+						<Thumbnail video={item} />
+					{:else if item.type === 'channel'}
+						<Channel channel={item} />
+					{/if}
+				</article>
+			</div>
+		{/each}
+	</div>
+</div>

@@ -178,6 +178,22 @@ export interface Playlist {
   videos: PlaylistVideo[];
 }
 
+export interface PlaylistPageVideo extends PlaylistVideo {
+  author: string;
+  index: number;
+  authorId: string;
+  viewCount: number;
+}
+
+export interface PlaylistPage extends Playlist {
+  description: string;
+  descriptionHtml: string;
+  viewCount: number;
+  updated: number;
+  isListed: boolean;
+  videos: PlaylistPageVideo[];
+}
+
 export interface ChannelPage extends Channel {
   allowedRegions: string[];
   tabs: string[];

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { auth, returnYTDislikesInstance } from '../../store';
-import type { Channel, ChannelPage, Comments, Playlist, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
+import type { Channel, ChannelPage, Comments, Playlist, PlaylistPage, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/api/v1/${path}`;
@@ -141,4 +141,9 @@ export async function postHistory(videoId: string) {
     method: 'POST',
     ...buildAuthHeaders()
   });
+}
+
+export async function getPlaylist(playlistId: string, page: number = 1): Promise<PlaylistPage> {
+  const resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`));
+  return await resp.json();
 }

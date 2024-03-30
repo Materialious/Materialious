@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { Video, VideoBase } from './Api/model';
+	import type { PlaylistPageVideo, Video, VideoBase } from './Api/model';
 	import PageLoading from './PageLoading.svelte';
 	import Thumbnail from './Thumbnail.svelte';
 
-	export let videos: VideoBase[] | Video[] | Notification[] = [];
+	export let videos: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[] = [];
 	export let oneItemPerRow: boolean = false;
 </script>
 

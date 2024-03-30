@@ -2,10 +2,10 @@
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { playerSavePlaybackPosition } from '../store';
-	import type { Notification, Video, VideoBase } from './Api/model';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './Api/model';
 	import { cleanNumber, truncate, videoLength } from './misc';
 
-	export let video: VideoBase | Video | Notification;
+	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 
 	let loading = true;
 	let loaded = false;
@@ -75,7 +75,8 @@
 		<div class="max">
 			<a href={`/watch/${video.videoId}`}><div class="bold">{truncate(video.title)}</div></a>
 			<div>
-				<a href={`/channel/${video.authorId}`}>{video.author}</a>{#if !('publishedText' in video)}
+				<a href={`/channel/${video.authorId}`}>{video.author}</a
+				>{#if !('publishedText' in video) && 'viewCountText' in video}
 					&nbsp;• {video.viewCountText}{/if}
 			</div>
 			{#if 'publishedText' in video}

@@ -185,6 +185,16 @@ export interface PlaylistPageVideo extends PlaylistVideo {
   viewCount: number;
 }
 
+export interface ChannelContentVideos {
+  videos: Video[];
+  continuation: string;
+}
+
+export interface ChannelContentPlaylists {
+  playlists: PlaylistPage[];
+  continuation: string;
+}
+
 export interface PlaylistPage extends Playlist {
   description: string;
   descriptionHtml: string;

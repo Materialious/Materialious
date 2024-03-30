@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { auth, returnYTDislikesInstance } from '../../store';
-import type { Channel, ChannelPage, Comments, Playlist, PlaylistPage, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
+import type { Channel, ChannelContentPlaylists, ChannelContentVideos, ChannelPage, Comments, Playlist, PlaylistPage, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/api/v1/${path}`;
@@ -51,6 +51,22 @@ export async function getComments(videoId: string, parameters: {
 
 export async function getChannel(channelId: string): Promise<ChannelPage> {
   const resp = await fetch(buildPath(`channels/${channelId}`));
+  return await resp.json();
+}
+
+export async function getChannelContent(
+  channelId: string,
+  parameters: {
+    type?: 'videos' | 'playlists' | 'streams' | 'shorts';
+    continuation?: string;
+  }): Promise<ChannelContentVideos | ChannelContentPlaylists> {
+  if (typeof parameters.type === 'undefined') parameters.type = 'videos';
+
+  const url = new URL(buildPath(`channels/${channelId}/${parameters.type}`));
+
+  if (typeof parameters.continuation !== 'undefined') url.searchParams.set('continuation', parameters.continuation);
+
+  const resp = await fetch(url.toString());
   return await resp.json();
 }
 

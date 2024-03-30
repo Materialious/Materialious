@@ -20,7 +20,6 @@ Modern material design for Invidious
 - Audio only mode.
 
 ## Todo
-- Complete channel view.
 - Playlist support.
 - PWA support.
 

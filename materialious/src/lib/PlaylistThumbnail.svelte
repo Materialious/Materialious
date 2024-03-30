@@ -13,7 +13,11 @@
 
 	onMount(() => {
 		img = new Image();
-		img.src = playlist.videos[0].videoThumbnails[4].url;
+		if (playlist.videos.length > 0) {
+			img.src = playlist.videos[0].videoThumbnails[4].url;
+		} else {
+			img.src = playlist.playlistThumbnail;
+		}
 
 		img.onload = () => {
 			loaded = true;

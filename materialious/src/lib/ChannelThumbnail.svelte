@@ -26,7 +26,7 @@
 	});
 </script>
 
-<a href={`/channel/${channel.authorId}`} class="wave">
+<a href={`/channel/${channel.authorId}`} class="wave" style="min-width: 100%;min-height: 100%;">
 	<div class="padding">
 		<div class="center-align">
 			{#if loading}

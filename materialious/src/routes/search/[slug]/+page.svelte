@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { getSearch } from '$lib/Api';
 	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
@@ -14,11 +15,19 @@
 
 	activePage.set(null);
 
+	function changeType(type: string) {
+		$page.url.searchParams.set('type', type);
+		document.location.href = $page.url.href;
+	}
+
 	async function handleScroll() {
 		const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
 		if (scrollTop + clientHeight >= scrollHeight - 5) {
 			currentPage += 1;
-			search = [...search, ...(await getSearch(data.slug, { page: currentPage.toString() }))];
+			search = [
+				...search,
+				...(await getSearch(data.slug, { page: currentPage.toString(), type: data.searchType }))
+			];
 		}
 	}
 
@@ -33,19 +42,31 @@
 
 <div class="space" style="margin-bottom: 1em;">
 	<div class="tabs left-align min">
-		<a class="active">
+		<a class:active={data.searchType === 'all'} href="#all" on:click={() => changeType('all')}>
 			<i>home</i>
 			<span>All</span>
 		</a>
-		<a>
+		<a
+			class:active={data.searchType === 'video'}
+			href="#videos"
+			on:click={() => changeType('video')}
+		>
 			<i>movie</i>
 			<span>Videos</span>
 		</a>
-		<a>
+		<a
+			class:active={data.searchType === 'playlist'}
+			href="#playlists"
+			on:click={() => changeType('playlist')}
+		>
 			<i>playlist_add_check</i>
 			<span>Playlists</span>
 		</a>
-		<a>
+		<a
+			class:active={data.searchType === 'channel'}
+			href="#channels"
+			on:click={() => changeType('channel')}
+		>
 			<i>person</i>
 			<span>Channels</span>
 		</a>

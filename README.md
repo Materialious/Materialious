@@ -21,7 +21,6 @@ Modern material design for Invidious
 
 ## Todo
 - Complete channel view.
-- Add different search filters.
 - Playlist support.
 - PWA support.
 

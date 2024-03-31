@@ -17,6 +17,7 @@
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
 	import { videoLength, type PhasedDescription } from './misc';
+	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription };
 	export let currentTime: number = 0;
@@ -124,9 +125,12 @@
 					} else {
 						formattedSrc = format.url;
 					}
+					const quality = format.size.split('x');
 					return {
 						src: formattedSrc,
-						type: format.type.split(';')[0]
+						type: format.type.split(';')[0],
+						height: Number(quality[1]),
+						width: Number(quality[0])
 					};
 				});
 			}
@@ -145,6 +149,48 @@
 				}
 			];
 		}
+
+		const currentTheme = await getDynamicTheme();
+
+		document.documentElement.style.setProperty(
+			'--video-controls-color',
+			currentTheme['--secondary']
+		);
+		document.documentElement.style.setProperty(
+			'--audio-controls-color',
+			currentTheme['--secondary']
+		);
+		document.documentElement.style.setProperty(
+			'--audio-play-button-bg',
+			currentTheme['--secondary']
+		);
+		document.documentElement.style.setProperty(
+			'--media-slider-track-fill-bg',
+			currentTheme['--secondary']
+		);
+		document.documentElement.style.setProperty('--media-menu-bg', currentTheme['--background']);
+		document.documentElement.style.setProperty(
+			'--media-menu-top-bar-bg',
+			currentTheme['--surface']
+		);
+		document.documentElement.style.setProperty(
+			'--media-menu-item-color',
+			currentTheme['--primary-text']
+		);
+		document.documentElement.style.setProperty(
+			'--media-menu-item-info-color',
+			currentTheme['--primary-text']
+		);
+		document.documentElement.style.setProperty(
+			'--media-menu-section-bg',
+			currentTheme['--surface']
+		);
+		document.documentElement.style.setProperty(
+			'--media-menu-surface-container',
+			currentTheme['--surface']
+		);
+		document.documentElement.style.setProperty('--audio-bg', currentTheme['--surface']);
+		document.documentElement.style.setProperty('--video-bg', currentTheme['--surface']);
 	});
 
 	function savePlayerPos() {
@@ -164,7 +210,7 @@
 </script>
 
 {#if audioMode}
-	<div style="margin-top: 5em;"></div>
+	<div style="margin-top: 50vh;"></div>
 {/if}
 
 <media-player

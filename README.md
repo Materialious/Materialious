@@ -34,8 +34,9 @@
 - Localization.
 
 ## Previews
+
 ### Player
-Waiting
+![Preview of player](./previews/player-preview.png)
 
 ### Settings
 ![Preview of settings](./previews/setting-preview.png)
@@ -44,11 +45,10 @@ Waiting
 ![Preview of channel](./previews/channel-preview.png)
 
 ### Chapters
-Waiting
+![Preview of chapters](./previews/chapter-previews.png)
 
 ### Playlists
 Waiting
-
 # Have any questions?
 [Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
 

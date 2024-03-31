@@ -15,7 +15,7 @@
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"@types/eslint": "^8.56.0",
+		"@types/eslint": "^8.56.6",
 		"@types/event-source-polyfill": "^1.0.5",
 		"@types/human-number": "^1.0.2",
 		"@typescript-eslint/eslint-plugin": "^7.0.0",

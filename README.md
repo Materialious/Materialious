@@ -33,10 +33,20 @@
 - Localization.
 
 ## Previews
-![Preview of player](./previews/player-preview.png)
+### Player
+Waiting
+
+### Settings
 ![Preview of settings](./previews/setting-preview.png)
+
+### Channel
 ![Preview of channel](./previews/channel-preview.png)
-![Preview of chapters](./previews/chapter-previews.png)
+
+### Chapters
+Waiting
+
+### Playlists
+Waiting
 
 # Special thanks to
 - [Invidious](https://github.com/iv-org)

@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { deleteUnsubscribe, getComments, getPlaylist, postSubscribe } from '$lib/Api/index.js';
+	import {
+		addPlaylistVideo,
+		deleteUnsubscribe,
+		getComments,
+		getPersonalPlaylists,
+		getPlaylist,
+		postSubscribe
+	} from '$lib/Api/index.js';
 	import type { PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
@@ -23,7 +30,6 @@
 		if (!data.playlistId) return;
 
 		for (let page = 1; page < Infinity; page++) {
-			console.log(page);
 			const newPlaylist = await getPlaylist(data.playlistId, page);
 			if (page === 1) {
 				playlist = newPlaylist;
@@ -39,6 +45,12 @@
 			);
 		}
 	});
+
+	async function addVideoToPlaylist(playlistId: string) {
+		await addPlaylistVideo(playlistId, data.video.videoId);
+
+		data.personalPlaylists = await getPersonalPlaylists();
+	}
 
 	async function loadMoreComments() {
 		if (!comments) {
@@ -78,95 +90,107 @@
 
 			<h5>{data.video.title}</h5>
 
-			<nav>
-				<a href={`/channel/${data.video.authorId}`}>
+			<div class="grid no-padding">
+				<div class="s12 m12 l4">
 					<nav>
-						<img
-							class="circle large"
-							src={data.video.authorThumbnails[2].url}
-							alt="Channel profile"
-						/>
-						<div>
-							<p class="bold">{data.video.author}</p>
-							<p>{data.video.subCountText}</p>
-						</div>
+						<a href={`/channel/${data.video.authorId}`}>
+							<nav>
+								<img
+									class="circle large"
+									src={data.video.authorThumbnails[2].url}
+									alt="Channel profile"
+								/>
+								<div>
+									<p class="bold">{data.video.author}</p>
+									<p>{data.video.subCountText}</p>
+								</div>
+							</nav>
+						</a>
+						<button
+							on:click={toggleSubscribed}
+							class:inverse-surface={!data.subscribed}
+							class:border={data.subscribed}
+						>
+							{#if !data.subscribed}
+								Subscribe
+							{:else}
+								Unsubscribe
+							{/if}
+						</button>
 					</nav>
-				</a>
-				<button
-					on:click={toggleSubscribed}
-					class:inverse-surface={!data.subscribed}
-					class:border={data.subscribed}
+				</div>
+				<div
+					class="s12 m12 l8"
+					style="display: flex;align-items: center;justify-content: flex-end;"
 				>
-					{#if !data.subscribed}
-						Subscribe
-					{:else}
-						Unsubscribe
+					{#if data.returnYTDislikes}
+						<nav class="no-space" style="margin-right: .5em;">
+							<button style="cursor: default;" class="border left-round">
+								<i class="small">thumb_up</i>
+								<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
+							</button>
+							<button style="cursor: default;" class="border right-round">
+								<i class="small">thumb_down_alt</i>
+								<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
+							</button>
+						</nav>
 					{/if}
-				</button>
-				<div class="max"></div>
-				{#if data.returnYTDislikes}
-					<nav class="no-space m l">
-						<button style="cursor: default;" class="border left-round">
-							<i class="small">thumb_up</i>
-							<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
-						</button>
-						<button style="cursor: default;" class="border right-round">
-							<i class="small">thumb_down_alt</i>
-							<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
-						</button>
-					</nav>
-				{/if}
-				<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
-					<i>headphones</i>
-					<span>Audio only </span>
-				</button>
-				<button class="border m l" data-ui="#share"
-					><i>share</i> Share
-					<menu class="left no-wrap" id="share" data-ui="#share">
-						<a
-							class="row"
-							href="#copy"
-							on:click={async () =>
-								await navigator.clipboard.writeText(
-									`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
-								)}
-						>
-							<div class="min">Copy Materialious link</div></a
-						><a
-							href="#copy"
-							class="row"
-							on:click={async () =>
-								await navigator.clipboard.writeText(
-									`https://redirect.invidious.io/watch?v=${data.video.videoId}`
-								)}
-						>
-							<div class="min">Copy Invidious redirect link</div></a
-						><a
-							class="row"
-							href="#copy"
-							on:click={async () =>
-								await navigator.clipboard.writeText(
-									`https://www.youtube.com/watch?v=${data.video.videoId}`
-								)}
-						>
-							<div class="min">Copy Youtube link</div></a
-						></menu
-					></button
-				>
-			</nav>
-
-			{#if data.returnYTDislikes}
-				<nav class="no-space s">
-					<button style="cursor: default;" class="border left-round">
-						<i class="small">thumb_up</i>
-						<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
+					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
+						<i>headphones</i>
+						<span>Audio only </span>
 					</button>
-					<button style="cursor: default;" class="border right-round">
-						<i class="small">thumb_down_alt</i>
-						<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
-					</button>
-				</nav>
-			{/if}
+					<button class="border m l" data-ui="#share"
+						><i>share</i> Share
+						<menu class="left no-wrap" id="share" data-ui="#share">
+							<a
+								class="row"
+								href="#copy"
+								on:click={async () =>
+									await navigator.clipboard.writeText(
+										`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
+									)}
+							>
+								<div class="min">Copy Materialious link</div></a
+							><a
+								href="#copy"
+								class="row"
+								on:click={async () =>
+									await navigator.clipboard.writeText(
+										`https://redirect.invidious.io/watch?v=${data.video.videoId}`
+									)}
+							>
+								<div class="min">Copy Invidious redirect link</div></a
+							><a
+								class="row"
+								href="#copy"
+								on:click={async () =>
+									await navigator.clipboard.writeText(
+										`https://www.youtube.com/watch?v=${data.video.videoId}`
+									)}
+							>
+								<div class="min">Copy Youtube link</div></a
+							></menu
+						></button
+					>
+					{#if data.personalPlaylists}
+						<button class="border">
+							<span>Add to playlist</span>
+							<i>arrow_drop_down</i>
+							<menu>
+								{#each data.personalPlaylists as personalPlaylist}
+									<a
+										href="#add"
+										on:click={async () => await addVideoToPlaylist(personalPlaylist.playlistId)}
+										>{personalPlaylist.title}{#if personalPlaylist.videos.filter((item) => {
+											if (item.videoId === data.video.videoId) return item;
+										})}<i>done</i>{/if}
+									</a>
+								{/each}
+							</menu>
+						</button>
+					{/if}
+				</div>
+			</div>
 
 			<article class="medium scroll">
 				<p class="bold">

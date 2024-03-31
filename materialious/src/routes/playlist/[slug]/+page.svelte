@@ -10,21 +10,26 @@
 
 	activePage.set(null);
 
-	let videos = data.playlist.videos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-		return a.index < b.index ? -1 : 1;
-	});
+	let videos: PlaylistPageVideo[] | undefined;
+	if (data.playlist.videos) {
+		videos = data.playlist.videos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
+			return a.index < b.index ? -1 : 1;
+		});
 
-	onMount(async () => {
-		for (let page = 1; page++; ) {
-			const newVideos = (await getPlaylist(data.playlist.playlistId, page)).videos;
-			if (newVideos.length === 0) {
-				break;
+		onMount(async () => {
+			for (let page = 1; page++; ) {
+				const newVideos = (await getPlaylist(data.playlist.playlistId, page)).videos;
+				if (newVideos.length === 0) {
+					break;
+				}
+				videos = [...(videos as PlaylistPageVideo[]), ...newVideos].sort(
+					(a: PlaylistPageVideo, b: PlaylistPageVideo) => {
+						return a.index < b.index ? -1 : 1;
+					}
+				);
 			}
-			videos = [...videos, ...newVideos].sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-				return a.index < b.index ? -1 : 1;
-			});
-		}
-	});
+		});
+	}
 </script>
 
 <div class="space"></div>
@@ -36,4 +41,6 @@
 	<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.description}</p>
 </article>
 
-<VideoList {videos} playlistId={data.playlist.playlistId} />
+{#if videos}
+	<VideoList {videos} playlistId={data.playlist.playlistId} />
+{/if}

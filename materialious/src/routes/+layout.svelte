@@ -168,6 +168,7 @@
 
 	function logout() {
 		auth.set(null);
+		goto('/');
 	}
 
 	async function loadNotifications() {

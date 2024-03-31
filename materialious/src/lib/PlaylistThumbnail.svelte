@@ -35,15 +35,17 @@
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
 >
-	{#if loading}
-		<progress class="circle"></progress>
-	{:else}
-		<img
-			class="responsive"
-			style="max-width: 100%;height: 100%;"
-			src={img.src}
-			alt="Thumbnail for playlist"
-		/>
+	{#if playlist.videoCount > 0}
+		{#if loading}
+			<progress class="circle"></progress>
+		{:else}
+			<img
+				class="responsive"
+				style="max-width: 100%;height: 100%;"
+				src={img.src}
+				alt="Thumbnail for playlist"
+			/>
+		{/if}
 	{/if}
 	<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
 		{playlist.videoCount} videos

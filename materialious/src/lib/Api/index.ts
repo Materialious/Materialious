@@ -160,6 +160,51 @@ export async function postHistory(videoId: string) {
 }
 
 export async function getPlaylist(playlistId: string, page: number = 1): Promise<PlaylistPage> {
-  const resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`));
+  let resp;
+
+  if (get(auth)) {
+    resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), buildAuthHeaders());
+  } else {
+    resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`));
+  }
   return await resp.json();
+}
+
+export async function getPersonalPlaylists(): Promise<PlaylistPage[]> {
+  const resp = await fetch(buildPath('auth/playlists'), buildAuthHeaders());
+  return await resp.json();
+}
+
+export async function deletePersonalPlaylist(playlistId: string) {
+  await fetch(buildPath(`auth/playlists/${playlistId}`), {
+    method: 'DELETE',
+    ...buildAuthHeaders()
+  });
+}
+
+export async function postPersonalPlaylist(title: string, privacy: 'public' | 'private' | 'unlisted') {
+  let headers: Record<string, Record<string, string>> = buildAuthHeaders();
+  headers['headers']['Content-type'] = 'application/json';
+
+  await fetch(buildPath('auth/playlists'), {
+    method: 'POST',
+    body: JSON.stringify({
+      title: title,
+      privacy: privacy
+    }),
+    ...headers
+  });
+}
+
+export async function addPlaylistVideo(playlistId: string, videoId: string) {
+  let headers: Record<string, Record<string, string>> = buildAuthHeaders();
+  headers['headers']['Content-type'] = 'application/json';
+
+  await fetch(buildPath(`auth/playlists/${playlistId}/videos`), {
+    method: 'POST',
+    body: JSON.stringify({
+      videoId: videoId
+    }),
+    ...headers
+  });
 }

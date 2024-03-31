@@ -1,4 +1,5 @@
-import { amSubscribed, getComments, getDislikes, getVideo, postHistory } from '$lib/Api/index.js';
+import { amSubscribed, getComments, getDislikes, getPersonalPlaylists, getVideo, postHistory } from '$lib/Api/index.js';
+import type { PlaylistPage } from '$lib/Api/model';
 import { phaseDescription } from '$lib/misc';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
@@ -12,8 +13,13 @@ export async function load({ params, url }) {
     error(500, (video as { errorBacktrace: string; }).errorBacktrace)
   );
 
+  let personalPlaylists: PlaylistPage[] | null;
+
   if (get(auth)) {
     postHistory(video.videoId);
+    personalPlaylists = await getPersonalPlaylists();
+  } else {
+    personalPlaylists = null;
   }
 
   let comments;
@@ -40,6 +46,7 @@ export async function load({ params, url }) {
     comments: comments,
     subscribed: await amSubscribed(video.authorId),
     content: phaseDescription(video.description),
-    playlistId: url.searchParams.get('playlist')
+    playlistId: url.searchParams.get('playlist'),
+    personalPlaylists: personalPlaylists
   };
 };

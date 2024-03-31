@@ -27,6 +27,9 @@
 
 ## Todo
 - Playlist support.
+- Docker building & publishing workflow.
+- Launching 'materialio.us'.
+- Locking down git branches & setup PR requirements.
 - Localization.
 
 ## Previews

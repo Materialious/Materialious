@@ -73,6 +73,7 @@
 
 			player.addEventListener('time-update', () => {
 				currentTime = player.currentTime;
+				savePlayerPos();
 			});
 
 			player.addEventListener('pause', () => {

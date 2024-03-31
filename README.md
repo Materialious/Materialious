@@ -1,7 +1,13 @@
-# Still in development!
+<div align="center">
+  <img src="previews/header.png" />
+  <quote>
+  Modern material design for Invidious.
+  </quote>
+</div>
 
-# Materialious
-Modern material design for Invidious
+&nbsp;
+
+-------
 
 ![Preview of homepage](./previews/home-preview.png)
 
@@ -21,7 +27,6 @@ Modern material design for Invidious
 
 ## Todo
 - Playlist support.
-- PWA support.
 
 ## Previews
 ![Preview of player](./previews/player-preview.png)

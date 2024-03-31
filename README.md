@@ -24,12 +24,10 @@
 - Dash support.
 - Chapters.
 - Audio only mode.
+- Playlists.
 - PWA support.
 
 ## Todo
-- Docker building & publishing workflow.
-- Launching 'materialio.us'.
-- Locking down git branches & setup PR requirements.
 - Localization.
 
 ## Previews

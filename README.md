@@ -33,3 +33,8 @@
 ![Preview of settings](./previews/setting-preview.png)
 ![Preview of channel](./previews/channel-preview.png)
 ![Preview of chapters](./previews/chapter-previews.png)
+
+# Special thanks to
+- [Invidious](https://github.com/iv-org)
+- [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
+- Every dependency in [package.json](/materialious/package.json).

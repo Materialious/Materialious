@@ -49,6 +49,9 @@ Waiting
 ### Playlists
 Waiting
 
+# Have any questions?
+[Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
+
 # Special thanks to
 - [Invidious](https://github.com/iv-org)
 - [Vidstack player](https://github.com/vidstack/player)

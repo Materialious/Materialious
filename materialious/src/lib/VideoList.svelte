@@ -5,6 +5,7 @@
 
 	export let videos: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[] = [];
 	export let oneItemPerRow: boolean = false;
+	export let playlistId: string = '';
 </script>
 
 {#if videos.length > 0}
@@ -14,7 +15,7 @@
 			{#each videos as video}
 				<div class={`s12 m${oneItemPerRow ? '12' : '6'} l${oneItemPerRow ? '12' : '2'}`}>
 					<article class="no-padding" style="height: 100%;">
-						<Thumbnail {video} />
+						<Thumbnail {video} {playlistId} />
 					</article>
 				</div>
 			{/each}

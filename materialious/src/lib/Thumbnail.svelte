@@ -6,6 +6,9 @@
 	import { cleanNumber, truncate, videoLength } from './misc';
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
+	export let playlistId: string = '';
+
+	let watchUrl = `/watch/${video.videoId}` + (playlistId ? `?playlist=${playlistId}` : '');
 
 	let loading = true;
 	let loaded = false;
@@ -35,11 +38,7 @@
 	});
 </script>
 
-<a
-	class="wave"
-	style="width: 100%; overflow: hidden;min-height:100px;"
-	href={`/watch/${video.videoId}`}
->
+<a class="wave" style="width: 100%; overflow: hidden;min-height:100px;" href={watchUrl}>
 	{#if loading}
 		<progress class="circle"></progress>
 	{:else if loaded}
@@ -73,7 +72,7 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a href={`/watch/${video.videoId}`}><div class="bold">{truncate(video.title)}</div></a>
+			<a href={watchUrl}><div class="bold">{truncate(video.title)}</div></a>
 			<div>
 				<a href={`/channel/${video.authorId}`}>{video.author}</a
 				>{#if !('publishedText' in video) && 'viewCountText' in video}

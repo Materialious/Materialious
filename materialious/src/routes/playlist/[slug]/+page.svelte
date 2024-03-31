@@ -36,4 +36,4 @@
 	<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.description}</p>
 </article>
 
-<VideoList {videos} />
+<VideoList {videos} playlistId={data.playlist.playlistId} />

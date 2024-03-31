@@ -27,6 +27,7 @@
 
 ## Todo
 - Playlist support.
+- Localization.
 
 ## Previews
 ![Preview of player](./previews/player-preview.png)

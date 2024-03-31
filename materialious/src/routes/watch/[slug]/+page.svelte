@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { deleteUnsubscribe, getComments, postSubscribe } from '$lib/Api/index.js';
+	import { deleteUnsubscribe, getComments, getPlaylist, postSubscribe } from '$lib/Api/index.js';
+	import type { PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
+	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { activePage, playerListenByDefault } from '../../../store.js';
 
@@ -13,6 +15,30 @@
 	let comments = data.comments;
 
 	activePage.set(null);
+
+	let playlistVideos: PlaylistPageVideo[] = [];
+	let playlist: PlaylistPage | null = null;
+
+	onMount(async () => {
+		if (!data.playlistId) return;
+
+		for (let page = 1; page < Infinity; page++) {
+			console.log(page);
+			const newPlaylist = await getPlaylist(data.playlistId, page);
+			if (page === 1) {
+				playlist = newPlaylist;
+			}
+			const newVideos = newPlaylist.videos;
+			if (newVideos.length === 0) {
+				break;
+			}
+			playlistVideos = [...playlistVideos, ...newVideos].sort(
+				(a: PlaylistPageVideo, b: PlaylistPageVideo) => {
+					return a.index < b.index ? -1 : 1;
+				}
+			);
+		}
+	});
 
 	async function loadMoreComments() {
 		if (!comments) {
@@ -47,7 +73,7 @@
 	<div class="grid">
 		<div class="s12 m12 l10">
 			{#key data.video.videoId}
-				<Player {data} {audioMode} bind:seekTo bind:currentTime />
+				<Player {data} {audioMode} {playlistVideos} bind:seekTo bind:currentTime />
 			{/key}
 
 			<h5>{data.video.title}</h5>
@@ -180,12 +206,31 @@
 			{/if}
 		</div>
 		<div class="s12 m12 l2">
-			{#if data.video.recommendedVideos}
-				{#each data.video.recommendedVideos as recommendedVideo}
-					<article class="no-padding">
-						<Thumbnail video={recommendedVideo} />
-					</article>
-				{/each}
+			{#if !data.playlistId}
+				{#if data.video.recommendedVideos}
+					{#each data.video.recommendedVideos as recommendedVideo}
+						<article class="no-padding">
+							<Thumbnail video={recommendedVideo} />
+						</article>
+					{/each}
+				{/if}
+			{:else if playlist}
+				<article style="height: 75vh;" class="scroll">
+					<h6>{playlist.title}</h6>
+					<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
+
+					<div class="divider"></div>
+					<div class="space"></div>
+
+					{#each playlistVideos as playlistVideo}
+						<article
+							class="no-padding primary-border"
+							class:border={playlistVideo.videoId === data.video.videoId}
+						>
+							<Thumbnail video={playlistVideo} playlistId={data.playlistId} />
+						</article>
+					{/each}
+				</article>
 			{/if}
 		</div>
 	</div>

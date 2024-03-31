@@ -48,7 +48,9 @@
 ![Preview of chapters](./previews/chapter-previews.png)
 
 ### Playlists
-Waiting
+![Preview of playlist page](./previews/playlist-preview.png)
+![Preview of playlist on video page](./previews/playlist-preview-2.png)
+
 # Have any questions?
 [Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
 

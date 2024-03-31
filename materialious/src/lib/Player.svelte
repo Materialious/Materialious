@@ -1,6 +1,7 @@
 <script lang="ts">
 	import 'vidstack/bundle';
 
+	import { goto } from '$app/navigation';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
@@ -15,13 +16,14 @@
 		sponsorBlockCategories,
 		sponsorBlockUrl
 	} from '../store';
-	import type { VideoPlay } from './Api/model';
+	import type { PlaylistPageVideo, VideoPlay } from './Api/model';
 	import { videoLength, type PhasedDescription } from './misc';
 	import { getDynamicTheme } from './theme';
 
-	export let data: { video: VideoPlay; content: PhasedDescription };
+	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 	export let currentTime: number = 0;
 	export let audioMode = false;
+	export let playlistVideos: PlaylistPageVideo[] | null = null;
 
 	let player: MediaPlayerElement;
 	let src: PlayerSrc = [];
@@ -36,6 +38,21 @@
 	const proxyVideos = get(playerProxyVideos);
 
 	onMount(async () => {
+		if (playlistVideos) {
+			player.addEventListener('end', () => {
+				if (!playlistVideos) return;
+
+				const playlistVideoIds = playlistVideos.map((value) => {
+					return value.videoId;
+				});
+
+				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+				const newIndex = currentVideoIndex + 1;
+				if (currentVideoIndex !== -1 && newIndex <= playlistVideoIds.length) {
+					goto(`/watch/${playlistVideos[newIndex].videoId}?playlist=${data.playlistId}`);
+				}
+			});
+		}
 		if (!data.video.hlsUrl) {
 			if (data.video.captions) {
 				data.video.captions.forEach(async (caption) => {

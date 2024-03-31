@@ -4,7 +4,7 @@ import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { auth, playerProxyVideos, returnYtDislikes } from '../../../store';
 
-export async function load({ params }) {
+export async function load({ params, url }) {
   let video;
   video = await getVideo(params.slug, get(playerProxyVideos));
 
@@ -39,6 +39,7 @@ export async function load({ params }) {
     returnYTDislikes: returnYTDislikes,
     comments: comments,
     subscribed: await amSubscribed(video.authorId),
-    content: phaseDescription(video.description)
+    content: phaseDescription(video.description),
+    playlistId: url.searchParams.get('playlist')
   };
 };

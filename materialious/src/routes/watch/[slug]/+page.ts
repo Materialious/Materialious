@@ -1,10 +1,17 @@
 import { amSubscribed, getComments, getDislikes, getVideo, postHistory } from '$lib/Api/index.js';
 import { phaseDescription } from '$lib/misc';
+import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { auth, playerProxyVideos, returnYtDislikes } from '../../../store';
 
 export async function load({ params }) {
-  const video = await getVideo(params.slug, get(playerProxyVideos));
+  let video;
+  video = await getVideo(params.slug, get(playerProxyVideos));
+
+  if ('errorBacktrace' in video) (
+    error(500, (video as { errorBacktrace: string; }).errorBacktrace)
+  );
+
   if (get(auth)) {
     postHistory(video.videoId);
   }
@@ -13,6 +20,10 @@ export async function load({ params }) {
   try {
     comments = video.liveNow ? null : await getComments(params.slug, { sort_by: "top", source: "youtube" });
   } catch {
+    comments = null;
+  }
+
+  if (comments && 'errorBacktrace' in comments) {
     comments = null;
   }
 

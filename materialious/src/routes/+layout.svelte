@@ -321,6 +321,22 @@
 	</div>
 
 	<div class="settings">
+		<h6>Data preferences</h6>
+		<p style="width: 240px;">
+			Looking to import/export subscriptions, change password or delete account?
+			<a
+				href={`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/preferences`}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="link"
+			>
+				Go here
+			</a>
+			and scroll to the bottom of the page.
+		</p>
+	</div>
+
+	<div class="settings">
 		<h6>Player</h6>
 		<div class="field no-margin">
 			<nav class="no-padding">

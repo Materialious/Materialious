@@ -1,30 +1,40 @@
-FROM node as build
+FROM node AS builder
 
+# Set the working directory
 WORKDIR /app
 
-COPY ./package*.json ./
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
-RUN npm install
-
+# Copy the rest of the project files to the working directory
 COPY . .
 
+# Create placeholder env vars
 RUN echo "VITE_DEFAULT_INVIDIOUS_INSTANCE=VITE_DEFAULT_INVIDIOUS_INSTANCE_PLACEHOLDER" > .env && \
     echo "VITE_DEFAULT_FRONTEND_URL=VITE_DEFAULT_FRONTEND_URL_PLACEHOLDER" > .env && \
     echo "VITE_DEFAULT_SPONSERBLOCK_INSTANCE=VITE_DEFAULT_SPONSERBLOCK_INSTANCE_PLACEHOLDER" > .env && \
     echo "VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE=VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE_PLACEHOLDER" >> .env
 
-RUN npm run build
+# Install dependencies and build the project
+RUN npm install && npm run build
 
-FROM node AS production
+FROM nginx:alpine
 
-COPY --from=build /app/build .
+# Remove the default nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
 
-COPY --from=build /app/package.json .
+# Copy the nginx.conf file to the container
+COPY nginx.conf /etc/nginx/nginx.conf
 
-COPY --from=build /app/package-lock.json .
+# Copy the built Vite project from the builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN npm ci --omit dev
+# Expose the desired port
+EXPOSE 80
 
-EXPOSE 3000
+# Copy the replace_env_vars.sh script
+COPY replace_env_vars.sh /replace_env_vars.sh
+RUN chmod +x /replace_env_vars.sh
 
-CMD ["node", "."]
+# Replace env vars & Start nginx
+CMD ["/bin/sh", "-c", "/replace_env_vars.sh && nginx -g \"daemon off;\""]

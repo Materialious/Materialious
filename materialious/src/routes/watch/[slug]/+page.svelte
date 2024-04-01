@@ -119,12 +119,9 @@
 						</button>
 					</nav>
 				</div>
-				<div
-					class="s12 m12 l8"
-					style="display: flex;align-items: center;justify-content: flex-end;"
-				>
+				<div class="s12 m12 l4 video-actions">
 					{#if data.returnYTDislikes}
-						<nav class="no-space" style="margin-right: .5em;">
+						<nav class="no-space no-margin" style="margin-right: .5em;">
 							<button style="cursor: default;" class="border left-round">
 								<i class="small">thumb_up</i>
 								<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
@@ -135,7 +132,14 @@
 							</button>
 						</nav>
 					{/if}
-					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
+				</div>
+
+				<div class="s12 m12 l4 video-actions">
+					<button
+						class="no-margin"
+						on:click={() => (audioMode = !audioMode)}
+						class:border={!audioMode}
+					>
 						<i>headphones</i>
 						<span>Audio only </span>
 					</button>
@@ -173,9 +177,9 @@
 						></button
 					>
 					{#if data.personalPlaylists}
-						<button class="border">
-							<span>Add to playlist</span>
-							<i>arrow_drop_down</i>
+						<button class="border no-margin">
+							<i>add</i>
+							<span>Playlist</span>
 							<menu>
 								{#each data.personalPlaylists as personalPlaylist}
 									<a
@@ -269,17 +273,29 @@
 		padding: 1em 10em;
 	}
 
-	@media screen and (max-width: 1646px) {
-		.grid {
-			padding: 0;
-		}
-	}
-
 	.timestamps {
 		margin-left: 0;
 		margin-bottom: 0.4em;
 		display: block;
 		background-color: var(--secondary-container);
 		color: var(--on-secondary-container);
+	}
+
+	.video-actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
+
+	@media screen and (max-width: 1000px) {
+		.video-actions {
+			justify-content: flex-start;
+		}
+	}
+
+	@media screen and (max-width: 1646px) {
+		.grid {
+			padding: 0;
+		}
 	}
 </style>

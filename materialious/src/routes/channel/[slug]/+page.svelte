@@ -97,7 +97,7 @@
 		</button>
 	</div>
 
-	<div class="tabs left-align">
+	<div class="tabs left-align scroll">
 		<a class:active={tab === 'videos'} on:click={() => changeTab('videos')} href={`#video`}>
 			<i>movie</i>
 			<span>Videos</span>

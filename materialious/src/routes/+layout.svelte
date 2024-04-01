@@ -177,6 +177,8 @@
 	}
 
 	onMount(async () => {
+		ui();
+
 		const isDark = get(darkMode);
 
 		if (isDark === null) {

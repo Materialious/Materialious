@@ -186,11 +186,7 @@
 		}
 
 		if (isLoggedIn) {
-			try {
-				loadNotifications();
-			} catch {
-				auth.set(null);
-			}
+			loadNotifications().catch(() => auth.set(null));
 		}
 	});
 </script>

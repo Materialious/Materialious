@@ -7,11 +7,11 @@ import { auth, playerProxyVideos, returnYtDislikes } from '../../../store';
 
 export async function load({ params, url }) {
   let video;
-  video = await getVideo(params.slug, get(playerProxyVideos));
-
-  if ('errorBacktrace' in video) (
-    error(500, (video as { errorBacktrace: string; }).errorBacktrace)
-  );
+  try {
+    video = await getVideo(params.slug, get(playerProxyVideos));
+  } catch (errorMessage: any) {
+    error(500, errorMessage);
+  }
 
   let personalPlaylists: PlaylistPage[] | null;
 

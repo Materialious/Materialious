@@ -139,7 +139,7 @@
 						<i>headphones</i>
 						<span>Audio only </span>
 					</button>
-					<button class="border m l" data-ui="#share"
+					<button class="border" data-ui="#share"
 						><i>share</i> Share
 						<menu class="left no-wrap" id="share" data-ui="#share">
 							<a
@@ -181,9 +181,7 @@
 									<a
 										href="#add"
 										on:click={async () => await addVideoToPlaylist(personalPlaylist.playlistId)}
-										>{personalPlaylist.title}{#if personalPlaylist.videos.filter((item) => {
-											if (item.videoId === data.video.videoId) return item;
-										})}<i>done</i>{/if}
+										>{personalPlaylist.title}
 									</a>
 								{/each}
 							</menu>

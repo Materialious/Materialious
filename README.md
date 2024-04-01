@@ -88,6 +88,30 @@ server {
 }
 ```
 
+### Traefik example
+Add this middleware to your Invidious instance:
+```yaml
+http:
+  middlewares:
+    materialious:
+      headers:
+        accessControlAllowCredentials: true
+        accessControlAllowOrigin: "https://materialious.example.com"
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+          - HEAD
+          - PATCH
+          - PUT
+          - DELETE
+        accessControlAllowHeaders: 
+          - User-Agent
+          - Authorization 
+          - Content-Type
+```
+
+
 ### Other
 Please open a PR request or issue if you implement this in a different reverse proxy.
 

@@ -4,9 +4,6 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-	ssr: {
-		noExternal: ['beercss']
-	},
 	plugins: [
 		VitePWA({
 			manifest: {

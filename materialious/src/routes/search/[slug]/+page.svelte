@@ -41,7 +41,7 @@
 </script>
 
 <div class="space" style="margin-bottom: 1em;">
-	<div class="tabs left-align min">
+	<div class="tabs left-align min scroll">
 		<a class:active={data.searchType === 'all'} href="#all" on:click={() => changeType('all')}>
 			<i>home</i>
 			<span>All</span>

@@ -1,3 +1,10 @@
 .thumbnail-corner {
     padding: .1em .4em;
 }
+
+@media screen and (max-width: 580px) {
+    main {
+        padding-left: .1em !important;
+        padding-right: .1em !important;
+    }
+}

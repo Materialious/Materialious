@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getFeed, getSearchSuggestions } from '$lib/Api/index';
+	import { getFeed } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
+	import Search from '$lib/Search.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import 'beercss';
 	import 'material-dynamic-colors';
@@ -48,24 +49,6 @@
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategories.subscribe((value) => (sponsorCategoriesList = value));
-
-	let search = '';
-
-	let suggestionsForSearch: string[] = [];
-
-	let debounceTimer = 0;
-	const debouncedSearch = (event: any) => {
-		if (!searchSuggestions) return;
-
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(async () => {
-			if (event.target.value === '') {
-				suggestionsForSearch = [];
-				return;
-			}
-			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
-		}, 250);
-	};
 
 	let isLoggedIn = false;
 	auth.subscribe((value) => {
@@ -233,29 +216,11 @@
 	<h6 class="m l">Materialious</h6>
 
 	<div class="max"></div>
-	<form on:submit|preventDefault={() => goto(`/search/${encodeURIComponent(search)}`)}>
-		<div class="max field round suffix prefix small no-margin m l white black-text">
-			<i class="front">search</i><input
-				data-ui="search-suggestions"
-				type="text"
-				placeholder="Search..."
-				bind:value={search}
-				on:keyup={(target) => debouncedSearch(target)}
-			/>
-			{#if searchSuggestions}
-				<menu
-					class="no-wrap"
-					style="width: 100%;"
-					id="search-suggestions"
-					data-ui="#search-suggestions"
-				>
-					{#each suggestionsForSearch as suggestion}
-						<a href={`/search/${encodeURIComponent(suggestion)}`}>{suggestion}</a>
-					{/each}
-				</menu>
-			{/if}
-		</div>
-	</form>
+
+	<div class="m l">
+		<Search />
+	</div>
+
 	<div class="max"></div>
 	<a
 		href="https://github.com/WardPearce/Materialious"
@@ -539,6 +504,9 @@
 			<h6>Materialious</h6>
 		</nav>
 	</header>
+
+	<Search />
+	<div class="space"></div>
 	{#each pages as page}
 		{#if !page.requiresAuth || isLoggedIn}
 			<a

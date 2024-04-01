@@ -1,5 +1,5 @@
 #!/bin/sh
-ROOT_DIR=/usr/share/nginx/html
+ROOT_DIR=./
 
 # Replace env vars in JavaScript and HTML files served by NGINX
 find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_INVIDIOUS_INSTANCE_PLACEHOLDER|'"$VITE_DEFAULT_INVIDIOUS_INSTANCE"'|g' {} +

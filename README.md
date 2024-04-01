@@ -89,7 +89,7 @@ server {
 ```
 
 ### Other
-Please open a PR request or issue if your implement this in a different reverse proxy.
+Please open a PR request or issue if you implement this in a different reverse proxy.
 
 ### Docker compose
 ```yaml

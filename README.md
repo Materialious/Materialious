@@ -96,7 +96,7 @@ http:
     materialious:
       headers:
         accessControlAllowCredentials: true
-        accessControlAllowOrigin: "https://materialious.example.com"
+        accessControlAllowOriginList: "https://materialious.example.com"
         accessControlAllowMethods:
           - GET
           - POST
@@ -110,7 +110,6 @@ http:
           - Authorization 
           - Content-Type
 ```
-
 
 ### Other
 Please open a PR request or issue if you implement this in a different reverse proxy.

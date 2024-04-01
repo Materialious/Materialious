@@ -190,6 +190,12 @@
 								{/each}
 							</menu>
 						</button>
+					{:else}
+						<button disabled class="border no-margin">
+							<i>add</i>
+							<span>Playlist</span>
+							<div class="tooltip">Login required</div>
+						</button>
 					{/if}
 				</div>
 			</div>

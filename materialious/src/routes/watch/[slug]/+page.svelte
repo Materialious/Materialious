@@ -84,9 +84,7 @@
 {#if data}
 	<div class="grid">
 		<div class="s12 m12 l10">
-			{#key data.video.videoId}
-				<Player {data} {audioMode} {playlistVideos} bind:seekTo bind:currentTime />
-			{/key}
+			<Player {data} {audioMode} {playlistVideos} bind:seekTo bind:currentTime />
 
 			<h5>{data.video.title}</h5>
 

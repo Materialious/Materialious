@@ -158,9 +158,9 @@
 						<i>headphones</i>
 						<span>Audio only </span>
 					</button>
-					<button class="border" data-ui="#share"
+					<button class="border"
 						><i>share</i> Share
-						<menu class="left no-wrap" id="share" data-ui="#share">
+						<menu class="no-wrap">
 							<a
 								class="row"
 								href="#copy"

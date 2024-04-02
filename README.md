@@ -26,6 +26,7 @@
 - Audio only mode.
 - Playlists.
 - PWA support.
+- YT path redirects (So your redirect plugins should still work!)
 
 # Todo
 - Localization.

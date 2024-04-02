@@ -8,6 +8,7 @@
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
+	import { pwaInfo } from 'virtual:pwa-info';
 	import {
 		activePage,
 		auth,
@@ -189,7 +190,13 @@
 			loadNotifications().catch(() => auth.set(null));
 		}
 	});
+
+	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
 </script>
+
+<svelte:head>
+	{@html webManifestLink}
+</svelte:head>
 
 <nav class="left m l small">
 	<header></header>

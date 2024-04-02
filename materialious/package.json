@@ -21,6 +21,7 @@
 		"@types/human-number": "^1.0.2",
 		"@typescript-eslint/eslint-plugin": "^7.0.0",
 		"@typescript-eslint/parser": "^7.0.0",
+		"@vite-pwa/sveltekit": "^0.4.0",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
@@ -30,8 +31,7 @@
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^5.0.3",
-		"vite-plugin-pwa": "^0.19.7"
+		"vite": "^5.0.3"
 	},
 	"type": "module",
 	"dependencies": {

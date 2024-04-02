@@ -15,7 +15,7 @@
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import { activePage, playerListenByDefault } from '../../../store.js';
+	import { activePage, auth, playerListenByDefault } from '../../../store.js';
 
 	export let data;
 
@@ -106,17 +106,24 @@
 								</div>
 							</nav>
 						</a>
-						<button
-							on:click={toggleSubscribed}
-							class:inverse-surface={!data.subscribed}
-							class:border={data.subscribed}
-						>
-							{#if !data.subscribed}
+						{#if $auth}
+							<button
+								on:click={toggleSubscribed}
+								class:inverse-surface={!data.subscribed}
+								class:border={data.subscribed}
+							>
+								{#if !data.subscribed}
+									Subscribe
+								{:else}
+									Unsubscribe
+								{/if}
+							</button>
+						{:else}
+							<button class="inverse-surface" disabled>
 								Subscribe
-							{:else}
-								Unsubscribe
-							{/if}
-						</button>
+								<div class="tooltip">Login required</div>
+							</button>
+						{/if}
 					</nav>
 				</div>
 				<div class="s12 m12 l4 video-actions">
@@ -194,7 +201,13 @@
 						<button disabled class="border no-margin">
 							<i>add</i>
 							<span>Playlist</span>
-							<div class="tooltip">Login required</div>
+							<div class="tooltip">
+								{#if $auth}
+									No playlists
+								{:else}
+									Login required
+								{/if}
+							</div>
 						</button>
 					{/if}
 				</div>

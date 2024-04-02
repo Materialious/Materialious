@@ -4,7 +4,7 @@
 	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber } from '$lib/misc.js';
 	import { onMount } from 'svelte';
-	import { activePage } from '../../../store.js';
+	import { activePage } from '../../../store';
 
 	export let data;
 

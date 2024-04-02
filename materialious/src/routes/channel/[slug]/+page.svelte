@@ -5,7 +5,8 @@
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber } from '$lib/misc';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
 	import { activePage, auth } from '../../../store';
 
@@ -19,22 +20,29 @@
 
 	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined = undefined;
 
-	async function handleScroll() {
+	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
 
-		const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-		if (scrollTop + clientHeight >= scrollHeight - 5) {
-			const newContent = await getChannelContent(data.channel.authorId, {
-				type: tab,
-				continuation: displayContent.continuation
-			});
-			if ('videos' in newContent && 'videos' in displayContent) {
-				displayContent.videos = [...displayContent.videos, ...newContent.videos];
-			} else if ('playlists' in displayContent && 'playlists' in newContent) {
-				displayContent.playlists = [...displayContent.playlists, ...newContent.playlists];
+		const newContent = await getChannelContent(data.channel.authorId, {
+			type: tab,
+			continuation: displayContent.continuation
+		});
+		if ('videos' in newContent && 'videos' in displayContent) {
+			if (displayContent.continuation === newContent.continuation) {
+				event.detail.complete();
+			} else {
+				event.detail.loaded();
 			}
-			displayContent.continuation = newContent.continuation;
+			displayContent.videos = [...displayContent.videos, ...newContent.videos];
+		} else if ('playlists' in displayContent && 'playlists' in newContent) {
+			if (displayContent.continuation === newContent.continuation) {
+				event.detail.complete();
+			} else {
+				event.detail.loaded();
+			}
+			displayContent.playlists = [...displayContent.playlists, ...newContent.playlists];
 		}
+		displayContent.continuation = newContent.continuation;
 	}
 
 	async function changeTab(newTab: 'videos' | 'playlists' | 'streams' | 'shorts') {
@@ -49,12 +57,6 @@
 		if (get(auth)) {
 			isSubscribed = await amSubscribed(data.channel.authorId);
 		}
-
-		window.addEventListener('scroll', handleScroll);
-	});
-
-	onDestroy(() => {
-		window.removeEventListener('scroll', handleScroll);
 	});
 
 	async function toggleSubscribed() {
@@ -144,6 +146,8 @@
 			{/if}
 		</div>
 	</div>
+
+	<InfiniteLoading on:infinite={loadMore} />
 {:else}
 	<PageLoading />
 {/if}

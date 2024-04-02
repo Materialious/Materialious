@@ -15,7 +15,7 @@
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import { activePage, auth, playerListenByDefault } from '../../../store.js';
+	import { activePage, auth, playerListenByDefault } from '../../../store';
 
 	export let data;
 

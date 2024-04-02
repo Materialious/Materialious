@@ -8,3 +8,8 @@
         padding-right: .1em !important;
     }
 }
+
+main.root {
+    max-height: 100vh;
+    overflow-y: scroll;
+}

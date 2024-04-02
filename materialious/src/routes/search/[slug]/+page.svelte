@@ -4,7 +4,7 @@
 	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { activePage } from '../../../store';
 
 	export let data;
@@ -20,24 +20,20 @@
 		document.location.href = $page.url.href;
 	}
 
-	async function handleScroll() {
-		const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-		if (scrollTop + clientHeight >= scrollHeight - 5) {
-			currentPage += 1;
-			search = [
-				...search,
-				...(await getSearch(data.slug, { page: currentPage.toString(), type: data.searchType }))
-			];
+	async function loadMore(event: InfiniteEvent) {
+		currentPage++;
+		const newSearch = await getSearch(data.slug, {
+			page: currentPage.toString(),
+			type: data.searchType
+		});
+
+		if (newSearch.length === 0) {
+			event.detail.complete();
+		} else {
+			search = [...search, ...newSearch];
+			event.detail.loaded();
 		}
 	}
-
-	onMount(() => {
-		window.addEventListener('scroll', handleScroll);
-	});
-
-	onDestroy(() => {
-		window.removeEventListener('scroll', handleScroll);
-	});
 </script>
 
 <div class="space" style="margin-bottom: 1em;">
@@ -91,3 +87,5 @@
 		{/each}
 	</div>
 </div>
+
+<InfiniteLoading on:infinite={loadMore} />

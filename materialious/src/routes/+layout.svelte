@@ -535,7 +535,7 @@
 	{/each}
 </dialog>
 
-<main class="responsive max">
+<main class="responsive max root">
 	<slot />
 </main>
 

@@ -3,7 +3,8 @@
 	import type { VideoPlay } from '$lib/Api/model';
 	import VideoList from '$lib/VideoList.svelte';
 	import { error } from '@sveltejs/kit';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { activePage } from '../../store';
 
 	activePage.set('history');
@@ -28,23 +29,21 @@
 		}
 	}
 
-	async function handleScroll() {
-		const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-		if (scrollTop + clientHeight >= scrollHeight - 5) {
-			currentPage += 1;
-			await loadPageHistory();
+	async function loadMore(event: InfiniteEvent) {
+		const pastHistoryLen = Number(history.length);
+
+		await loadPageHistory();
+
+		if (pastHistoryLen === history.length) {
+			event.detail.complete();
+		} else {
+			event.detail.loaded();
 		}
 	}
 
 	onMount(async () => {
 		await loadPageHistory();
 		loaded = true;
-
-		window.addEventListener('scroll', handleScroll);
-	});
-
-	onDestroy(() => {
-		window.removeEventListener('scroll', handleScroll);
 	});
 </script>
 
@@ -66,3 +65,5 @@
 </div>
 
 <VideoList videos={history} />
+
+<InfiniteLoading on:infinite={loadMore} />

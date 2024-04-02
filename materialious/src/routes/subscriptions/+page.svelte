@@ -1,32 +1,28 @@
 <script lang="ts">
 	import { getFeed } from '$lib/Api/index.js';
 	import VideoList from '$lib/VideoList.svelte';
-	import { onDestroy, onMount } from 'svelte';
-	import { activePage } from '../../store.js';
+	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import { activePage } from '../../store';
 
 	export let data;
 
 	let currentPage = 1;
-	let videos = [...data.feed.videos, ...data.feed.notifications];
+	$: videos = [...data.feed.videos, ...data.feed.notifications];
 
 	activePage.set('subscriptions');
 
-	async function handleScroll() {
-		const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-		if (scrollTop + clientHeight >= scrollHeight - 5) {
-			currentPage += 1;
-			const feed = await getFeed(100, currentPage);
+	async function loadMore(event: InfiniteEvent) {
+		currentPage++;
+		const feed = await getFeed(100, currentPage);
+		if (feed.notifications.length === 0) {
+			event.detail.complete();
+		} else {
 			videos = [...videos, ...feed.notifications];
+			event.detail.loaded();
 		}
 	}
-
-	onMount(() => {
-		window.addEventListener('scroll', handleScroll);
-	});
-
-	onDestroy(() => {
-		window.removeEventListener('scroll', handleScroll);
-	});
 </script>
 
 <VideoList bind:videos />
+
+<InfiniteLoading on:infinite={loadMore} />

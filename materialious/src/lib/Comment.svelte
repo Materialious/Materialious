@@ -37,7 +37,7 @@
 			{/if}
 		</div>
 		<p style="margin-bottom: 0;">
-			{comment.content}
+			{@html comment.contentHtml}
 		</p>
 		<div style="display: flex;">
 			<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>

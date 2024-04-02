@@ -40,30 +40,45 @@ export interface PhasedDescription {
 
 export function phaseDescription(content: string): PhasedDescription {
   const timestamps: { title: string; time: number; timePretty: string; }[] = [];
+  console.log(content);
   const lines = content.split('\n');
 
-  const regex = /(\d+:\d+(?::\d+)?)(?:\s(.+))?/;
-  const filteredLines = lines.filter(line => {
-    const match = regex.exec(line);
+  const urlRegex = /<a href="([^"]+)"/;
+  const timestampRegex = /<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">(\d+:\d+(?::\d+)?)<\/a>\s*(.+)/;
 
-    if (match !== null) {
-      const timestamp = match[1];
-      const title = match[2] || '';
-      timestamps.push({
-        time: convertToSeconds(timestamp),
-        title: title,
-        timePretty: timestamp
-      });
-      return false;
+  let filteredLines: string[] = [];
+  lines.forEach(
+    (line) => {
+      const urlMatch = urlRegex.exec(line);
+      const timestampMatch = timestampRegex.exec(line);
+
+      if (urlMatch !== null && timestampMatch === null) {
+        // If line contains a URL but not a timestamp, modify the URL
+        const modifiedLine = line.replace(/<a href="([^"]+)"/, '<a href="$1" target="_blank" rel="noopener noreferrer" class="link"');
+        filteredLines.push(modifiedLine);
+      } else if (timestampMatch !== null) {
+        // If line contains a timestamp, extract details and push into timestamps array
+        const time = timestampMatch[2];
+        const timestamp = timestampMatch[3];
+        const title = timestampMatch[4] || '';
+        timestamps.push({
+          time: parseInt(time),
+          title: title,
+          timePretty: timestamp
+        });
+      } else {
+        filteredLines.push(line);
+      }
     }
+  );
 
-    return true;
-  });
 
   const filteredContent = filteredLines.join('\n');
 
   return { description: filteredContent, timestamps: timestamps };
 }
+
+
 
 function convertToSeconds(time: string): number {
   const parts = time.split(':').map(part => parseInt(part));

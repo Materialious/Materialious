@@ -170,20 +170,8 @@
 		const currentTheme = await getDynamicTheme();
 
 		document.documentElement.style.setProperty(
-			'--video-controls-color',
-			currentTheme['--secondary']
-		);
-		document.documentElement.style.setProperty(
-			'--audio-controls-color',
-			currentTheme['--secondary']
-		);
-		document.documentElement.style.setProperty(
-			'--audio-play-button-bg',
-			currentTheme['--secondary']
-		);
-		document.documentElement.style.setProperty(
 			'--media-slider-track-fill-bg',
-			currentTheme['--secondary']
+			currentTheme['--primary']
 		);
 		document.documentElement.style.setProperty('--media-menu-bg', currentTheme['--background']);
 		document.documentElement.style.setProperty(
@@ -191,12 +179,12 @@
 			currentTheme['--surface']
 		);
 		document.documentElement.style.setProperty(
-			'--media-menu-item-color',
-			currentTheme['--primary-text']
+			'--media-menu-text-color',
+			currentTheme['--on-background']
 		);
 		document.documentElement.style.setProperty(
 			'--media-menu-item-info-color',
-			currentTheme['--primary-text']
+			currentTheme['--on-background']
 		);
 		document.documentElement.style.setProperty(
 			'--media-menu-section-bg',

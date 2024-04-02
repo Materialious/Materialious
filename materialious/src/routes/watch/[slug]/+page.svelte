@@ -267,7 +267,9 @@
 				{#if data.video.recommendedVideos}
 					{#each data.video.recommendedVideos as recommendedVideo}
 						<article class="no-padding">
-							<Thumbnail video={recommendedVideo} />
+							{#key recommendedVideo.videoId}
+								<Thumbnail video={recommendedVideo} />
+							{/key}
 						</article>
 					{/each}
 				{/if}

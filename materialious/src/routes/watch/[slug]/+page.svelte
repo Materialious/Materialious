@@ -213,30 +213,40 @@
 				</div>
 			</div>
 
-			<article class="medium scroll">
-				<p class="bold">
-					{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
-				</p>
-				<div style="white-space: pre-line; overflow-wrap: break-word;">
-					{@html data.content.description}
-				</div>
-				{#if data.content}
-					{#if data.content.timestamps.length > 0}
-						<h6 style="margin-bottom: .3em;">Chapters</h6>
-						{#each data.content.timestamps as timestamp}
-							<button
-								on:click={() => seekTo(timestamp.time)}
-								class="timestamps"
-								class:primary={timestamp.time <= currentTime}
-								>{timestamp.timePretty}
-								{#if !timestamp.title.startsWith('-')}
-									-
-								{/if}
-								{timestamp.title}</button
-							>
-						{/each}
-					{/if}
-				{/if}
+			<article>
+				<details>
+					<summary class="bold none">
+						<nav>
+							<div class="max">
+								{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
+							</div>
+							<i>expand_more</i>
+						</nav>
+					</summary>
+					<div class="space"></div>
+					<div class="medium scroll">
+						<div style="white-space: pre-line; overflow-wrap: break-word;">
+							{@html data.content.description}
+						</div>
+						{#if data.content}
+							{#if data.content.timestamps.length > 0}
+								<h6 style="margin-bottom: .3em;">Chapters</h6>
+								{#each data.content.timestamps as timestamp}
+									<button
+										on:click={() => seekTo(timestamp.time)}
+										class="timestamps"
+										class:primary={timestamp.time <= currentTime}
+										>{timestamp.timePretty}
+										{#if !timestamp.title.startsWith('-')}
+											-
+										{/if}
+										{timestamp.title}</button
+									>
+								{/each}
+							{/if}
+						{/if}
+					</div>
+				</details>
 			</article>
 
 			<div class="space"></div>

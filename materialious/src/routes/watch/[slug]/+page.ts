@@ -45,7 +45,7 @@ export async function load({ params, url }) {
     returnYTDislikes: returnYTDislikes,
     comments: comments,
     subscribed: await amSubscribed(video.authorId),
-    content: phaseDescription(video.description),
+    content: phaseDescription(video.descriptionHtml),
     playlistId: url.searchParams.get('playlist'),
     personalPlaylists: personalPlaylists
   };

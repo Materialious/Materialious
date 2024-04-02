@@ -217,7 +217,9 @@
 				<p class="bold">
 					{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
 				</p>
-				{@html data.video.descriptionHtml}
+				<div style="white-space: pre-line; overflow-wrap: break-word;">
+					{@html data.content.description}
+				</div>
 				{#if data.content}
 					{#if data.content.timestamps.length > 0}
 						<h6 style="margin-bottom: .3em;">Chapters</h6>

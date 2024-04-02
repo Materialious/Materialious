@@ -44,6 +44,14 @@
 				}
 			);
 		}
+
+		const playlistCurrentVideo = document.getElementById(data.video.videoId);
+		const playlistScrollable = document.getElementById('playlist');
+
+		if (playlistCurrentVideo && playlistScrollable) {
+			playlistScrollable.scrollTop =
+				playlistCurrentVideo.offsetTop - playlistScrollable.offsetTop - 200;
+		}
 	});
 
 	async function addVideoToPlaylist(playlistId: string) {
@@ -267,21 +275,28 @@
 				{#if data.video.recommendedVideos}
 					{#each data.video.recommendedVideos as recommendedVideo}
 						<article class="no-padding">
-							<Thumbnail video={recommendedVideo} />
+							{#key recommendedVideo.videoId}
+								<Thumbnail video={recommendedVideo} />
+							{/key}
 						</article>
 					{/each}
 				{/if}
 			{:else if playlist}
-				<article style="height: 75vh;" class="scroll">
-					<h6>{playlist.title}</h6>
-					<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
+				<article style="height: 75vh; position: relative;" id="playlist" class="scroll no-padding">
+					<article class="no-elevate" style="position: sticky; top: 0; z-index: 99999;">
+						<h6>{playlist.title}</h6>
+						<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
+						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
+						<div class="divider"></div>
+					</article>
 
-					<div class="divider"></div>
 					<div class="space"></div>
 
 					{#each playlistVideos as playlistVideo}
 						<article
 							class="no-padding primary-border"
+							style="margin: .7em;"
+							id={playlistVideo.videoId}
 							class:border={playlistVideo.videoId === data.video.videoId}
 						>
 							<Thumbnail video={playlistVideo} playlistId={data.playlistId} />

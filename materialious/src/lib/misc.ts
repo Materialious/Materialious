@@ -10,7 +10,7 @@ export function numberWithCommas(number: number) {
 }
 
 export function cleanNumber(number: number): string {
-  return humanNumber(number, (number: number) => Number.parseFloat(number.toString()).toFixed(1));
+  return humanNumber(number, (number: number) => Number.parseFloat(number.toString()).toFixed(1)).replace('.0', '');
 }
 
 export function videoLength(lengthSeconds: number): string {

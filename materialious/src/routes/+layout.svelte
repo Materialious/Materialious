@@ -225,18 +225,29 @@
 		class="button circle large transparent"
 	>
 		<i>code</i>
+		<div class="tooltip bottom">Star us on Github!</div>
 	</a>
 	{#if isLoggedIn}
 		<button class="circle large transparent" data-ui="#dialog-notifications"
-			><i>notifications</i></button
-		>
+			><i>notifications</i>
+			<div class="tooltip bottom">Notifications</div>
+		</button>
 	{/if}
-	<button class="circle large transparent" data-ui="#dialog-settings"><i>settings</i></button>
+	<button class="circle large transparent" data-ui="#dialog-settings">
+		<i>settings</i>
+		<div class="tooltip bottom">Settings</div>
+	</button>
 
 	{#if !isLoggedIn}
-		<button on:click={login} class="circle large transparent"><i>login</i></button>
+		<button on:click={login} class="circle large transparent">
+			<i>login</i>
+			<div class="tooltip bottom">Login</div>
+		</button>
 	{:else}
-		<button on:click={logout} class="circle large transparent"><i>logout</i></button>
+		<button on:click={logout} class="circle large transparent">
+			<i>logout</i>
+			<div class="tooltip bottom">Logout</div>
+		</button>
 	{/if}
 </nav>
 

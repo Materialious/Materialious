@@ -39,6 +39,7 @@
 		"human-number": "^2.0.4",
 		"media-icons": "^0.10.0",
 		"sponsorblock-api": "^0.2.4",
+		"svelte-infinite-scroll": "^2.0.1",
 		"svelte-persisted-store": "^0.9.1",
 		"vidstack": "^1.11.4"
 	}

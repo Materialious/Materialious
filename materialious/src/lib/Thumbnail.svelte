@@ -38,7 +38,12 @@
 	});
 </script>
 
-<a class="wave" style="width: 100%; overflow: hidden;min-height:100px;" href={watchUrl}>
+<a
+	class="wave"
+	style="width: 100%; overflow: hidden;min-height:100px;"
+	href={watchUrl}
+	data-sveltekit-preload-data="off"
+>
 	{#if loading}
 		<progress class="circle"></progress>
 	{:else if loaded}

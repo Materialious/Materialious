@@ -249,7 +249,7 @@
 					<button on:click={loadMoreComments} class="margin">Load more</button>
 				{/if}
 			{:else}
-				<h6>Comments disabled</h6>
+				<h6>Unable to load comments</h6>
 			{/if}
 		</div>
 		<div class="s12 m12 l2">

@@ -19,7 +19,7 @@
 
 	export let data;
 
-	let comments = data.comments;
+	$: comments = data.comments;
 
 	activePage.set(null);
 

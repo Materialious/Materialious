@@ -1,19 +1,21 @@
-import { getPopular, getTrending } from '$lib/Api/index.js';
+import { getPopular } from '$lib/Api/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load() {
-  let popular;
+  let popular = undefined;
+  let popularDisabled: boolean = false;
 
   try {
     popular = await getPopular();
   } catch (errorMessage: any) {
     if (errorMessage.toString() === 'Error: Administrator has disabled this endpoint.') {
-      popular = await getTrending();
+      popularDisabled = true;
     } else {
       error(500, errorMessage);
     }
   }
   return {
-    popular: popular
+    popular: popular,
+    popularDisabled: popularDisabled
   };
 }

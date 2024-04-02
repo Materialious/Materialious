@@ -7,4 +7,12 @@
 	activePage.set('home');
 </script>
 
-<VideoList videos={data.popular} />
+{#if data.popularDisabled}
+	<div class="space"></div>
+
+	<nav class="center-align">
+		<h3>Popular page has been disabled</h3>
+	</nav>
+{:else}
+	<VideoList videos={data.popular} />
+{/if}

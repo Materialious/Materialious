@@ -18,7 +18,11 @@
 
 	let progress: string | null;
 	if (get(playerSavePlaybackPosition)) {
-		progress = localStorage.getItem(`v_${video.videoId}`);
+		try {
+			progress = localStorage.getItem(`v_${video.videoId}`);
+		} catch {
+			progress = null;
+		}
 	} else {
 		progress = null;
 	}

@@ -52,11 +52,13 @@
 		on:click={async () => {
 			await deleteHistory();
 			history = [];
-			Object.keys(localStorage).forEach((key) => {
-				if (key.startsWith('v_')) {
-					localStorage.removeItem(key);
-				}
-			});
+			try {
+				Object.keys(localStorage).forEach((key) => {
+					if (key.startsWith('v_')) {
+						localStorage.removeItem(key);
+					}
+				});
+			} catch {}
 		}}
 	>
 		<i>delete_sweep</i>

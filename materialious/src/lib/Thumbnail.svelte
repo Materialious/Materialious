@@ -65,9 +65,11 @@
 		></progress>
 	{/if}
 	{#if !('liveVideo' in video) || !video.liveVideo}
-		<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
-			&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
-		</div>
+		{#if video.lengthSeconds !== 0}
+			<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
+				&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
+			</div>
+		{/if}
 	{:else}
 		<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
 			LIVE

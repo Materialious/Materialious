@@ -74,15 +74,17 @@
 	<div class="grid">
 		{#each search as item}
 			<div class="s12 m6 l2">
-				<article class="no-padding" style="height: 100%;">
-					{#if item.type === 'video'}
-						<Thumbnail video={item} />
-					{:else if item.type === 'channel'}
-						<ChannelThumbnail channel={item} />
-					{:else if item.type === 'playlist'}
-						<PlaylistThumbnail playlist={item} />
-					{/if}
-				</article>
+				{#key data.search}
+					<article class="no-padding" style="height: 100%;">
+						{#if item.type === 'video'}
+							<Thumbnail video={item} />
+						{:else if item.type === 'channel'}
+							<ChannelThumbnail channel={item} />
+						{:else if item.type === 'playlist'}
+							<PlaylistThumbnail playlist={item} />
+						{/if}
+					</article>
+				{/key}
 			</div>
 		{/each}
 	</div>

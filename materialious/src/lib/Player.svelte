@@ -5,12 +5,7 @@
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import type {
-		MediaQualityChangeEvent,
-		MediaTimeUpdateEvent,
-		MediaVolumeChangeEvent,
-		PlayerSrc
-	} from 'vidstack';
+	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		playerAlwaysLoop,
@@ -109,25 +104,6 @@
 				savePlayerPos();
 			});
 
-			player.addEventListener('volume-change', (event: MediaVolumeChangeEvent) => {
-				try {
-					localStorage.setItem('volume', event.detail.volume.toString());
-				} catch {}
-			});
-
-			player.addEventListener('quality-change', (event: MediaQualityChangeEvent) => {
-				if (!event.detail) return;
-
-				if (player.qualities.auto) return;
-
-				try {
-					localStorage.setItem(
-						'preferredQuality',
-						player.qualities.indexOf(event.detail).toString()
-					);
-				} catch {}
-			});
-
 			if (get(sponsorBlockCategories)) {
 				const currentCategories = get(sponsorBlockCategories);
 
@@ -199,23 +175,7 @@
 			];
 		}
 
-		// Have to wait for qualities to be loaded.
-		setTimeout(() => {
-			try {
-				const preferredQuality = localStorage.getItem('preferredQuality');
-				if (preferredQuality) {
-					let qualityIndex = Number(preferredQuality);
-
-					if (qualityIndex > player.qualities.length - 1) {
-						while (qualityIndex > player.qualities.length - 1) {
-							qualityIndex--;
-						}
-					}
-
-					player.remoteControl.changeQuality(qualityIndex);
-				}
-			} catch (error) {}
-		}, 100);
+		player.storage = 'video-player';
 
 		const currentTheme = await getDynamicTheme();
 

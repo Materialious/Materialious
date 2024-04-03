@@ -5,7 +5,12 @@
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent, MediaVolumeChangeEvent, PlayerSrc } from 'vidstack';
+	import type {
+		MediaQualityChangeEvent,
+		MediaTimeUpdateEvent,
+		MediaVolumeChangeEvent,
+		PlayerSrc
+	} from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		playerAlwaysLoop,
@@ -110,6 +115,19 @@
 				} catch {}
 			});
 
+			player.addEventListener('quality-change', (event: MediaQualityChangeEvent) => {
+				if (!event.detail) return;
+
+				if (player.qualities.auto) return;
+
+				try {
+					localStorage.setItem(
+						'preferredQuality',
+						player.qualities.indexOf(event.detail).toString()
+					);
+				} catch {}
+			});
+
 			if (get(sponsorBlockCategories)) {
 				const currentCategories = get(sponsorBlockCategories);
 
@@ -180,6 +198,24 @@
 				}
 			];
 		}
+
+		// Have to wait for qualities to be loaded.
+		setTimeout(() => {
+			try {
+				const preferredQuality = localStorage.getItem('preferredQuality');
+				if (preferredQuality) {
+					let qualityIndex = Number(preferredQuality);
+
+					if (qualityIndex > player.qualities.length - 1) {
+						while (qualityIndex > player.qualities.length - 1) {
+							qualityIndex--;
+						}
+					}
+
+					player.remoteControl.changeQuality(qualityIndex);
+				}
+			} catch (error) {}
+		}, 100);
 
 		const currentTheme = await getDynamicTheme();
 

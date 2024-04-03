@@ -36,6 +36,7 @@ For security reasons regarding CORS, your hosted instance of Materialious must s
 
 Invidious doesn't provide a simple way to modify CORS, so this must be done with your reverse proxy.
 
+## Step 1: Reverse proxy
 ### Caddy example
 ```caddyfile
 invidious.example.com {
@@ -70,6 +71,7 @@ server {
             return 204;
         }
 
+        proxy_hide_header Access-Control-Allow-Origin;
         add_header Access-Control-Allow-Credentials true;
         add_header Access-Control-Allow-Origin "https://materialious.example.com" always;
         add_header Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD, PATCH, PUT, DELETE" always;
@@ -115,7 +117,17 @@ http:
 ### Other
 Please open a PR request or issue if you implement this in a different reverse proxy.
 
-### Docker compose
+## Step 2: Invidious config
+The following Invidious values must be set in your config.
+
+- `domain:` - The reverse proxied domain of your Invidious instance.
+- `https_only: true` - Must be set if you are using HTTPS.
+- `external_port: 443` - Must be set if you are using HTTPS.
+
+
+## Step 3: Docker
+Please ensure you have followed the previous steps before doing this!
+
 ```yaml
 version: "3"
 services:

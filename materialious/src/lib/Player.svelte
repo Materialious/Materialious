@@ -5,7 +5,12 @@
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
+	import type {
+		MediaQualityChangeEvent,
+		MediaTimeUpdateEvent,
+		MediaVolumeChangeEvent,
+		PlayerSrc
+	} from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		playerAlwaysLoop,
@@ -38,6 +43,13 @@
 	const proxyVideos = get(playerProxyVideos);
 
 	onMount(async () => {
+		try {
+			const defaultVolume = localStorage.getItem('volume');
+			if (defaultVolume) {
+				player.volume = Number(defaultVolume);
+			}
+		} catch {}
+
 		if (playlistVideos) {
 			player.addEventListener('end', () => {
 				if (!playlistVideos) return;
@@ -97,6 +109,25 @@
 				savePlayerPos();
 			});
 
+			player.addEventListener('volume-change', (event: MediaVolumeChangeEvent) => {
+				try {
+					localStorage.setItem('volume', event.detail.volume.toString());
+				} catch {}
+			});
+
+			player.addEventListener('quality-change', (event: MediaQualityChangeEvent) => {
+				if (!event.detail) return;
+
+				if (player.qualities.auto) return;
+
+				try {
+					localStorage.setItem(
+						'preferredQuality',
+						player.qualities.indexOf(event.detail).toString()
+					);
+				} catch {}
+			});
+
 			if (get(sponsorBlockCategories)) {
 				const currentCategories = get(sponsorBlockCategories);
 
@@ -152,10 +183,12 @@
 			}
 
 			if (get(playerSavePlaybackPosition)) {
-				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-				if (playerPos) {
-					player.currentTime = Number(playerPos);
-				}
+				try {
+					const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
+					if (playerPos) {
+						player.currentTime = Number(playerPos);
+					}
+				} catch {}
 			}
 		} else {
 			src = [
@@ -165,6 +198,24 @@
 				}
 			];
 		}
+
+		// Have to wait for qualities to be loaded.
+		setTimeout(() => {
+			try {
+				const preferredQuality = localStorage.getItem('preferredQuality');
+				if (preferredQuality) {
+					let qualityIndex = Number(preferredQuality);
+
+					if (qualityIndex > player.qualities.length - 1) {
+						while (qualityIndex > player.qualities.length - 1) {
+							qualityIndex--;
+						}
+					}
+
+					player.remoteControl.changeQuality(qualityIndex);
+				}
+			} catch (error) {}
+		}, 100);
 
 		const currentTheme = await getDynamicTheme();
 
@@ -194,17 +245,18 @@
 			currentTheme['--surface']
 		);
 		document.documentElement.style.setProperty('--audio-bg', currentTheme['--surface']);
-		document.documentElement.style.setProperty('--video-bg', currentTheme['--surface']);
 	});
 
 	function savePlayerPos() {
-		if (get(playerSavePlaybackPosition) && player.currentTime) {
-			if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
-				localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());
-			} else {
-				localStorage.removeItem(`v_${data.video.videoId}`);
+		try {
+			if (get(playerSavePlaybackPosition) && player.currentTime) {
+				if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
+					localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());
+				} else {
+					localStorage.removeItem(`v_${data.video.videoId}`);
+				}
 			}
-		}
+		} catch {}
 	}
 
 	onDestroy(() => {
@@ -225,6 +277,7 @@
 	streamType={data.video.hlsUrl ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
 	playsInline={true}
+	keep-alive
 	{src}
 >
 	<media-provider>

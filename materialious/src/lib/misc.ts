@@ -40,7 +40,6 @@ export interface PhasedDescription {
 
 export function phaseDescription(content: string): PhasedDescription {
   const timestamps: { title: string; time: number; timePretty: string; }[] = [];
-  console.log(content);
   const lines = content.split('\n');
 
   const urlRegex = /<a href="([^"]+)"/;

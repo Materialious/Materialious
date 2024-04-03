@@ -283,7 +283,7 @@
 				{/if}
 			{:else if playlist}
 				<article style="height: 75vh; position: relative;" id="playlist" class="scroll no-padding">
-					<article class="no-elevate" style="position: sticky; top: 0; z-index: 99999;">
+					<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
 						<h6>{playlist.title}</h6>
 						<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
 						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>

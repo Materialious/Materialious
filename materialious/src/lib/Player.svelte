@@ -194,7 +194,6 @@
 			currentTheme['--surface']
 		);
 		document.documentElement.style.setProperty('--audio-bg', currentTheme['--surface']);
-		document.documentElement.style.setProperty('--video-bg', currentTheme['--surface']);
 	});
 
 	function savePlayerPos() {

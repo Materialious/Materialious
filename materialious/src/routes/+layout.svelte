@@ -293,8 +293,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={searchSuggestions}
-						on:click={() => interfaceSearchSuggestions.set(!searchSuggestions)}
+						bind:checked={$interfaceSearchSuggestions}
+						on:click={() => interfaceSearchSuggestions.set(!$interfaceSearchSuggestions)}
 					/>
 					<span></span>
 				</label>
@@ -328,8 +328,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={autoplay}
-						on:click={() => playerAutoPlay.set(!autoplay)}
+						bind:checked={$playerAutoPlay}
+						on:click={() => playerAutoPlay.set(!$playerAutoPlay)}
 					/>
 					<span></span>
 				</label>
@@ -344,8 +344,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={alwaysLoop}
-						on:click={() => playerAlwaysLoop.set(!alwaysLoop)}
+						bind:checked={$playerAlwaysLoop}
+						on:click={() => playerAlwaysLoop.set(!$playerAlwaysLoop)}
 					/>
 					<span></span>
 				</label>
@@ -360,8 +360,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={proxyVideos}
-						on:click={() => playerProxyVideos.set(!proxyVideos)}
+						bind:checked={$playerProxyVideos}
+						on:click={() => playerProxyVideos.set(!$playerProxyVideos)}
 					/>
 					<span></span>
 				</label>
@@ -376,8 +376,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={savePlayerPackPos}
-						on:click={() => playerSavePlaybackPosition.set(!savePlayerPackPos)}
+						bind:checked={$playerSavePlaybackPosition}
+						on:click={() => playerSavePlaybackPosition.set(!$playerSavePlaybackPosition)}
 					/>
 					<span></span>
 				</label>
@@ -392,8 +392,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={listenByDefault}
-						on:click={() => playerListenByDefault.set(!listenByDefault)}
+						bind:checked={$playerListenByDefault}
+						on:click={() => playerListenByDefault.set(!$playerListenByDefault)}
 					/>
 					<span></span>
 				</label>
@@ -406,7 +406,11 @@
 					<div>Dash</div>
 				</div>
 				<label class="switch">
-					<input type="checkbox" bind:checked={dash} on:click={() => playerDash.set(!dash)} />
+					<input
+						type="checkbox"
+						bind:checked={$playerDash}
+						on:click={() => playerDash.set(!$playerDash)}
+					/>
 					<span></span>
 				</label>
 			</nav>
@@ -435,7 +439,7 @@
 			<label class="switch">
 				<input
 					bind:checked={$returnYtDislikes}
-					on:click={() => returnYtDislikes.set(!get(returnYtDislikes))}
+					on:click={() => returnYtDislikes.set(!$returnYtDislikes)}
 					type="checkbox"
 				/>
 				<span></span>
@@ -465,7 +469,7 @@
 			<label class="switch">
 				<input
 					bind:checked={$sponsorBlock}
-					on:click={() => sponsorBlock.set(!get(sponsorBlock))}
+					on:click={() => sponsorBlock.set(!$sponsorBlock)}
 					type="checkbox"
 				/>
 				<span></span>

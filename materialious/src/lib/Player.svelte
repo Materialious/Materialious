@@ -24,8 +24,8 @@
 	export let currentTime: number = 0;
 	export let audioMode = false;
 	export let playlistVideos: PlaylistPageVideo[] | null = null;
+	export let player: MediaPlayerElement;
 
-	let player: MediaPlayerElement;
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
 

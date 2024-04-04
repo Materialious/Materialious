@@ -12,6 +12,7 @@
 ![Preview of homepage](./previews/home-preview.png)
 
 # Features
+- Watch sync parties!
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
 - DeArrow built-in (With local processing fallback).

@@ -32,64 +32,64 @@
 		let imageSrc = video.videoThumbnails[4].url;
 
 		if (get(deArrowEnabled)) {
+			let locatedThumbnail = false;
+
 			try {
 				const deArrow = await getDeArrow(video.videoId);
 				for (const title of deArrow.titles) {
-					if (title.locked && !title.original) {
+					if (title.locked || title.votes > 0) {
 						video.title = title.title.replace('>', '');
-						console.log(video.title);
 						break;
 					}
 				}
 
-				let locatedThumbnail = false;
 				for (const thumbnail of deArrow.thumbnails) {
-					if (thumbnail.locked || thumbnail.original) {
-						if (typeof thumbnail.timestamp !== 'undefined') {
+					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
+						if (thumbnail.timestamp !== null) {
 							imageSrc = await getThumbnail(video.videoId, thumbnail.timestamp);
 						}
 						locatedThumbnail = true;
 						break;
 					}
 				}
-
-				if (!locatedThumbnail) {
-					// Process thumbnail locally.
-					const canvas = document.getElementById('canvas') as HTMLCanvasElement | null;
-					function generateThumbnail(): Promise<string> {
-						return new Promise<string>(async (resolve, reject) => {
-							if (canvas) {
-								const context = canvas.getContext('2d');
-								const mockVideo = document.createElement('video');
-								const videoContainer = document.getElementById('video-container');
-								videoContainer?.appendChild(mockVideo);
-
-								mockVideo.preload = 'auto';
-								mockVideo.id = 'video';
-								mockVideo.crossOrigin = import.meta.env.VITE_DEFAULT_FRONTEND_URL;
-								mockVideo.src = proxyVideoUrl((await getVideo(video.videoId)).formatStreams[0].url);
-
-								mockVideo.addEventListener('loadeddata', () => {
-									mockVideo.currentTime = mockVideo.duration / 100;
-
-									mockVideo.addEventListener('seeked', () => {
-										if (context) {
-											context.drawImage(mockVideo, 0, 0, 320, 180);
-											resolve(canvas.toDataURL('image/png'));
-											mockVideo.preload = 'none';
-											mockVideo.pause();
-											videoContainer?.removeChild(mockVideo);
-										}
-									});
-								});
-								mockVideo.load();
-							}
-						});
-					}
-
-					imageSrc = await generateThumbnail();
-				}
 			} catch {}
+
+			if (!locatedThumbnail) {
+				// Process thumbnail locally.
+				const canvas = document.getElementById('canvas') as HTMLCanvasElement | null;
+				function generateThumbnail(): Promise<string> {
+					return new Promise<string>(async (resolve, reject) => {
+						if (canvas) {
+							const context = canvas.getContext('2d');
+							const mockVideo = document.createElement('video');
+							const videoContainer = document.getElementById('video-container');
+							videoContainer?.appendChild(mockVideo);
+
+							mockVideo.preload = 'auto';
+							mockVideo.id = 'video';
+							mockVideo.crossOrigin = import.meta.env.VITE_DEFAULT_FRONTEND_URL;
+							mockVideo.src = proxyVideoUrl((await getVideo(video.videoId)).formatStreams[0].url);
+
+							mockVideo.addEventListener('loadeddata', () => {
+								mockVideo.currentTime = mockVideo.duration / 100;
+
+								mockVideo.addEventListener('seeked', () => {
+									if (context) {
+										context.drawImage(mockVideo, 0, 0, canvas.width, canvas.height);
+										resolve(canvas.toDataURL('image/png'));
+										mockVideo.preload = 'none';
+										mockVideo.pause();
+										videoContainer?.removeChild(mockVideo);
+									}
+								});
+							});
+							mockVideo.load();
+						}
+					});
+				}
+
+				imageSrc = await generateThumbnail();
+			}
 		}
 
 		img = new Image();

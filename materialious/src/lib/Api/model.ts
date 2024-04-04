@@ -241,7 +241,7 @@ export interface DeArrow {
     UUID: string;
   }[];
   thumbnails: {
-    timestamp?: number;
+    timestamp: number | null;
     original: boolean;
     votes: number;
     locked: boolean;

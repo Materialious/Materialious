@@ -13,8 +13,12 @@
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
-	import { onMount } from 'svelte';
+	import type { PlayerEvent } from '$lib/player';
+	import type { DataConnection } from 'peerjs';
+	import Peer from 'peerjs';
+	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
+	import type { MediaPlayerElement } from 'vidstack/elements';
 	import { activePage, auth, playerListenByDefault } from '../../../store';
 
 	export let data;
@@ -23,10 +27,83 @@
 
 	activePage.set(null);
 
+	const currentUrl = new URL(location.href);
+
 	let playlistVideos: PlaylistPageVideo[] = [];
 	let playlist: PlaylistPage | null = null;
 
+	let audioMode = get(playerListenByDefault);
+	let currentTime: number;
+	let seekTo: (time: number) => void;
+	let player: MediaPlayerElement;
+
+	let peer: Peer | null = null;
+
+	function playerSyncEvents(conn: DataConnection) {
+		conn.on('data', (data) => {
+			const events = data as PlayerEvent[];
+
+			events.forEach((event) => {
+				if (event.type === 'pause') {
+					player.pause();
+				} else if (event.type === 'play') {
+					player.play();
+				} else if (event.type === 'seek' && event.time) {
+					player.currentTime = event.time;
+				}
+			});
+		});
+
+		player.addEventListener('pause', () => {
+			conn.send([
+				{
+					type: 'pause'
+				},
+				{
+					type: 'seek',
+					time: player.currentTime
+				}
+			] as PlayerEvent[]);
+		});
+
+		player.addEventListener('playing', () => {
+			conn.send([
+				{
+					type: 'play'
+				},
+				{
+					type: 'seek',
+					time: player.currentTime
+				}
+			] as PlayerEvent[]);
+		});
+
+		player.addEventListener('waiting', () => {
+			conn.send([
+				{
+					type: 'pause'
+				},
+				{
+					type: 'seek',
+					time: player.currentTime
+				}
+			] as PlayerEvent[]);
+		});
+	}
+
 	onMount(async () => {
+		const syncId = currentUrl.searchParams.get('sync');
+		if (syncId) {
+			peer = new Peer(crypto.randomUUID());
+			peer.on('open', () => {
+				if (!peer) return;
+
+				const conn = peer.connect(syncId);
+
+				playerSyncEvents(conn);
+			});
+		}
+
 		if (!data.playlistId) return;
 
 		for (let page = 1; page < Infinity; page++) {
@@ -53,6 +130,34 @@
 				playlistCurrentVideo.offsetTop - playlistScrollable.offsetTop - 200;
 		}
 	});
+
+	onDestroy(() => {
+		if (peer) {
+			peer.disconnect();
+			peer = null;
+		}
+	});
+
+	async function startWatchSync() {
+		if (peer) {
+			peer.disconnect();
+			peer = null;
+			return;
+		}
+
+		const peerId = crypto.randomUUID();
+
+		currentUrl.searchParams.set('sync', peerId);
+		window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
+
+		peer = new Peer(peerId);
+
+		peer.on('connection', (conn) => {
+			conn.on('open', () => {
+				playerSyncEvents(conn);
+			});
+		});
+	}
 
 	async function addVideoToPlaylist(playlistId: string) {
 		await addPlaylistVideo(playlistId, data.video.videoId);
@@ -83,17 +188,13 @@
 
 		data.subscribed = !data.subscribed;
 	}
-
-	let audioMode = get(playerListenByDefault);
-	let currentTime: number;
-	let seekTo: (time: number) => void;
 </script>
 
 {#if data}
 	<div class="grid">
 		<div class="s12 m12 l10">
 			{#key data.video.videoId}
-				<Player {data} {audioMode} {playlistVideos} bind:seekTo bind:currentTime />
+				<Player {data} {audioMode} {playlistVideos} bind:seekTo bind:currentTime bind:player />
 			{/key}
 
 			<h5>{data.video.title}</h5>
@@ -150,6 +251,18 @@
 				</div>
 
 				<div class="s12 m12 l4 video-actions">
+					{#if data.video.hlsUrl}
+						<button disabled>
+							<i>group</i>
+							<span>Watch sync</span>
+							<div class="tooltip">Sync not available for live streams</div>
+						</button>
+					{:else}
+						<button on:click={startWatchSync} class:border={!peer}>
+							<i>group</i>
+							<span>Watch sync</span>
+						</button>
+					{/if}
 					<button
 						class="no-margin"
 						on:click={() => (audioMode = !audioMode)}

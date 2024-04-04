@@ -78,6 +78,18 @@
 			] as PlayerEvent[]);
 		});
 
+		player.addEventListener('play', () => {
+			conn.send([
+				{
+					type: 'play'
+				},
+				{
+					type: 'seek',
+					time: player.currentTime
+				}
+			] as PlayerEvent[]);
+		});
+
 		player.addEventListener('waiting', () => {
 			conn.send([
 				{
@@ -194,7 +206,15 @@
 	<div class="grid">
 		<div class="s12 m12 l10">
 			{#key data.video.videoId}
-				<Player {data} {audioMode} {playlistVideos} bind:seekTo bind:currentTime bind:player />
+				<Player
+					{data}
+					{audioMode}
+					{playlistVideos}
+					isSyncing={!peer}
+					bind:seekTo
+					bind:currentTime
+					bind:player
+				/>
 			{/key}
 
 			<h5>{data.video.title}</h5>

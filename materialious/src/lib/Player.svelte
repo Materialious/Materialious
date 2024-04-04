@@ -25,6 +25,7 @@
 	export let audioMode = false;
 	export let playlistVideos: PlaylistPageVideo[] | null = null;
 	export let player: MediaPlayerElement;
+	export let isSyncing: boolean = false;
 
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
@@ -225,7 +226,7 @@
 
 <media-player
 	bind:this={player}
-	autoPlay={$playerAutoPlay}
+	autoPlay={$playerAutoPlay && !isSyncing}
 	loop={$playerAlwaysLoop}
 	title={data.video.title}
 	streamType={data.video.hlsUrl ? 'live' : 'on-demand'}

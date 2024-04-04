@@ -17,7 +17,7 @@
 		sponsorBlockUrl
 	} from '../store';
 	import type { PlaylistPageVideo, VideoPlay } from './Api/model';
-	import { videoLength, type PhasedDescription } from './misc';
+	import { proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
 	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -138,13 +138,7 @@
 				let formattedSrc;
 				src = data.video.formatStreams.map((format) => {
 					if (proxyVideos) {
-						const rawSrc = new URL(format.url);
-						rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
-							'http://',
-							''
-						).replace('https://', '');
-
-						formattedSrc = rawSrc.toString();
+						formattedSrc = proxyVideoUrl(format.url);
 					} else {
 						formattedSrc = format.url;
 					}

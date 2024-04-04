@@ -61,7 +61,7 @@ export function phaseDescription(content: string): PhasedDescription {
         const timestamp = timestampMatch[3];
         const title = timestampMatch[4] || '';
         timestamps.push({
-          time: parseInt(time),
+          time: convertToSeconds(time),
           title: title,
           timePretty: timestamp
         });
@@ -77,8 +77,6 @@ export function phaseDescription(content: string): PhasedDescription {
   return { description: filteredContent, timestamps: timestamps };
 }
 
-
-
 function convertToSeconds(time: string): number {
   const parts = time.split(':').map(part => parseInt(part));
   let seconds = 0;
@@ -93,4 +91,14 @@ function convertToSeconds(time: string): number {
     seconds = parts[0];
   }
   return seconds;
+}
+
+export function proxyVideoUrl(source: string): string {
+  const rawSrc = new URL(source);
+  rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace(
+    'http://',
+    ''
+  ).replace('https://', '');
+
+  return rawSrc.toString();
 }

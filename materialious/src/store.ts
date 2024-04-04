@@ -23,3 +23,7 @@ export const auth: Writable<null | { username: string, token: string; }> = persi
 export const sponsorBlock = persisted("sponsorBlock", true);
 export const sponsorBlockUrl = persisted("sponsorBlockUrl", import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE);
 export const sponsorBlockCategories: Writable<string[]> = persisted("sponsorBlockCategories", []);
+
+export const deArrowInstance = persisted("deArrowInstance", import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE);
+export const deArrowEnabled = persisted("deArrowEnabled", false);
+export const deArrowThumbnailInstance = persisted("deArrowThumbnailInstance", import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE);

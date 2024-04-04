@@ -13,6 +13,9 @@
 		activePage,
 		auth,
 		darkMode,
+		deArrowEnabled,
+		deArrowInstance,
+		deArrowThumbnailInstance,
 		interfaceSearchSuggestions,
 		playerAlwaysLoop,
 		playerAutoPlay,
@@ -31,20 +34,6 @@
 	let currentPage: string | null = '';
 	activePage.subscribe((page) => (currentPage = page));
 
-	let autoplay = false;
-	let alwaysLoop = false;
-	let proxyVideos = false;
-	let savePlayerPackPos = false;
-	let dash = false;
-	let listenByDefault = false;
-
-	playerAutoPlay.subscribe((value) => (autoplay = value));
-	playerAlwaysLoop.subscribe((value) => (alwaysLoop = value));
-	playerProxyVideos.subscribe((value) => (proxyVideos = value));
-	playerSavePlaybackPosition.subscribe((value) => (savePlayerPackPos = value));
-	playerDash.subscribe((value) => (dash = value));
-	playerListenByDefault.subscribe((value) => (listenByDefault = value));
-
 	let searchSuggestions = false;
 	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
 
@@ -60,6 +49,8 @@
 
 	let sponsorBlockInstance = get(sponsorBlockUrl);
 	let returnYTInstance = get(returnYTDislikesInstance);
+	let deArrowUrl = get(deArrowInstance);
+	let deArrowThumbnailUrl = get(deArrowThumbnailInstance);
 
 	const pages = [
 		{
@@ -493,6 +484,48 @@
 				</nav>
 			</div>
 		{/each}
+	</div>
+
+	<div class="settings">
+		<h6>DeArrow</h6>
+
+		<form on:submit|preventDefault={() => deArrowInstance.set(deArrowUrl)}>
+			<nav>
+				<div class="field label border">
+					<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
+					<label for="dearrow-instance">Instance URL</label>
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+
+		<form on:submit|preventDefault={() => deArrowThumbnailInstance.set(deArrowThumbnailUrl)}>
+			<nav>
+				<div class="field label border">
+					<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
+					<label for="dearrow-thumbnail-instance">Thumbnail instance URL</label>
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>Enabled</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$deArrowEnabled}
+					on:click={() => deArrowEnabled.set(!$deArrowEnabled)}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
 	</div>
 </dialog>
 

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	import { playerSavePlaybackPosition } from '../store';
+	import { deArrowEnabled, playerSavePlaybackPosition } from '../store';
+	import { getDeArrow, getThumbnail, getVideo } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './Api/model';
-	import { cleanNumber, truncate, videoLength } from './misc';
+	import { cleanNumber, proxyVideoUrl, truncate, videoLength } from './misc';
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 	export let playlistId: string = '';
@@ -27,9 +28,72 @@
 		progress = null;
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		let imageSrc = video.videoThumbnails[4].url;
+
+		if (get(deArrowEnabled)) {
+			try {
+				const deArrow = await getDeArrow(video.videoId);
+				for (const title of deArrow.titles) {
+					if (title.locked && !title.original) {
+						video.title = title.title.replace('>', '');
+						console.log(video.title);
+						break;
+					}
+				}
+
+				let locatedThumbnail = false;
+				for (const thumbnail of deArrow.thumbnails) {
+					if (thumbnail.locked || thumbnail.original) {
+						if (typeof thumbnail.timestamp !== 'undefined') {
+							imageSrc = await getThumbnail(video.videoId, thumbnail.timestamp);
+						}
+						locatedThumbnail = true;
+						break;
+					}
+				}
+
+				if (!locatedThumbnail) {
+					// Process thumbnail locally.
+					const canvas = document.getElementById('canvas') as HTMLCanvasElement | null;
+					function generateThumbnail(): Promise<string> {
+						return new Promise<string>(async (resolve, reject) => {
+							if (canvas) {
+								const context = canvas.getContext('2d');
+								const mockVideo = document.createElement('video');
+								const videoContainer = document.getElementById('video-container');
+								videoContainer?.appendChild(mockVideo);
+
+								mockVideo.preload = 'auto';
+								mockVideo.id = 'video';
+								mockVideo.crossOrigin = import.meta.env.VITE_DEFAULT_FRONTEND_URL;
+								mockVideo.src = proxyVideoUrl((await getVideo(video.videoId)).formatStreams[0].url);
+
+								mockVideo.addEventListener('loadeddata', () => {
+									mockVideo.currentTime = mockVideo.duration / 100;
+
+									mockVideo.addEventListener('seeked', () => {
+										if (context) {
+											context.drawImage(mockVideo, 0, 0, 320, 180);
+											resolve(canvas.toDataURL('image/png'));
+											mockVideo.preload = 'none';
+											mockVideo.pause();
+											videoContainer?.removeChild(mockVideo);
+										}
+									});
+								});
+								mockVideo.load();
+							}
+						});
+					}
+
+					imageSrc = await generateThumbnail();
+				}
+			} catch {}
+		}
+
 		img = new Image();
-		img.src = video.videoThumbnails[4].url;
+		img.src = imageSrc;
 
 		img.onload = () => {
 			loaded = true;
@@ -53,7 +117,7 @@
 	{:else if loaded}
 		<img
 			class="responsive"
-			style="max-width: 100%;height: 100%;"
+			style="max-width: 100%;min-height: 160px;"
 			src={img.src}
 			alt="Thumbnail for video"
 		/>
@@ -97,3 +161,6 @@
 		</div>
 	</nav>
 </div>
+
+<canvas id="canvas" style="display: none;"></canvas>
+<div id="video-container" style="display: none;"></div>

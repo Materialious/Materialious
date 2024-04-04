@@ -14,6 +14,7 @@
 # Features
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
+- DeArrow built-in (With local processing fallback).
 - Video progress tracking & resuming.
 - No ads.
 - No tracking.
@@ -150,6 +151,12 @@ services:
 
       # URL to Sponsorblock
       VITE_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"
+
+      # URL to DeArrow
+      VITE_DEFAULT_DEARROW_INSTANCE: "https://sponsor.ajay.app"
+
+      # URL to DeArrow thumbnail instance
+      VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
 ```
 
 # Previews
@@ -175,6 +182,7 @@ services:
 
 # Special thanks to
 - [Invidious](https://github.com/iv-org)
+- [Clipious](https://github.com/lamarios/clipious) for inspiration & a good source for learning more about undocumented Invidious routes.
 - [Vidstack player](https://github.com/vidstack/player)
 - [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
 - Every dependency in [package.json](/materialious/package.json).

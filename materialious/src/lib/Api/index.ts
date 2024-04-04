@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
-import { auth, returnYTDislikesInstance } from '../../store';
-import type { Channel, ChannelContentPlaylists, ChannelContentVideos, ChannelPage, Comments, Playlist, PlaylistPage, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
+import { auth, deArrowInstance, deArrowThumbnailInstance, returnYTDislikesInstance } from '../../store';
+import type { Channel, ChannelContentPlaylists, ChannelContentVideos, ChannelPage, Comments, DeArrow, Playlist, PlaylistPage, ReturnYTDislikes, SearchSuggestion, Subscription, Video, VideoPlay } from './model';
 
 export function buildPath(path: string): string {
   return `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/api/v1/${path}`;
@@ -221,4 +221,19 @@ export async function addPlaylistVideo(playlistId: string, videoId: string) {
     }),
     ...headers
   }));
+}
+
+export async function getDeArrow(videoId: string): Promise<DeArrow> {
+  const resp = await fetchErrorHandle(
+    await fetch(`${get(deArrowInstance)}/api/branding?videoID=${videoId}`
+    )
+  );
+  return await resp.json();
+}
+
+export async function getThumbnail(videoId: string, time: number): Promise<string> {
+  const resp = await fetchErrorHandle(
+    await fetch(`${get(deArrowThumbnailInstance)}/api/v1/getThumbnail?videoID=${videoId}&time=${time}`)
+  );
+  return URL.createObjectURL(await resp.blob());
 }

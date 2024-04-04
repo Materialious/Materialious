@@ -231,3 +231,22 @@ export interface Subscription {
   author: string;
   authorId: string;
 }
+
+export interface DeArrow {
+  titles: {
+    title: string;
+    original: boolean;
+    votes: number;
+    locked: boolean;
+    UUID: string;
+  }[];
+  thumbnails: {
+    timestamp?: number;
+    original: boolean;
+    votes: number;
+    locked: boolean;
+    UUID: string;
+  }[];
+  randomTime: number;
+  videoDuration: number;
+}

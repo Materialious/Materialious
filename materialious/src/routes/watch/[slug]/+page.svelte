@@ -13,7 +13,7 @@
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
-	import type { PlayerEvent } from '$lib/player';
+	import type { PlayerEvents } from '$lib/player';
 	import type { DataConnection } from 'peerjs';
 	import Peer from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
@@ -40,54 +40,93 @@
 	let peer: Peer | null = null;
 
 	function playerSyncEvents(conn: DataConnection) {
-		conn.on('data', (data) => {
-			const events = data as PlayerEvent[];
+		let disableEvents = false;
 
-			events.forEach((event) => {
+		conn.on('data', (data) => {
+			const events = data as PlayerEvents;
+
+			disableEvents = true;
+
+			events.events.forEach((event) => {
 				if (event.type === 'pause') {
 					player.pause();
 				} else if (event.type === 'play') {
 					player.play();
 				} else if (event.type === 'seek' && event.time) {
-					player.currentTime = event.time;
+					player.currentTime =
+						event.time +
+						Math.abs(new Date(events.timestamp).getTime() - new Date().getTime()) / 1000;
 				}
 			});
+
+			setTimeout(() => {
+				disableEvents = false;
+			}, 500);
 		});
 
 		player.addEventListener('pause', () => {
-			conn.send([
-				{
-					type: 'pause'
-				},
-				{
-					type: 'seek',
-					time: player.currentTime
-				}
-			] as PlayerEvent[]);
+			if (disableEvents) return;
+
+			conn.send({
+				events: [
+					{
+						type: 'pause'
+					},
+					{
+						type: 'seek',
+						time: player.currentTime
+					}
+				],
+				timestamp: new Date()
+			} as PlayerEvents);
 		});
 
 		player.addEventListener('playing', () => {
-			conn.send([
-				{
-					type: 'play'
-				},
-				{
-					type: 'seek',
-					time: player.currentTime
-				}
-			] as PlayerEvent[]);
+			if (disableEvents) return;
+
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: player.currentTime
+					},
+					{
+						type: 'play'
+					}
+				],
+				timestamp: new Date()
+			} as PlayerEvents);
 		});
 
 		player.addEventListener('waiting', () => {
-			conn.send([
-				{
-					type: 'pause'
-				},
-				{
-					type: 'seek',
-					time: player.currentTime
-				}
-			] as PlayerEvent[]);
+			if (disableEvents) return;
+
+			conn.send({
+				events: [
+					{
+						type: 'pause'
+					},
+					{
+						type: 'seek',
+						time: player.currentTime
+					}
+				],
+				timestamp: new Date()
+			} as PlayerEvents);
+		});
+
+		player.addEventListener('seeked', () => {
+			if (disableEvents) return;
+
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: player.currentTime
+					}
+				],
+				timestamp: new Date()
+			} as PlayerEvents);
 		});
 	}
 
@@ -198,7 +237,7 @@
 					{data}
 					{audioMode}
 					{playlistVideos}
-					isSyncing={!peer}
+					isSyncing={peer !== null}
 					bind:seekTo
 					bind:currentTime
 					bind:player

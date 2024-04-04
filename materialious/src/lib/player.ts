@@ -3,3 +3,8 @@ export interface PlayerEvent {
   time?: number;
   videoId?: string;
 }
+
+export interface PlayerEvents {
+  events: PlayerEvent[];
+  timestamp: Date;
+}

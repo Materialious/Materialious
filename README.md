@@ -58,7 +58,7 @@ invidious.example.com {
 }
 
 materialious.example.com {
-	reverse_proxy localhost:5173
+	reverse_proxy localhost:3001
 }
 ```
 
@@ -88,7 +88,7 @@ server {
     server_name materialious.example.com;
 
     location / {
-        proxy_pass http://localhost:5173;
+        proxy_pass http://localhost:3001;
     }
 }
 ```

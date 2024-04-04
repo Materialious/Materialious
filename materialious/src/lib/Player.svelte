@@ -231,7 +231,6 @@
 	title={data.video.title}
 	streamType={data.video.hlsUrl ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
-	playsInline={true}
 	keep-alive
 	{src}
 >

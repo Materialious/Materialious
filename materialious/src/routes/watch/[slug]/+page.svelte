@@ -78,18 +78,6 @@
 			] as PlayerEvent[]);
 		});
 
-		player.addEventListener('play', () => {
-			conn.send([
-				{
-					type: 'play'
-				},
-				{
-					type: 'seek',
-					time: player.currentTime
-				}
-			] as PlayerEvent[]);
-		});
-
 		player.addEventListener('waiting', () => {
 			conn.send([
 				{

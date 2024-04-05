@@ -30,9 +30,6 @@
 - PWA support.
 - YT path redirects (So your redirect plugins should still work!)
 
-# Todo
-- Localization.
-
 # Setup
 For security reasons regarding CORS, your hosted instance of Materialious must serve as the value for the `Access-Control-Allow-Origin` header on Invidious.
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { deArrowEnabled, playerSavePlaybackPosition } from '../store';
@@ -8,8 +9,14 @@
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 	export let playlistId: string = '';
+	export let onClick: (input: string) => void = (input: string) => {};
 
 	let watchUrl = `/watch/${video.videoId}` + (playlistId ? `?playlist=${playlistId}` : '');
+
+	const syncId = $page.url.searchParams.get('sync');
+	if (syncId) {
+		watchUrl += (playlistId ? '&' : '?') + `sync=${syncId}`;
+	}
 
 	let loading = true;
 	let loaded = false;
@@ -110,6 +117,7 @@
 	class="wave"
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	href={watchUrl}
+	on:click={() => onClick(video.videoId)}
 	data-sveltekit-preload-data="off"
 >
 	{#if loading}

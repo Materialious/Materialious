@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
 		deleteUnsubscribe,
@@ -38,14 +39,26 @@
 	let player: MediaPlayerElement;
 
 	let peer: Peer | null = null;
+	let peerConnection: DataConnection | null = null;
+
+	function onVideoChange(videoId: string) {
+		if (!peerConnection) return;
+
+		peerConnection.send({
+			events: [
+				{
+					type: 'change-video',
+					videoId: videoId
+				}
+			]
+		} as PlayerEvents);
+	}
 
 	function playerSyncEvents(conn: DataConnection) {
-		let disableEvents = false;
+		peerConnection = conn;
 
 		conn.on('data', (data) => {
 			const events = data as PlayerEvents;
-
-			disableEvents = true;
 
 			events.events.forEach((event) => {
 				if (event.type === 'pause') {
@@ -53,37 +66,15 @@
 				} else if (event.type === 'play') {
 					player.play();
 				} else if (event.type === 'seek' && event.time) {
-					player.currentTime =
-						event.time +
-						Math.abs(new Date(events.timestamp).getTime() - new Date().getTime()) / 1000;
+					player.currentTime = event.time;
+				} else if (event.type === 'change-video' && event.videoId) {
+					currentUrl.pathname = `/watch/${event.videoId}`;
+					goto(currentUrl);
 				}
 			});
-
-			setTimeout(() => {
-				disableEvents = false;
-			}, 500);
 		});
 
-		player.addEventListener('pause', () => {
-			if (disableEvents) return;
-
-			conn.send({
-				events: [
-					{
-						type: 'pause'
-					},
-					{
-						type: 'seek',
-						time: player.currentTime
-					}
-				],
-				timestamp: new Date()
-			} as PlayerEvents);
-		});
-
-		player.addEventListener('playing', () => {
-			if (disableEvents) return;
-
+		player.addEventListener('auto-play', () => {
 			conn.send({
 				events: [
 					{
@@ -93,39 +84,66 @@
 					{
 						type: 'play'
 					}
-				],
-				timestamp: new Date()
+				]
 			} as PlayerEvents);
 		});
 
-		player.addEventListener('waiting', () => {
-			if (disableEvents) return;
-
+		player.addEventListener('pause', () => {
 			conn.send({
 				events: [
 					{
 						type: 'pause'
-					},
+					}
+				]
+			} as PlayerEvents);
+		});
+
+		player.addEventListener('playing', () => {
+			conn.send({
+				events: [
 					{
 						type: 'seek',
 						time: player.currentTime
+					},
+					{
+						type: 'play'
 					}
-				],
-				timestamp: new Date()
+				]
+			} as PlayerEvents);
+		});
+
+		player.addEventListener('play', () => {
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: player.currentTime
+					},
+					{
+						type: 'play'
+					}
+				]
+			} as PlayerEvents);
+		});
+
+		player.addEventListener('waiting', () => {
+			conn.send({
+				events: [
+					{
+						type: 'pause'
+					}
+				]
 			} as PlayerEvents);
 		});
 
 		player.addEventListener('seeked', () => {
-			if (disableEvents) return;
-
 			conn.send({
 				events: [
 					{
 						type: 'seek',
 						time: player.currentTime
 					}
-				],
-				timestamp: new Date()
+				]
 			} as PlayerEvents);
 		});
 	}
@@ -436,7 +454,7 @@
 					{#each data.video.recommendedVideos as recommendedVideo}
 						<article class="no-padding">
 							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} />
+								<Thumbnail onClick={onVideoChange} video={recommendedVideo} />
 							{/key}
 						</article>
 					{/each}
@@ -459,7 +477,11 @@
 							id={playlistVideo.videoId}
 							class:border={playlistVideo.videoId === data.video.videoId}
 						>
-							<Thumbnail video={playlistVideo} playlistId={data.playlistId} />
+							<Thumbnail
+								onClick={onVideoChange}
+								video={playlistVideo}
+								playlistId={data.playlistId}
+							/>
 						</article>
 					{/each}
 				</article>

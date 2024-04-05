@@ -6,5 +6,4 @@ export interface PlayerEvent {
 
 export interface PlayerEvents {
   events: PlayerEvent[];
-  timestamp: Date;
 }

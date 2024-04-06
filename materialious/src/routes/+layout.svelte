@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import { getFeed } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
@@ -136,6 +136,19 @@
 		if ($syncPartyPeer) {
 			$syncPartyPeer.on('connection', (conn) => {
 				conn.on('open', () => {
+					if ($page.url.pathname.startsWith('/watch')) {
+						const paths = $page.url.pathname.split('/');
+						if (paths.length > 2) {
+							conn.send({
+								events: [
+									{
+										type: 'change-video',
+										videoId: paths[2]
+									}
+								]
+							} as PlayerEvents);
+						}
+					}
 					changeVideoEvent(conn);
 					syncPartyConnections.set([...($syncPartyConnections || []), conn]);
 				});
@@ -240,6 +253,11 @@
 				syncPartyConnections.set([...($syncPartyConnections || []), conn]);
 
 				changeVideoEvent(conn);
+			});
+
+			$syncPartyPeer.on('disconnected', () => {
+				syncPartyPeer.set(null);
+				syncPartyConnections.set(null);
 			});
 		}
 	});

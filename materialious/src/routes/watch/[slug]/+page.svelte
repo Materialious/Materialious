@@ -41,6 +41,10 @@
 	let player: MediaPlayerElement;
 
 	function playerSyncEvents(conn: DataConnection) {
+		conn.send({
+			events: [{ type: 'seek', time: player.currentTime }]
+		} as PlayerEvents);
+
 		conn.on('data', (data) => {
 			const events = data as PlayerEvents;
 

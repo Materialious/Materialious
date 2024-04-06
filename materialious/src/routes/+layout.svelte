@@ -120,7 +120,7 @@
 		const currentUrl = new URL(location.href);
 
 		if ($syncPartyPeer) {
-			$syncPartyPeer.disconnect();
+			$syncPartyPeer.destroy();
 			syncPartyPeer.set(null);
 			currentUrl.searchParams.delete('sync');
 			window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
@@ -264,7 +264,7 @@
 
 	onDestroy(() => {
 		if ($syncPartyPeer) {
-			$syncPartyPeer.disconnect();
+			$syncPartyPeer.destroy();
 			$syncPartyPeer = null;
 		}
 	});

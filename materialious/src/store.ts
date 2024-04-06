@@ -1,3 +1,5 @@
+import type Peer from 'peerjs';
+import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 
@@ -27,3 +29,6 @@ export const sponsorBlockCategories: Writable<string[]> = persisted("sponsorBloc
 export const deArrowInstance = persisted("deArrowInstance", import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE);
 export const deArrowEnabled = persisted("deArrowEnabled", false);
 export const deArrowThumbnailInstance = persisted("deArrowThumbnailInstance", import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE);
+
+export const syncPartyPeer: Writable<Peer | null> = writable(null);
+export const syncPartyConnections: Writable<DataConnection[] | null> = writable();

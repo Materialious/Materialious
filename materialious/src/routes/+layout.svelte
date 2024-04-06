@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { navigating } from '$app/stores';
 	import { getFeed } from '$lib/Api/index';
 	import Logo from '$lib/Logo.svelte';
+	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import 'beercss';
@@ -573,7 +575,11 @@
 </dialog>
 
 <main class="responsive max root">
-	<slot />
+	{#if $navigating}
+		<PageLoading />
+	{:else}
+		<slot />
+	{/if}
 </main>
 
 <style>

@@ -312,9 +312,9 @@
 		<i>code</i>
 		<div class="tooltip bottom">Star us on Github!</div>
 	</a>
-	<button on:click={startWatchSync} class="circle large transparent">
+	<button data-ui="#sync-party" class="circle large transparent">
 		<i class:primary-text={$syncPartyPeer}>group</i>
-		<div class="tooltip bottom">Start sync party</div>
+		<div class="tooltip bottom">Sync party</div>
 	</button>
 	{#if isLoggedIn}
 		<button class="circle large transparent" data-ui="#dialog-notifications"
@@ -661,6 +661,40 @@
 			>
 		{/if}
 	{/each}
+</dialog>
+
+<dialog id="sync-party">
+	{#if $syncPartyPeer}
+		<nav>
+			<div class="field label border">
+				<input
+					name="sync-share"
+					readonly
+					value={`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeer.id}`}
+					type="text"
+				/>
+				<label for="sync-share">Share URL</label>
+			</div>
+			<button
+				on:click={async () => {
+					await navigator.clipboard.writeText(
+						`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeer.id}`
+					);
+				}}
+				class="square round"
+			>
+				<i>content_copy</i>
+			</button>
+		</nav>
+	{/if}
+	<div class="space"></div>
+	<button on:click={startWatchSync} data-ui={`${$syncPartyPeer ? '#sync-party' : ''}`}
+		>{#if $syncPartyPeer}
+			End
+		{:else}
+			Start
+		{/if} sync party
+	</button>
 </dialog>
 
 <main class="responsive max root">

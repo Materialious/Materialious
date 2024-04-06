@@ -6,9 +6,12 @@
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import type { PlayerEvents } from '$lib/player';
 	import 'beercss';
 	import 'material-dynamic-colors';
-	import { onMount } from 'svelte';
+	import type { DataConnection } from 'peerjs';
+	import Peer from 'peerjs';
+	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import {
@@ -30,6 +33,8 @@
 		sponsorBlock,
 		sponsorBlockCategories,
 		sponsorBlockUrl,
+		syncPartyConnections,
+		syncPartyPeer,
 		themeColor
 	} from '../store';
 
@@ -96,6 +101,47 @@
 		{ name: 'Preview/Recap/Hook', category: 'preview' },
 		{ name: 'Filler Tangent/Jokes', category: 'filler' }
 	];
+
+	function changeVideoEvent(conn: DataConnection) {
+		conn.on('data', (data) => {
+			const events = data as PlayerEvents;
+			const currentUrl = new URL(location.href);
+
+			events.events.forEach((event) => {
+				if (event.type === 'change-video' && event.videoId) {
+					currentUrl.pathname = `/watch/${event.videoId}`;
+					goto(currentUrl);
+				}
+			});
+		});
+	}
+
+	async function startWatchSync() {
+		const currentUrl = new URL(location.href);
+
+		if ($syncPartyPeer) {
+			$syncPartyPeer.disconnect();
+			syncPartyPeer.set(null);
+			currentUrl.searchParams.delete('sync');
+			window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
+			return;
+		}
+
+		const peerId = crypto.randomUUID();
+		currentUrl.searchParams.set('sync', peerId);
+		window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
+
+		$syncPartyPeer = new Peer(peerId);
+
+		if ($syncPartyPeer) {
+			$syncPartyPeer.on('connection', (conn) => {
+				conn.on('open', () => {
+					changeVideoEvent(conn);
+					syncPartyConnections.set([...($syncPartyConnections || []), conn]);
+				});
+			});
+		}
+	}
 
 	function toggleSponsor(category: string) {
 		if (sponsorCategoriesList.includes(category)) {
@@ -182,6 +228,27 @@
 		if (isLoggedIn) {
 			loadNotifications().catch(() => auth.set(null));
 		}
+
+		const currentUrl = new URL(location.href);
+		const syncId = currentUrl.searchParams.get('sync');
+		if (syncId) {
+			$syncPartyPeer = new Peer(crypto.randomUUID());
+			$syncPartyPeer.on('open', () => {
+				if (!$syncPartyPeer) return;
+
+				const conn = $syncPartyPeer.connect(syncId);
+				syncPartyConnections.set([...($syncPartyConnections || []), conn]);
+
+				changeVideoEvent(conn);
+			});
+		}
+	});
+
+	onDestroy(() => {
+		if ($syncPartyPeer) {
+			$syncPartyPeer.disconnect();
+			$syncPartyPeer = null;
+		}
 	});
 
 	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
@@ -227,6 +294,10 @@
 		<i>code</i>
 		<div class="tooltip bottom">Star us on Github!</div>
 	</a>
+	<button on:click={startWatchSync} class="circle large transparent">
+		<i class:primary-text={$syncPartyPeer}>group</i>
+		<div class="tooltip bottom">Start sync party</div>
+	</button>
 	{#if isLoggedIn}
 		<button class="circle large transparent" data-ui="#dialog-notifications"
 			><i>notifications</i>

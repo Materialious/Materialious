@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
 		deleteUnsubscribe,
@@ -16,19 +15,22 @@
 	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
 	import type { PlayerEvents } from '$lib/player';
 	import type { DataConnection } from 'peerjs';
-	import Peer from 'peerjs';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import type { MediaPlayerElement } from 'vidstack/elements';
-	import { activePage, auth, playerListenByDefault } from '../../../store';
+	import {
+		activePage,
+		auth,
+		playerListenByDefault,
+		syncPartyConnections,
+		syncPartyPeer
+	} from '../../../store';
 
 	export let data;
 
 	$: comments = data.comments;
 
 	activePage.set(null);
-
-	const currentUrl = new URL(location.href);
 
 	let playlistVideos: PlaylistPageVideo[] = [];
 	let playlist: PlaylistPage | null = null;
@@ -38,27 +40,11 @@
 	let seekTo: (time: number) => void;
 	let player: MediaPlayerElement;
 
-	let peer: Peer | null = null;
-	let peerConnection: DataConnection | null = null;
-
-	function onVideoChange(videoId: string) {
-		if (!peerConnection) return;
-
-		peerConnection.send({
-			events: [
-				{
-					type: 'change-video',
-					videoId: videoId
-				}
-			]
-		} as PlayerEvents);
-	}
-
 	function playerSyncEvents(conn: DataConnection) {
-		peerConnection = conn;
-
 		conn.on('data', (data) => {
 			const events = data as PlayerEvents;
+
+			if (!player) return;
 
 			events.events.forEach((event) => {
 				if (event.type === 'pause') {
@@ -67,9 +53,6 @@
 					player.play();
 				} else if (event.type === 'seek' && event.time) {
 					player.currentTime = event.time;
-				} else if (event.type === 'change-video' && event.videoId) {
-					currentUrl.pathname = `/watch/${event.videoId}`;
-					goto(currentUrl);
 				}
 			});
 		});
@@ -148,15 +131,14 @@
 		});
 	}
 
+	syncPartyConnections.subscribe((connections) => {
+		if (!connections || !player) return;
+		playerSyncEvents(connections[connections.length - 1]);
+	});
+
 	onMount(async () => {
-		const syncId = currentUrl.searchParams.get('sync');
-		if (syncId) {
-			peer = new Peer(crypto.randomUUID());
-			peer.on('open', () => {
-				if (!peer) return;
-
-				const conn = peer.connect(syncId);
-
+		if ($syncPartyConnections) {
+			$syncPartyConnections.forEach((conn) => {
 				playerSyncEvents(conn);
 			});
 		}
@@ -187,34 +169,6 @@
 				playlistCurrentVideo.offsetTop - playlistScrollable.offsetTop - 200;
 		}
 	});
-
-	onDestroy(() => {
-		if (peer) {
-			peer.disconnect();
-			peer = null;
-		}
-	});
-
-	async function startWatchSync() {
-		if (peer) {
-			peer.disconnect();
-			peer = null;
-			return;
-		}
-
-		const peerId = crypto.randomUUID();
-
-		currentUrl.searchParams.set('sync', peerId);
-		window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
-
-		peer = new Peer(peerId);
-
-		peer.on('connection', (conn) => {
-			conn.on('open', () => {
-				playerSyncEvents(conn);
-			});
-		});
-	}
 
 	async function addVideoToPlaylist(playlistId: string) {
 		await addPlaylistVideo(playlistId, data.video.videoId);
@@ -255,7 +209,7 @@
 					{data}
 					{audioMode}
 					{playlistVideos}
-					isSyncing={peer !== null}
+					isSyncing={$syncPartyPeer !== null}
 					bind:seekTo
 					bind:currentTime
 					bind:player
@@ -316,18 +270,6 @@
 				</div>
 
 				<div class="s12 m12 l4 video-actions">
-					{#if data.video.hlsUrl}
-						<button disabled>
-							<i>group</i>
-							<span>Watch sync</span>
-							<div class="tooltip">Sync not available for live streams</div>
-						</button>
-					{:else}
-						<button on:click={startWatchSync} class:border={!peer}>
-							<i>group</i>
-							<span>Watch sync</span>
-						</button>
-					{/if}
 					<button
 						class="no-margin"
 						on:click={() => (audioMode = !audioMode)}
@@ -454,7 +396,7 @@
 					{#each data.video.recommendedVideos as recommendedVideo}
 						<article class="no-padding">
 							{#key recommendedVideo.videoId}
-								<Thumbnail onClick={onVideoChange} video={recommendedVideo} />
+								<Thumbnail video={recommendedVideo} />
 							{/key}
 						</article>
 					{/each}
@@ -477,11 +419,7 @@
 							id={playlistVideo.videoId}
 							class:border={playlistVideo.videoId === data.video.videoId}
 						>
-							<Thumbnail
-								onClick={onVideoChange}
-								video={playlistVideo}
-								playlistId={data.playlistId}
-							/>
+							<Thumbnail video={playlistVideo} playlistId={data.playlistId} />
 						</article>
 					{/each}
 				</article>

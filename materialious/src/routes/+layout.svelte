@@ -664,6 +664,8 @@
 </dialog>
 
 <dialog id="sync-party">
+	<h6>Sync party</h6>
+	<p>Please note your IP will be visible to users you invite.</p>
 	{#if $syncPartyPeer}
 		<nav>
 			<div class="field label border">
@@ -673,7 +675,7 @@
 					value={`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeer.id}`}
 					type="text"
 				/>
-				<label for="sync-share">Share URL</label>
+				<label class="active" for="sync-share">Share URL</label>
 			</div>
 			<button
 				on:click={async () => {
@@ -688,7 +690,10 @@
 		</nav>
 	{/if}
 	<div class="space"></div>
-	<button on:click={startWatchSync} data-ui={`${$syncPartyPeer ? '#sync-party' : ''}`}
+	<button
+		class="no-margin"
+		on:click={startWatchSync}
+		data-ui={`${$syncPartyPeer ? '#sync-party' : ''}`}
 		>{#if $syncPartyPeer}
 			End
 		{:else}

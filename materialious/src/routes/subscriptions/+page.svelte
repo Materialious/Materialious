@@ -23,6 +23,14 @@
 	}
 </script>
 
+<div class="space"></div>
+<nav class="right-align">
+	<a class="button" href="/subscriptions/manage">
+		<i>subscriptions</i>
+		<span>Manage subscriptions</span>
+	</a>
+</nav>
+
 <VideoList bind:videos />
 
 <InfiniteLoading on:infinite={loadMore} />

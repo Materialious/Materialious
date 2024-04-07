@@ -36,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"beercss": "^3.5.1",
+		"fuse.js": "^7.0.0",
 		"human-number": "^2.0.4",
 		"media-icons": "^0.10.0",
 		"peerjs": "^1.5.2",

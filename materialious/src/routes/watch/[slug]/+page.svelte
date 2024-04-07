@@ -56,7 +56,11 @@
 				} else if (event.type === 'play') {
 					player.play();
 				} else if (event.type === 'seek' && event.time) {
-					player.currentTime = event.time;
+					const timeDiff = player.currentTime - event.time;
+
+					if (timeDiff > 3 || timeDiff < 3) {
+						player.currentTime = event.time;
+					}
 				}
 			});
 		});
@@ -223,7 +227,7 @@
 			<h5>{data.video.title}</h5>
 
 			<div class="grid no-padding">
-				<div class="s12 m12 l4">
+				<div class="s12 m12 l5">
 					<nav>
 						<a href={`/channel/${data.video.authorId}`}>
 							<nav>
@@ -258,9 +262,9 @@
 						{/if}
 					</nav>
 				</div>
-				<div class="s12 m12 l4 video-actions">
+				<div class="s12 m12 l7 video-actions">
 					{#if data.returnYTDislikes}
-						<nav class="no-space no-margin" style="margin-right: .5em;">
+						<nav class="no-space" style="margin-right: .5em;">
 							<button style="cursor: default;" class="border left-round">
 								<i class="small">thumb_up</i>
 								<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
@@ -271,19 +275,11 @@
 							</button>
 						</nav>
 					{/if}
-				</div>
-
-				<div class="s12 m12 l4 video-actions">
-					<button
-						class="no-margin"
-						on:click={() => (audioMode = !audioMode)}
-						class:border={!audioMode}
-					>
+					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
 						<i>headphones</i>
-						<span>Audio only </span>
 					</button>
 					<button class="border"
-						><i>share</i> Share
+						><i>share</i>
 						<menu class="no-wrap">
 							<a
 								class="row"
@@ -315,10 +311,21 @@
 							></menu
 						></button
 					>
+					{#if data.downloadOptions.length > 0}
+						<button class="border"
+							><i>download</i>
+							<menu class="no-wrap">
+								{#each data.downloadOptions as download}
+									<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
+										>{download.title}</a
+									>
+								{/each}
+							</menu></button
+						>
+					{/if}
 					{#if data.personalPlaylists}
-						<button class="border no-margin">
+						<button class="border">
 							<i>add</i>
-							<span>Playlist</span>
 							<menu>
 								{#each data.personalPlaylists as personalPlaylist}
 									<a
@@ -332,7 +339,6 @@
 					{:else}
 						<button disabled class="border no-margin">
 							<i>add</i>
-							<span>Playlist</span>
 							<div class="tooltip">
 								{#if $auth}
 									No playlists
@@ -455,6 +461,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
+	}
+
+	.video-actions button:not(.left-round):not(.right-round) {
+		margin: 0.3em;
 	}
 
 	@media screen and (max-width: 1000px) {

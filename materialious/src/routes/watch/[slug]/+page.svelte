@@ -262,9 +262,9 @@
 						{/if}
 					</nav>
 				</div>
-				<div class="s12 m12 l4 video-actions">
+				<div class="s12 m12 l7 video-actions">
 					{#if data.returnYTDislikes}
-						<nav class="no-space no-margin" style="margin-right: .5em;">
+						<nav class="no-space" style="margin-right: .5em;">
 							<button style="cursor: default;" class="border left-round">
 								<i class="small">thumb_up</i>
 								<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
@@ -275,17 +275,10 @@
 							</button>
 						</nav>
 					{/if}
-				</div>
-
-				<div class="s12 m12 l3 video-actions">
-					<button
-						class="no-margin"
-						on:click={() => (audioMode = !audioMode)}
-						class:border={!audioMode}
-					>
+					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
 						<i>headphones</i>
 					</button>
-					<button class="border" style="margin-right: 0;"
+					<button class="border"
 						><i>share</i>
 						<menu class="no-wrap">
 							<a
@@ -318,7 +311,7 @@
 							></menu
 						></button
 					>
-					{#if data.downloadOptions}
+					{#if data.downloadOptions.length > 0}
 						<button class="border"
 							><i>download</i>
 							<menu class="no-wrap">
@@ -331,7 +324,7 @@
 						>
 					{/if}
 					{#if data.personalPlaylists}
-						<button class="border no-margin">
+						<button class="border">
 							<i>add</i>
 							<menu>
 								{#each data.personalPlaylists as personalPlaylist}
@@ -468,6 +461,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
+	}
+
+	.video-actions button:not(.left-round):not(.right-round) {
+		margin: 0.3em;
 	}
 
 	@media screen and (max-width: 1000px) {

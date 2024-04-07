@@ -56,7 +56,11 @@
 				} else if (event.type === 'play') {
 					player.play();
 				} else if (event.type === 'seek' && event.time) {
-					player.currentTime = event.time;
+					const timeDiff = player.currentTime - event.time;
+
+					if (timeDiff > 3 || timeDiff < 3) {
+						player.currentTime = event.time;
+					}
 				}
 			});
 		});

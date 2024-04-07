@@ -58,7 +58,7 @@
 				} else if (event.type === 'seek' && event.time) {
 					const timeDiff = player.currentTime - event.time;
 
-					if (timeDiff > 3 || timeDiff < 3) {
+					if (timeDiff > 3 || timeDiff < -3) {
 						player.currentTime = event.time;
 					}
 				}

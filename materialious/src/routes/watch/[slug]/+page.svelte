@@ -227,7 +227,7 @@
 			<h5>{data.video.title}</h5>
 
 			<div class="grid no-padding">
-				<div class="s12 m12 l4">
+				<div class="s12 m12 l5">
 					<nav>
 						<a href={`/channel/${data.video.authorId}`}>
 							<nav>
@@ -277,17 +277,16 @@
 					{/if}
 				</div>
 
-				<div class="s12 m12 l4 video-actions">
+				<div class="s12 m12 l3 video-actions">
 					<button
 						class="no-margin"
 						on:click={() => (audioMode = !audioMode)}
 						class:border={!audioMode}
 					>
 						<i>headphones</i>
-						<span>Audio only </span>
 					</button>
-					<button class="border"
-						><i>share</i> Share
+					<button class="border" style="margin-right: 0;"
+						><i>share</i>
 						<menu class="no-wrap">
 							<a
 								class="row"
@@ -319,10 +318,21 @@
 							></menu
 						></button
 					>
+					{#if data.downloadOptions}
+						<button class="border"
+							><i>download</i>
+							<menu class="no-wrap">
+								{#each data.downloadOptions as download}
+									<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
+										>{download.title}</a
+									>
+								{/each}
+							</menu></button
+						>
+					{/if}
 					{#if data.personalPlaylists}
 						<button class="border no-margin">
 							<i>add</i>
-							<span>Playlist</span>
 							<menu>
 								{#each data.personalPlaylists as personalPlaylist}
 									<a
@@ -336,7 +346,6 @@
 					{:else}
 						<button disabled class="border no-margin">
 							<i>add</i>
-							<span>Playlist</span>
 							<div class="tooltip">
 								{#if $auth}
 									No playlists

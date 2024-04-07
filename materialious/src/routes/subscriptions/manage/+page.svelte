@@ -47,7 +47,8 @@
 {#each subscriptions as sub}
 	<article>
 		<nav>
-			<h6 class="max">{sub.author}</h6>
+			<a href={`/channel/${sub.authorId}`} class="link"><h6>{sub.author}</h6></a>
+			<div class="max"></div>
 			<button on:click={async () => unsubscribe(sub.authorId)} class="inverse-surface">
 				Unsubscribe
 			</button>

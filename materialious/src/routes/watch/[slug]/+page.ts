@@ -13,6 +13,24 @@ export async function load({ params, url }) {
     error(500, errorMessage);
   }
 
+  let downloadOptions: { title: string; url: string; }[] = [];
+
+  if (!video.hlsUrl) {
+    video.formatStreams.forEach(format => {
+      downloadOptions.push({
+        title: `${format.type.split(';')[0].trim()} - ${format.qualityLabel} (With audio)`,
+        url: format.url
+      });
+    });
+
+    video.adaptiveFormats.forEach(format => {
+      downloadOptions.push({
+        title: `${format.type.split(';')[0].trim()} - ${format.qualityLabel || format.bitrate + ' bitrate'}`,
+        url: format.url
+      });
+    });
+  }
+
   let personalPlaylists: PlaylistPage[] | null;
 
   if (get(auth)) {
@@ -47,6 +65,7 @@ export async function load({ params, url }) {
     subscribed: await amSubscribed(video.authorId),
     content: phaseDescription(video.descriptionHtml),
     playlistId: url.searchParams.get('playlist'),
-    personalPlaylists: personalPlaylists
+    personalPlaylists: personalPlaylists,
+    downloadOptions: downloadOptions
   };
 };

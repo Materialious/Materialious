@@ -414,10 +414,7 @@
 							{#if data.content.timestamps.length > 0}
 								<h6 style="margin-bottom: .3em;">Chapters</h6>
 								{#each data.content.timestamps as timestamp}
-									<button
-										on:click={() => seekTo(timestamp.time)}
-										class="timestamps"
-										class:primary={timestamp.time <= currentTime}
+									<button on:click={() => seekTo(timestamp.time)} class="timestamps"
 										>{timestamp.timePretty}
 										{#if !timestamp.title.startsWith('-')}
 											-
@@ -503,8 +500,14 @@
 		margin-left: 0;
 		margin-bottom: 0.4em;
 		display: block;
-		background-color: var(--secondary-container);
+		padding: 0;
+		text-align: left;
+		background-color: transparent;
 		color: var(--on-secondary-container);
+	}
+
+	.timestamps:hover {
+		padding: 0 0.5em;
 	}
 
 	.video-actions {

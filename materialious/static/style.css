@@ -2,6 +2,20 @@
     padding: .1em .4em;
 }
 
+.vds-chapter-radio-label {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+}
+
+.vds-chapter-radio-content {
+    max-width: 200px !important;
+}
+
+.vds-chapter-radio {
+    align-items: start !important;
+}
+
 @media screen and (max-width: 580px) {
     main {
         padding-left: .1em !important;

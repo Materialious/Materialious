@@ -68,6 +68,16 @@
 			});
 		});
 
+		player.addEventListener('auto-play-fail', () => {
+			conn.send({
+				events: [
+					{
+						type: 'pause'
+					}
+				]
+			} as PlayerEvents);
+		});
+
 		player.addEventListener('auto-play', () => {
 			conn.send({
 				events: [

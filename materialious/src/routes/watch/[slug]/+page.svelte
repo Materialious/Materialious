@@ -166,13 +166,15 @@
 			});
 		}
 
-		if ($playerAutoplayNextByDefault) {
-			player.addEventListener('end', () => {
-				if ($playerAutoplayNextByDefault && !playlist) {
-					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
-				}
-			});
-		}
+		player.addEventListener('end', () => {
+			if ($playerAutoplayNextByDefault && !playlist) {
+				goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+			}
+
+			if (data.playlistId) {
+				setTimeout(goToCurrentPlaylistItem, 1000);
+			}
+		});
 
 		if (!data.playlistId) return;
 
@@ -192,6 +194,10 @@
 			);
 		}
 
+		goToCurrentPlaylistItem();
+	});
+
+	function goToCurrentPlaylistItem() {
 		const playlistCurrentVideo = document.getElementById(data.video.videoId);
 		const playlistScrollable = document.getElementById('playlist');
 
@@ -199,7 +205,7 @@
 			playlistScrollable.scrollTop =
 				playlistCurrentVideo.offsetTop - playlistScrollable.offsetTop - 200;
 		}
-	});
+	}
 
 	async function addVideoToPlaylist(playlistId: string) {
 		await addPlaylistVideo(playlistId, data.video.videoId);

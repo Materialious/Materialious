@@ -123,6 +123,9 @@
 									event.detail.currentTime >= segment.startTime &&
 									event.detail.currentTime <= segment.endTime
 								) {
+									if (Math.round(player.currentTime) >= Math.round(player.duration)) {
+										return;
+									}
 									categoryBeingSkipped = segment.category;
 									player.currentTime = segment.endTime + 1;
 									ui('#sponsorblock-alert');

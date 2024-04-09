@@ -28,6 +28,7 @@
 		playerListenByDefault,
 		playerProxyVideos,
 		playerSavePlaybackPosition,
+		playerTheatreModeByDefault,
 		returnYTDislikesInstance,
 		returnYtDislikes,
 		sponsorBlock,
@@ -476,6 +477,22 @@
 						type="checkbox"
 						bind:checked={$playerListenByDefault}
 						on:click={() => playerListenByDefault.set(!$playerListenByDefault)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Theatre mode by default</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$playerTheatreModeByDefault}
+						on:click={() => playerTheatreModeByDefault.set(!$playerTheatreModeByDefault)}
 					/>
 					<span></span>
 				</label>

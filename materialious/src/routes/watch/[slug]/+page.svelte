@@ -22,6 +22,7 @@
 		activePage,
 		auth,
 		playerListenByDefault,
+		playerTheatreModeByDefault,
 		syncPartyConnections,
 		syncPartyPeer
 	} from '../../../store';
@@ -34,6 +35,8 @@
 
 	let playlistVideos: PlaylistPageVideo[] = [];
 	let playlist: PlaylistPage | null = null;
+
+	let theatreMode = get(playerTheatreModeByDefault);
 
 	let audioMode = get(playerListenByDefault);
 	let currentTime: number;
@@ -207,11 +210,15 @@
 
 		data.subscribed = !data.subscribed;
 	}
+
+	async function toggleTheatreMode() {
+		theatreMode = !theatreMode;
+	}
 </script>
 
 {#if data}
 	<div class="grid">
-		<div class="s12 m12 l10">
+		<div class={`s12 m12 l${theatreMode ? '12' : '10'}`}>
 			{#key data.video.videoId}
 				<Player
 					{data}
@@ -281,7 +288,7 @@
 							<i>headphones</i>
 							<div class="tooltip">Audio only</div>
 						</button>
-						<button class="border">
+						<button on:click={toggleTheatreMode} class="m l" class:border={!theatreMode}>
 							<i>width_wide</i>
 							<div class="tooltip">Theatre mode</div>
 						</button>
@@ -411,41 +418,47 @@
 				<h6>Unable to load comments</h6>
 			{/if}
 		</div>
-		<div class="s12 m12 l2">
-			{#if !data.playlistId}
-				{#if data.video.recommendedVideos}
-					{#each data.video.recommendedVideos as recommendedVideo}
-						<article class="no-padding">
-							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} />
-							{/key}
+		{#if !theatreMode}
+			<div class="s12 m12 l2">
+				{#if !data.playlistId}
+					{#if data.video.recommendedVideos}
+						{#each data.video.recommendedVideos as recommendedVideo}
+							<article class="no-padding">
+								{#key recommendedVideo.videoId}
+									<Thumbnail video={recommendedVideo} />
+								{/key}
+							</article>
+						{/each}
+					{/if}
+				{:else if playlist}
+					<article
+						style="height: 75vh; position: relative;"
+						id="playlist"
+						class="scroll no-padding"
+					>
+						<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
+							<h6>{playlist.title}</h6>
+							<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
+							<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
+							<div class="divider"></div>
 						</article>
-					{/each}
-				{/if}
-			{:else if playlist}
-				<article style="height: 75vh; position: relative;" id="playlist" class="scroll no-padding">
-					<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
-						<h6>{playlist.title}</h6>
-						<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
-						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
-						<div class="divider"></div>
+
+						<div class="space"></div>
+
+						{#each playlistVideos as playlistVideo}
+							<article
+								class="no-padding primary-border"
+								style="margin: .7em;"
+								id={playlistVideo.videoId}
+								class:border={playlistVideo.videoId === data.video.videoId}
+							>
+								<Thumbnail video={playlistVideo} playlistId={data.playlistId} />
+							</article>
+						{/each}
 					</article>
-
-					<div class="space"></div>
-
-					{#each playlistVideos as playlistVideo}
-						<article
-							class="no-padding primary-border"
-							style="margin: .7em;"
-							id={playlistVideo.videoId}
-							class:border={playlistVideo.videoId === data.video.videoId}
-						>
-							<Thumbnail video={playlistVideo} playlistId={data.playlistId} />
-						</article>
-					{/each}
-				</article>
-			{/if}
-		</div>
+				{/if}
+			</div>
+		{/if}
 	</div>
 {:else}
 	<PageLoading />

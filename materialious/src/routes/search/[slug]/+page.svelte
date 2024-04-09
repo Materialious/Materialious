@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { getSearch } from '$lib/Api';
 	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
+	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
@@ -15,9 +15,11 @@
 
 	activePage.set(null);
 
-	function changeType(type: string) {
-		$page.url.searchParams.set('type', type);
-		document.location.href = $page.url.href;
+	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
+		data.searchType = type;
+		currentPage = 1;
+		search = [];
+		search = await getSearch(data.slug, { type: type });
 	}
 
 	async function loadMore(event: InfiniteEvent) {
@@ -38,14 +40,18 @@
 
 <div class="space" style="margin-bottom: 1em;">
 	<div class="tabs left-align min scroll">
-		<a class:active={data.searchType === 'all'} href="#all" on:click={() => changeType('all')}>
+		<a
+			class:active={data.searchType === 'all'}
+			href="#all"
+			on:click={async () => changeType('all')}
+		>
 			<i>home</i>
 			<span>All</span>
 		</a>
 		<a
 			class:active={data.searchType === 'video'}
 			href="#videos"
-			on:click={() => changeType('video')}
+			on:click={async () => changeType('video')}
 		>
 			<i>movie</i>
 			<span>Videos</span>
@@ -53,7 +59,7 @@
 		<a
 			class:active={data.searchType === 'playlist'}
 			href="#playlists"
-			on:click={() => changeType('playlist')}
+			on:click={async () => changeType('playlist')}
 		>
 			<i>playlist_add_check</i>
 			<span>Playlists</span>
@@ -61,7 +67,7 @@
 		<a
 			class:active={data.searchType === 'channel'}
 			href="#channels"
-			on:click={() => changeType('channel')}
+			on:click={async () => changeType('channel')}
 		>
 			<i>person</i>
 			<span>Channels</span>
@@ -69,25 +75,29 @@
 	</div>
 </div>
 
-<div class="page right active">
-	<div class="space"></div>
-	<div class="grid">
-		{#each search as item}
-			<div class="s12 m6 l2">
-				{#key data.search}
-					<article class="no-padding" style="height: 100%;">
-						{#if item.type === 'video'}
-							<Thumbnail video={item} />
-						{:else if item.type === 'channel'}
-							<ChannelThumbnail channel={item} />
-						{:else if item.type === 'playlist'}
-							<PlaylistThumbnail playlist={item} />
-						{/if}
-					</article>
-				{/key}
-			</div>
-		{/each}
+{#if search.length > 0}
+	<div class="page right active">
+		<div class="space"></div>
+		<div class="grid">
+			{#each search as item}
+				<div class="s12 m6 l2">
+					{#key item}
+						<article class="no-padding" style="height: 100%;">
+							{#if item.type === 'video'}
+								<Thumbnail video={item} />
+							{:else if item.type === 'channel'}
+								<ChannelThumbnail channel={item} />
+							{:else if item.type === 'playlist'}
+								<PlaylistThumbnail playlist={item} />
+							{/if}
+						</article>
+					{/key}
+				</div>
+			{/each}
+		</div>
 	</div>
-</div>
+{:else}
+	<PageLoading />
+{/if}
 
 <InfiniteLoading on:infinite={loadMore} />

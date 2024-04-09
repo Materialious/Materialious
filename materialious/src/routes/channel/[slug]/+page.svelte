@@ -100,26 +100,34 @@
 	</div>
 
 	<div class="tabs left-align scroll">
-		<a class:active={tab === 'videos'} on:click={() => changeTab('videos')} href={`#video`}>
-			<i>movie</i>
-			<span>Videos</span>
-		</a>
-		<a class:active={tab === 'shorts'} on:click={() => changeTab('shorts')} href={`#short`}>
-			<i>smartphone</i>
-			<span>Shorts</span>
-		</a>
-		<a class:active={tab === 'streams'} on:click={() => changeTab('streams')} href={`#stream`}>
-			<i>stream</i>
-			<span>Streams</span>
-		</a>
-		<a
-			class:active={tab === 'playlists'}
-			on:click={() => changeTab('playlists')}
-			href={`#playlist`}
-		>
-			<i>playlist_add_check</i>
-			<span>Playlists</span>
-		</a>
+		{#if data.channel.tabs.includes('videos')}
+			<a class:active={tab === 'videos'} on:click={() => changeTab('videos')} href={`#video`}>
+				<i>movie</i>
+				<span>Videos</span>
+			</a>
+		{/if}
+		{#if data.channel.tabs.includes('shorts')}
+			<a class:active={tab === 'shorts'} on:click={() => changeTab('shorts')} href={`#short`}>
+				<i>smartphone</i>
+				<span>Shorts</span>
+			</a>
+		{/if}
+		{#if data.channel.tabs.includes('streams')}
+			<a class:active={tab === 'streams'} on:click={() => changeTab('streams')} href={`#stream`}>
+				<i>stream</i>
+				<span>Streams</span>
+			</a>
+		{/if}
+		{#if data.channel.tabs.includes('playlists')}
+			<a
+				class:active={tab === 'playlists'}
+				on:click={() => changeTab('playlists')}
+				href={`#playlist`}
+			>
+				<i>playlist_add_check</i>
+				<span>Playlists</span>
+			</a>
+		{/if}
 	</div>
 </div>
 

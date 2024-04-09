@@ -24,6 +24,7 @@
 		interfaceSearchSuggestions,
 		playerAlwaysLoop,
 		playerAutoPlay,
+		playerAutoplayNextByDefault,
 		playerDash,
 		playerListenByDefault,
 		playerProxyVideos,
@@ -406,7 +407,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Autoplay</div>
+					<div>Autoplay video</div>
 				</div>
 				<label class="switch">
 					<input
@@ -422,7 +423,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Always loop</div>
+					<div>Always loop video</div>
 				</div>
 				<label class="switch">
 					<input
@@ -493,6 +494,22 @@
 						type="checkbox"
 						bind:checked={$playerTheatreModeByDefault}
 						on:click={() => playerTheatreModeByDefault.set(!$playerTheatreModeByDefault)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>Autoplay next by default</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$playerAutoplayNextByDefault}
+						on:click={() => playerAutoplayNextByDefault.set(!$playerAutoplayNextByDefault)}
 					/>
 					<span></span>
 				</label>

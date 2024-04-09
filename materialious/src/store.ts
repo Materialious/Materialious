@@ -16,6 +16,7 @@ export const playerListenByDefault = persisted("listenByDefault", false);
 export const playerSavePlaybackPosition = persisted("savePlaybackPosition", true);
 export const playerDash = persisted("dashEnabled", false);
 export const playerTheatreModeByDefault = persisted("theatreModeByDefault", false);
+export const playerAutoplayNextByDefault = persisted("autoplayNextByDefault", false);
 
 export const returnYtDislikes = persisted("returnYtDislikes", true);
 

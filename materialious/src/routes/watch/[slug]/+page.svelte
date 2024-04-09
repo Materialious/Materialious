@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
 		deleteUnsubscribe,
@@ -21,6 +22,7 @@
 	import {
 		activePage,
 		auth,
+		playerAutoplayNextByDefault,
 		playerListenByDefault,
 		playerTheatreModeByDefault,
 		syncPartyConnections,
@@ -161,6 +163,14 @@
 		if ($syncPartyConnections) {
 			$syncPartyConnections.forEach((conn) => {
 				playerSyncEvents(conn);
+			});
+		}
+
+		if ($playerAutoplayNextByDefault) {
+			player.addEventListener('end', () => {
+				if ($playerAutoplayNextByDefault && !playlist) {
+					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+				}
 			});
 		}
 

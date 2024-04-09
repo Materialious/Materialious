@@ -275,79 +275,90 @@
 							</button>
 						</nav>
 					{/if}
-					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
-						<i>headphones</i>
-					</button>
-					<button class="border"
-						><i>share</i>
-						<menu class="no-wrap">
-							<a
-								class="row"
-								href="#copy"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
-									)}
-							>
-								<div class="min">Copy Materialious link</div></a
-							><a
-								href="#copy"
-								class="row"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`https://redirect.invidious.io/watch?v=${data.video.videoId}`
-									)}
-							>
-								<div class="min">Copy Invidious redirect link</div></a
-							><a
-								class="row"
-								href="#copy"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`https://www.youtube.com/watch?v=${data.video.videoId}`
-									)}
-							>
-								<div class="min">Copy Youtube link</div></a
-							></menu
-						></button
-					>
-					{#if data.downloadOptions.length > 0}
-						<button class="border"
-							><i>download</i>
-							<menu class="no-wrap">
-								{#each data.downloadOptions as download}
-									<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
-										>{download.title}</a
-									>
-								{/each}
-							</menu></button
-						>
-					{/if}
-					{#if data.personalPlaylists}
+
+					<div>
+						<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
+							<i>headphones</i>
+							<div class="tooltip">Audio only</div>
+						</button>
 						<button class="border">
-							<i>add</i>
-							<menu>
-								{#each data.personalPlaylists as personalPlaylist}
-									<a
-										href="#add"
-										on:click={async () => await addVideoToPlaylist(personalPlaylist.playlistId)}
-										>{personalPlaylist.title}
-									</a>
-								{/each}
-							</menu>
+							<i>width_wide</i>
+							<div class="tooltip">Theatre mode</div>
 						</button>
-					{:else}
-						<button disabled class="border no-margin">
-							<i>add</i>
-							<div class="tooltip">
-								{#if $auth}
-									No playlists
-								{:else}
-									Login required
-								{/if}
-							</div>
-						</button>
-					{/if}
+						<button class="border"
+							><i>share</i>
+							<div class="tooltip">Share</div>
+							<menu class="no-wrap">
+								<a
+									class="row"
+									href="#copy"
+									on:click={async () =>
+										await navigator.clipboard.writeText(
+											`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
+										)}
+								>
+									<div class="min">Copy Materialious link</div></a
+								><a
+									href="#copy"
+									class="row"
+									on:click={async () =>
+										await navigator.clipboard.writeText(
+											`https://redirect.invidious.io/watch?v=${data.video.videoId}`
+										)}
+								>
+									<div class="min">Copy Invidious redirect link</div></a
+								><a
+									class="row"
+									href="#copy"
+									on:click={async () =>
+										await navigator.clipboard.writeText(
+											`https://www.youtube.com/watch?v=${data.video.videoId}`
+										)}
+								>
+									<div class="min">Copy Youtube link</div></a
+								></menu
+							></button
+						>
+						{#if data.downloadOptions.length > 0}
+							<button class="border"
+								><i>download</i>
+								<div class="tooltip">Download</div>
+								<menu class="no-wrap">
+									{#each data.downloadOptions as download}
+										<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
+											>{download.title}</a
+										>
+									{/each}
+								</menu></button
+							>
+						{/if}
+						{#if data.personalPlaylists}
+							<button class="border">
+								<i>add</i>
+								<div class="tooltip">Add to playlist</div>
+								<menu>
+									{#each data.personalPlaylists as personalPlaylist}
+										<a
+											href="#add"
+											on:click={async () => await addVideoToPlaylist(personalPlaylist.playlistId)}
+											>{personalPlaylist.title}
+										</a>
+									{/each}
+								</menu>
+							</button>
+						{:else}
+							<button disabled class="border no-margin">
+								<i>add</i>
+								<div class="tooltip">
+									{#if $auth}
+										No playlists
+									{:else}
+										Login required
+									{/if}
+								</div>
+							</button>
+						{/if}
+					</div>
 				</div>
 			</div>
 
@@ -469,7 +480,25 @@
 
 	@media screen and (max-width: 1000px) {
 		.video-actions {
-			justify-content: flex-start;
+			align-items: flex-start;
+			flex-direction: column;
+		}
+	}
+
+	@media screen and (max-width: 1000px) {
+		.video-actions > div {
+			margin-top: 1em;
+		}
+	}
+
+	@media screen and (max-width: 1000px) {
+		menu {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			width: 100%;
+			transform: translate(-50%, 50%);
+			background-color: var(--surface-variant);
 		}
 	}
 

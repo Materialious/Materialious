@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import {
 		deArrowEnabled,
@@ -145,7 +146,7 @@
 			alt="Thumbnail for video"
 		/>
 	{:else}
-		<p>Failed to load image</p>
+		<p>{$_('thumbnail.failedToLoadImage')}</p>
 	{/if}
 	{#if progress}
 		<progress
@@ -163,7 +164,7 @@
 		{/if}
 	{:else}
 		<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
-			LIVE
+			{$_('thumbnail.live')}
 		</div>
 	{/if}
 </a>

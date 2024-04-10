@@ -17,6 +17,7 @@
 	import type { PlayerEvents } from '$lib/player';
 	import type { DataConnection } from 'peerjs';
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
@@ -282,15 +283,17 @@
 								class:border={data.subscribed}
 							>
 								{#if !data.subscribed}
-									Subscribe
+									{$_('subscribe')}
 								{:else}
-									Unsubscribe
+									{$_('unsubscribe')}
 								{/if}
 							</button>
 						{:else}
 							<button class="inverse-surface" disabled>
-								Subscribe
-								<div class="tooltip">Login required</div>
+								{$_('subscribe')}
+								<div class="tooltip">
+									{$_('loginRequired')}
+								</div>
 							</button>
 						{/if}
 					</nav>
@@ -312,15 +315,17 @@
 					<div>
 						<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
 							<i>headphones</i>
-							<div class="tooltip">Audio only</div>
+							<div class="tooltip">{$_('player.audioOnly')}</div>
 						</button>
 						<button on:click={toggleTheatreMode} class="m l" class:border={!theatreMode}>
 							<i>width_wide</i>
-							<div class="tooltip">Theatre mode</div>
+							<div class="tooltip">{$_('player.theatreMode')}</div>
 						</button>
 						<button class="border"
 							><i>share</i>
-							<div class="tooltip">Share</div>
+							<div class="tooltip">
+								{$_('player.share.title')}
+							</div>
 							<menu class="no-wrap">
 								<a
 									class="row"
@@ -330,7 +335,7 @@
 											`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
 										)}
 								>
-									<div class="min">Copy Materialious link</div></a
+									<div class="min">{$_('player.share.materialiousLink')}</div></a
 								><a
 									href="#copy"
 									class="row"
@@ -339,7 +344,7 @@
 											`https://redirect.invidious.io/watch?v=${data.video.videoId}`
 										)}
 								>
-									<div class="min">Copy Invidious redirect link</div></a
+									<div class="min">{$_('player.share.invidiousRedirect')}</div></a
 								><a
 									class="row"
 									href="#copy"
@@ -348,14 +353,14 @@
 											`https://www.youtube.com/watch?v=${data.video.videoId}`
 										)}
 								>
-									<div class="min">Copy Youtube link</div></a
+									<div class="min">{$_('player.share.youtubeLink')}</div></a
 								></menu
 							></button
 						>
 						{#if data.downloadOptions.length > 0}
 							<button class="border"
 								><i>download</i>
-								<div class="tooltip">Download</div>
+								<div class="tooltip">{$_('player.download')}</div>
 								<menu class="no-wrap">
 									{#each data.downloadOptions as download}
 										<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
@@ -368,7 +373,7 @@
 						{#if data.personalPlaylists}
 							<button class="border">
 								<i>add</i>
-								<div class="tooltip">Add to playlist</div>
+								<div class="tooltip">{$_('player.addToPlaylist')}</div>
 								<menu>
 									{#each data.personalPlaylists as personalPlaylist}
 										<a
@@ -384,9 +389,9 @@
 								<i>add</i>
 								<div class="tooltip">
 									{#if $auth}
-										No playlists
+										{$_('player.noPlaylists')}
 									{:else}
-										Login required
+										{$_('loginRequired')}
 									{/if}
 								</div>
 							</button>
@@ -435,10 +440,10 @@
 					<Comment {comment} videoId={data.video.videoId}></Comment>
 				{/each}
 				{#if comments.continuation}
-					<button on:click={loadMoreComments} class="margin">Load more</button>
+					<button on:click={loadMoreComments} class="margin">{$_('loadMore')}</button>
 				{/if}
 			{:else}
-				<h6>Unable to load comments</h6>
+				<h6>{$_('player.unableToLoadComments')}</h6>
 			{/if}
 		</div>
 		{#if !theatreMode}
@@ -461,7 +466,11 @@
 					>
 						<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
 							<h6>{playlist.title}</h6>
-							<p>{cleanNumber(playlist.viewCount)} views • {playlist.videoCount} videos</p>
+							<p>
+								{cleanNumber(playlist.viewCount)}
+								{$_('views')} • {playlist.videoCount}
+								{$_('videos')}
+							</p>
 							<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
 							<div class="divider"></div>
 						</article>

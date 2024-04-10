@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import type { Channel } from './Api/model';
 	import { cleanNumber, truncate } from './misc';
 
@@ -37,7 +38,8 @@
 		</div>
 		<h5 class="center-align">{truncate(channel.author, 14)}</h5>
 		<h6 style="margin-top: 0;" class="center-align grey-text medium-text">
-			{cleanNumber(channel.subCount)} subscribers
+			{cleanNumber(channel.subCount)}
+			{$_('subscribers')}
 		</h6>
 		<p>{channel.description}</p>
 	</div>

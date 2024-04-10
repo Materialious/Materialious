@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/Api';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
+	import { _ } from 'svelte-i18n';
 	import { activePage } from '../../store';
 
 	export let data;
@@ -53,7 +54,7 @@
 			<article style="height: 100%;display: flex;align-items: center;justify-content: center;">
 				<button data-ui="#create-playlist" class="round extra">
 					<i>add_circle</i>
-					<span>Create playlist</span>
+					<span>{$_('playlist.createPlaylist')}</span>
 				</button>
 			</article>
 		</div>
@@ -64,27 +65,27 @@
 	<form on:submit|preventDefault={createPlaylist}>
 		<div class="field label border">
 			<input bind:value={playlistTitle} required name="title" type="text" />
-			<label for="title">Title</label>
+			<label for="title">{$_('title')}</label>
 		</div>
 		<div class="field middle-align">
 			<nav>
 				<label class="radio">
 					<input checked on:change={onPrivacyChange} value="public" type="radio" name="privacy" />
-					<span>Public</span>
+					<span>{$_('playlist.public')}</span>
 				</label>
 				<label class="radio">
 					<input on:change={onPrivacyChange} type="radio" value="unlisted" name="privacy" />
-					<span>Unlisted</span>
+					<span>{$_('playlist.unlisted')}</span>
 				</label>
 				<label class="radio">
 					<input on:change={onPrivacyChange} type="radio" value="private" name="privacy" />
-					<span>Private</span>
+					<span>{$_('playlist.private')}</span>
 				</label>
 			</nav>
 		</div>
 		<nav class="right-align">
-			<button type="button" data-ui="#create-playlist">Cancel</button>
-			<button type="submit">Create</button>
+			<button type="button" data-ui="#create-playlist">{$_('cancel')}</button>
+			<button type="submit">{$_('create')}</button>
 		</nav>
 	</form>
 </dialog>

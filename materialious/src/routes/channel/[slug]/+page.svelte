@@ -6,6 +6,7 @@
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber } from '$lib/misc';
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
 	import { activePage, auth } from '../../../store';
@@ -83,7 +84,7 @@
 		/>
 		<div>
 			<h2>{data.channel.author}</h2>
-			<p>{cleanNumber(data.channel.subCount)} subscribers</p>
+			<p>{cleanNumber(data.channel.subCount)} {$_('subscribers')}</p>
 			<p style="width: 60vw;">{data.channel.description}</p>
 		</div>
 		<button
@@ -92,9 +93,9 @@
 			class:border={isSubscribed}
 		>
 			{#if !isSubscribed}
-				Subscribe
+				{$_('subscribe')}
 			{:else}
-				Unsubscribe
+				{$_('unsubscribe')}
 			{/if}
 		</button>
 	</div>
@@ -103,19 +104,19 @@
 		{#if data.channel.tabs.includes('videos')}
 			<a class:active={tab === 'videos'} on:click={() => changeTab('videos')} href={`#video`}>
 				<i>movie</i>
-				<span>Videos</span>
+				<span>{$_('videoTabs.videos')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('shorts')}
 			<a class:active={tab === 'shorts'} on:click={() => changeTab('shorts')} href={`#short`}>
 				<i>smartphone</i>
-				<span>Shorts</span>
+				<span>{$_('videoTabs.shorts')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('streams')}
 			<a class:active={tab === 'streams'} on:click={() => changeTab('streams')} href={`#stream`}>
 				<i>stream</i>
-				<span>Streams</span>
+				<span>{$_('videoTabs.streams')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('playlists')}
@@ -125,7 +126,7 @@
 				href={`#playlist`}
 			>
 				<i>playlist_add_check</i>
-				<span>Playlists</span>
+				<span>{$_('videoTabs.playlists')}</span>
 			</a>
 		{/if}
 	</div>

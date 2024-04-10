@@ -2,6 +2,7 @@
 	import { deleteUnsubscribe } from '$lib/Api';
 	import { truncate } from '$lib/misc';
 	import Fuse from 'fuse.js';
+	import { _ } from 'svelte-i18n';
 	import { activePage } from '../../../store';
 
 	activePage.set(null);
@@ -41,7 +42,7 @@
 		bind:value={search}
 		on:input={searchSubs}
 		type="text"
-		placeholder="Search..."
+		placeholder={$_('searchPlaceholder')}
 	/>
 </div>
 

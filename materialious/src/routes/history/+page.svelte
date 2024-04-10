@@ -4,6 +4,7 @@
 	import VideoList from '$lib/VideoList.svelte';
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { activePage } from '../../store';
 
@@ -62,7 +63,7 @@
 		}}
 	>
 		<i>delete_sweep</i>
-		<span>Delete all history</span>
+		<span>{$_('deleteAllHistory')}</span>
 	</button>
 </div>
 

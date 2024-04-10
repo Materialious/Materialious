@@ -7,6 +7,6 @@
         "https://cdn.jsdelivr.net/npm/@inlang/plugin-i18next@latest/dist/index.js"
     ],
     "plugin.inlang.i18next": {
-        "pathPattern": "./materialious/src/i18n/locales/{languageTag}.json"
+        "pathPattern": "./materialious/src/lib/i18n/locales/{languageTag}.json"
     }
 }

@@ -6,6 +6,7 @@
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import { bookmarkletLoadFromUrl, bookmarkletSaveToUrl } from '$lib/bookmarklet';
 	import type { PlayerEvents } from '$lib/player';
 	import 'beercss';
 	import 'material-dynamic-colors';
@@ -216,6 +217,8 @@
 
 	onMount(async () => {
 		ui();
+
+		bookmarkletLoadFromUrl();
 
 		const isDark = get(darkMode);
 
@@ -651,6 +654,15 @@
 				<span></span>
 			</label>
 		</nav>
+	</div>
+
+	<div class="settings">
+		<h6>Bookmarklet</h6>
+		<button
+			class="no-margin"
+			on:click={async () => await navigator.clipboard.writeText(bookmarkletSaveToUrl())}
+			>Copy URL</button
+		>
 	</div>
 </dialog>
 

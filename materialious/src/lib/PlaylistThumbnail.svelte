@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import type { Playlist } from './Api/model';
 	import { truncate } from './misc';
 
@@ -48,7 +49,8 @@
 		{/if}
 	{/if}
 	<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
-		{playlist.videoCount} videos
+		{playlist.videoCount}
+		{$_('videos')}
 	</div>
 </a>
 

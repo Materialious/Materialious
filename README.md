@@ -11,6 +11,8 @@
 
 ![Preview of homepage](./previews/home-preview.png)
 
+[Help translate Materialious!](https://fink.inlang.com/github.com/WardPearce/Materialious)
+
 # Features
 - Watch sync parties!
 - Sponsorblock built-in.

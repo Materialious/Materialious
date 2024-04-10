@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import { getComments } from './Api';
 	import { type Comment, type Comments } from './Api/model';
 	import { numberWithCommas } from './misc';
@@ -68,7 +69,7 @@
 				class="transparent replies"
 			>
 				<i class="primary-text">expand_more</i>
-				<span class="primary-text">{comment.replies.replyCount} replies</span>
+				<span class="primary-text">{comment.replies.replyCount} {$_('replies')}</span>
 			</button>
 		{/if}
 	</div>

@@ -4,6 +4,7 @@
 	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber } from '$lib/misc.js';
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import { activePage } from '../../../store';
 
 	export let data;
@@ -36,7 +37,11 @@
 
 <article>
 	<h3>{data.playlist.title}</h3>
-	<p>{cleanNumber(data.playlist.viewCount)} views • {data.playlist.videoCount} videos</p>
+	<p>
+		{cleanNumber(data.playlist.viewCount)}
+		{$_('views')} • {data.playlist.videoCount}
+		{$_('videos')}
+	</p>
 	<div class="divider" style="margin-bottom: 1em;"></div>
 	<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.description}</p>
 </article>

@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
@@ -254,7 +255,7 @@
 
 <div class="snackbar" id="sponsorblock-alert">
 	<span
-		>Skipping <span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span
-		></span
+		>{$_('skipping')}
+		<span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span></span
 	>
 </div>

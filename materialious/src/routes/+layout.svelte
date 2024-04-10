@@ -13,6 +13,7 @@
 	import type { DataConnection } from 'peerjs';
 	import Peer from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import {
@@ -66,43 +67,43 @@
 		{
 			icon: 'home',
 			href: '/',
-			name: 'Home',
+			name: $_('pages.home'),
 			requiresAuth: false
 		},
 		{
 			icon: 'whatshot',
 			href: '/trending',
-			name: 'Trending',
+			name: $_('pages.trending'),
 			requiresAuth: false
 		},
 		{
 			icon: 'subscriptions',
 			href: '/subscriptions',
-			name: 'Subscriptions',
+			name: $_('pages.subscriptions'),
 			requiresAuth: true
 		},
 		{
 			icon: 'video_library',
 			href: '/playlists',
-			name: 'Playlists',
+			name: $_('pages.playlists'),
 			requiresAuth: true
 		},
 		{
 			icon: 'history',
 			href: '/history',
-			name: 'History',
+			name: $_('pages.history'),
 			requiresAuth: true
 		}
 	];
 
 	const sponsorCategories = [
-		{ name: 'Sponsor', category: 'sponsor' },
-		{ name: 'Unpaid/Self Promotion', category: 'selfpromo' },
-		{ name: 'Interaction Reminder (Subscribe)', category: 'interaction' },
-		{ name: 'Intermission/Intro Animation', category: 'intro' },
-		{ name: 'Endcards/Credits', category: 'outro' },
-		{ name: 'Preview/Recap/Hook', category: 'preview' },
-		{ name: 'Filler Tangent/Jokes', category: 'filler' }
+		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
+		{ name: $_('layout.sponsors.unpaidSelfPromotion'), category: 'selfpromo' },
+		{ name: $_('layout.sponsors.interactionReminder'), category: 'interaction' },
+		{ name: $_('layout.sponsors.intermissionIntroAnimation'), category: 'intro' },
+		{ name: $_('layout.sponsors.credits'), category: 'outro' },
+		{ name: $_('layout.sponsors.preViewRecapHook'), category: 'preview' },
+		{ name: $_('layout.sponsors.tangentJokes'), category: 'filler' }
 	];
 
 	function changeVideoEvent(conn: DataConnection) {
@@ -315,57 +316,57 @@
 		class="button circle large transparent"
 	>
 		<i>code</i>
-		<div class="tooltip bottom">Star us on Github!</div>
+		<div class="tooltip bottom">{$_('layout.star')}</div>
 	</a>
 	<button data-ui="#sync-party" class="circle large transparent">
 		<i class:primary-text={$syncPartyPeer}>group</i>
-		<div class="tooltip bottom">Sync party</div>
+		<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 	</button>
 	{#if isLoggedIn}
 		<button class="circle large transparent" data-ui="#dialog-notifications"
 			><i>notifications</i>
-			<div class="tooltip bottom">Notifications</div>
+			<div class="tooltip bottom">{$_('layout.notifications')}</div>
 		</button>
 	{/if}
 	<button class="circle large transparent" data-ui="#dialog-settings">
 		<i>settings</i>
-		<div class="tooltip bottom">Settings</div>
+		<div class="tooltip bottom">{$_('layout.settings')}</div>
 	</button>
 
 	{#if !isLoggedIn}
 		<button on:click={login} class="circle large transparent">
 			<i>login</i>
-			<div class="tooltip bottom">Login</div>
+			<div class="tooltip bottom">{$_('layout.login')}</div>
 		</button>
 	{:else}
 		<button on:click={logout} class="circle large transparent">
 			<i>logout</i>
-			<div class="tooltip bottom">Logout</div>
+			<div class="tooltip bottom">{$_('layout.logout')}</div>
 		</button>
 	{/if}
 </nav>
 
 <dialog class="right" id="dialog-settings">
 	<nav>
-		<h4 class="max">Settings</h4>
+		<h4 class="max">{$_('layout.settings')}</h4>
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
 	</nav>
-	<p>Customize Materialious</p>
+	<p>{$_('layout.customize')} Materialious</p>
 
 	<div class="settings">
-		<h6>Theme</h6>
+		<h6>{$_('layout.theme.theme')}</h6>
 		<button on:click={toggleDarkMode} class="no-margin">
 			{#if !$darkMode}
 				<i>dark_mode</i>
-				<span>Dark mode</span>
+				<span>{$_('layout.theme.darkMode')}</span>
 			{:else}
 				<i>light_mode</i>
-				<span>Light mode</span>
+				<span>{$_('layout.theme.lightMode')}</span>
 			{/if}
 		</button>
 		<button>
 			<i>palette</i>
-			<span>Color</span>
+			<span>{$_('layout.theme.color')}</span>
 			<input on:change={setColor} type="color" />
 		</button>
 	</div>
@@ -375,7 +376,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Search suggestions</div>
+					<div>{$_('layout.searchSuggestions')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -390,27 +391,25 @@
 	</div>
 
 	<div class="settings">
-		<h6>Data preferences</h6>
+		<h6>{$_('layout.dataPreferences.dataPreferences')}</h6>
 		<p style="width: 240px;">
-			Looking to import/export subscriptions, change password or delete account?
 			<a
 				href={`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/preferences`}
 				target="_blank"
 				rel="noopener noreferrer"
 				class="link"
 			>
-				Go here
+				{$_('layout.dataPreferences.content')}
 			</a>
-			and scroll to the bottom of the page.
 		</p>
 	</div>
 
 	<div class="settings">
-		<h6>Player</h6>
+		<h6>{$_('layout.player.title')}</h6>
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Autoplay video</div>
+					<div>{$_('layout.player.autoPlay')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -426,7 +425,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Always loop video</div>
+					<div>{$_('layout.player.alwaysLoopVideo')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -442,7 +441,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Proxy videos</div>
+					<div>{$_('layout.player.proxyVideos')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -458,7 +457,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Save playback position</div>
+					<div>{$_('layout.player.savePlaybackPosition')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -474,7 +473,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Listen by default</div>
+					<div>{$_('layout.player.listenByDefault')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -490,7 +489,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Theatre mode by default</div>
+					<div>{$_('layout.player.theatreModeByDefault')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -506,7 +505,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Autoplay next by default</div>
+					<div>{$_('layout.player.autoPlayNextByDefault')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -522,7 +521,7 @@
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
-					<div>Dash</div>
+					<div>{$_('layout.player.dash')}</div>
 				</div>
 				<label class="switch">
 					<input
@@ -543,7 +542,7 @@
 			<nav>
 				<div class="field label border">
 					<input bind:value={returnYTInstance} name="returnyt-instance" type="text" />
-					<label for="returnyt-instance">Instance URL</label>
+					<label for="returnyt-instance">{$_('layout.instanceUrl')}</label>
 				</div>
 				<button class="square round">
 					<i>done</i>
@@ -553,7 +552,7 @@
 
 		<nav class="no-padding">
 			<div class="max">
-				<p>Enabled</p>
+				<p>{$_('enabled')}</p>
 			</div>
 			<label class="switch">
 				<input
@@ -573,7 +572,7 @@
 			<nav>
 				<div class="field label border">
 					<input bind:value={sponsorBlockInstance} name="sponsorblock-instance" type="text" />
-					<label for="sponsorblock-instance">Instance URL</label>
+					<label for="sponsorblock-instance">{$_('layout.instanceUrl')}</label>
 				</div>
 				<button class="square round">
 					<i>done</i>
@@ -583,7 +582,7 @@
 
 		<nav class="no-padding">
 			<div class="max">
-				<p>Enabled</p>
+				<p>{$_('enabled')}</p>
 			</div>
 			<label class="switch">
 				<input
@@ -615,13 +614,13 @@
 	</div>
 
 	<div class="settings">
-		<h6>DeArrow</h6>
+		<h6>{$_('layout.deArrow.title')}</h6>
 
 		<form on:submit|preventDefault={() => deArrowInstance.set(deArrowUrl)}>
 			<nav>
 				<div class="field label border">
 					<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
-					<label for="dearrow-instance">Instance URL</label>
+					<label for="dearrow-instance">{$_('layout.instanceUrl')}</label>
 				</div>
 				<button class="square round">
 					<i>done</i>
@@ -633,7 +632,8 @@
 			<nav>
 				<div class="field label border">
 					<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
-					<label for="dearrow-thumbnail-instance">Thumbnail instance URL</label>
+					<label for="dearrow-thumbnail-instance">{$_('layout.deArrow.thumbnailInstanceUrl')}</label
+					>
 				</div>
 				<button class="square round">
 					<i>done</i>
@@ -643,7 +643,7 @@
 
 		<nav class="no-padding">
 			<div class="max">
-				<p>Enabled</p>
+				<p>{$_('enabled')}</p>
 			</div>
 			<label class="switch">
 				<input
@@ -657,22 +657,22 @@
 	</div>
 
 	<div class="settings">
-		<h6>Bookmarklet</h6>
+		<h6>{$_('layout.bookmarklet')}</h6>
 		<button
 			class="no-margin"
 			on:click={async () => await navigator.clipboard.writeText(bookmarkletSaveToUrl())}
-			>Copy URL</button
+			>{$_('copyUrl')}</button
 		>
 	</div>
 </dialog>
 
 <dialog class="right" id="dialog-notifications">
 	<nav>
-		<h5 class="max">Notifications</h5>
+		<h5 class="max">{$_('layout.notifications')}</h5>
 		<button class="circle transparent" data-ui="#dialog-notifications"><i>close</i></button>
 	</nav>
 	{#if notifications.length === 0}
-		<p>No new notifications here</p>
+		<p>{$_('layout.noNewNotifications')}</p>
 	{:else}
 		{#each notifications as notification}
 			<article class="no-padding">
@@ -710,8 +710,8 @@
 </dialog>
 
 <dialog id="sync-party">
-	<h6>Sync party</h6>
-	<p>Please note your IP will be visible to users you invite.</p>
+	<h6>{$_('layout.syncParty')}</h6>
+	<p>{$_('layout.syncPartyWarning')}</p>
 	{#if $syncPartyPeer}
 		<nav>
 			<div class="field label border">
@@ -741,10 +741,10 @@
 		on:click={startWatchSync}
 		data-ui={`${$syncPartyPeer ? '#sync-party' : ''}`}
 		>{#if $syncPartyPeer}
-			End
+			{$_('layout.endSyncParty')}
 		{:else}
-			Start
-		{/if} sync party
+			{$_('layout.startSyncParty')}
+		{/if}
 	</button>
 </dialog>
 

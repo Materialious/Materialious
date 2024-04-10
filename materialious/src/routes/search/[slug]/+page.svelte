@@ -4,6 +4,7 @@
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { activePage } from '../../../store';
 
@@ -46,7 +47,7 @@
 			on:click={async () => changeType('all')}
 		>
 			<i>home</i>
-			<span>All</span>
+			<span>{$_('videoTabs.all')}</span>
 		</a>
 		<a
 			class:active={data.searchType === 'video'}
@@ -54,7 +55,7 @@
 			on:click={async () => changeType('video')}
 		>
 			<i>movie</i>
-			<span>Videos</span>
+			<span>{$_('videoTabs.videos')}</span>
 		</a>
 		<a
 			class:active={data.searchType === 'playlist'}
@@ -62,7 +63,7 @@
 			on:click={async () => changeType('playlist')}
 		>
 			<i>playlist_add_check</i>
-			<span>Playlists</span>
+			<span>{$_('videoTabs.playlists')}</span>
 		</a>
 		<a
 			class:active={data.searchType === 'channel'}
@@ -70,7 +71,7 @@
 			on:click={async () => changeType('channel')}
 		>
 			<i>person</i>
-			<span>Channels</span>
+			<span>{$_('videoTabs.channels')}</span>
 		</a>
 	</div>
 </div>

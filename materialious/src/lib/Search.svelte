@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { _ } from 'svelte-i18n';
 	import { interfaceSearchSuggestions } from '../store';
 	import { getSearchSuggestions } from './Api';
 
@@ -29,7 +30,7 @@
 		<i class="front">search</i><input
 			data-ui="search-suggestions"
 			type="text"
-			placeholder="Search..."
+			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
 			on:keyup={(target) => debouncedSearch(target)}
 		/>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getFeed } from '$lib/Api/index.js';
 	import VideoList from '$lib/VideoList.svelte';
+	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { activePage } from '../../store';
 
@@ -27,7 +28,7 @@
 <nav class="right-align">
 	<a class="button" href="/subscriptions/manage">
 		<i>subscriptions</i>
-		<span>Manage subscriptions</span>
+		<span>{$_('subscriptions.manageSubscriptions')}</span>
 	</a>
 </nav>
 

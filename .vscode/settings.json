@@ -1,0 +1,11 @@
+{
+    "i18n-ally.defaultNamespace": "",
+    "i18n-ally.enabledFrameworks": [
+        "svelte"
+    ],
+    "i18n-ally.localesPaths": [
+        "materialious/src/lib/i18n",
+        "materialious/src/lib/i18n/locales"
+    ],
+    "i18n-ally.extract.autoDetect": true
+}

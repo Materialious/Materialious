@@ -180,6 +180,7 @@ export interface Playlist {
 export interface PlaylistPageVideo extends PlaylistVideo {
 	author: string;
 	index: number;
+	indexId: string;
 	authorId: string;
 	viewCount: number;
 }

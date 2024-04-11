@@ -6,7 +6,8 @@
 		getComments,
 		getPersonalPlaylists,
 		getPlaylist,
-		postSubscribe
+		postSubscribe,
+		removePlaylistVideo
 	} from '$lib/Api/index.js';
 	import type { PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
@@ -294,8 +295,28 @@
 		}
 	}
 
-	async function addVideoToPlaylist(playlistId: string) {
-		await addPlaylistVideo(playlistId, data.video.videoId);
+	async function toggleVideoToPlaylist(playlistId: string) {
+		if (!data.personalPlaylists) return;
+
+		const selectedPlaylist = data.personalPlaylists.filter((item) => {
+			return item.playlistId === playlistId;
+		});
+
+		if (selectedPlaylist.length === 0) {
+			return;
+		}
+
+		const videosToDelete = selectedPlaylist[0].videos.filter((item) => {
+			return item.videoId === data.video.videoId;
+		});
+
+		if (videosToDelete.length > 0) {
+			videosToDelete.forEach(async (toDelete) => {
+				await removePlaylistVideo(playlistId, toDelete.indexId);
+			});
+		} else {
+			await addPlaylistVideo(playlistId, data.video.videoId);
+		}
 
 		data.personalPlaylists = await getPersonalPlaylists();
 	}
@@ -462,12 +483,22 @@
 						<button class="border">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
-							<menu>
+							<menu class="no-wrap">
 								{#each data.personalPlaylists as personalPlaylist}
 									<a
 										href="#add"
-										on:click={async () => await addVideoToPlaylist(personalPlaylist.playlistId)}
-										>{personalPlaylist.title}
+										on:click={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
+									>
+										<nav>
+											<span class="max">{personalPlaylist.title}</span>
+											{#if personalPlaylist.videos.filter((item) => {
+												return item.videoId === data.video.videoId;
+											}).length > 0}
+												<i>close</i>
+											{:else}
+												<i>add</i>
+											{/if}
+										</nav>
 									</a>
 								{/each}
 							</menu>

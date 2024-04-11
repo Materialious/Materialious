@@ -18,7 +18,7 @@
 
 	async function loadPageHistory() {
 		try {
-			const videoIds = await getHistory(currentPage, 10);
+			const videoIds = await getHistory(currentPage, 20);
 			let promises = [];
 			for (const videoId of videoIds) {
 				promises.push(

@@ -276,6 +276,15 @@ export async function addPlaylistVideo(playlistId: string, videoId: string) {
 	);
 }
 
+export async function removePlaylistVideo(playlistId: string, indexId: string) {
+	await fetchErrorHandle(
+		await fetch(buildPath(`auth/playlists/${playlistId}/videos/${indexId}`), {
+			method: 'DELETE',
+			...buildAuthHeaders()
+		})
+	);
+}
+
 export async function getDeArrow(videoId: string): Promise<DeArrow> {
 	const resp = await fetchErrorHandle(
 		await fetch(`${get(deArrowInstance)}/api/branding?videoID=${videoId}`)

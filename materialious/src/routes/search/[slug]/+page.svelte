@@ -12,15 +12,13 @@
 
 	let currentPage = 1;
 
-	$: search = data.search;
-
 	activePage.set(null);
 
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
 		data.searchType = type;
 		currentPage = 1;
-		search = [];
-		search = await getSearch(data.slug, { type: type });
+		data.search = [];
+		data.search = await getSearch(data.slug, { type: type });
 	}
 
 	async function loadMore(event: InfiniteEvent) {
@@ -33,7 +31,7 @@
 		if (newSearch.length === 0) {
 			event.detail.complete();
 		} else {
-			search = [...search, ...newSearch];
+			data.search = [...data.search, ...newSearch];
 			event.detail.loaded();
 		}
 	}
@@ -76,11 +74,11 @@
 	</div>
 </div>
 
-{#if search.length > 0}
+{#if data.search.length > 0}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each search as item}
+			{#each data.search as item}
 				<div class="s12 m6 l2">
 					{#key item}
 						<article class="no-padding" style="height: 100%;">

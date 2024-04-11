@@ -482,7 +482,7 @@
 			</nav>
 		</div>
 
-		<div class="field no-margin">
+		<div class="field no-margin m l">
 			<nav class="no-padding">
 				<div class="max">
 					<div>{$_('layout.player.theatreModeByDefault')}</div>

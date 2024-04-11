@@ -69,7 +69,9 @@
 				><div class="bold">{truncate(playlist.title)}</div></a
 			>
 			<div>
-				<a href={`/channel/${playlist.authorId}`}>{playlist.author}</a>
+				<a class:link-disabled={playlist.authorId === null} href={`/channel/${playlist.authorId}`}
+					>{playlist.author}</a
+				>
 			</div>
 		</div>
 	</nav>

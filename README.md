@@ -32,6 +32,16 @@
 - PWA support.
 - YT path redirects (So your redirect plugins should still work!)
 
+# Public instances
+- [materialio.us](https://materialio.us)
+  - **Location:** New Zealand
+  - **Threads:** 6
+  - **Twice daily IPV6 rotation:** Yes
+  - **Cloudflare:** No
+  - **Accounts:** Yes
+
+Open an issue to add your instance.
+
 # Setup
 For security reasons regarding CORS, your hosted instance of Materialious must serve as the value for the `Access-Control-Allow-Origin` header on Invidious.
 

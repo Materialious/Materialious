@@ -120,10 +120,18 @@
 
 	function syncChangeVideo() {
 		if ($syncPartyConnections) {
+			const events = {
+				events: [{ type: 'change-video', videoId: video.videoId }]
+			} as PlayerEvents;
+
+			if (playlistId) {
+				events.events.unshift({
+					type: 'playlist',
+					playlistId: playlistId
+				});
+			}
 			$syncPartyConnections.forEach((conn) => {
-				conn.send({
-					events: [{ type: 'change-video', videoId: video.videoId }]
-				} as PlayerEvents);
+				conn.send(events);
 			});
 		}
 	}

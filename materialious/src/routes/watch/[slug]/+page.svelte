@@ -53,6 +53,17 @@
 			} as PlayerEvents);
 		}
 
+		if (data.playlistId) {
+			conn.send({
+				events: [
+					{
+						type: 'playlist',
+						playlistId: data.playlistId
+					}
+				]
+			} as PlayerEvents);
+		}
+
 		conn.on('data', (rawData) => {
 			const events = rawData as PlayerEvents;
 
@@ -69,6 +80,14 @@
 					if (timeDiff > 3 || timeDiff < -3) {
 						player.currentTime = event.time;
 					}
+				} else if (
+					event.type === 'playlist' &&
+					event.playlistId &&
+					event.playlistId !== data.playlistId
+				) {
+					data.playlistId = event.playlistId;
+					await loadPlaylist(event.playlistId);
+					goToCurrentPlaylistItem();
 				}
 			});
 		});
@@ -207,7 +226,10 @@
 					if ($syncPartyConnections) {
 						$syncPartyConnections.forEach((conn) => {
 							conn.send({
-								events: [{ type: 'change-video', videoId: playlistVideos[newIndex].videoId }]
+								events: [
+									{ type: 'change-video', videoId: playlistVideos[newIndex].videoId },
+									{ type: 'playlist', playlistId: data.playlistId }
+								]
 							} as PlayerEvents);
 						});
 					}

@@ -23,9 +23,13 @@
 			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
 		}, 250);
 	};
+
+	function handleSubmit() {
+		goto(`/search/${encodeURIComponent(search)}`);
+	}
 </script>
 
-<form on:submit|preventDefault={() => goto(`/search/${encodeURIComponent(search)}`)}>
+<form on:submit|preventDefault={handleSubmit}>
 	<div class="field prefix round fill no-margin search">
 		<i class="front">search</i>
 		<input bind:value={search} on:click={() => document.getElementById('search')?.focus()} />
@@ -36,8 +40,15 @@
 					placeholder={$_('searchPlaceholder')}
 					type="text"
 					id="search"
+					required
 					bind:value={search}
-					on:keyup={(target) => debouncedSearch(target)}
+					on:keyup={(event) => {
+						if (event.key === 'Enter') {
+							handleSubmit();
+						} else {
+							debouncedSearch(event);
+						}
+					}}
 				/>
 				<i class="front" on:click={() => (search = '')}>close</i>
 			</div>

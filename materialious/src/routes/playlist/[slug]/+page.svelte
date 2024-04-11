@@ -69,7 +69,7 @@
 	</p>
 	<div class="divider" style="margin-bottom: 1em;"></div>
 
-	<article class="medium scroll no-padding no-elevate no-round">
+	<article style="max-height: 200px;" class="scroll no-padding no-elevate no-round">
 		<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.description}</p>
 	</article>
 </article>

@@ -5,23 +5,28 @@
 	import { truncate } from './misc';
 
 	export let playlist: Playlist;
+	export let disabled: boolean = false;
 
 	let loading = true;
-	let loaded = false;
 	let failed = false;
 
 	let img: HTMLImageElement;
+
+	const playlistLink = `/playlist/${playlist.playlistId}`;
 
 	onMount(() => {
 		img = new Image();
 		if (playlist.videos.length > 0) {
 			img.src = playlist.videos[0].videoThumbnails[4].url;
-		} else {
+		} else if (playlist.playlistThumbnail) {
 			img.src = playlist.playlistThumbnail;
+		} else {
+			img.src = '';
+			loading = false;
+			return;
 		}
 
 		img.onload = () => {
-			loaded = true;
 			loading = false;
 		};
 		img.onerror = () => {
@@ -32,14 +37,15 @@
 </script>
 
 <a
-	href={`/playlist/${playlist.playlistId}`}
+	href={playlistLink}
+	class:link-disabled={disabled}
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
 >
 	{#if playlist.videoCount > 0}
 		{#if loading}
 			<progress class="circle"></progress>
-		{:else}
+		{:else if img.src !== ''}
 			<img
 				class="responsive"
 				style="max-width: 100%;height: 100%;"
@@ -47,6 +53,8 @@
 				alt="Thumbnail for playlist"
 			/>
 		{/if}
+	{:else}
+		<h6 style="margin: 3em 0;">No image</h6>
 	{/if}
 	<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
 		{playlist.videoCount}
@@ -57,7 +65,7 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a href={`/playlist/${playlist.playlistId}`}
+			<a class:link-disabled={disabled} href={playlistLink}
 				><div class="bold">{truncate(playlist.title)}</div></a
 			>
 			<div>
@@ -66,3 +74,9 @@
 		</div>
 	</nav>
 </div>
+
+<style>
+	.link-disabled {
+		pointer-events: none;
+	}
+</style>

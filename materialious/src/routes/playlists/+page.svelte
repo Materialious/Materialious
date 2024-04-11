@@ -37,7 +37,7 @@
 		{#each data.playlists as playlist}
 			<div class="s12 m6 l2">
 				<article class="no-padding" style="height: 100%;">
-					<PlaylistThumbnail {playlist} />
+					<PlaylistThumbnail disabled={playlist.videoCount === 0} {playlist} />
 
 					<nav class="right-align padding">
 						<button

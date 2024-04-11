@@ -49,7 +49,8 @@
 	});
 </script>
 
-<div style="display: flex;margin-top: 1em;" class="space">
+<div class="space"></div>
+<nav class="right-align">
 	<button
 		on:click={async () => {
 			await deleteHistory();
@@ -66,7 +67,7 @@
 		<i>delete_sweep</i>
 		<span>{$_('deleteAllHistory')}</span>
 	</button>
-</div>
+</nav>
 
 {#if loaded}
 	<VideoList videos={history} />

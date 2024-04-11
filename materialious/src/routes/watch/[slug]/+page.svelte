@@ -47,16 +47,18 @@
 	let player: MediaPlayerElement;
 
 	function playerSyncEvents(conn: DataConnection) {
-		conn.send({
-			events: [{ type: 'seek', time: player.currentTime }]
-		} as PlayerEvents);
+		if (player) {
+			conn.send({
+				events: [{ type: 'seek', time: player.currentTime }]
+			} as PlayerEvents);
+		}
 
 		conn.on('data', (rawData) => {
 			const events = rawData as PlayerEvents;
 
-			if (!player) return;
-
 			events.events.forEach(async (event) => {
+				if (!player) return;
+
 				if (event.type === 'pause') {
 					player.pause();
 				} else if (event.type === 'play') {
@@ -71,6 +73,8 @@
 			});
 		});
 
+		if (!player) return;
+
 		player.addEventListener('auto-play-fail', () => {
 			conn.send({
 				events: [
@@ -82,6 +86,7 @@
 		});
 
 		player.addEventListener('auto-play', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -106,6 +111,7 @@
 		});
 
 		player.addEventListener('playing', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -120,6 +126,7 @@
 		});
 
 		player.addEventListener('play', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -144,6 +151,7 @@
 		});
 
 		player.addEventListener('seeked', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -167,15 +175,17 @@
 			});
 		}
 
-		player.addEventListener('end', () => {
-			if ($playerAutoplayNextByDefault && !playlist) {
-				goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
-			}
+		if (player) {
+			player.addEventListener('end', () => {
+				if ($playerAutoplayNextByDefault && !playlist) {
+					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+				}
 
-			if (data.playlistId) {
-				goToCurrentPlaylistItem();
-			}
-		});
+				if (data.playlistId) {
+					goToCurrentPlaylistItem();
+				}
+			});
+		}
 
 		if (!data.playlistId) return;
 
@@ -183,7 +193,7 @@
 
 		goToCurrentPlaylistItem();
 
-		if (playlistVideos) {
+		if (playlistVideos && player) {
 			player.addEventListener('end', () => {
 				if (!playlistVideos) return;
 

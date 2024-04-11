@@ -9,9 +9,10 @@
 
 	let search: string;
 	let suggestionsForSearch: string[] = [];
+	let selectedSuggestionIndex: number = -1;
 
 	let debounceTimer: NodeJS.Timeout;
-	const debouncedSearch = (event: any) => {
+	function debouncedSearch(event: any) {
 		if (!searchSuggestions) return;
 
 		if (debounceTimer) clearTimeout(debounceTimer);
@@ -22,10 +23,27 @@
 			}
 			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
 		}, 250);
-	};
+	}
 
 	function handleSubmit() {
+		selectedSuggestionIndex = -1;
 		goto(`/search/${encodeURIComponent(search)}`);
+	}
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+		} else if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			selectedSuggestionIndex = Math.min(
+				selectedSuggestionIndex + 1,
+				suggestionsForSearch.length - 1
+			);
+		} else if (event.key === 'Enter' && selectedSuggestionIndex !== -1) {
+			search = suggestionsForSearch[selectedSuggestionIndex];
+			handleSubmit();
+		}
 	}
 </script>
 
@@ -42,6 +60,7 @@
 					id="search"
 					required
 					bind:value={search}
+					on:keydown={handleKeyDown}
 					on:keyup={(event) => {
 						if (event.key === 'Enter') {
 							handleSubmit();
@@ -53,10 +72,14 @@
 				<i class="front" on:click={() => (search = '')}>close</i>
 			</div>
 			{#if searchSuggestions}
-				{#each suggestionsForSearch as suggestion}
+				{#each suggestionsForSearch as suggestion, index}
 					<a
-						on:click={() => (search = suggestion)}
+						on:click={() => {
+							search = suggestion;
+							handleSubmit();
+						}}
 						class="row"
+						class:selected={index === selectedSuggestionIndex}
 						href={`/search/${encodeURIComponent(suggestion)}`}
 					>
 						<div>{suggestion}</div>
@@ -75,5 +98,8 @@
 		.search {
 			width: 100%;
 		}
+	}
+	.selected {
+		background-color: var(--surface-variant);
 	}
 </style>

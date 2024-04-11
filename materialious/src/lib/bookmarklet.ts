@@ -124,7 +124,7 @@ export function bookmarkletSaveToUrl(): string {
 
   persistedStores.forEach(store => {
     let value = get(store.store);
-    if (value) {
+    if (value !== null) {
       url.searchParams.set(store.name, value.toString());
     }
   });

@@ -1,0 +1,103 @@
+# Taken from https://github.com/iv-org/documentation/edit/master/.github/ISSUE_TEMPLATE/new_instance.yaml
+
+name: New instance
+description: New public instance proposal form
+title: "[New instance] <instance name>"
+assignees: 
+  - WardPearce
+labels:
+  - instance-add
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please consult these two important tutorials:
+
+        - Escaping the YouTube block ([403 errors in playback](https://github.com/iv-org/invidious/issues/4045)): https://docs.invidious.io/ipv6-rotator/
+        - Improving the performance and the stability of your public instance: https://docs.invidious.io/improve-public-instance/
+        
+        It is highly recommended to follow these tutorials because it will allow the instance to stay stable and performant over the long term.
+      
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: "the URL of your instance"
+      placeholder: "Example: https://invidious.example.com"
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Mandatory checks
+      description: "Your instance must fulfill all the conditions listed below in order to be accepted"
+      options:
+      - label: "Instance has a domain name"
+        required: true
+      - label: "Instance is served over HTTPS"
+        required: true
+      - label: "Statistics (`/api/v1/stats`) are enabled"
+        required: true
+      - label: "Instance is properly configured (including the mandatory [post install configuration](https://docs.invidious.io/installation/#post-install-configuration))"
+        required: true
+      - label: "Instance has an automatic hourly restart setup of Invidious"
+        required: true
+      - label: "If dash, proxy + download is enabled (default settings), the instance has unlimited traffic/bandwidth or close to unlimited (100TB minimum)"
+        required: true
+      - label: "Instance is not running any kind of analytics"
+        required: true
+
+  - type: checkboxes
+    attributes:
+      label: Maintainer chart
+      description: "As a maintainer, I acknowledge that I must do the following to stay in the public list"
+      options:
+      - label: "Ensure that my instance is up to date (less than one month old)"
+        required: true
+      - label: "Ensure a proper uptime of my instance (around 90%)"
+        required: true
+
+  - type: input
+    id: country
+    attributes:
+      label: Host country
+      description: What country is the instance hosted in?
+      placeholder: "Example: United States"
+    validations:
+      required: true
+
+  - type: input
+    id: threads
+    attributes:
+      label: Invidious threads
+      description: Is your Invidious instance milti-threaded?
+      placeholder: "Default: 1" 
+    validations:
+      required: true
+
+  - type: checkboxes
+    attributes:
+      label: Twice daily IPV6 rotation
+      description: "Are you avoiding YouTube rate limiting with IPV6 rotation?"
+      options:
+      - label: "Yes"
+        required: false
+
+  - type: input
+    id: mitm-name
+    attributes:
+      label: Man in the Middle
+      description: "If your instance is behind a DDoS protection or MitM system, please specify that here"
+      placeholder: "Example: CloudFlare"
+    validations:
+      required: false
+
+  - type: textarea
+    id: more-infos
+    attributes:
+      label: Additional information
+      description: "If you want to add other information on your instance, do so here:"
+      placeholder: "Example: Our instance also has an .onion URL, The source code changes are ..., etc."
+    validations:
+      required: false

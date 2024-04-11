@@ -194,6 +194,13 @@
 				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
 				const newIndex = currentVideoIndex + 1;
 				if (currentVideoIndex !== -1 && newIndex <= playlistVideoIds.length) {
+					if ($syncPartyConnections) {
+						$syncPartyConnections.forEach((conn) => {
+							conn.send({
+								events: [{ type: 'change-video', videoId: playlistVideos[newIndex].videoId }]
+							} as PlayerEvents);
+						});
+					}
 					goto(`/watch/${playlistVideos[newIndex].videoId}?playlist=${data.playlistId}`);
 				}
 			});

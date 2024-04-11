@@ -22,6 +22,11 @@
 	align-items: start !important;
 }
 
+.vds-time-divider {
+	font-size: 0 !important;
+	margin-right: 5px !important;
+}
+
 @media screen and (max-width: 580px) {
 	main {
 		padding-left: 0.1em !important;

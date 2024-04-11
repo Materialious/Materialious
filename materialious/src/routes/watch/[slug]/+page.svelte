@@ -51,12 +51,12 @@
 			events: [{ type: 'seek', time: player.currentTime }]
 		} as PlayerEvents);
 
-		conn.on('data', (data) => {
-			const events = data as PlayerEvents;
+		conn.on('data', (rawData) => {
+			const events = rawData as PlayerEvents;
 
 			if (!player) return;
 
-			events.events.forEach((event) => {
+			events.events.forEach(async (event) => {
 				if (event.type === 'pause') {
 					player.pause();
 				} else if (event.type === 'play') {
@@ -173,14 +173,36 @@
 			}
 
 			if (data.playlistId) {
-				setTimeout(goToCurrentPlaylistItem, 1000);
+				goToCurrentPlaylistItem();
 			}
 		});
 
 		if (!data.playlistId) return;
 
+		await loadPlaylist(data.playlistId);
+
+		goToCurrentPlaylistItem();
+
+		if (playlistVideos) {
+			player.addEventListener('end', () => {
+				if (!playlistVideos) return;
+
+				const playlistVideoIds = playlistVideos.map((value) => {
+					return value.videoId;
+				});
+
+				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+				const newIndex = currentVideoIndex + 1;
+				if (currentVideoIndex !== -1 && newIndex <= playlistVideoIds.length) {
+					goto(`/watch/${playlistVideos[newIndex].videoId}?playlist=${data.playlistId}`);
+				}
+			});
+		}
+	});
+
+	async function loadPlaylist(playlistId: string) {
 		for (let page = 1; page < Infinity; page++) {
-			const newPlaylist = await getPlaylist(data.playlistId, page);
+			const newPlaylist = await getPlaylist(playlistId, page);
 			if (page === 1) {
 				playlist = newPlaylist;
 			}
@@ -194,9 +216,7 @@
 				}
 			);
 		}
-
-		goToCurrentPlaylistItem();
-	});
+	}
 
 	function goToCurrentPlaylistItem() {
 		const playlistCurrentVideo = document.getElementById(data.video.videoId);
@@ -250,7 +270,6 @@
 				<Player
 					{data}
 					{audioMode}
-					{playlistVideos}
 					isSyncing={$syncPartyPeer !== null}
 					bind:seekTo
 					bind:currentTime
@@ -448,7 +467,7 @@
 		</div>
 		{#if !theatreMode}
 			<div class="s12 m12 l2">
-				{#if !data.playlistId}
+				{#if !playlist}
 					{#if data.video.recommendedVideos}
 						{#each data.video.recommendedVideos as recommendedVideo}
 							<article class="no-padding">
@@ -458,7 +477,7 @@
 							</article>
 						{/each}
 					{/if}
-				{:else if playlist}
+				{:else}
 					<article
 						style="height: 75vh; position: relative;"
 						id="playlist"

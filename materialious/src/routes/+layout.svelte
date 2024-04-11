@@ -7,6 +7,7 @@
 	import Search from '$lib/Search.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl, bookmarkletSaveToUrl } from '$lib/bookmarklet';
+	import { removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import 'beercss';
 	import 'material-dynamic-colors';
@@ -109,7 +110,7 @@
 	function changeVideoEvent(conn: DataConnection) {
 		conn.on('data', (data) => {
 			const events = data as PlayerEvents;
-			const currentUrl = new URL(location.href);
+			const currentUrl = get(page).url;
 
 			events.events.forEach((event) => {
 				if (event.type === 'change-video' && event.videoId) {
@@ -121,20 +122,15 @@
 	}
 
 	async function startWatchSync() {
-		const currentUrl = new URL(location.href);
-
 		if ($syncPartyPeer) {
 			$syncPartyPeer.destroy();
 			syncPartyPeer.set(null);
-			currentUrl.searchParams.delete('sync');
-			window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
+			removeWindowQueryFlag('sync');
 			return;
 		}
 
 		const peerId = crypto.randomUUID();
-		currentUrl.searchParams.set('sync', peerId);
-		window.history.pushState({ path: currentUrl.toString() }, '', currentUrl.toString());
-
+		setWindowQueryFlag('sync', peerId);
 		$syncPartyPeer = new Peer(peerId);
 
 		if ($syncPartyPeer) {
@@ -248,7 +244,7 @@
 			loadNotifications().catch(() => auth.set(null));
 		}
 
-		const currentUrl = new URL(location.href);
+		const currentUrl = get(page).url;
 		const syncId = currentUrl.searchParams.get('sync');
 		if (syncId) {
 			$syncPartyPeer = new Peer(crypto.randomUUID());

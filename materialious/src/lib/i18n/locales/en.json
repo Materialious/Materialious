@@ -26,7 +26,10 @@
 		"createPlaylist": "Create playlist",
 		"public": "Public",
 		"unlisted": "Unlisted",
-		"private": "Private"
+		"private": "Private",
+		"playVideos": "Play videos",
+		"shuffleVideos": "Play videos shuffled",
+		"loopPlaylist": "Loop playlist"
 	},
 	"thumbnail": {
 		"live": "LIVE",

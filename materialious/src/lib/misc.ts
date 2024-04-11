@@ -1,4 +1,7 @@
+import { pushState } from '$app/navigation';
+import { page } from '$app/stores';
 import humanNumber from 'human-number';
+import { get } from 'svelte/store';
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
@@ -37,11 +40,11 @@ export function videoLength(lengthSeconds: number): string {
 
 export interface PhasedDescription {
 	description: string;
-	timestamps: { title: string; time: number; timePretty: string }[];
+	timestamps: { title: string; time: number; timePretty: string; }[];
 }
 
 export function phaseDescription(content: string): PhasedDescription {
-	const timestamps: { title: string; time: number; timePretty: string }[] = [];
+	const timestamps: { title: string; time: number; timePretty: string; }[] = [];
 	const lines = content.split('\n');
 
 	const urlRegex = /<a href="([^"]+)"/;
@@ -104,4 +107,20 @@ export function proxyVideoUrl(source: string): string {
 	);
 
 	return rawSrc.toString();
+}
+
+export function unsafeRandomItem(array: any[]): any {
+	return array[Math.floor(Math.random() * array.length)];
+}
+
+export function setWindowQueryFlag(key: string, value: string) {
+	const currentPage = get(page);
+	currentPage.url.searchParams.set(key, value);
+	pushState(currentPage.url, currentPage.state);
+}
+
+export function removeWindowQueryFlag(key: string) {
+	const currentPage = get(page);
+	currentPage.url.searchParams.delete(key);
+	pushState(currentPage.url, currentPage.state);
 }

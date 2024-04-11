@@ -16,11 +16,15 @@
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 	export let playlistId: string = '';
 
-	let watchUrl = `/watch/${video.videoId}` + (playlistId ? `?playlist=${playlistId}` : '');
+	let watchUrl = new URL(`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${video.videoId}`);
+
+	if (playlistId !== '') {
+		watchUrl.searchParams.set('playlist', playlistId);
+	}
 
 	syncPartyPeer.subscribe((peer) => {
 		if (peer) {
-			watchUrl += (playlistId ? '&' : '?') + `sync=${peer.id}`;
+			watchUrl.searchParams.set('sync', peer.id);
 		}
 	});
 
@@ -140,7 +144,7 @@
 <a
 	class="wave"
 	style="width: 100%; overflow: hidden;min-height:100px;"
-	href={watchUrl}
+	href={watchUrl.toString()}
 	data-sveltekit-preload-data="off"
 	on:click={syncChangeVideo}
 >
@@ -179,7 +183,7 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a href={watchUrl}><div class="bold">{truncate(video.title)}</div></a>
+			<a href={watchUrl.toString()}><div class="bold">{truncate(video.title)}</div></a>
 			<div>
 				<a href={`/channel/${video.authorId}`}>{video.author}</a
 				>{#if !('publishedText' in video) && 'viewCountText' in video}

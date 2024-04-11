@@ -25,7 +25,7 @@ export const returnYtDislikes = persisted('returnYtDislikes', true);
 
 export const interfaceSearchSuggestions = persisted('searchSuggestions', true);
 
-export const auth: Writable<null | { username: string; token: string }> = persisted(
+export const auth: Writable<null | { username: string; token: string; }> = persisted(
 	'authToken',
 	null
 );
@@ -49,3 +49,5 @@ export const deArrowThumbnailInstance = persisted(
 
 export const syncPartyPeer: Writable<Peer | null> = writable(null);
 export const syncPartyConnections: Writable<DataConnection[] | null> = writable();
+
+export const playlistSettings: Writable<Record<string, { shuffle: boolean, loop: boolean; }>> = writable({});

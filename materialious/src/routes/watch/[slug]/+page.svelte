@@ -12,7 +12,7 @@
 	import Comment from '$lib/Comment.svelte';
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { cleanNumber, numberWithCommas } from '$lib/misc.js';
+	import { cleanNumber, numberWithCommas, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
@@ -25,6 +25,7 @@
 		playerAutoplayNextByDefault,
 		playerListenByDefault,
 		playerTheatreModeByDefault,
+		playlistSettings,
 		syncPartyConnections,
 		syncPartyPeer
 	} from '../../../store';
@@ -38,12 +39,23 @@
 	let playlistVideos: PlaylistPageVideo[] = [];
 	let playlist: PlaylistPage | null = null;
 
+	let loopPlaylist: boolean = false;
+	let shufflePlaylist: boolean = false;
+
 	let theatreMode = get(playerTheatreModeByDefault);
 
 	let audioMode = get(playerListenByDefault);
 	let currentTime: number;
 	let seekTo: (time: number) => void;
 	let player: MediaPlayerElement;
+
+	playlistSettings.subscribe((playlistSetting) => {
+		if (!data.playlistId) return;
+		if (data.playlistId in playlistSetting) {
+			loopPlaylist = playlistSetting[data.playlistId].loop;
+			shufflePlaylist = playlistSetting[data.playlistId].shuffle;
+		}
+	});
 
 	function playerSyncEvents(conn: DataConnection) {
 		if (player) {
@@ -195,12 +207,49 @@
 
 		if (player) {
 			player.addEventListener('end', () => {
-				if ($playerAutoplayNextByDefault && !playlist) {
-					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+				if (!playlistVideos) {
+					if ($playerAutoplayNextByDefault) {
+						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+					}
+					return;
 				}
 
-				if (data.playlistId) {
-					goToCurrentPlaylistItem();
+				goToCurrentPlaylistItem();
+
+				const playlistVideoIds = playlistVideos.map((value) => {
+					return value.videoId;
+				});
+
+				let goToVideo: PlaylistPageVideo | undefined;
+
+				if (shufflePlaylist) {
+					goToVideo = unsafeRandomItem(playlistVideos);
+				} else {
+					const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+					const newIndex = currentVideoIndex + 1;
+					if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
+						goToVideo = playlistVideos[newIndex];
+					} else if (loopPlaylist) {
+						// Loop playlist on end
+						goToVideo = playlistVideos[0];
+					}
+				}
+
+				if (typeof goToVideo !== 'undefined') {
+					if ($syncPartyConnections) {
+						$syncPartyConnections.forEach((conn) => {
+							if (typeof goToVideo === 'undefined') return;
+
+							conn.send({
+								events: [
+									{ type: 'change-video', videoId: goToVideo.videoId },
+									{ type: 'playlist', playlistId: data.playlistId }
+								]
+							} as PlayerEvents);
+						});
+					}
+
+					goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
 				}
 			});
 		}
@@ -210,32 +259,6 @@
 		await loadPlaylist(data.playlistId);
 
 		goToCurrentPlaylistItem();
-
-		if (playlistVideos && player) {
-			player.addEventListener('end', () => {
-				if (!playlistVideos) return;
-
-				const playlistVideoIds = playlistVideos.map((value) => {
-					return value.videoId;
-				});
-
-				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
-				const newIndex = currentVideoIndex + 1;
-				if (currentVideoIndex !== -1 && newIndex <= playlistVideoIds.length) {
-					if ($syncPartyConnections) {
-						$syncPartyConnections.forEach((conn) => {
-							conn.send({
-								events: [
-									{ type: 'change-video', videoId: playlistVideos[newIndex].videoId },
-									{ type: 'playlist', playlistId: data.playlistId }
-								]
-							} as PlayerEvents);
-						});
-					}
-					goto(`/watch/${playlistVideos[newIndex].videoId}?playlist=${data.playlistId}`);
-				}
-			});
-		}
 	});
 
 	onDestroy(() => {
@@ -533,6 +556,40 @@
 							{$_('videos')}
 						</p>
 						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
+						<nav>
+							<button
+								on:click={() => (
+									(loopPlaylist = !loopPlaylist),
+									playlistSettings.set({
+										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
+									})
+								)}
+								class="circle"
+								class:fill={!loopPlaylist}
+							>
+								<i>loop</i>
+								<div class="tooltip bottom">
+									{$_('playlist.loopPlaylist')}
+								</div>
+							</button>
+							<button
+								on:click={() => (
+									(shufflePlaylist = !shufflePlaylist),
+									playlistSettings.set({
+										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
+									})
+								)}
+								class="circle"
+								class:fill={!shufflePlaylist}
+							>
+								<i>shuffle</i>
+								<div class="tooltip bottom">
+									{$_('playlist.shuffleVideos')}
+								</div>
+							</button>
+						</nav>
+
+						<div class="space"></div>
 						<div class="divider"></div>
 					</article>
 
@@ -545,7 +602,9 @@
 							id={playlistVideo.videoId}
 							class:border={playlistVideo.videoId === data.video.videoId}
 						>
-							<Thumbnail video={playlistVideo} playlistId={data.playlistId} />
+							{#key playlistVideo.videoId}
+								<Thumbnail video={playlistVideo} playlistId={data.playlistId || undefined} />
+							{/key}
 						</article>
 					{/each}
 				</article>

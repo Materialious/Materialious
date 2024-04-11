@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { deleteHistory, getHistory, getVideo } from '$lib/Api';
 	import type { VideoPlay } from '$lib/Api/model';
+	import PageLoading from '$lib/PageLoading.svelte';
 	import VideoList from '$lib/VideoList.svelte';
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
@@ -67,6 +68,10 @@
 	</button>
 </div>
 
-<VideoList videos={history} />
+{#if loaded}
+	<VideoList videos={history} />
 
-<InfiniteLoading on:infinite={loadMore} />
+	<InfiniteLoading on:infinite={loadMore} />
+{:else}
+	<PageLoading />
+{/if}

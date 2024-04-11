@@ -12,7 +12,7 @@
 	activePage.set(null);
 
 	let videos: PlaylistPageVideo[] | undefined;
-	if (data.playlist.videos) {
+	if (data.playlist.videos.length > 0) {
 		videos = data.playlist.videos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
 			return a.index < b.index ? -1 : 1;
 		});

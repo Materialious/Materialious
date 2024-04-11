@@ -1,16 +1,16 @@
-import { getSubscriptions } from "$lib/Api";
-import { error } from "@sveltejs/kit";
+import { getSubscriptions } from '$lib/Api';
+import { error } from '@sveltejs/kit';
 
 export async function load() {
-  let subscriptions;
+	let subscriptions;
 
-  try {
-    subscriptions = await getSubscriptions();
-  } catch (errorMessage: any) {
-    error(500, errorMessage);
-  }
+	try {
+		subscriptions = await getSubscriptions();
+	} catch (errorMessage: any) {
+		error(500, errorMessage);
+	}
 
-  return {
-    subscriptions: subscriptions
-  };
+	return {
+		subscriptions: subscriptions
+	};
 }

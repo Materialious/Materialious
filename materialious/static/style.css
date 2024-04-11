@@ -1,29 +1,29 @@
 .thumbnail-corner {
-    padding: .1em .4em;
+	padding: 0.1em 0.4em;
 }
 
 .vds-chapter-radio-label {
-    word-wrap: break-word !important;
-    overflow-wrap: break-word !important;
-    white-space: normal !important;
+	word-wrap: break-word !important;
+	overflow-wrap: break-word !important;
+	white-space: normal !important;
 }
 
 .vds-chapter-radio-content {
-    max-width: 200px !important;
+	max-width: 200px !important;
 }
 
 .vds-chapter-radio {
-    align-items: start !important;
+	align-items: start !important;
 }
 
 @media screen and (max-width: 580px) {
-    main {
-        padding-left: .1em !important;
-        padding-right: .1em !important;
-    }
+	main {
+		padding-left: 0.1em !important;
+		padding-right: 0.1em !important;
+	}
 }
 
 main.root {
-    max-height: 100vh;
-    overflow-y: scroll;
+	max-height: 100vh;
+	overflow-y: scroll;
 }

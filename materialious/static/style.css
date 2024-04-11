@@ -12,6 +12,12 @@
 	max-width: 200px !important;
 }
 
+.vds-kb-action {
+	position: absolute !important;
+	top: 50% !important;
+	left: 50% !important;
+}
+
 .vds-chapter-radio {
 	align-items: start !important;
 }

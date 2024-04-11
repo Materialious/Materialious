@@ -186,9 +186,9 @@ export async function deleteUnsubscribe(authorId: string) {
 	);
 }
 
-export async function getHistory(page: number = 1): Promise<string[]> {
+export async function getHistory(page: number = 1, maxResults: number = 20): Promise<string[]> {
 	const resp = await fetchErrorHandle(
-		await fetch(buildPath(`auth/history?page=${page}`), buildAuthHeaders())
+		await fetch(buildPath(`auth/history?page=${page}&max_results=${maxResults}`), buildAuthHeaders())
 	);
 	return await resp.json();
 }

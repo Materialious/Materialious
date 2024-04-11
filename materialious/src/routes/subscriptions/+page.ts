@@ -2,14 +2,14 @@ import { getFeed } from '$lib/Api/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
-  let feed;
+	let feed;
 
-  try {
-    feed = await getFeed(100, 1);
-  } catch (errorMessage: any) {
-    error(500, errorMessage);
-  }
-  return {
-    feed: feed
-  };
+	try {
+		feed = await getFeed(100, 1);
+	} catch (errorMessage: any) {
+		error(500, errorMessage);
+	}
+	return {
+		feed: feed
+	};
 }

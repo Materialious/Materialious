@@ -1,110 +1,110 @@
 {
-    "enabled": "Enabled",
-    "copyUrl": "Copy URL",
-    "loadMore": "Load more",
-    "views": "views",
-    "videos": "videos",
-    "cancel": "Cancel",
-    "create": "Create",
-    "title": "Title",
-    "searchPlaceholder": "Search...",
-    "deleteAllHistory": "Delete all history",
-    "skipping": "Skipping",
-    "replies": "replies",
-    "videoTabs": {
-        "all": "All",
-        "videos": "Videos",
-        "playlists": "Playlists",
-        "channels": "Channels",
-        "shorts": "Shorts",
-        "streams": "Streams"
-    },
-    "subscriptions": {
-        "manageSubscriptions": "Manage subscriptions"
-    },
-    "playlist": {
-        "createPlaylist": "Create playlist",
-        "public": "Public",
-        "unlisted": "Unlisted",
-        "private": "Private"
-    },
-    "thumbnail": {
-        "live": "LIVE",
-        "failedToLoadImage": "Failed to load image"
-    },
-    "pages": {
-        "home": "Home",
-        "trending": "Trending",
-        "subscriptions": "Subscriptions",
-        "playlists": "Playlists",
-        "history": "History"
-    },
-    "subscribers": "subscribers",
-    "subscribe": "Subscribe",
-    "unsubscribe": "Unsubscribe",
-    "loginRequired": "Login required",
-    "player": {
-        "audioOnly": "Audio only",
-        "theatreMode": "Theatre mode",
-        "share": {
-            "title": "Share",
-            "materialiousLink": "Copy Materialious link",
-            "invidiousRedirect": "Copy Invidious redirect link",
-            "youtubeLink": "Copy Youtube link"
-        },
-        "download": "Download",
-        "addToPlaylist": "Add to playlist",
-        "noPlaylists": "No playlists",
-        "unableToLoadComments": "Unable to load comments"
-    },
-    "layout": {
-        "star": "Star us on Github!",
-        "syncParty": "Sync party",
-        "syncPartyWarning": "Please note your IP will be visible to users you invite.",
-        "startSyncParty": "Start sync party",
-        "endSyncParty": "End sync party",
-        "notifications": "Notifications",
-        "noNewNotifications": "No new notifications here",
-        "settings": "Settings",
-        "login": "Login",
-        "logout": "Logout",
-        "customize": "Customize",
-        "theme": {
-            "theme": "Theme",
-            "darkMode": "Dark mode",
-            "lightMode": "Light mode",
-            "color": "Color"
-        },
-        "searchSuggestions": "Search suggestions",
-        "dataPreferences": {
-            "dataPreferences": "Data preferences",
-            "content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page."
-        },
-        "player": {
-            "title": "Player",
-            "autoPlay": "Autoplay video",
-            "alwaysLoopVideo": "Always loop video",
-            "proxyVideos": "Proxy videos",
-            "savePlaybackPosition": "Save playback position",
-            "listenByDefault": "Listen by default",
-            "theatreModeByDefault": "Theatre mode by default",
-            "autoPlayNextByDefault": "Autoplay next by default",
-            "dash": "Dash"
-        },
-        "instanceUrl": "Instance URL",
-        "sponsors": {
-            "sponsor": "Sponsor",
-            "unpaidSelfPromotion": "Unpaid/Self Promotion",
-            "interactionReminder": "Interaction Reminder (Subscribe)",
-            "intermissionIntroAnimation": "Intermission/Intro Animation",
-            "credits": "Endcards/Credits",
-            "preViewRecapHook": "Preview/Recap/Hook",
-            "tangentJokes": "Filler Tangent/Jokes"
-        },
-        "deArrow": {
-            "title": "DeArrow",
-            "thumbnailInstanceUrl": "Thumbnail instance URL"
-        },
-        "bookmarklet": "Bookmarklet"
-    }
+	"enabled": "Enabled",
+	"copyUrl": "Copy URL",
+	"loadMore": "Load more",
+	"views": "views",
+	"videos": "videos",
+	"cancel": "Cancel",
+	"create": "Create",
+	"title": "Title",
+	"searchPlaceholder": "Search...",
+	"deleteAllHistory": "Delete all history",
+	"skipping": "Skipping",
+	"replies": "replies",
+	"videoTabs": {
+		"all": "All",
+		"videos": "Videos",
+		"playlists": "Playlists",
+		"channels": "Channels",
+		"shorts": "Shorts",
+		"streams": "Streams"
+	},
+	"subscriptions": {
+		"manageSubscriptions": "Manage subscriptions"
+	},
+	"playlist": {
+		"createPlaylist": "Create playlist",
+		"public": "Public",
+		"unlisted": "Unlisted",
+		"private": "Private"
+	},
+	"thumbnail": {
+		"live": "LIVE",
+		"failedToLoadImage": "Failed to load image"
+	},
+	"pages": {
+		"home": "Home",
+		"trending": "Trending",
+		"subscriptions": "Subscriptions",
+		"playlists": "Playlists",
+		"history": "History"
+	},
+	"subscribers": "subscribers",
+	"subscribe": "Subscribe",
+	"unsubscribe": "Unsubscribe",
+	"loginRequired": "Login required",
+	"player": {
+		"audioOnly": "Audio only",
+		"theatreMode": "Theatre mode",
+		"share": {
+			"title": "Share",
+			"materialiousLink": "Copy Materialious link",
+			"invidiousRedirect": "Copy Invidious redirect link",
+			"youtubeLink": "Copy Youtube link"
+		},
+		"download": "Download",
+		"addToPlaylist": "Add to playlist",
+		"noPlaylists": "No playlists",
+		"unableToLoadComments": "Unable to load comments"
+	},
+	"layout": {
+		"star": "Star us on Github!",
+		"syncParty": "Sync party",
+		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
+		"startSyncParty": "Start sync party",
+		"endSyncParty": "End sync party",
+		"notifications": "Notifications",
+		"noNewNotifications": "No new notifications here",
+		"settings": "Settings",
+		"login": "Login",
+		"logout": "Logout",
+		"customize": "Customize",
+		"theme": {
+			"theme": "Theme",
+			"darkMode": "Dark mode",
+			"lightMode": "Light mode",
+			"color": "Color"
+		},
+		"searchSuggestions": "Search suggestions",
+		"dataPreferences": {
+			"dataPreferences": "Data preferences",
+			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page."
+		},
+		"player": {
+			"title": "Player",
+			"autoPlay": "Autoplay video",
+			"alwaysLoopVideo": "Always loop video",
+			"proxyVideos": "Proxy videos",
+			"savePlaybackPosition": "Save playback position",
+			"listenByDefault": "Listen by default",
+			"theatreModeByDefault": "Theatre mode by default",
+			"autoPlayNextByDefault": "Autoplay next by default",
+			"dash": "Dash"
+		},
+		"instanceUrl": "Instance URL",
+		"sponsors": {
+			"sponsor": "Sponsor",
+			"unpaidSelfPromotion": "Unpaid/Self Promotion",
+			"interactionReminder": "Interaction Reminder (Subscribe)",
+			"intermissionIntroAnimation": "Intermission/Intro Animation",
+			"credits": "Endcards/Credits",
+			"preViewRecapHook": "Preview/Recap/Hook",
+			"tangentJokes": "Filler Tangent/Jokes"
+		},
+		"deArrow": {
+			"title": "DeArrow",
+			"thumbnailInstanceUrl": "Thumbnail instance URL"
+		},
+		"bookmarklet": "Bookmarklet"
+	}
 }

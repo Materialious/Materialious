@@ -7,8 +7,6 @@
 	export let channel: Channel;
 
 	let loading = true;
-	let loaded = false;
-	let failed = false;
 
 	let img: HTMLImageElement;
 
@@ -17,12 +15,10 @@
 		img.src = channel.authorThumbnails[0].url;
 
 		img.onload = () => {
-			loaded = true;
 			loading = false;
 		};
 		img.onerror = () => {
 			loading = false;
-			failed = true;
 		};
 	});
 </script>

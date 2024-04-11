@@ -2,20 +2,20 @@ import { getPopular } from '$lib/Api/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load() {
-  let popular = undefined;
-  let popularDisabled: boolean = false;
+	let popular = undefined;
+	let popularDisabled: boolean = false;
 
-  try {
-    popular = await getPopular();
-  } catch (errorMessage: any) {
-    if (errorMessage.toString() === 'Error: Administrator has disabled this endpoint.') {
-      popularDisabled = true;
-    } else {
-      error(500, errorMessage);
-    }
-  }
-  return {
-    popular: popular,
-    popularDisabled: popularDisabled
-  };
+	try {
+		popular = await getPopular();
+	} catch (errorMessage: any) {
+		if (errorMessage.toString() === 'Error: Administrator has disabled this endpoint.') {
+			popularDisabled = true;
+		} else {
+			error(500, errorMessage);
+		}
+	}
+	return {
+		popular: popular,
+		popularDisabled: popularDisabled
+	};
 }

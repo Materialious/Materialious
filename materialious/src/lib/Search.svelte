@@ -69,7 +69,7 @@
 						}
 					}}
 				/>
-				<i class="front" on:click={() => (search = '')}>close</i>
+				<i class="front" on:click={() => (search = '', suggestionsForSearch = [], selectedSuggestionIndex = -1)}>close</i>
 			</div>
 			{#if searchSuggestions}
 				{#each suggestionsForSearch as suggestion, index}

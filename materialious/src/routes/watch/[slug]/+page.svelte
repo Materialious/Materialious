@@ -47,16 +47,29 @@
 	let player: MediaPlayerElement;
 
 	function playerSyncEvents(conn: DataConnection) {
-		conn.send({
-			events: [{ type: 'seek', time: player.currentTime }]
-		} as PlayerEvents);
+		if (player) {
+			conn.send({
+				events: [{ type: 'seek', time: player.currentTime }]
+			} as PlayerEvents);
+		}
 
-		conn.on('data', (data) => {
-			const events = data as PlayerEvents;
+		if (data.playlistId) {
+			conn.send({
+				events: [
+					{
+						type: 'playlist',
+						playlistId: data.playlistId
+					}
+				]
+			} as PlayerEvents);
+		}
 
-			if (!player) return;
+		conn.on('data', (rawData) => {
+			const events = rawData as PlayerEvents;
 
-			events.events.forEach((event) => {
+			events.events.forEach(async (event) => {
+				if (!player) return;
+
 				if (event.type === 'pause') {
 					player.pause();
 				} else if (event.type === 'play') {
@@ -67,9 +80,19 @@
 					if (timeDiff > 3 || timeDiff < -3) {
 						player.currentTime = event.time;
 					}
+				} else if (
+					event.type === 'playlist' &&
+					event.playlistId &&
+					event.playlistId !== data.playlistId
+				) {
+					data.playlistId = event.playlistId;
+					await loadPlaylist(event.playlistId);
+					goToCurrentPlaylistItem();
 				}
 			});
 		});
+
+		if (!player) return;
 
 		player.addEventListener('auto-play-fail', () => {
 			conn.send({
@@ -82,6 +105,7 @@
 		});
 
 		player.addEventListener('auto-play', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -106,6 +130,7 @@
 		});
 
 		player.addEventListener('playing', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -120,6 +145,7 @@
 		});
 
 		player.addEventListener('play', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -144,6 +170,7 @@
 		});
 
 		player.addEventListener('seeked', () => {
+			if (!player) return;
 			conn.send({
 				events: [
 					{
@@ -167,20 +194,54 @@
 			});
 		}
 
-		player.addEventListener('end', () => {
-			if ($playerAutoplayNextByDefault && !playlist) {
-				goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
-			}
+		if (player) {
+			player.addEventListener('end', () => {
+				if ($playerAutoplayNextByDefault && !playlist) {
+					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+				}
 
-			if (data.playlistId) {
-				setTimeout(goToCurrentPlaylistItem, 1000);
-			}
-		});
+				if (data.playlistId) {
+					goToCurrentPlaylistItem();
+				}
+			});
+		}
 
 		if (!data.playlistId) return;
 
+		await loadPlaylist(data.playlistId);
+
+		goToCurrentPlaylistItem();
+
+		if (playlistVideos && player) {
+			player.addEventListener('end', () => {
+				if (!playlistVideos) return;
+
+				const playlistVideoIds = playlistVideos.map((value) => {
+					return value.videoId;
+				});
+
+				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+				const newIndex = currentVideoIndex + 1;
+				if (currentVideoIndex !== -1 && newIndex <= playlistVideoIds.length) {
+					if ($syncPartyConnections) {
+						$syncPartyConnections.forEach((conn) => {
+							conn.send({
+								events: [
+									{ type: 'change-video', videoId: playlistVideos[newIndex].videoId },
+									{ type: 'playlist', playlistId: data.playlistId }
+								]
+							} as PlayerEvents);
+						});
+					}
+					goto(`/watch/${playlistVideos[newIndex].videoId}?playlist=${data.playlistId}`);
+				}
+			});
+		}
+	});
+
+	async function loadPlaylist(playlistId: string) {
 		for (let page = 1; page < Infinity; page++) {
-			const newPlaylist = await getPlaylist(data.playlistId, page);
+			const newPlaylist = await getPlaylist(playlistId, page);
 			if (page === 1) {
 				playlist = newPlaylist;
 			}
@@ -194,9 +255,7 @@
 				}
 			);
 		}
-
-		goToCurrentPlaylistItem();
-	});
+	}
 
 	function goToCurrentPlaylistItem() {
 		const playlistCurrentVideo = document.getElementById(data.video.videoId);
@@ -250,7 +309,6 @@
 				<Player
 					{data}
 					{audioMode}
-					{playlistVideos}
 					isSyncing={$syncPartyPeer !== null}
 					bind:seekTo
 					bind:currentTime
@@ -448,7 +506,7 @@
 		</div>
 		{#if !theatreMode}
 			<div class="s12 m12 l2">
-				{#if !data.playlistId}
+				{#if !playlist}
 					{#if data.video.recommendedVideos}
 						{#each data.video.recommendedVideos as recommendedVideo}
 							<article class="no-padding">
@@ -458,7 +516,7 @@
 							</article>
 						{/each}
 					{/if}
-				{:else if playlist}
+				{:else}
 					<article
 						style="height: 75vh; position: relative;"
 						id="playlist"

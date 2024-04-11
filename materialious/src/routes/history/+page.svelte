@@ -18,13 +18,19 @@
 
 	async function loadPageHistory() {
 		try {
-			const videoIds = await getHistory(currentPage);
+			const videoIds = await getHistory(currentPage, 20);
 			let promises = [];
 			for (const videoId of videoIds) {
-				promises.push(getVideo(videoId));
+				promises.push(
+					getVideo(videoId).catch(() => {
+						return null;
+					})
+				);
 			}
 
-			const loadedHistory = await Promise.all(promises);
+			const loadedHistory = (await Promise.all(promises)).filter((item) => {
+				return item !== null;
+			}) as VideoPlay[];
 			history = [...history, ...loadedHistory];
 		} catch (errorMessage: any) {
 			error(500, errorMessage);
@@ -33,6 +39,8 @@
 
 	async function loadMore(event: InfiniteEvent) {
 		const pastHistoryLen = Number(history.length);
+
+		currentPage++;
 
 		await loadPageHistory();
 

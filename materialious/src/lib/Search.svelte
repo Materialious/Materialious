@@ -23,28 +23,57 @@
 			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
 		}, 250);
 	};
+
+	function handleSubmit() {
+		goto(`/search/${encodeURIComponent(search)}`);
+	}
 </script>
 
-<form on:submit|preventDefault={() => goto(`/search/${encodeURIComponent(search)}`)}>
-	<div class="max field round suffix prefix small no-margin white black-text">
-		<i class="front">search</i><input
-			data-ui="search-suggestions"
-			type="text"
-			placeholder={$_('searchPlaceholder')}
-			bind:value={search}
-			on:keyup={(target) => debouncedSearch(target)}
-		/>
-		{#if searchSuggestions}
-			<menu
-				class="no-wrap"
-				style="width: 100%;"
-				id="search-suggestions"
-				data-ui="#search-suggestions"
-			>
+<form on:submit|preventDefault={handleSubmit}>
+	<div class="field prefix round fill no-margin search">
+		<i class="front">search</i>
+		<input bind:value={search} on:click={() => document.getElementById('search')?.focus()} />
+		<menu class="min">
+			<div class="field large prefix suffix no-margin fixed">
+				<i class="front">arrow_back</i>
+				<input
+					placeholder={$_('searchPlaceholder')}
+					type="text"
+					id="search"
+					required
+					bind:value={search}
+					on:keyup={(event) => {
+						if (event.key === 'Enter') {
+							handleSubmit();
+						} else {
+							debouncedSearch(event);
+						}
+					}}
+				/>
+				<i class="front" on:click={() => (search = '')}>close</i>
+			</div>
+			{#if searchSuggestions}
 				{#each suggestionsForSearch as suggestion}
-					<a href={`/search/${encodeURIComponent(suggestion)}`}>{suggestion}</a>
+					<a
+						on:click={() => (search = suggestion)}
+						class="row"
+						href={`/search/${encodeURIComponent(suggestion)}`}
+					>
+						<div>{suggestion}</div>
+					</a>
 				{/each}
-			</menu>
-		{/if}
+			{/if}
+		</menu>
 	</div>
 </form>
+
+<style>
+	.search {
+		width: 500px;
+	}
+	@media screen and (max-width: 1140px) {
+		.search {
+			width: 100%;
+		}
+	}
+</style>

@@ -27,6 +27,10 @@
 	margin-right: 5px !important;
 }
 
+.infinite-status-prompt {
+	display: none !important;
+}
+
 @media screen and (max-width: 580px) {
 	main {
 		padding-left: 0.1em !important;

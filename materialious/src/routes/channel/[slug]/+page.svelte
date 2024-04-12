@@ -24,6 +24,11 @@
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
 
+		if (typeof displayContent.continuation === 'undefined') {
+			event.detail.complete();
+			return;
+		}
+
 		const newContent = await getChannelContent(data.channel.authorId, {
 			type: tab,
 			continuation: displayContent.continuation

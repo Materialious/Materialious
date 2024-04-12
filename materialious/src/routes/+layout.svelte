@@ -689,7 +689,9 @@
 		</nav>
 	</header>
 
-	<Search />
+	<div class="s">
+		<Search />
+	</div>
 	<div class="space"></div>
 	{#each pages as page}
 		{#if !page.requiresAuth || isLoggedIn}

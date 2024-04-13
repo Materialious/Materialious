@@ -28,6 +28,7 @@
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
 	let playerIsLive = false;
+	let playerPosSet = false;
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -178,6 +179,8 @@
 	});
 
 	function loadPlayerPos() {
+		if (playerPosSet) return;
+		playerPosSet = true;
 		if (get(playerSavePlaybackPosition)) {
 			try {
 				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);

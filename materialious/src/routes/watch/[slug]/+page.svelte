@@ -46,7 +46,6 @@
 	let theatreMode = get(playerTheatreModeByDefault);
 
 	let audioMode = get(playerListenByDefault);
-	let currentTime: number;
 	let seekTo: (time: number) => void;
 	let player: MediaPlayerElement;
 
@@ -357,14 +356,7 @@
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '10'}`}>
 		{#key data.video.videoId}
-			<Player
-				{data}
-				{audioMode}
-				isSyncing={$syncPartyPeer !== null}
-				bind:seekTo
-				bind:currentTime
-				bind:player
-			/>
+			<Player {data} {audioMode} isSyncing={$syncPartyPeer !== null} bind:seekTo bind:player />
 		{/key}
 
 		<h5>{data.video.title}</h5>

@@ -4,17 +4,24 @@
 	import { get } from 'svelte/store';
 	import {
 		deArrowEnabled,
+		interfacePreviewVideoOnHover,
+		playerProxyVideos,
 		playerSavePlaybackPosition,
 		syncPartyConnections,
 		syncPartyPeer
 	} from '../store';
 	import { getDeArrow, getThumbnail, getVideo } from './Api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './Api/model';
-	import { cleanNumber, proxyVideoUrl, truncate, videoLength } from './misc';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
+	import { cleanNumber, proxyVideoUrl, videoLength } from './misc';
 	import type { PlayerEvents } from './player';
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 	export let playlistId: string = '';
+
+	let showVideoPreview: boolean = false;
+	let videoPreview: VideoPlay | null = null;
+	let videoPreviewMuted: boolean = true;
+	let videoPreviewVolume: number = 0.4;
 
 	let watchUrl = new URL(`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${video.videoId}`);
 
@@ -30,7 +37,6 @@
 
 	let loading = true;
 	let loaded = false;
-	let failed = false;
 
 	let img: HTMLImageElement;
 
@@ -118,7 +124,6 @@
 		};
 		img.onerror = () => {
 			loading = false;
-			failed = true;
 		};
 	});
 
@@ -139,52 +144,126 @@
 			});
 		}
 	}
+
+	async function previewVideo() {
+		if (!get(interfacePreviewVideoOnHover)) return;
+
+		showVideoPreview = true;
+		try {
+			videoPreview = await getVideo(video.videoId, get(playerProxyVideos));
+			if (videoPreview.hlsUrl) {
+				showVideoPreview = false;
+				videoPreview = null;
+			} else {
+				try {
+					const playerSettings = localStorage.getItem('video-player');
+					if (playerSettings && typeof playerSettings === 'object' && 'volume' in playerSettings) {
+						videoPreviewVolume = Number(playerSettings['volume']);
+					}
+				} catch {}
+			}
+		} catch {
+			showVideoPreview = true;
+		}
+	}
 </script>
 
-<a
-	class="wave"
-	style="width: 100%; overflow: hidden;min-height:100px;"
-	href={watchUrl.toString()}
-	data-sveltekit-preload-data="off"
-	on:click={syncChangeVideo}
+<div
+	style="position: relative;"
+	on:mouseover={previewVideo}
+	on:mouseleave={() => (showVideoPreview = false)}
+	on:focus={() => {}}
+	role="region"
 >
-	{#if loading}
-		<progress class="circle"></progress>
-	{:else if loaded}
-		<img
-			class="responsive"
-			style="max-width: 100%;min-height: 160px;"
-			src={img.src}
-			alt="Thumbnail for video"
-		/>
-	{:else}
-		<p>{$_('thumbnail.failedToLoadImage')}</p>
-	{/if}
-	{#if progress}
-		<progress
-			class="absolute right bottom"
-			style="z-index: 1;"
-			value={progress}
-			max={video.lengthSeconds}
-		></progress>
-	{/if}
-	{#if !('liveVideo' in video) || !video.liveVideo}
-		{#if video.lengthSeconds !== 0}
-			<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
-				&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
+	<a
+		class="wave thumbnail"
+		href={watchUrl.toString()}
+		data-sveltekit-preload-data="off"
+		on:click={syncChangeVideo}
+	>
+		{#if loading}
+			<progress class="circle"></progress>
+		{:else if loaded}
+			{#if showVideoPreview && videoPreview}
+				<div style="max-width: 100%; max-height: 200px;">
+					<video
+						style="max-width: 100%; max-height: 200px;"
+						autoplay
+						poster={img.src}
+						width="100%"
+						height="100%"
+						muted={videoPreviewMuted}
+						controls={false}
+						volume={videoPreviewVolume}
+						src={videoPreview.formatStreams[0].url}
+					>
+					</video>
+				</div>
+			{:else}
+				<img
+					class="responsive"
+					style="max-width: 100%;min-height: 160px;"
+					src={img.src}
+					alt="Thumbnail for video"
+				/>
+			{/if}
+		{:else}
+			<p>{$_('thumbnail.failedToLoadImage')}</p>
+		{/if}
+		{#if progress}
+			<progress
+				class="absolute right bottom"
+				style="z-index: 1;"
+				value={progress}
+				max={video.lengthSeconds}
+			></progress>
+		{/if}
+		{#if !('liveVideo' in video) || !video.liveVideo}
+			{#if video.lengthSeconds !== 0}
+				<div
+					class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
+				>
+					&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
+				</div>
+			{/if}
+		{:else}
+			<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
+				{$_('thumbnail.live')}
 			</div>
 		{/if}
-	{:else}
-		<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
-			{$_('thumbnail.live')}
-		</div>
+	</a>
+	{#if showVideoPreview && videoPreview}
+		<button
+			class="no-padding"
+			style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px;"
+			on:click={() => {
+				videoPreviewMuted = !videoPreviewMuted;
+			}}
+		>
+			<i>
+				{#if videoPreviewMuted}
+					volume_off
+				{:else}
+					volume_up
+				{/if}
+			</i>
+		</button>
 	{/if}
-</a>
+</div>
+
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a href={watchUrl.toString()}><div class="bold">{truncate(video.title)}</div></a>
-			<div>
+			<a
+				href={watchUrl.toString()}
+				style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
+				><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
+					{video.title}
+				</div>
+
+				<div class="tooltip bottom small">{video.title}</div>
+			</a>
+			<div style="margin-top: 1.4em;">
 				<a href={`/channel/${video.authorId}`}>{video.author}</a
 				>{#if !('publishedText' in video) && 'viewCountText' in video}
 					&nbsp;• {video.viewCountText}{/if}
@@ -200,3 +279,17 @@
 
 <canvas id="canvas" style="display: none;"></canvas>
 <div id="video-container" style="display: none;"></div>
+
+<style>
+	.thumbnail {
+		width: 100%;
+		overflow: hidden;
+		max-height: 160px;
+	}
+
+	@media screen and (max-width: 650px) {
+		.thumbnail {
+			max-height: 100%;
+		}
+	}
+</style>

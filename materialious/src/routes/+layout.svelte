@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/stores';
 	import { getFeed } from '$lib/Api/index';
+	import type { Notification } from '$lib/Api/model';
 	import Logo from '$lib/Logo.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
@@ -24,6 +25,7 @@
 		deArrowEnabled,
 		deArrowInstance,
 		deArrowThumbnailInstance,
+		interfacePreviewVideoOnHover,
 		interfaceSearchSuggestions,
 		playerAlwaysLoop,
 		playerAutoPlay,
@@ -43,11 +45,10 @@
 		themeColor
 	} from '../store';
 
+	let mobileSearchShow = false;
+
 	let currentPage: string | null = '';
 	activePage.subscribe((page) => (currentPage = page));
-
-	let searchSuggestions = false;
-	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategories.subscribe((value) => (sponsorCategoriesList = value));
@@ -291,55 +292,73 @@
 </nav>
 
 <nav class="top">
-	<button class="circle large transparent s m l small-margin" data-ui="#menu-expanded"
+	{#if !mobileSearchShow}
+		<button
+			on:click={() => (mobileSearchShow = !mobileSearchShow)}
+			class="transparent s circle large"
+		>
+			<i>search</i>
+		</button>
+	{/if}
+
+	<button class="circle large transparent m l small-margin" data-ui="#menu-expanded"
 		><i>menu</i></button
 	>
 
 	<Logo classes="m l" />
 	<h6 class="m l">Materialious</h6>
 
-	<div class="max"></div>
+	<div class="max m l"></div>
 
 	<div class="m l">
 		<Search />
 	</div>
 
-	<div class="max"></div>
-	<a
-		href="https://github.com/WardPearce/Materialious"
-		target="_blank"
-		rel="noopener noreferrer"
-		class="button circle large transparent"
-	>
-		<i>code</i>
-		<div class="tooltip bottom">{$_('layout.star')}</div>
-	</a>
-	<button data-ui="#sync-party" class="circle large transparent">
-		<i class:primary-text={$syncPartyPeer}>group</i>
-		<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-	</button>
-	{#if isLoggedIn}
-		<button class="circle large transparent" data-ui="#dialog-notifications"
-			><i>notifications</i>
-			<div class="tooltip bottom">{$_('layout.notifications')}</div>
-		</button>
+	{#if !mobileSearchShow}
+		<div class="max"></div>
 	{/if}
-	<button class="circle large transparent" data-ui="#dialog-settings">
-		<i>settings</i>
-		<div class="tooltip bottom">{$_('layout.settings')}</div>
-	</button>
 
-	{#if !isLoggedIn}
-		<button on:click={login} class="circle large transparent">
-			<i>login</i>
-			<div class="tooltip bottom">{$_('layout.login')}</div>
-		</button>
+	{#if mobileSearchShow}
+		<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 	{:else}
-		<button on:click={logout} class="circle large transparent">
-			<i>logout</i>
-			<div class="tooltip bottom">{$_('layout.logout')}</div>
+		<button data-ui="#sync-party" class="m l circle large transparent">
+			<i class:primary-text={$syncPartyPeer}>group</i>
+			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 		</button>
+		{#if isLoggedIn}
+			<button class="circle large transparent" data-ui="#dialog-notifications"
+				><i>notifications</i>
+				<div class="tooltip bottom">{$_('layout.notifications')}</div>
+			</button>
+		{/if}
+		<button class="circle large transparent" data-ui="#dialog-settings">
+			<i>settings</i>
+			<div class="tooltip bottom">{$_('layout.settings')}</div>
+		</button>
+
+		{#if !isLoggedIn}
+			<button on:click={login} class="circle large transparent">
+				<i>login</i>
+				<div class="tooltip bottom">{$_('layout.login')}</div>
+			</button>
+		{:else}
+			<button on:click={logout} class="circle large transparent">
+				<i>logout</i>
+				<div class="tooltip bottom">{$_('layout.logout')}</div>
+			</button>
+		{/if}
 	{/if}
+</nav>
+
+<nav class="bottom s">
+	{#each pages as page}
+		{#if !page.requiresAuth || isLoggedIn}
+			<a class="round" href={page.href} class:active={currentPage === page.name.toLowerCase()}
+				><i>{page.icon}</i>
+				<div class="tooltip top">{page.name}</div>
+			</a>
+		{/if}
+	{/each}
 </nav>
 
 <dialog class="right" id="dialog-settings">
@@ -379,6 +398,22 @@
 						type="checkbox"
 						bind:checked={$interfaceSearchSuggestions}
 						on:click={() => interfaceSearchSuggestions.set(!$interfaceSearchSuggestions)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.previewVideoOnHover')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$interfacePreviewVideoOnHover}
+						on:click={() => interfacePreviewVideoOnHover.set(!$interfacePreviewVideoOnHover)}
 					/>
 					<span></span>
 				</label>
@@ -689,9 +724,6 @@
 		</nav>
 	</header>
 
-	<div class="s">
-		<Search />
-	</div>
 	<div class="space"></div>
 	{#each pages as page}
 		{#if !page.requiresAuth || isLoggedIn}
@@ -765,5 +797,11 @@
 
 	form {
 		margin: 1em 0;
+	}
+
+	@media screen and (max-width: 650px) {
+		dialog.right {
+			width: 100%;
+		}
 	}
 </style>

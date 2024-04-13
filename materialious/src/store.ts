@@ -24,6 +24,7 @@ export const playerAutoplayNextByDefault = persisted('autoplayNextByDefault', fa
 export const returnYtDislikes = persisted('returnYtDislikes', true);
 
 export const interfaceSearchSuggestions = persisted('searchSuggestions', true);
+export const interfacePreviewVideoOnHover = persisted('previewVideoOnHover', true);
 
 export const auth: Writable<null | { username: string; token: string; }> = persisted(
 	'authToken',

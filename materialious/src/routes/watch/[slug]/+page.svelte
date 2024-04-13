@@ -684,8 +684,9 @@
 
 	@media screen and (max-width: 1000px) {
 		menu {
+			z-index: 9999;
 			position: fixed;
-			top: 50%;
+			top: 30%;
 			left: 50%;
 			width: 100%;
 			transform: translate(-50%, 50%);

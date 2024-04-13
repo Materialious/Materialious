@@ -212,7 +212,7 @@
 </script>
 
 {#if audioMode}
-	<div style="margin-top: 50vh;"></div>
+	<div style="margin-top: 40vh;"></div>
 {/if}
 
 <media-player
@@ -223,6 +223,7 @@
 	streamType={playerIsLive ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
 	keep-alive
+	style="max-height: 80vh;"
 	{src}
 >
 	<media-provider>

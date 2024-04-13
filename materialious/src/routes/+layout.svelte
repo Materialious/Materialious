@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/stores';
 	import { getFeed } from '$lib/Api/index';
+	import type { Notification } from '$lib/Api/model';
 	import Logo from '$lib/Logo.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
@@ -46,9 +47,6 @@
 
 	let currentPage: string | null = '';
 	activePage.subscribe((page) => (currentPage = page));
-
-	let searchSuggestions = false;
-	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategories.subscribe((value) => (sponsorCategoriesList = value));
@@ -292,7 +290,7 @@
 </nav>
 
 <nav class="top">
-	<button class="circle large transparent s m l small-margin" data-ui="#menu-expanded"
+	<button class="circle large transparent m l small-margin" data-ui="#menu-expanded"
 		><i>menu</i></button
 	>
 
@@ -341,6 +339,17 @@
 			<div class="tooltip bottom">{$_('layout.logout')}</div>
 		</button>
 	{/if}
+</nav>
+
+<nav class="bottom s">
+	{#each pages as page}
+		{#if !page.requiresAuth || isLoggedIn}
+			<a class="round" href={page.href} class:active={currentPage === page.name.toLowerCase()}
+				><i>{page.icon}</i>
+				<div class="tooltip top">{page.name}</div>
+			</a>
+		{/if}
+	{/each}
 </nav>
 
 <dialog class="right" id="dialog-settings">
@@ -706,9 +715,6 @@
 		</nav>
 	</header>
 
-	<div class="s">
-		<Search />
-	</div>
 	<div class="space"></div>
 	{#each pages as page}
 		{#if !page.requiresAuth || isLoggedIn}
@@ -782,5 +788,11 @@
 
 	form {
 		margin: 1em 0;
+	}
+
+	@media screen and (max-width: 650px) {
+		dialog.right {
+			width: 100%;
+		}
 	}
 </style>

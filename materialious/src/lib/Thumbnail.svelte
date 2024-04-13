@@ -287,7 +287,7 @@
 		max-height: 160px;
 	}
 
-	@media screen and (max-width: 1000px) {
+	@media screen and (max-width: 650px) {
 		.thumbnail {
 			max-height: 100%;
 		}

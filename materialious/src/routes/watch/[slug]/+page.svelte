@@ -355,10 +355,15 @@
 
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '10'}`}>
-		{#key data.video.videoId}
-			<Player {data} {audioMode} isSyncing={$syncPartyPeer !== null} bind:seekTo bind:player />
-		{/key}
-
+		<div style="display: flex;justify-content: center;">
+			{#key data.video.videoId}
+				<div
+					style="max-height: 80vh;max-width: calc(80vh * 16 / 9);overflow: hidden;position: relative;flex: 1;"
+				>
+					<Player {data} {audioMode} isSyncing={$syncPartyPeer !== null} bind:seekTo bind:player />
+				</div>
+			{/key}
+		</div>
 		<h5>{data.video.title}</h5>
 
 		<div class="grid no-padding">

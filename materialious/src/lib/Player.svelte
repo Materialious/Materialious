@@ -223,7 +223,6 @@
 	streamType={playerIsLive ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
 	keep-alive
-	style="max-height: 80vh;"
 	{src}
 >
 	<media-provider>

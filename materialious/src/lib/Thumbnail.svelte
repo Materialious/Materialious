@@ -21,6 +21,7 @@
 	let showVideoPreview: boolean = false;
 	let videoPreview: VideoPlay | null = null;
 	let videoPreviewMuted: boolean = true;
+	let videoPreviewVolume: number = 0.4;
 
 	let watchUrl = new URL(`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${video.videoId}`);
 
@@ -153,6 +154,13 @@
 			if (videoPreview.hlsUrl) {
 				showVideoPreview = false;
 				videoPreview = null;
+			} else {
+				try {
+					const playerSettings = localStorage.getItem('video-player');
+					if (playerSettings && typeof playerSettings === 'object' && 'volume' in playerSettings) {
+						videoPreviewVolume = Number(playerSettings['volume']);
+					}
+				} catch {}
 			}
 		} catch {
 			showVideoPreview = true;
@@ -185,7 +193,8 @@
 						width="100%"
 						height="100%"
 						muted={videoPreviewMuted}
-						volume={0.5}
+						controls={false}
+						volume={videoPreviewVolume}
 						src={videoPreview.formatStreams[0].url}
 					>
 					</video>
@@ -250,8 +259,10 @@
 				style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
 				><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
 					{video.title}
-				</div></a
-			>
+				</div>
+
+				<div class="tooltip bottom small">{video.title}</div>
+			</a>
 			<div style="margin-top: 1.4em;">
 				<a href={`/channel/${video.authorId}`}>{video.author}</a
 				>{#if !('publishedText' in video) && 'viewCountText' in video}

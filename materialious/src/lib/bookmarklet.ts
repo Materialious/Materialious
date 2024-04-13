@@ -5,6 +5,7 @@ import {
 	deArrowEnabled,
 	deArrowInstance,
 	deArrowThumbnailInstance,
+	interfacePreviewVideoOnHover,
 	interfaceSearchSuggestions,
 	playerAlwaysLoop,
 	playerAutoPlay,
@@ -85,6 +86,11 @@ const persistedStores = [
 	{
 		name: 'searchSuggestions',
 		store: interfaceSearchSuggestions,
+		type: 'boolean'
+	},
+	{
+		name: 'previewVideoOnHover',
+		store: interfacePreviewVideoOnHover,
 		type: 'boolean'
 	},
 	{

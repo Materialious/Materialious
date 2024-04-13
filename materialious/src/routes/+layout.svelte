@@ -24,6 +24,7 @@
 		deArrowEnabled,
 		deArrowInstance,
 		deArrowThumbnailInstance,
+		interfacePreviewVideoOnHover,
 		interfaceSearchSuggestions,
 		playerAlwaysLoop,
 		playerAutoPlay,
@@ -379,6 +380,22 @@
 						type="checkbox"
 						bind:checked={$interfaceSearchSuggestions}
 						on:click={() => interfaceSearchSuggestions.set(!$interfaceSearchSuggestions)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.previewVideoOnHover')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$interfacePreviewVideoOnHover}
+						on:click={() => interfacePreviewVideoOnHover.set(!$interfacePreviewVideoOnHover)}
 					/>
 					<span></span>
 				</label>

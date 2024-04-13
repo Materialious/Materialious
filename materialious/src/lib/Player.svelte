@@ -21,7 +21,6 @@
 	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-	export let currentTime: number = 0;
 	export let audioMode = false;
 	export let player: MediaPlayerElement;
 	export let isSyncing: boolean = false;
@@ -38,13 +37,6 @@
 	const proxyVideos = get(playerProxyVideos);
 
 	onMount(async () => {
-		try {
-			const defaultVolume = localStorage.getItem('volume');
-			if (defaultVolume) {
-				player.volume = Number(defaultVolume);
-			}
-		} catch {}
-
 		if (!data.video.hlsUrl) {
 			if (data.video.captions) {
 				data.video.captions.forEach(async (caption) => {
@@ -80,10 +72,6 @@
 					default: true
 				});
 			}
-
-			player.addEventListener('time-update', () => {
-				currentTime = player.currentTime;
-			});
 
 			player.addEventListener('pause', () => {
 				savePlayerPos();

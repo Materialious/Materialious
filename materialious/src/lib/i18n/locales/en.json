@@ -79,6 +79,7 @@
 			"color": "Color"
 		},
 		"searchSuggestions": "Search suggestions",
+		"previewVideoOnHover": "Preview video on hover",
 		"dataPreferences": {
 			"dataPreferences": "Data preferences",
 			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page."

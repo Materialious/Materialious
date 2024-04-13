@@ -12,7 +12,7 @@
 	} from '../store';
 	import { getDeArrow, getThumbnail, getVideo } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
-	import { cleanNumber, proxyVideoUrl, truncate, videoLength } from './misc';
+	import { cleanNumber, proxyVideoUrl, videoLength } from './misc';
 	import type { PlayerEvents } from './player';
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -150,6 +150,10 @@
 		showVideoPreview = true;
 		try {
 			videoPreview = await getVideo(video.videoId, get(playerProxyVideos));
+			if (videoPreview.hlsUrl) {
+				showVideoPreview = false;
+				videoPreview = null;
+			}
 		} catch {
 			showVideoPreview = true;
 		}
@@ -178,11 +182,12 @@
 						style="max-width: 100%; max-height: 200px;"
 						autoplay
 						poster={img.src}
+						width="100%"
+						height="100%"
 						muted={videoPreviewMuted}
 						volume={0.5}
 						src={videoPreview.formatStreams[0].url}
 					>
-						<track label="" kind="subtitles" srclang="" src="" default />
 					</video>
 				</div>
 			{:else}
@@ -240,8 +245,14 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a href={watchUrl.toString()}><div class="bold">{truncate(video.title)}</div></a>
-			<div>
+			<a
+				href={watchUrl.toString()}
+				style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
+				><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
+					{video.title}
+				</div></a
+			>
+			<div style="margin-top: 1.4em;">
 				<a href={`/channel/${video.authorId}`}>{video.author}</a
 				>{#if !('publishedText' in video) && 'viewCountText' in video}
 					&nbsp;• {video.viewCountText}{/if}

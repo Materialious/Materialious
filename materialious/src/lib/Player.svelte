@@ -27,6 +27,7 @@
 
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
+	let playerIsLive = false;
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -38,6 +39,7 @@
 
 	onMount(async () => {
 		if (!data.video.hlsUrl) {
+			playerIsLive = false;
 			if (data.video.captions) {
 				data.video.captions.forEach(async (caption) => {
 					player.textTracks.add({
@@ -109,6 +111,10 @@
 			}
 
 			if (get(playerDash)) {
+				player.addEventListener('dash-can-play', () => {
+					loadPlayerPos();
+				});
+
 				src = [{ src: data.video.dashUrl + '?local=true', type: 'application/dash+xml' }];
 			} else {
 				let formattedSrc;
@@ -126,17 +132,11 @@
 						width: Number(quality[0])
 					};
 				});
-			}
 
-			if (get(playerSavePlaybackPosition)) {
-				try {
-					const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-					if (playerPos) {
-						player.currentTime = Number(playerPos);
-					}
-				} catch {}
+				loadPlayerPos();
 			}
 		} else {
+			playerIsLive = true;
 			src = [
 				{
 					src: data.video.hlsUrl + '?local=true',
@@ -177,7 +177,20 @@
 		document.documentElement.style.setProperty('--audio-bg', currentTheme['--surface']);
 	});
 
+	function loadPlayerPos() {
+		if (get(playerSavePlaybackPosition)) {
+			try {
+				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
+				if (playerPos) {
+					player.currentTime = Number(playerPos);
+				}
+			} catch {}
+		}
+	}
+
 	function savePlayerPos() {
+		if (data.video.hlsUrl) return;
+
 		try {
 			if (get(playerSavePlaybackPosition) && player.currentTime) {
 				if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
@@ -204,7 +217,7 @@
 	autoPlay={$playerAutoPlay && !isSyncing}
 	loop={$playerAlwaysLoop}
 	title={data.video.title}
-	streamType={data.video.hlsUrl ? 'live' : 'on-demand'}
+	streamType={playerIsLive ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
 	keep-alive
 	{src}

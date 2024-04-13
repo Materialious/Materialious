@@ -45,6 +45,8 @@
 		themeColor
 	} from '../store';
 
+	let mobileSearchShow = false;
+
 	let currentPage: string | null = '';
 	activePage.subscribe((page) => (currentPage = page));
 
@@ -290,6 +292,15 @@
 </nav>
 
 <nav class="top">
+	{#if !mobileSearchShow}
+		<button
+			on:click={() => (mobileSearchShow = !mobileSearchShow)}
+			class="transparent s circle large"
+		>
+			<i>search</i>
+		</button>
+	{/if}
+
 	<button class="circle large transparent m l small-margin" data-ui="#menu-expanded"
 		><i>menu</i></button
 	>
@@ -297,47 +308,45 @@
 	<Logo classes="m l" />
 	<h6 class="m l">Materialious</h6>
 
-	<div class="max"></div>
+	<div class="max m l"></div>
 
 	<div class="m l">
 		<Search />
 	</div>
 
-	<div class="max"></div>
-	<a
-		href="https://github.com/WardPearce/Materialious"
-		target="_blank"
-		rel="noopener noreferrer"
-		class="button circle large transparent"
-	>
-		<i>code</i>
-		<div class="tooltip bottom">{$_('layout.star')}</div>
-	</a>
-	<button data-ui="#sync-party" class="circle large transparent">
-		<i class:primary-text={$syncPartyPeer}>group</i>
-		<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-	</button>
-	{#if isLoggedIn}
-		<button class="circle large transparent" data-ui="#dialog-notifications"
-			><i>notifications</i>
-			<div class="tooltip bottom">{$_('layout.notifications')}</div>
-		</button>
+	{#if !mobileSearchShow}
+		<div class="max"></div>
 	{/if}
-	<button class="circle large transparent" data-ui="#dialog-settings">
-		<i>settings</i>
-		<div class="tooltip bottom">{$_('layout.settings')}</div>
-	</button>
 
-	{#if !isLoggedIn}
-		<button on:click={login} class="circle large transparent">
-			<i>login</i>
-			<div class="tooltip bottom">{$_('layout.login')}</div>
-		</button>
+	{#if mobileSearchShow}
+		<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 	{:else}
-		<button on:click={logout} class="circle large transparent">
-			<i>logout</i>
-			<div class="tooltip bottom">{$_('layout.logout')}</div>
+		<button data-ui="#sync-party" class="m l circle large transparent">
+			<i class:primary-text={$syncPartyPeer}>group</i>
+			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 		</button>
+		{#if isLoggedIn}
+			<button class="circle large transparent" data-ui="#dialog-notifications"
+				><i>notifications</i>
+				<div class="tooltip bottom">{$_('layout.notifications')}</div>
+			</button>
+		{/if}
+		<button class="circle large transparent" data-ui="#dialog-settings">
+			<i>settings</i>
+			<div class="tooltip bottom">{$_('layout.settings')}</div>
+		</button>
+
+		{#if !isLoggedIn}
+			<button on:click={login} class="circle large transparent">
+				<i>login</i>
+				<div class="tooltip bottom">{$_('layout.login')}</div>
+			</button>
+		{:else}
+			<button on:click={logout} class="circle large transparent">
+				<i>logout</i>
+				<div class="tooltip bottom">{$_('layout.logout')}</div>
+			</button>
+		{/if}
 	{/if}
 </nav>
 

@@ -8,7 +8,7 @@
 	export let data;
 
 	let currentPage = 1;
-	$: videos = data.feed.notifications;
+	$: videos = [...data.feed.videos, ...data.feed.notifications];
 
 	activePage.set('subscriptions');
 
@@ -18,7 +18,7 @@
 		if (feed.notifications.length === 0) {
 			event.detail.complete();
 		} else {
-			videos = [...videos, ...feed.notifications];
+			videos = [...videos, ...feed.videos, ...feed.notifications];
 			event.detail.loaded();
 		}
 	}

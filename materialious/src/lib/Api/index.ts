@@ -12,6 +12,7 @@ import type {
 	ChannelPage,
 	Comments,
 	DeArrow,
+	Feed,
 	Playlist,
 	PlaylistPage,
 	ReturnYTDislikes,
@@ -142,7 +143,7 @@ export async function getSearch(
 	return await resp.json();
 }
 
-export async function getFeed(maxResults: number, page: number) {
+export async function getFeed(maxResults: number, page: number): Promise<Feed> {
 	const path = new URL(buildPath('auth/feed'));
 	path.search = new URLSearchParams({
 		max_results: maxResults.toString(),

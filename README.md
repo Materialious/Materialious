@@ -9,6 +9,7 @@
 
 -------
 
+
 ![Preview of homepage](./previews/home-preview.png)
 
 [Help translate Materialious!](https://fink.inlang.com/github.com/WardPearce/Materialious)
@@ -169,6 +170,9 @@ services:
 ```
 
 # Previews
+
+## Mobile
+<img src="./previews/mobile-preview.png" style="height: 500px"/>
 
 ## Player
 ![Preview of player](./previews/player-preview.png)

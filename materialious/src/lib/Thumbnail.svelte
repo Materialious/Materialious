@@ -261,6 +261,7 @@
 		<div class="max">
 			<a
 				href={watchUrl.toString()}
+                                data-sveltekit-preload-data="off"
 				style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
 				><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
 					{video.title}

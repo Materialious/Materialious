@@ -72,6 +72,29 @@
 	<article style="max-height: 200px;" class="scroll no-padding no-elevate no-round">
 		<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.description}</p>
 	</article>
+
+	<div class="space"></div>
+
+	<button class="border no-margin">
+		<i>share</i>
+		<span>{$_('player.share.title')}</span>
+		<menu class="no-wrap">
+			<a
+				href="#share"
+				on:click={async () => {
+					await navigator.clipboard.writeText(location.href);
+				}}>{$_('player.share.materialiousLink')}</a
+			>
+			<a
+				href="#share"
+				on:click={async () => {
+					await navigator.clipboard.writeText(
+						`https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
+					);
+				}}>{$_('player.share.youtubeLink')}</a
+			>
+		</menu>
+	</button>
 </article>
 
 {#if videos}

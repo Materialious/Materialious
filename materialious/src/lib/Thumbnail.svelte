@@ -23,6 +23,8 @@
 	let videoPreviewMuted: boolean = true;
 	let videoPreviewVolume: number = 0.4;
 
+	let proxyVideos = get(playerProxyVideos);
+
 	let watchUrl = new URL(`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${video.videoId}`);
 
 	if (playlistId !== '') {
@@ -91,7 +93,8 @@
 							mockVideo.preload = 'auto';
 							mockVideo.id = 'video';
 							mockVideo.crossOrigin = import.meta.env.VITE_DEFAULT_FRONTEND_URL;
-							mockVideo.src = proxyVideoUrl((await getVideo(video.videoId)).formatStreams[0].url);
+							const videoToThumbnail = (await getVideo(video.videoId)).formatStreams[0].url;
+							mockVideo.src = proxyVideos ? proxyVideoUrl(videoToThumbnail) : videoToThumbnail;
 
 							mockVideo.addEventListener('loadeddata', () => {
 								mockVideo.currentTime = mockVideo.duration / 100;
@@ -150,7 +153,7 @@
 
 		showVideoPreview = true;
 		try {
-			videoPreview = await getVideo(video.videoId, get(playerProxyVideos));
+			videoPreview = await getVideo(video.videoId);
 			if (videoPreview.hlsUrl) {
 				showVideoPreview = false;
 				videoPreview = null;
@@ -195,7 +198,9 @@
 						muted={videoPreviewMuted}
 						controls={false}
 						volume={videoPreviewVolume}
-						src={videoPreview.formatStreams[0].url}
+						src={proxyVideos
+							? proxyVideoUrl(videoPreview.formatStreams[0].url)
+							: videoPreview.formatStreams[0].url}
 					>
 					</video>
 				</div>

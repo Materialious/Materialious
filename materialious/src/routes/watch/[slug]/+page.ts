@@ -20,7 +20,7 @@ export async function load({ params, url }) {
 		error(500, errorMessage);
 	}
 
-	let downloadOptions: { title: string; url: string }[] = [];
+	let downloadOptions: { title: string; url: string; }[] = [];
 
 	if (!video.hlsUrl) {
 		video.formatStreams.forEach((format) => {

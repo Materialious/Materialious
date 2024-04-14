@@ -103,6 +103,26 @@
 				{$_('unsubscribe')}
 			{/if}
 		</button>
+		<button class="border">
+			<i>share</i>
+			<span>{$_('player.share.title')}</span>
+			<menu class="no-wrap">
+				<a
+					href="#share"
+					on:click={async () => {
+						await navigator.clipboard.writeText(location.href);
+					}}>{$_('player.share.materialiousLink')}</a
+				>
+				<a
+					href="#share"
+					on:click={async () => {
+						await navigator.clipboard.writeText(
+							`https://www.youtube.com/channel/${data.channel.authorId}`
+						);
+					}}>{$_('player.share.youtubeLink')}</a
+				>
+			</menu>
+		</button>
 	</div>
 
 	<div class="tabs left-align scroll">

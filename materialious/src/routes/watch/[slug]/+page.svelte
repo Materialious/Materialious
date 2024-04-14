@@ -546,6 +546,14 @@
 						{/if}
 					{/if}
 				</div>
+
+				<nav class="scroll">
+					{#if data.video.keywords}
+						{#each data.video.keywords as keyword}
+							<a href={`/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
+						{/each}
+					{/if}
+				</nav>
 			</details>
 		</article>
 

@@ -1,0 +1,67 @@
+{
+	"enabled": "Activé",
+	"copyUrl": "Copier l'URL",
+	"loadMore": "Charger plus",
+	"views": "vues",
+	"videos": "vidéos",
+	"cancel": "Annuler",
+	"create": "Créer",
+	"title": "Titre",
+	"searchPlaceholder": "Recherche...",
+	"deleteAllHistory": "Supprimer tout l'historique",
+	"skipping": "Passer",
+	"replies": "réponses",
+	"videoTabs": {
+		"all": "Tout",
+		"videos": "Vidéos",
+		"playlists": "Playlists",
+		"channels": "Chaines",
+		"shorts": "Shorts"
+	},
+	"playlist": {
+		"createPlaylist": "Créer une playlist",
+		"public": "Publique",
+		"private": "Privé",
+		"playVideos": "Lancer la vidéo",
+		"shuffleVideos": "Lecture des vidéos en aléatoire"
+	},
+	"thumbnail": {
+		"live": "LIVE"
+	},
+	"pages": {
+		"home": "Accueil",
+		"trending": "Tendance",
+		"subscriptions": "Abonnements",
+		"playlists": "Playlists",
+		"history": "Historique"
+	},
+	"subscribers": "abonnés",
+	"subscribe": "S'abonner",
+	"unsubscribe": "Se désabonner",
+	"player": {
+		"audioOnly": "Audio uniquement",
+		"share": {
+			"title": "Partager",
+			"materialiousLink": "Copier le lien Materialious",
+			"invidiousRedirect": "Copier le lien de redirection Invidious",
+			"youtubeLink": "Copier le lien Youtube"
+		},
+		"download": "Télécharger",
+		"addToPlaylist": "Ajouter à la playlist",
+		"noPlaylists": "Pas de playlists"
+	},
+	"layout": {
+		"syncPartyWarning": "Veuillez noter que votre adresse IP sera visible aux utilisateurs que vous invitez.",
+		"notifications": "Notifications",
+		"noNewNotifications": "Pas de nouvelles notifications",
+		"settings": "Paramètres",
+		"customize": "Customiser",
+		"theme": {
+			"darkMode": "Mode sombre",
+			"lightMode": "Mode clair",
+			"color": "Couleur"
+		},
+		"searchSuggestions": "Suggestions de recherche",
+		"instanceUrl": "L'URL de l'instance"
+	}
+}

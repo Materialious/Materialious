@@ -10,7 +10,7 @@ export default defineConfig({
 			manifest: {
 				description: 'Modern material design for Invidious.',
 				theme_color: "#8936FF",
-				background_color: "#2EC6FE",
+				background_color: "#1e1b1e",
 				icons: [
 					{
 						purpose: "maskable",

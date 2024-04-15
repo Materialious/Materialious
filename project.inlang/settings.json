@@ -1,7 +1,8 @@
 {
     "sourceLanguageTag": "en",
     "languageTags": [
-        "en"
+        "en",
+        "fr"
     ],
     "modules": [
         "https://cdn.jsdelivr.net/npm/@inlang/plugin-i18next@latest/dist/index.js",

@@ -24,7 +24,7 @@
 		"@vite-pwa/sveltekit": "^0.4.0",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "^2.36.0",
+		"eslint-plugin-svelte": "^2.37.0",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.2.3",
 		"svelte": "^4.2.7",

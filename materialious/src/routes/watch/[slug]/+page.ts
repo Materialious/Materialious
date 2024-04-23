@@ -10,7 +10,7 @@ import type { PlaylistPage } from '$lib/Api/model';
 import { phaseDescription } from '$lib/misc';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import { authStore, playerProxyVideosStore, returnYtDislikesStore } from '../../../store';
+import { authStore, playerProxyVideosStore, returnYTDislikesInstanceStore, returnYtDislikesStore } from '../../../store';
 
 export async function load({ params, url }) {
 	let video;
@@ -60,11 +60,12 @@ export async function load({ params, url }) {
 		comments = null;
 	}
 
-	let returnYTDislikes;
-	try {
-		returnYTDislikes = get(returnYtDislikesStore) ? await getDislikes(params.slug) : null;
-	} catch {
-		returnYTDislikes = null;
+	let returnYTDislikes = null;
+	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
+	if (returnYTDislikesInstance && returnYTDislikesInstance !== "") {
+		try {
+			returnYTDislikes = get(returnYtDislikesStore) ? await getDislikes(params.slug) : null;
+		} catch { }
 	}
 
 	return {

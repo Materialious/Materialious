@@ -21,7 +21,7 @@ export const playerDash = persisted('dashEnabled', false);
 export const playerTheatreModeByDefault = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefault = persisted('autoplayNextByDefault', false);
 
-export const returnYtDislikes = persisted('returnYtDislikes', true);
+export const returnYtDislikes = persisted('returnYtDislikes', false);
 
 export const interfaceSearchSuggestions = persisted('searchSuggestions', true);
 export const interfacePreviewVideoOnHover = persisted('previewVideoOnHover', true);

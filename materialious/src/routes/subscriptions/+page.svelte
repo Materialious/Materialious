@@ -3,14 +3,14 @@
 	import VideoList from '$lib/VideoList.svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { activePage } from '../../store';
+	import { activePageStore } from '../../store';
 
 	export let data;
 
 	let currentPage = 1;
 	$: videos = [...data.feed.videos, ...data.feed.notifications];
 
-	activePage.set('subscriptions');
+	activePageStore.set('subscriptions');
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;

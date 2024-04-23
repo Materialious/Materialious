@@ -2,11 +2,11 @@
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/Api';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import { _ } from 'svelte-i18n';
-	import { activePage } from '../../store';
+	import { activePageStore } from '../../store';
 
 	export let data;
 
-	activePage.set('playlists');
+	activePageStore.set('playlists');
 
 	let playlistPrivacy: 'public' | 'private' | 'unlisted' = 'public';
 	let playlistTitle: string;

@@ -1,9 +1,9 @@
 import { get } from 'svelte/store';
 import {
-	auth,
-	deArrowInstance,
-	deArrowThumbnailInstance,
-	returnYTDislikesInstance
+	authStore,
+	deArrowInstanceStore,
+	deArrowThumbnailInstanceStore,
+	returnYTDislikesInstanceStore
 } from '../../store';
 import type {
 	Channel,
@@ -40,7 +40,7 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 }
 
 export function buildAuthHeaders(): { headers: { Authorization: string; }; } {
-	return { headers: { Authorization: `Bearer ${get(auth)?.token}` } };
+	return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
 }
 
 export async function getTrending(): Promise<Video[]> {
@@ -60,7 +60,7 @@ export async function getVideo(videoId: string, local: boolean = false): Promise
 
 export async function getDislikes(videoId: string): Promise<ReturnYTDislikes> {
 	const resp = await fetchErrorHandle(
-		await fetch(`${get(returnYTDislikesInstance)}/votes?videoId=${videoId}`)
+		await fetch(`${get(returnYTDislikesInstanceStore)}/votes?videoId=${videoId}`)
 	);
 	return await resp.json();
 }
@@ -220,7 +220,7 @@ export async function postHistory(videoId: string) {
 export async function getPlaylist(playlistId: string, page: number = 1): Promise<PlaylistPage> {
 	let resp;
 
-	if (get(auth)) {
+	if (get(authStore)) {
 		resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), buildAuthHeaders());
 	} else {
 		resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`));
@@ -288,7 +288,7 @@ export async function removePlaylistVideo(playlistId: string, indexId: string) {
 
 export async function getDeArrow(videoId: string): Promise<DeArrow> {
 	const resp = await fetchErrorHandle(
-		await fetch(`${get(deArrowInstance)}/api/branding?videoID=${videoId}`)
+		await fetch(`${get(deArrowInstanceStore)}/api/branding?videoID=${videoId}`)
 	);
 	return await resp.json();
 }
@@ -296,7 +296,7 @@ export async function getDeArrow(videoId: string): Promise<DeArrow> {
 export async function getThumbnail(videoId: string, time: number): Promise<string> {
 	const resp = await fetchErrorHandle(
 		await fetch(
-			`${get(deArrowThumbnailInstance)}/api/v1/getThumbnail?videoID=${videoId}&time=${time}`
+			`${get(deArrowThumbnailInstanceStore)}/api/v1/getThumbnail?videoID=${videoId}&time=${time}`
 		)
 	);
 	return URL.createObjectURL(await resp.blob());

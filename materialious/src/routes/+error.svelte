@@ -1,8 +1,8 @@
 <script src="ts">
 	import { page } from '$app/stores';
-	import { activePage } from '../store';
+	import { activePageStore } from '../store';
 
-	activePage.set(null);
+	activePageStore.set(null);
 </script>
 
 <div class="space"></div>

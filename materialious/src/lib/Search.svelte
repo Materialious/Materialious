@@ -2,13 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { createEventDispatcher } from 'svelte';
 	import { _ } from 'svelte-i18n';
-	import { interfaceSearchSuggestions } from '../store';
+	import { interfaceSearchSuggestionsStore } from '../store';
 	import { getSearchSuggestions } from './Api';
 
 	const dispatch = createEventDispatcher();
 
 	let searchSuggestions = false;
-	interfaceSearchSuggestions.subscribe((value) => (searchSuggestions = value));
+	interfaceSearchSuggestionsStore.subscribe((value) => (searchSuggestions = value));
 
 	let search: string;
 	let suggestionsForSearch: string[] = [];

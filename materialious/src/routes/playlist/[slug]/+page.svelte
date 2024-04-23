@@ -5,11 +5,11 @@
 	import { cleanNumber, unsafeRandomItem } from '$lib/misc.js';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
-	import { activePage, playlistSettings } from '../../../store';
+	import { activePageStore, playlistSettingsStore } from '../../../store';
 
 	export let data;
 
-	activePage.set(null);
+	activePageStore.set(null);
 
 	let videos: PlaylistPageVideo[] | undefined;
 	if (data.playlist.videos.length > 0) {
@@ -51,7 +51,7 @@
 			<a
 				href={`/watch/${unsafeRandomItem(videos).videoId}?playlist=${data.playlist.playlistId}`}
 				on:click={() =>
-					playlistSettings.set({ [data.playlist.playlistId]: { shuffle: true, loop: false } })}
+					playlistSettingsStore.set({ [data.playlist.playlistId]: { shuffle: true, loop: false } })}
 				class="button circle extra no-margin border"
 			>
 				<i>shuffle</i>

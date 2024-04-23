@@ -6,13 +6,13 @@
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { activePage } from '../../../store';
+	import { activePageStore } from '../../../store';
 
 	export let data;
 
 	let currentPage = 1;
 
-	activePage.set(null);
+	activePageStore.set(null);
 
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
 		data.searchType = type;

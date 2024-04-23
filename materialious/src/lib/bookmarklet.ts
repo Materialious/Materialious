@@ -1,126 +1,126 @@
 import { page } from '$app/stores';
 import { get } from 'svelte/store';
 import {
-	darkMode,
-	deArrowEnabled,
-	deArrowInstance,
-	deArrowThumbnailInstance,
-	interfacePreviewVideoOnHover,
-	interfaceSearchSuggestions,
-	playerAlwaysLoop,
-	playerAutoPlay,
-	playerAutoplayNextByDefault,
-	playerDash,
-	playerListenByDefault,
-	playerProxyVideos,
-	playerSavePlaybackPosition,
-	playerTheatreModeByDefault,
-	returnYTDislikesInstance,
-	sponsorBlock,
-	sponsorBlockCategories,
-	sponsorBlockUrl,
-	themeColor
+	darkModeStore,
+	deArrowEnabledStore,
+	deArrowInstanceStore,
+	deArrowThumbnailInstanceStore,
+	interfacePreviewVideoOnHoverStore,
+	interfaceSearchSuggestionsStore,
+	playerAlwaysLoopStore,
+	playerAutoPlayStore,
+	playerAutoplayNextByDefaultStore,
+	playerDashStore,
+	playerListenByDefaultStore,
+	playerProxyVideosStore,
+	playerSavePlaybackPositionStore,
+	playerTheatreModeByDefaultStore,
+	returnYTDislikesInstanceStore,
+	sponsorBlockCategoriesStore,
+	sponsorBlockStore,
+	sponsorBlockUrlStore,
+	themeColorStore
 } from '../store';
 
 const persistedStores = [
 	{
 		name: 'returnYTDislikesInstance',
-		store: returnYTDislikesInstance,
+		store: returnYTDislikesInstanceStore,
 		type: 'string'
 	},
 	{
 		name: 'darkMode',
-		store: darkMode,
+		store: darkModeStore,
 		type: 'boolean'
 	},
 	{
 		name: 'themeColor',
-		store: themeColor,
+		store: themeColorStore,
 		type: 'string'
 	},
 	{
 		name: 'autoPlay',
-		store: playerAutoPlay,
+		store: playerAutoPlayStore,
 		type: 'boolean'
 	},
 	{
 		name: 'alwaysLoop',
-		store: playerAlwaysLoop,
+		store: playerAlwaysLoopStore,
 		type: 'boolean'
 	},
 	{
 		name: 'proxyVideos',
-		store: playerProxyVideos,
+		store: playerProxyVideosStore,
 		type: 'boolean'
 	},
 	{
 		name: 'listenByDefault',
-		store: playerListenByDefault,
+		store: playerListenByDefaultStore,
 		type: 'boolean'
 	},
 	{
 		name: 'savePlaybackPosition',
-		store: playerSavePlaybackPosition,
+		store: playerSavePlaybackPositionStore,
 		type: 'boolean'
 	},
 	{
 		name: 'dashEnabled',
-		store: playerDash,
+		store: playerDashStore,
 		type: 'boolean'
 	},
 	{
 		name: 'theatreModeByDefault',
-		store: playerTheatreModeByDefault,
+		store: playerTheatreModeByDefaultStore,
 		type: 'boolean'
 	},
 	{
 		name: 'autoplayNextByDefault',
-		store: playerAutoplayNextByDefault,
+		store: playerAutoplayNextByDefaultStore,
 		type: 'boolean'
 	},
 	{
 		name: 'returnYtDislikes',
-		store: returnYTDislikesInstance,
+		store: returnYTDislikesInstanceStore,
 		type: 'boolean'
 	},
 	{
 		name: 'searchSuggestions',
-		store: interfaceSearchSuggestions,
+		store: interfaceSearchSuggestionsStore,
 		type: 'boolean'
 	},
 	{
 		name: 'previewVideoOnHover',
-		store: interfacePreviewVideoOnHover,
+		store: interfacePreviewVideoOnHoverStore,
 		type: 'boolean'
 	},
 	{
 		name: 'sponsorBlock',
-		store: sponsorBlock,
+		store: sponsorBlockStore,
 		type: 'boolean'
 	},
 	{
 		name: 'sponsorBlockUrl',
-		store: sponsorBlockUrl,
+		store: sponsorBlockUrlStore,
 		type: 'string'
 	},
 	{
 		name: 'sponsorBlockCategories',
-		store: sponsorBlockCategories,
+		store: sponsorBlockCategoriesStore,
 		type: 'array'
 	},
 	{
 		name: 'deArrowInstance',
-		store: deArrowInstance,
+		store: deArrowInstanceStore,
 		type: 'string'
 	},
 	{
 		name: 'deArrowEnabled',
-		store: deArrowEnabled,
+		store: deArrowEnabledStore,
 		type: 'boolean'
 	},
 	{
 		name: 'deArrowThumbnailInstance',
-		store: deArrowThumbnailInstance,
+		store: deArrowThumbnailInstanceStore,
 		type: 'string'
 	}
 ];

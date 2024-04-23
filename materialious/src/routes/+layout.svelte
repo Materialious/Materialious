@@ -19,51 +19,51 @@
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import {
-		activePage,
-		auth,
-		darkMode,
-		deArrowEnabled,
-		deArrowInstance,
-		deArrowThumbnailInstance,
-		interfacePreviewVideoOnHover,
-		interfaceSearchSuggestions,
-		playerAlwaysLoop,
-		playerAutoPlay,
-		playerAutoplayNextByDefault,
-		playerDash,
-		playerListenByDefault,
-		playerProxyVideos,
-		playerSavePlaybackPosition,
-		playerTheatreModeByDefault,
-		returnYTDislikesInstance,
-		returnYtDislikes,
-		sponsorBlock,
-		sponsorBlockCategories,
-		sponsorBlockUrl,
-		syncPartyConnections,
-		syncPartyPeer,
-		themeColor
+		activePageStore,
+		authStore,
+		darkModeStore,
+		deArrowEnabledStore,
+		deArrowInstanceStore,
+		deArrowThumbnailInstanceStore,
+		interfacePreviewVideoOnHoverStore,
+		interfaceSearchSuggestionsStore,
+		playerAlwaysLoopStore,
+		playerAutoPlayStore,
+		playerAutoplayNextByDefaultStore,
+		playerDashStore,
+		playerListenByDefaultStore,
+		playerProxyVideosStore,
+		playerSavePlaybackPositionStore,
+		playerTheatreModeByDefaultStore,
+		returnYTDislikesInstanceStore,
+		returnYtDislikesStore,
+		sponsorBlockCategoriesStore,
+		sponsorBlockStore,
+		sponsorBlockUrlStore,
+		syncPartyConnectionsStore,
+		syncPartyPeerStore,
+		themeColorStore
 	} from '../store';
 
 	let mobileSearchShow = false;
 
 	let currentPage: string | null = '';
-	activePage.subscribe((page) => (currentPage = page));
+	activePageStore.subscribe((page) => (currentPage = page));
 
 	let sponsorCategoriesList: string[] = [];
-	sponsorBlockCategories.subscribe((value) => (sponsorCategoriesList = value));
+	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
 
 	let isLoggedIn = false;
-	auth.subscribe((value) => {
+	authStore.subscribe((value) => {
 		isLoggedIn = value !== null;
 	});
 
 	let notifications: Notification[] = [];
 
-	let sponsorBlockInstance = get(sponsorBlockUrl);
-	let returnYTInstance = get(returnYTDislikesInstance);
-	let deArrowUrl = get(deArrowInstance);
-	let deArrowThumbnailUrl = get(deArrowThumbnailInstance);
+	let sponsorBlockInstance = get(sponsorBlockUrlStore);
+	let returnYTInstance = get(returnYTDislikesInstanceStore);
+	let deArrowUrl = get(deArrowInstanceStore);
+	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
 
 	const pages = [
 		{
@@ -123,19 +123,19 @@
 	}
 
 	async function startWatchSync() {
-		if ($syncPartyPeer) {
-			$syncPartyPeer.destroy();
-			syncPartyPeer.set(null);
+		if ($syncPartyPeerStore) {
+			$syncPartyPeerStore.destroy();
+			syncPartyPeerStore.set(null);
 			removeWindowQueryFlag('sync');
 			return;
 		}
 
 		const peerId = crypto.randomUUID();
 		setWindowQueryFlag('sync', peerId);
-		$syncPartyPeer = new Peer(peerId);
+		$syncPartyPeerStore = new Peer(peerId);
 
-		if ($syncPartyPeer) {
-			$syncPartyPeer.on('connection', (conn) => {
+		if ($syncPartyPeerStore) {
+			$syncPartyPeerStore.on('connection', (conn) => {
 				conn.on('open', () => {
 					if ($page.url.pathname.startsWith('/watch')) {
 						const paths = $page.url.pathname.split('/');
@@ -151,7 +151,7 @@
 						}
 					}
 					changeVideoEvent(conn);
-					syncPartyConnections.set([...($syncPartyConnections || []), conn]);
+					syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
 				});
 			});
 		}
@@ -159,10 +159,10 @@
 
 	function toggleSponsor(category: string) {
 		if (sponsorCategoriesList.includes(category)) {
-			sponsorBlockCategories.set(sponsorCategoriesList.filter((value) => value !== category));
+			sponsorBlockCategoriesStore.set(sponsorCategoriesList.filter((value) => value !== category));
 		} else {
 			sponsorCategoriesList.push(category);
-			sponsorBlockCategories.set(sponsorCategoriesList);
+			sponsorBlockCategoriesStore.set(sponsorCategoriesList);
 		}
 	}
 
@@ -170,22 +170,22 @@
 		const target = color.target;
 		const hex = (target as { value: string }).value;
 		await ui('theme', hex);
-		themeColor.set(hex);
+		themeColorStore.set(hex);
 	}
 
 	function toggleDarkMode() {
-		const isDark = get(darkMode);
+		const isDark = get(darkModeStore);
 
 		if (isDark) {
 			ui('mode', 'light');
-			darkMode.set(false);
+			darkModeStore.set(false);
 		} else {
 			ui('mode', 'dark');
-			darkMode.set(true);
+			darkModeStore.set(true);
 		}
 	}
 
-	darkMode.subscribe((isDark) => {
+	darkModeStore.subscribe((isDark) => {
 		if (isDark) {
 			ui('mode', 'dark');
 		} else {
@@ -204,7 +204,7 @@
 	}
 
 	function logout() {
-		auth.set(null);
+		authStore.set(null);
 		goto('/');
 	}
 
@@ -218,14 +218,14 @@
 
 		bookmarkletLoadFromUrl();
 
-		const isDark = get(darkMode);
+		const isDark = get(darkModeStore);
 
 		if (isDark === null) {
 			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				darkMode.set(true);
+				darkModeStore.set(true);
 				ui('mode', 'dark');
 			} else {
-				darkMode.set(false);
+				darkModeStore.set(false);
 				ui('mode', 'light');
 			}
 		} else {
@@ -236,39 +236,39 @@
 			}
 		}
 
-		const themeHex = get(themeColor);
+		const themeHex = get(themeColorStore);
 		if (themeHex) {
 			await ui('theme', themeHex);
 		}
 
 		if (isLoggedIn) {
-			loadNotifications().catch(() => auth.set(null));
+			loadNotifications().catch(() => authStore.set(null));
 		}
 
 		const currentUrl = get(page).url;
 		const syncId = currentUrl.searchParams.get('sync');
 		if (syncId) {
-			$syncPartyPeer = new Peer(crypto.randomUUID());
-			$syncPartyPeer.on('open', () => {
-				if (!$syncPartyPeer) return;
+			$syncPartyPeerStore = new Peer(crypto.randomUUID());
+			$syncPartyPeerStore.on('open', () => {
+				if (!$syncPartyPeerStore) return;
 
-				const conn = $syncPartyPeer.connect(syncId);
-				syncPartyConnections.set([...($syncPartyConnections || []), conn]);
+				const conn = $syncPartyPeerStore.connect(syncId);
+				syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
 
 				changeVideoEvent(conn);
 			});
 
-			$syncPartyPeer.on('disconnected', () => {
-				syncPartyPeer.set(null);
-				syncPartyConnections.set(null);
+			$syncPartyPeerStore.on('disconnected', () => {
+				syncPartyPeerStore.set(null);
+				syncPartyConnectionsStore.set(null);
 			});
 		}
 	});
 
 	onDestroy(() => {
-		if ($syncPartyPeer) {
-			$syncPartyPeer.destroy();
-			$syncPartyPeer = null;
+		if ($syncPartyPeerStore) {
+			$syncPartyPeerStore.destroy();
+			$syncPartyPeerStore = null;
 		}
 	});
 
@@ -322,7 +322,7 @@
 		<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 	{:else}
 		<button data-ui="#sync-party" class="m l circle large transparent">
-			<i class:primary-text={$syncPartyPeer}>group</i>
+			<i class:primary-text={$syncPartyPeerStore}>group</i>
 			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 		</button>
 		{#if isLoggedIn}
@@ -371,7 +371,7 @@
 	<div class="settings">
 		<h6>{$_('layout.theme.theme')}</h6>
 		<button on:click={toggleDarkMode} class="no-margin">
-			{#if !$darkMode}
+			{#if !$darkModeStore}
 				<i>dark_mode</i>
 				<span>{$_('layout.theme.darkMode')}</span>
 			{:else}
@@ -396,8 +396,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$interfaceSearchSuggestions}
-						on:click={() => interfaceSearchSuggestions.set(!$interfaceSearchSuggestions)}
+						bind:checked={$interfaceSearchSuggestionsStore}
+						on:click={() => interfaceSearchSuggestionsStore.set(!$interfaceSearchSuggestionsStore)}
 					/>
 					<span></span>
 				</label>
@@ -412,8 +412,9 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$interfacePreviewVideoOnHover}
-						on:click={() => interfacePreviewVideoOnHover.set(!$interfacePreviewVideoOnHover)}
+						bind:checked={$interfacePreviewVideoOnHoverStore}
+						on:click={() =>
+							interfacePreviewVideoOnHoverStore.set(!$interfacePreviewVideoOnHoverStore)}
 					/>
 					<span></span>
 				</label>
@@ -445,8 +446,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerAutoPlay}
-						on:click={() => playerAutoPlay.set(!$playerAutoPlay)}
+						bind:checked={$playerAutoPlayStore}
+						on:click={() => playerAutoPlayStore.set(!$playerAutoPlayStore)}
 					/>
 					<span></span>
 				</label>
@@ -461,8 +462,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerAlwaysLoop}
-						on:click={() => playerAlwaysLoop.set(!$playerAlwaysLoop)}
+						bind:checked={$playerAlwaysLoopStore}
+						on:click={() => playerAlwaysLoopStore.set(!$playerAlwaysLoopStore)}
 					/>
 					<span></span>
 				</label>
@@ -477,8 +478,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerProxyVideos}
-						on:click={() => playerProxyVideos.set(!$playerProxyVideos)}
+						bind:checked={$playerProxyVideosStore}
+						on:click={() => playerProxyVideosStore.set(!$playerProxyVideosStore)}
 					/>
 					<span></span>
 				</label>
@@ -493,8 +494,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerSavePlaybackPosition}
-						on:click={() => playerSavePlaybackPosition.set(!$playerSavePlaybackPosition)}
+						bind:checked={$playerSavePlaybackPositionStore}
+						on:click={() => playerSavePlaybackPositionStore.set(!$playerSavePlaybackPositionStore)}
 					/>
 					<span></span>
 				</label>
@@ -509,8 +510,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerListenByDefault}
-						on:click={() => playerListenByDefault.set(!$playerListenByDefault)}
+						bind:checked={$playerListenByDefaultStore}
+						on:click={() => playerListenByDefaultStore.set(!$playerListenByDefaultStore)}
 					/>
 					<span></span>
 				</label>
@@ -525,8 +526,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerTheatreModeByDefault}
-						on:click={() => playerTheatreModeByDefault.set(!$playerTheatreModeByDefault)}
+						bind:checked={$playerTheatreModeByDefaultStore}
+						on:click={() => playerTheatreModeByDefaultStore.set(!$playerTheatreModeByDefaultStore)}
 					/>
 					<span></span>
 				</label>
@@ -541,8 +542,9 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerAutoplayNextByDefault}
-						on:click={() => playerAutoplayNextByDefault.set(!$playerAutoplayNextByDefault)}
+						bind:checked={$playerAutoplayNextByDefaultStore}
+						on:click={() =>
+							playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
 					/>
 					<span></span>
 				</label>
@@ -557,8 +559,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerDash}
-						on:click={() => playerDash.set(!$playerDash)}
+						bind:checked={$playerDashStore}
+						on:click={() => playerDashStore.set(!$playerDashStore)}
 					/>
 					<span></span>
 				</label>
@@ -569,7 +571,7 @@
 	<div class="settings">
 		<h6>Return YT Dislikes</h6>
 
-		<form on:submit|preventDefault={() => returnYTDislikesInstance.set(returnYTInstance)}>
+		<form on:submit|preventDefault={() => returnYTDislikesInstanceStore.set(returnYTInstance)}>
 			<nav>
 				<div class="field label border">
 					<input bind:value={returnYTInstance} name="returnyt-instance" type="text" />
@@ -587,8 +589,8 @@
 			</div>
 			<label class="switch">
 				<input
-					bind:checked={$returnYtDislikes}
-					on:click={() => returnYtDislikes.set(!$returnYtDislikes)}
+					bind:checked={$returnYtDislikesStore}
+					on:click={() => returnYtDislikesStore.set(!$returnYtDislikesStore)}
 					type="checkbox"
 				/>
 				<span></span>
@@ -599,7 +601,7 @@
 	<div class="settings">
 		<h6>Sponsorblock</h6>
 
-		<form on:submit|preventDefault={() => sponsorBlockUrl.set(sponsorBlockInstance)}>
+		<form on:submit|preventDefault={() => sponsorBlockUrlStore.set(sponsorBlockInstance)}>
 			<nav>
 				<div class="field label border">
 					<input bind:value={sponsorBlockInstance} name="sponsorblock-instance" type="text" />
@@ -617,8 +619,8 @@
 			</div>
 			<label class="switch">
 				<input
-					bind:checked={$sponsorBlock}
-					on:click={() => sponsorBlock.set(!$sponsorBlock)}
+					bind:checked={$sponsorBlockStore}
+					on:click={() => sponsorBlockStore.set(!$sponsorBlockStore)}
 					type="checkbox"
 				/>
 				<span></span>
@@ -647,7 +649,7 @@
 	<div class="settings">
 		<h6>{$_('layout.deArrow.title')}</h6>
 
-		<form on:submit|preventDefault={() => deArrowInstance.set(deArrowUrl)}>
+		<form on:submit|preventDefault={() => deArrowInstanceStore.set(deArrowUrl)}>
 			<nav>
 				<div class="field label border">
 					<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
@@ -659,7 +661,7 @@
 			</nav>
 		</form>
 
-		<form on:submit|preventDefault={() => deArrowThumbnailInstance.set(deArrowThumbnailUrl)}>
+		<form on:submit|preventDefault={() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl)}>
 			<nav>
 				<div class="field label border">
 					<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
@@ -678,8 +680,8 @@
 			</div>
 			<label class="switch">
 				<input
-					bind:checked={$deArrowEnabled}
-					on:click={() => deArrowEnabled.set(!$deArrowEnabled)}
+					bind:checked={$deArrowEnabledStore}
+					on:click={() => deArrowEnabledStore.set(!$deArrowEnabledStore)}
 					type="checkbox"
 				/>
 				<span></span>
@@ -742,13 +744,13 @@
 <dialog id="sync-party">
 	<h6>{$_('layout.syncParty')}</h6>
 	<p>{$_('layout.syncPartyWarning')}</p>
-	{#if $syncPartyPeer}
+	{#if $syncPartyPeerStore}
 		<nav>
 			<div class="field label border">
 				<input
 					name="sync-share"
 					readonly
-					value={`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeer.id}`}
+					value={`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeerStore.id}`}
 					type="text"
 				/>
 				<label class="active" for="sync-share">Share URL</label>
@@ -756,7 +758,7 @@
 			<button
 				on:click={async () => {
 					await navigator.clipboard.writeText(
-						`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeer.id}`
+						`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeerStore.id}`
 					);
 				}}
 				class="square round"
@@ -769,8 +771,8 @@
 	<button
 		class="no-margin"
 		on:click={startWatchSync}
-		data-ui={`${$syncPartyPeer ? '#sync-party' : ''}`}
-		>{#if $syncPartyPeer}
+		data-ui={`${$syncPartyPeerStore ? '#sync-party' : ''}`}
+		>{#if $syncPartyPeerStore}
 			{$_('layout.endSyncParty')}
 		{:else}
 			{$_('layout.startSyncParty')}

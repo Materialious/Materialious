@@ -3,9 +3,9 @@
 	import { truncate } from '$lib/misc';
 	import Fuse from 'fuse.js';
 	import { _ } from 'svelte-i18n';
-	import { activePage } from '../../../store';
+	import { activePageStore } from '../../../store';
 
-	activePage.set(null);
+	activePageStore.set(null);
 
 	export let data;
 

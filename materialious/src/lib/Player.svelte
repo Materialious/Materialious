@@ -83,8 +83,10 @@
 			if (get(sponsorBlockCategories)) {
 				const currentCategories = get(sponsorBlockCategories);
 
-				if (currentCategories.length > 0) {
-					const sponsorBlock = new SponsorBlock('', { baseURL: get(sponsorBlockUrl) });
+				const sponsorBlockInstance = get(sponsorBlockUrl);
+
+				if (currentCategories.length > 0 && sponsorBlockInstance && sponsorBlockInstance !== '') {
+					const sponsorBlock = new SponsorBlock('', { baseURL: sponsorBlockInstance });
 
 					try {
 						const segments = await sponsorBlock.getSegments(

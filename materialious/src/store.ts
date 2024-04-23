@@ -32,7 +32,7 @@ export const auth: Writable<null | { username: string; token: string; }> = persi
 );
 
 export const sponsorBlock = persisted('sponsorBlock', true);
-export const sponsorBlockUrl = persisted(
+export const sponsorBlockUrl: Writable<string | null | undefined> = persisted(
 	'sponsorBlockUrl',
 	import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE
 );

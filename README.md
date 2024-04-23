@@ -160,6 +160,7 @@ services:
       VITE_DEFAULT_FRONTEND_URL: "https://materialio.us"
 
       # URL to Sponsorblock
+      # Leave blank to completely disable sponsorblock.
       VITE_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"
 
       # URL to DeArrow

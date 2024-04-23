@@ -3,7 +3,7 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 
-export const returnYTDislikesInstanceStore = persisted(
+export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
 	'returnYTDislikesInstance',
 	import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE
 );

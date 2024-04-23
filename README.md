@@ -154,6 +154,7 @@ services:
       VITE_DEFAULT_INVIDIOUS_INSTANCE: "https://invidious.materialio.us"
 
       # URL TO RYD
+      # Leave blank to disable completely.
       VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
 
       # URL to your proxied instance of Materialious

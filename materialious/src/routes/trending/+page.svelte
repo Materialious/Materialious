@@ -1,10 +1,10 @@
 <script lang="ts">
 	import VideoList from '$lib/VideoList.svelte';
-	import { activePage } from '../../store';
+	import { activePageStore } from '../../store';
 
 	export let data;
 
-	activePage.set('trending');
+	activePageStore.set('trending');
 </script>
 
 <VideoList videos={data.trending} />

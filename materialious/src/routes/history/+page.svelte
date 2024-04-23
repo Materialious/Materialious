@@ -7,9 +7,9 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { activePage } from '../../store';
+	import { activePageStore } from '../../store';
 
-	activePage.set('history');
+	activePageStore.set('history');
 
 	let history: VideoPlay[] = [];
 	let loaded = false;

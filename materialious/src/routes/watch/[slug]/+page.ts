@@ -10,12 +10,12 @@ import type { PlaylistPage } from '$lib/Api/model';
 import { phaseDescription } from '$lib/misc';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import { auth, playerProxyVideos, returnYtDislikes } from '../../../store';
+import { authStore, playerProxyVideosStore, returnYtDislikesStore } from '../../../store';
 
 export async function load({ params, url }) {
 	let video;
 	try {
-		video = await getVideo(params.slug, get(playerProxyVideos));
+		video = await getVideo(params.slug, get(playerProxyVideosStore));
 	} catch (errorMessage: any) {
 		error(500, errorMessage);
 	}
@@ -40,7 +40,7 @@ export async function load({ params, url }) {
 
 	let personalPlaylists: PlaylistPage[] | null;
 
-	if (get(auth)) {
+	if (get(authStore)) {
 		postHistory(video.videoId);
 		personalPlaylists = await getPersonalPlaylists();
 	} else {
@@ -62,7 +62,7 @@ export async function load({ params, url }) {
 
 	let returnYTDislikes;
 	try {
-		returnYTDislikes = get(returnYtDislikes) ? await getDislikes(params.slug) : null;
+		returnYTDislikes = get(returnYtDislikesStore) ? await getDislikes(params.slug) : null;
 	} catch {
 		returnYTDislikes = null;
 	}

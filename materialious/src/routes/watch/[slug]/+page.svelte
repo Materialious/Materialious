@@ -21,21 +21,21 @@
 	import { get } from 'svelte/store';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
-		activePage,
-		auth,
-		playerAutoplayNextByDefault,
-		playerListenByDefault,
-		playerTheatreModeByDefault,
-		playlistSettings,
-		syncPartyConnections,
-		syncPartyPeer
+		activePageStore,
+		authStore,
+		playerAutoplayNextByDefaultStore,
+		playerListenByDefaultStore,
+		playerTheatreModeByDefaultStore,
+		playlistSettingsStore,
+		syncPartyConnectionsStore,
+		syncPartyPeerStore
 	} from '../../../store';
 
 	export let data;
 
 	$: comments = data.comments;
 
-	activePage.set(null);
+	activePageStore.set(null);
 
 	let playlistVideos: PlaylistPageVideo[] = [];
 	let playlist: PlaylistPage | null = null;
@@ -43,13 +43,13 @@
 	let loopPlaylist: boolean = false;
 	let shufflePlaylist: boolean = false;
 
-	let theatreMode = get(playerTheatreModeByDefault);
+	let theatreMode = get(playerTheatreModeByDefaultStore);
 
-	let audioMode = get(playerListenByDefault);
+	let audioMode = get(playerListenByDefaultStore);
 	let seekTo: (time: number) => void;
 	let player: MediaPlayerElement;
 
-	playlistSettings.subscribe((playlistSetting) => {
+	playlistSettingsStore.subscribe((playlistSetting) => {
 		if (!data.playlistId) return;
 		if (data.playlistId in playlistSetting) {
 			loopPlaylist = playlistSetting[data.playlistId].loop;
@@ -193,14 +193,14 @@
 		});
 	}
 
-	syncPartyConnections.subscribe((connections) => {
+	syncPartyConnectionsStore.subscribe((connections) => {
 		if (!connections || !player) return;
 		playerSyncEvents(connections[connections.length - 1]);
 	});
 
 	onMount(async () => {
-		if ($syncPartyConnections) {
-			$syncPartyConnections.forEach((conn) => {
+		if ($syncPartyConnectionsStore) {
+			$syncPartyConnectionsStore.forEach((conn) => {
 				playerSyncEvents(conn);
 			});
 		}
@@ -208,7 +208,7 @@
 		if (player) {
 			player.addEventListener('end', () => {
 				if (!playlistVideos) {
-					if ($playerAutoplayNextByDefault) {
+					if ($playerAutoplayNextByDefaultStore) {
 						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
 					}
 					return;
@@ -236,8 +236,8 @@
 				}
 
 				if (typeof goToVideo !== 'undefined') {
-					if ($syncPartyConnections) {
-						$syncPartyConnections.forEach((conn) => {
+					if ($syncPartyConnectionsStore) {
+						$syncPartyConnectionsStore.forEach((conn) => {
 							if (typeof goToVideo === 'undefined') return;
 
 							conn.send({
@@ -360,7 +360,13 @@
 				<div
 					style="max-height: 80vh;max-width: calc(80vh * 16 / 9);overflow: hidden;position: relative;flex: 1;"
 				>
-					<Player {data} {audioMode} isSyncing={$syncPartyPeer !== null} bind:seekTo bind:player />
+					<Player
+						{data}
+						{audioMode}
+						isSyncing={$syncPartyPeerStore !== null}
+						bind:seekTo
+						bind:player
+					/>
 				</div>
 			{/key}
 		</div>
@@ -382,7 +388,7 @@
 							</div>
 						</nav>
 					</a>
-					{#if $auth}
+					{#if $authStore}
 						<button
 							on:click={toggleSubscribed}
 							class:inverse-surface={!data.subscribed}
@@ -504,7 +510,7 @@
 						<button disabled class="border no-margin">
 							<i>add</i>
 							<div class="tooltip">
-								{#if $auth}
+								{#if $authStore}
 									{$_('player.noPlaylists')}
 								{:else}
 									{$_('loginRequired')}
@@ -596,7 +602,7 @@
 							<button
 								on:click={() => (
 									(loopPlaylist = !loopPlaylist),
-									playlistSettings.set({
+									playlistSettingsStore.set({
 										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
 									})
 								)}
@@ -611,7 +617,7 @@
 							<button
 								on:click={() => (
 									(shufflePlaylist = !shufflePlaylist),
-									playlistSettings.set({
+									playlistSettingsStore.set({
 										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
 									})
 								)}

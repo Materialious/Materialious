@@ -3,12 +3,12 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import {
-		deArrowEnabled,
-		interfacePreviewVideoOnHover,
-		playerProxyVideos,
-		playerSavePlaybackPosition,
-		syncPartyConnections,
-		syncPartyPeer
+		deArrowEnabledStore,
+		interfacePreviewVideoOnHoverStore,
+		playerProxyVideosStore,
+		playerSavePlaybackPositionStore,
+		syncPartyConnectionsStore,
+		syncPartyPeerStore
 	} from '../store';
 	import { getDeArrow, getThumbnail, getVideo } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
@@ -23,7 +23,7 @@
 	let videoPreviewMuted: boolean = true;
 	let videoPreviewVolume: number = 0.4;
 
-	let proxyVideos = get(playerProxyVideos);
+	let proxyVideos = get(playerProxyVideosStore);
 
 	let watchUrl = new URL(`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${video.videoId}`);
 
@@ -31,7 +31,7 @@
 		watchUrl.searchParams.set('playlist', playlistId);
 	}
 
-	syncPartyPeer.subscribe((peer) => {
+	syncPartyPeerStore.subscribe((peer) => {
 		if (peer) {
 			watchUrl.searchParams.set('sync', peer.id);
 		}
@@ -43,7 +43,7 @@
 	let img: HTMLImageElement;
 
 	let progress: string | null;
-	if (get(playerSavePlaybackPosition)) {
+	if (get(playerSavePlaybackPositionStore)) {
 		try {
 			progress = localStorage.getItem(`v_${video.videoId}`);
 		} catch {
@@ -56,7 +56,7 @@
 	onMount(async () => {
 		let imageSrc = video.videoThumbnails[4].url;
 
-		if (get(deArrowEnabled)) {
+		if (get(deArrowEnabledStore)) {
 			let locatedThumbnail = false;
 
 			try {
@@ -131,7 +131,7 @@
 	});
 
 	function syncChangeVideo() {
-		if ($syncPartyConnections) {
+		if ($syncPartyConnectionsStore) {
 			const events = {
 				events: [{ type: 'change-video', videoId: video.videoId }]
 			} as PlayerEvents;
@@ -142,14 +142,14 @@
 					playlistId: playlistId
 				});
 			}
-			$syncPartyConnections.forEach((conn) => {
+			$syncPartyConnectionsStore.forEach((conn) => {
 				conn.send(events);
 			});
 		}
 	}
 
 	async function previewVideo() {
-		if (!get(interfacePreviewVideoOnHover)) return;
+		if (!get(interfacePreviewVideoOnHoverStore)) return;
 
 		showVideoPreview = true;
 		try {
@@ -261,7 +261,7 @@
 		<div class="max">
 			<a
 				href={watchUrl.toString()}
-                                data-sveltekit-preload-data="off"
+				data-sveltekit-preload-data="off"
 				style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
 				><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
 					{video.title}

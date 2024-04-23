@@ -8,13 +8,13 @@
 	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
-		playerAlwaysLoop,
-		playerAutoPlay,
-		playerDash,
-		playerProxyVideos,
-		playerSavePlaybackPosition,
-		sponsorBlockCategories,
-		sponsorBlockUrl
+		playerAlwaysLoopStore,
+		playerAutoPlayStore,
+		playerDashStore,
+		playerProxyVideosStore,
+		playerSavePlaybackPositionStore,
+		sponsorBlockCategoriesStore,
+		sponsorBlockUrlStore
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
 	import { proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
@@ -36,7 +36,7 @@
 		}
 	}
 
-	const proxyVideos = get(playerProxyVideos);
+	const proxyVideos = get(playerProxyVideosStore);
 
 	onMount(async () => {
 		if (!data.video.hlsUrl) {
@@ -80,18 +80,18 @@
 				savePlayerPos();
 			});
 
-			if (get(sponsorBlockCategories)) {
-				const currentCategories = get(sponsorBlockCategories);
+			if (get(sponsorBlockCategoriesStore)) {
+				const currentCategories = get(sponsorBlockCategoriesStore);
 
-				const sponsorBlockInstance = get(sponsorBlockUrl);
+				const sponsorBlockUrl = get(sponsorBlockUrlStore);
 
-				if (currentCategories.length > 0 && sponsorBlockInstance && sponsorBlockInstance !== '') {
-					const sponsorBlock = new SponsorBlock('', { baseURL: sponsorBlockInstance });
+				if (currentCategories.length > 0 && sponsorBlockUrl && sponsorBlockUrl !== '') {
+					const sponsorBlock = new SponsorBlock('', { baseURL: sponsorBlockUrl });
 
 					try {
 						const segments = await sponsorBlock.getSegments(
 							data.video.videoId,
-							get(sponsorBlockCategories) as Category[]
+							get(sponsorBlockCategoriesStore) as Category[]
 						);
 
 						player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
@@ -113,7 +113,7 @@
 				}
 			}
 
-			if (get(playerDash)) {
+			if (get(playerDashStore)) {
 				player.addEventListener('dash-can-play', () => {
 					loadPlayerPos();
 				});
@@ -183,7 +183,7 @@
 	function loadPlayerPos() {
 		if (playerPosSet) return;
 		playerPosSet = true;
-		if (get(playerSavePlaybackPosition)) {
+		if (get(playerSavePlaybackPositionStore)) {
 			try {
 				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
 				if (playerPos) {
@@ -197,7 +197,7 @@
 		if (data.video.hlsUrl) return;
 
 		try {
-			if (get(playerSavePlaybackPosition) && player.currentTime) {
+			if (get(playerSavePlaybackPositionStore) && player.currentTime) {
 				if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
 					localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());
 				} else {
@@ -219,8 +219,8 @@
 
 <media-player
 	bind:this={player}
-	autoPlay={$playerAutoPlay && !isSyncing}
-	loop={$playerAlwaysLoop}
+	autoPlay={$playerAutoPlayStore && !isSyncing}
+	loop={$playerAlwaysLoopStore}
 	title={data.video.title}
 	streamType={playerIsLive ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}

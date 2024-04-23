@@ -3,52 +3,52 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 
-export const returnYTDislikesInstance = persisted(
+export const returnYTDislikesInstanceStore = persisted(
 	'returnYTDislikesInstance',
 	import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE
 );
-export const darkMode: Writable<null | boolean> = persisted('darkMode', null);
-export const themeColor: Writable<null | string> = persisted('themeColor', null);
+export const darkModeStore: Writable<null | boolean> = persisted('darkMode', null);
+export const themeColorStore: Writable<null | string> = persisted('themeColor', null);
 
-export const activePage: Writable<string | null> = writable('home');
+export const activePageStore: Writable<string | null> = writable('home');
 
-export const playerAutoPlay = persisted('autoPlay', true);
-export const playerAlwaysLoop = persisted('alwaysLoop', false);
-export const playerProxyVideos = persisted('proxyVideos', false);
-export const playerListenByDefault = persisted('listenByDefault', false);
-export const playerSavePlaybackPosition = persisted('savePlaybackPosition', true);
-export const playerDash = persisted('dashEnabled', false);
-export const playerTheatreModeByDefault = persisted('theatreModeByDefault', false);
-export const playerAutoplayNextByDefault = persisted('autoplayNextByDefault', false);
+export const playerAutoPlayStore = persisted('autoPlay', true);
+export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
+export const playerProxyVideosStore = persisted('proxyVideos', false);
+export const playerListenByDefaultStore = persisted('listenByDefault', false);
+export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
+export const playerDashStore = persisted('dashEnabled', false);
+export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
+export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 
-export const returnYtDislikes = persisted('returnYtDislikes', false);
+export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 
-export const interfaceSearchSuggestions = persisted('searchSuggestions', true);
-export const interfacePreviewVideoOnHover = persisted('previewVideoOnHover', true);
+export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
+export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover', true);
 
-export const auth: Writable<null | { username: string; token: string; }> = persisted(
+export const authStore: Writable<null | { username: string; token: string; }> = persisted(
 	'authToken',
 	null
 );
 
-export const sponsorBlock = persisted('sponsorBlock', true);
-export const sponsorBlockUrl: Writable<string | null | undefined> = persisted(
+export const sponsorBlockStore = persisted('sponsorBlock', true);
+export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(
 	'sponsorBlockUrl',
 	import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE
 );
-export const sponsorBlockCategories: Writable<string[]> = persisted('sponsorBlockCategories', []);
+export const sponsorBlockCategoriesStore: Writable<string[]> = persisted('sponsorBlockCategories', []);
 
-export const deArrowInstance = persisted(
+export const deArrowInstanceStore = persisted(
 	'deArrowInstance',
 	import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE
 );
-export const deArrowEnabled = persisted('deArrowEnabled', false);
-export const deArrowThumbnailInstance = persisted(
+export const deArrowEnabledStore = persisted('deArrowEnabled', false);
+export const deArrowThumbnailInstanceStore = persisted(
 	'deArrowThumbnailInstance',
 	import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE
 );
 
-export const syncPartyPeer: Writable<Peer | null> = writable(null);
-export const syncPartyConnections: Writable<DataConnection[] | null> = writable();
+export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
+export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writable();
 
-export const playlistSettings: Writable<Record<string, { shuffle: boolean, loop: boolean; }>> = writable({});
+export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean, loop: boolean; }>> = writable({});

@@ -9,11 +9,11 @@
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
-	import { activePage, auth } from '../../../store';
+	import { activePageStore, authStore } from '../../../store';
 
 	export let data;
 
-	activePage.set(null);
+	activePageStore.set(null);
 
 	let isSubscribed = false;
 
@@ -60,7 +60,7 @@
 	onMount(async () => {
 		displayContent = await getChannelContent(data.channel.authorId, { type: 'videos' });
 
-		if (get(auth)) {
+		if (get(authStore)) {
 			isSubscribed = await amSubscribed(data.channel.authorId);
 		}
 	});

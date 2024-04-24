@@ -207,7 +207,7 @@
 
 		if (player) {
 			player.addEventListener('end', () => {
-				if (!playlistVideos) {
+				if (playlistVideos.length === 0) {
 					if ($playerAutoplayNextByDefaultStore) {
 						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
 					}

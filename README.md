@@ -144,7 +144,7 @@ Please ensure you have followed the previous steps before doing this!
 version: "3"
 services:
   materialious:
-    image: wardpearce/materialious
+    image: wardpearce/materialious:latest
     restart: unless-stopped
     ports:
       - 3001:80
@@ -169,6 +169,17 @@ services:
 
       # URL to DeArrow thumbnail instance
       VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
+```
+
+## Step 4 (Optional): Self-host PeerJS
+[Read the official guide.](https://github.com/peers/peerjs-server?tab=readme-ov-file#docker)
+
+Add these additional environment variables to Materialious.
+```yaml
+# Will differ depending on how you self-host peerjs.
+VITE_DEFAULT_PEERJS_HOST: "peerjs.example.com"
+VITE_DEFAULT_PEERJS_PATH: "/"
+VITE_DEFAULT_PEERJS_PORT: 443
 ```
 
 # Previews

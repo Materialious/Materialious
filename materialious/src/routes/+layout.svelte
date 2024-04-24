@@ -8,7 +8,7 @@
 	import Search from '$lib/Search.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl, bookmarkletSaveToUrl } from '$lib/bookmarklet';
-	import { removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
+	import { peerJsOptions, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import 'beercss';
 	import 'material-dynamic-colors';
@@ -132,11 +132,13 @@
 
 		const peerId = crypto.randomUUID();
 		setWindowQueryFlag('sync', peerId);
-		$syncPartyPeerStore = new Peer(peerId);
+		$syncPartyPeerStore = new Peer(peerId, peerJsOptions());
 
 		if ($syncPartyPeerStore) {
 			$syncPartyPeerStore.on('connection', (conn) => {
 				conn.on('open', () => {
+					ui('#sync-party-connection-join');
+
 					if ($page.url.pathname.startsWith('/watch')) {
 						const paths = $page.url.pathname.split('/');
 						if (paths.length > 2) {
@@ -152,6 +154,10 @@
 					}
 					changeVideoEvent(conn);
 					syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
+				});
+
+				conn.on('close', () => {
+					ui('#sync-party-connection-left');
 				});
 			});
 		}
@@ -248,7 +254,7 @@
 		const currentUrl = get(page).url;
 		const syncId = currentUrl.searchParams.get('sync');
 		if (syncId) {
-			$syncPartyPeerStore = new Peer(crypto.randomUUID());
+			$syncPartyPeerStore = new Peer(crypto.randomUUID(), peerJsOptions());
 			$syncPartyPeerStore.on('open', () => {
 				if (!$syncPartyPeerStore) return;
 
@@ -779,6 +785,16 @@
 		{/if}
 	</button>
 </dialog>
+
+<div class="snackbar" id="sync-party-connection-join">
+	<i>person_add</i>
+	<span>{$_('syncParty.userJoined')}</span>
+</div>
+
+<div class="snackbar" id="sync-party-connection-left">
+	<i>person_remove</i>
+	<span>{$_('syncParty.userLeft')}</span>
+</div>
 
 <main class="responsive max root">
 	{#if $navigating}

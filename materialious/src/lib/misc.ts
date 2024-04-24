@@ -1,6 +1,7 @@
 import { pushState } from '$app/navigation';
 import { page } from '$app/stores';
 import humanNumber from 'human-number';
+import type { PeerOptions } from 'peerjs';
 import { get } from 'svelte/store';
 
 export function truncate(value: string, maxLength: number = 50): string {
@@ -123,4 +124,12 @@ export function removeWindowQueryFlag(key: string) {
 	const currentPage = get(page);
 	currentPage.url.searchParams.delete(key);
 	pushState(currentPage.url, currentPage.state);
+}
+
+export function peerJsOptions(): PeerOptions {
+	return {
+		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
+		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
+		port: Number(import.meta.env.VITE_DEFAULT_PEERJS_PORT) || 443
+	};
 }

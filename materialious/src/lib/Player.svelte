@@ -209,6 +209,7 @@
 
 	onDestroy(() => {
 		savePlayerPos();
+		player.pause();
 		player.destroy();
 	});
 </script>

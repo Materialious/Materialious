@@ -94,7 +94,7 @@
 							mockVideo.id = 'video';
 							mockVideo.crossOrigin = import.meta.env.VITE_DEFAULT_FRONTEND_URL;
 							const videoToThumbnail = (await getVideo(video.videoId)).formatStreams[0].url;
-							mockVideo.src = proxyVideos ? proxyVideoUrl(videoToThumbnail) : videoToThumbnail;
+							mockVideo.src = proxyVideoUrl(videoToThumbnail);
 
 							mockVideo.addEventListener('loadeddata', () => {
 								mockVideo.currentTime = mockVideo.duration / 100;

@@ -51,12 +51,8 @@ export async function load({ params, url }) {
 	try {
 		comments = video.liveNow
 			? null
-			: await getComments(params.slug, { sort_by: 'top', source: 'youtube' });
+			: getComments(params.slug, { sort_by: 'top', source: 'youtube' });
 	} catch {
-		comments = null;
-	}
-
-	if (comments && 'errorBacktrace' in comments) {
 		comments = null;
 	}
 
@@ -64,18 +60,20 @@ export async function load({ params, url }) {
 	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
 	if (returnYTDislikesInstance && returnYTDislikesInstance !== "") {
 		try {
-			returnYTDislikes = get(returnYtDislikesStore) ? await getDislikes(params.slug) : null;
+			returnYTDislikes = get(returnYtDislikesStore) ? getDislikes(params.slug) : null;
 		} catch { }
 	}
 
 	return {
 		video: video,
-		returnYTDislikes: returnYTDislikes,
-		comments: comments,
-		subscribed: await amSubscribed(video.authorId),
 		content: phaseDescription(video.descriptionHtml),
 		playlistId: url.searchParams.get('playlist'),
 		personalPlaylists: personalPlaylists,
-		downloadOptions: downloadOptions
+		downloadOptions: downloadOptions,
+		streamed: {
+			returnYTDislikes: returnYTDislikes,
+			comments: comments,
+			subscribed: amSubscribed(video.authorId),
+		}
 	};
 }

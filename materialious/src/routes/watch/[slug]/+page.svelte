@@ -9,7 +9,7 @@
 		postSubscribe,
 		removePlaylistVideo
 	} from '$lib/Api/index.js';
-	import type { PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
+	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
@@ -33,7 +33,15 @@
 
 	export let data;
 
-	$: comments = data.comments;
+	let comments: Comments | null = null;
+	data.streamed.comments?.then((streamedComments) => {
+		comments = streamedComments;
+	});
+
+	let subscribed: boolean = false;
+	data.streamed.subscribed.then((isSubbed) => {
+		subscribed = isSubbed;
+	});
 
 	activePageStore.set(null);
 
@@ -335,13 +343,13 @@
 	}
 
 	async function toggleSubscribed() {
-		if (data.subscribed) {
+		if (subscribed) {
 			await deleteUnsubscribe(data.video.authorId);
 		} else {
 			await postSubscribe(data.video.authorId);
 		}
 
-		data.subscribed = !data.subscribed;
+		subscribed = !subscribed;
 	}
 
 	async function toggleTheatreMode() {
@@ -391,10 +399,10 @@
 					{#if $authStore}
 						<button
 							on:click={toggleSubscribed}
-							class:inverse-surface={!data.subscribed}
-							class:border={data.subscribed}
+							class:inverse-surface={!subscribed}
+							class:border={subscribed}
 						>
-							{#if !data.subscribed}
+							{#if !subscribed}
 								{$_('subscribe')}
 							{:else}
 								{$_('unsubscribe')}
@@ -411,18 +419,20 @@
 				</nav>
 			</div>
 			<div class="s12 m12 l7 video-actions">
-				{#if data.returnYTDislikes}
-					<nav class="no-space" style="margin-right: .5em;">
-						<button style="cursor: default;" class="border left-round">
-							<i class="small">thumb_up</i>
-							<span>{cleanNumber(data.returnYTDislikes.likes)}</span>
-						</button>
-						<button style="cursor: default;" class="border right-round">
-							<i class="small">thumb_down_alt</i>
-							<span>{cleanNumber(data.returnYTDislikes.dislikes)}</span>
-						</button>
-					</nav>
-				{/if}
+				{#await data.streamed.returnYTDislikes then returnYTDislikes}
+					{#if returnYTDislikes}
+						<nav class="no-space" style="margin-right: .5em;">
+							<button style="cursor: default;" class="border left-round">
+								<i class="small">thumb_up</i>
+								<span>{cleanNumber(returnYTDislikes.likes)}</span>
+							</button>
+							<button style="cursor: default;" class="border right-round">
+								<i class="small">thumb_down_alt</i>
+								<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
+							</button>
+						</nav>
+					{/if}
+				{/await}
 
 				<div>
 					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
@@ -564,7 +574,7 @@
 		</article>
 
 		<div class="space"></div>
-		{#if comments !== null && comments.comments !== undefined && comments.comments.length > 0}
+		{#if comments && comments.comments.length > 0}
 			<h6>{numberWithCommas(comments.commentCount)} comments</h6>
 			{#each comments.comments as comment}
 				<Comment {comment} videoId={data.video.videoId}></Comment>

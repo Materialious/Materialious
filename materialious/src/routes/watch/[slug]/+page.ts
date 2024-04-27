@@ -6,7 +6,6 @@ import {
 	getVideo,
 	postHistory
 } from '$lib/Api/index.js';
-import type { PlaylistPage } from '$lib/Api/model';
 import { phaseDescription } from '$lib/misc';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
@@ -38,11 +37,10 @@ export async function load({ params, url }) {
 		});
 	}
 
-	let personalPlaylists: PlaylistPage[] | null;
-
+	let personalPlaylists;
 	if (get(authStore)) {
 		postHistory(video.videoId);
-		personalPlaylists = await getPersonalPlaylists();
+		personalPlaylists = getPersonalPlaylists();
 	} else {
 		personalPlaylists = null;
 	}
@@ -68,9 +66,9 @@ export async function load({ params, url }) {
 		video: video,
 		content: phaseDescription(video.descriptionHtml),
 		playlistId: url.searchParams.get('playlist'),
-		personalPlaylists: personalPlaylists,
 		downloadOptions: downloadOptions,
 		streamed: {
+			personalPlaylists: personalPlaylists,
 			returnYTDislikes: returnYTDislikes,
 			comments: comments,
 			subscribed: amSubscribed(video.authorId),

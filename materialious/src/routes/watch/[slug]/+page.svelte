@@ -39,9 +39,12 @@
 	});
 
 	let subscribed: boolean = false;
-	data.streamed.subscribed.then((isSubbed) => {
-		subscribed = isSubbed;
+	data.streamed.subscribed.then((streamedIsSubbed) => {
+		subscribed = streamedIsSubbed;
 	});
+
+	let personalPlaylists: PlaylistPage[] | null = null;
+	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
 
 	activePageStore.set(null);
 
@@ -303,9 +306,9 @@
 	}
 
 	async function toggleVideoToPlaylist(playlistId: string) {
-		if (!data.personalPlaylists) return;
+		if (!personalPlaylists) return;
 
-		const selectedPlaylist = data.personalPlaylists.filter((item) => {
+		const selectedPlaylist = personalPlaylists.filter((item) => {
 			return item.playlistId === playlistId;
 		});
 
@@ -325,7 +328,7 @@
 			await addPlaylistVideo(playlistId, data.video.videoId);
 		}
 
-		data.personalPlaylists = await getPersonalPlaylists();
+		personalPlaylists = await getPersonalPlaylists();
 	}
 
 	async function loadMoreComments() {
@@ -492,12 +495,12 @@
 							</menu></button
 						>
 					{/if}
-					{#if data.personalPlaylists}
+					{#if personalPlaylists}
 						<button class="border">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
 							<menu class="no-wrap">
-								{#each data.personalPlaylists as personalPlaylist}
+								{#each personalPlaylists as personalPlaylist}
 									<a
 										href="#add"
 										on:click={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}

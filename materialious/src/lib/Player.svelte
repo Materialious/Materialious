@@ -17,7 +17,7 @@
 		sponsorBlockUrlStore
 	} from '../store';
 	import type { VideoPlay } from './Api/model';
-	import { proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
+	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
 	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -230,7 +230,8 @@
 >
 	<media-provider>
 		{#if !audioMode}
-			<media-poster class="vds-poster" src={data.video.videoThumbnails[0].url}></media-poster>
+			<media-poster class="vds-poster" src={getBestThumbnail(data.video.videoThumbnails)}
+			></media-poster>
 		{/if}
 	</media-provider>
 	<media-audio-layout></media-audio-layout>

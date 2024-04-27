@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import type { Playlist } from './Api/model';
-	import { truncate } from './misc';
+	import { getBestThumbnail, truncate } from './misc';
 
 	export let playlist: Playlist;
 	export let disabled: boolean = false;
@@ -17,7 +17,7 @@
 	onMount(() => {
 		img = new Image();
 		if (playlist.videos.length > 0) {
-			img.src = playlist.videos[0].videoThumbnails[4].url;
+			img.src = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
 		} else if (playlist.playlistThumbnail) {
 			img.src = playlist.playlistThumbnail;
 		} else {

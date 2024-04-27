@@ -87,42 +87,50 @@
 			src={getBestThumbnail(data.channel.authorThumbnails)}
 			alt="Channel profile"
 		/>
+
 		<div>
 			<h2>{data.channel.author}</h2>
 			<p>{cleanNumber(data.channel.subCount)} {$_('subscribers')}</p>
 			<p style="width: 60vw;">{data.channel.description}</p>
 		</div>
-		<button
-			on:click={toggleSubscribed}
-			class:inverse-surface={!isSubscribed}
-			class:border={isSubscribed}
-		>
-			{#if !isSubscribed}
-				{$_('subscribe')}
-			{:else}
-				{$_('unsubscribe')}
-			{/if}
-		</button>
-		<button class="border">
-			<i>share</i>
-			<span>{$_('player.share.title')}</span>
-			<menu class="no-wrap">
-				<a
-					href="#share"
-					on:click={async () => {
-						await navigator.clipboard.writeText(location.href);
-					}}>{$_('player.share.materialiousLink')}</a
+		<div class="grid no-padding">
+			<div class="s12 m12 l5">
+				<button
+					on:click={toggleSubscribed}
+					class:inverse-surface={!isSubscribed}
+					class:border={isSubscribed}
 				>
-				<a
-					href="#share"
-					on:click={async () => {
-						await navigator.clipboard.writeText(
-							`https://www.youtube.com/channel/${data.channel.authorId}`
-						);
-					}}>{$_('player.share.youtubeLink')}</a
-				>
-			</menu>
-		</button>
+					{#if !isSubscribed}
+						{$_('subscribe')}
+					{:else}
+						{$_('unsubscribe')}
+					{/if}
+				</button>
+			</div>
+
+			<div class="s12 m12 l5">
+				<button class="border">
+					<i>share</i>
+					<span>{$_('player.share.title')}</span>
+					<menu class="no-wrap">
+						<a
+							href="#share"
+							on:click={async () => {
+								await navigator.clipboard.writeText(location.href);
+							}}>{$_('player.share.materialiousLink')}</a
+						>
+						<a
+							href="#share"
+							on:click={async () => {
+								await navigator.clipboard.writeText(
+									`https://www.youtube.com/channel/${data.channel.authorId}`
+								);
+							}}>{$_('player.share.youtubeLink')}</a
+						>
+					</menu>
+				</button>
+			</div>
+		</div>
 	</div>
 
 	<div class="tabs left-align scroll">
@@ -191,6 +199,12 @@
 		display: flex;
 		padding: 1em 0;
 		justify-content: center;
+	}
+
+	@media screen and (max-width: 580px) {
+		.description {
+			flex-direction: column;
+		}
 	}
 
 	.tabs {

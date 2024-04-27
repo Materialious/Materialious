@@ -13,7 +13,7 @@
 	import Comment from '$lib/Comment.svelte';
 	import Player from '$lib/Player.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { cleanNumber, numberWithCommas, unsafeRandomItem } from '$lib/misc';
+	import { cleanNumber, getBestThumbnail, numberWithCommas, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
@@ -379,7 +379,7 @@
 						<nav>
 							<img
 								class="circle large"
-								src={data.video.authorThumbnails[2].url}
+								src={getBestThumbnail(data.video.authorThumbnails)}
 								alt="Channel profile"
 							/>
 							<div>

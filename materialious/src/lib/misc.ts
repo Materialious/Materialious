@@ -3,6 +3,7 @@ import { page } from '$app/stores';
 import humanNumber from 'human-number';
 import type { PeerOptions } from 'peerjs';
 import { get } from 'svelte/store';
+import type { Image } from './Api/model';
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
@@ -132,4 +133,16 @@ export function peerJsOptions(): PeerOptions {
 		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
 		port: Number(import.meta.env.VITE_DEFAULT_PEERJS_PORT) || 443
 	};
+}
+
+export function getBestThumbnail(images: Image[] | null): string | null {
+	if (images && images.length > 0) {
+		images.sort((a, b) => {
+			return (b.width * b.height) - (a.width * a.height);
+		});
+
+		return images[0].url;
+	} else {
+		return null;
+	}
 }

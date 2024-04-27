@@ -12,7 +12,7 @@
 	} from '../store';
 	import { getDeArrow, getThumbnail, getVideo } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
-	import { cleanNumber, proxyVideoUrl, videoLength } from './misc';
+	import { cleanNumber, getBestThumbnail, proxyVideoUrl, videoLength } from './misc';
 	import type { PlayerEvents } from './player';
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -54,7 +54,7 @@
 	}
 
 	onMount(async () => {
-		let imageSrc = video.videoThumbnails[4].url;
+		let imageSrc = getBestThumbnail(video.videoThumbnails);
 
 		if (get(deArrowEnabledStore)) {
 			let locatedThumbnail = false;

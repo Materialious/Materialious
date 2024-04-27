@@ -4,7 +4,7 @@
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { cleanNumber } from '$lib/misc';
+	import { cleanNumber, getBestThumbnail } from '$lib/misc';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
@@ -84,7 +84,7 @@
 		<img
 			style="margin-right: 1em;"
 			class="circle extra m l"
-			src={data.channel.authorThumbnails[5].url}
+			src={getBestThumbnail(data.channel.authorThumbnails)}
 			alt="Channel profile"
 		/>
 		<div>

@@ -579,7 +579,7 @@
 
 		<form on:submit|preventDefault={() => returnYTDislikesInstanceStore.set(returnYTInstance)}>
 			<nav>
-				<div class="field label border">
+				<div class="field label border max">
 					<input bind:value={returnYTInstance} name="returnyt-instance" type="text" />
 					<label for="returnyt-instance">{$_('layout.instanceUrl')}</label>
 				</div>
@@ -609,7 +609,7 @@
 
 		<form on:submit|preventDefault={() => sponsorBlockUrlStore.set(sponsorBlockInstance)}>
 			<nav>
-				<div class="field label border">
+				<div class="field label border max">
 					<input bind:value={sponsorBlockInstance} name="sponsorblock-instance" type="text" />
 					<label for="sponsorblock-instance">{$_('layout.instanceUrl')}</label>
 				</div>
@@ -657,7 +657,7 @@
 
 		<form on:submit|preventDefault={() => deArrowInstanceStore.set(deArrowUrl)}>
 			<nav>
-				<div class="field label border">
+				<div class="field label border max">
 					<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
 					<label for="dearrow-instance">{$_('layout.instanceUrl')}</label>
 				</div>
@@ -669,7 +669,7 @@
 
 		<form on:submit|preventDefault={() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl)}>
 			<nav>
-				<div class="field label border">
+				<div class="field label border max">
 					<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
 					<label for="dearrow-thumbnail-instance">{$_('layout.deArrow.thumbnailInstanceUrl')}</label
 					>
@@ -752,7 +752,7 @@
 	<p>{$_('layout.syncPartyWarning')}</p>
 	{#if $syncPartyPeerStore}
 		<nav>
-			<div class="field label border">
+			<div class="field label border max">
 				<input
 					name="sync-share"
 					readonly

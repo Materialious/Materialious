@@ -576,15 +576,28 @@
 			</details>
 		</article>
 
-		<div class="space"></div>
 		{#if comments && comments.comments.length > 0}
-			<h6>{numberWithCommas(comments.commentCount)} comments</h6>
-			{#each comments.comments as comment}
-				<Comment {comment} videoId={data.video.videoId}></Comment>
-			{/each}
-			{#if comments.continuation}
-				<button on:click={loadMoreComments} class="margin">{$_('loadMore')}</button>
-			{/if}
+			<article>
+				<details open>
+					<summary class="none bold">
+						<nav>
+							<div class="max">{numberWithCommas(comments.commentCount)} comments</div>
+							<i>expand_more</i>
+						</nav>
+					</summary>
+
+					<div class="space"></div>
+
+					<div class="medium scroll">
+						{#each comments.comments as comment}
+							<Comment {comment} videoId={data.video.videoId}></Comment>
+						{/each}
+						{#if comments.continuation}
+							<button on:click={loadMoreComments} class="margin">{$_('loadMore')}</button>
+						{/if}
+					</div>
+				</details>
+			</article>
 		{:else}
 			<h6>{$_('player.unableToLoadComments')}</h6>
 		{/if}

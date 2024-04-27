@@ -171,7 +171,83 @@ services:
       VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
 ```
 
-## Step 4 (Optional): Self-host PeerJS
+## Step 4 (Optional, but recommended): Self-host RYD-Proxy
+
+### Step 1: Docker compose
+Add the following to your docker compose file.
+
+#### With TOR (Recommended)
+```yml
+tor-proxy:
+  image: 1337kavin/alpine-tor:latest
+  restart: unless-stopped
+  environment:
+    - tors=15
+
+ryd-proxy:
+  image: 1337kavin/ryd-proxy:latest
+  restart: unless-stopped
+  depends_on:
+    - tor-proxy
+  environment:
+    - PROXY=socks5://tor-proxy:5566
+  ports:
+    - "127.0.0.1:3003:3000"
+```
+#### Without TOR
+```yml
+ryd-proxy:
+  image: 1337kavin/ryd-proxy:latest
+  restart: unless-stopped
+  ports:
+    - "127.0.0.1:3003:3000"
+```
+
+### Step 2:
+Reverse proxy RYD-Proxy.
+
+#### Caddy example
+```caddy
+ryd-proxy.example.com {
+  header Access-Control-Allow-Origin "https://materialious.example.com" {
+      defer
+  }
+  header Access-Control-Allow-Methods "GET,OPTIONS"
+  reverse_proxy localhost:3003
+}
+```
+
+#### Nginx example
+```nginx
+server {
+    listen 80;
+    server_name ryd-proxy.example.com;
+
+    location / {
+        add_header Access-Control-Allow-Origin "https://materialious.example.com" always;
+        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        proxy_pass http://localhost:3003;
+    }
+}
+```
+
+#### Traefik example
+Add this middleware to your RYD-Proxy instance:
+```yaml
+http:
+  middlewares:
+    ryd-proxy:
+      headers:
+        accessControlAllowOriginList: "https://materialious.example.com"
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+```
+
+### Step 3:
+Modify/add `VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.
+
+## Step 5 (Optional): Self-host PeerJS
 [Read the official guide.](https://github.com/peers/peerjs-server?tab=readme-ov-file#docker)
 
 Add these additional environment variables to Materialious.

@@ -15,6 +15,8 @@
 [Help translate Materialious!](https://fink.inlang.com/github.com/WardPearce/Materialious)
 
 # Features
+- [Syncios integration!](https://github.com/WardPearce/syncious)
+  - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
@@ -247,7 +249,30 @@ http:
 ### Step 3:
 Modify/add `VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.
 
-## Step 5 (Optional): Self-host PeerJS
+## Step 5 (Optional, but recommended): Self-host Syncios
+Sync your watch progress between Invidious sessions.
+
+### Step 1: Docker compose
+Add the following to your docker compose
+
+```yaml
+services:
+  syncious:
+    image: wardpearce/syncious:latest
+    restart: unless-stopped
+    ports:
+      - 3004:80
+    environment:
+      syncious_postgre: '{"host": "invidious-db", "port": 5432, "database": "invidious", "user": "kemal", "password": "kemal"}'
+      syncious_allowed_origins: '["https://materialios.example.com"]'
+      syncious_debug: false
+
+      # No trailing backslashes!
+      syncious_invidious_instance: "https://invidious.example.com"
+      syncious_production_instance: "https://syncious.example.com"
+```
+
+## Step 6 (Optional): Self-host PeerJS
 [Read the official guide.](https://github.com/peers/peerjs-server?tab=readme-ov-file#docker)
 
 Add these additional environment variables to Materialious.

@@ -3,14 +3,16 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import {
+		authStore,
 		deArrowEnabledStore,
 		interfacePreviewVideoOnHoverStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		syncPartyConnectionsStore,
-		syncPartyPeerStore
+		syncPartyPeerStore,
+		synciousStore
 	} from '../store';
-	import { getDeArrow, getThumbnail, getVideo } from './Api';
+	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
 	import { cleanNumber, getBestThumbnail, proxyVideoUrl, videoLength } from './misc';
 	import type { PlayerEvents } from './player';
@@ -128,6 +130,12 @@
 		img.onerror = () => {
 			loading = false;
 		};
+
+		if (get(synciousStore) && get(authStore)) {
+			try {
+				progress = (await getVideoProgress(video.videoId))[0].time.toString();
+			} catch {}
+		}
 	});
 
 	function syncChangeVideo() {

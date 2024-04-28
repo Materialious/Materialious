@@ -191,14 +191,14 @@
 				try {
 					player.currentTime = (await getVideoProgress(data.video.videoId))[0].time;
 				} catch {}
+			} else {
+				try {
+					const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
+					if (playerPos) {
+						player.currentTime = Number(playerPos);
+					}
+				} catch {}
 			}
-
-			try {
-				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-				if (playerPos) {
-					player.currentTime = Number(playerPos);
-				}
-			} catch {}
 		}
 	}
 

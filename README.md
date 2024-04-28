@@ -272,6 +272,11 @@ services:
       syncious_production_instance: "https://syncious.example.com"
 ```
 
+Add these additional environment variables to Materialious.
+```yaml
+VITE_DEFAULT_SYNCIOUS_INSTANCE: "https://syncious.example.com"
+```
+
 ## Step 6 (Optional): Self-host PeerJS
 [Read the official guide.](https://github.com/peers/peerjs-server?tab=readme-ov-file#docker)
 

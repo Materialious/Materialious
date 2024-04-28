@@ -192,7 +192,7 @@ ryd-proxy:
   environment:
     - PROXY=socks5://tor-proxy:5566
   ports:
-    - "127.0.0.1:3003:3000"
+    - 3003:3000
 ```
 #### Without TOR
 ```yml
@@ -200,7 +200,7 @@ ryd-proxy:
   image: 1337kavin/ryd-proxy:latest
   restart: unless-stopped
   ports:
-    - "127.0.0.1:3003:3000"
+    - 3003:3000
 ```
 
 ### Step 2:

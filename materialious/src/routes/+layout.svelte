@@ -42,6 +42,8 @@
 		sponsorBlockUrlStore,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore,
+		synciousInstanceStore,
+		synciousStore,
 		themeColorStore
 	} from '../store';
 
@@ -61,6 +63,7 @@
 	let notifications: Notification[] = [];
 
 	let sponsorBlockInstance = get(sponsorBlockUrlStore);
+	let synciousInstance = get(synciousInstanceStore);
 	let returnYTInstance = get(returnYTDislikesInstanceStore);
 	let deArrowUrl = get(deArrowInstanceStore);
 	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
@@ -597,6 +600,36 @@
 				<input
 					bind:checked={$returnYtDislikesStore}
 					on:click={() => returnYtDislikesStore.set(!$returnYtDislikesStore)}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+
+	<div class="settings">
+		<h6>Syncious</h6>
+
+		<form on:submit|preventDefault={() => synciousInstanceStore.set(synciousInstance)}>
+			<nav>
+				<div class="field label border max">
+					<input bind:value={synciousInstance} name="syncious-instance" type="text" />
+					<label for="syncious-instance">{$_('layout.instanceUrl')}</label>
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>{$_('enabled')}</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$synciousStore}
+					on:click={() => synciousStore.set(!$synciousStore)}
 					type="checkbox"
 				/>
 				<span></span>

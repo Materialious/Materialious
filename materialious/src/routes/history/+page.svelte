@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deleteHistory, getHistory, getVideo } from '$lib/Api';
+	import { deleteAllVideoProgress, deleteHistory, getHistory, getVideo } from '$lib/Api';
 	import type { VideoPlay } from '$lib/Api/model';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import VideoList from '$lib/VideoList.svelte';
@@ -7,7 +7,8 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { activePageStore } from '../../store';
+	import { get } from 'svelte/store';
+	import { activePageStore, synciousStore } from '../../store';
 
 	activePageStore.set('history');
 
@@ -62,6 +63,11 @@
 	<button
 		on:click={async () => {
 			await deleteHistory();
+
+			if (get(synciousStore)) {
+				deleteAllVideoProgress();
+			}
+
 			history = [];
 			try {
 				Object.keys(localStorage).forEach((key) => {

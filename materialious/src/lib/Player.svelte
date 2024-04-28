@@ -8,14 +8,17 @@
 	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
+		authStore,
 		playerAlwaysLoopStore,
 		playerAutoPlayStore,
 		playerDashStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		sponsorBlockCategoriesStore,
-		sponsorBlockUrlStore
+		sponsorBlockUrlStore,
+		synciousStore
 	} from '../store';
+	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
 	import type { VideoPlay } from './Api/model';
 	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
 	import { getDynamicTheme } from './theme';
@@ -114,8 +117,8 @@
 			}
 
 			if (get(playerDashStore)) {
-				player.addEventListener('dash-can-play', () => {
-					loadPlayerPos();
+				player.addEventListener('dash-can-play', async () => {
+					await loadPlayerPos();
 				});
 
 				src = [{ src: data.video.dashUrl + '?local=true', type: 'application/dash+xml' }];
@@ -180,10 +183,16 @@
 		document.documentElement.style.setProperty('--audio-bg', currentTheme['--surface']);
 	});
 
-	function loadPlayerPos() {
+	async function loadPlayerPos() {
 		if (playerPosSet) return;
 		playerPosSet = true;
 		if (get(playerSavePlaybackPositionStore)) {
+			if (get(synciousStore) && get(authStore)) {
+				try {
+					player.currentTime = (await getVideoProgress(data.video.videoId))[0].time;
+				} catch {}
+			}
+
 			try {
 				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
 				if (playerPos) {
@@ -196,15 +205,25 @@
 	function savePlayerPos() {
 		if (data.video.hlsUrl) return;
 
-		try {
-			if (get(playerSavePlaybackPositionStore) && player.currentTime) {
-				if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
+		if (get(playerSavePlaybackPositionStore) && player.currentTime) {
+			if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
+				try {
 					localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());
-				} else {
+				} catch {}
+
+				if (get(synciousStore) && get(authStore)) {
+					saveVideoProgress(data.video.videoId, player.currentTime);
+				}
+			} else {
+				try {
 					localStorage.removeItem(`v_${data.video.videoId}`);
+				} catch {}
+
+				if (get(synciousStore) && get(authStore)) {
+					deleteVideoProgress(data.video.videoId);
 				}
 			}
-		} catch {}
+		}
 	}
 
 	onDestroy(() => {

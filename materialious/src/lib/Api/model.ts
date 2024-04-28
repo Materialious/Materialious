@@ -250,3 +250,12 @@ export interface DeArrow {
 	randomTime: number;
 	videoDuration: number;
 }
+
+export interface SynciousProgressModel {
+	time: number;
+	video_id: string;
+}
+
+export interface SynciousSaveProgressModel {
+	time: number;
+}

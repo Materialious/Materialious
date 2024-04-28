@@ -3,10 +3,12 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 
-export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
-	'returnYTDislikesInstance',
-	import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE
+export const authStore: Writable<null | { username: string; token: string; }> = persisted(
+	'authToken',
+	null
 );
+
+
 export const darkModeStore: Writable<null | boolean> = persisted('darkMode', null);
 export const themeColorStore: Writable<null | string> = persisted('themeColor', null);
 
@@ -22,14 +24,19 @@ export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault',
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
+export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
+	'returnYTDislikesInstance',
+	import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE
+);
+
+export const synciousStore = persisted('syncious', true);
+export const synciousInstanceStore: Writable<string | null | undefined> = persisted(
+	'synciousInstance',
+	import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE
+);
 
 export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
 export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover', true);
-
-export const authStore: Writable<null | { username: string; token: string; }> = persisted(
-	'authToken',
-	null
-);
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(

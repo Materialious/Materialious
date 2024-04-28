@@ -3,7 +3,8 @@ import {
 	authStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
-	returnYTDislikesInstanceStore
+	returnYTDislikesInstanceStore,
+	synciousInstanceStore
 } from '../../store';
 import type {
 	Channel,
@@ -18,6 +19,7 @@ import type {
 	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
+	SynciousProgressModel,
 	Video,
 	VideoPlay
 } from './model';
@@ -300,4 +302,57 @@ export async function getThumbnail(videoId: string, time: number): Promise<strin
 		)
 	);
 	return URL.createObjectURL(await resp.blob());
+}
+
+export async function getVideoProgress(videoId: string): Promise<SynciousProgressModel[]> {
+	const resp = await fetchErrorHandle(
+		await fetch(
+			`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`,
+			buildAuthHeaders()
+		)
+	);
+
+	return resp.json();
+}
+
+export async function saveVideoProgress(videoId: string, time: number) {
+	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
+	headers['headers']['Content-type'] = 'application/json';
+
+	await fetchErrorHandle(
+		await fetch(
+			`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`,
+			{
+				...headers,
+				method: "POST",
+				body: JSON.stringify({
+					time: time
+				})
+			}
+		)
+	);
+}
+
+export async function deleteVideoProgress(videoId: string) {
+	await fetchErrorHandle(
+		await fetch(
+			`${get(synciousInstanceStore)}/video/${videoId}`,
+			{
+				method: "DELETE",
+				...buildAuthHeaders()
+			}
+		)
+	);
+}
+
+export async function deleteAllVideoProgress() {
+	await fetchErrorHandle(
+		await fetch(
+			`${get(synciousInstanceStore)}/videos`,
+			{
+				method: "DELETE",
+				...buildAuthHeaders()
+			}
+		)
+	);
 }

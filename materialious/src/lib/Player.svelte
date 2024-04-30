@@ -249,7 +249,7 @@
 >
 	<media-provider>
 		{#if !audioMode}
-			<media-poster class="vds-poster" src={getBestThumbnail(data.video.videoThumbnails, 1249, 779)}
+			<media-poster class="vds-poster" src={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
 			></media-poster>
 		{/if}
 	</media-provider>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { createEventDispatcher } from 'svelte';
+	import Mousetrap from 'mousetrap';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { interfaceSearchSuggestionsStore } from '../store';
 	import { getSearchSuggestions } from './Api';
@@ -37,28 +38,52 @@
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
-		if (event.key === 'ArrowUp') {
+		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
 			event.preventDefault();
-			selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
-		} else if (event.key === 'ArrowDown') {
-			event.preventDefault();
-			selectedSuggestionIndex = Math.min(
-				selectedSuggestionIndex + 1,
-				suggestionsForSearch.length - 1
-			);
+			const direction = event.key === 'ArrowUp' ? -1 : 1;
+			const container = document.querySelector('.suggestions-container');
+			if (container) {
+				const children = Array.from(container.children);
+				const currentIndex = selectedSuggestionIndex !== -1 ? selectedSuggestionIndex : 0;
+				const newIndex = Math.min(Math.max(currentIndex + direction, 0), children.length - 1);
+				const selectedItem = children[newIndex];
+				if (selectedItem) {
+					selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+					selectedSuggestionIndex = newIndex;
+				}
+			}
 		} else if (event.key === 'Enter' && selectedSuggestionIndex !== -1) {
 			search = suggestionsForSearch[selectedSuggestionIndex];
 			handleSubmit();
+		} else if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+			resetSearch();
+			event.preventDefault();
 		}
 	}
+
+	function resetSearch() {
+		search = '';
+		suggestionsForSearch = [];
+		selectedSuggestionIndex = -1;
+		showSearchBox = false;
+	}
+
+	onMount(() => {
+		Mousetrap.bind(['ctrl+k', 'command+k'], () => {
+			document.getElementById('search-box')?.focus();
+			showSearchBox = !showSearchBox;
+			if (!showSearchBox) resetSearch();
+			return false;
+		});
+	});
 </script>
 
 <form on:submit|preventDefault={handleSubmit}>
 	<div class="field prefix round fill no-margin search">
 		<i class="front">search</i>
-		<input bind:value={search} on:click={() => (showSearchBox = true)} />
+		<input id="search-box" bind:value={search} on:click={() => (showSearchBox = true)} />
 		{#if showSearchBox}
-			<menu class="min">
+			<menu class="min suggestions-container">
 				<div class="field large prefix suffix no-margin fixed">
 					<i class="front" on:click={() => dispatch('searchCancelled')}>arrow_back</i>
 					<input
@@ -76,12 +101,7 @@
 							}
 						}}
 					/>
-					<i
-						class="front"
-						on:click={() => (
-							(search = ''), (suggestionsForSearch = []), (selectedSuggestionIndex = -1)
-						)}>close</i
-					>
+					<i class="front" on:click={resetSearch}>close</i>
 				</div>
 				{#if searchSuggestions}
 					{#each suggestionsForSearch as suggestion, index}

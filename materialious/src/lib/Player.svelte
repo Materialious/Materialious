@@ -9,6 +9,7 @@
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		authStore,
+		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
 		playerAutoPlayStore,
 		playerDashStore,
@@ -42,6 +43,8 @@
 	const proxyVideos = get(playerProxyVideosStore);
 
 	onMount(async () => {
+		miniPlayerSrcStore.set(null);
+
 		if (!data.video.hlsUrl) {
 			playerIsLive = false;
 			if (data.video.captions) {
@@ -139,7 +142,7 @@
 					};
 				});
 
-				loadPlayerPos();
+				await loadPlayerPos();
 			}
 		} else {
 			playerIsLive = true;
@@ -186,6 +189,14 @@
 	async function loadPlayerPos() {
 		if (playerPosSet) return;
 		playerPosSet = true;
+
+		const paramTime = new URLSearchParams(window.location.search).get('time');
+
+		if (paramTime && !isNaN(parseFloat(paramTime))) {
+			player.currentTime = Number(paramTime);
+			return;
+		}
+
 		if (get(playerSavePlaybackPositionStore)) {
 			if (get(synciousStore) && get(authStore)) {
 				try {

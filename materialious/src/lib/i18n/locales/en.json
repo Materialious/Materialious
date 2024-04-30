@@ -91,6 +91,7 @@
 		"player": {
 			"title": "Player",
 			"autoPlay": "Autoplay video",
+			"miniPlayer": "Mini player",
 			"alwaysLoopVideo": "Always loop video",
 			"proxyVideos": "Proxy videos",
 			"savePlaybackPosition": "Save playback position",

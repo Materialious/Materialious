@@ -23,8 +23,10 @@
 	import {
 		activePageStore,
 		authStore,
+		miniPlayerSrcStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
+		playerMiniPlayer,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
@@ -275,6 +277,13 @@
 	onDestroy(() => {
 		// Reset title when page left.
 		document.title = 'Materialious';
+
+		if (get(playerMiniPlayer) && !player.paused) {
+			miniPlayerSrcStore.set({
+				video: data.video,
+				time: player.currentTime
+			});
+		}
 	});
 
 	async function loadPlaylist(playlistId: string) {

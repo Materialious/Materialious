@@ -3,6 +3,11 @@ node_modules
 /build
 /.svelte-kit
 /package
+# Lock files of most package managers
+bun.lockb
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
 .env
 .env.*
 !.env.example

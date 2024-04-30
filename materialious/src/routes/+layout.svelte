@@ -164,7 +164,7 @@
 	>
 
 	<Logo classes="m l" />
-	<h6 class="m l">Materialious</h6>
+	<h6 class="l">Materialious</h6>
 
 	<div class="max m l"></div>
 

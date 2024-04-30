@@ -12,6 +12,7 @@ import {
 	playerAutoplayNextByDefaultStore,
 	playerDashStore,
 	playerListenByDefaultStore,
+	playerMiniPlayerStore,
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
@@ -19,6 +20,8 @@ import {
 	sponsorBlockCategoriesStore,
 	sponsorBlockStore,
 	sponsorBlockUrlStore,
+	synciousInstanceStore,
+	synciousStore,
 	themeColorStore
 } from '../store';
 
@@ -121,6 +124,21 @@ const persistedStores = [
 	{
 		name: 'deArrowThumbnailInstance',
 		store: deArrowThumbnailInstanceStore,
+		type: 'string'
+	},
+	{
+		name: 'playerMiniPlayer',
+		store: playerMiniPlayerStore,
+		type: 'boolean'
+	},
+	{
+		name: 'syncious',
+		store: synciousStore,
+		type: 'boolean'
+	},
+	{
+		name: 'synciousInstance',
+		store: synciousInstanceStore,
 		type: 'string'
 	}
 ];

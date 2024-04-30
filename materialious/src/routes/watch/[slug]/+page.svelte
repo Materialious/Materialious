@@ -26,7 +26,7 @@
 		miniPlayerSrcStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
-		playerMiniPlayer,
+		playerMiniPlayerStore,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
@@ -278,7 +278,7 @@
 		// Reset title when page left.
 		document.title = 'Materialious';
 
-		if (get(playerMiniPlayer) && !player.paused) {
+		if (get(playerMiniPlayerStore) && !player.paused) {
 			miniPlayerSrcStore.set({
 				video: data.video,
 				time: player.currentTime

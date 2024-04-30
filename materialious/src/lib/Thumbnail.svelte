@@ -167,9 +167,11 @@
 				videoPreview = null;
 			} else {
 				try {
-					const playerSettings = localStorage.getItem('video-player');
-					if (playerSettings && typeof playerSettings === 'object' && 'volume' in playerSettings) {
-						videoPreviewVolume = Number(playerSettings['volume']);
+					const vidstackDetails = localStorage.getItem('video-player');
+					if (vidstackDetails) {
+						const vidstackDetailsParsed = JSON.parse(vidstackDetails);
+						if ('volume' in vidstackDetailsParsed)
+							videoPreviewVolume = vidstackDetailsParsed.volume;
 					}
 				} catch {}
 			}

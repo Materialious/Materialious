@@ -4,6 +4,7 @@
 	import { getFeed } from '$lib/Api/index';
 	import type { Notification } from '$lib/Api/model';
 	import Logo from '$lib/Logo.svelte';
+	import MiniPlayer from '$lib/MiniPlayer.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
@@ -264,6 +265,8 @@
 </dialog>
 
 <SyncParty />
+
+<MiniPlayer />
 
 <main class="responsive max root">
 	{#if $navigating}

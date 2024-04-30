@@ -1,3 +1,4 @@
+import type { VideoPlay } from '$lib/Api/model';
 import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
@@ -22,6 +23,7 @@ export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition',
 export const playerDashStore = persisted('dashEnabled', false);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
+export const playerMiniPlayer = persisted('miniPlayer', true);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
@@ -59,3 +61,5 @@ export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
 export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writable();
 
 export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean, loop: boolean; }>> = writable({});
+
+export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | null> = writable(null);

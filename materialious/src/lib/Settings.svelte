@@ -16,6 +16,7 @@
 		playerAutoplayNextByDefaultStore,
 		playerDashStore,
 		playerListenByDefaultStore,
+		playerMiniPlayer,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
@@ -154,6 +155,23 @@
 
 	<div class="settings">
 		<h6>{$_('layout.player.title')}</h6>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.player.miniPlayer')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$playerMiniPlayer}
+						on:click={() => playerMiniPlayer.set(!$playerMiniPlayer)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">

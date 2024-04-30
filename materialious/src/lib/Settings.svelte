@@ -16,7 +16,7 @@
 		playerAutoplayNextByDefaultStore,
 		playerDashStore,
 		playerListenByDefaultStore,
-		playerMiniPlayer,
+		playerMiniPlayerStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
@@ -164,8 +164,8 @@
 				<label class="switch">
 					<input
 						type="checkbox"
-						bind:checked={$playerMiniPlayer}
-						on:click={() => playerMiniPlayer.set(!$playerMiniPlayer)}
+						bind:checked={$playerMiniPlayerStore}
+						on:click={() => playerMiniPlayerStore.set(!$playerMiniPlayerStore)}
 					/>
 					<span></span>
 				</label>

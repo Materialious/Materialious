@@ -31,6 +31,11 @@
 	display: none !important;
 }
 
+main.root {
+	max-height: 100vh;
+	overflow-y: scroll;
+}
+
 @media screen and (max-width: 580px) {
 	main {
 		padding-left: 0.1em !important;
@@ -38,7 +43,8 @@
 	}
 }
 
-main.root {
-	max-height: 100vh;
-	overflow-y: scroll;
+@media screen and (max-width: 650px) {
+	dialog.right {
+		width: 100% !important;
+	}
 }

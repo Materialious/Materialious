@@ -179,7 +179,7 @@
 	{#if mobileSearchShow}
 		<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 	{:else}
-		<button data-ui="#sync-party" class="m l circle large transparent">
+		<button data-ui="#sync-party" class="circle large transparent">
 			<i class:primary-text={$syncPartyPeerStore}>group</i>
 			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 		</button>

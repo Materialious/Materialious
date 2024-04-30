@@ -135,8 +135,17 @@ export function peerJsOptions(): PeerOptions {
 	};
 }
 
-export function getBestThumbnail(images: Image[] | null): string | null {
+export function getBestThumbnail(
+	images: Image[] | null,
+	maxWidthDimension: number = 480,
+	maxHeightDimension = 360): string | null {
 	if (images && images.length > 0) {
+		images = images.filter(image => image.width < maxWidthDimension && image.height < maxHeightDimension);
+
+		if (images.length === 0) {
+			return null;
+		}
+
 		images.sort((a, b) => {
 			return (b.width * b.height) - (a.width * a.height);
 		});

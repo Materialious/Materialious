@@ -8,7 +8,7 @@
 	export let data;
 
 	let currentPage = 1;
-	$: videos = [...data.feed.videos, ...data.feed.notifications];
+	$: videos = [...data.feed.notifications, ...data.feed.videos];
 
 	activePageStore.set('subscriptions');
 

@@ -79,4 +79,10 @@
 	.align-right {
 		text-align: right;
 	}
+
+	@media screen and (max-width: 590px) {
+		nav.bottom {
+			bottom: 100px !important;
+		}
+	}
 </style>

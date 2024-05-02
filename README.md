@@ -18,6 +18,8 @@
 - [Syncios integration!](https://github.com/WardPearce/syncious)
   - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
+- Mini player.
+- Preview video on hover.
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
 - DeArrow built-in (With local processing fallback).

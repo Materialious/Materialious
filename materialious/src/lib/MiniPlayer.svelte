@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { _ } from 'svelte-i18n';
 	import { miniPlayerSrcStore } from '../store';
-	import { cleanNumber, proxyVideoUrl } from './misc';
+	import { proxyVideoUrl } from './misc';
 
 	let currentTime: number = 0;
 
@@ -29,24 +28,24 @@
 
 {#if $miniPlayerSrcStore}
 	<nav class="bottom no-padding">
-		<article class="surface-variant">
+		<article class="surface-bright">
+			<button on:click={() => miniPlayerSrcStore.set(null)} class="s circle transparent no-margin">
+				<i>close</i>
+			</button>
 			<div class="flex-container">
 				<div style="display: flex;">
-					<p class="bold truncate align-right">
+					<p class="bold truncate">
 						{$miniPlayerSrcStore.video.title}
 					</p>
 					<button
 						on:click={() => miniPlayerSrcStore.set(null)}
-						class="circle transparent no-margin"
-						style="margin-right: 1em;"
+						class="m l circle transparent no-margin"
 					>
 						<i>close</i>
 					</button>
 				</div>
-				<p style="margin-right: .8em;" class="align-right">
-					{cleanNumber($miniPlayerSrcStore.video.viewCount)}
-					{$_('views')}
-				</p>
+				<progress class="s" value={currentTime} max={$miniPlayerSrcStore.video.lengthSeconds}
+				></progress>
 			</div>
 			<video
 				crossorigin="anonymous"
@@ -55,6 +54,7 @@
 					miniPlayerSrcStore.set(null);
 				}}
 				id="video"
+				style="cursor: pointer;"
 				bind:currentTime
 				on:loadedmetadata={setTime}
 				controls={false}
@@ -88,17 +88,13 @@
 	.flex-container {
 		flex: 1;
 		overflow: hidden;
-		max-width: 300px;
 	}
 
 	.truncate {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-	}
-
-	.align-right {
-		text-align: right;
+		max-width: 270px;
 	}
 
 	@media screen and (max-width: 590px) {
@@ -115,10 +111,10 @@
 
 		article {
 			align-items: start;
-			justify-content: space-between;
 			width: 100%;
 			flex-direction: row;
 			padding: 0 !important;
+			justify-content: center;
 		}
 
 		nav video {
@@ -127,11 +123,6 @@
 		}
 
 		.flex-container {
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-			align-items: center;
-			justify-content: center;
 			max-width: 100%;
 		}
 	}

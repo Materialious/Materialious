@@ -3,8 +3,6 @@
 	import { page } from '$app/stores';
 	import { peerJsOptions, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
-	import 'beercss';
-	import 'material-dynamic-colors';
 	import type { DataConnection } from 'peerjs';
 	import Peer from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
@@ -113,7 +111,7 @@
 			<button
 				on:click={async () => {
 					await navigator.clipboard.writeText(
-						`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeerStore.id}`
+						`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeerStore?.id}`
 					);
 				}}
 				class="square round"

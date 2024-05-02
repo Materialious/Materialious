@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { bookmarkletSaveToUrl } from '$lib/bookmarklet';
-	import 'beercss';
-	import 'material-dynamic-colors';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import {

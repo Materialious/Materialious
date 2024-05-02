@@ -43,7 +43,10 @@
 						<i>close</i>
 					</button>
 				</div>
-				<p class="align-right">{cleanNumber($miniPlayerSrcStore.video.viewCount)} {$_('views')}</p>
+				<p style="margin-right: .8em;" class="align-right">
+					{cleanNumber($miniPlayerSrcStore.video.viewCount)}
+					{$_('views')}
+				</p>
 			</div>
 			<video
 				crossorigin="anonymous"
@@ -124,6 +127,11 @@
 		}
 
 		.flex-container {
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+			align-items: center;
+			justify-content: center;
 			max-width: 100%;
 		}
 	}

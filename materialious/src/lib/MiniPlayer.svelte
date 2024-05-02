@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { _ } from 'svelte-i18n';
 	import { miniPlayerSrcStore } from '../store';
 	import { cleanNumber, proxyVideoUrl } from './misc';
 
@@ -28,19 +29,21 @@
 
 {#if $miniPlayerSrcStore}
 	<nav class="bottom no-padding">
-		<article>
-			<button
-				on:click={() => miniPlayerSrcStore.set(null)}
-				class="circle transparent no-margin"
-				style="margin-right: 1em;"
-			>
-				<i>close</i>
-			</button>
+		<article class="surface-variant">
 			<div class="flex-container">
-				<p class="bold truncate align-right">
-					{$miniPlayerSrcStore.video.title}
-				</p>
-				<p class="align-right">{cleanNumber($miniPlayerSrcStore.video.viewCount)}</p>
+				<div style="display: flex;">
+					<p class="bold truncate align-right">
+						{$miniPlayerSrcStore.video.title}
+					</p>
+					<button
+						on:click={() => miniPlayerSrcStore.set(null)}
+						class="circle transparent no-margin"
+						style="margin-right: 1em;"
+					>
+						<i>close</i>
+					</button>
+				</div>
+				<p class="align-right">{cleanNumber($miniPlayerSrcStore.video.viewCount)} {$_('views')}</p>
 			</div>
 			<video
 				crossorigin="anonymous"
@@ -75,13 +78,14 @@
 	}
 
 	nav video {
-		height: 200px;
+		height: 180px;
 		width: auto;
 	}
 
 	.flex-container {
 		flex: 1;
 		overflow: hidden;
+		max-width: 300px;
 	}
 
 	.truncate {
@@ -117,6 +121,10 @@
 		nav video {
 			height: 100%;
 			margin-left: 10px;
+		}
+
+		.flex-container {
+			max-width: 100%;
 		}
 	}
 </style>

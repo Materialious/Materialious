@@ -278,7 +278,13 @@
 		// Reset title when page left.
 		document.title = 'Materialious';
 
-		if (get(playerMiniPlayerStore) && !player.paused) {
+		if (
+			get(playerMiniPlayerStore) &&
+			!player.paused &&
+			!data.video.hlsUrl &&
+			data.video.formatStreams &&
+			data.video.formatStreams.length > 0
+		) {
 			miniPlayerSrcStore.set({
 				video: data.video,
 				time: player.currentTime

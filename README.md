@@ -299,6 +299,9 @@ VITE_DEFAULT_PEERJS_PORT: 443
 ## Settings
 ![Preview of settings](./previews/setting-preview.png)
 
+## Mini player
+![Preview of mini player](./previews/mini-player-desktop-preview.png)
+
 ## Channel
 ![Preview of channel](./previews/channel-preview.png)
 

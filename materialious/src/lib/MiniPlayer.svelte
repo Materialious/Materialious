@@ -18,50 +18,64 @@
 
 			player.currentTime = $miniPlayerSrcStore.time;
 		}
+
+		// Fixes volume being muted on mobile.
+		if (player.volume === 0) {
+			player.volume = 1;
+		}
 	}
 </script>
 
 {#if $miniPlayerSrcStore}
-	<nav class="bottom right-align no-padding">
-		<div class="flex-container">
-			<p class="bold truncate align-right">
-				{$miniPlayerSrcStore.video.title}
-			</p>
-			<p class="align-right">{cleanNumber($miniPlayerSrcStore.video.viewCount)}</p>
-		</div>
-		<video
-			crossorigin="anonymous"
-			on:click={() => {
-				goto(`/watch/${$miniPlayerSrcStore.video.videoId}?time=${currentTime}`);
-				miniPlayerSrcStore.set(null);
-			}}
-			id="video"
-			volume="1"
-			bind:currentTime
-			on:loadedmetadata={setTime}
-			controls={false}
-			autoplay
-			src={proxyVideoUrl($miniPlayerSrcStore.video.formatStreams[0].url)}
-		>
-		</video>
-		<button
-			on:click={() => miniPlayerSrcStore.set(null)}
-			class="circle transparent"
-			style="margin-right: 1em;"
-		>
-			<i>close</i>
-		</button>
+	<nav class="bottom no-padding">
+		<article>
+			<button
+				on:click={() => miniPlayerSrcStore.set(null)}
+				class="circle transparent no-margin"
+				style="margin-right: 1em;"
+			>
+				<i>close</i>
+			</button>
+			<div class="flex-container">
+				<p class="bold truncate align-right">
+					{$miniPlayerSrcStore.video.title}
+				</p>
+				<p class="align-right">{cleanNumber($miniPlayerSrcStore.video.viewCount)}</p>
+			</div>
+			<video
+				crossorigin="anonymous"
+				on:click={() => {
+					goto(`/watch/${$miniPlayerSrcStore.video.videoId}?time=${currentTime}`);
+					miniPlayerSrcStore.set(null);
+				}}
+				id="video"
+				bind:currentTime
+				on:loadedmetadata={setTime}
+				controls={false}
+				autoplay
+				src={proxyVideoUrl($miniPlayerSrcStore.video.formatStreams[0].url)}
+			>
+			</video>
+		</article>
 	</nav>
 {/if}
 
 <style>
 	nav {
 		display: flex;
-		align-items: center;
+		background-color: transparent;
+		justify-content: end;
+		align-items: flex-end;
+	}
+
+	article {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
 	}
 
 	nav video {
-		height: 100%;
+		height: 200px;
 		width: auto;
 	}
 
@@ -83,6 +97,26 @@
 	@media screen and (max-width: 590px) {
 		nav.bottom {
 			bottom: 100px !important;
+		}
+
+		nav {
+			flex-direction: initial;
+			background-color: initial;
+			justify-content: initial;
+			align-items: initial;
+		}
+
+		article {
+			align-items: start;
+			justify-content: space-between;
+			width: 100%;
+			flex-direction: row;
+			padding: 0 !important;
+		}
+
+		nav video {
+			height: 100%;
+			margin-left: 10px;
 		}
 	}
 </style>

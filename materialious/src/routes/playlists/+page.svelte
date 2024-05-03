@@ -52,7 +52,7 @@
 		{/each}
 		<div class="s12 m6 l2">
 			<article style="height: 100%;display: flex;align-items: center;justify-content: center;">
-				<button data-ui="#create-playlist" class="round extra">
+				<button on:click={() => ui('#create-playlist')} class="round extra">
 					<i>add_circle</i>
 					<span>{$_('playlist.createPlaylist')}</span>
 				</button>
@@ -84,7 +84,7 @@
 			</nav>
 		</div>
 		<nav class="right-align">
-			<button type="button" data-ui="#create-playlist">{$_('cancel')}</button>
+			<button type="button" on:click={() => ui('#create-playlist')}>{$_('cancel')}</button>
 			<button type="submit">{$_('create')}</button>
 		</nav>
 	</form>

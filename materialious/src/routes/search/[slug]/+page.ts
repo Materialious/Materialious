@@ -6,7 +6,7 @@ export async function load({ params, url }) {
 
 	const queryFlag = url.searchParams.get('type');
 	if (queryFlag && ['playlist', 'video', 'channel', 'all'].includes(queryFlag)) {
-		type = queryFlag;
+		type = queryFlag as 'playlist' | 'all' | 'video' | 'channel';
 	} else {
 		type = 'all';
 	}

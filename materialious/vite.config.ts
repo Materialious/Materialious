@@ -9,25 +9,25 @@ export default defineConfig({
 			injectRegister: 'inline',
 			manifest: {
 				description: 'Modern material design for Invidious.',
-				theme_color: "#8936FF",
-				background_color: "#1e1b1e",
+				theme_color: '#8936FF',
+				background_color: '#1e1b1e',
 				icons: [
 					{
-						purpose: "maskable",
-						sizes: "512x512",
-						src: "icon512_maskable.png",
-						type: "image/png"
+						purpose: 'maskable',
+						sizes: '512x512',
+						src: 'icon512_maskable.png',
+						type: 'image/png'
 					},
 					{
-						purpose: "any",
-						sizes: "512x512",
-						src: "icon512_rounded.png",
-						type: "image/png"
+						purpose: 'any',
+						sizes: '512x512',
+						src: 'icon512_rounded.png',
+						type: 'image/png'
 					}
 				],
-				orientation: "any",
-				display: "standalone",
-				name: "Materialious",
+				orientation: 'any',
+				display: 'standalone',
+				name: 'Materialious'
 			}
 		}),
 		vidstack(),

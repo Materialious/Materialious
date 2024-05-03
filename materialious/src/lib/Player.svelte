@@ -5,7 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
+	import type { MediaTimeUpdateEvent, PlayerSrc, VideoSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		authStore,
@@ -140,7 +140,7 @@
 						height: Number(quality[1]),
 						width: Number(quality[0])
 					};
-				});
+				}) as VideoSrc[];
 
 				await loadPlayerPos();
 			}

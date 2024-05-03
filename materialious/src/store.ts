@@ -4,11 +4,10 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 
-export const authStore: Writable<null | { username: string; token: string; }> = persisted(
+export const authStore: Writable<null | { username: string; token: string }> = persisted(
 	'authToken',
 	null
 );
-
 
 export const darkModeStore: Writable<null | boolean> = persisted('darkMode', null);
 export const themeColorStore: Writable<null | string> = persisted('themeColor', null);
@@ -45,7 +44,10 @@ export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist
 	'sponsorBlockUrl',
 	import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE
 );
-export const sponsorBlockCategoriesStore: Writable<string[]> = persisted('sponsorBlockCategories', []);
+export const sponsorBlockCategoriesStore: Writable<string[]> = persisted(
+	'sponsorBlockCategories',
+	[]
+);
 
 export const deArrowInstanceStore = persisted(
 	'deArrowInstance',
@@ -60,6 +62,8 @@ export const deArrowThumbnailInstanceStore = persisted(
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
 export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writable();
 
-export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean, loop: boolean; }>> = writable({});
+export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean }>> =
+	writable({});
 
-export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | null> = writable(null);
+export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number } | null> =
+	writable(null);

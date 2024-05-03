@@ -3,6 +3,7 @@ import {
 	authStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
+	instanceStore,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
 } from '../../store';
@@ -25,7 +26,7 @@ import type {
 } from './model';
 
 export function buildPath(path: string): string {
-	return `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/api/v1/${path}`;
+	return `${get(instanceStore)}/api/v1/${path}`;
 }
 
 export async function fetchErrorHandle(response: Response): Promise<Response> {
@@ -34,14 +35,14 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 		try {
 			const json = await response.json();
 			message = 'errorBacktrace' in json ? json.errorBacktrace : json.error;
-		} catch {}
+		} catch { }
 		throw Error(message);
 	}
 
 	return response;
 }
 
-export function buildAuthHeaders(): { headers: { Authorization: string } } {
+export function buildAuthHeaders(): { headers: { Authorization: string; }; } {
 	return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
 }
 

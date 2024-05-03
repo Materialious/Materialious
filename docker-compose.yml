@@ -8,7 +8,6 @@ services:
     environment:
       VITE_DEFAULT_INVIDIOUS_INSTANCE: "https://invidious.materialio.us"
       VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
-      VITE_DEFAULT_FRONTEND_URL: "https://materialio.us"
       VITE_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"
       VITE_DEFAULT_DEARROW_INSTANCE: "https://sponsor.ajay.app"
       VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"

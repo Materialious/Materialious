@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { bookmarkletSaveToUrl } from '$lib/bookmarklet';
+	import { Capacitor } from '@capacitor/core';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import {
@@ -7,6 +8,7 @@
 		deArrowEnabledStore,
 		deArrowInstanceStore,
 		deArrowThumbnailInstanceStore,
+		instanceStore,
 		interfacePreviewVideoOnHoverStore,
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
@@ -34,6 +36,7 @@
 	let sponsorBlockInstance = get(sponsorBlockUrlStore);
 	let synciousInstance = get(synciousInstanceStore);
 	let returnYTInstance = get(returnYTDislikesInstanceStore);
+	let invidiousInstance = get(instanceStore);
 	let deArrowUrl = get(deArrowInstanceStore);
 	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
 
@@ -101,6 +104,23 @@
 		</button>
 	</div>
 
+	{#if Capacitor.isNativePlatform()}
+		<div class="settings">
+			<h6>Invidious</h6>
+			<form on:submit|preventDefault={() => instanceStore.set(invidiousInstance)}>
+				<nav>
+					<div class="field label border max">
+						<input bind:value={invidiousInstance} name="returnyt-instance" type="text" />
+						<label for="returnyt-instance">{$_('layout.instanceUrl')}</label>
+					</div>
+					<button class="square round">
+						<i>done</i>
+					</button>
+				</nav>
+			</form>
+		</div>
+	{/if}
+
 	<div class="settings">
 		<h6>Interface</h6>
 		<div class="field no-margin">
@@ -141,7 +161,7 @@
 		<h6>{$_('layout.dataPreferences.dataPreferences')}</h6>
 		<p style="width: 240px;">
 			<a
-				href={`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/preferences`}
+				href={`${get(instanceStore)}/preferences`}
 				target="_blank"
 				rel="noopener noreferrer"
 				class="link"

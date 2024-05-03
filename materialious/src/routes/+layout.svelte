@@ -11,6 +11,8 @@
 	import SyncParty from '$lib/SyncParty.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl } from '$lib/bookmarklet';
+	import { Browser } from '@capacitor/browser';
+	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
@@ -21,6 +23,7 @@
 		activePageStore,
 		authStore,
 		darkModeStore,
+		instanceStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '../store';
@@ -78,14 +81,20 @@
 		}
 	});
 
-	function login() {
-		const path = new URL(`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/authorize_token`);
-		path.search = new URLSearchParams({
-			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*',
-			callback_url: `${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/auth`
-		}).toString();
-
-		document.location.href = path.toString();
+	async function login() {
+		const path = new URL(`${get(instanceStore)}/authorize_token`);
+		const searchParams = new URLSearchParams({
+			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
+		});
+		if (Capacitor.isNativePlatform()) {
+			searchParams.set('callback_url', 'materialious-auth://');
+			path.search = searchParams.toString();
+			await Browser.open({ url: path.toString() });
+		} else {
+			searchParams.set('callback_url', `${location.origin}/auth`);
+			path.search = searchParams.toString();
+			document.location.href = path.toString();
+		}
 	}
 
 	function logout() {

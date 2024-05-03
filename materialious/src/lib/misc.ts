@@ -3,6 +3,7 @@ import { page } from '$app/stores';
 import humanNumber from 'human-number';
 import type { PeerOptions } from 'peerjs';
 import { get } from 'svelte/store';
+import { instanceStore } from '../store';
 import type { Image } from './Api/model';
 
 export function truncate(value: string, maxLength: number = 50): string {
@@ -103,7 +104,7 @@ function convertToSeconds(time: string): number {
 
 export function proxyVideoUrl(source: string): string {
 	const rawSrc = new URL(source);
-	rawSrc.host = import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE.replace('http://', '').replace(
+	rawSrc.host = get(instanceStore).replace('http://', '').replace(
 		'https://',
 		''
 	);

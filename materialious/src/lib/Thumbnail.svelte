@@ -27,7 +27,7 @@
 
 	let proxyVideos = get(playerProxyVideosStore);
 
-	let watchUrl = new URL(`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${video.videoId}`);
+	let watchUrl = new URL(`${location.origin}/watch/${video.videoId}`);
 
 	if (playlistId !== '') {
 		watchUrl.searchParams.set('playlist', playlistId);
@@ -94,7 +94,7 @@
 
 							mockVideo.preload = 'auto';
 							mockVideo.id = 'video';
-							mockVideo.crossOrigin = import.meta.env.VITE_DEFAULT_FRONTEND_URL;
+							mockVideo.crossOrigin = location.origin;
 							const videoToThumbnail = (await getVideo(video.videoId)).formatStreams[0].url;
 							mockVideo.src = proxyVideoUrl(videoToThumbnail);
 

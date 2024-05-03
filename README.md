@@ -160,10 +160,7 @@ services:
       # URL TO RYD
       # Leave blank to disable completely.
       VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
-
-      # URL to your proxied instance of Materialious
-      VITE_DEFAULT_FRONTEND_URL: "https://materialio.us"
-
+  
       # URL to Sponsorblock
       # Leave blank to completely disable sponsorblock.
       VITE_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"

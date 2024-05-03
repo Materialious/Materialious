@@ -9,6 +9,7 @@
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		authStore,
+		instanceStore,
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
 		playerAutoPlayStore,
@@ -53,7 +54,7 @@
 						label: caption.label,
 						kind: 'captions',
 						language: caption.language_code,
-						src: `${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}${caption.url}`
+						src: `${get(instanceStore)}${caption.url}`
 					});
 				});
 			}
@@ -266,8 +267,7 @@
 	</media-provider>
 	<media-audio-layout></media-audio-layout>
 	{#if data.video.storyboards && data.video.storyboards.length > 3}
-		<media-video-layout
-			thumbnails={`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}${data.video.storyboards[3].url}`}
+		<media-video-layout thumbnails={`${get(instanceStore)}${data.video.storyboards[3].url}`}
 		></media-video-layout>
 	{:else}
 		<media-video-layout></media-video-layout>

@@ -264,16 +264,15 @@
 	{/each}
 </dialog>
 
-<SyncParty />
-
-<MiniPlayer />
-
 <main class="responsive max root">
 	{#if $navigating}
 		<PageLoading />
 	{:else}
 		<slot />
 	{/if}
+
+	<SyncParty />
+	<MiniPlayer />
 </main>
 
 <style>

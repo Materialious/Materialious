@@ -38,8 +38,8 @@
 
 		if ($syncPartyPeerStore) {
 			$syncPartyPeerStore.on('connection', (conn) => {
-				conn.on('open', () => {
-					ui('#sync-party-connection-join');
+				conn.on('open', async () => {
+					await ui('#sync-party-connection-join');
 
 					if ($page.url.pathname.startsWith('/watch')) {
 						const paths = $page.url.pathname.split('/');
@@ -58,8 +58,8 @@
 					syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
 				});
 
-				conn.on('close', () => {
-					ui('#sync-party-connection-left');
+				conn.on('close', async () => {
+					await ui('#sync-party-connection-left');
 				});
 			});
 		}

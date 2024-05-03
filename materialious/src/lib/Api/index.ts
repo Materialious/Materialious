@@ -34,14 +34,14 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 		try {
 			const json = await response.json();
 			message = 'errorBacktrace' in json ? json.errorBacktrace : json.error;
-		} catch { }
+		} catch {}
 		throw Error(message);
 	}
 
 	return response;
 }
 
-export function buildAuthHeaders(): { headers: { Authorization: string; }; } {
+export function buildAuthHeaders(): { headers: { Authorization: string } } {
 	return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
 }
 
@@ -191,7 +191,10 @@ export async function deleteUnsubscribe(authorId: string) {
 
 export async function getHistory(page: number = 1, maxResults: number = 20): Promise<string[]> {
 	const resp = await fetchErrorHandle(
-		await fetch(buildPath(`auth/history?page=${page}&max_results=${maxResults}`), buildAuthHeaders())
+		await fetch(
+			buildPath(`auth/history?page=${page}&max_results=${maxResults}`),
+			buildAuthHeaders()
+		)
 	);
 	return await resp.json();
 }
@@ -320,39 +323,30 @@ export async function saveVideoProgress(videoId: string, time: number) {
 	headers['headers']['Content-type'] = 'application/json';
 
 	await fetchErrorHandle(
-		await fetch(
-			`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`,
-			{
-				...headers,
-				method: "POST",
-				body: JSON.stringify({
-					time: time
-				})
-			}
-		)
+		await fetch(`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`, {
+			...headers,
+			method: 'POST',
+			body: JSON.stringify({
+				time: time
+			})
+		})
 	);
 }
 
 export async function deleteVideoProgress(videoId: string) {
 	await fetchErrorHandle(
-		await fetch(
-			`${get(synciousInstanceStore)}/video/${videoId}`,
-			{
-				method: "DELETE",
-				...buildAuthHeaders()
-			}
-		)
+		await fetch(`${get(synciousInstanceStore)}/video/${videoId}`, {
+			method: 'DELETE',
+			...buildAuthHeaders()
+		})
 	);
 }
 
 export async function deleteAllVideoProgress() {
 	await fetchErrorHandle(
-		await fetch(
-			`${get(synciousInstanceStore)}/videos`,
-			{
-				method: "DELETE",
-				...buildAuthHeaders()
-			}
-		)
+		await fetch(`${get(synciousInstanceStore)}/videos`, {
+			method: 'DELETE',
+			...buildAuthHeaders()
+		})
 	);
 }

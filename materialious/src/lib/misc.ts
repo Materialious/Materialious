@@ -42,11 +42,11 @@ export function videoLength(lengthSeconds: number): string {
 
 export interface PhasedDescription {
 	description: string;
-	timestamps: { title: string; time: number; timePretty: string; }[];
+	timestamps: { title: string; time: number; timePretty: string }[];
 }
 
 export function phaseDescription(content: string): PhasedDescription {
-	const timestamps: { title: string; time: number; timePretty: string; }[] = [];
+	const timestamps: { title: string; time: number; timePretty: string }[] = [];
 	const lines = content.split('\n');
 
 	const urlRegex = /<a href="([^"]+)"/;
@@ -138,16 +138,19 @@ export function peerJsOptions(): PeerOptions {
 export function getBestThumbnail(
 	images: Image[] | null,
 	maxWidthDimension: number = 480,
-	maxHeightDimension = 360): string | null {
+	maxHeightDimension = 360
+): string | null {
 	if (images && images.length > 0) {
-		images = images.filter(image => image.width < maxWidthDimension && image.height < maxHeightDimension);
+		images = images.filter(
+			(image) => image.width < maxWidthDimension && image.height < maxHeightDimension
+		);
 
 		if (images.length === 0) {
 			return null;
 		}
 
 		images.sort((a, b) => {
-			return (b.width * b.height) - (a.width * a.height);
+			return b.width * b.height - a.width * a.height;
 		});
 
 		return images[0].url;

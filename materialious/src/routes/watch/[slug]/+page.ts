@@ -9,7 +9,12 @@ import {
 import { phaseDescription } from '$lib/misc';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import { authStore, playerProxyVideosStore, returnYTDislikesInstanceStore, returnYtDislikesStore } from '../../../store';
+import {
+	authStore,
+	playerProxyVideosStore,
+	returnYTDislikesInstanceStore,
+	returnYtDislikesStore
+} from '../../../store';
 
 export async function load({ params, url }) {
 	let video;
@@ -19,7 +24,7 @@ export async function load({ params, url }) {
 		error(500, errorMessage);
 	}
 
-	let downloadOptions: { title: string; url: string; }[] = [];
+	let downloadOptions: { title: string; url: string }[] = [];
 
 	if (!video.hlsUrl) {
 		video.formatStreams.forEach((format) => {
@@ -56,10 +61,10 @@ export async function load({ params, url }) {
 
 	let returnYTDislikes = null;
 	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
-	if (returnYTDislikesInstance && returnYTDislikesInstance !== "") {
+	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
 		try {
 			returnYTDislikes = get(returnYtDislikesStore) ? getDislikes(params.slug) : null;
-		} catch { }
+		} catch {}
 	}
 
 	return {
@@ -71,7 +76,7 @@ export async function load({ params, url }) {
 			personalPlaylists: personalPlaylists,
 			returnYTDislikes: returnYTDislikes,
 			comments: comments,
-			subscribed: amSubscribed(video.authorId),
+			subscribed: amSubscribed(video.authorId)
 		}
 	};
 }

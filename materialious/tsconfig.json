@@ -10,18 +10,10 @@
 		"sourceMap": true,
 		"strict": true,
 		"moduleResolution": "bundler",
-		"types": [
-			"vidstack/svelte"
-		]
+		"types": ["vidstack/svelte"]
 	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.d.ts"
-	],
-	"exclude": [
-		"node_modules",
-		"dist"
-	]
+	"include": ["src/**/*.ts", "src/**/*.d.ts"],
+	"exclude": ["node_modules", "dist"]
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
 	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes

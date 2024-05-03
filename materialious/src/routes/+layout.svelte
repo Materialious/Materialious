@@ -238,7 +238,9 @@
 		{#if !page.requiresAuth || isLoggedIn}
 			<a class="round" href={page.href} class:active={currentPage === page.name.toLowerCase()}
 				><i>{page.icon}</i>
-				<div class="tooltip top">{page.name}</div>
+				{#if currentPage === page.name.toLowerCase()}
+					<span style="font-size: .8em;">{page.name}</span>
+				{/if}
 			</a>
 		{/if}
 	{/each}

@@ -209,12 +209,12 @@
 			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 		</button>
 		{#if isLoggedIn}
-			<button class="circle large transparent" data-ui="#dialog-notifications"
+			<button class="circle large transparent" on:click={() => ui('#dialog-notifications')}
 				><i>notifications</i>
 				<div class="tooltip bottom">{$_('layout.notifications')}</div>
 			</button>
 		{/if}
-		<button class="circle large transparent" data-ui="#dialog-settings">
+		<button class="circle large transparent" on:click={() => ui('#dialog-settings')}>
 			<i>settings</i>
 			<div class="tooltip bottom">{$_('layout.settings')}</div>
 		</button>

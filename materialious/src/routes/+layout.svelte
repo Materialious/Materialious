@@ -11,6 +11,7 @@
 	import SyncParty from '$lib/SyncParty.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl } from '$lib/bookmarklet';
+	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
@@ -78,6 +79,20 @@
 			ui('mode', 'dark');
 		} else {
 			ui('mode', 'light');
+		}
+	});
+
+	// Auth response handling for Mobile
+	App.addListener('appUrlOpen', (data) => {
+		const authUrl = new URL(data.url);
+		const username = authUrl.searchParams.get('username');
+		const token = authUrl.searchParams.get('token');
+
+		if (username && token) {
+			authStore.set({
+				username: username,
+				token: token
+			});
 		}
 	});
 

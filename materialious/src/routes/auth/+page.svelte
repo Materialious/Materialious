@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '../../store';
 
+	// Auth response handling for Desktop
 	onMount(() => {
 		authStore.set({
 			username: $page.url.searchParams.get('username') as string,

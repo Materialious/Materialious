@@ -42,11 +42,11 @@ export function videoLength(lengthSeconds: number): string {
 
 export interface PhasedDescription {
 	description: string;
-	timestamps: { title: string; time: number; timePretty: string }[];
+	timestamps: { title: string; time: number; timePretty: string; }[];
 }
 
 export function phaseDescription(content: string): PhasedDescription {
-	const timestamps: { title: string; time: number; timePretty: string }[] = [];
+	const timestamps: { title: string; time: number; timePretty: string; }[] = [];
 	const lines = content.split('\n');
 
 	const urlRegex = /<a href="([^"]+)"/;
@@ -129,9 +129,9 @@ export function removeWindowQueryFlag(key: string) {
 
 export function peerJsOptions(): PeerOptions {
 	return {
-		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
-		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
-		port: Number(import.meta.env.VITE_DEFAULT_PEERJS_PORT) || 443
+		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST && import.meta.env.VITE_DEFAULT_PEERJS_HOST !== '' ? import.meta.env.VITE_DEFAULT_PEERJS_HOST : '0.peerjs.com',
+		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH && import.meta.env.VITE_DEFAULT_PEERJS_PATH !== '' ? import.meta.env.VITE_DEFAULT_PEERJS_PATH : '/',
+		port: import.meta.env.VITE_DEFAULT_PEERJS_PATH && import.meta.env.VITE_DEFAULT_PEERJS_PATH !== '' ? Number(import.meta.env.VITE_DEFAULT_PEERJS_PORT) : 443
 	};
 }
 

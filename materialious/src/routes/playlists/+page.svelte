@@ -26,7 +26,7 @@
 
 	async function createPlaylist() {
 		await postPersonalPlaylist(playlistTitle, playlistPrivacy);
-		ui('#create-playlist');
+		await ui('#create-playlist');
 		data.playlists = await getPersonalPlaylists();
 	}
 </script>

@@ -101,7 +101,7 @@
 		const searchParams = new URLSearchParams({
 			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
 		});
-		if (Capacitor.isNativePlatform()) {
+		if (Capacitor.getPlatform() === 'android') {
 			searchParams.set('callback_url', 'materialious-auth://');
 			path.search = searchParams.toString();
 			await Browser.open({ url: path.toString() });

@@ -36,6 +36,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@capacitor-community/electron": "^5.0.1",
 		"@capacitor/android": "^6.0.0",
 		"@capacitor/app": "^6.0.0",
 		"@capacitor/browser": "^6.0.0",

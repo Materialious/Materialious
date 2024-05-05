@@ -229,7 +229,7 @@
 			</nav>
 		</div>
 
-		{#if !Capacitor.isNativePlatform()}
+		{#if Capacitor.getPlatform() !== 'android'}
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">
@@ -312,7 +312,7 @@
 			</nav>
 		</div>
 
-		{#if !Capacitor.isNativePlatform()}
+		{#if Capacitor.getPlatform() !== 'android'}
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">

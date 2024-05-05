@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { peerJsOptions, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
+	import { peerJs, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import type { DataConnection } from 'peerjs';
-	import Peer from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
@@ -34,7 +33,7 @@
 
 		const peerId = crypto.randomUUID();
 		setWindowQueryFlag('sync', peerId);
-		$syncPartyPeerStore = new Peer(peerId, peerJsOptions());
+		$syncPartyPeerStore = peerJs(peerId);
 
 		if ($syncPartyPeerStore) {
 			$syncPartyPeerStore.on('connection', (conn) => {
@@ -69,7 +68,7 @@
 		const currentUrl = get(page).url;
 		const syncId = currentUrl.searchParams.get('sync');
 		if (syncId) {
-			$syncPartyPeerStore = new Peer(crypto.randomUUID(), peerJsOptions());
+			$syncPartyPeerStore = peerJs(crypto.randomUUID());
 			$syncPartyPeerStore.on('open', () => {
 				if (!$syncPartyPeerStore) return;
 

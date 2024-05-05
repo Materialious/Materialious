@@ -1,7 +1,7 @@
 import { pushState } from '$app/navigation';
 import { page } from '$app/stores';
 import humanNumber from 'human-number';
-import type { PeerOptions } from 'peerjs';
+import { Peer } from 'peerjs';
 import { get } from 'svelte/store';
 import { instanceStore } from '../store';
 import type { Image } from './Api/model';
@@ -128,12 +128,15 @@ export function removeWindowQueryFlag(key: string) {
 	pushState(currentPage.url, currentPage.state);
 }
 
-export function peerJsOptions(): PeerOptions {
-	return {
-		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST && import.meta.env.VITE_DEFAULT_PEERJS_HOST !== '' ? import.meta.env.VITE_DEFAULT_PEERJS_HOST : '0.peerjs.com',
-		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH && import.meta.env.VITE_DEFAULT_PEERJS_PATH !== '' ? import.meta.env.VITE_DEFAULT_PEERJS_PATH : '/',
-		port: import.meta.env.VITE_DEFAULT_PEERJS_PATH && import.meta.env.VITE_DEFAULT_PEERJS_PATH !== '' ? Number(import.meta.env.VITE_DEFAULT_PEERJS_PORT) : 443
-	};
+export function peerJs(peerId: string): Peer {
+	return new Peer(
+		peerId,
+		{
+			host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
+			path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
+			port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || 443
+		}
+	);
 }
 
 export function getBestThumbnail(

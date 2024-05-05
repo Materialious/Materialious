@@ -13,3 +13,5 @@ yarn.lock
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+resources/android/**/*
+android/release.jks*

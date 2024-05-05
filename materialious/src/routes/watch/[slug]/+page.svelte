@@ -472,7 +472,7 @@
 								href="#copy"
 								on:click={async () =>
 									await navigator.clipboard.writeText(
-										`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/watch/${data.video.videoId}`
+										`${location.origin}watch/${data.video.videoId}`
 									)}
 							>
 								<div class="min">{$_('player.share.materialiousLink')}</div></a

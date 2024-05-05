@@ -144,7 +144,7 @@ const persistedStores = [
 ];
 
 export function bookmarkletSaveToUrl(): string {
-	const url = new URL(import.meta.env.VITE_DEFAULT_FRONTEND_URL);
+	const url = new URL(location.origin);
 
 	persistedStores.forEach((store) => {
 		let value = get(store.store);

@@ -11,6 +11,9 @@
 	import SyncParty from '$lib/SyncParty.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl } from '$lib/bookmarklet';
+	import { App } from '@capacitor/app';
+	import { Browser } from '@capacitor/browser';
+	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
@@ -21,6 +24,7 @@
 		activePageStore,
 		authStore,
 		darkModeStore,
+		instanceStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '../store';
@@ -78,14 +82,34 @@
 		}
 	});
 
-	function login() {
-		const path = new URL(`${import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE}/authorize_token`);
-		path.search = new URLSearchParams({
-			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*',
-			callback_url: `${import.meta.env.VITE_DEFAULT_FRONTEND_URL}/auth`
-		}).toString();
+	// Auth response handling for Mobile
+	App.addListener('appUrlOpen', (data) => {
+		const authUrl = new URL(data.url);
+		const username = authUrl.searchParams.get('username');
+		const token = authUrl.searchParams.get('token');
 
-		document.location.href = path.toString();
+		if (username && token) {
+			authStore.set({
+				username: username,
+				token: token
+			});
+		}
+	});
+
+	async function login() {
+		const path = new URL(`${get(instanceStore)}/authorize_token`);
+		const searchParams = new URLSearchParams({
+			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
+		});
+		if (Capacitor.isNativePlatform()) {
+			searchParams.set('callback_url', 'materialious-auth://');
+			path.search = searchParams.toString();
+			await Browser.open({ url: path.toString() });
+		} else {
+			searchParams.set('callback_url', `${location.origin}/auth`);
+			path.search = searchParams.toString();
+			document.location.href = path.toString();
+		}
 	}
 
 	function logout() {
@@ -185,12 +209,12 @@
 			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 		</button>
 		{#if isLoggedIn}
-			<button class="circle large transparent" data-ui="#dialog-notifications"
+			<button class="circle large transparent" on:click={() => ui('#dialog-notifications')}
 				><i>notifications</i>
 				<div class="tooltip bottom">{$_('layout.notifications')}</div>
 			</button>
 		{/if}
-		<button class="circle large transparent" data-ui="#dialog-settings">
+		<button class="circle large transparent" on:click={() => ui('#dialog-settings')}>
 			<i>settings</i>
 			<div class="tooltip bottom">{$_('layout.settings')}</div>
 		</button>
@@ -214,7 +238,9 @@
 		{#if !page.requiresAuth || isLoggedIn}
 			<a class="round" href={page.href} class:active={currentPage === page.name.toLowerCase()}
 				><i>{page.icon}</i>
-				<div class="tooltip top">{page.name}</div>
+				{#if currentPage === page.name.toLowerCase()}
+					<span style="font-size: .8em;">{page.name}</span>
+				{/if}
 			</a>
 		{/if}
 	{/each}

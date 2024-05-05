@@ -36,6 +36,11 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@capacitor/android": "^6.0.0",
+		"@capacitor/app": "^6.0.0",
+		"@capacitor/browser": "^6.0.0",
+		"@capacitor/cli": "^6.0.0",
+		"@capacitor/core": "^6.0.0",
 		"beercss": "^3.5.1",
 		"fuse.js": "^7.0.0",
 		"human-number": "^2.0.4",

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { deleteUnsubscribe } from '$lib/Api';
-	import { truncate } from '$lib/misc';
 	import Fuse from 'fuse.js';
 	import { _ } from 'svelte-i18n';
 	import { activePageStore } from '../../../store';
@@ -49,9 +48,20 @@
 {#each subscriptions as sub}
 	<article>
 		<nav>
-			<a href={`/channel/${sub.authorId}`}><h6>{truncate(sub.author, 18)}</h6></a>
-			<div class="max"></div>
+			<a href={`/channel/${sub.authorId}`} style="flex: 1;"
+				><h6>
+					{sub.author}
+				</h6></a
+			>
 			<button on:click={async () => unsubscribe(sub.authorId)} class="border">Unsubscribe</button>
 		</nav>
 	</article>
 {/each}
+
+<style>
+	@media screen and (max-width: 590px) {
+		nav {
+			flex-direction: column;
+		}
+	}
+</style>

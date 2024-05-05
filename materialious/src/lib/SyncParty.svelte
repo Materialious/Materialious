@@ -103,16 +103,14 @@
 				<input
 					name="sync-share"
 					readonly
-					value={`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeerStore.id}`}
+					value={`${location.origin}?sync=${$syncPartyPeerStore.id}`}
 					type="text"
 				/>
 				<label class="active" for="sync-share">Share URL</label>
 			</div>
 			<button
 				on:click={async () => {
-					await navigator.clipboard.writeText(
-						`${import.meta.env.VITE_DEFAULT_FRONTEND_URL}?sync=${$syncPartyPeerStore?.id}`
-					);
+					await navigator.clipboard.writeText(`${location.origin}?sync=${$syncPartyPeerStore?.id}`);
 				}}
 				class="square round"
 			>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { miniPlayerSrcStore } from '../store';
+	import { get } from 'svelte/store';
+	import { miniPlayerSrcStore, playerProxyVideosStore } from '../store';
 	import { proxyVideoUrl } from './misc';
 
 	let currentTime: number = 0;
@@ -48,7 +49,6 @@
 				></progress>
 			</div>
 			<video
-				crossorigin="anonymous"
 				on:click={() => {
 					goto(`/watch/${$miniPlayerSrcStore.video.videoId}?time=${currentTime}`);
 					miniPlayerSrcStore.set(null);
@@ -59,7 +59,9 @@
 				on:loadedmetadata={setTime}
 				controls={false}
 				autoplay
-				src={proxyVideoUrl($miniPlayerSrcStore.video.formatStreams[0].url)}
+				src={get(playerProxyVideosStore)
+					? proxyVideoUrl($miniPlayerSrcStore.video.formatStreams[0].url)
+					: $miniPlayerSrcStore.video.formatStreams[0].url}
 			>
 			</video>
 		</article>

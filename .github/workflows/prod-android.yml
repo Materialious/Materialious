@@ -53,10 +53,11 @@ jobs:
         with:
           name: app-release
           path: android/app/build/outputs/bundle/release/app-release-signed.aab
-      - name: Upload binaries to release
+
+      - name: Upload APK to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: android/app/build/outputs/bundle/release/*
+          file: android/app/build/outputs/bundle/release/app-release-signed.aab
           overwrite: true
           file_glob: true

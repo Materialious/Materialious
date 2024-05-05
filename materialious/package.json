@@ -12,6 +12,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@capacitor/assets": "^3.0.5",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-static": "^3.0.1",
 		"@sveltejs/kit": "^2.0.0",
@@ -43,6 +44,7 @@
 		"@capacitor/cli": "^6.0.0",
 		"@capacitor/core": "^6.0.0",
 		"beercss": "^3.5.1",
+		"electron-builder": "^24.13.3",
 		"fuse.js": "^7.0.0",
 		"human-number": "^2.0.4",
 		"material-dynamic-colors": "^1.1.0",

@@ -34,11 +34,8 @@ jobs:
       - name: Build Svelte app
         run: npm run build
 
-      - name: Capacitor update
-        run: npx cap update
-
-      - name: Capacitor copy
-        run: npx cap copy
+      - name: Capacitor sync
+        run: npx cap sync
 
       - name: Build app bundle
         run: cd android && ./gradlew bundle

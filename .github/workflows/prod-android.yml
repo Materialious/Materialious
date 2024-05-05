@@ -20,7 +20,7 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
+          distribution: 'adopt'
           java-version: '17'
 
       - name: Setup Node.js
@@ -52,12 +52,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: app-release
-          path: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+          path: ./android/app/build/outputs/bundle/release/app-release.aab
 
       - name: Upload APK to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+          file:  ./android/app/build/outputs/bundle/release/app-release.aab
           overwrite: true
           file_glob: true

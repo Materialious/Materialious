@@ -37,27 +37,19 @@ jobs:
       - name: Capacitor sync
         run: npx cap sync
 
-      - name: Build app bundle
-        run: cd android && ./gradlew bundle
+      - name: Build APK
+        run: cd android && ./gradlew assembleRelease
 
-      - name: Extract Android signing key from env
+      - name: Sign APK
         run: |
           echo "${{ secrets.RELEASE_KEYSTORE }}" > android/release.jks.base64
           base64 -d android/release.jks.base64 > android/release.decrypted.jks
-
-      - name: Sign dev build
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
-
-      - name: Upload release bundle
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release
-          path: ./materialious/android/app/build/outputs/bundle/release/app-release-signed.aab
+          jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/release/app-release-signed.apk ./android/app/build/outputs/apk/release/app-release-unsigned.apk release
 
       - name: Upload APK to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./materialious/android/app/build/outputs/bundle/release/app-release-signed.aab
+          file: ./materialious/android/app/build/outputs/apk/release/app-release-signed.apk
           overwrite: true
           file_glob: true

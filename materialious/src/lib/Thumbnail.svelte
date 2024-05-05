@@ -94,9 +94,10 @@
 
 							mockVideo.preload = 'auto';
 							mockVideo.id = 'video';
-							mockVideo.crossOrigin = location.origin;
 							const videoToThumbnail = (await getVideo(video.videoId)).formatStreams[0].url;
-							mockVideo.src = proxyVideoUrl(videoToThumbnail);
+							mockVideo.src = get(playerProxyVideosStore)
+								? proxyVideoUrl(videoToThumbnail)
+								: videoToThumbnail;
 
 							mockVideo.addEventListener('loadeddata', () => {
 								mockVideo.currentTime = mockVideo.duration / 100;

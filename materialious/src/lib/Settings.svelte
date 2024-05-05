@@ -4,6 +4,7 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import {
+		authStore,
 		darkModeStore,
 		deArrowEnabledStore,
 		deArrowInstanceStore,
@@ -29,6 +30,7 @@
 		synciousStore,
 		themeColorStore
 	} from '../store';
+	import { ensureNoTrailingSlash } from './misc';
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
@@ -107,7 +109,12 @@
 	{#if Capacitor.isNativePlatform()}
 		<div class="settings">
 			<h6>Invidious</h6>
-			<form on:submit|preventDefault={() => instanceStore.set(invidiousInstance)}>
+			<form
+				on:submit|preventDefault={() => {
+					authStore.set(null);
+					instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
+				}}
+			>
 				<nav>
 					<div class="field label border max">
 						<input bind:value={invidiousInstance} name="returnyt-instance" type="text" />
@@ -222,21 +229,23 @@
 			</nav>
 		</div>
 
-		<div class="field no-margin">
-			<nav class="no-padding">
-				<div class="max">
-					<div>{$_('layout.player.proxyVideos')}</div>
-				</div>
-				<label class="switch">
-					<input
-						type="checkbox"
-						bind:checked={$playerProxyVideosStore}
-						on:click={() => playerProxyVideosStore.set(!$playerProxyVideosStore)}
-					/>
-					<span></span>
-				</label>
-			</nav>
-		</div>
+		{#if !Capacitor.isNativePlatform()}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.proxyVideos')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerProxyVideosStore}
+							on:click={() => playerProxyVideosStore.set(!$playerProxyVideosStore)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+		{/if}
 
 		<div class="field no-margin">
 			<nav class="no-padding">
@@ -303,27 +312,32 @@
 			</nav>
 		</div>
 
-		<div class="field no-margin">
-			<nav class="no-padding">
-				<div class="max">
-					<div>{$_('layout.player.dash')}</div>
-				</div>
-				<label class="switch">
-					<input
-						type="checkbox"
-						bind:checked={$playerDashStore}
-						on:click={() => playerDashStore.set(!$playerDashStore)}
-					/>
-					<span></span>
-				</label>
-			</nav>
-		</div>
+		{#if !Capacitor.isNativePlatform()}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.dash')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerDashStore}
+							on:click={() => playerDashStore.set(!$playerDashStore)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+		{/if}
 	</div>
 
 	<div class="settings">
 		<h6>Return YT Dislikes</h6>
 
-		<form on:submit|preventDefault={() => returnYTDislikesInstanceStore.set(returnYTInstance)}>
+		<form
+			on:submit|preventDefault={() =>
+				returnYTDislikesInstanceStore.set(ensureNoTrailingSlash(returnYTInstance))}
+		>
 			<nav>
 				<div class="field label border max">
 					<input bind:value={returnYTInstance} name="returnyt-instance" type="text" />
@@ -353,7 +367,10 @@
 	<div class="settings">
 		<h6>Syncious</h6>
 
-		<form on:submit|preventDefault={() => synciousInstanceStore.set(synciousInstance)}>
+		<form
+			on:submit|preventDefault={() =>
+				synciousInstanceStore.set(ensureNoTrailingSlash(synciousInstance))}
+		>
 			<nav>
 				<div class="field label border max">
 					<input bind:value={synciousInstance} name="syncious-instance" type="text" />
@@ -383,7 +400,10 @@
 	<div class="settings">
 		<h6>Sponsorblock</h6>
 
-		<form on:submit|preventDefault={() => sponsorBlockUrlStore.set(sponsorBlockInstance)}>
+		<form
+			on:submit|preventDefault={() =>
+				sponsorBlockUrlStore.set(ensureNoTrailingSlash(sponsorBlockInstance))}
+		>
 			<nav>
 				<div class="field label border max">
 					<input bind:value={sponsorBlockInstance} name="sponsorblock-instance" type="text" />
@@ -431,7 +451,9 @@
 	<div class="settings">
 		<h6>{$_('layout.deArrow.title')}</h6>
 
-		<form on:submit|preventDefault={() => deArrowInstanceStore.set(deArrowUrl)}>
+		<form
+			on:submit|preventDefault={() => deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl))}
+		>
 			<nav>
 				<div class="field label border max">
 					<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
@@ -471,14 +493,16 @@
 		</nav>
 	</div>
 
-	<div class="settings">
-		<h6>{$_('layout.bookmarklet')}</h6>
-		<button
-			class="no-margin"
-			on:click={async () => await navigator.clipboard.writeText(bookmarkletSaveToUrl())}
-			>{$_('copyUrl')}</button
-		>
-	</div>
+	{#if !Capacitor.isNativePlatform()}
+		<div class="settings">
+			<h6>{$_('layout.bookmarklet')}</h6>
+			<button
+				class="no-margin"
+				on:click={async () => await navigator.clipboard.writeText(bookmarkletSaveToUrl())}
+				>{$_('copyUrl')}</button
+			>
+		</div>
+	{/if}
 </dialog>
 
 <style>

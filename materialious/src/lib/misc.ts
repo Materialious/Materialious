@@ -159,3 +159,9 @@ export function getBestThumbnail(
 		return null;
 	}
 }
+
+export function ensureNoTrailingSlash(url: any): string {
+	if (typeof url !== 'string') return '';
+
+	return url.endsWith('/') ? url.slice(0, -1) : url;
+}

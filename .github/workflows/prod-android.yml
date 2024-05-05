@@ -9,6 +9,10 @@ jobs:
   build:
     name: Build APK
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./materialious
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v3

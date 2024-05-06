@@ -66,8 +66,8 @@ jobs:
         id: changelog
         uses: ardalanamini/auto-changelog@v3
         with:
-          mention-authors: true
-          mention-new-contributors: true
+          mention-authors: false
+          mention-new-contributors: false
           include-compare: false
           semver: false
 

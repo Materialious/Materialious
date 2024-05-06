@@ -1,8 +1,9 @@
 {
-  "appId": "com.yourdoamnin.yourapp",
+  "appId": "us.materialio.app",
   "directories": {
     "buildResources": "resources"
   },
+  "icon": "../static/icon512_maskable.png",
   "files": [
     "assets/**/*",
     "build/**/*",
@@ -22,7 +23,35 @@
     "icon": "assets/appIcon.ico"
   },
   "mac": {
-    "category": "your.app.category.type",
+    "category": "Entertainment",
     "target": "dmg"
+  },
+  "linux": {
+    "target": [
+      "deb",
+      "zip",
+      "7z",
+      "rpm",
+      "AppImage"
+    ],
+    "category": "AudioVideo"
+  },
+  "rpm": {
+    "fpm": [
+      "--rpm-rpmbuild-define=_build_id_links none"
+    ]
+  },
+  "deb": {
+    "depends": [
+      "libgtk-3-0",
+      "libnotify4",
+      "libnss3",
+      "libxss1",
+      "libxtst6",
+      "xdg-utils",
+      "libatspi2.0-0",
+      "libuuid1",
+      "libsecret-1-0"
+    ]
   }
 }

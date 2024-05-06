@@ -1,0 +1,66 @@
+name: Build desktop
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  desktop-build:
+    strategy:
+      matrix:
+        node-version: [18]
+        runtime:
+          - linux-x64
+          - linux-armv7l
+          - linux-arm64
+          - win-x64
+          - win-arm64
+          - osx-x64
+
+        include:
+        - runtime: linux-x64
+          os: ubuntu-latest
+
+        - runtime: linux-armv7l
+          os: ubuntu-latest
+
+        - runtime: linux-arm64
+          os: ubuntu-latest
+
+        - runtime: osx-x64
+          os: macOS-latest
+
+        - runtime: win-x64
+          os: windows-latest
+
+        - runtime: win-arm64
+          os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install modules
+        run: cd ./materialious && npm install
+
+      - name: Build package
+        run: cd ./materialious && npm run build
+
+      - name: Sync electron package
+        run: cd ./materialious && npx cap sync @capacitor-community/electron
+
+      - name: Install electron modules
+        run: cd ./materialious/electron && npm install
+      
+      - name: Install required system packages
+        run: apt-get install -y libxcrypt-dev
+
+      - name: Build desktop packages
+        run: cd ./materialious/electron && npm run electron:make

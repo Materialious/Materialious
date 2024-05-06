@@ -69,7 +69,6 @@ jobs:
         with:
           artifacts: "./materialious/android/app/build/outputs/app-release-signed.aab, ./materialious/android/app/build/outputs/app-release-signed.apk"
           body: ${{ steps.changelog.outputs.changelog }}
-          tag: ${{ github.event.head_commit.message }}
           name: Release ${{ github.event.head_commit.message }}
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}

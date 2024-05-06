@@ -65,8 +65,8 @@ jobs:
         if: runner.os != 'Windows'
             
       - name: Set up environment variables
-        run: echo ("GH_TOKEN=" + ${{ secrets.GITHUB_TOKEN }}) >> $env:GITHUB_ENV
-        shell: cmd
+        run: echo GH_TOKEN=${{ secrets.GITHUB_TOKEN }} >> $env:GITHUB_ENV
+        shell: powershell
         if: runner.os == 'Windows'
 
       - name: Build desktop packages

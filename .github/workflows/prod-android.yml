@@ -14,6 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install modules
+        run: cd ../ && npm install
+
+      - name: Build package
+        run: cd ../ && npm run build
+
+      - name: Sync package
+        run: cd ../ && npx cap sync
+
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:

@@ -63,13 +63,12 @@ jobs:
           include-compare: false
           semver: false
 
-      - name: Create Release
-        id: create_release
-        uses: ncipollo/release-action@v1
+      - name: Upload APKs to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          artifacts: "./materialious/android/app/build/outputs/app-release-signed.aab, ./materialious/android/app/build/outputs/app-release-signed.apk"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.changelog.outputs.changelog }}
-          name: Release ${{ github.event.head_commit.message }}
+          file: ./materialious/android/app/build/outputs/*
           tag: ${{ github.ref }}
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          overwrite: true
+          file_glob: true

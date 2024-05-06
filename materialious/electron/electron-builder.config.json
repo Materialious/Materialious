@@ -3,6 +3,9 @@
   "directories": {
     "buildResources": "resources"
   },
+  "publish": {
+    "provider": "github"
+  },
   "icon": "../static/icon512_maskable.png",
   "files": [
     "assets/**/*",

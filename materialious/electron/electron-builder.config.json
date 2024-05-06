@@ -5,6 +5,7 @@
   },
   "publish": {
     "provider": "github",
+    "vPrefixedTagName": false,
     "releaseType": "release"
   },
   "icon": "../static/icon512_maskable.png",

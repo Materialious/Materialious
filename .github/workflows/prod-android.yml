@@ -1,11 +1,16 @@
-name: Build
+name: Build Android
 on:
   push:
     branches:
       - 'main'
+
 jobs:
-  Build:
+  android-build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./materialious
+
     steps:
       - uses: actions/checkout@v3
 
@@ -18,13 +23,13 @@ jobs:
 
       - name: Build App
         run: |
-          bash ./materialious/android/gradlew assembleRelease
-          bash ./materialious/android/gradlew bundleRelease
+          bash /android/gradlew assembleRelease
+          bash /android/gradlew bundleRelease
 
       - name: Move files
         run: |
-          mv /materialious/android/app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
-          mv /materialious/android/app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          mv /android/app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
+          mv /android/app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
 
       - name: Sign App
         id: sign_app

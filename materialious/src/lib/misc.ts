@@ -46,6 +46,12 @@ export interface PhasedDescription {
 	timestamps: { title: string; time: number; timePretty: string; }[];
 }
 
+export function decodeHtmlCharCodes(str: string): string {
+	return str.replace(/(&#(\d+);)/g, function (match, capture, charCode) {
+		return String.fromCharCode(charCode);
+	});
+}
+
 export function phaseDescription(content: string): PhasedDescription {
 	const timestamps: { title: string; time: number; timePretty: string; }[] = [];
 	const lines = content.split('\n');
@@ -73,7 +79,7 @@ export function phaseDescription(content: string): PhasedDescription {
 			const title = timestampMatch[4] || '';
 			timestamps.push({
 				time: convertToSeconds(time),
-				title: title,
+				title: decodeHtmlCharCodes(title),
 				timePretty: timestamp
 			});
 		} else {

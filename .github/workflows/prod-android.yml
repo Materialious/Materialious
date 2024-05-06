@@ -65,10 +65,11 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1
         with:
           artifacts: "./materialious/android/app/build/outputs/app-release-signed.aab, ./materialious/android/app/build/outputs/app-release-signed.apk"
           body: ${{ steps.changelog.outputs.changelog }}
           name: Release ${{ github.event.head_commit.message }}
+          tag: ${{ github.ref }}
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -41,6 +41,7 @@ jobs:
 
       - name: Move files
         run: |
+          mkdir /materialious/android/app/build/outputs
           mv app/build/outputs/apk/release/app-release-unsigned.apk /materialious/android/app/build/outputs/app-release.apk
           mv app/build/outputs/bundle/release/app-release.aab /materialious/android/app/build/outputs/app-release.aab
 
@@ -67,7 +68,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
+          artifacts: "/materialious/android/app/build/outputs/app-release-signed.aab, /materialious/android/app/build/outputs/app-release-signed.apk"
           body: ${{ steps.changelog.outputs.changelog }}
           tag: ${{ github.event.head_commit.message }}
           name: Release ${{ github.event.head_commit.message }}

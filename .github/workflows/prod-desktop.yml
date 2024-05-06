@@ -56,6 +56,9 @@ jobs:
       - name: Sync electron package
         run: cd ./materialious && npx cap sync @capacitor-community/electron
 
+      - name: Install electron modules
+        run: cd ./materialious/electron && npm install
+
       - name: Set up environment variables
         run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
         shell: bash

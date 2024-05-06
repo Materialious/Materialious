@@ -60,4 +60,6 @@ jobs:
         run: cd ./materialious/electron && npm install
 
       - name: Build desktop packages
-        run: cd ./materialious/electron && npm run electron:make
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: cd ./materialious/electron && GH_TOKEN=${GH_TOKEN} npm run electron:make

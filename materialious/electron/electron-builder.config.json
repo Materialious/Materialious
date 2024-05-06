@@ -4,7 +4,8 @@
     "buildResources": "resources"
   },
   "publish": {
-    "provider": "github"
+    "provider": "github",
+    "releaseType": "release"
   },
   "icon": "../static/icon512_maskable.png",
   "files": [

@@ -56,10 +56,8 @@ jobs:
       - name: Sync electron package
         run: cd ./materialious && npx cap sync @capacitor-community/electron
 
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.github_token }}
-          skip_build: true
-          args: "-c ./electron-builder.config.json -p always"
-          package_root: "./materialious/electron"
+      - name: Set up environment variables
+        run: echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Build desktop packages
+        run: cd ./materialious/electron && npm run electron:make

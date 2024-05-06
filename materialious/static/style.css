@@ -32,12 +32,14 @@
 }
 
 main.root {
+	padding-left: 7em !important;
+	padding-top: 5em !important;
 	max-height: 100vh;
 	overflow-y: scroll;
 }
 
 @media screen and (max-width: 580px) {
-	main {
+	main.root {
 		padding-left: 0.1em !important;
 		padding-right: 0.1em !important;
 	}

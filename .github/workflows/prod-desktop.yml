@@ -60,6 +60,12 @@ jobs:
         run: cd ./materialious/electron && npm install
 
       - name: Build desktop packages
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: cd ./materialious/electron && GH_TOKEN=${GH_TOKEN} npm run electron:make
+        run: |
+          cd ./materialious/electron
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            $env:GH_TOKEN = "${{ secrets.GITHUB_TOKEN }}"
+            npm run electron:make
+          else
+            export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            npm run electron:make
+          fi

@@ -88,7 +88,7 @@
 			"dataPreferences": "Настройки данных"
 		},
 		"player": {
-			"title": "Плейер",
+			"title": "Плеер",
 			"autoPlay": "Авто-воспроизведение видео",
 			"alwaysLoopVideo": "Зацикливать видео",
 			"savePlaybackPosition": "Сохранять позицию",

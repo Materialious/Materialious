@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./materialious
+        working-directory: ./materialious/android
 
     steps:
       - uses: actions/checkout@v3
@@ -23,13 +23,13 @@ jobs:
 
       - name: Build App
         run: |
-          bash android/gradlew assembleRelease
-          bash android/gradlew bundleRelease
+          bash gradlew assembleRelease
+          bash gradlew bundleRelease
 
       - name: Move files
         run: |
-          mv android/app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
-          mv android/app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
+          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
 
       - name: Sign App
         id: sign_app

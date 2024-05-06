@@ -54,6 +54,14 @@ jobs:
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
+      - name: Make release dir
+        run: mkdir app/release
+
+      - name: Move files to release
+        run: |
+          mv app/build/outputs/app-release-signed.aab app/release/app-release-signed.aab
+          mv app/build/outputs/app-release-signed.apk app/release/app-release-signed.apk
+
       - name: Build Changelog
         id: changelog
         uses: ardalanamini/auto-changelog@v3
@@ -68,7 +76,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.changelog.outputs.changelog }}
-          file: ./materialious/android/app/build/outputs/*
+          file: ./materialious/android/app/release/*
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true

@@ -65,7 +65,7 @@ jobs:
         if: runner.os != 'Windows'
             
       - name: Set up environment variables
-        run: set "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> %GITHUB_ENV%
+        run: echo ("GH_TOKEN=" + ${{ secrets.GITHUB_TOKEN }}) >> $env:GITHUB_ENV
         shell: cmd
         if: runner.os == 'Windows'
 

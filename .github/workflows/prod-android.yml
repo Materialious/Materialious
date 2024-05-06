@@ -48,7 +48,7 @@ jobs:
         id: sign_app
         uses: ilharp/sign-android-release@v1.0.4
         with:
-          releaseDir: app/build/outputs/
+          releaseDir: ./materialious/android/app/build/outputs/
           signingKey: ${{ secrets.ANDROID_SIGNING_KEY }}
           keyAlias: ${{ secrets.ANDROID_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -67,7 +67,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
+          artifacts: "./materialious/android/app/build/outputs/app-release-signed.aab, ./materialious/android/app/build/outputs/app-release-signed.apk"
           body: ${{ steps.changelog.outputs.changelog }}
           tag: ${{ github.event.head_commit.message }}
           name: Release ${{ github.event.head_commit.message }}

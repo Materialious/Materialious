@@ -43,11 +43,10 @@
 		"home": "Home",
 		"trending": "Trending",
 		"subscriptions": "Subscriptions",
-		"playlists": "Playlists",
-		"history": "History"
+		"history": "History",
+		"playlists": "Playlists"
 	},
 	"subscribers": "subscribers",
-	"subscribe": "Subscribe",
 	"unsubscribe": "Unsubscribe",
 	"loginRequired": "Login required",
 	"player": {
@@ -60,9 +59,9 @@
 			"youtubeLink": "Copy Youtube link"
 		},
 		"download": "Download",
-		"addToPlaylist": "Add to playlist",
 		"noPlaylists": "No playlists",
-		"unableToLoadComments": "Unable to load comments"
+		"unableToLoadComments": "Unable to load comments",
+		"addToPlaylist": "Add to playlist"
 	},
 	"layout": {
 		"star": "Star us on Github!",
@@ -85,21 +84,22 @@
 		"searchSuggestions": "Search suggestions",
 		"previewVideoOnHover": "Preview video on hover",
 		"dataPreferences": {
-			"dataPreferences": "Data preferences",
-			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page."
+			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page.",
+			"dataPreferences": "Data preferences"
 		},
 		"player": {
 			"title": "Player",
 			"autoPlay": "Autoplay video",
-			"miniPlayer": "Mini player",
 			"alwaysLoopVideo": "Always loop video",
-			"proxyVideos": "Proxy videos",
 			"savePlaybackPosition": "Save playback position",
 			"listenByDefault": "Listen by default",
 			"theatreModeByDefault": "Theatre mode by default",
 			"autoPlayNextByDefault": "Autoplay next by default",
+			"miniPlayer": "Mini player",
+			"proxyVideos": "Proxy videos",
 			"dash": "Dash"
 		},
+		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",
 		"sponsors": {
 			"sponsor": "Sponsor",
@@ -113,7 +113,7 @@
 		"deArrow": {
 			"title": "DeArrow",
 			"thumbnailInstanceUrl": "Thumbnail instance URL"
-		},
-		"bookmarklet": "Bookmarklet"
-	}
+		}
+	},
+	"subscribe": "Subscribe"
 }

@@ -43,7 +43,8 @@
 		"home": "Начало",
 		"trending": "Тренды",
 		"subscriptions": "Подписки",
-		"history": "История"
+		"history": "История",
+		"playlists": "Плейлисты"
 	},
 	"subscribers": "подписчик(а/ов)",
 	"unsubscribe": "Отписаться",
@@ -59,7 +60,8 @@
 		},
 		"download": "Скачать",
 		"noPlaylists": "Нет списков воспроизведения",
-		"unableToLoadComments": "Невозможно загрузить комментарии"
+		"unableToLoadComments": "Невозможно загрузить комментарии",
+		"addToPlaylist": "Добавить в плейлист"
 	},
 	"layout": {
 		"star": "Поставить нам звезду на Github",
@@ -82,7 +84,8 @@
 		"searchSuggestions": "Поисковые подсказки",
 		"previewVideoOnHover": "Предпросмотр видео при наведении",
 		"dataPreferences": {
-			"content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз."
+			"content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз.",
+			"dataPreferences": "Настройки данных"
 		},
 		"player": {
 			"title": "Плейер",
@@ -91,8 +94,25 @@
 			"savePlaybackPosition": "Сохранять позицию",
 			"listenByDefault": "Слушать по умолчанию",
 			"theatreModeByDefault": "Широкий формат по умолчанию",
-			"autoPlayNextByDefault": "Авто-воспроизведение по умолчанию"
+			"autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
+			"miniPlayer": "Мини-плеер",
+			"proxyVideos": "Прокси видео"
 		},
-		"bookmarklet": "Закладка"
-	}
+		"bookmarklet": "Закладка",
+		"instanceUrl": "URL инстанса",
+		"sponsors": {
+			"sponsor": "Спонсор",
+			"unpaidSelfPromotion": "Самореклама",
+			"interactionReminder": "Напоминание о подписке",
+			"intermissionIntroAnimation": "Интро",
+			"credits": "Титры/Авторы",
+			"preViewRecapHook": "Краткое содержание",
+			"tangentJokes": "Шутки"
+		},
+		"deArrow": {
+			"title": "DeArrow",
+			"thumbnailInstanceUrl": "URL инстанса обложек"
+		}
+	},
+	"subscribe": "Подписаться"
 }

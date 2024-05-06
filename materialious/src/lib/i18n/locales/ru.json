@@ -40,8 +40,8 @@
 		"failedToLoadImage": "Ошибка загрузки изображения"
 	},
 	"pages": {
-		"home": "Начало",
-		"trending": "Тренды",
+		"home": "Главная",
+		"trending": "В тренде",
 		"subscriptions": "Подписки",
 		"history": "История",
 		"playlists": "Плейлисты"

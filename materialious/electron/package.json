@@ -1,14 +1,14 @@
 {
   "name": "Materialious",
   "version": "1.0.0",
-  "description": "An Amazing Capacitor App",
+  "description": "Modern material design for Invidious.",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Ward Pearce",
+    "email": "wardpearce@pm.me"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/WardPearce/Materialious"
   },
   "license": "MIT",
   "main": "build/src/index.js",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@capacitor-community/electron": "^5.0.0",
+    "@types/node": "^16.18.71",
     "chokidar": "~3.5.3",
     "electron-is-dev": "~2.0.0",
     "electron-serve": "~1.1.0",

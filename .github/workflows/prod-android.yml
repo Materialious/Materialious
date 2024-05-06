@@ -41,15 +41,14 @@ jobs:
 
       - name: Move files
         run: |
-          mkdir /materialious/android/app/build && mkdir /materialious/android/app/build/outputs
-          mv app/build/outputs/apk/release/app-release-unsigned.apk /materialious/android/app/build/outputs/app-release.apk
-          mv app/build/outputs/bundle/release/app-release.aab /materialious/android/app/build/outputs/app-release.aab
+          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
+          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
 
       - name: Sign App
         id: sign_app
         uses: ilharp/sign-android-release@v1.0.4
         with:
-          releaseDir: /materialious/android/app/build/outputs/
+          releaseDir: app/build/outputs/
           signingKey: ${{ secrets.ANDROID_SIGNING_KEY }}
           keyAlias: ${{ secrets.ANDROID_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -68,7 +67,7 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1.13.0
         with:
-          artifacts: "/materialious/android/app/build/outputs/app-release-signed.aab, /materialious/android/app/build/outputs/app-release-signed.apk"
+          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
           body: ${{ steps.changelog.outputs.changelog }}
           tag: ${{ github.event.head_commit.message }}
           name: Release ${{ github.event.head_commit.message }}

@@ -58,9 +58,6 @@ jobs:
 
       - name: Install electron modules
         run: cd ./materialious/electron && npm install
-      
-      - name: Install required system packages
-        run: apt-get install -y libxcrypt-dev
 
       - name: Build desktop packages
         run: cd ./materialious/electron && npm run electron:make

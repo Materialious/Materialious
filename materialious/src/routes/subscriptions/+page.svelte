@@ -15,7 +15,7 @@
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
 		const feed = await getFeed(100, currentPage);
-		if (feed.notifications.length === 0) {
+		if (feed.videos.length === 0) {
 			event.detail.complete();
 		} else {
 			videos = [...videos, ...feed.videos, ...feed.notifications];

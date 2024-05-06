@@ -71,12 +71,18 @@ jobs:
           include-compare: false
           semver: false
 
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: ./materialious
+
       - name: Upload APKs to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           body: ${{ steps.changelog.outputs.changelog }}
           file: ./materialious/android/app/release/*
-          tag: ${{ github.ref }}
+          tag: ${{ steps.package-version.outputs.current-version}}
           overwrite: true
           file_glob: true

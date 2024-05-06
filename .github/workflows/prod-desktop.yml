@@ -60,4 +60,6 @@ jobs:
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.github_token }}
+          skip_build: true
+          args: "-c ./electron-builder.config.json -p always"
           package_root: "./materialious/electron"

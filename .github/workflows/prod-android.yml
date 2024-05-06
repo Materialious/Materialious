@@ -41,7 +41,7 @@ jobs:
 
       - name: Move files
         run: |
-          mkdir /materialious/android/app/build/outputs
+          mkdir /materialious/android/app/build && mkdir /materialious/android/app/build/outputs
           mv app/build/outputs/apk/release/app-release-unsigned.apk /materialious/android/app/build/outputs/app-release.apk
           mv app/build/outputs/bundle/release/app-release.aab /materialious/android/app/build/outputs/app-release.aab
 

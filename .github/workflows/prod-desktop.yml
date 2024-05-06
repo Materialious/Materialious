@@ -60,12 +60,13 @@ jobs:
         run: cd ./materialious/electron && npm install
 
       - name: Build desktop packages
-        run: |
-          cd ./materialious/electron
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            $env:GH_TOKEN = "${{ secrets.GITHUB_TOKEN }}"
-            npm run electron:make
-          else
-            export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}
-            npm run electron:make
-          fi
+        run: cd ./materialious/electron && npm run electron:make
+
+      - name: Upload builds to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./materialious/electron/dist/Materialious*
+          tag: ${{ github.ref }}
+          overwrite: false
+          file_glob: true

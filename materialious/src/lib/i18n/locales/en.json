@@ -11,6 +11,7 @@
 	"deleteAllHistory": "Delete all history",
 	"skipping": "Skipping",
 	"replies": "replies",
+	"hideVideo": "Hide video",
 	"syncParty": {
 		"userJoined": "User joined your watch party.",
 		"userLeft": "User left your watch party."

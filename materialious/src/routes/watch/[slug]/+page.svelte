@@ -12,10 +12,10 @@
 	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
 	import Player from '$lib/Player.svelte';
+	import ShareVideo from '$lib/ShareVideo.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail, numberWithCommas, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
-	import { Capacitor } from '@capacitor/core';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -468,38 +468,8 @@
 							{$_('player.share.title')}
 						</div>
 						<menu class="no-wrap">
-							{#if !Capacitor.isNativePlatform()}
-								<a
-									class="row"
-									href="#copy"
-									on:click={async () =>
-										await navigator.clipboard.writeText(
-											`${location.origin}watch/${data.video.videoId}`
-										)}
-								>
-									<div class="min">{$_('player.share.materialiousLink')}</div></a
-								>
-							{/if}
-							<a
-								href="#copy"
-								class="row"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`https://redirect.invidious.io/watch?v=${data.video.videoId}`
-									)}
-							>
-								<div class="min">{$_('player.share.invidiousRedirect')}</div></a
-							><a
-								class="row"
-								href="#copy"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`https://www.youtube.com/watch?v=${data.video.videoId}`
-									)}
-							>
-								<div class="min">{$_('player.share.youtubeLink')}</div></a
-							></menu
-						></button
+							<ShareVideo video={data.video} />
+						</menu></button
 					>
 					{#if data.downloadOptions.length > 0}
 						<button class="border"

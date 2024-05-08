@@ -374,6 +374,15 @@
 	async function toggleTheatreMode() {
 		theatreMode = !theatreMode;
 	}
+
+	function downloadFile(downloadUrl: string) {
+		const anchor = document.createElement('a');
+		anchor.href = downloadUrl;
+		anchor.download = downloadUrl.split('/').pop() || 'unknown';
+		anchor.target = '_blank';
+		anchor.click();
+		document.body.removeChild(anchor);
+	}
 </script>
 
 <svelte:head>
@@ -477,7 +486,7 @@
 							<div class="tooltip">{$_('player.download')}</div>
 							<menu class="no-wrap">
 								{#each data.downloadOptions as download}
-									<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
+									<a class="row" href="#download" on:click={() => downloadFile(download.url)}
 										>{download.title}</a
 									>
 								{/each}

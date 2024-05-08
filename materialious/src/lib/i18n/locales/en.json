@@ -8,6 +8,7 @@
 	"create": "Create",
 	"title": "Title",
 	"searchPlaceholder": "Search...",
+	"delete": "Delete",
 	"deleteAllHistory": "Delete all history",
 	"skipping": "Skipping",
 	"replies": "replies",

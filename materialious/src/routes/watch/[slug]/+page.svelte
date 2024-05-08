@@ -15,6 +15,7 @@
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail, numberWithCommas, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
+	import { Capacitor } from '@capacitor/core';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -467,16 +468,19 @@
 							{$_('player.share.title')}
 						</div>
 						<menu class="no-wrap">
+							{#if !Capacitor.isNativePlatform()}
+								<a
+									class="row"
+									href="#copy"
+									on:click={async () =>
+										await navigator.clipboard.writeText(
+											`${location.origin}watch/${data.video.videoId}`
+										)}
+								>
+									<div class="min">{$_('player.share.materialiousLink')}</div></a
+								>
+							{/if}
 							<a
-								class="row"
-								href="#copy"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`${location.origin}watch/${data.video.videoId}`
-									)}
-							>
-								<div class="min">{$_('player.share.materialiousLink')}</div></a
-							><a
 								href="#copy"
 								class="row"
 								on:click={async () =>

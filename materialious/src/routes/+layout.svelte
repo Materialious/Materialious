@@ -204,10 +204,12 @@
 	{#if mobileSearchShow}
 		<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 	{:else}
-		<button data-ui="#sync-party" class="circle large transparent">
-			<i class:primary-text={$syncPartyPeerStore}>group</i>
-			<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-		</button>
+		{#if !Capacitor.isNativePlatform()}
+			<button data-ui="#sync-party" class="circle large transparent">
+				<i class:primary-text={$syncPartyPeerStore}>group</i>
+				<div class="tooltip bottom">{$_('layout.syncParty')}</div>
+			</button>
+		{/if}
 		{#if isLoggedIn}
 			<button class="circle large transparent" on:click={() => ui('#dialog-notifications')}
 				><i>notifications</i>

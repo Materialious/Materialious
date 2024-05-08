@@ -5,6 +5,7 @@
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail } from '$lib/misc';
+	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
@@ -113,12 +114,14 @@
 					<i>share</i>
 					<span>{$_('player.share.title')}</span>
 					<menu class="no-wrap">
-						<a
-							href="#share"
-							on:click={async () => {
-								await navigator.clipboard.writeText(location.href);
-							}}>{$_('player.share.materialiousLink')}</a
-						>
+						{#if !Capacitor.isNativePlatform()}
+							<a
+								href="#share"
+								on:click={async () => {
+									await navigator.clipboard.writeText(location.href);
+								}}>{$_('player.share.materialiousLink')}</a
+							>
+						{/if}
 						<a
 							href="#share"
 							on:click={async () => {

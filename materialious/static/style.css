@@ -50,3 +50,9 @@ main.root {
 		width: 100% !important;
 	}
 }
+
+@media screen and (max-width: 650px) {
+	main.root {
+		padding-top: 6em !important;
+	}
+}

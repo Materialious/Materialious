@@ -33,7 +33,7 @@
 
 		const peerId = crypto.randomUUID();
 		setWindowQueryFlag('sync', peerId);
-		$syncPartyPeerStore = peerJs(peerId);
+		$syncPartyPeerStore = await peerJs(peerId);
 
 		if ($syncPartyPeerStore) {
 			$syncPartyPeerStore.on('connection', (conn) => {
@@ -68,7 +68,7 @@
 		const currentUrl = get(page).url;
 		const syncId = currentUrl.searchParams.get('sync');
 		if (syncId) {
-			$syncPartyPeerStore = peerJs(crypto.randomUUID());
+			$syncPartyPeerStore = await peerJs(crypto.randomUUID());
 			$syncPartyPeerStore.on('open', () => {
 				if (!$syncPartyPeerStore) return;
 

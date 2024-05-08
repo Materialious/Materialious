@@ -1,7 +1,7 @@
 import { pushState } from '$app/navigation';
 import { page } from '$app/stores';
 import humanNumber from 'human-number';
-import { Peer } from 'peerjs';
+import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import { instanceStore } from '../store';
 import type { Image } from './Api/model';
@@ -134,8 +134,13 @@ export function removeWindowQueryFlag(key: string) {
 	pushState(currentPage.url, currentPage.state);
 }
 
-export function peerJs(peerId: string): Peer {
-	return new Peer(
+let PeerInstance: typeof Peer;
+export async function peerJs(peerId: string): Promise<Peer> {
+	// https://github.com/peers/peerjs/issues/819
+	if (typeof PeerInstance === 'undefined') {
+		PeerInstance = (await import('peerjs')).Peer;
+	}
+	return new PeerInstance(
 		peerId,
 		{
 			host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',

@@ -38,12 +38,7 @@
 - YT path redirects (So your redirect plugins should still work!)
 
 # Public instances
-- [materialio.us](https://materialio.us)
-  - **Location:** New Zealand
-  - **Threads:** 6
-  - **Twice daily IPV6 rotation:** Yes
-  - **Cloudflare:** No
-  - **Accounts:** Yes
+[Public instances are listed here](./docs/INSTANCES.md).
 
 Open an issue to add your instance.
 

@@ -1,5 +1,5 @@
 # Public instances
-- [materialio.us](https://materialio.us)
+- [app.materialio.us](https://app.materialio.us)
   - **Location:** New Zealand
   - **Threads:** 6
   - **IPV6 rotation:** Yes

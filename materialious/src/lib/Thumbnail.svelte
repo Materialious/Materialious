@@ -314,7 +314,7 @@
 						</div>
 						<button class="transparent circle">
 							<i>arrow_drop_down</i>
-							<menu class="no-wrap">
+							<menu class="left no-wrap">
 								<a href="#hide" on:click={hideVideo}>
 									{$_('hideVideo')}
 								</a>

@@ -38,13 +38,6 @@ main.root {
 	overflow-y: scroll;
 }
 
-@media screen and (max-width: 580px) {
-	main.root {
-		padding-left: 0.1em !important;
-		padding-right: 0.1em !important;
-	}
-}
-
 @media screen and (max-width: 650px) {
 	dialog.right {
 		width: 100% !important;
@@ -53,6 +46,7 @@ main.root {
 
 @media screen and (max-width: 650px) {
 	main.root {
-		padding-top: 6em !important;
+		padding-left: 0.1em !important;
+		padding-right: 0.1em !important;
 	}
 }

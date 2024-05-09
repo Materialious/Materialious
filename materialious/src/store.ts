@@ -28,6 +28,7 @@ export const playerDashStore = persisted('dashEnabled', false);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerMiniPlayerStore = persisted('miniPlayer', true);
+export const playerAndroidBackgroundPlayStore = persisted('androidBackgroundPlayer', true);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(

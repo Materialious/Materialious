@@ -99,6 +99,7 @@
 			"autoPlayNextByDefault": "Autoplay next by default",
 			"miniPlayer": "Mini player",
 			"proxyVideos": "Proxy videos",
+			"backgroundPlay": "Play audio in background",
 			"dash": "Dash"
 		},
 		"bookmarklet": "Bookmarklet",

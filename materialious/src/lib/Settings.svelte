@@ -13,6 +13,7 @@
 		interfacePreviewVideoOnHoverStore,
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
+		playerAndroidBackgroundPlayStore,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerDashStore,
@@ -311,6 +312,25 @@
 				</label>
 			</nav>
 		</div>
+
+		{#if Capacitor.getPlatform() === 'android'}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.backgroundPlay')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerAndroidBackgroundPlayStore}
+							on:click={() =>
+								playerAndroidBackgroundPlayStore.set(!$playerAndroidBackgroundPlayStore)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+		{/if}
 
 		{#if Capacitor.getPlatform() !== 'android'}
 			<div class="field no-margin">

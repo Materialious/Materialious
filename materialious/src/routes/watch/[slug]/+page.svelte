@@ -375,10 +375,10 @@
 		theatreMode = !theatreMode;
 	}
 
-	function downloadFile(downloadUrl: string) {
+	function downloadFile(url: string, container: string | undefined) {
 		const anchor = document.createElement('a');
-		anchor.href = downloadUrl;
-		anchor.download = downloadUrl.split('/').pop() || 'unknown';
+		anchor.href = url;
+		anchor.download = container || 'mp3';
 		anchor.target = '_blank';
 		anchor.click();
 		document.body.removeChild(anchor);
@@ -488,7 +488,10 @@
 							<div class="tooltip">{$_('player.download')}</div>
 							<menu class="no-wrap">
 								{#each data.downloadOptions as download}
-									<a class="row" href="#download" on:click={() => downloadFile(download.url)}
+									<a
+										class="row"
+										href="#download"
+										on:click={() => downloadFile(download.url, download.container)}
 										>{download.title}</a
 									>
 								{/each}

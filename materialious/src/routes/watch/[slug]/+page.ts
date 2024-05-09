@@ -24,20 +24,22 @@ export async function load({ params, url }) {
 		error(500, errorMessage);
 	}
 
-	let downloadOptions: { title: string; url: string }[] = [];
+	let downloadOptions: { title: string; url: string; container: string | undefined; }[] = [];
 
 	if (!video.hlsUrl) {
 		video.formatStreams.forEach((format) => {
 			downloadOptions.push({
 				title: `${format.type.split(';')[0].trim()} - ${format.qualityLabel} (With audio)`,
-				url: format.url
+				url: format.url,
+				container: format.container
 			});
 		});
 
 		video.adaptiveFormats.forEach((format) => {
 			downloadOptions.push({
 				title: `${format.type.split(';')[0].trim()} - ${format.qualityLabel || format.bitrate + ' bitrate'}`,
-				url: format.url
+				url: format.url,
+				container: format.container
 			});
 		});
 	}
@@ -64,7 +66,7 @@ export async function load({ params, url }) {
 	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
 		try {
 			returnYTDislikes = get(returnYtDislikesStore) ? getDislikes(params.slug) : null;
-		} catch {}
+		} catch { }
 	}
 
 	return {

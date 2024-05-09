@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bookmarkletSaveToUrl } from '$lib/bookmarklet';
+	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';

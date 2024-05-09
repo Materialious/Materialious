@@ -10,7 +10,7 @@
 	import Settings from '$lib/Settings.svelte';
 	import SyncParty from '$lib/SyncParty.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { bookmarkletLoadFromUrl } from '$lib/bookmarklet';
+	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
@@ -125,8 +125,6 @@
 	onMount(async () => {
 		ui();
 
-		bookmarkletLoadFromUrl();
-
 		const isDark = get(darkModeStore);
 
 		if (isDark === null) {
@@ -149,6 +147,11 @@
 		if (themeHex) {
 			await ui('theme', themeHex);
 		}
+
+		loadSettingsFromEnv();
+		// Should always be loaded after env settings
+		// So user preferences overwrite instance preferences.
+		bookmarkletLoadFromUrl();
 
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));

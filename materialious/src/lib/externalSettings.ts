@@ -143,6 +143,39 @@ const persistedStores = [
 	}
 ];
 
+function setStores(toSet: Record<string, any>) {
+	persistedStores.forEach((store) => {
+		let userOverwritten: boolean = false;
+		try {
+			userOverwritten = localStorage.getItem(store.name) !== null;
+		} catch { }
+
+		let paramValue = toSet[store.name];
+		if (typeof paramValue !== 'undefined' && !userOverwritten) {
+			let value: any;
+
+			if (store.type === 'array') {
+				value = paramValue.split(',');
+			} else if (store.type === 'boolean') {
+				value = paramValue === 'true';
+			} else {
+				value = paramValue;
+			}
+
+			store.store.set(value);
+		}
+	});
+}
+
+export function loadSettingsFromEnv() {
+	try {
+		if (typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'undefined') {
+			const defaultSettings = JSON.parse(import.meta.env.VITE_DEFAULT_SETTINGS);
+			setStores(defaultSettings);
+		}
+	} catch { }
+}
+
 export function bookmarkletSaveToUrl(): string {
 	const url = new URL(location.origin);
 
@@ -159,20 +192,11 @@ export function bookmarkletSaveToUrl(): string {
 export function bookmarkletLoadFromUrl() {
 	const currentPage = get(page);
 
-	persistedStores.forEach((store) => {
-		let paramValue = currentPage.url.searchParams.get(store.name);
-		if (paramValue) {
-			let value: any;
+	const toSet: Record<string, string> = {};
 
-			if (store.type === 'array') {
-				value = paramValue.split(',');
-			} else if (store.type === 'boolean') {
-				value = paramValue === 'true';
-			} else {
-				value = paramValue;
-			}
-
-			store.store.set(value);
-		}
+	currentPage.url.searchParams.forEach((value, key) => {
+		toSet[key] = value;
 	});
+
+	setStores(toSet);
 }

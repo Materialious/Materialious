@@ -125,6 +125,11 @@
 	onMount(async () => {
 		ui();
 
+		loadSettingsFromEnv();
+		// Should always be loaded after env settings
+		// So user preferences overwrite instance preferences.
+		bookmarkletLoadFromUrl();
+
 		const isDark = get(darkModeStore);
 
 		if (isDark === null) {
@@ -147,11 +152,6 @@
 		if (themeHex) {
 			await ui('theme', themeHex);
 		}
-
-		loadSettingsFromEnv();
-		// Should always be loaded after env settings
-		// So user preferences overwrite instance preferences.
-		bookmarkletLoadFromUrl();
 
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));

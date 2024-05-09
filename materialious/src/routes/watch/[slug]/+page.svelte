@@ -389,6 +389,8 @@
 	<title>{data.video.title} | Materialious</title>
 </svelte:head>
 
+<div class="space"></div>
+
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '10'}`}>
 		<div style="display: flex;justify-content: center;">

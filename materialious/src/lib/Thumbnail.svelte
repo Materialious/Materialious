@@ -313,7 +313,7 @@
 							{cleanNumber(video.viewCount)} • {video.publishedText}
 						</div>
 						<button class="transparent circle">
-							<i>arrow_drop_down</i>
+							<i>more_vert</i>
 							<menu class="left no-wrap">
 								<a href="#hide" on:click={hideVideo}>
 									{$_('hideVideo')}

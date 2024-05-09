@@ -3,6 +3,7 @@
 	import type { PlaylistPageVideo } from '$lib/Api/model.js';
 	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber, unsafeRandomItem } from '$lib/misc.js';
+	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { activePageStore, playlistSettingsStore } from '../../../store';
@@ -79,12 +80,14 @@
 		<i>share</i>
 		<span>{$_('player.share.title')}</span>
 		<menu class="no-wrap">
-			<a
-				href="#share"
-				on:click={async () => {
-					await navigator.clipboard.writeText(location.href);
-				}}>{$_('player.share.materialiousLink')}</a
-			>
+			{#if !Capacitor.isNativePlatform()}
+				<a
+					href="#share"
+					on:click={async () => {
+						await navigator.clipboard.writeText(location.href);
+					}}>{$_('player.share.materialiousLink')}</a
+				>
+			{/if}
 			<a
 				href="#share"
 				on:click={async () => {
@@ -98,5 +101,5 @@
 </article>
 
 {#if videos}
-	<VideoList {videos} playlistId={data.playlist.playlistId} />
+	<VideoList {videos} playlistAuthor={data.playlist.author} playlistId={data.playlist.playlistId} />
 {/if}

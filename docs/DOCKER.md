@@ -95,6 +95,8 @@ The following Invidious values must be set in your config.
 ## Step 3: Docker
 Please ensure you have followed the previous steps before doing this!
 
+### Docker Compose
+
 ```yaml
 version: "3"
 services:
@@ -121,6 +123,71 @@ services:
 
       # URL to DeArrow thumbnail instance
       VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
+
+      # Look at "Overwriting Materialious defaults" for all the accepted values.
+      VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be"}'
+```
+
+### Overwriting Materialious defaults
+Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETTINGS`
+
+```json
+{
+  // Set to true to enable dark mode, or false to disable it.
+  "darkMode": true,
+  
+  // Specifies the theme color in hexadecimal format (e.g., #ff0000 for red).
+  "themeColor": "#ff0000",
+  
+  // Set to true to enable autoplay, or false to disable it.
+  "autoPlay": false,
+  
+  // Set to true to always loop videos, or false to loop only when specified.
+  "alwaysLoop": false,
+  
+  // Set to true to proxy videos, or false to play them directly.
+  "proxyVideos": true,
+  
+  // Set to true to enable listening by default, or false to disable it.
+  "listenByDefault": true,
+  
+  // Set to true to save playback position, or false to reset it.
+  "savePlaybackPosition": true,
+  
+  // Set to true to enable DASH playback, or false to use other formats.
+  "dashEnabled": true,
+  
+  // Set to true to enable theatre mode by default, or false to disable it.
+  "theatreModeByDefault": false,
+  
+  // Set to true to autoplay next video by default, or false to disable it.
+  "autoplayNextByDefault": true,
+  
+  // Set to true to return YouTube dislikes, or false to hide them.
+  "returnYtDislikes": false,
+  
+  // Set to true to enable search suggestions, or false to disable them.
+  "searchSuggestions": true,
+  
+  // Set to true to preview video on hover, or false to disable it.
+  "previewVideoOnHover": true,
+  
+  // Set to true to enable sponsor block, or false to disable it.
+  "sponsorBlock": false,
+  
+  // Specifies the categories for sponsor block as comma-separated values.
+  // https://wiki.sponsor.ajay.app/w/Types
+  "sponsorBlockCategories": "sponsor,interaction",
+
+  // Set to true to enable deArrow, or false to disable it.
+  "deArrowEnabled": true,
+
+  // Set to true to enable mini player, or false to disable it.
+  "playerMiniPlayer": true,
+  
+  // Set to true to enable syncious, or false to disable it.
+  "syncious": true,
+}
 ```
 
 ## Step 4 (Optional, but recommended): Self-host RYD-Proxy

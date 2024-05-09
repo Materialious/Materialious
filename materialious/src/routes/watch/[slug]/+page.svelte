@@ -12,6 +12,7 @@
 	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
 	import Player from '$lib/Player.svelte';
+	import ShareVideo from '$lib/ShareVideo.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail, numberWithCommas, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
@@ -373,6 +374,15 @@
 	async function toggleTheatreMode() {
 		theatreMode = !theatreMode;
 	}
+
+	function downloadFile(downloadUrl: string) {
+		const anchor = document.createElement('a');
+		anchor.href = downloadUrl;
+		anchor.download = downloadUrl.split('/').pop() || 'unknown';
+		anchor.target = '_blank';
+		anchor.click();
+		document.body.removeChild(anchor);
+	}
 </script>
 
 <svelte:head>
@@ -467,35 +477,8 @@
 							{$_('player.share.title')}
 						</div>
 						<menu class="no-wrap">
-							<a
-								class="row"
-								href="#copy"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`${location.origin}watch/${data.video.videoId}`
-									)}
-							>
-								<div class="min">{$_('player.share.materialiousLink')}</div></a
-							><a
-								href="#copy"
-								class="row"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`https://redirect.invidious.io/watch?v=${data.video.videoId}`
-									)}
-							>
-								<div class="min">{$_('player.share.invidiousRedirect')}</div></a
-							><a
-								class="row"
-								href="#copy"
-								on:click={async () =>
-									await navigator.clipboard.writeText(
-										`https://www.youtube.com/watch?v=${data.video.videoId}`
-									)}
-							>
-								<div class="min">{$_('player.share.youtubeLink')}</div></a
-							></menu
-						></button
+							<ShareVideo video={data.video} />
+						</menu></button
 					>
 					{#if data.downloadOptions.length > 0}
 						<button class="border"
@@ -503,7 +486,7 @@
 							<div class="tooltip">{$_('player.download')}</div>
 							<menu class="no-wrap">
 								{#each data.downloadOptions as download}
-									<a class="row" href={download.url} target="_blank" rel="noopener noreferrer"
+									<a class="row" href="#download" on:click={() => downloadFile(download.url)}
 										>{download.title}</a
 									>
 								{/each}

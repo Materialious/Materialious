@@ -100,7 +100,7 @@ body:
       options:
         - label: "RYD-Proxy"
           required: false
-        - label: "Syncious integration"
+        - label: "Invidious API extended integration"
           required: false
         - label: "Self-hosted PeerJS"
           required: false

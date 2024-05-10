@@ -15,7 +15,7 @@
 [Help translate Materialious!](https://fink.inlang.com/github.com/WardPearce/Materialious)
 
 # Features
-- [Syncios integration!](https://github.com/WardPearce/syncious)
+- [Invidious API extended integration!](https://github.com/Materialious/api-extended)
   - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
 - Mini player.

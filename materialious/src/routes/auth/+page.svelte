@@ -7,10 +7,15 @@
 
 	// Auth response handling for Desktop
 	onMount(() => {
-		authStore.set({
-			username: $page.url.searchParams.get('username') as string,
-			token: $page.url.searchParams.get('token') as string
-		});
+		const username = $page.url.searchParams.get('username');
+		const token = $page.url.searchParams.get('token');
+
+		if (username && token) {
+			authStore.set({
+				username: username,
+				token: token
+			});
+		}
 
 		goto('/');
 	});

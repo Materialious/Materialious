@@ -168,12 +168,25 @@ function setStores(toSet: Record<string, any>) {
 }
 
 export function loadSettingsFromEnv() {
+	if (typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'string') return;
+
+	// If $VITE_DEFAULT_SETTINGS is passed via docker, it will be wrapped with quotations.
+	let defaultSettingsJson = import.meta.env.VITE_DEFAULT_SETTINGS;
+
+	if (defaultSettingsJson.startsWith('"')) {
+		defaultSettingsJson = defaultSettingsJson.slice(1);
+	}
+
+	if (defaultSettingsJson.endsWith('"')) {
+		defaultSettingsJson = defaultSettingsJson.slice(0, -1);
+	}
+
 	try {
-		if (typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'undefined') {
-			const defaultSettings = JSON.parse(import.meta.env.VITE_DEFAULT_SETTINGS);
-			setStores(defaultSettings);
-		}
-	} catch { }
+		const defaultSettings = JSON.parse(defaultSettingsJson);
+		setStores(defaultSettings);
+	} catch (error) {
+		console.log(error);
+	}
 }
 
 export function bookmarkletSaveToUrl(): string {

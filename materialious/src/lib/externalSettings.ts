@@ -17,6 +17,7 @@ import {
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
 	returnYTDislikesInstanceStore,
+	returnYtDislikesStore,
 	sponsorBlockCategoriesStore,
 	sponsorBlockStore,
 	sponsorBlockUrlStore,
@@ -83,7 +84,7 @@ const persistedStores = [
 	},
 	{
 		name: 'returnYtDislikes',
-		store: returnYTDislikesInstanceStore,
+		store: returnYtDislikesStore,
 		type: 'boolean'
 	},
 	{
@@ -157,12 +158,18 @@ function setStores(toSet: Record<string, any>) {
 			if (store.type === 'array') {
 				value = paramValue.split(',');
 			} else if (store.type === 'boolean') {
-				value = paramValue === 'true';
+				value = typeof paramValue === 'string' ? paramValue === 'true' : paramValue;
 			} else {
 				value = paramValue;
 			}
 
 			store.store.set(value);
+
+			// Kinda backwards but delete out of localstorage after setting
+			// So can be changed in the future.
+			try {
+				localStorage.removeItem(store.name);
+			} catch { }
 		}
 	});
 }

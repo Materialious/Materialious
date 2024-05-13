@@ -69,7 +69,7 @@
 			return;
 		}
 
-		let imageSrc = getBestThumbnail(video.videoThumbnails);
+		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;
 
 		if (get(deArrowEnabledStore)) {
 			let locatedThumbnail = false;
@@ -107,13 +107,14 @@
 
 							mockVideo.preload = 'auto';
 							mockVideo.id = 'video';
-							const videoToThumbnail = (await getVideo(video.videoId)).formatStreams[0].url;
-							mockVideo.src = get(playerProxyVideosStore)
-								? proxyVideoUrl(videoToThumbnail)
-								: videoToThumbnail;
+							mockVideo.crossOrigin = 'anonymous';
+
+							const videoDetails = (await getVideo(video.videoId)).formatStreams[0];
+
+							mockVideo.src = proxyVideoUrl(videoDetails.url);
 
 							mockVideo.addEventListener('loadeddata', () => {
-								mockVideo.currentTime = mockVideo.duration / 100;
+								mockVideo.currentTime = mockVideo.duration / 50;
 
 								mockVideo.addEventListener('seeked', () => {
 									if (context) {

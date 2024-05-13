@@ -8,4 +8,4 @@
 	let player: MediaPlayerElement;
 </script>
 
-<Player bind:player {data} />
+<Player bind:player isEmbed={true} {data} />

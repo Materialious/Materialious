@@ -3,10 +3,10 @@
 	import type { PlaylistPageVideo } from '$lib/Api/model.js';
 	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber, unsafeRandomItem } from '$lib/misc.js';
+	import { activePageStore, playlistSettingsStore } from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
-	import { activePageStore, playlistSettingsStore } from '../../../store';
 
 	export let data;
 

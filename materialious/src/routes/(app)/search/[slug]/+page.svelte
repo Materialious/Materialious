@@ -4,9 +4,9 @@
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import { activePageStore } from '$lib/store';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { activePageStore } from '../../../store';
 
 	export let data;
 

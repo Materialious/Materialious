@@ -16,11 +16,6 @@
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail, numberWithCommas, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
-	import type { DataConnection } from 'peerjs';
-	import { onDestroy, onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
-	import { get } from 'svelte/store';
-	import type { MediaPlayerElement } from 'vidstack/elements';
 	import {
 		activePageStore,
 		authStore,
@@ -32,7 +27,12 @@
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
-	} from '../../../store';
+	} from '$lib/store';
+	import type { DataConnection } from 'peerjs';
+	import { onDestroy, onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
+	import { get } from 'svelte/store';
+	import type { MediaPlayerElement } from 'vidstack/elements';
 
 	export let data;
 

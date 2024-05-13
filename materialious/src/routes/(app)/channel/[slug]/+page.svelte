@@ -5,12 +5,12 @@
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail } from '$lib/misc';
+	import { activePageStore, authStore } from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
-	import { activePageStore, authStore } from '../../../store';
 
 	export let data;
 

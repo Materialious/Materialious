@@ -2,8 +2,8 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import PageLoading from '$lib/PageLoading.svelte';
+	import { authStore } from '$lib/store';
 	import { onMount } from 'svelte';
-	import { authStore } from '../../store';
 
 	// Auth response handling for Desktop
 	onMount(() => {

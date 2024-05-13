@@ -29,6 +29,7 @@
 	export let audioMode = false;
 	export let player: MediaPlayerElement;
 	export let isSyncing: boolean = false;
+	export let isEmbed: boolean = false;
 
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
@@ -279,9 +280,11 @@
 	{/if}
 </media-player>
 
-<div class="snackbar" id="sponsorblock-alert">
-	<span
-		>{$_('skipping')}
-		<span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span></span
-	>
-</div>
+{#if !isEmbed}
+	<div class="snackbar" id="sponsorblock-alert">
+		<span
+			>{$_('skipping')}
+			<span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span></span
+		>
+	</div>
+{/if}

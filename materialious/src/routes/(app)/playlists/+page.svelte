@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/Api';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
+	import { activePageStore } from '$lib/store';
 	import { _ } from 'svelte-i18n';
-	import { activePageStore } from '../../store';
 
 	export let data;
 

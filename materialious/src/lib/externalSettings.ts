@@ -1,5 +1,4 @@
 import { page } from '$app/stores';
-import { get } from 'svelte/store';
 import {
 	darkModeStore,
 	deArrowEnabledStore,
@@ -24,7 +23,8 @@ import {
 	synciousInstanceStore,
 	synciousStore,
 	themeColorStore
-} from '../store';
+} from '$lib/store';
+import { get } from 'svelte/store';
 
 const persistedStores = [
 	{

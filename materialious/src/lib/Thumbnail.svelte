@@ -2,6 +2,11 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
+	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
+	import ShareVideo from './ShareVideo.svelte';
+	import { cleanNumber, getBestThumbnail, proxyVideoUrl, videoLength } from './misc';
+	import type { PlayerEvents } from './player';
 	import {
 		authStore,
 		deArrowEnabledStore,
@@ -11,12 +16,7 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore,
 		synciousStore
-	} from '../store';
-	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
-	import ShareVideo from './ShareVideo.svelte';
-	import { cleanNumber, getBestThumbnail, proxyVideoUrl, videoLength } from './misc';
-	import type { PlayerEvents } from './player';
+	} from './store';
 
 	const dispatch = createEventDispatcher();
 

@@ -1,6 +1,6 @@
 <script src="ts">
 	import { page } from '$app/stores';
-	import { activePageStore } from '../store';
+	import { activePageStore } from '$lib/store';
 
 	activePageStore.set(null);
 </script>

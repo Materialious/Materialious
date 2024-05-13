@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { get } from 'svelte/store';
-	import { miniPlayerSrcStore, playerProxyVideosStore } from '../store';
 	import { proxyVideoUrl } from './misc';
+	import { miniPlayerSrcStore, playerProxyVideosStore } from './store';
 
 	let currentTime: number = 0;
 

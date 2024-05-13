@@ -1,6 +1,6 @@
 <script lang="ts">
 	import VideoList from '$lib/VideoList.svelte';
-	import { activePageStore } from '../store';
+	import { activePageStore } from '$lib/store';
 
 	export let data;
 

@@ -11,6 +11,14 @@
 	import SyncParty from '$lib/SyncParty.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
+	import {
+		activePageStore,
+		authStore,
+		darkModeStore,
+		instanceStore,
+		syncPartyPeerStore,
+		themeColorStore
+	} from '$lib/store';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
@@ -20,14 +28,6 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import {
-		activePageStore,
-		authStore,
-		darkModeStore,
-		instanceStore,
-		syncPartyPeerStore,
-		themeColorStore
-	} from '../store';
 
 	let mobileSearchShow = false;
 

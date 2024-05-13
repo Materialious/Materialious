@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { deleteUnsubscribe } from '$lib/Api';
+	import { activePageStore } from '$lib/store';
 	import Fuse from 'fuse.js';
 	import { _ } from 'svelte-i18n';
-	import { activePageStore } from '../../../store';
 
 	activePageStore.set(null);
 

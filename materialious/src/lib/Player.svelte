@@ -7,6 +7,9 @@
 	import { get } from 'svelte/store';
 	import type { MediaTimeUpdateEvent, PlayerSrc, VideoSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
+	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
+	import type { VideoPlay } from './Api/model';
+	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
 	import {
 		authStore,
 		instanceStore,
@@ -19,10 +22,7 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockUrlStore,
 		synciousStore
-	} from '../store';
-	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
-	import type { VideoPlay } from './Api/model';
-	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
+	} from './store';
 	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };

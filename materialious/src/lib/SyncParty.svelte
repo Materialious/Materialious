@@ -7,7 +7,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { syncPartyConnectionsStore, syncPartyPeerStore } from '../store';
+	import { syncPartyConnectionsStore, syncPartyPeerStore } from './store';
 
 	function changeVideoEvent(conn: DataConnection) {
 		conn.on('data', (data) => {

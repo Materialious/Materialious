@@ -3,8 +3,8 @@ import { page } from '$app/stores';
 import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
-import { instanceStore } from '../store';
 import type { Image } from './Api/model';
+import { instanceStore } from './store';
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;

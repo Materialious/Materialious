@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { authStore } from '../store';
 	import { removePlaylistVideo } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './Api/model';
 	import Thumbnail from './Thumbnail.svelte';
+	import { authStore } from './store';
 
 	export let videos: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[] = [];
 	export let oneItemPerRow: boolean = false;

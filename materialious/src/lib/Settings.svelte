@@ -3,6 +3,7 @@
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
+	import { ensureNoTrailingSlash } from './misc';
 	import {
 		authStore,
 		darkModeStore,
@@ -30,8 +31,7 @@
 		synciousInstanceStore,
 		synciousStore,
 		themeColorStore
-	} from '../store';
-	import { ensureNoTrailingSlash } from './misc';
+	} from './store';
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));

@@ -7,14 +7,14 @@ import {
 	postHistory
 } from '$lib/Api/index.js';
 import { phaseDescription } from '$lib/misc';
-import { error } from '@sveltejs/kit';
-import { get } from 'svelte/store';
 import {
 	authStore,
 	playerProxyVideosStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
-} from '../../../store';
+} from '$lib/store';
+import { error } from '@sveltejs/kit';
+import { get } from 'svelte/store';
 
 export async function load({ params, url }) {
 	let video;

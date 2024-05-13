@@ -7,7 +7,7 @@
 	export let comment: Comment;
 	export let videoId: string;
 
-	let replies: Comments;
+	let replies: Comments | undefined = undefined;
 
 	async function loadReplies(continuation: string) {
 		try {
@@ -74,6 +74,11 @@
 			>
 				<i class="primary-text">expand_more</i>
 				<span class="primary-text">{comment.replies.replyCount} {$_('replies')}</span>
+			</button>
+		{:else if replies}
+			<button on:click={() => (replies = undefined)} class="transparent replies">
+				<i class="primary-text">expand_less</i>
+				<span class="primary-text">{$_('hideReplies')}</span>
 			</button>
 		{/if}
 	</div>

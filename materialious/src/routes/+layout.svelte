@@ -191,8 +191,10 @@
 		><i>menu</i></button
 	>
 
-	<Logo classes="m l" />
-	<h6 class="l">Materialious</h6>
+	<nav on:click={() => goto('/')} style="cursor: pointer;" class="m l">
+		<Logo />
+		<h6 class="l">Materialious</h6>
+	</nav>
 
 	<div class="max m l"></div>
 
@@ -271,7 +273,7 @@
 
 <dialog class="left small" id="menu-expanded">
 	<header class="fixed">
-		<nav>
+		<nav on:click={() => goto('/')} style="cursor: pointer;">
 			<button class="transparent circle large" data-ui="#menu-expanded"><i>menu</i></button>
 			<div style="width: 20%;">
 				<Logo />

@@ -1,19 +1,22 @@
 <script lang="ts">
 	import 'vidstack/bundle';
 
-	import { App } from '@capacitor/app';
+	import { page } from '$app/stores';
+	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { MediaTimeUpdateEvent, PlayerSrc, VideoSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
+	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
+	import type { VideoPlay } from './Api/model';
+	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
 	import {
 		authStore,
 		instanceStore,
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
-		playerAndroidBackgroundPlayStore,
 		playerAutoPlayStore,
 		playerDashStore,
 		playerProxyVideosStore,
@@ -21,21 +24,33 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockUrlStore,
 		synciousStore
-	} from '../store';
-	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
-	import type { VideoPlay } from './Api/model';
-	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
+	} from './store';
 	import { getDynamicTheme } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 	export let audioMode = false;
 	export let player: MediaPlayerElement;
 	export let isSyncing: boolean = false;
+	export let isEmbed: boolean = false;
 
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
 	let playerIsLive = false;
 	let playerPosSet = false;
+
+	function loadTimeFromUrl(page: Page): boolean {
+		if (player) {
+			const timeGivenUrl = page.url.searchParams.get('time');
+			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
+				player.currentTime = Number(timeGivenUrl);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -123,11 +138,11 @@
 			}
 
 			if (get(playerDashStore)) {
+				src = [{ src: data.video.dashUrl + '?local=true', type: 'application/dash+xml' }];
+
 				player.addEventListener('dash-can-play', async () => {
 					await loadPlayerPos();
 				});
-
-				src = [{ src: data.video.dashUrl + '?local=true', type: 'application/dash+xml' }];
 			} else {
 				let formattedSrc;
 				src = data.video.formatStreams.map((format) => {
@@ -193,12 +208,7 @@
 		if (playerPosSet) return;
 		playerPosSet = true;
 
-		const paramTime = new URLSearchParams(window.location.search).get('time');
-
-		if (paramTime && !isNaN(parseFloat(paramTime))) {
-			player.currentTime = Number(paramTime);
-			return;
-		}
+		if (loadTimeFromUrl($page)) return;
 
 		let toSetTime = 0;
 
@@ -250,19 +260,6 @@
 		player.destroy();
 		playerPosSet = false;
 	});
-
-	// Background play for Android.
-	App.addListener('appStateChange', (state) => {
-		// Very much backwards logic, but for whatever reason
-		// Calling play() within a conditional breaks background play.
-		// Maybe a race condition.
-
-		player.play();
-
-		if (!get(playerAndroidBackgroundPlayStore)) {
-			player.pause();
-		}
-	});
 </script>
 
 {#if audioMode}
@@ -294,9 +291,11 @@
 	{/if}
 </media-player>
 
-<div class="snackbar" id="sponsorblock-alert">
-	<span
-		>{$_('skipping')}
-		<span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span></span
-	>
-</div>
+{#if !isEmbed}
+	<div class="snackbar" id="sponsorblock-alert">
+		<span
+			>{$_('skipping')}
+			<span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span></span
+		>
+	</div>
+{/if}

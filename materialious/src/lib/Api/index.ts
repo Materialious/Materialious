@@ -6,7 +6,7 @@ import {
 	instanceStore,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
-} from '../../store';
+} from '../store';
 import type {
 	Channel,
 	ChannelContentPlaylists,

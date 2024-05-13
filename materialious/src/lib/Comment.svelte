@@ -7,7 +7,7 @@
 	export let comment: Comment;
 	export let videoId: string;
 
-	let replies: Comments;
+	let replies: Comments | undefined = undefined;
 
 	async function loadReplies(continuation: string) {
 		try {
@@ -17,6 +17,16 @@
 				source: 'youtube'
 			});
 		} catch {}
+	}
+
+	function commentTimestamps(html: string): string {
+		const regex =
+			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">(\d+:\d+(?::\d+)?)<\/a>\s*(.+)/;
+		const replacement = `<a href="/watch/${videoId}?time=$2" data-sveltekit-preload-data="off" class="link">$3</a>`;
+
+		const processedHtml = html.replace(regex, replacement);
+
+		return processedHtml;
 	}
 </script>
 
@@ -42,7 +52,7 @@
 			{/if}
 		</div>
 		<p style="margin-bottom: 0;">
-			{@html comment.contentHtml}
+			{@html commentTimestamps(comment.contentHtml)}
 		</p>
 		<div style="display: flex;">
 			<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
@@ -74,6 +84,11 @@
 			>
 				<i class="primary-text">expand_more</i>
 				<span class="primary-text">{comment.replies.replyCount} {$_('replies')}</span>
+			</button>
+		{:else if replies}
+			<button on:click={() => (replies = undefined)} class="transparent replies">
+				<i class="primary-text">expand_less</i>
+				<span class="primary-text">{$_('hideReplies')}</span>
 			</button>
 		{/if}
 	</div>

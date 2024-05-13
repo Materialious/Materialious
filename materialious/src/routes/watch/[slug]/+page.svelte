@@ -461,6 +461,11 @@
 								<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
 							</button>
 						</nav>
+					{:else}
+						<button style="cursor: default;" class="border">
+							<i class="small">thumb_up</i>
+							<span>{cleanNumber(data.video.likeCount)}</span>
+						</button>
 					{/if}
 				{/await}
 

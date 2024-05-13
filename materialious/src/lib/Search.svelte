@@ -32,6 +32,8 @@
 	}
 
 	function handleSubmit() {
+		if (search.trim() === '') return;
+
 		selectedSuggestionIndex = -1;
 		goto(`/search/${encodeURIComponent(search)}`);
 		dispatch('searchSubmitted');

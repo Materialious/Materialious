@@ -1,7 +1,6 @@
 <script lang="ts">
 	import 'vidstack/bundle';
 
-	import { App } from '@capacitor/app';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -13,7 +12,6 @@
 		instanceStore,
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
-		playerAndroidBackgroundPlayStore,
 		playerAutoPlayStore,
 		playerDashStore,
 		playerProxyVideosStore,
@@ -249,19 +247,6 @@
 		player.pause();
 		player.destroy();
 		playerPosSet = false;
-	});
-
-	// Background play for Android.
-	App.addListener('appStateChange', (state) => {
-		// Very much backwards logic, but for whatever reason
-		// Calling play() within a conditional breaks background play.
-		// Maybe a race condition.
-
-		player.play();
-
-		if (!get(playerAndroidBackgroundPlayStore)) {
-			player.pause();
-		}
 	});
 </script>
 

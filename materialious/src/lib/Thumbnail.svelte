@@ -238,12 +238,7 @@
 						</video>
 					</div>
 				{:else}
-					<img
-						class="responsive"
-						style="max-width: 100%;min-height: 160px;"
-						src={img.src}
-						alt="Thumbnail for video"
-					/>
+					<img class="responsive" src={img.src} alt="Thumbnail for video" />
 				{/if}
 			{:else}
 				<p>{$_('thumbnail.failedToLoadImage')}</p>
@@ -337,6 +332,10 @@
 		width: 100%;
 		overflow: hidden;
 		max-height: 160px;
+	}
+
+	.thumbnail img {
+		object-fit: contain;
 	}
 
 	@media screen and (max-width: 650px) {

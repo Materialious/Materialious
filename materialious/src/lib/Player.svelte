@@ -1,6 +1,8 @@
 <script lang="ts">
 	import 'vidstack/bundle';
 
+	import { page } from '$app/stores';
+	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -35,6 +37,20 @@
 	let categoryBeingSkipped = '';
 	let playerIsLive = false;
 	let playerPosSet = false;
+
+	function loadTimeFromUrl(page: Page): boolean {
+		if (player) {
+			const timeGivenUrl = page.url.searchParams.get('time');
+			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
+				player.currentTime = Number(timeGivenUrl);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
 	export function seekTo(time: number) {
 		if (typeof player !== 'undefined') {
@@ -122,11 +138,11 @@
 			}
 
 			if (get(playerDashStore)) {
+				src = [{ src: data.video.dashUrl + '?local=true', type: 'application/dash+xml' }];
+
 				player.addEventListener('dash-can-play', async () => {
 					await loadPlayerPos();
 				});
-
-				src = [{ src: data.video.dashUrl + '?local=true', type: 'application/dash+xml' }];
 			} else {
 				let formattedSrc;
 				src = data.video.formatStreams.map((format) => {
@@ -192,12 +208,7 @@
 		if (playerPosSet) return;
 		playerPosSet = true;
 
-		const paramTime = new URLSearchParams(window.location.search).get('time');
-
-		if (paramTime && !isNaN(parseFloat(paramTime))) {
-			player.currentTime = Number(paramTime);
-			return;
-		}
+		if (loadTimeFromUrl($page)) return;
 
 		let toSetTime = 0;
 

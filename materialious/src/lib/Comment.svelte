@@ -18,6 +18,16 @@
 			});
 		} catch {}
 	}
+
+	function commentTimestamps(html: string): string {
+		const regex =
+			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">(\d+:\d+(?::\d+)?)<\/a>\s*(.+)/;
+		const replacement = `<a href="/watch/${videoId}?time=$2" data-sveltekit-preload-data="off" class="link">$3</a>`;
+
+		const processedHtml = html.replace(regex, replacement);
+
+		return processedHtml;
+	}
 </script>
 
 <div class="comment">
@@ -42,7 +52,7 @@
 			{/if}
 		</div>
 		<p style="margin-bottom: 0;">
-			{@html comment.contentHtml}
+			{@html commentTimestamps(comment.contentHtml)}
 		</p>
 		<div style="display: flex;">
 			<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>

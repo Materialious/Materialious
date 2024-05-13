@@ -58,7 +58,29 @@ server {
 }
 ```
 ### Nginx Proxy Manager example
-https://gist.github.com/R0GGER/2d99282389a24da0b350c349314a39ef 
+1. Tab: Details -  Create a new proxy host with SSL on (Let's Encrypt or your own certificate).
+2. Tab: Custom locations, fill in IP and port. Click gear icon to add some security headers.   
+
+Click image for fullsize:   
+<img src="https://github.com/R0GGER/Materialious/assets/8298741/257d1b81-0e35-43ec-bed9-9d051a30d49d" width=15% height=15%>
+
+**Add:** 
+```nginx
+    if ($request_method = OPTIONS) {
+      return 204;
+    }
+
+    proxy_hide_header Access-Control-Allow-Origin;
+    add_header Access-Control-Allow-Credentials true;
+    add_header Access-Control-Allow-Origin "https://materialious.example.com" always;
+    add_header Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD, PATCH, PUT, DELETE" always;
+    add_header Access-Control-Allow-Headers "User-Agent, Authorization, Content-Type" always;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $http_connection;
+    proxy_http_version 1.1;
+```
+3. Click **Save**.
 
 ### Traefik example
 Add this middleware to your Invidious instance:

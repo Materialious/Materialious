@@ -57,6 +57,8 @@ server {
     }
 }
 ```
+### Nginx Proxy Manager example
+https://gist.github.com/R0GGER/2d99282389a24da0b350c349314a39ef 
 
 ### Traefik example
 Add this middleware to your Invidious instance:

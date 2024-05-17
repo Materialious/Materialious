@@ -4,5 +4,29 @@
     "videos": "视频",
     "thumbnail": {
         "failedToLoadImage": "加载图像失败。"
+    },
+    "cancel": "取消",
+    "create": "新建",
+    "title": "标题",
+    "delete": "删除",
+    "videoTabs": {
+        "all": "全部",
+        "videos": "视频",
+        "playlists": "播放列表"
+    },
+    "playlist": {
+        "createPlaylist": "新建播放列表",
+        "public": "公开",
+        "private": "仅自己可见"
+    },
+    "pages": {
+        "home": "首页",
+        "history": "历史记录",
+        "playlists": "播放列表"
+    },
+    "player": {
+        "share": {
+            "title": "分享"
+        }
     }
 }

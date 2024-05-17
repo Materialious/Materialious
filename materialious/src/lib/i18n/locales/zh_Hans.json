@@ -37,7 +37,8 @@
         "login": "登录",
         "logout": "登出",
         "theme": {
-            "theme": "主题"
+            "theme": "主题",
+            "darkMode": "深色模式"
         },
         "bookmarklet": "书签"
     },

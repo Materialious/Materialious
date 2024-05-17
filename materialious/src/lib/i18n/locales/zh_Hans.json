@@ -1,9 +1,10 @@
 {
     "enabled": "已启用",
-    "views": "视图",
+    "views": "浏览",
     "videos": "视频",
     "thumbnail": {
-        "failedToLoadImage": "加载图像失败。"
+        "failedToLoadImage": "加载图像失败",
+        "live": "直播"
     },
     "cancel": "取消",
     "create": "新建",
@@ -12,24 +13,40 @@
     "videoTabs": {
         "all": "全部",
         "videos": "视频",
-        "playlists": "播放列表"
+        "playlists": "播放列表",
+        "channels": "频道",
+        "shorts": "短片",
+        "streams": "串流"
     },
     "playlist": {
         "createPlaylist": "新建播放列表",
         "public": "公开",
-        "private": "仅自己可见"
+        "private": "私有",
+        "unlisted": "不列出",
+        "playVideos": "播放视频",
+        "shuffleVideos": "乱序播放视频",
+        "loopPlaylist": "循环播放列表"
     },
     "pages": {
         "home": "首页",
         "history": "历史记录",
-        "playlists": "播放列表"
+        "playlists": "播放列表",
+        "trending": "趋势",
+        "subscriptions": "订阅"
     },
     "player": {
         "share": {
-            "title": "分享"
+            "title": "分享",
+            "materialiousLink": "复制 Materialious 链接",
+            "invidiousRedirect": "复制 Invidious 重定向链接",
+            "youtubeLink": "复制 YouTube 链接"
         },
         "download": "下载",
-        "addToPlaylist": "加入播放列表"
+        "addToPlaylist": "加入播放列表",
+        "audioOnly": "仅音频",
+        "theatreMode": "剧院模式",
+        "noPlaylists": "尚无播放列表",
+        "unableToLoadComments": "无法加载评论 :("
     },
     "layout": {
         "notifications": "通知",
@@ -38,9 +55,69 @@
         "logout": "登出",
         "theme": {
             "theme": "主题",
-            "darkMode": "深色模式"
+            "darkMode": "深色模式",
+            "lightMode": "亮色模式",
+            "color": "颜色"
         },
-        "bookmarklet": "书签"
+        "bookmarklet": "书签",
+        "star": "在 GitHub 上为我们加星⭐！",
+        "syncParty": "一起看",
+        "syncPartyWarning": "请注意，您的IP将对您邀请的用户可见。",
+        "startSyncParty": "开始一起看",
+        "endSyncParty": "结束一起看",
+        "noNewNotifications": "暂时木有新通知呢",
+        "customize": "自定义",
+        "searchSuggestions": "搜索建议",
+        "previewVideoOnHover": "悬停时预览视频",
+        "dataPreferences": {
+            "content": "是否要导入/导出订阅、更改密码或删除帐户？单击此处并滚动到页面底部。",
+            "dataPreferences": "数据首选项"
+        },
+        "player": {
+            "title": "播放器",
+            "autoPlay": "自动播放视频",
+            "alwaysLoopVideo": "始终循环播放视频",
+            "savePlaybackPosition": "保存播放位置",
+            "listenByDefault": "默认仅播放音频",
+            "theatreModeByDefault": "默认影院模式",
+            "autoPlayNextByDefault": "默认自动播放下一个",
+            "miniPlayer": "迷你播放器",
+            "proxyVideos": "代理视频",
+            "backgroundPlay": "在后台播放音频",
+            "dash": "MPEG-DASH 支持"
+        },
+        "instanceUrl": "实例 URL",
+        "sponsors": {
+            "sponsor": "赞助者",
+            "unpaidSelfPromotion": "无偿/自我推销",
+            "interactionReminder": "互动提醒（订阅）",
+            "intermissionIntroAnimation": "转场/入场动画",
+            "credits": "尾卡/制作人员名单",
+            "preViewRecapHook": "预览/回顾/引子",
+            "tangentJokes": "包袱/笑话"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "缩略图实例 URL"
+        }
     },
-    "subscribe": "订阅"
+    "subscribe": "订阅",
+    "copyUrl": "复制 URL",
+    "loadMore": "加载更多",
+    "searchPlaceholder": "搜索...",
+    "deleteAllHistory": "删除所有历史记录",
+    "skipping": "跳过",
+    "replies": "回复",
+    "hideReplies": "隐藏回复",
+    "hideVideo": "隐藏视频",
+    "syncParty": {
+        "userLeft": "用户离开了您的一起看。",
+        "userJoined": "用户已加入您的一起看。"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "管理订阅"
+    },
+    "subscribers": "订阅者",
+    "unsubscribe": "退订",
+    "loginRequired": "需要登录"
 }

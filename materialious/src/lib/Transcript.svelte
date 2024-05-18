@@ -13,6 +13,7 @@
 	export let player: MediaPlayerElement;
 
 	let url: string | null = null;
+	let autoScroll: boolean = true;
 
 	let transcript: ParsedCaptionsResult | null = null;
 	let transcriptCues: VTTCue[] = [];
@@ -23,14 +24,16 @@
 	player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
 		currentTime = event.detail.currentTime;
 
-		const currentTranscriptLine = document.querySelector(
-			'.transcript-line.secondary-container'
-		) as HTMLElement;
-		const transcriptScrollable = document.getElementById('transcript');
+		if (autoScroll) {
+			const currentTranscriptLine = document.querySelector(
+				'.transcript-line.secondary-container'
+			) as HTMLElement;
+			const transcriptScrollable = document.getElementById('transcript');
 
-		if (currentTranscriptLine && transcriptScrollable) {
-			transcriptScrollable.scrollTop =
-				currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
+			if (currentTranscriptLine && transcriptScrollable) {
+				transcriptScrollable.scrollTop =
+					currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
+			}
 		}
 	});
 
@@ -77,14 +80,21 @@
 			<label for="captions">{$_('language')}</label>
 			<i>arrow_drop_down</i>
 		</div>
-		<div class="max field round suffix prefix small no-margin surface-variant">
-			<i class="front">search</i><input
-				bind:value={search}
-				on:input={searchTranscript}
-				type="text"
-				placeholder={$_('searchPlaceholder')}
-			/>
-		</div>
+		{#if transcriptCues.length > 0}
+			<div class="max field round suffix prefix small no-margin surface-variant">
+				<i class="front">search</i><input
+					bind:value={search}
+					on:input={searchTranscript}
+					type="text"
+					placeholder={$_('searchPlaceholder')}
+				/>
+			</div>
+			<div class="space"></div>
+			<label class="checkbox">
+				<input bind:checked={autoScroll} type="checkbox" />
+				<span>Auto scroll</span>
+			</label>
+		{/if}
 		<div class="space"></div>
 		<div class="divider"></div>
 	</article>

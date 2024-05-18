@@ -15,12 +15,47 @@ export const titleCases: TitleCase[] = [
 	'sentence case'
 ];
 
-export function getLetterCaseClass(): string {
+export function letterCase(text: string): string {
 	const casing = get(interfaceForceCase);
-	if (!casing) return '';
+	if (!casing) return text;
 
-	return casing.toLowerCase().replaceAll(' ', '-');
+	switch (casing) {
+		case 'lowercase':
+			return text.toLowerCase();
+		case 'uppercase':
+			text.toUpperCase();
+		case 'sentence case':
+			return sentenceCase(text);
+		default:
+			return titleCase(text);
+	}
 }
+
+export function sentenceCase(text: string): string {
+	let sentences: string[] = text.match(/[^.!?]*[.!?]*/g) || [];
+
+	let casedSentences: string[] = sentences.map(sentence => {
+		sentence = sentence.trim();
+		if (sentence.length === 0) return '';
+		return sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
+	});
+
+	return casedSentences.join(' ');
+}
+
+export function titleCase(text: string): string {
+	if (!text) return '';
+
+	let words: string[] = text.split(/\s+/);
+
+	let titleCasedWords: string[] = words.map(word => {
+		if (word.length === 0) return '';
+		return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+	});
+
+	return titleCasedWords.join(' ');
+}
+
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;

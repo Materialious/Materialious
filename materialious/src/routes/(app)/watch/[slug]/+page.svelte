@@ -17,7 +17,7 @@
 	import {
 		cleanNumber,
 		getBestThumbnail,
-		getLetterCaseClass,
+		letterCase,
 		numberWithCommas,
 		unsafeRandomItem
 	} from '$lib/misc';
@@ -414,7 +414,7 @@
 				</div>
 			{/key}
 		</div>
-		<h5 class={getLetterCaseClass()}>{data.video.title}</h5>
+		<h5>{letterCase(data.video.title)}</h5>
 
 		<div class="grid no-padding">
 			<div class="s12 m12 l5">

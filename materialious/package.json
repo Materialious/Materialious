@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.0.11",
+	"version": "1.1.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -19,6 +19,7 @@
 		"@sveltejs/vite-plugin-svelte": "^3.1.0",
 		"@types/eslint": "^8.56.7",
 		"@types/event-source-polyfill": "^1.0.5",
+		"@types/he": "^1.2.3",
 		"@types/human-number": "^1.0.2",
 		"@types/mousetrap": "^1.6.15",
 		"@typescript-eslint/eslint-plugin": "^7.8.0",
@@ -45,9 +46,11 @@
 		"@capacitor/core": "^6.0.0",
 		"beercss": "^3.5.5",
 		"fuse.js": "^7.0.0",
+		"he": "^1.2.0",
 		"human-number": "^2.0.4",
 		"iso-3166": "^4.3.0",
 		"material-dynamic-colors": "^1.1.0",
+		"media-captions": "^1.0.3",
 		"media-icons": "^0.10.0",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.3",

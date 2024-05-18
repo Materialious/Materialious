@@ -1,5 +1,6 @@
 import { pushState } from '$app/navigation';
 import { page } from '$app/stores';
+import he from 'he';
 import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
@@ -15,12 +16,47 @@ export const titleCases: TitleCase[] = [
 	'sentence case'
 ];
 
-export function getLetterCaseClass(): string {
+export function letterCase(text: string): string {
 	const casing = get(interfaceForceCase);
-	if (!casing) return '';
+	if (!casing) return text;
 
-	return casing.toLowerCase().replaceAll(' ', '-');
+	switch (casing) {
+		case 'lowercase':
+			return text.toLowerCase();
+		case 'uppercase':
+			text.toUpperCase();
+		case 'sentence case':
+			return sentenceCase(text);
+		default:
+			return titleCase(text);
+	}
 }
+
+export function sentenceCase(text: string): string {
+	let sentences: string[] = text.match(/[^.!?]*[.!?]*/g) || [];
+
+	let casedSentences: string[] = sentences.map(sentence => {
+		sentence = sentence.trim();
+		if (sentence.length === 0) return '';
+		return sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
+	});
+
+	return casedSentences.join(' ');
+}
+
+export function titleCase(text: string): string {
+	if (!text) return '';
+
+	let words: string[] = text.split(/\s+/);
+
+	let titleCasedWords: string[] = words.map(word => {
+		if (word.length === 0) return '';
+		return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+	});
+
+	return titleCasedWords.join(' ');
+}
+
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
@@ -40,7 +76,7 @@ export function cleanNumber(number: number): string {
 export function videoLength(lengthSeconds: number): string {
 	const hours = Math.floor(lengthSeconds / 3600);
 	let minutes: number | string = Math.floor((lengthSeconds % 3600) / 60);
-	let seconds: number | string = lengthSeconds % 60;
+	let seconds: number | string = Math.round(lengthSeconds % 60);
 
 	if (minutes < 10) {
 		minutes = `0${minutes}`;
@@ -63,9 +99,8 @@ export interface PhasedDescription {
 }
 
 export function decodeHtmlCharCodes(str: string): string {
-	return str.replace(/(&#(\d+);)/g, function (match, capture, charCode) {
-		return String.fromCharCode(charCode);
-	});
+	const { decode } = he;
+	return decode(str);
 }
 
 export function phaseDescription(content: string): PhasedDescription {

@@ -36,7 +36,7 @@
 
 <div class="space"></div>
 
-<div class="max field round suffix prefix small no-margin white black-text">
+<div class="max field round suffix prefix small no-margin surface-variant">
 	<i class="front">search</i><input
 		bind:value={search}
 		on:input={searchSubs}

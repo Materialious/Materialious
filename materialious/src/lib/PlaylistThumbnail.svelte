@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import type { Playlist } from './Api/model';
-	import { getBestThumbnail, getLetterCaseClass, truncate } from './misc';
+	import { getBestThumbnail, letterCase, truncate } from './misc';
 
 	export let playlist: Playlist;
 	export let disabled: boolean = false;
@@ -66,7 +66,7 @@
 	<nav class="no-margin">
 		<div class="max">
 			<a class:link-disabled={disabled} href={playlistLink}
-				><div class={`bold ${getLetterCaseClass()}`}>{truncate(playlist.title)}</div></a
+				><div class="bold">{letterCase(truncate(playlist.title))}</div></a
 			>
 			<div>
 				<a class:link-disabled={playlist.authorId === null} href={`/channel/${playlist.authorId}`}

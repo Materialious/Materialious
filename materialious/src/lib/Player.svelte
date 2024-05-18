@@ -53,12 +53,6 @@
 
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
-	export function seekTo(time: number) {
-		if (typeof player !== 'undefined') {
-			player.currentTime = time;
-		}
-	}
-
 	const proxyVideos = get(playerProxyVideosStore);
 
 	onMount(async () => {

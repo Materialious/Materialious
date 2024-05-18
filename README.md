@@ -59,6 +59,9 @@ Due to Google's policies on custom YouTube frontends, Materialious isn't availab
 ## Player
 ![Preview of player](./previews/player-preview.png)
 
+## Transcript
+![Preview of player transcript](./previews/transcript-preview.png)
+
 ## Settings
 ![Preview of settings](./previews/setting-preview.png)
 

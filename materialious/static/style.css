@@ -39,26 +39,6 @@ main.root {
 }
 
 
-.lowercase {
-	text-transform: lowercase;
-}
-
-.uppercase {
-	text-transform: uppercase;
-}
-
-.title-case {
-	text-transform: capitalize;
-}
-
-.sentence-case {
-	text-transform: lowercase;
-}
-
-.sentence-case::first-letter {
-	text-transform: uppercase !important;
-}
-
 @media screen and (max-width: 650px) {
 	dialog.right {
 		width: 100% !important;

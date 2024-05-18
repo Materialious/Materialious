@@ -159,7 +159,13 @@ Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETT
 {
   // Set to true to enable dark mode, or false to disable it.
   "darkMode": true,
-  
+
+  // Force case for Videos/Playlists etc.
+  "forceCase": "uppercase | lowercase | sentence case | title case",
+
+  // Any ISO 3166 country code
+  "region": "US",
+
   // Specifies the theme color in hexadecimal format (e.g., #ff0000 for red).
   "themeColor": "#ff0000",
   

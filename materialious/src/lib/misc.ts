@@ -79,7 +79,8 @@ export function phaseDescription(content: string): PhasedDescription {
 			const title = timestampMatch[4] || '';
 			timestamps.push({
 				time: convertToSeconds(time),
-				title: decodeHtmlCharCodes(title),
+				// Remove any URL in the timestamp title.
+				title: decodeHtmlCharCodes(title.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '')),
 				timePretty: timestamp
 			});
 		} else {

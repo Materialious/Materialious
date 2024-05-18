@@ -5,7 +5,13 @@
 	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
 	import ShareVideo from './ShareVideo.svelte';
-	import { cleanNumber, getBestThumbnail, proxyVideoUrl, videoLength } from './misc';
+	import {
+		cleanNumber,
+		getBestThumbnail,
+		getLetterCaseClass,
+		proxyVideoUrl,
+		videoLength
+	} from './misc';
 	import type { PlayerEvents } from './player';
 	import {
 		authStore,
@@ -292,11 +298,14 @@
 					href={watchUrl.toString()}
 					data-sveltekit-preload-data="off"
 					style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
-					><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
+					><div
+						class={`${getLetterCaseClass()} bold`}
+						style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;"
+					>
 						{video.title}
 					</div>
 
-					<div class="tooltip bottom small">{video.title}</div>
+					<div class={`tooltip bottom small ${getLetterCaseClass()}`}>{video.title}</div>
 				</a>
 				<div style="margin-top: 1.4em;">
 					<a href={`/channel/${video.authorId}`}>{video.author}</a

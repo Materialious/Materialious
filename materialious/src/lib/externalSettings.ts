@@ -4,6 +4,7 @@ import {
 	deArrowEnabledStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
+	interfaceForceCase,
 	interfacePreviewVideoOnHoverStore,
 	interfaceRegionStore,
 	interfaceSearchSuggestionsStore,
@@ -146,6 +147,11 @@ const persistedStores = [
 	{
 		name: 'region',
 		store: interfaceRegionStore,
+		type: 'string'
+	},
+	{
+		name: 'forceCase',
+		store: interfaceForceCase,
 		type: 'string'
 	}
 ];

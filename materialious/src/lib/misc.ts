@@ -4,11 +4,23 @@ import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import type { Image } from './Api/model';
-import { instanceStore } from './store';
+import { instanceStore, interfaceForceCase } from './store';
 
 
-export type titleCase = 'uppercase' | 'lowercase' | 'sentence case' | 'title case' | null;
+export type TitleCase = 'uppercase' | 'lowercase' | 'sentence case' | 'title case' | null;
+export const titleCases: TitleCase[] = [
+	'lowercase',
+	'uppercase',
+	'title case',
+	'sentence case'
+];
 
+export function getLetterCaseClass(): string {
+	const casing = get(interfaceForceCase);
+	if (!casing) return '';
+
+	return casing.toLowerCase().replaceAll(' ', '-');
+}
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;

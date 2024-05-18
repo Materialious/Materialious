@@ -3,7 +3,7 @@ import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
-import type { titleCase } from './misc';
+import type { TitleCase } from './misc';
 
 export const instanceStore: Writable<string> = persisted(
 	"invidiousInstance",
@@ -46,7 +46,7 @@ export const synciousInstanceStore: Writable<string | null | undefined> = persis
 export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');
 export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
 export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover', true);
-export const interfaceForceCase: Writable<titleCase> = persisted('forceCase', null);
+export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(

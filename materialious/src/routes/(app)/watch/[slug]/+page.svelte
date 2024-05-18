@@ -14,7 +14,13 @@
 	import Player from '$lib/Player.svelte';
 	import ShareVideo from '$lib/ShareVideo.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { cleanNumber, getBestThumbnail, numberWithCommas, unsafeRandomItem } from '$lib/misc';
+	import {
+		cleanNumber,
+		getBestThumbnail,
+		getLetterCaseClass,
+		numberWithCommas,
+		unsafeRandomItem
+	} from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		activePageStore,
@@ -408,7 +414,7 @@
 				</div>
 			{/key}
 		</div>
-		<h5>{data.video.title}</h5>
+		<h5 class={getLetterCaseClass()}>{data.video.title}</h5>
 
 		<div class="grid no-padding">
 			<div class="s12 m12 l5">

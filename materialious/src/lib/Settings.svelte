@@ -4,7 +4,7 @@
 	import { iso31661 } from 'iso-3166';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, truncate } from './misc';
+	import { ensureNoTrailingSlash, titleCases, truncate } from './misc';
 	import {
 		authStore,
 		darkModeStore,
@@ -12,6 +12,7 @@
 		deArrowInstanceStore,
 		deArrowThumbnailInstanceStore,
 		instanceStore,
+		interfaceForceCase,
 		interfacePreviewVideoOnHoverStore,
 		interfaceRegionStore,
 		interfaceSearchSuggestionsStore,
@@ -44,8 +45,8 @@
 	let invidiousInstance = get(instanceStore);
 	let deArrowUrl = get(deArrowInstanceStore);
 	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
-
 	let region = get(interfaceRegionStore);
+	let forceCase = get(interfaceForceCase);
 
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
@@ -169,7 +170,7 @@
 			</nav>
 		</div>
 
-		<div class="field label no-margin suffix border">
+		<div class="field label suffix border">
 			<select name="region" bind:value={region} on:change={() => interfaceRegionStore.set(region)}>
 				{#each iso31661 as region}
 					<option selected={$interfaceRegionStore === region.alpha2} value={region.alpha2}
@@ -178,6 +179,21 @@
 				{/each}
 			</select>
 			<label for="region">{$_('region')}</label>
+			<i>arrow_drop_down</i>
+		</div>
+
+		<div class="field label suffix border">
+			<select
+				name="case"
+				bind:value={forceCase}
+				on:change={() => interfaceForceCase.set(forceCase)}
+			>
+				<option selected={$interfaceForceCase === null} value={null}>Default</option>
+				{#each titleCases as caseType}
+					<option selected={$interfaceForceCase === caseType} value={caseType}>{caseType}</option>
+				{/each}
+			</select>
+			<label for="case">{$_('letterCase')}</label>
 			<i>arrow_drop_down</i>
 		</div>
 	</div>

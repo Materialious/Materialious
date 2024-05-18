@@ -14,6 +14,7 @@
 	import Player from '$lib/Player.svelte';
 	import ShareVideo from '$lib/ShareVideo.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
+	import Transcript from '$lib/Transcript.svelte';
 	import {
 		cleanNumber,
 		getBestThumbnail,
@@ -66,8 +67,9 @@
 	let theatreMode = get(playerTheatreModeByDefaultStore);
 
 	let audioMode = get(playerListenByDefaultStore);
-	let seekTo: (time: number) => void;
 	let player: MediaPlayerElement;
+
+	let showTranscript = false;
 
 	playlistSettingsStore.subscribe((playlistSetting) => {
 		if (!data.playlistId) return;
@@ -398,19 +400,13 @@
 <div class="space"></div>
 
 <div class="grid">
-	<div class={`s12 m12 l${theatreMode ? '12' : '10'}`}>
+	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#key data.video.videoId}
 				<div
 					style="max-height: 80vh;max-width: calc(80vh * 16 / 9);overflow: hidden;position: relative;flex: 1;"
 				>
-					<Player
-						{data}
-						{audioMode}
-						isSyncing={$syncPartyPeerStore !== null}
-						bind:seekTo
-						bind:player
-					/>
+					<Player {data} {audioMode} isSyncing={$syncPartyPeerStore !== null} bind:player />
 				</div>
 			{/key}
 		</div>
@@ -483,6 +479,15 @@
 					<button on:click={toggleTheatreMode} class="m l" class:border={!theatreMode}>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
+					</button>
+					<button
+						on:click={() => ((showTranscript = !showTranscript), (theatreMode = false))}
+						class:border={!showTranscript}
+					>
+						<i>description</i>
+						<div class="tooltip">
+							{$_('transcript')}
+						</div>
 					</button>
 					<button class="border"
 						><i>share</i>
@@ -568,7 +573,7 @@
 						{#if data.content.timestamps.length > 0}
 							<h6 style="margin-bottom: .3em;">Chapters</h6>
 							{#each data.content.timestamps as timestamp}
-								<button on:click={() => seekTo(timestamp.time)} class="timestamps"
+								<button on:click={() => (player.currentTime = timestamp.time)} class="timestamps"
 									>{timestamp.timePretty}
 									{#if !timestamp.title.startsWith('-')}
 										-
@@ -617,7 +622,10 @@
 		{/if}
 	</div>
 	{#if !theatreMode}
-		<div class="s12 m12 l2">
+		<div class="s12 m12 l3">
+			{#if player && showTranscript}
+				<Transcript bind:player video={data.video} />
+			{/if}
 			{#if !playlist}
 				{#if data.video.recommendedVideos}
 					{#each data.video.recommendedVideos as recommendedVideo}
@@ -698,10 +706,6 @@
 <style>
 	:root {
 		--plyr-color-main: var(--primary);
-	}
-
-	.grid {
-		padding: 1em 10em;
 	}
 
 	.timestamps {

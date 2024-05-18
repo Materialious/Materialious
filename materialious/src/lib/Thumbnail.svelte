@@ -332,7 +332,6 @@
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;
-		max-height: 160px;
 	}
 
 	.thumbnail img {

@@ -3,6 +3,7 @@ import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
+import type { titleCase } from './misc';
 
 export const instanceStore: Writable<string> = persisted(
 	"invidiousInstance",
@@ -42,8 +43,10 @@ export const synciousInstanceStore: Writable<string | null | undefined> = persis
 	import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE || 'https://syncious.materialio.us'
 );
 
+export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');
 export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
 export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover', true);
+export const interfaceForceCase: Writable<titleCase> = persisted('forceCase', null);
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(
@@ -73,3 +76,4 @@ export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; 
 
 export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | null> =
 	writable(null);
+

@@ -11,7 +11,7 @@
 		class="row"
 		href="#copy"
 		on:click={async () =>
-			await navigator.clipboard.writeText(`${location.origin}watch/${video.videoId}`)}
+			await navigator.clipboard.writeText(`${location.origin}/watch/${video.videoId}`)}
 	>
 		<div class="min">{$_('player.share.materialiousLink')}</div></a
 	>

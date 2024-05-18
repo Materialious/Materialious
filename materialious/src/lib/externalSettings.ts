@@ -5,6 +5,7 @@ import {
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
 	interfacePreviewVideoOnHoverStore,
+	interfaceRegionStore,
 	interfaceSearchSuggestionsStore,
 	playerAlwaysLoopStore,
 	playerAutoPlayStore,
@@ -140,6 +141,11 @@ const persistedStores = [
 	{
 		name: 'synciousInstance',
 		store: synciousInstanceStore,
+		type: 'string'
+	},
+	{
+		name: 'region',
+		store: interfaceRegionStore,
 		type: 'string'
 	}
 ];

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { Capacitor } from '@capacitor/core';
+	import { iso31661 } from 'iso-3166';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash } from './misc';
+	import { ensureNoTrailingSlash, truncate } from './misc';
 	import {
 		authStore,
 		darkModeStore,
@@ -12,6 +13,7 @@
 		deArrowThumbnailInstanceStore,
 		instanceStore,
 		interfacePreviewVideoOnHoverStore,
+		interfaceRegionStore,
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
 		playerAndroidBackgroundPlayStore,
@@ -42,6 +44,8 @@
 	let invidiousInstance = get(instanceStore);
 	let deArrowUrl = get(deArrowInstanceStore);
 	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
+
+	let region = get(interfaceRegionStore);
 
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
@@ -131,6 +135,7 @@
 
 	<div class="settings">
 		<h6>Interface</h6>
+
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
@@ -162,6 +167,18 @@
 					<span></span>
 				</label>
 			</nav>
+		</div>
+
+		<div class="field label no-margin suffix border">
+			<select name="region" bind:value={region} on:change={() => interfaceRegionStore.set(region)}>
+				{#each iso31661 as region}
+					<option selected={$interfaceRegionStore === region.alpha2} value={region.alpha2}
+						>{region.alpha2} - {truncate(region.name, 13)}</option
+					>
+				{/each}
+			</select>
+			<label for="region">{$_('region')}</label>
+			<i>arrow_drop_down</i>
 		</div>
 	</div>
 

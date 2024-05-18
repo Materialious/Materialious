@@ -6,6 +6,10 @@ import { get } from 'svelte/store';
 import type { Image } from './Api/model';
 import { instanceStore } from './store';
 
+
+export type titleCase = 'uppercase' | 'lowercase' | 'sentence case' | 'title case' | null;
+
+
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
 }

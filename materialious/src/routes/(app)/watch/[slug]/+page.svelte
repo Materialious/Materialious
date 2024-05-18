@@ -637,7 +637,7 @@
 					{/each}
 				{/if}
 			{:else}
-				<article style="height: 75vh; position: relative;" id="playlist" class="scroll no-padding">
+				<article style="height: 85vh; position: relative;" id="playlist" class="scroll no-padding">
 					<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
 						<h6>{playlist.title}</h6>
 						<p>

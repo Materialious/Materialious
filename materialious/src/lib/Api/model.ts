@@ -117,7 +117,7 @@ export interface ReturnYTDislikes {
 export interface Comment {
 	author: string;
 	authorThumbnails: Image[];
-	authorID: string;
+	authorId: string;
 	authorUrl: string;
 	isEdited: boolean;
 	isPinned: boolean;

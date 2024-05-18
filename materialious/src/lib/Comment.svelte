@@ -38,12 +38,14 @@
 	/>
 	<div>
 		<div class="row">
-			<p>
-				<span class:bold={true} class:channel-owner={comment.authorIsChannelOwner}
-					>{comment.author}</span
-				>
-				<span class="secondary-text">{comment.publishedText}</span>
-			</p>
+			<a href={`/channel/${comment.authorId}`}>
+				<p class="no-margin">
+					<span class="bold" class:channel-owner={comment.authorIsChannelOwner}
+						>{comment.author}</span
+					>
+					<span class="secondary-text">{comment.publishedText}</span>
+				</p>
+			</a>
 			{#if comment.isPinned}
 				<i>push_pin</i>
 			{/if}

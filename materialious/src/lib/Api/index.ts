@@ -4,6 +4,7 @@ import {
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
 	instanceStore,
+	interfaceRegionStore,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
 } from '../store';
@@ -25,8 +26,18 @@ import type {
 	VideoPlay
 } from './model';
 
-export function buildPath(path: string): string {
-	return `${get(instanceStore)}/api/v1/${path}`;
+export function buildPath(path: string): URL {
+	return new URL(`${get(instanceStore)}/api/v1/${path}`);
+}
+
+export function setRegion(url: URL): URL {
+	const region = get(interfaceRegionStore);
+
+	if (region) {
+		url.searchParams.set('region', region);
+	}
+
+	return url;
 }
 
 export async function fetchErrorHandle(response: Response): Promise<Response> {
@@ -47,7 +58,7 @@ export function buildAuthHeaders(): { headers: { Authorization: string; }; } {
 }
 
 export async function getTrending(): Promise<Video[]> {
-	const resp = await fetchErrorHandle(await fetch(buildPath('trending')));
+	const resp = await fetchErrorHandle(await fetch(setRegion(buildPath('trending'))));
 	return await resp.json();
 }
 
@@ -57,7 +68,7 @@ export async function getPopular(): Promise<Video[]> {
 }
 
 export async function getVideo(videoId: string, local: boolean = false): Promise<VideoPlay> {
-	const resp = await fetchErrorHandle(await fetch(buildPath(`videos/${videoId}?local=${local}`)));
+	const resp = await fetchErrorHandle(await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`))));
 	return await resp.json();
 }
 
@@ -84,7 +95,7 @@ export async function getComments(
 		parameters.source = 'youtube';
 	}
 
-	const path = new URL(buildPath(`comments/${videoId}`));
+	const path = buildPath(`comments/${videoId}`);
 	path.search = new URLSearchParams(parameters).toString();
 	const resp = await fetchErrorHandle(await fetch(path));
 	return await resp.json();
@@ -104,7 +115,7 @@ export async function getChannelContent(
 ): Promise<ChannelContentVideos | ChannelContentPlaylists> {
 	if (typeof parameters.type === 'undefined') parameters.type = 'videos';
 
-	const url = new URL(buildPath(`channels/${channelId}/${parameters.type}`));
+	const url = buildPath(`channels/${channelId}/${parameters.type}`);
 
 	if (typeof parameters.continuation !== 'undefined')
 		url.searchParams.set('continuation', parameters.continuation);
@@ -114,7 +125,7 @@ export async function getChannelContent(
 }
 
 export async function getSearchSuggestions(search: string): Promise<SearchSuggestion> {
-	const path = new URL(buildPath('search/suggestions'));
+	const path = buildPath('search/suggestions');
 	path.search = new URLSearchParams({ q: search }).toString();
 	const resp = await fetchErrorHandle(await fetch(path));
 	return await resp.json();
@@ -140,14 +151,14 @@ export async function getSearch(
 		options.page = '1';
 	}
 
-	const path = new URL(buildPath('search'));
+	const path = buildPath('search');
 	path.search = new URLSearchParams({ ...options, q: search }).toString();
-	const resp = await fetchErrorHandle(await fetch(path));
+	const resp = await fetchErrorHandle(await fetch(setRegion(path)));
 	return await resp.json();
 }
 
 export async function getFeed(maxResults: number, page: number): Promise<Feed> {
-	const path = new URL(buildPath('auth/feed'));
+	const path = buildPath('auth/feed');
 	path.search = new URLSearchParams({
 		max_results: maxResults.toString(),
 		page: page.toString()

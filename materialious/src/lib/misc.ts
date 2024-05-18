@@ -4,7 +4,23 @@ import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import type { Image } from './Api/model';
-import { instanceStore } from './store';
+import { instanceStore, interfaceForceCase } from './store';
+
+
+export type TitleCase = 'uppercase' | 'lowercase' | 'sentence case' | 'title case' | null;
+export const titleCases: TitleCase[] = [
+	'lowercase',
+	'uppercase',
+	'title case',
+	'sentence case'
+];
+
+export function getLetterCaseClass(): string {
+	const casing = get(interfaceForceCase);
+	if (!casing) return '';
+
+	return casing.toLowerCase().replaceAll(' ', '-');
+}
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
@@ -79,7 +95,8 @@ export function phaseDescription(content: string): PhasedDescription {
 			const title = timestampMatch[4] || '';
 			timestamps.push({
 				time: convertToSeconds(time),
-				title: decodeHtmlCharCodes(title),
+				// Remove any URL in the timestamp title.
+				title: decodeHtmlCharCodes(title.replace(/<a\b[^>]*>(.*?)<\/a>/gi, '')),
 				timePretty: timestamp
 			});
 		} else {

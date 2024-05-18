@@ -1,5 +1,6 @@
 import { pushState } from '$app/navigation';
 import { page } from '$app/stores';
+import he from 'he';
 import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
@@ -98,9 +99,8 @@ export interface PhasedDescription {
 }
 
 export function decodeHtmlCharCodes(str: string): string {
-	return str.replace(/(&#(\d+);)/g, function (match, capture, charCode) {
-		return String.fromCharCode(charCode);
-	});
+	const { decode } = he;
+	return decode(str);
 }
 
 export function phaseDescription(content: string): PhasedDescription {

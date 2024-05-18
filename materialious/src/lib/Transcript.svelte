@@ -6,7 +6,7 @@
 	import type { MediaTimeUpdateEvent } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import type { VideoPlay } from './Api/model';
-	import { videoLength } from './misc';
+	import { decodeHtmlCharCodes, videoLength } from './misc';
 	import { instanceStore } from './store';
 
 	export let video: VideoPlay;
@@ -104,7 +104,7 @@
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
-						<p class="transcript-text">{cue.text}</p>
+						<p class="transcript-text">{decodeHtmlCharCodes(cue.text)}</p>
 					</div>
 				{/each}
 			{:else}
@@ -134,6 +134,6 @@
 	}
 
 	.transcript-line .chip {
-		padding: 0.5em;
+		padding: 0 1.5em;
 	}
 </style>

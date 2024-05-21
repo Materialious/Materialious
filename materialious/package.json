@@ -53,7 +53,7 @@
 		"media-captions": "^1.0.3",
 		"media-icons": "^0.10.0",
 		"mousetrap": "^1.6.5",
-		"peerjs": "^1.5.3",
+		"peerjs": "^1.5.4",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-i18n": "^4.0.0",
 		"svelte-infinite-loading": "^1.3.8",

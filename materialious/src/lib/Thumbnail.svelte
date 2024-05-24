@@ -28,6 +28,7 @@
 	let videoPreview: VideoPlay | null = null;
 	let videoPreviewMuted: boolean = true;
 	let videoPreviewVolume: number = 0.4;
+	let imgHeight: number;
 
 	let proxyVideos = get(playerProxyVideosStore);
 
@@ -210,6 +211,7 @@
 		on:mouseover={previewVideo}
 		on:mouseleave={() => (showVideoPreview = false)}
 		on:focus={() => {}}
+		bind:clientHeight={imgHeight}
 		role="region"
 	>
 		<a
@@ -222,9 +224,9 @@
 				<progress class="circle"></progress>
 			{:else if loaded}
 				{#if showVideoPreview && videoPreview}
-					<div style="max-width: 100%; max-height: 200px;">
+					<div style="max-width: 100%; max-height: {imgHeight}px;">
 						<video
-							style="max-width: 100%; max-height: 200px;"
+							style="max-width: 100%; height: {imgHeight}px;"
 							autoplay
 							poster={img.src}
 							width="100%"

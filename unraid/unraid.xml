@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>materialious</Name>
+  <Repository>wardpearce/materialious</Repository>
+  <Registry>https://hub.docker.com/r/wardpearce/materialious/</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/Materialious/Materialious/issues</Support>
+  <Project>https://github.com/Materialious/Materialious</Project>
+  <Overview>Materialious is a privacy respecting frontend for YouTube built ontop of Invidious.</Overview>
+  <Category>Productivity: Tools:</Category>
+  <WebUI>http://[IP]:[PORT:80]</WebUI>
+  <Icon>https://i.imgur.com/wTtRPnS.png</Icon>
+  <ExtraParams>--restart=always</ExtraParams>
+  <Requires>For security reasons regarding CORS, your hosted instance of Materialious must serve as the value for the Access-Control-Allow-Origin header on Invidious.&#xD;
+&#xD;
+Invidious doesn't provide a simple way to modify CORS, so this must be done with your reverse proxy.&#xD;
+&#xD;
+Please see the documentation on further information on how to do this if you are unsure.&#xD;
+https://materialio.us/</Requires>
+  <Config Name="Port" Target="80" Default="3001" Mode="tcp" Description="" Type="Port" Display="always" Required="true" Mask="false">3001</Config>
+  <Config Name="Indidious Instance URL" Target="VITE_DEFAULT_INVIDIOUS_INSTANCE" Default="https://invidious.materialio.us" Mode="" Description="Specify the URL to your proxied Invidious Instance.&#13;&#10;Do not include a trailing backslash as this will cause issues. " Type="Variable" Display="always" Required="true" Mask="false">https://invidious.materialio.us</Config>
+  <Config Name="Return YouTube Dislikes URL" Target="VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE" Default="" Mode="" Description="Leave blank or delete this variable to disable." Type="Variable" Display="always" Required="false" Mask="false">https://returnyoutubedislikeapi.com</Config>
+  <Config Name="SponsorBlock URL" Target="VITE_DEFAULT_SPONSERBLOCK_INSTANCE" Default="" Mode="" Description="Leave blank or delete this variable to disable." Type="Variable" Display="always" Required="false" Mask="false">https://sponsor.ajay.app</Config>
+  <Config Name="DeArrow URL" Target="VITE_DEFAULT_DEARROW_INSTANCE" Default="https://sponsor.ajay.app" Mode="" Description="Specify the URL to your DeArrow Instance." Type="Variable" Display="always" Required="false" Mask="false">https://sponsor.ajay.app</Config>
+  <Config Name="DeArrow Thumbnail Instance URL" Target="VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE" Default="https://dearrow-thumb.ajay.app" Mode="" Description="Specify the URL to your DeArrow Thumbnail Instance." Type="Variable" Display="always" Required="false" Mask="false">https://dearrow-thumb.ajay.app</Config>
+  <Config Name="Materialious Default Overrides" Target="VITE_DEFAULT_SETTINGS" Default="" Mode="" Description="Set your default overrides for Materialous.&#13;&#10;Refer to the documentation for a list of all configurable options." Type="Variable" Display="always" Required="false" Mask="false">{"themeColor": "#2596be"}</Config>
+</Container>

@@ -24,7 +24,7 @@ export function letterCase(text: string): string {
 		case 'lowercase':
 			return text.toLowerCase();
 		case 'uppercase':
-			text.toUpperCase();
+			return text.toUpperCase();
 		case 'sentence case':
 			return sentenceCase(text);
 		default:

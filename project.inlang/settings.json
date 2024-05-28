@@ -1,8 +1,9 @@
 {
-  "sourceLanguageTag": "ru",
+  "sourceLanguageTag": "en",
   "languageTags": [
+    "en",
     "ru",
-    "en"
+    "tr"
   ],
   "modules": [
     "https://cdn.jsdelivr.net/npm/@inlang/plugin-i18next@latest/dist/index.js"

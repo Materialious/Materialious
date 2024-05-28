@@ -8,9 +8,12 @@
 	"create": "Создать",
 	"title": "Заголовок",
 	"searchPlaceholder": "Искать...",
+	"delete": "Удалить",
 	"deleteAllHistory": "Удалить всю историю",
 	"skipping": "Пропускаю",
 	"replies": "ответ(а/ов)",
+	"region": "Регион",
+	"noResult": "Без результатов",
 	"syncParty": {
 		"userJoined": "Пользователь вошел в вашу группу",
 		"userLeft": "Пользователь покинул вашу группу"

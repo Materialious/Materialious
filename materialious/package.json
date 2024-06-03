@@ -57,7 +57,7 @@
 		"sponsorblock-api": "^0.2.4",
 		"svelte-i18n": "^4.0.0",
 		"svelte-infinite-loading": "^1.4.0",
-		"svelte-persisted-store": "^0.9.4",
+		"svelte-persisted-store": "^0.11.0",
 		"vidstack": "^1.11.21"
 	}
 }

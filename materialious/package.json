@@ -43,7 +43,7 @@
 		"@capacitor/app": "^6.0.0",
 		"@capacitor/browser": "^6.0.0",
 		"@capacitor/cli": "^6.0.0",
-		"@capacitor/core": "^6.0.0",
+		"@capacitor/core": "^6.1.0",
 		"beercss": "^3.5.6",
 		"fuse.js": "^7.0.0",
 		"he": "^1.2.0",

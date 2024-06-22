@@ -26,6 +26,8 @@
 	import {
 		activePageStore,
 		authStore,
+		interfaceAutoExpandComments,
+		interfaceAutoExpandDesc,
 		miniPlayerSrcStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
@@ -555,7 +557,7 @@
 		</div>
 
 		<article>
-			<details>
+			<details open={$interfaceAutoExpandDesc}>
 				<summary class="bold none">
 					<nav>
 						<div class="max">
@@ -597,7 +599,7 @@
 
 		{#if comments && comments.comments.length > 0}
 			<article>
-				<details open>
+				<details open={$interfaceAutoExpandComments}>
 					<summary class="none bold">
 						<nav>
 							<div class="max">{numberWithCommas(comments.commentCount)} comments</div>
@@ -631,7 +633,7 @@
 					{#each data.video.recommendedVideos as recommendedVideo}
 						<article class="no-padding">
 							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} />
+								<Thumbnail video={recommendedVideo} sideways={true} />
 							{/key}
 						</article>
 					{/each}

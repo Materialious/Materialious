@@ -1,5 +1,7 @@
+import ui from 'beercss';
+
 export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
-	const givenSettings = (await window.ui('theme')) as IBeerCssTheme;
+	const givenSettings = (await ui('theme'));
 
 	// @ts-ignore
 	const themes: string = givenSettings[mode ? mode : (ui('mode') as string)];

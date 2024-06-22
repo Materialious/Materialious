@@ -1,11 +1,18 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
 	import ShareVideo from './ShareVideo.svelte';
-	import { cleanNumber, getBestThumbnail, letterCase, proxyVideoUrl, videoLength } from './misc';
+	import {
+		cleanNumber,
+		getBestThumbnail,
+		letterCase,
+		proxyVideoUrl,
+		truncate,
+		videoLength
+	} from './misc';
 	import type { PlayerEvents } from './player';
 	import {
 		authStore,
@@ -22,6 +29,7 @@
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 	export let playlistId: string = '';
+	export let sideways: boolean = false;
 
 	let thumbnailHidden: boolean = false;
 	let showVideoPreview: boolean = false;
@@ -60,6 +68,14 @@
 		progress = null;
 	}
 
+	let startedSideways = sideways === true;
+	function disableSideways() {
+		if (!startedSideways) return;
+
+		if (window.innerWidth <= 1000) sideways = false;
+		else sideways = true;
+	}
+
 	onMount(async () => {
 		try {
 			thumbnailHidden = localStorage.getItem(`v_h_${video.videoId}`) === '1';
@@ -69,6 +85,8 @@
 			dispatch('videoHidden');
 			return;
 		}
+
+		addEventListener('resize', disableSideways);
 
 		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;
 
@@ -154,6 +172,10 @@
 		}
 	});
 
+	onDestroy(() => {
+		removeEventListener('resize', disableSideways);
+	});
+
 	function syncChangeVideo() {
 		if ($syncPartyConnectionsStore) {
 			const events = {
@@ -206,124 +228,130 @@
 </script>
 
 {#if !thumbnailHidden}
-	<div
-		style="position: relative;"
-		on:mouseover={previewVideo}
-		on:mouseleave={() => (showVideoPreview = false)}
-		on:focus={() => {}}
-		bind:clientHeight={imgHeight}
-		role="region"
-	>
-		<a
-			class="wave thumbnail"
-			href={watchUrl.toString()}
-			data-sveltekit-preload-data="off"
-			on:click={syncChangeVideo}
+	<div class:side-ways={sideways}>
+		<div
+			style="position: relative;"
+			on:mouseover={previewVideo}
+			on:mouseleave={() => (showVideoPreview = false)}
+			on:focus={() => {}}
+			bind:clientHeight={imgHeight}
+			role="region"
 		>
-			{#if loading}
-				<progress class="circle"></progress>
-			{:else if loaded}
-				{#if showVideoPreview && videoPreview}
-					<div style="max-width: 100%; max-height: {imgHeight}px;">
-						<video
-							style="max-width: 100%; height: {imgHeight}px;"
-							autoplay
-							poster={img.src}
-							width="100%"
-							height="100%"
-							muted={videoPreviewMuted}
-							controls={false}
-							volume={videoPreviewVolume}
-							src={proxyVideos
-								? proxyVideoUrl(videoPreview.formatStreams[0].url)
-								: videoPreview.formatStreams[0].url}
-						>
-						</video>
-					</div>
-				{:else}
-					<img class="responsive" src={img.src} alt="Thumbnail for video" />
-				{/if}
-			{:else}
-				<p>{$_('thumbnail.failedToLoadImage')}</p>
-			{/if}
-			{#if progress}
-				<progress
-					class="absolute right bottom"
-					style="z-index: 1;"
-					value={progress}
-					max={video.lengthSeconds}
-				></progress>
-			{/if}
-			{#if !('liveVideo' in video) || !video.liveVideo}
-				{#if video.lengthSeconds !== 0}
-					<div
-						class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
-					>
-						&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
-					</div>
-				{/if}
-			{:else}
-				<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
-					{$_('thumbnail.live')}
-				</div>
-			{/if}
-		</a>
-		{#if showVideoPreview && videoPreview}
-			<button
-				class="no-padding"
-				style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px;"
-				on:click={() => {
-					videoPreviewMuted = !videoPreviewMuted;
-				}}
+			<a
+				class="wave thumbnail"
+				href={watchUrl.toString()}
+				data-sveltekit-preload-data="off"
+				on:click={syncChangeVideo}
 			>
-				<i>
-					{#if videoPreviewMuted}
-						volume_off
-					{:else}
-						volume_up
-					{/if}
-				</i>
-			</button>
-		{/if}
-	</div>
-
-	<div class="small-padding">
-		<nav class="no-margin">
-			<div class="max">
-				<a
-					href={watchUrl.toString()}
-					data-sveltekit-preload-data="off"
-					style="display: flex; justify-content:flex-start; position: absolute; width: 100%;"
-					><div class="bold" style="white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">
-						{letterCase(video.title)}
-					</div>
-
-					<div class="tooltip bottom small">{letterCase(video.title)}</div>
-				</a>
-				<div style="margin-top: 1.4em;">
-					<a href={`/channel/${video.authorId}`}>{video.author}</a
-					>{#if !('publishedText' in video) && 'viewCountText' in video}
-						&nbsp;• {video.viewCountText}{/if}
-				</div>
-				<nav class="no-margin">
-					{#if 'publishedText' in video}
-						<div class="max">
-							{cleanNumber(video.viewCount)} • {video.publishedText}
+				{#if loading}
+					<progress class="circle"></progress>
+				{:else if loaded}
+					{#if showVideoPreview && videoPreview}
+						<div style="max-width: 100%; max-height: {imgHeight}px;">
+							<video
+								style="max-width: 100%; height: {imgHeight}px;"
+								autoplay
+								poster={img.src}
+								width="100%"
+								height="100%"
+								muted={videoPreviewMuted}
+								controls={false}
+								volume={videoPreviewVolume}
+								src={proxyVideos
+									? proxyVideoUrl(videoPreview.formatStreams[0].url)
+									: videoPreview.formatStreams[0].url}
+							>
+							</video>
 						</div>
-						<button class="transparent circle">
-							<i>more_vert</i>
-							<menu class="left no-wrap">
-								<a href="#hide" on:click={hideVideo}>
-									{$_('hideVideo')}
-								</a>
-								<div class="divider"></div>
-								<ShareVideo {video} />
-							</menu>
-						</button>
+					{:else}
+						<img class="responsive" src={img.src} alt="Thumbnail for video" />
 					{/if}
-				</nav>
-			</div>
-		</nav>
+				{:else}
+					<p>{$_('thumbnail.failedToLoadImage')}</p>
+				{/if}
+				{#if progress}
+					<progress
+						class="absolute right bottom"
+						style="z-index: 1;"
+						value={progress}
+						max={video.lengthSeconds}
+					></progress>
+				{/if}
+				{#if !('liveVideo' in video) || !video.liveVideo}
+					{#if video.lengthSeconds !== 0}
+						<div
+							class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
+						>
+							&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
+						</div>
+					{/if}
+				{:else}
+					<div
+						class="absolute right bottom small-margin red white-text small-text thumbnail-corner"
+					>
+						{$_('thumbnail.live')}
+					</div>
+				{/if}
+			</a>
+			{#if showVideoPreview && videoPreview}
+				<button
+					class="no-padding"
+					style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px;"
+					on:click={() => {
+						videoPreviewMuted = !videoPreviewMuted;
+					}}
+				>
+					<i>
+						{#if videoPreviewMuted}
+							volume_off
+						{:else}
+							volume_up
+						{/if}
+					</i>
+				</button>
+			{/if}
+		</div>
+
+		<div class="small-padding">
+			<nav class="no-margin">
+				<div class="max">
+					<a
+						href={watchUrl.toString()}
+						data-sveltekit-preload-data="off"
+						class:ellipsis-container={!sideways}
+						><div class="bold" class:ellipsis={!sideways}>
+							{truncate(letterCase(video.title.trim()), 40)}
+						</div>
+
+						<div class="tooltip bottom small">{letterCase(video.title.trim())}</div>
+					</a>
+					<div>
+						<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+						<span>
+							{#if !('publishedText' in video) && 'viewCountText' in video}
+								&nbsp;• {video.viewCountText}{/if}
+						</span>
+					</div>
+					<nav class="no-margin">
+						{#if 'publishedText' in video}
+							<div class="max">
+								{cleanNumber(video.viewCount)} • {video.publishedText}
+							</div>
+							<button class="transparent circle">
+								<i>more_vert</i>
+								<menu class="left no-wrap">
+									<a href="#hide" on:click={hideVideo}>
+										{$_('hideVideo')}
+									</a>
+									<div class="divider"></div>
+									<ShareVideo {video} />
+								</menu>
+							</button>
+						{/if}
+					</nav>
+				</div>
+			</nav>
+		</div>
 	</div>
 {/if}
 
@@ -331,6 +359,31 @@
 <div id="video-container" style="display: none;"></div>
 
 <style>
+	.side-ways {
+		display: flex;
+	}
+
+	.side-ways img {
+		width: 200px;
+	}
+
+	.ellipsis-container {
+		display: flex;
+		justify-content: flex-start;
+		position: absolute;
+		width: 100%;
+	}
+
+	.ellipsis {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.author {
+		margin-top: 1.4em;
+	}
+
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;

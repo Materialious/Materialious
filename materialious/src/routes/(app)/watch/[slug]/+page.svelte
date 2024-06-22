@@ -631,7 +631,7 @@
 					{#each data.video.recommendedVideos as recommendedVideo}
 						<article class="no-padding">
 							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} />
+								<Thumbnail video={recommendedVideo} sideways={true} />
 							{/key}
 						</article>
 					{/each}

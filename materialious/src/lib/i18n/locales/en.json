@@ -93,6 +93,8 @@
 		},
 		"searchSuggestions": "Search suggestions",
 		"previewVideoOnHover": "Preview video on hover",
+		"expandDescription": "Expand description by default",
+		"expandComments": "Expand comments by default",
 		"dataPreferences": {
 			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page.",
 			"dataPreferences": "Data preferences"
@@ -123,7 +125,8 @@
 		},
 		"deArrow": {
 			"title": "DeArrow",
-			"thumbnailInstanceUrl": "Thumbnail instance URL"
+			"thumbnailInstanceUrl": "Thumbnail instance URL",
+			"titleOnly": "Title only"
 		}
 	},
 	"subscribe": "Subscribe"

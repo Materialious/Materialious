@@ -47,6 +47,8 @@ export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion
 export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
 export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover', true);
 export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
+export const interfaceAutoExpandComments: Writable<boolean> = persisted('autoExpandComments', true);
+export const interfaceAutoExpandDesc: Writable<boolean> = persisted('autoExpandDesc', false);
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(
@@ -63,6 +65,7 @@ export const deArrowInstanceStore = persisted(
 	import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE || 'https://sponsor.ajay.app'
 );
 export const deArrowEnabledStore = persisted('deArrowEnabled', false);
+export const deArrowTitlesOnly = persisted('deArrowTitlesOnly', true);
 export const deArrowThumbnailInstanceStore = persisted(
 	'deArrowThumbnailInstance',
 	import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE || 'https://dearrow-thumb.ajay.app'

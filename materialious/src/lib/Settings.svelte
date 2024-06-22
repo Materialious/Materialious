@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { Capacitor } from '@capacitor/core';
+	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
@@ -11,7 +12,10 @@
 		deArrowEnabledStore,
 		deArrowInstanceStore,
 		deArrowThumbnailInstanceStore,
+		deArrowTitlesOnly,
 		instanceStore,
+		interfaceAutoExpandComments,
+		interfaceAutoExpandDesc,
 		interfaceForceCase,
 		interfacePreviewVideoOnHoverStore,
 		interfaceRegionStore,
@@ -164,6 +168,38 @@
 						bind:checked={$interfacePreviewVideoOnHoverStore}
 						on:click={() =>
 							interfacePreviewVideoOnHoverStore.set(!$interfacePreviewVideoOnHoverStore)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.expandDescription')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$interfaceAutoExpandDesc}
+						on:click={() => interfaceAutoExpandDesc.set(!$interfaceAutoExpandDesc)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.expandComments')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$interfaceAutoExpandComments}
+						on:click={() => interfaceAutoExpandComments.set(!$interfaceAutoExpandComments)}
 					/>
 					<span></span>
 				</label>
@@ -532,6 +568,20 @@
 				</button>
 			</nav>
 		</form>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>{$_('layout.deArrow.titleOnly')}</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$deArrowTitlesOnly}
+					on:click={() => deArrowTitlesOnly.set(!$deArrowTitlesOnly)}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
 
 		<nav class="no-padding">
 			<div class="max">

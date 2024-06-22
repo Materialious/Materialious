@@ -4,6 +4,9 @@ import {
 	deArrowEnabledStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
+	deArrowTitlesOnly,
+	interfaceAutoExpandComments,
+	interfaceAutoExpandDesc,
 	interfaceForceCase,
 	interfacePreviewVideoOnHoverStore,
 	interfaceRegionStore,
@@ -153,6 +156,21 @@ const persistedStores = [
 		name: 'forceCase',
 		store: interfaceForceCase,
 		type: 'string'
+	},
+	{
+		name: 'autoExpandComments',
+		store: interfaceAutoExpandComments,
+		type: 'boolean'
+	},
+	{
+		name: 'autoExpandDesc',
+		store: interfaceAutoExpandDesc,
+		type: 'boolean'
+	},
+	{
+		name: 'deArrowTitlesOnly',
+		store: deArrowTitlesOnly,
+		type: 'boolean'
 	}
 ];
 

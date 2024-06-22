@@ -17,6 +17,7 @@
 	import {
 		authStore,
 		deArrowEnabledStore,
+		deArrowTitlesOnly,
 		interfacePreviewVideoOnHoverStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
@@ -113,7 +114,7 @@
 				}
 			} catch {}
 
-			if (!locatedThumbnail) {
+			if (!locatedThumbnail && !get(deArrowTitlesOnly)) {
 				// Process thumbnail locally.
 				const canvas = document.getElementById('canvas') as HTMLCanvasElement | null;
 				function generateThumbnail(): Promise<string> {
@@ -318,20 +319,19 @@
 					<a
 						href={watchUrl.toString()}
 						data-sveltekit-preload-data="off"
-						class:ellipsis-container={!sideways}
+						class:ellipsis-root={!sideways}
 						><div class="bold" class:ellipsis={!sideways}>
 							{truncate(letterCase(video.title.trim()), 40)}
 						</div>
 
-						<div class="tooltip bottom small">{letterCase(video.title.trim())}</div>
+						<div class="tooltip bottom small">{letterCase(video.title)}</div>
 					</a>
-					<div>
-						<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
-						<span>
-							{#if !('publishedText' in video) && 'viewCountText' in video}
-								&nbsp;• {video.viewCountText}{/if}
-						</span>
-					</div>
+
+					<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+					<span>
+						{#if !('publishedText' in video) && 'viewCountText' in video}
+							&nbsp;• {video.viewCountText}{/if}
+					</span>
 					<nav class="no-margin">
 						{#if 'publishedText' in video}
 							<div class="max">
@@ -367,7 +367,7 @@
 		width: 200px;
 	}
 
-	.ellipsis-container {
+	.ellipsis-root {
 		display: flex;
 		justify-content: flex-start;
 		position: absolute;

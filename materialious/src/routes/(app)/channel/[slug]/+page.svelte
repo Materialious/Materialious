@@ -204,9 +204,10 @@
 		justify-content: center;
 	}
 
-	@media screen and (max-width: 580px) {
+	@media screen and (max-width: 1350px) {
 		.description {
 			flex-direction: column;
+			align-items: flex-start;
 		}
 	}
 

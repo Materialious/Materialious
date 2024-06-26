@@ -23,6 +23,7 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		sponsorBlockCategoriesStore,
+		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousStore
 	} from './store';
@@ -99,7 +100,7 @@
 				savePlayerPos();
 			});
 
-			if (get(sponsorBlockCategoriesStore)) {
+			if (get(sponsorBlockStore) && get(sponsorBlockCategoriesStore)) {
 				const currentCategories = get(sponsorBlockCategoriesStore);
 
 				const sponsorBlockUrl = get(sponsorBlockUrlStore);

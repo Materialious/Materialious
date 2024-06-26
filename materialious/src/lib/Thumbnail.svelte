@@ -5,7 +5,14 @@
 	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
 	import ShareVideo from './ShareVideo.svelte';
-	import { cleanNumber, getBestThumbnail, letterCase, proxyVideoUrl, videoLength } from './misc';
+	import {
+		cleanNumber,
+		getBestThumbnail,
+		letterCase,
+		proxyVideoUrl,
+		truncate,
+		videoLength
+	} from './misc';
 	import type { PlayerEvents } from './player';
 	import {
 		authStore,
@@ -309,15 +316,17 @@
 		<div class="small-padding">
 			<nav class="no-margin">
 				<div class="max">
-					<a href={watchUrl.toString()} data-sveltekit-preload-data="off" class="ellipsis-root"
-						><div class="bold ellipsis">
-							{letterCase(video.title.trim())}
-						</div>
-
-						<div class="tooltip bottom small">{letterCase(video.title)}</div>
+					<a
+						href={watchUrl.toString()}
+						data-sveltekit-preload-data="off"
+						class:ellipsis-root={!sideways}
+					>
+						<span class="bold" class:ellipsis={!sideways}
+							>{truncate(letterCase(video.title.trim()), 30)}</span
+						>
 					</a>
 
-					<div class:sideways-info={sideways}>
+					<div>
 						<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
 						<span>
 							{#if !('publishedText' in video) && 'viewCountText' in video}
@@ -384,10 +393,6 @@
 
 	.sideways-root .thumbnail {
 		width: 180px;
-	}
-
-	.sideways-info {
-		margin-top: 1.5em;
 	}
 
 	@media screen and (max-width: 1499px) {

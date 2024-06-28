@@ -87,6 +87,9 @@
 			return;
 		}
 
+                // Check if sideways should be enabled or disabled.
+                disableSideways();
+
 		addEventListener('resize', disableSideways);
 
 		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;

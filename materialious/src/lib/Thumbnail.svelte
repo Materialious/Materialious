@@ -87,8 +87,8 @@
 			return;
 		}
 
-                // Check if sideways should be enabled or disabled.
-                disableSideways();
+		// Check if sideways should be enabled or disabled.
+		disableSideways();
 
 		addEventListener('resize', disableSideways);
 
@@ -218,8 +218,10 @@
 				} catch {}
 			}
 		} catch {
-			showVideoPreview = true;
+			showVideoPreview = false;
 		}
+
+		imgHeight = document.getElementById('thumbnail-container')?.clientHeight as number;
 	}
 
 	function hideVideo() {
@@ -238,7 +240,7 @@
 			on:mouseover={previewVideo}
 			on:mouseleave={() => (showVideoPreview = false)}
 			on:focus={() => {}}
-			bind:clientHeight={imgHeight}
+			id="thumbnail-container"
 			role="region"
 		>
 			<a
@@ -253,7 +255,7 @@
 					{#if showVideoPreview && videoPreview}
 						<div style="max-width: 100%; max-height: {imgHeight}px;">
 							<video
-								style="max-width: 100%; height: {imgHeight}px;"
+								style="max-width: 100%; max-height: {imgHeight}px;"
 								autoplay
 								poster={img.src}
 								width="100%"
@@ -324,8 +326,10 @@
 						data-sveltekit-preload-data="off"
 						class:ellipsis-root={!sideways}
 					>
-						<span class="bold" class:ellipsis={!sideways}
-							>{truncate(letterCase(video.title.trim()), 30)}</span
+						<span class="bold" class:ellipsis={!sideways}>
+							{#if sideways}
+								{truncate(letterCase(video.title), 30)}
+							{:else}{letterCase(video.title)}{/if}</span
 						>
 					</a>
 

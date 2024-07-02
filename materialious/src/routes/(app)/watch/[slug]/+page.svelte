@@ -112,7 +112,7 @@
 				} else if (event.type === 'seek' && event.time) {
 					const timeDiff = player.currentTime - event.time;
 
-					if (timeDiff > 3 || timeDiff < -3) {
+					if (timeDiff > 5 || timeDiff < -5) {
 						player.currentTime = event.time;
 					}
 				} else if (
@@ -292,6 +292,7 @@
 		if (
 			get(playerMiniPlayerStore) &&
 			!player.paused &&
+			!$syncPartyPeerStore &&
 			!data.video.hlsUrl &&
 			data.video.formatStreams &&
 			data.video.formatStreams.length > 0

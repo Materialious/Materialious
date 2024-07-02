@@ -23,6 +23,7 @@
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
+	import ui from 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';

@@ -291,8 +291,8 @@
 
 		if (
 			get(playerMiniPlayerStore) &&
-			!$syncPartyPeerStore &&
 			!player.paused &&
+			!$syncPartyPeerStore &&
 			!data.video.hlsUrl &&
 			data.video.formatStreams &&
 			data.video.formatStreams.length > 0

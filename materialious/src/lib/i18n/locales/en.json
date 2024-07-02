@@ -23,7 +23,8 @@
 	"hideVideo": "Hide video",
 	"syncParty": {
 		"userJoined": "User joined your watch party.",
-		"userLeft": "User left your watch party."
+		"userLeft": "User left your watch party.",
+		"userOnPrivatePage": "User currently viewing a private page, syncing will resume shorty."
 	},
 	"videoTabs": {
 		"all": "All",

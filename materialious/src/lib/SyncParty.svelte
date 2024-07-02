@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { peerJs, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
+	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -14,10 +15,19 @@
 			const events = data as PlayerEvents;
 			const currentUrl = get(page).url;
 
+			const blockedPages = ['subscriptions', 'playlists', 'history'];
+
 			events.events.forEach((event) => {
 				if (event.type === 'change-video' && event.videoId) {
 					currentUrl.pathname = `/watch/${event.videoId}`;
 					goto(currentUrl);
+				} else if (event.type === 'goto' && event.path && event.path !== $page.url.pathname) {
+					if (blockedPages.includes(event.path.replace('/', ''))) {
+						ui('#sync-party-private-page');
+					} else {
+						currentUrl.pathname = event.path;
+						goto(currentUrl);
+					}
 				}
 			});
 		});
@@ -40,19 +50,15 @@
 				conn.on('open', async () => {
 					await ui('#sync-party-connection-join');
 
-					if ($page.url.pathname.startsWith('/watch')) {
-						const paths = $page.url.pathname.split('/');
-						if (paths.length > 2) {
-							conn.send({
-								events: [
-									{
-										type: 'change-video',
-										videoId: paths[2]
-									}
-								]
-							} as PlayerEvents);
-						}
-					}
+					conn.send({
+						events: [
+							{
+								type: 'goto',
+								path: $page.url.pathname
+							}
+						]
+					} as PlayerEvents);
+
 					changeVideoEvent(conn);
 					syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
 				});
@@ -63,6 +69,21 @@
 			});
 		}
 	}
+
+	page.subscribe((newPage) => {
+		if (!newPage.url.pathname.startsWith('/watch') && $syncPartyPeerStore) {
+			$syncPartyConnectionsStore?.forEach((conn) => {
+				conn.send({
+					events: [
+						{
+							type: 'goto',
+							path: newPage.url.pathname
+						}
+					]
+				} as PlayerEvents);
+			});
+		}
+	});
 
 	onMount(async () => {
 		const currentUrl = get(page).url;
@@ -138,4 +159,9 @@
 <div class="snackbar" id="sync-party-connection-left">
 	<i>person_remove</i>
 	<span>{$_('syncParty.userLeft')}</span>
+</div>
+
+<div class="snackbar" id="sync-party-private-page">
+	<i>shield_person</i>
+	<span>{$_('syncParty.userOnPrivatePage')}</span>
 </div>

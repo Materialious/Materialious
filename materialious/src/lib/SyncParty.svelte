@@ -15,7 +15,7 @@
 			const events = data as PlayerEvents;
 			const currentUrl = get(page).url;
 
-			const blockedPages = ['subscriptions', 'playlists', 'history'];
+			const blockedPages = ['subscriptions', 'playlists', 'history', 'subscriptions/manage'];
 
 			events.events.forEach((event) => {
 				if (event.type === 'change-video' && event.videoId) {

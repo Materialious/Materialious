@@ -61,7 +61,7 @@
 	"unsubscribe": "Отписаться",
 	"loginRequired": "Нужно войти в учётную запись",
 	"player": {
-		"audioOnly": "Слушать",
+		"audioOnly": "Только звук",
 		"theatreMode": "Широкий экран",
 		"share": {
 			"title": "Поделиться",
@@ -110,7 +110,8 @@
 			"autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
 			"miniPlayer": "Мини-плеер",
 			"proxyVideos": "Прокси видео",
-			"backgroundPlay": "Играть аудио в фоне"
+			"backgroundPlay": "Играть аудио в фоне",
+			"dash": "Использование DASH"
 		},
 		"bookmarklet": "Закладка",
 		"instanceUrl": "URL инстанса",

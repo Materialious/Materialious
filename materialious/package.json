@@ -58,6 +58,6 @@
 		"svelte-i18n": "^4.0.0",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.11.0",
-		"vidstack": "^1.11.25"
+		"vidstack": "^1.11.29"
 	}
 }

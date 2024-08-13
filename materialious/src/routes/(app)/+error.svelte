@@ -1,4 +1,4 @@
-<script src="ts">
+<script lang="ts">
 	import { page } from '$app/stores';
 	import { activePageStore } from '$lib/store';
 

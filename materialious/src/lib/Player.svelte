@@ -100,6 +100,10 @@
 				savePlayerPos();
 			});
 
+			player.addEventListener('end', () => {
+				savePlayerPos();
+			});
+
 			if (get(sponsorBlockStore) && get(sponsorBlockCategoriesStore)) {
 				const currentCategories = get(sponsorBlockCategoriesStore);
 

@@ -62,7 +62,9 @@ server {
 2. Tab: Custom locations, fill in IP and port. Click gear icon to add some security headers.   
 
 Click image for fullsize:   
-<img src="https://github.com/R0GGER/Materialious/assets/8298741/257d1b81-0e35-43ec-bed9-9d051a30d49d" width=15% height=15%>
+<img src="https://github.com/user-attachments/assets/bd7be837-5f08-4ceb-9fdf-f0f445228075" width=15% height=15%>
+
+
 
 **Add:** 
 ```nginx

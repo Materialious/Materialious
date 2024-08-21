@@ -77,12 +77,8 @@ Click image for fullsize:
     add_header Access-Control-Allow-Origin "https://materialious.example.com" always;
     add_header Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD, PATCH, PUT, DELETE" always;
     add_header Access-Control-Allow-Headers "User-Agent, Authorization, Content-Type" always;
-
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $http_connection;
-    proxy_http_version 1.1;
 ```
-3. Click **Save**.
+Click **Save**.
 
 ### Traefik example
 Add this middleware to your Invidious instance:

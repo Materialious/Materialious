@@ -171,6 +171,7 @@ export function proxyVideoUrl(source: string): string {
 }
 
 export function proxyGoogleImage(source: string): string {
+	if (source.startsWith('//')) source = `https:${source}`;
 
 	let path: string | undefined;
 	try {

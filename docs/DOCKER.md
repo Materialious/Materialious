@@ -147,76 +147,13 @@ services:
       VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
 
       # Look at "Overwriting Materialious defaults" for all the accepted values.
-      VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be"}'
+      VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
 ```
 
 ### Overwriting Materialious defaults
-Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETTINGS`
+Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETTINGS`, see [SETTINGS](./SETTINGS.md) for more details.
 
-```json
-{
-  // Set to true to enable dark mode, or false to disable it.
-  "darkMode": true,
-
-  // Force case for Videos/Playlists etc.
-  "forceCase": "uppercase | lowercase | sentence case | title case",
-
-  // Any ISO 3166 country code
-  "region": "US",
-
-  // Specifies the theme color in hexadecimal format (e.g., #ff0000 for red).
-  "themeColor": "#ff0000",
-  
-  // Set to true to enable autoplay, or false to disable it.
-  "autoPlay": false,
-  
-  // Set to true to always loop videos, or false to loop only when specified.
-  "alwaysLoop": false,
-  
-  // Set to true to proxy videos, or false to play them directly.
-  "proxyVideos": true,
-  
-  // Set to true to enable listening by default, or false to disable it.
-  "listenByDefault": true,
-  
-  // Set to true to save playback position, or false to reset it.
-  "savePlaybackPosition": true,
-  
-  // Set to true to enable DASH playback, or false to use other formats.
-  "dashEnabled": true,
-  
-  // Set to true to enable theatre mode by default, or false to disable it.
-  "theatreModeByDefault": false,
-  
-  // Set to true to autoplay next video by default, or false to disable it.
-  "autoplayNextByDefault": true,
-  
-  // Set to true to return YouTube dislikes, or false to hide them.
-  "returnYtDislikes": false,
-  
-  // Set to true to enable search suggestions, or false to disable them.
-  "searchSuggestions": true,
-  
-  // Set to true to preview video on hover, or false to disable it.
-  "previewVideoOnHover": true,
-  
-  // Set to true to enable sponsor block, or false to disable it.
-  "sponsorBlock": false,
-  
-  // Specifies the categories for sponsor block as comma-separated values.
-  // https://wiki.sponsor.ajay.app/w/Types
-  "sponsorBlockCategories": "sponsor,interaction",
-
-  // Set to true to enable deArrow, or false to disable it.
-  "deArrowEnabled": true,
-
-  // Set to true to enable mini player, or false to disable it.
-  "playerMiniPlayer": true,
-  
-  // Set to true to enable syncious, or false to disable it.
-  "syncious": true,
-}
-```
+**Please note:** These overwrites only apply on 1st load & won't replace existing configuration stored in browser local storage.
 
 ## Step 4 (Optional, but recommended): Self-host RYD-Proxy
 

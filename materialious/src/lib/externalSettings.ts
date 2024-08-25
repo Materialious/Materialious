@@ -200,12 +200,6 @@ function setStores(toSet: Record<string, any>) {
 			}
 
 			store.store.set(value);
-
-			// Kinda backwards but delete out of localstorage after setting
-			// So can be changed in the future.
-			try {
-				localStorage.removeItem(store.name);
-			} catch { }
 		}
 	});
 }

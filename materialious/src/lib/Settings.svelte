@@ -33,6 +33,7 @@
 		returnYTDislikesInstanceStore,
 		returnYtDislikesStore,
 		sponsorBlockCategoriesStore,
+		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
@@ -519,6 +520,24 @@
 				<span></span>
 			</label>
 		</nav>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>{$_('layout.sponsors.disableToast')}</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$sponsorBlockDisplayToastStore}
+					on:click={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
+
+		<hr style="margin: 1em 0;" />
+
+		<p class="bold">{$_('layout.sponsors.Catagories')}</p>
 
 		{#each sponsorCategories as sponsor}
 			<div class="field middle-align no-margin">

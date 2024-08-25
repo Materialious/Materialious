@@ -59,6 +59,10 @@ export const sponsorBlockCategoriesStore: Writable<string[]> = persisted(
 	'sponsorBlockCategories',
 	[]
 );
+export const sponsorBlockDisplayToastStore: Writable<boolean> = persisted(
+	'sponsorBlockDisplayToast',
+	false
+);
 
 export const deArrowInstanceStore = persisted(
 	'deArrowInstance',

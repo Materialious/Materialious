@@ -117,6 +117,8 @@
 		"instanceUrl": "Instance URL",
 		"sponsors": {
 			"sponsor": "Sponsor",
+			"disableToast": "Disable toast",
+			"Catagories": "Catagories",
 			"unpaidSelfPromotion": "Unpaid/Self Promotion",
 			"interactionReminder": "Interaction Reminder (Subscribe)",
 			"intermissionIntroAnimation": "Intermission/Intro Animation",

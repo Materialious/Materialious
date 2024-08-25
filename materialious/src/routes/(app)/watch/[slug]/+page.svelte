@@ -20,6 +20,7 @@
 		getBestThumbnail,
 		letterCase,
 		numberWithCommas,
+		proxyGoogleImage,
 		unsafeRandomItem
 	} from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
@@ -422,7 +423,7 @@
 						<nav>
 							<img
 								class="circle large"
-								src={getBestThumbnail(data.video.authorThumbnails)}
+								src={proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))}
 								alt="Channel profile"
 							/>
 							<div>

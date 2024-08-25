@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import type { Channel } from './Api/model';
-	import { cleanNumber, getBestThumbnail, truncate } from './misc';
+	import { cleanNumber, getBestThumbnail, proxyGoogleImage, truncate } from './misc';
 
 	export let channel: Channel;
 
@@ -12,7 +12,7 @@
 
 	onMount(() => {
 		img = new Image();
-		img.src = getBestThumbnail(channel.authorThumbnails) || '';
+		img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)) || '';
 
 		img.onload = () => {
 			loading = false;

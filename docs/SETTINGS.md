@@ -1,5 +1,6 @@
 # Materialious Settings
-Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETTINGS` (code block below each setting) or click here for full [json](https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md#overwriting-materialious-defaults).
+
+Materialious allows you to customize various settings by overwriting the default values using the environmental variable `VITE_DEFAULT_SETTINGS`.
 
 ## TOC
 
@@ -12,6 +13,8 @@ Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETT
       + [Preview video on hover](#preview-video-on-hover)
       + [Region](#region)
       + [Letter case for titles](#letter-case-for-titles)
+      + [Auto expand comments](#auto-expand-comments)
+      + [Auto expand description](#auto-expand-desc)
    * [Player](#player)
       + [Mini player](#mini-player)
       + [Autoplay video](#autoplay-video)
@@ -24,6 +27,7 @@ Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETT
       + [Dash](#dash)
    * [Return YT Dislikes](#return-yt-dislikes)
    * [Syncious](#syncious)
+      + [Syncious Instance](#syncious-instance)
    * [Sponsorblock](#sponsorblock)
       + [Sponsor](#sponsor)
       + [Unpaid/Self Promotion](#unpaidself-promotion)
@@ -34,239 +38,277 @@ Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETT
       + [Endcards/Credits](#endcardscredits)
       + [Preview/Recap/Hook](#previewrecaphook)
       + [Filler Tangent/Jokes](#filler-tangentjokes)
+      + [Display Toast](#sponsorblockdisplaytoast)
    * [DeArrow](#dearrow)
+      + [DeArrow Enabled](#dearrow-enabled)
+      + [DeArrow Instance](#dearrow-instance)
+      + [DeArrow Thumbnail Instance](#dearrow-thumbnail-instance)
+      + [DeArrow Titles Only](#dearrow-titles-only)
    * [Bookmarklet](#bookmarklet)
 
 ## Theme
 
 ### Dark mode / Light mode
 
-Background light (whitish) or dark (dark grey),
-Set to true to enable dark mode, or false to disable it.
+Controls the background mode of the application.
 
-```
-  "darkMode": true,
+```json
+"darkMode": true
 ```
 
 ### Color
 
-Specifies the theme color in hexadecimal format (e.g., #ff0000 for red).
+Sets the theme color using a hexadecimal value.
 
-```
-  "themeColor": "#ff0000",
+```json
+"themeColor": "#ff0000"
 ```
 
 ## Interface
 
 ### Search suggestions
 
-Enable or disable search suggestions.
+Enables or disables search suggestions.
 
-```
-  "searchSuggestions": true,
+```json
+"searchSuggestions": true
 ```
 
 ### Preview video on hover
 
-Preview video on hover.
+Allows video previews when hovering over thumbnails.
 
-```
-  "previewVideoOnHover": true,
+```json
+"previewVideoOnHover": true
 ```
 
 ### Region
 
-Any [ISO 3166](https://www.iso.org/obp/ui/#search) country code (alpha-2 code).
+Specifies the region using an ISO 3166 country code.
 
-```
-  "region": "US",
+```json
+"region": "US"
 ```
 
 ### Letter case for titles
 
+Controls the letter case for titles (e.g., uppercase, lowercase).
+
+```json
+"forceCase": "uppercase"
 ```
-  "forceCase": "uppercase | lowercase | sentence case | title case",
+
+### Auto expand comments
+
+Automatically expands comments section.
+
+```json
+"autoExpandComments": true
+```
+
+### Auto expand description
+
+Automatically expands video descriptions.
+
+```json
+"autoExpandDesc": true
 ```
 
 ## Player
 
 ### Mini player
 
-Set to true to enable mini player, or false to disable it.
+Enables or disables the mini player feature.
 
-```
-  "playerMiniPlayer": true,
+```json
+"playerMiniPlayer": true
 ```
 
 ### Autoplay video
 
-Set to true to enable autoplay, or false to disable it.
+Controls whether videos autoplay.
 
-```
-  "autoPlay": false,
+```json
+"autoPlay": false
 ```
 
 ### Always loop video
 
-Set to true to always loop videos, or false to loop only when specified.
+Determines if videos should loop automatically.
 
-```
- "alwaysLoop": false,
+```json
+"alwaysLoop": false
 ```
 
 ### Proxy videos
 
-Proxy videos by rotating IPs every 2 minutes to avoid rate limiting (TOR).
-Optional, but recommended: [Self-host RYD-Proxy](https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md#step-4-optional-but-recommended-self-host-ryd-proxy)
+Enables video proxying to avoid rate limiting by rotating IPs.
 
-```
-  "proxyVideos": true,
+```json
+"proxyVideos": true
 ```
 
 ### Save playback position
 
-Set to true to save playback position, or false to reset it.
+Saves the playback position of videos.
 
-```
-  "savePlaybackPosition": true,
+```json
+"savePlaybackPosition": true
 ```
 
 ### Listen by default
 
-Set to true to enable listening by default, or false to disable it.
+Enables or disables listening by default.
 
-```
-  "listenByDefault": true,
+```json
+"listenByDefault": true
 ```
 
 ### Theatre mode by default
 
-Set to true to enable theatre mode by default, or false to disable it.
+Controls whether theatre mode is enabled by default.
 
-```
-  "theatreModeByDefault": false,
+```json
+"theatreModeByDefault": false
 ```
 
 ### Autoplay next by default
 
-Set to true to enable autoplay, or false to disable it.
+Determines if the next video should autoplay.
 
-```
-  "autoPlay": false,
+```json
+"autoplayNextByDefault": false
 ```
 
 ### Dash
 
-DASH is a streaming technique used by YouTube to provide resolutions higher than 720p by providing multiple files for a client to use depending on network and user preferences.
+Enables DASH streaming for higher resolutions.
 
-```
-  "dashEnabled": true,
+```json
+"dashEnabled": true
 ```
 
 ## Return YT Dislikes
-An open-source, non-logging proxy for the "Return YouTube Dislike" API server.
-Requests are spoofed to look like how they would appear when using the Tor Browser with the official extension. IPs are rotated every 2 minutes to avoid rate limiting.
 
-Optional, but recommended: [Self-host RYD-Proxy](https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md#step-4-optional-but-recommended-self-host-ryd-proxy)
+Configures an open-source proxy for the Return YouTube Dislike API, with optional self-hosting.
 
+```json
+"returnYtDislikes": true
+```
 
 ## Syncious
 
-A self-hostable API extension for Invidious, made for custom clients. In short: it keeps your watch progress synced between Invidious clients / sessions.
-More info and config: [Self-host Invidious API extended](https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md#step-5-optional-but-recommended-self-host-invidious-api-extended)
+Syncious keeps your watch progress synced across Invidious clients.
 
-```
-"syncious": true,
+```json
+"syncious": true
 ```
 
-Environment var in Materialious [docker compose](https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md#docker-compose): 
-
-```
-VITE_DEFAULT_SYNCIOUS_INSTANCE: "https://syncious.example.com"
-```
 
 ## Sponsorblock
 
-Specifies the categories for sponsor block as comma-separated values.
-More info: https://wiki.sponsor.ajay.app/w/Types
+Configures Sponsorblock categories for skipping unwanted video segments.
 
-```
-  "sponsorBlockCategories": "sponsor,interaction,selfpromo",
+```json
+"sponsorBlockCategories": "sponsor,interaction,selfpromo"
 ```
 
 ### Sponsor
 
-Part of a video promoting a product or service not directly related to the creator. The creator will receive payment or compensation in the form of money or free products.
-If the entire video is about the product or service, use a Full Video Label.
+Identifies promotional content within a video.
 
-`sponsor`
+```json
+"sponsorBlockCategories": "sponsor"
+```
 
 ### Unpaid/Self Promotion
 
-#### Self Promotion
+Includes categories for unpaid and self-promotion.
 
-Promoting a product or service that is directly related to the creator themselves. This usually includes merchandise or promotion of monetized platforms.
-
-#### Unpaid Promotion
-
-The creator will not receive any payment in exchange for this promotion. This includes charity drives or free shout outs for products or other people they like.
-Can be bundled into Endcards/Credits [^1].
-
-[^1]: If it is **impossible** to cleanly cut  or overlap the segments, Interactions and Self Promotion can be included in Endcards if they also occur during the outro.
-
-`selfpromo`
+```json
+"sponsorBlockCategories": "selfpromo"
+```
 
 ### Interaction Reminder (Subscribe)
 
-Explicit reminders to like, subscribe or interact with them on any paid or free platform(s) (e.g. click on a video). If about something specific it should be Unpaid/Self Promotion instead.
-Can be bundled with Self Promotion into Endcards/Credits [^1].
+Skips explicit reminders for interactions.
 
-[^1]: If it is **impossible** to cleanly cut  or overlap the segments, Interactions and Self Promotion can be included in Endcards if they also occur during the outro.
-
-`interaction`
+```json
+"sponsorBlockCategories": "interaction"
+```
 
 ### Intermission/Intro Animation
 
-Segments typically found at the start of a video that include an animation, still frame or clip which are also seen in other videos by the same creator.
-This can include livestream pauses with no content (looping animations or chat windows) and Copyright/ Fair Use disclaimers.
-Do not include disclaimers to protect viewers, preparation or cleanup clips and as a rule of thumb, speech should usually not be included.
-Do not include skits, time-lapses, slow-motion clips. (Possibly Filler Tangent/ Jokes)
-Do not use this to skip past content to get to the main point of the video. (See Highlight)
+Skips intermission or intro animations.
 
-`intro`
+```json
+"sponsorBlockCategories": "intro"
+```
 
 ### Endcards/Credits
 
-Typically near or at the end of the video when the credits pop up and/or endcards are shown. This should not be based solely on the YouTube annotations.
-Interaction Reminder (Subscribe) or Self Promotion can be included [^1].
+Skips endcards and credits.
 
-[^1]: If it is **impossible** to cleanly cut  or overlap the segments, Interactions and Self Promotion can be included in Endcards if they also occur during the outro.
-
-`outro`
+```json
+"sponsorBlockCategories": "outro"
+```
 
 ### Preview/Recap/Hook
 
-Collection of clips that show what is coming up in in this video or other videos in a series where all information is repeated later in the video.
-Do not include clips that only appear in the video or clips from a recapped video that is not directly linked to the current video.
+Skips previews, recaps, or hooks.
 
-`preview`
+```json
+"sponsorBlockCategories": "preview"
+```
 
 ### Filler Tangent/Jokes
 
-Filler Tangent/ Jokes is only for tangential scenes added only for filler or humor that are not required to understand the main content of the video.
-This can also include: Timelapses/ B-Roll, Fake Sponsors and slow-motion clips that do not provide any context or are used as replays or B-roll.
+Skips filler, tangents, or jokes.
 
-`filler`
+```json
+"sponsorBlockCategories": "filler"
+```
+
+### Display Toast
+
+Enables or disables displaying a toast notification when Sponsorblock actions occur.
+
+```json
+"sponsorBlockDisplayToast": true
+```
 
 ## DeArrow
 
-[DeArrow](https://dearrow.ajay.app/) is an open source browser extension for crowdsourcing better titles and thumbnails on YouTube. The goal is to make titles accurate  and reduce sensationalism. No more arrows, ridiculous faces, and no more clickbait.
+Controls the DeArrow extension for removing sensational elements from YouTube titles and thumbnails.
 
-* Instance URL: https://sponsor.ajay.app
-* Thumbnail instance URL: https://dearrow-thumb.ajay.app
+### DeArrow Enabled
 
+Enables or disables the DeArrow extension.
+
+```json
+"deArrowEnabled": true
 ```
-  "deArrowEnabled": true,
+
+### DeArrow Instance
+
+Specifies the URL for the DeArrow instance.
+
+```json
+"deArrowInstance": "https://sponsor.ajay.app"
 ```
-## Bookmarklet
-Copy bookmarklet with all Materilious settings within the URL. 
+
+### DeArrow Thumbnail Instance
+
+Specifies the URL for the DeArrow thumbnail instance.
+
+```json
+"deArrowThumbnailInstance": "https://dearrow-thumb.ajay.app"
+```
+
+### DeArrow Titles Only
+
+Configures DeArrow to only modify titles without changing thumbnails.
+
+```json
+"deArrowTitlesOnly": true
+```

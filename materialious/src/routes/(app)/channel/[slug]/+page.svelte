@@ -79,7 +79,11 @@
 
 <div class="padding">
 	{#if data.channel.authorBanners.length > 0}
-		<img src={data.channel.authorBanners[0].url} width="100%" alt="Channel banner" />
+		<img
+			src={proxyGoogleImage(data.channel.authorBanners[0].url)}
+			width="100%"
+			alt="Channel banner"
+		/>
 	{/if}
 	<div class="description">
 		<img

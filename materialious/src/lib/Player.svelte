@@ -23,6 +23,7 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		sponsorBlockCategoriesStore,
+		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousStore
@@ -295,7 +296,7 @@
 	{/if}
 </media-player>
 
-{#if !isEmbed}
+{#if !isEmbed && !$sponsorBlockDisplayToastStore}
 	<div class="snackbar" id="sponsorblock-alert">
 		<span
 			>{$_('skipping')}

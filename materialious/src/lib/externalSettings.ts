@@ -23,6 +23,7 @@ import {
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore,
 	sponsorBlockCategoriesStore,
+	sponsorBlockDisplayToastStore,
 	sponsorBlockStore,
 	sponsorBlockUrlStore,
 	synciousInstanceStore,
@@ -170,6 +171,11 @@ const persistedStores = [
 	{
 		name: 'deArrowTitlesOnly',
 		store: deArrowTitlesOnly,
+		type: 'boolean'
+	},
+	{
+		name: 'sponsorBlockDisplayToast',
+		store: sponsorBlockDisplayToastStore,
 		type: 'boolean'
 	}
 ];

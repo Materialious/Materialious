@@ -4,7 +4,7 @@
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { cleanNumber, getBestThumbnail } from '$lib/misc';
+	import { cleanNumber, getBestThumbnail, proxyGoogleImage } from '$lib/misc';
 	import { activePageStore, authStore } from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
@@ -85,7 +85,7 @@
 		<img
 			style="margin-right: 1em;"
 			class="circle extra m l"
-			src={getBestThumbnail(data.channel.authorThumbnails)}
+			src={proxyGoogleImage(getBestThumbnail(data.channel.authorThumbnails))}
 			alt="Channel profile"
 		/>
 

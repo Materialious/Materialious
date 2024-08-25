@@ -2,7 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { getComments } from './Api';
 	import { type Comment, type Comments } from './Api/model';
-	import { getBestThumbnail, numberWithCommas } from './misc';
+	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from './misc';
 
 	export let comment: Comment;
 	export let videoId: string;
@@ -33,7 +33,7 @@
 <div class="comment">
 	<img
 		class="circle small"
-		src={getBestThumbnail(comment.authorThumbnails)}
+		src={proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))}
 		alt="comment profile"
 	/>
 	<div>

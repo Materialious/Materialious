@@ -170,6 +170,10 @@ export function proxyVideoUrl(source: string): string {
 	return rawSrc.toString();
 }
 
+export function proxyGoogleImage(source: string): string {
+	return `${get(instanceStore)}/ggpht${new URL(source).pathname}`;
+}
+
 export function unsafeRandomItem(array: any[]): any {
 	return array[Math.floor(Math.random() * array.length)];
 }
@@ -206,14 +210,14 @@ export function getBestThumbnail(
 	images: Image[] | null,
 	maxWidthDimension: number = 480,
 	maxHeightDimension = 360
-): string | null {
+): string {
 	if (images && images.length > 0) {
 		images = images.filter(
 			(image) => image.width < maxWidthDimension && image.height < maxHeightDimension
 		);
 
 		if (images.length === 0) {
-			return null;
+			return '';
 		}
 
 		images.sort((a, b) => {
@@ -222,7 +226,7 @@ export function getBestThumbnail(
 
 		return images[0].url;
 	} else {
-		return null;
+		return '';
 	}
 }
 

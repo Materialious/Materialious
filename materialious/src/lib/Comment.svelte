@@ -63,7 +63,7 @@
 					<img
 						class="circle"
 						style="width: 25px; height: 25px"
-						src={comment.creatorHeart.creatorThumbnail}
+						src={proxyGoogleImage(comment.creatorHeart.creatorThumbnail)}
 						alt="Creator profile"
 					/>
 					<i style="font-size: 20px;margin-left: 5px;" class="absolute left red-text bottom fill"

@@ -309,7 +309,7 @@ services:
       - 3004:80
     environment:
       api_extended_postgre: '{"host": "invidious-db", "port": 5432, "database": "invidious", "user": "kemal", "password": "kemal"}'
-      api_extended_allowed_origins: '["https://materialios.example.com"]'
+      api_extended_allowed_origins: '["https://materialious.example.com"]'
       api_extended_debug: false
 
       # No trailing backslashes!

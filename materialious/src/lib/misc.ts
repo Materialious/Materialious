@@ -171,7 +171,15 @@ export function proxyVideoUrl(source: string): string {
 }
 
 export function proxyGoogleImage(source: string): string {
-	return `${get(instanceStore)}/ggpht${new URL(source).pathname}`;
+
+	let path: string | undefined;
+	try {
+		path = new URL(source).pathname;
+	} catch { }
+
+	if (typeof path === 'undefined') return '';
+
+	return `${get(instanceStore)}/ggpht${path}`;
 }
 
 export function unsafeRandomItem(array: any[]): any {

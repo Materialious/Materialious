@@ -188,9 +188,16 @@
 		</button>
 	{/if}
 
-	<button class="circle large transparent m l small-margin" data-ui="#menu-expanded"
-		><i>menu</i></button
-	>
+	{#if Capacitor.getPlatform() === 'electron'}
+		<nav class="no-space">
+			<button on:click={() => window.history.back()} class="border left-round">
+				<i>arrow_back</i>
+			</button>
+			<button on:click={() => window.history.forward()} class="border right-round">
+				<i>arrow_forward</i>
+			</button>
+		</nav>
+	{/if}
 
 	<nav on:click={() => goto('/')} style="cursor: pointer;" class="m l">
 		<Logo />
@@ -270,32 +277,6 @@
 			</article>
 		{/each}
 	{/if}
-</dialog>
-
-<dialog class="left small" id="menu-expanded">
-	<header class="fixed">
-		<nav on:click={() => goto('/')} style="cursor: pointer;">
-			<button class="transparent circle large" data-ui="#menu-expanded"><i>menu</i></button>
-			<div style="width: 20%;">
-				<Logo />
-			</div>
-			<h6>Materialious</h6>
-		</nav>
-	</header>
-
-	<div class="space"></div>
-	{#each pages as page}
-		{#if !page.requiresAuth || isLoggedIn}
-			<a
-				class="row round"
-				data-ui="#menu-expanded"
-				href={page.href}
-				class:active={currentPage === page.name.toLowerCase()}
-				><i>{page.icon}</i>
-				<div>{page.name}</div></a
-			>
-		{/if}
-	{/each}
 </dialog>
 
 <main class="responsive max root">

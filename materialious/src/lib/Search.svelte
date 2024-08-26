@@ -60,6 +60,8 @@
 		} else if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
 			resetSearch();
 			event.preventDefault();
+		} else if (event.key === 'Escape') {
+			resetSearch();
 		}
 	}
 
@@ -83,7 +85,12 @@
 <form on:submit|preventDefault={handleSubmit}>
 	<div class="field prefix round fill no-margin search">
 		<i class="front">search</i>
-		<input id="search-box" bind:value={search} on:click={() => (showSearchBox = true)} />
+		<input
+			id="search-box"
+			placeholder="Search (ctrl + K)"
+			bind:value={search}
+			on:click={() => (showSearchBox = true)}
+		/>
 		{#if showSearchBox}
 			<menu class="min suggestions-container">
 				<div class="field large prefix suffix no-margin fixed">

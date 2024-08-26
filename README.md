@@ -2,8 +2,9 @@
   <img src="./materialious/static/logo.svg" width="200px" />
   <br />
   <br />
+  <h1>Materialious</h1>
   <quote>
-  Modern material design for Invidious.
+    Modern material design for Invidious.
   </quote>
 </div>
 

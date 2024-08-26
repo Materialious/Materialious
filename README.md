@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="previews/header.png" />
+  <img src="./materialious/static/logo.svg" width="200px" />
+  <br />
+  <br />
   <quote>
   Modern material design for Invidious.
   </quote>
@@ -82,6 +84,7 @@ Due to Google's policies on custom YouTube frontends, Materialious isn't availab
 [Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
 
 # Special thanks to
+- [SecularSteve](https://github.com/SecularSteve) for creating Materialious' logo.
 - [Invidious](https://github.com/iv-org)
 - [Clipious](https://github.com/lamarios/clipious) for inspiration & a good source for learning more about undocumented Invidious routes.
 - [Vidstack player](https://github.com/vidstack/player)

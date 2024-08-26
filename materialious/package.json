@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.1.7",
+	"version": "1.1.8",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -39,10 +39,10 @@
 	"type": "module",
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.1",
-		"@capacitor/android": "^6.1.2",
+		"@capacitor/android": "6.1.2",
 		"@capacitor/app": "^6.0.1",
 		"@capacitor/browser": "^6.0.0",
-		"@capacitor/cli": "^6.1.2",
+		"@capacitor/cli": "6.1.2",
 		"@capacitor/core": "^6.1.2",
 		"beercss": "^3.6.13",
 		"fuse.js": "^7.0.0",

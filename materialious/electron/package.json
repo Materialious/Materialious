@@ -23,7 +23,7 @@
 		"@capacitor-community/electron": "^5.0.0",
 		"@types/node": "^16.18.71",
 		"chokidar": "~3.6.0",
-		"electron-is-dev": "~2.0.0",
+		"electron-is-dev": "~3.0.1",
 		"electron-serve": "~1.1.0",
 		"electron-unhandled": "~4.0.1",
 		"electron-updater": "^6.3.4",

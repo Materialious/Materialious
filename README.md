@@ -1,5 +1,7 @@
 <div align="center">
-  <img src="previews/header.png" />
+  <img src="./materialious/static/logo.svg" width="200px" />
+  <br />
+  <br />
   <quote>
   Modern material design for Invidious.
   </quote>

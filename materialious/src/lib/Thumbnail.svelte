@@ -244,7 +244,7 @@
 				on:click={syncChangeVideo}
 			>
 				{#if loading}
-					<progress class="circle"></progress>
+					<progress style="padding: 20%;" class="circle"></progress>
 				{:else if loaded}
 					{#if showVideoPreview && videoPreview}
 						<div style="max-width: 100%; max-height: {imgHeight}px;">

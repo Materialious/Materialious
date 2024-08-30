@@ -22,10 +22,10 @@ export const activePageStore: Writable<string | null> = writable('home');
 
 export const playerAutoPlayStore = persisted('autoPlay', true);
 export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
-export const playerProxyVideosStore = persisted('proxyVideos', true);
+export const playerProxyVideosStore = persisted('proxyVideos', false);
 export const playerListenByDefaultStore = persisted('listenByDefault', false);
 export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
-export const playerDashStore = persisted('dashEnabled', true);
+export const playerDashStore = persisted('dashEnabled', false);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerMiniPlayerStore = persisted('miniPlayer', true);

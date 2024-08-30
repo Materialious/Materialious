@@ -5,14 +5,7 @@
 	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
 	import ShareVideo from './ShareVideo.svelte';
-	import {
-		cleanNumber,
-		getBestThumbnail,
-		letterCase,
-		proxyVideoUrl,
-		truncate,
-		videoLength
-	} from './misc';
+	import { cleanNumber, getBestThumbnail, letterCase, proxyVideoUrl, videoLength } from './misc';
 	import type { PlayerEvents } from './player';
 	import {
 		authStore,
@@ -90,7 +83,9 @@
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
-		addEventListener('resize', disableSideways);
+		addEventListener('resize', () => {
+			disableSideways();
+		});
 
 		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;
 
@@ -236,7 +231,6 @@
 {#if !thumbnailHidden}
 	<div class:sideways-root={sideways}>
 		<div
-			style="position: relative;"
 			on:mouseover={previewVideo}
 			on:mouseleave={() => (showVideoPreview = false)}
 			on:focus={() => {}}
@@ -318,47 +312,35 @@
 			{/if}
 		</div>
 
-		<div class="small-padding">
-			<nav class="no-margin">
-				<div class="max">
-					<a
-						href={watchUrl.toString()}
-						data-sveltekit-preload-data="off"
-						class:ellipsis-root={!sideways}
-					>
-						<span class="bold" class:ellipsis={!sideways}>
-							{#if sideways}
-								{truncate(letterCase(video.title), 30)}
-							{:else}{letterCase(video.title)}{/if}</span
-						>
-					</a>
+		<div class="video-title" style="padding: 0 0.5em;">
+			<a class="video-title" data-sveltekit-preload-data="off" href={watchUrl.toString()}>
+				<span>{letterCase(video.title.trimEnd())}</span>
+			</a>
 
-					<div>
-						<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
-						<span>
-							{#if !('publishedText' in video) && 'viewCountText' in video}
-								&nbsp;• {video.viewCountText}{/if}
-						</span>
-						<nav class="no-margin">
-							{#if 'publishedText' in video}
-								<div class="max">
-									{cleanNumber(video.viewCount)} • {video.publishedText}
-								</div>
-								<button class="transparent circle">
-									<i>more_vert</i>
-									<menu class="left no-wrap">
-										<a href="#hide" on:click={hideVideo}>
-											{$_('hideVideo')}
-										</a>
-										<div class="divider"></div>
-										<ShareVideo {video} />
-									</menu>
-								</button>
-							{/if}
-						</nav>
-					</div>
-				</div>
-			</nav>
+			<div>
+				<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+				<span>
+					{#if !('publishedText' in video) && 'viewCountText' in video}
+						&nbsp;• {video.viewCountText}{/if}
+				</span>
+				<nav class="no-margin">
+					{#if 'publishedText' in video}
+						<div class="max">
+							{cleanNumber(video.viewCount)} • {video.publishedText}
+						</div>
+						<button class="transparent circle">
+							<i>more_vert</i>
+							<menu class="left no-wrap">
+								<a href="#hide" on:click={hideVideo}>
+									{$_('hideVideo')}
+								</a>
+								<div class="divider"></div>
+								<ShareVideo {video} />
+							</menu>
+						</button>
+					{/if}
+				</nav>
+			</div>
 		</div>
 	</div>
 {/if}
@@ -367,19 +349,6 @@
 <div id="video-container" style="display: none;"></div>
 
 <style>
-	.ellipsis-root {
-		display: flex;
-		justify-content: flex-start;
-		position: absolute;
-		width: 100%;
-	}
-
-	.ellipsis {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
 	.author {
 		margin-top: 1.4em;
 	}
@@ -394,12 +363,21 @@
 	}
 
 	.sideways-root {
+		height: 115px;
 		display: flex;
 		align-items: flex-start;
 	}
 
 	.sideways-root .thumbnail {
-		width: 180px;
+		width: 200px;
+	}
+
+	.video-title {
+		display: inline-block;
+		white-space: nowrap;
+		width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	@media screen and (max-width: 1499px) {

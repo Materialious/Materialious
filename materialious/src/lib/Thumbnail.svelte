@@ -4,7 +4,14 @@
 	import { get } from 'svelte/store';
 	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
-	import { cleanNumber, getBestThumbnail, letterCase, proxyVideoUrl, videoLength } from './misc';
+	import {
+		cleanNumber,
+		getBestThumbnail,
+		letterCase,
+		proxyGoogleImage,
+		proxyVideoUrl,
+		videoLength
+	} from './misc';
 	import type { PlayerEvents } from './player';
 	import {
 		authStore,
@@ -75,7 +82,7 @@
 		const channel = await getChannel(video.authorId);
 
 		const authorImgObject = new Image();
-		authorImgObject.src = getBestThumbnail(channel.authorThumbnails);
+		authorImgObject.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails));
 
 		authorImgObject.onload = () => {
 			authorImg = authorImgObject.src;

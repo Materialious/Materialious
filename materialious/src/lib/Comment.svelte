@@ -53,7 +53,7 @@
 				<i>edit</i>
 			{/if}
 		</div>
-		<p style="margin-bottom: 0;">
+		<p class="no-margin">
 			{@html commentTimestamps(comment.contentHtml)}
 		</p>
 		<div style="display: flex;">

@@ -94,12 +94,17 @@
             "intermissionIntroAnimation": "转场/入场动画",
             "credits": "尾卡/制作人员名单",
             "preViewRecapHook": "预览/回顾/引子",
-            "tangentJokes": "包袱/笑话"
+            "tangentJokes": "包袱/笑话",
+            "Catagories": "类别",
+            "disableToast": "禁用提示"
         },
         "deArrow": {
             "title": "DeArrow",
-            "thumbnailInstanceUrl": "缩略图实例 URL"
-        }
+            "thumbnailInstanceUrl": "缩略图实例 URL",
+            "titleOnly": "仅标题"
+        },
+        "expandComments": "默认展开评论",
+        "expandDescription": "默认展开描述"
     },
     "subscribe": "订阅",
     "copyUrl": "复制 URL",
@@ -112,12 +117,20 @@
     "hideVideo": "隐藏视频",
     "syncParty": {
         "userLeft": "用户离开了您的一起看。",
-        "userJoined": "用户已加入您的一起看。"
+        "userJoined": "用户已加入您的一起看。",
+        "userOnPrivatePage": "用户当前正在查看私人页面，同步将很快恢复。"
     },
     "subscriptions": {
         "manageSubscriptions": "管理订阅"
     },
     "subscribers": "订阅者",
     "unsubscribe": "退订",
-    "loginRequired": "需要登录"
+    "loginRequired": "需要登录",
+    "language": "语言",
+    "noCaptionData": "字幕没有任何数据。",
+    "selectLang": "选择语言",
+    "letterCase": "标题字母大小写",
+    "transcript": "记录",
+    "noResult": "无结果",
+    "region": "区域"
 }

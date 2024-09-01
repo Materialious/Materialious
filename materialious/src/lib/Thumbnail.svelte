@@ -343,7 +343,12 @@
 				</div>
 			{/if}
 			<div class="video-title">
-				<a class="video-title" data-sveltekit-preload-data="off" href={watchUrl.toString()}>
+				<a
+					style="padding-left: 1px;"
+					class="video-title"
+					data-sveltekit-preload-data="off"
+					href={watchUrl.toString()}
+				>
 					<span class="bold">{letterCase(video.title.trimEnd())}</span>
 				</a>
 

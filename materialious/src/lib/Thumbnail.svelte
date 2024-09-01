@@ -374,7 +374,6 @@
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;
-		line-height: 0;
 	}
 
 	.thumbnail img {

@@ -101,17 +101,17 @@
 			return;
 		}
 
-		// Load author details in background.
-		if (!sideways) {
-			loadAuthor();
-		}
-
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
 		addEventListener('resize', () => {
 			disableSideways();
 		});
+
+		// Load author details in background.
+		if (!sideways) {
+			loadAuthor();
+		}
 
 		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;
 

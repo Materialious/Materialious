@@ -1,134 +1,134 @@
 {
-	"enabled": "Включено",
-	"copyUrl": "Копировать ссылку",
-	"loadMore": "Загрузить ещё",
-	"views": "просмотров",
-	"videos": "видео",
-	"cancel": "Отмена",
-	"create": "Создать",
-	"title": "Заголовок",
-	"searchPlaceholder": "Искать...",
-	"delete": "Удалить",
-	"deleteAllHistory": "Удалить всю историю",
-	"skipping": "Пропускаю",
-	"replies": "ответ(а/ов)",
-	"region": "Регион",
-	"noResult": "Без результатов",
-	"language": "Язык",
-	"transcript": "Транскрипция",
-	"noCaptionData": "Субтитры не содержат данных.",
-	"selectLang": "Выбрать язык",
-	"letterCase": "Регистр для названий",
-	"hideReplies": "Скрыть ответы",
-	"hideVideo": "Скрыть видео",
-	"syncParty": {
-		"userJoined": "Пользователь вошел в вашу группу",
-		"userLeft": "Пользователь покинул вашу группу",
-		"userOnPrivatePage": "Сейчас пользователь просматривает приватную страницу, синхронизация вскоре возобновится."
-	},
-	"videoTabs": {
-		"all": "Всё",
-		"videos": "Видео",
-		"playlists": "Списки воспроизведения",
-		"channels": "Каналы",
-		"shorts": "Shorts",
-		"streams": "Трансляции"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Управление подписками"
-	},
-	"playlist": {
-		"createPlaylist": "Создать список воспроизведения",
-		"public": "Общедоступно",
-		"unlisted": "Недоступно",
-		"private": "Ограниченно",
-		"playVideos": "Воспроизвести видео",
-		"shuffleVideos": "Воспроизвести видео в случайном порядке",
-		"loopPlaylist": "Повторять список воспроизведения"
-	},
-	"thumbnail": {
-		"live": "В ЭФИРЕ",
-		"failedToLoadImage": "Ошибка загрузки изображения"
-	},
-	"pages": {
-		"home": "Главная",
-		"trending": "В тренде",
-		"subscriptions": "Подписки",
-		"history": "История",
-		"playlists": "Плейлисты"
-	},
-	"subscribers": "подписчик(а/ов)",
-	"unsubscribe": "Отписаться",
-	"loginRequired": "Нужно войти в учётную запись",
-	"player": {
-		"audioOnly": "Только звук",
-		"theatreMode": "Широкий экран",
-		"share": {
-			"title": "Поделиться",
-			"materialiousLink": "Скопировать ссылку на Materialious",
-			"invidiousRedirect": "Скопировать ссылку на инстанс Invidious",
-			"youtubeLink": "Скопировать ссылку на Youtube"
-		},
-		"download": "Скачать",
-		"noPlaylists": "Нет списков воспроизведения",
-		"unableToLoadComments": "Невозможно загрузить комментарии",
-		"addToPlaylist": "Добавить в плейлист"
-	},
-	"layout": {
-		"star": "Поставить нам звезду на GitHub!",
-		"syncParty": "Совместный просмотр",
-		"syncPartyWarning": "Помните, ваш IP должен быть доступен для тех кого вы приглашаете.",
-		"startSyncParty": "Начать совместный просмотр",
-		"endSyncParty": "Закончить совместный просмотр",
-		"notifications": "Уведомления",
-		"noNewNotifications": "Нет новых уведомлений",
-		"settings": "Настройки",
-		"login": "Зайти в учетную запись",
-		"logout": "Выйти из учетной записи",
-		"customize": "Настроить под себя",
-		"theme": {
-			"theme": "Тема",
-			"darkMode": "Тёмный режим",
-			"lightMode": "Светлый режим",
-			"color": "Цвет"
-		},
-		"searchSuggestions": "Поисковые подсказки",
-		"previewVideoOnHover": "Предпросмотр видео при наведении",
-		"expandDescription": "Развернуть описание по умолчанию",
-		"expandComments": "Развернуть комментарий по умолчанию",
-		"dataPreferences": {
-			"content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз.",
-			"dataPreferences": "Настройки данных"
-		},
-		"player": {
-			"title": "Плеер",
-			"autoPlay": "Авто-воспроизведение видео",
-			"alwaysLoopVideo": "Зацикливать видео",
-			"savePlaybackPosition": "Сохранять позицию",
-			"listenByDefault": "Слушать по умолчанию",
-			"theatreModeByDefault": "Широкий формат по умолчанию",
-			"autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
-			"miniPlayer": "Мини-плеер",
-			"proxyVideos": "Прокси видео",
-			"backgroundPlay": "Играть аудио в фоне",
-			"dash": "Использовать DASH"
-		},
-		"bookmarklet": "Закладка",
-		"instanceUrl": "URL инстанса",
-		"sponsors": {
-			"sponsor": "Спонсор",
-			"unpaidSelfPromotion": "Самореклама",
-			"interactionReminder": "Напоминание о подписке",
-			"intermissionIntroAnimation": "Интро",
-			"credits": "Титры/Авторы",
-			"preViewRecapHook": "Краткое содержание",
-			"tangentJokes": "Шутки"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL инстанса обложек",
-			"titleOnly": "Только название"
-		}
-	},
-	"subscribe": "Подписаться"
+    "enabled": "Включено",
+    "copyUrl": "Копировать ссылку",
+    "loadMore": "Загрузить ещё",
+    "views": "просмотров",
+    "videos": "видео",
+    "cancel": "Отмена",
+    "create": "Создать",
+    "title": "Заголовок",
+    "searchPlaceholder": "Искать...",
+    "delete": "Удалить",
+    "deleteAllHistory": "Удалить всю историю",
+    "skipping": "Пропускаю",
+    "replies": "ответ(а/ов)",
+    "region": "Регион",
+    "noResult": "Без результатов",
+    "language": "Язык",
+    "transcript": "Транскрипция",
+    "noCaptionData": "Субтитры не содержат данных.",
+    "selectLang": "Выбрать язык",
+    "letterCase": "Регистр для названий",
+    "hideReplies": "Скрыть ответы",
+    "hideVideo": "Скрыть видео",
+    "syncParty": {
+        "userJoined": "Пользователь вошел в вашу группу",
+        "userLeft": "Пользователь покинул вашу группу",
+        "userOnPrivatePage": "Сейчас пользователь просматривает приватную страницу, синхронизация вскоре возобновится."
+    },
+    "videoTabs": {
+        "all": "Всё",
+        "videos": "Видео",
+        "playlists": "Списки воспроизведения",
+        "channels": "Каналы",
+        "shorts": "Shorts",
+        "streams": "Трансляции"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Управление подписками"
+    },
+    "playlist": {
+        "createPlaylist": "Создать список воспроизведения",
+        "public": "Общедоступно",
+        "unlisted": "Недоступно",
+        "private": "Ограниченно",
+        "playVideos": "Воспроизвести видео",
+        "shuffleVideos": "Воспроизвести видео в случайном порядке",
+        "loopPlaylist": "Повторять список воспроизведения"
+    },
+    "thumbnail": {
+        "live": "В ЭФИРЕ",
+        "failedToLoadImage": "Ошибка загрузки изображения"
+    },
+    "pages": {
+        "home": "Главная",
+        "trending": "В тренде",
+        "subscriptions": "Подписки",
+        "history": "История",
+        "playlists": "Плейлисты"
+    },
+    "subscribers": "подписчик(а/ов)",
+    "unsubscribe": "Отписаться",
+    "loginRequired": "Нужно войти в учётную запись",
+    "player": {
+        "audioOnly": "Только звук",
+        "theatreMode": "Широкий экран",
+        "share": {
+            "title": "Поделиться",
+            "materialiousLink": "Скопировать ссылку на Materialious",
+            "invidiousRedirect": "Скопировать ссылку на инстанс Invidious",
+            "youtubeLink": "Скопировать ссылку на Youtube"
+        },
+        "download": "Скачать",
+        "noPlaylists": "Нет списков воспроизведения",
+        "unableToLoadComments": "Невозможно загрузить комментарии",
+        "addToPlaylist": "Добавить в плейлист"
+    },
+    "layout": {
+        "star": "Поставить нам звезду на GitHub!",
+        "syncParty": "Совместный просмотр",
+        "syncPartyWarning": "Помните, ваш IP должен быть доступен для тех кого вы приглашаете.",
+        "startSyncParty": "Начать совместный просмотр",
+        "endSyncParty": "Закончить совместный просмотр",
+        "notifications": "Уведомления",
+        "noNewNotifications": "Нет новых уведомлений",
+        "settings": "Настройки",
+        "login": "Зайти в учетную запись",
+        "logout": "Выйти из учетной записи",
+        "customize": "Настроить под себя",
+        "theme": {
+            "theme": "Тема",
+            "darkMode": "Тёмный режим",
+            "lightMode": "Светлый режим",
+            "color": "Цвет"
+        },
+        "searchSuggestions": "Поисковые подсказки",
+        "previewVideoOnHover": "Предпросмотр видео при наведении",
+        "expandDescription": "Развернуть описание по умолчанию",
+        "expandComments": "Развернуть комментарий по умолчанию",
+        "dataPreferences": {
+            "content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз.",
+            "dataPreferences": "Настройки данных"
+        },
+        "player": {
+            "title": "Плеер",
+            "autoPlay": "Авто-воспроизведение видео",
+            "alwaysLoopVideo": "Зацикливать видео",
+            "savePlaybackPosition": "Сохранять позицию",
+            "listenByDefault": "Слушать по умолчанию",
+            "theatreModeByDefault": "Широкий формат по умолчанию",
+            "autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
+            "miniPlayer": "Мини-плеер",
+            "proxyVideos": "Прокси видео",
+            "backgroundPlay": "Играть аудио в фоне",
+            "dash": "Использовать DASH"
+        },
+        "bookmarklet": "Закладка",
+        "instanceUrl": "URL инстанса",
+        "sponsors": {
+            "sponsor": "Спонсор",
+            "unpaidSelfPromotion": "Самореклама",
+            "interactionReminder": "Напоминание о подписке",
+            "intermissionIntroAnimation": "Интро",
+            "credits": "Титры/Авторы",
+            "preViewRecapHook": "Краткое содержание",
+            "tangentJokes": "Шутки"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL инстанса обложек",
+            "titleOnly": "Только название"
+        }
+    },
+    "subscribe": "Подписаться"
 }

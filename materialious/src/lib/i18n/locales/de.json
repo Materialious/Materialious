@@ -1,133 +1,133 @@
 {
-	"enabled": "Aktiviert",
-	"copyUrl": "URL kopieren",
-	"loadMore": "Mehr laden",
-	"views": "Ansichten",
-	"videos": "Videos",
-	"cancel": "Abbrechen",
-	"create": "Erstellen",
-	"title": "Titel",
-	"searchPlaceholder": "Suchen...",
-	"delete": "Löschen",
-	"deleteAllHistory": "Gesamten Verlauf löschen",
-	"skipping": "Überspringen",
-	"replies": "antworten",
-	"region": "Region",
-	"noResult": "Keine Ergebnisse",
-	"language": "Sprache",
-	"transcript": "Transkript",
-	"noCaptionData": "Untertitel enthalten keine daten.",
-	"selectLang": "Sprache auswählen",
-	"letterCase": "Groß-/Kleinschreibung für Titel",
-	"hideReplies": "Antworten verstecken",
-	"hideVideo": "Video verstecken",
-	"syncParty": {
-		"userJoined": "Ein Benutzer ist Ihrer Watch-Party beigetreten.",
-		"userLeft": "Ein Benutzer hat ihre Watch-Party verlassen.",
-		"userOnPrivatePage": "Der Benutzer sieht gerade eine private Seite, die Synchronisierung wird in Kürze fortgesetzt."
-	},
-	"videoTabs": {
-		"all": "Alle",
-		"videos": "Videos",
-		"playlists": "Wiedergabeliste",
-		"channels": "Kanäle",
-		"shorts": "Shorts",
-		"streams": "Streams"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Abonnements verwalten"
-	},
-	"playlist": {
-		"createPlaylist": "Wiedergabeliste erstellen",
-		"public": "Öffentlich",
-		"unlisted": "Ungelistet",
-		"private": "Privat",
-		"playVideos": "Videos abspielen",
-		"shuffleVideos": "Videos in zufälliger Reihenfolge abspielen",
-		"loopPlaylist": "Wiedergabeliste in Schleife abspielen"
-	},
-	"thumbnail": {
-		"live": "LIVE",
-		"failedToLoadImage": "Laden des Bildes fehlgeschlagen"
-	},
-	"pages": {
-		"home": "Startseite",
-		"trending": "Beliebt",
-		"subscriptions": "Abonnements",
-		"history": "Verlauf",
-		"playlists": "Wiedergabelisten"
-	},
-	"subscribers": "Abonnenten",
-	"unsubscribe": "Deabonnieren",
-	"loginRequired": "Anmeldung erforderlich",
-	"player": {
-		"audioOnly": "Nur Ton",
-		"theatreMode": "Theatermodus",
-		"share": {
-			"title": "Teilen",
-			"materialiousLink": "Materialious link kopieren",
-			"invidiousRedirect": "Invidious Weiterleitungslink kopieren",
-			"youtubeLink": "YouTube Link kopieren"
-		},
-		"download": "Herunterladen",
-		"noPlaylists": "Keine Wiedergabelisten",
-		"unableToLoadComments": "Laden der Kommentare fehlgeschlagen",
-		"addToPlaylist": "Zur Wiedergabeliste hinzufügen"
-	},
-	"layout": {
-		"star": "Sternchen auf GitHub vergeben",
-		"syncPartyWarning": "Bitte beachten Sie, dass Ihre IP für die von Ihnen eingeladenen Benutzer sichtbar ist.",
-		"startSyncParty": "Sync-Party starten",
-		"endSyncParty": "Sync-Party beenden",
-		"notifications": "Benachrichtigungen",
-		"noNewNotifications": "Keine neuen Benachrichtigungen",
-		"settings": "Einstellungen",
-		"login": "Anmelden",
-		"logout": "Abmelden",
-		"customize": "Anpassen",
-		"theme": {
-			"theme": "Thema",
-			"darkMode": "Dunkler Modus",
-			"lightMode": "Heller Modus",
-			"color": "Farbe"
-		},
-		"searchSuggestions": "Suchvorschläge",
-		"previewVideoOnHover": "Video-Vorschau beim Hovern",
-		"expandDescription": "Beschreibung standardmäßig erweitern",
-		"expandComments": "Kommentare standardmäßig erweitern",
-		"dataPreferences": {
-			"content": "Sie möchten Abonnements importieren/exportieren, Ihr Passwort ändern oder Ihr Konto löschen? Klicken Sie hier und scrollen Sie bis zum Ende der Seite.",
-			"dataPreferences": "Dateneinstellungen"
-		},
-		"player": {
-			"title": "Player",
-			"autoPlay": "Video automatisch abspielen",
-			"alwaysLoopVideo": "Video immer in Schleife abspielen",
-			"savePlaybackPosition": "Wiedergabeposition speichern",
-			"listenByDefault": "Standardmäßig zuhören",
-			"theatreModeByDefault": "Standardmäßiger Theatermodus",
-			"autoPlayNextByDefault": "Standardmäßige Wiedergabe des nächsten Videos",
-			"miniPlayer": "Miniplayer",
-			"proxyVideos": "Proxy-Videos",
-			"backgroundPlay": "Ton im Hintergrund abspielen",
-			"dash": "Bindestrich"
-		},
-		"bookmarklet": "Lesezeichen",
-		"instanceUrl": "URL der Instanz",
-		"sponsors": {
-			"sponsor": "Sponsor",
-			"unpaidSelfPromotion": "Unbezahlte / Selbstständige Förderung",
-			"interactionReminder": "Interaktionserinnerung (Abonnieren)",
-			"intermissionIntroAnimation": "Unterbrechung/Einstiegsanimation",
-			"credits": "Endkarten/Gutschriften",
-			"preViewRecapHook": "Vorschau/Rückblick/Hook",
-			"tangentJokes": "Füller Tangent/Witze"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL der Miniaturansicht",
-			"titleOnly": "Nur Titel"
-		}
-	},
-	"subscribe": "Abonnieren"
+    "enabled": "Aktiviert",
+    "copyUrl": "URL kopieren",
+    "loadMore": "Mehr laden",
+    "views": "Ansichten",
+    "videos": "Videos",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "title": "Titel",
+    "searchPlaceholder": "Suchen...",
+    "delete": "Löschen",
+    "deleteAllHistory": "Gesamten Verlauf löschen",
+    "skipping": "Überspringen",
+    "replies": "antworten",
+    "region": "Region",
+    "noResult": "Keine Ergebnisse",
+    "language": "Sprache",
+    "transcript": "Transkript",
+    "noCaptionData": "Untertitel enthalten keine daten.",
+    "selectLang": "Sprache auswählen",
+    "letterCase": "Groß-/Kleinschreibung für Titel",
+    "hideReplies": "Antworten verstecken",
+    "hideVideo": "Video verstecken",
+    "syncParty": {
+        "userJoined": "Ein Benutzer ist Ihrer Watch-Party beigetreten.",
+        "userLeft": "Ein Benutzer hat ihre Watch-Party verlassen.",
+        "userOnPrivatePage": "Der Benutzer sieht gerade eine private Seite, die Synchronisierung wird in Kürze fortgesetzt."
+    },
+    "videoTabs": {
+        "all": "Alle",
+        "videos": "Videos",
+        "playlists": "Wiedergabeliste",
+        "channels": "Kanäle",
+        "shorts": "Shorts",
+        "streams": "Streams"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Abonnements verwalten"
+    },
+    "playlist": {
+        "createPlaylist": "Wiedergabeliste erstellen",
+        "public": "Öffentlich",
+        "unlisted": "Ungelistet",
+        "private": "Privat",
+        "playVideos": "Videos abspielen",
+        "shuffleVideos": "Videos in zufälliger Reihenfolge abspielen",
+        "loopPlaylist": "Wiedergabeliste in Schleife abspielen"
+    },
+    "thumbnail": {
+        "live": "LIVE",
+        "failedToLoadImage": "Laden des Bildes fehlgeschlagen"
+    },
+    "pages": {
+        "home": "Startseite",
+        "trending": "Beliebt",
+        "subscriptions": "Abonnements",
+        "history": "Verlauf",
+        "playlists": "Wiedergabelisten"
+    },
+    "subscribers": "Abonnenten",
+    "unsubscribe": "Deabonnieren",
+    "loginRequired": "Anmeldung erforderlich",
+    "player": {
+        "audioOnly": "Nur Ton",
+        "theatreMode": "Theatermodus",
+        "share": {
+            "title": "Teilen",
+            "materialiousLink": "Materialious link kopieren",
+            "invidiousRedirect": "Invidious Weiterleitungslink kopieren",
+            "youtubeLink": "YouTube Link kopieren"
+        },
+        "download": "Herunterladen",
+        "noPlaylists": "Keine Wiedergabelisten",
+        "unableToLoadComments": "Laden der Kommentare fehlgeschlagen",
+        "addToPlaylist": "Zur Wiedergabeliste hinzufügen"
+    },
+    "layout": {
+        "star": "Sternchen auf GitHub vergeben",
+        "syncPartyWarning": "Bitte beachten Sie, dass Ihre IP für die von Ihnen eingeladenen Benutzer sichtbar ist.",
+        "startSyncParty": "Sync-Party starten",
+        "endSyncParty": "Sync-Party beenden",
+        "notifications": "Benachrichtigungen",
+        "noNewNotifications": "Keine neuen Benachrichtigungen",
+        "settings": "Einstellungen",
+        "login": "Anmelden",
+        "logout": "Abmelden",
+        "customize": "Anpassen",
+        "theme": {
+            "theme": "Thema",
+            "darkMode": "Dunkler Modus",
+            "lightMode": "Heller Modus",
+            "color": "Farbe"
+        },
+        "searchSuggestions": "Suchvorschläge",
+        "previewVideoOnHover": "Video-Vorschau beim Hovern",
+        "expandDescription": "Beschreibung standardmäßig erweitern",
+        "expandComments": "Kommentare standardmäßig erweitern",
+        "dataPreferences": {
+            "content": "Sie möchten Abonnements importieren/exportieren, Ihr Passwort ändern oder Ihr Konto löschen? Klicken Sie hier und scrollen Sie bis zum Ende der Seite.",
+            "dataPreferences": "Dateneinstellungen"
+        },
+        "player": {
+            "title": "Player",
+            "autoPlay": "Video automatisch abspielen",
+            "alwaysLoopVideo": "Video immer in Schleife abspielen",
+            "savePlaybackPosition": "Wiedergabeposition speichern",
+            "listenByDefault": "Standardmäßig zuhören",
+            "theatreModeByDefault": "Standardmäßiger Theatermodus",
+            "autoPlayNextByDefault": "Standardmäßige Wiedergabe des nächsten Videos",
+            "miniPlayer": "Miniplayer",
+            "proxyVideos": "Proxy-Videos",
+            "backgroundPlay": "Ton im Hintergrund abspielen",
+            "dash": "Bindestrich"
+        },
+        "bookmarklet": "Lesezeichen",
+        "instanceUrl": "URL der Instanz",
+        "sponsors": {
+            "sponsor": "Sponsor",
+            "unpaidSelfPromotion": "Unbezahlte / Selbstständige Förderung",
+            "interactionReminder": "Interaktionserinnerung (Abonnieren)",
+            "intermissionIntroAnimation": "Unterbrechung/Einstiegsanimation",
+            "credits": "Endkarten/Gutschriften",
+            "preViewRecapHook": "Vorschau/Rückblick/Hook",
+            "tangentJokes": "Füller Tangent/Witze"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL der Miniaturansicht",
+            "titleOnly": "Nur Titel"
+        }
+    },
+    "subscribe": "Abonnieren"
 }

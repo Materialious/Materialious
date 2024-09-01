@@ -7,7 +7,7 @@
 	"cancel": "Cancel",
 	"create": "Create",
 	"title": "Title",
-	"searchPlaceholder": "Search...",
+	"searchPlaceholder": "Search (ctrl + k)",
 	"delete": "Delete",
 	"deleteAllHistory": "Delete all history",
 	"skipping": "Skipping",

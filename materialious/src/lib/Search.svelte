@@ -87,7 +87,7 @@
 		<i class="front">search</i>
 		<input
 			id="search-box"
-			placeholder="Search (ctrl + K)"
+			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
 			on:click={() => (showSearchBox = true)}
 		/>

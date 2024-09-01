@@ -2,15 +2,14 @@
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
+	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
-	import ShareVideo from './ShareVideo.svelte';
 	import {
 		cleanNumber,
 		getBestThumbnail,
 		letterCase,
+		proxyGoogleImage,
 		proxyVideoUrl,
-		truncate,
 		videoLength
 	} from './misc';
 	import type { PlayerEvents } from './player';
@@ -38,6 +37,8 @@
 	let videoPreviewMuted: boolean = true;
 	let videoPreviewVolume: number = 0.4;
 	let imgHeight: number;
+
+	let authorImg: string = '';
 
 	let proxyVideos = get(playerProxyVideosStore);
 
@@ -73,8 +74,21 @@
 	function disableSideways() {
 		if (!startedSideways) return;
 
-		if (window.innerWidth <= 1500) sideways = false;
-		else sideways = true;
+		if (window.innerWidth <= 1500) {
+			sideways = false;
+			if (typeof authorImg === 'undefined') loadAuthor();
+		} else sideways = true;
+	}
+
+	async function loadAuthor() {
+		const channel = await getChannel(video.authorId);
+
+		const authorImgObject = new Image();
+		authorImgObject.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails));
+
+		authorImgObject.onload = () => {
+			authorImg = authorImgObject.src;
+		};
 	}
 
 	onMount(async () => {
@@ -87,10 +101,17 @@
 			return;
 		}
 
+		// Load author details in background.
+		if (!sideways) {
+			loadAuthor();
+		}
+
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
-		addEventListener('resize', disableSideways);
+		addEventListener('resize', () => {
+			disableSideways();
+		});
 
 		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;
 
@@ -223,20 +244,11 @@
 
 		imgHeight = document.getElementById('thumbnail-container')?.clientHeight as number;
 	}
-
-	function hideVideo() {
-		try {
-			localStorage.setItem(`v_h_${video.videoId}`, '1');
-			dispatch('videoHidden');
-			thumbnailHidden = true;
-		} catch {}
-	}
 </script>
 
 {#if !thumbnailHidden}
 	<div class:sideways-root={sideways}>
 		<div
-			style="position: relative;"
 			on:mouseover={previewVideo}
 			on:mouseleave={() => (showVideoPreview = false)}
 			on:focus={() => {}}
@@ -250,7 +262,9 @@
 				on:click={syncChangeVideo}
 			>
 				{#if loading}
-					<progress class="circle"></progress>
+					{#if !sideways}
+						<div class="secondary-container" style="width: 100%;height: 200px;"></div>
+					{/if}
 				{:else if loaded}
 					{#if showVideoPreview && videoPreview}
 						<div style="max-width: 100%; max-height: {imgHeight}px;">
@@ -318,47 +332,42 @@
 			{/if}
 		</div>
 
-		<div class="small-padding">
-			<nav class="no-margin">
-				<div class="max">
-					<a
-						href={watchUrl.toString()}
-						data-sveltekit-preload-data="off"
-						class:ellipsis-root={!sideways}
-					>
-						<span class="bold" class:ellipsis={!sideways}>
-							{#if sideways}
-								{truncate(letterCase(video.title), 30)}
-							{:else}{letterCase(video.title)}{/if}</span
-						>
-					</a>
-
-					<div>
-						<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
-						<span>
-							{#if !('publishedText' in video) && 'viewCountText' in video}
-								&nbsp;• {video.viewCountText}{/if}
-						</span>
-						<nav class="no-margin">
-							{#if 'publishedText' in video}
-								<div class="max">
-									{cleanNumber(video.viewCount)} • {video.publishedText}
-								</div>
-								<button class="transparent circle">
-									<i>more_vert</i>
-									<menu class="left no-wrap">
-										<a href="#hide" on:click={hideVideo}>
-											{$_('hideVideo')}
-										</a>
-										<div class="divider"></div>
-										<ShareVideo {video} />
-									</menu>
-								</button>
-							{/if}
-						</nav>
-					</div>
+		<div class="thumbnail-details video-title">
+			{#if !sideways}
+				<div style="margin-right: 1em;">
+					{#if authorImg !== ''}
+						<img class="circle small" src={authorImg} alt="Author" />
+					{:else}
+						<progress style="padding: 15px;" class="circle small"></progress>
+					{/if}
 				</div>
-			</nav>
+			{/if}
+			<div class="video-title">
+				<a
+					style="padding-left: 1px;"
+					class="video-title"
+					data-sveltekit-preload-data="off"
+					href={watchUrl.toString()}
+				>
+					<span class="bold">{letterCase(video.title.trimEnd())}</span>
+				</a>
+
+				<div>
+					<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+					{#if !('publishedText' in video) && 'viewCountText' in video}
+						<span style="margin-top: 1em;">
+							• {video.viewCountText}
+							{$_('views')}
+						</span>
+					{/if}
+
+					{#if 'publishedText' in video}
+						<div class="max">
+							{cleanNumber(video.viewCount)} • {video.publishedText}
+						</div>
+					{/if}
+				</div>
+			</div>
 		</div>
 	</div>
 {/if}
@@ -367,23 +376,6 @@
 <div id="video-container" style="display: none;"></div>
 
 <style>
-	.ellipsis-root {
-		display: flex;
-		justify-content: flex-start;
-		position: absolute;
-		width: 100%;
-	}
-
-	.ellipsis {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.author {
-		margin-top: 1.4em;
-	}
-
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;
@@ -394,12 +386,29 @@
 	}
 
 	.sideways-root {
+		height: 115px;
 		display: flex;
 		align-items: flex-start;
 	}
 
 	.sideways-root .thumbnail {
-		width: 180px;
+		width: 200px;
+	}
+
+	.video-title {
+		display: inline-block;
+		white-space: nowrap;
+		width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.thumbnail-details {
+		display: flex;
+		align-items: start;
+		justify-content: start;
+		padding: 0 1em 1em 1em;
+		line-height: 1.5;
 	}
 
 	@media screen and (max-width: 1499px) {

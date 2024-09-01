@@ -27,6 +27,10 @@
 	margin-right: 5px !important;
 }
 
+.vds-poster :where(img) {
+	object-fit: cover !important;
+}
+
 .infinite-status-prompt {
 	display: none !important;
 }

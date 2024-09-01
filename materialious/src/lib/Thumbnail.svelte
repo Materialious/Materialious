@@ -74,8 +74,10 @@
 	function disableSideways() {
 		if (!startedSideways) return;
 
-		if (window.innerWidth <= 1500) sideways = false;
-		else sideways = true;
+		if (window.innerWidth <= 1500) {
+			sideways = false;
+			if (typeof authorImg === 'undefined') loadAuthor();
+		} else sideways = true;
 	}
 
 	async function loadAuthor() {
@@ -100,7 +102,9 @@
 		}
 
 		// Load author details in background.
-		loadAuthor();
+		if (!sideways) {
+			loadAuthor();
+		}
 
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
@@ -328,34 +332,40 @@
 			{/if}
 		</div>
 
-		<div class="video-title" style="padding: 0 1em 1em 1em;">
-			<a class="video-title" data-sveltekit-preload-data="off" href={watchUrl.toString()}>
-				<span class="bold">{letterCase(video.title.trimEnd())}</span>
-			</a>
-
-			<div>
-				{#if !('publishedText' in video) && 'viewCountText' in video}
-					<span style="margin-top: 1em;">
-						{video.viewCountText}
-						{$_('views')}
-					</span>
-				{/if}
-
-				{#if 'publishedText' in video}
-					<div class="max">
-						{cleanNumber(video.viewCount)} • {video.publishedText}
-					</div>
-				{/if}
-
-				<div>
+		<div class="thumbnail-details video-title">
+			{#if !sideways}
+				<div style="margin-right: 1em;">
 					{#if authorImg !== ''}
 						<img class="circle small" src={authorImg} alt="Author" />
 					{:else}
 						<progress style="padding: 15px;" class="circle small"></progress>
 					{/if}
-					<a style="margin-left: 5px;" class:author={!sideways} href={`/channel/${video.authorId}`}
-						>{video.author}</a
-					>
+				</div>
+			{/if}
+			<div class="video-title">
+				<a
+					style="padding-left: 1px;"
+					class="video-title"
+					data-sveltekit-preload-data="off"
+					href={watchUrl.toString()}
+				>
+					<span class="bold">{letterCase(video.title.trimEnd())}</span>
+				</a>
+
+				<div>
+					<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+					{#if !('publishedText' in video) && 'viewCountText' in video}
+						<span style="margin-top: 1em;">
+							• {video.viewCountText}
+							{$_('views')}
+						</span>
+					{/if}
+
+					{#if 'publishedText' in video}
+						<div class="max">
+							{cleanNumber(video.viewCount)} • {video.publishedText}
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -366,10 +376,6 @@
 <div id="video-container" style="display: none;"></div>
 
 <style>
-	.author {
-		margin-top: 1.4em;
-	}
-
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;
@@ -395,6 +401,14 @@
 		width: 100%;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.thumbnail-details {
+		display: flex;
+		align-items: start;
+		justify-content: start;
+		padding: 0 1em 1em 1em;
+		line-height: 1.5;
 	}
 
 	@media screen and (max-width: 1499px) {

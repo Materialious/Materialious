@@ -3,6 +3,6 @@
 # And the CLI then renames it
 app
 node_modules
+build
 dist
 logs
-build

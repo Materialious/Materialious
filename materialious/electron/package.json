@@ -25,7 +25,7 @@
 		"electron-is-dev": "~2.0.0",
 		"electron-serve": "~1.1.0",
 		"electron-unhandled": "~4.0.1",
-		"electron-updater": "^5.3.0",
+		"electron-updater": "^6.2.1",
 		"electron-window-state": "^5.0.3"
 	},
 	"devDependencies": {

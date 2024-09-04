@@ -8,7 +8,7 @@
     "vPrefixedTagName": false,
     "releaseType": "release"
   },
-  "icon": "logo.png",
+  "icon": "appIcon.png",
   "files": [
     "assets/**/*",
     "build/**/*",

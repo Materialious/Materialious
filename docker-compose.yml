@@ -1,4 +1,3 @@
----
 services:
   materialious:
     image: wardpearce/materialious

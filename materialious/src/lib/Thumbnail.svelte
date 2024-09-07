@@ -22,6 +22,7 @@
 		playerSavePlaybackPositionStore,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore,
+		synciousInstanceStore,
 		synciousStore
 	} from './store';
 
@@ -195,7 +196,7 @@
 			loading = false;
 		};
 
-		if (get(synciousStore) && get(authStore)) {
+		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 			try {
 				progress = (await getVideoProgress(video.videoId))[0].time.toString();
 			} catch {}

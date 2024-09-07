@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
 	import type { Page } from '@sveltejs/kit';
+	import { type ParsedCaptionsResult } from 'media-captions';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -26,6 +27,7 @@
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
+		synciousInstanceStore,
 		synciousStore
 	} from './store';
 	import { getDynamicTheme } from './theme';
@@ -40,6 +42,8 @@
 	let categoryBeingSkipped = '';
 	let playerIsLive = false;
 	let playerPosSet = false;
+
+	let transcript: ParsedCaptionsResult;
 
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
@@ -90,11 +94,13 @@
 					timestampIndex += 1;
 				});
 
-				player.textTracks.add({
-					kind: 'chapters',
-					src: URL.createObjectURL(new Blob([chapterWebVTT])),
-					default: true
-				});
+				if (timestampIndex > 0) {
+					player.textTracks.add({
+						kind: 'chapters',
+						src: URL.createObjectURL(new Blob([chapterWebVTT])),
+						default: true
+					});
+				}
 			}
 
 			player.addEventListener('pause', () => {
@@ -217,7 +223,7 @@
 
 		let toSetTime = 0;
 
-		if (get(synciousStore) && get(authStore)) {
+		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
 			} catch {}
@@ -244,7 +250,7 @@
 					localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());
 				} catch {}
 
-				if (get(synciousStore) && get(authStore)) {
+				if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 					saveVideoProgress(data.video.videoId, player.currentTime);
 				}
 			} else {
@@ -252,7 +258,7 @@
 					localStorage.removeItem(`v_${data.video.videoId}`);
 				} catch {}
 
-				if (get(synciousStore) && get(authStore)) {
+				if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 					deleteVideoProgress(data.video.videoId);
 				}
 			}

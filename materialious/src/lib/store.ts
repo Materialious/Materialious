@@ -1,13 +1,24 @@
 import type { VideoPlay } from '$lib/Api/model';
+import { Capacitor } from '@capacitor/core';
 import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './misc';
 
+
+function platformDependentDefault(givenValue: any, defaultValue: any): any {
+	if (typeof givenValue !== 'undefined' || typeof givenValue !== null) {
+		return givenValue;
+	} else if (defaultValue && Capacitor.getPlatform() !== 'web') {
+		return defaultValue;
+	}
+}
+
+
 export const instanceStore: Writable<string> = persisted(
 	"invidiousInstance",
-	import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE || 'https://invidious.materialio.us'
+	platformDependentDefault(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE, 'https://invidious.materialio.us')
 );
 
 export const authStore: Writable<null | { username: string; token: string; }> = persisted(
@@ -34,13 +45,13 @@ export const playerAndroidBackgroundPlayStore = persisted('androidBackgroundPlay
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
 	'returnYTDislikesInstance',
-	import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE || 'https://ryd-proxy.materialio.us'
+	platformDependentDefault(import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE, 'https://ryd-proxy.materialio.us')
 );
 
 export const synciousStore = persisted('syncious', true);
 export const synciousInstanceStore: Writable<string | null | undefined> = persisted(
 	'synciousInstance',
-	import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE || 'https://syncious.materialio.us'
+	platformDependentDefault(import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE, 'https://syncious.materialio.us')
 );
 
 export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');

@@ -42,6 +42,8 @@
 
 	let proxyVideos = get(playerProxyVideosStore);
 
+	let placeholderHeight: number = 0;
+
 	let watchUrl = new URL(`${location.origin}/watch/${video.videoId}`);
 
 	if (playlistId !== '') {
@@ -101,11 +103,14 @@
 			return;
 		}
 
+		calcThumbnailPlaceholderHeight();
+
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
 		addEventListener('resize', () => {
 			disableSideways();
+			calcThumbnailPlaceholderHeight();
 		});
 
 		// Load author details in background.
@@ -244,6 +249,22 @@
 
 		imgHeight = document.getElementById('thumbnail-container')?.clientHeight as number;
 	}
+
+	function calcThumbnailPlaceholderHeight() {
+		if (!sideways) {
+			if (innerWidth < 1000) {
+				if (innerWidth < 600) {
+					placeholderHeight = innerWidth / 2;
+				} else {
+					placeholderHeight = innerWidth / 4;
+				}
+			} else {
+				placeholderHeight = innerWidth / 12;
+			}
+		} else {
+			placeholderHeight = 115;
+		}
+	}
 </script>
 
 {#if !thumbnailHidden}
@@ -262,13 +283,12 @@
 				on:click={syncChangeVideo}
 			>
 				{#if loading}
-					{#if !sideways}
-						<div class="secondary-container" style="width: 100%;height: 200px;"></div>
-					{/if}
+					<div class="secondary-container" style="width: 100%;height: {placeholderHeight}px;"></div>
 				{:else if loaded}
 					{#if showVideoPreview && videoPreview}
 						<div style="max-width: 100%; max-height: {imgHeight}px;">
 							<video
+								id="video-preview"
 								style="max-width: 100%; max-height: {imgHeight}px;"
 								autoplay
 								poster={img.src}
@@ -393,6 +413,10 @@
 
 	.sideways-root .thumbnail {
 		width: 200px;
+	}
+
+	#video-preview[poster] {
+		object-fit: contain;
 	}
 
 	.video-title {

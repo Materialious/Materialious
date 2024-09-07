@@ -8,7 +8,7 @@ import type { TitleCase } from './misc';
 
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
-	if (typeof givenValue !== 'undefined' || typeof givenValue !== null) {
+	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
 		return givenValue;
 	} else if (defaultValue && Capacitor.getPlatform() !== 'web') {
 		return defaultValue;

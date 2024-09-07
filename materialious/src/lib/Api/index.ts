@@ -175,6 +175,8 @@ export async function getSubscriptions(): Promise<Subscription[]> {
 }
 
 export async function amSubscribed(authorId: string): Promise<boolean> {
+	if (!get(authStore)) return false;
+
 	try {
 		const subscriptions = (await getSubscriptions()).filter((sub) => sub.authorId === authorId);
 		return subscriptions.length === 1;

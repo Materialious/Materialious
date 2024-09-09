@@ -32,6 +32,7 @@
 		playerTheatreModeByDefaultStore,
 		returnYTDislikesInstanceStore,
 		returnYtDislikesStore,
+		silenceSkipperStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -140,7 +141,7 @@
 	{/if}
 
 	<div class="settings">
-		<h6>Interface</h6>
+		<h6>{$_('layout.interface')}</h6>
 
 		<div class="field no-margin">
 			<nav class="no-padding">
@@ -421,6 +422,22 @@
 				</nav>
 			</div>
 		{/if}
+
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.player.silenceSkipper')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$silenceSkipperStore}
+						on:click={() => silenceSkipperStore.set(!$silenceSkipperStore)}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
 	</div>
 
 	<div class="settings">

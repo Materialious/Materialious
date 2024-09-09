@@ -6,7 +6,6 @@ import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './misc';
 
-
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
 		return givenValue;
@@ -14,7 +13,6 @@ function platformDependentDefault(givenValue: any, defaultValue: any): any {
 		return defaultValue;
 	}
 }
-
 
 export const instanceStore: Writable<string> = persisted(
 	"invidiousInstance",
@@ -95,3 +93,5 @@ export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; 
 export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | null> =
 	writable(null);
 
+
+export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);

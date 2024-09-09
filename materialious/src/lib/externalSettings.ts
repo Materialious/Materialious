@@ -22,6 +22,7 @@ import {
 	playerTheatreModeByDefaultStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore,
+	silenceSkipperStore,
 	sponsorBlockCategoriesStore,
 	sponsorBlockDisplayToastStore,
 	sponsorBlockStore,
@@ -176,6 +177,11 @@ const persistedStores = [
 	{
 		name: 'sponsorBlockDisplayToast',
 		store: sponsorBlockDisplayToastStore,
+		type: 'boolean'
+	},
+	{
+		name: 'silenceSkipper',
+		store: silenceSkipperStore,
 		type: 'boolean'
 	}
 ];

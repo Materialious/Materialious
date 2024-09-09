@@ -75,6 +75,7 @@
 		"addToPlaylist": "Add to playlist"
 	},
 	"layout": {
+		"interface": "Interface",
 		"star": "Star us on Github!",
 		"syncParty": "Sync party",
 		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
@@ -111,7 +112,8 @@
 			"miniPlayer": "Mini player",
 			"proxyVideos": "Proxy videos",
 			"backgroundPlay": "Play audio in background",
-			"dash": "Dash"
+			"dash": "Dash",
+			"silenceSkipper": "Silence skipper (Experimental)"
 		},
 		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",

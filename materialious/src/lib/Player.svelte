@@ -4,7 +4,6 @@
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
 	import type { Page } from '@sveltejs/kit';
-	import { type ParsedCaptionsResult } from 'media-captions';
 	import { SponsorBlock, type Category } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -23,6 +22,7 @@
 		playerDashStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		silenceSkipperStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -43,7 +43,10 @@
 	let playerIsLive = false;
 	let playerPosSet = false;
 
-	let transcript: ParsedCaptionsResult;
+	let userVideoSpeed = 1;
+	let silenceIsFastForwarding = false;
+
+	let silenceSkipperInterval: NodeJS.Timeout;
 
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
@@ -59,7 +62,73 @@
 
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
+	let initStoreSilence = true;
+	silenceSkipperStore.subscribe((value) => {
+		if (initStoreSilence) {
+			initStoreSilence = false;
+			return;
+		}
+
+		if (typeof silenceSkipperInterval !== 'undefined') {
+			clearInterval(silenceSkipperInterval);
+		}
+
+		if (value) {
+			initSilenceSkipper();
+		}
+	});
+
 	const proxyVideos = get(playerProxyVideosStore);
+
+	function fastForwardToSound(
+		videoElement: HTMLAudioElement,
+		threshold: number = 0.01,
+		checkInterval: number = 100,
+		fastForwardRate: number = 4
+	): void {
+		if (!(videoElement instanceof HTMLMediaElement)) {
+			console.error('Provided element is not a valid HTMLMediaElement');
+			return;
+		}
+
+		const audioContext = new AudioContext();
+		const source = audioContext.createMediaElementSource(videoElement);
+		const analyser = audioContext.createAnalyser();
+
+		source.connect(analyser);
+		analyser.connect(audioContext.destination);
+		analyser.fftSize = 256;
+
+		const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+		const checkForSound = () => {
+			analyser.getByteFrequencyData(dataArray);
+
+			const averageVolume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+			const volume = averageVolume / 255;
+
+			if (volume < threshold) {
+				if (!silenceIsFastForwarding) {
+					videoElement.playbackRate = fastForwardRate;
+					silenceIsFastForwarding = true;
+				}
+			} else {
+				if (silenceIsFastForwarding) {
+					videoElement.playbackRate = userVideoSpeed;
+					silenceIsFastForwarding = false;
+				}
+			}
+		};
+
+		silenceSkipperInterval = setInterval(checkForSound, checkInterval);
+	}
+
+	function initSilenceSkipper() {
+		const videoContainer = document.getElementById('video') as HTMLElement;
+		const videoElement = videoContainer.querySelector('video') as HTMLMediaElement;
+
+		fastForwardToSound(videoElement);
+	}
 
 	onMount(async () => {
 		miniPlayerSrcStore.set(null);
@@ -105,10 +174,35 @@
 
 			player.addEventListener('pause', () => {
 				savePlayerPos();
+				if (get(silenceSkipperStore)) {
+					clearInterval(silenceSkipperInterval);
+				}
 			});
 
 			player.addEventListener('end', () => {
 				savePlayerPos();
+				if (get(silenceSkipperStore)) {
+					clearInterval(silenceSkipperInterval);
+				}
+			});
+
+			player.addEventListener('play', () => {
+				if (get(silenceSkipperStore)) {
+					initSilenceSkipper();
+				}
+			});
+
+			player.addEventListener('seeked', () => {
+				if (get(silenceSkipperStore)) {
+					clearInterval(silenceSkipperInterval);
+
+					initSilenceSkipper();
+				}
+			});
+
+			player.addEventListener('rate-change', () => {
+				if (silenceIsFastForwarding) return;
+				userVideoSpeed = player.playbackRate;
 			});
 
 			if (get(sponsorBlockStore) && get(sponsorBlockCategoriesStore)) {
@@ -266,6 +360,9 @@
 	}
 
 	onDestroy(() => {
+		if (typeof silenceSkipperInterval !== 'undefined') {
+			clearInterval(silenceSkipperInterval);
+		}
 		savePlayerPos();
 		player.pause();
 		player.destroy();
@@ -279,6 +376,7 @@
 
 <media-player
 	bind:this={player}
+	id="video"
 	autoPlay={$playerAutoPlayStore && !isSyncing}
 	loop={$playerAlwaysLoopStore}
 	title={data.video.title}

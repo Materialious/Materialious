@@ -392,13 +392,26 @@
 		theatreMode = !theatreMode;
 	}
 
-	function downloadFile(url: string, container: string | undefined) {
-		const anchor = document.createElement('a');
-		anchor.href = url;
-		anchor.download = container || 'mp3';
-		anchor.target = '_blank';
-		anchor.click();
-		document.body.removeChild(anchor);
+	let downloadStage: string | undefined;
+	let downloadProgress: number = 0;
+
+	function onVideoDownloadProgress(progress: number) {
+		downloadStage = $_('player.downloadSteps.video');
+		downloadProgress = progress;
+	}
+
+	function onAudioDownloadProgress(progress: number) {
+		downloadStage = $_('player.downloadSteps.audio');
+		downloadProgress = progress;
+	}
+
+	function onMergingProgress(progress: number) {
+		downloadStage = $_('player.downloadSteps.merging');
+		downloadProgress = progress;
+
+		if (progress >= 100) {
+			downloadStage = undefined;
+		}
 	}
 </script>
 
@@ -419,6 +432,14 @@
 				</div>
 			{/key}
 		</div>
+
+		{#if downloadStage}
+			<article>
+				<h6>{downloadStage}</h6>
+				<progress class="max" value={downloadProgress} max="100"></progress>
+			</article>
+		{/if}
+
 		<h5>{letterCase(data.video.title)}</h5>
 
 		<div class="grid no-padding">
@@ -517,8 +538,12 @@
 										<a
 											class="row"
 											href="#download"
-											on:click={async () => await mergeMediaFromDASH(quality, data.video.title)}
-											>{quality.resolution}</a
+											on:click={async () =>
+												await mergeMediaFromDASH(quality, data.video.title, {
+													video: onVideoDownloadProgress,
+													audio: onAudioDownloadProgress,
+													merging: onMergingProgress
+												})}>{quality.resolution}</a
 										>
 									{/each}
 								</menu></button

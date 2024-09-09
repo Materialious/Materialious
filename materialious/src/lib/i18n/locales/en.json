@@ -70,6 +70,11 @@
 			"youtubeLink": "Copy Youtube link"
 		},
 		"download": "Download",
+		"downloadSteps": {
+			"merging": "Merging video & audio together",
+			"video": "Downloading video",
+			"audio": "Downloading audio"
+		},
 		"noPlaylists": "No playlists",
 		"unableToLoadComments": "Unable to load comments",
 		"addToPlaylist": "Add to playlist"

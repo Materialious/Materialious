@@ -11,7 +11,6 @@ interface MediaQuality {
   audioBandwidth?: string;
 }
 
-
 // https://github.com/ffmpegwasm/ffmpeg.wasm/issues/603#issuecomment-1982289892
 // Ripped from https://github.com/ffmpegwasm/ffmpeg.wasm/blob/ae1cdac7db79c5315f9a1b716fcbd9bcfe27c902/packages/util/src/index.ts#L49
 export async function fetchFile(
@@ -49,8 +48,6 @@ export async function fetchFile(
 
   return data;
 }
-
-
 
 export async function toBlobURL(
   url: string,

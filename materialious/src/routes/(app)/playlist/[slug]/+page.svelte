@@ -17,6 +17,9 @@
 		videos = data.playlist.videos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
 			return a.index < b.index ? -1 : 1;
 		});
+		videos = videos.filter((playlistVideo) => {
+			return playlistVideo.lengthSeconds > 0;
+		});
 
 		onMount(async () => {
 			for (let page = 1; page++; ) {
@@ -29,6 +32,9 @@
 						return a.index < b.index ? -1 : 1;
 					}
 				);
+				videos = videos.filter((playlistVideo) => {
+					return playlistVideo.lengthSeconds > 0;
+				});
 			}
 		});
 	}

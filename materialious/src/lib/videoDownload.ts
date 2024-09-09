@@ -127,7 +127,7 @@ export async function listCombinedQualities(manifestUrl: string): Promise<MediaQ
 export async function mergeMediaFromDASH(
   selectedQuality: MediaQuality,
   fileName: string,
-  progressCallbacks: {
+  progressCallbacks?: {
     video?: (progress: number) => void,
     audio?: (progress: number) => void,
     transcoding?: (progress: number) => void,
@@ -136,7 +136,7 @@ export async function mergeMediaFromDASH(
   const ffmpeg = new FFmpeg();
 
   ffmpeg.on('progress', ({ progress }) => {
-    if (progressCallbacks.transcoding) {
+    if (progressCallbacks?.transcoding) {
       progressCallbacks.transcoding(progress * 100);
     }
   });
@@ -151,8 +151,8 @@ export async function mergeMediaFromDASH(
 
   const { videoUrl, audioUrl } = selectedQuality;
 
-  ffmpeg.writeFile('input.mp4', await fetchFile(videoUrl, progressCallbacks.video));
-  ffmpeg.writeFile('input.mp3', await fetchFile(audioUrl, progressCallbacks.audio));
+  ffmpeg.writeFile('input.mp4', await fetchFile(videoUrl, progressCallbacks?.video));
+  ffmpeg.writeFile('input.mp3', await fetchFile(audioUrl, progressCallbacks?.audio));
 
   console.log('transcoding');
 

@@ -130,14 +130,14 @@ export async function mergeMediaFromDASH(
   progressCallbacks?: {
     video?: (progress: number) => void,
     audio?: (progress: number) => void,
-    transcoding?: (progress: number) => void,
+    merging?: (progress: number) => void,
   }
 ) {
   const ffmpeg = new FFmpeg();
 
   ffmpeg.on('progress', ({ progress }) => {
-    if (progressCallbacks?.transcoding) {
-      progressCallbacks.transcoding(progress * 100);
+    if (progressCallbacks?.merging) {
+      progressCallbacks.merging(progress * 100);
     }
   });
 
@@ -154,8 +154,6 @@ export async function mergeMediaFromDASH(
   ffmpeg.writeFile('input.mp4', await fetchFile(videoUrl, progressCallbacks?.video));
   ffmpeg.writeFile('input.mp3', await fetchFile(audioUrl, progressCallbacks?.audio));
 
-  console.log('transcoding');
-
   await ffmpeg.exec(['-i', 'input.mp4', '-i', 'input.mp3', '-c:v', 'copy', '-c:a', 'aac', 'output.mp4']);
 
   const data = await ffmpeg.readFile('output.mp4');
@@ -166,8 +164,6 @@ export async function mergeMediaFromDASH(
   a.download = `${fileName}.mp4`;
   document.body.appendChild(a);
   a.click();
-
-  console.log('down');
 
   URL.revokeObjectURL(url);
   document.body.removeChild(a);

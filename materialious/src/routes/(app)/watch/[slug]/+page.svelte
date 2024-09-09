@@ -38,6 +38,7 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
+	import { mergeMediaFromDASH } from '$lib/videoDownload';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -506,22 +507,24 @@
 							<ShareVideo video={data.video} />
 						</menu></button
 					>
-					{#if data.downloadOptions.length > 0}
-						<button class="border"
-							><i>download</i>
-							<div class="tooltip">{$_('player.download')}</div>
-							<menu class="no-wrap">
-								{#each data.downloadOptions as download}
-									<a
-										class="row"
-										href="#download"
-										on:click={() => downloadFile(download.url, download.container)}
-										>{download.title}</a
-									>
-								{/each}
-							</menu></button
-						>
-					{/if}
+					{#await data.streamed.downloadQualitiesDash then downloadQualitiesDash}
+						{#if downloadQualitiesDash}
+							<button class="border"
+								><i>download</i>
+								<div class="tooltip">{$_('player.download')}</div>
+								<menu class="no-wrap">
+									{#each downloadQualitiesDash as quality}
+										<a
+											class="row"
+											href="#download"
+											on:click={async () => await mergeMediaFromDASH(quality, data.video.title)}
+											>{quality.resolution}</a
+										>
+									{/each}
+								</menu></button
+							>
+						{/if}
+					{/await}
 					{#if personalPlaylists}
 						<button class="border">
 							<i>add</i>

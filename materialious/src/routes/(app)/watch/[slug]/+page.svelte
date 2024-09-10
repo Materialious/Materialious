@@ -435,7 +435,7 @@
 
 		{#if downloadStage}
 			<article>
-				<h6>{downloadStage}</h6>
+				<h6>{downloadStage} ({Math.round(downloadProgress)}%)</h6>
 				<progress class="max" value={downloadProgress} max="100"></progress>
 			</article>
 		{/if}

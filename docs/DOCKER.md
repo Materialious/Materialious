@@ -148,6 +148,9 @@ services:
 
       # Look at "Overwriting Materialious defaults" for all the accepted values.
       VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
+
+      # Please look at step 7 about enabling this.
+      VITE_DEFAULT_DOWNLOAD_ENABLED: false
 ```
 
 ### Overwriting Materialious defaults
@@ -269,3 +272,59 @@ VITE_DEFAULT_PEERJS_HOST: "peerjs.example.com"
 VITE_DEFAULT_PEERJS_PATH: "/"
 VITE_DEFAULT_PEERJS_PORT: 443
 ```
+
+
+## Step 7 (Optional): Enabling downloads
+
+### Step 1: Add the following to your reverse proxy
+
+#### Caddy
+
+```caddy
+materialious.example.com {
+	reverse_proxy localhost:3001
+
+    header {
+        Cross-Origin-Opener-Policy "same-origin"
+        Cross-Origin-Embedder-Policy "require-corp"
+    }
+
+}
+```
+
+#### Nginx
+```nginx
+server {
+    listen 80;
+    server_name materialious.example.com;
+
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Cross-Origin-Embedder-Policy "require-corp" always;
+
+    location / {
+        proxy_pass http://localhost:3001;
+    }
+}
+```
+
+#### Traefik
+Add the following to Materialious
+
+```yaml
+http:
+  middlewares:
+    materialious-downloads:
+      headers:
+        customResponseHeaders:
+          Cross-Origin-Opener-Policy: "same-origin"
+          Cross-Origin-Embedder-Policy: "require-corp"
+```
+
+
+### Step 2: Modify docker compose.
+
+Add this environment variable to Materialious.
+```yaml
+VITE_DEFAULT_DOWNLOAD_ENABLED: true
+```
+

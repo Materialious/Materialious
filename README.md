@@ -22,7 +22,8 @@
   - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
 - Mini player.
-- Silence skipper (Experimental)
+- Silence skipper (Experimental.)
+- ffmpeg integration for downloading videos with audio at any quality ([Configuration required](./docs/DOCKER.md#step-7-optional-enabling-downloads)).
 - Preview video on hover.
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.

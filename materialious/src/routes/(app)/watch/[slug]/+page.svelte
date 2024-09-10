@@ -44,6 +44,7 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { MediaPlayerElement } from 'vidstack/elements';
+	import { loadPfp } from '../../../../lib/misc.js';
 
 	export let data;
 
@@ -447,11 +448,9 @@
 				<nav>
 					<a href={`/channel/${data.video.authorId}`}>
 						<nav>
-							<img
-								class="circle large"
-								src={proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))}
-								alt="Channel profile"
-							/>
+							{#await loadPfp(proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))) then pfp}
+								<img class="circle large" src={pfp} alt="Channel profile" />
+							{/await}
 							<div>
 								<p class="bold">{data.video.author}</p>
 								<p>{data.video.subCountText}</p>

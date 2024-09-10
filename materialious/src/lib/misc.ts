@@ -170,6 +170,11 @@ export function proxyVideoUrl(source: string): string {
 	return rawSrc.toString();
 }
 
+export async function loadPfp(url: string): Promise<string> {
+	const resp = await fetch(url);
+	return URL.createObjectURL(await resp.blob());
+}
+
 export function proxyGoogleImage(source: string): string {
 	if (source.startsWith('//')) source = `https:${source}`;
 

@@ -1,5 +1,4 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { proxyVideoUrl } from './misc';
 
 interface MediaQuality {
   bandwidth: string;
@@ -69,7 +68,7 @@ async function fetchDASHManifest(manifestUrl: string) {
 
 
 export async function listCombinedQualities(manifestUrl: string): Promise<MediaQuality[]> {
-  const manifest = await fetchDASHManifest(manifestUrl);
+  const manifest = await fetchDASHManifest(`${manifestUrl}?local=true`);
   const qualities: MediaQuality[] = [];
 
   // Fetch all AdaptationSets (both video and audio)
@@ -93,7 +92,7 @@ export async function listCombinedQualities(manifestUrl: string): Promise<MediaQ
   // Combine video and audio representations
   videoRepresentations.forEach((videoRep) => {
     const videoBandwidth = videoRep.getAttribute('bandwidth');
-    const videoUrl = proxyVideoUrl(videoRep.getElementsByTagName('BaseURL')[0].textContent as string);
+    const videoUrl = videoRep.getElementsByTagName('BaseURL')[0].textContent as string;
     const width = videoRep.getAttribute('width');
     const height = videoRep.getAttribute('height');
     const resolution = width && height ? `${width}x${height}` : undefined;
@@ -101,7 +100,7 @@ export async function listCombinedQualities(manifestUrl: string): Promise<MediaQ
 
     // Pair this video representation with each audio representation
     audioRepresentations.forEach((audioRep) => {
-      const audioUrl = proxyVideoUrl(audioRep.getElementsByTagName('BaseURL')[0].textContent as string);
+      const audioUrl = audioRep.getElementsByTagName('BaseURL')[0].textContent as string;
       const audioChannels = audioRep.getElementsByTagName('AudioChannelConfiguration')[0]?.getAttribute('value') || '';
       const audioBandwidth = audioRep.getAttribute('bandwidth') || '';
 

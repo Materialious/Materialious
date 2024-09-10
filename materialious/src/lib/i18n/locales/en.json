@@ -74,7 +74,11 @@
 			"merging": "Merging video & audio together",
 			"video": "Downloading video",
 			"audio": "Downloading audio",
-			"ffmpeg": "Downloading ffmpeg library & components"
+			"ffmpeg": "Downloading ffmpeg library & components",
+			"classWorker": "Downloading ffmpeg class worker",
+			"core": "Downloading ffmpeg core",
+			"wasm": "Downloading ffmpeg wasm",
+			"worker": "Downloading ffmpeg worker"
 		},
 		"noPlaylists": "No playlists",
 		"unableToLoadComments": "Unable to load comments",

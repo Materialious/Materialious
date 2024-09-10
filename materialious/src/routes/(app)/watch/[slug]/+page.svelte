@@ -414,6 +414,10 @@
 			downloadStage = undefined;
 		}
 	}
+
+	function onLoadingFFmpeg(completed: boolean) {
+		downloadStage = $_('player.downloadSteps.ffmpeg');
+	}
 </script>
 
 <svelte:head>
@@ -541,7 +545,8 @@
 												await mergeMediaFromDASH(quality, data.video.title, {
 													video: onVideoDownloadProgress,
 													audio: onAudioDownloadProgress,
-													merging: onMergingProgress
+													merging: onMergingProgress,
+													loadingFfmpeg: onLoadingFFmpeg
 												})}>{quality.resolution}</a
 										>
 									{/each}

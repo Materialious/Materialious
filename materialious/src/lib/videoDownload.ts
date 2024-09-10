@@ -125,8 +125,13 @@ export async function mergeMediaFromDASH(
     video?: (progress: number) => void,
     audio?: (progress: number) => void,
     merging?: (progress: number) => void,
+    loadingFfmpeg?: (completed: boolean) => void;
   }
 ) {
+  if (progressCallbacks?.loadingFfmpeg) {
+    progressCallbacks.loadingFfmpeg(false);
+  }
+
   const FFmpeg = await import('@ffmpeg/ffmpeg');
 
   const ffmpeg = new FFmpeg.FFmpeg();
@@ -144,6 +149,10 @@ export async function mergeMediaFromDASH(
     workerURL: await toBlobURL('/ffmpeg/ffmpeg-core.worker.js', 'text/javascript')
   });
 
+  if (progressCallbacks?.loadingFfmpeg) {
+    progressCallbacks.loadingFfmpeg(true);
+  }
+
   const { videoUrl, audioUrl } = selectedQuality;
 
   ffmpeg.writeFile('input.mp4', await fetchFile(videoUrl, progressCallbacks?.video));
@@ -156,7 +165,7 @@ export async function mergeMediaFromDASH(
   const url = URL.createObjectURL(mergedFile);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${fileName}.mp4`;
+  a.download = `${fileName} - ${selectedQuality.resolution}.mp4`;
   document.body.appendChild(a);
   a.click();
 

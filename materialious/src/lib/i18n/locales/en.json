@@ -73,7 +73,8 @@
 		"downloadSteps": {
 			"merging": "Merging video & audio together",
 			"video": "Downloading video",
-			"audio": "Downloading audio"
+			"audio": "Downloading audio",
+			"ffmpeg": "Downloading ffmpeg library & components"
 		},
 		"noPlaylists": "No playlists",
 		"unableToLoadComments": "Unable to load comments",

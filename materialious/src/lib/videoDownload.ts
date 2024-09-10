@@ -49,9 +49,9 @@ export async function fetchFile(
 export async function toBlobURL(
   url: string,
   mimeType: string,
+  onProgress?: (progress: number) => void
 ): Promise<string> {
-  const response = await fetch(url);
-  return URL.createObjectURL(new Blob([await response.arrayBuffer()], { type: mimeType }));
+  return URL.createObjectURL(new Blob([await fetchFile(url, onProgress)], { type: mimeType }));
 }
 
 
@@ -126,6 +126,10 @@ export async function mergeMediaFromDASH(
     audio?: (progress: number) => void,
     merging?: (progress: number) => void,
     loadingFfmpeg?: (completed: boolean) => void;
+    classWorker?: (progress: number) => void,
+    core?: (progress: number) => void;
+    wasm?: (progress: number) => void;
+    worker?: (progress: number) => void;
   }
 ) {
   if (progressCallbacks?.loadingFfmpeg) {
@@ -143,10 +147,10 @@ export async function mergeMediaFromDASH(
   });
 
   await ffmpeg.load({
-    classWorkerURL: await toBlobURL('/ffmpeg/ffmpeg-worker.js', 'text/javascript'),
-    coreURL: await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript'),
-    wasmURL: await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm'),
-    workerURL: await toBlobURL('/ffmpeg/ffmpeg-core.worker.js', 'text/javascript')
+    classWorkerURL: await toBlobURL('/ffmpeg/ffmpeg-worker.js', 'text/javascript', progressCallbacks?.classWorker),
+    coreURL: await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript', progressCallbacks?.core),
+    wasmURL: await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm', progressCallbacks?.wasm),
+    workerURL: await toBlobURL('/ffmpeg/ffmpeg-core.worker.js', 'text/javascript', progressCallbacks?.worker)
   });
 
   if (progressCallbacks?.loadingFfmpeg) {

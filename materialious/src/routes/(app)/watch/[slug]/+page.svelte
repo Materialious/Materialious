@@ -416,7 +416,28 @@
 	}
 
 	function onLoadingFFmpeg(completed: boolean) {
+		downloadProgress = 0;
 		downloadStage = $_('player.downloadSteps.ffmpeg');
+	}
+
+	function onClassWorkerProgress(progress) {
+		downloadStage = $_('player.downloadSteps.classWorker');
+		downloadProgress = progress;
+	}
+
+	function onCoreProgress(progress) {
+		downloadStage = $_('player.downloadSteps.core');
+		downloadProgress = progress;
+	}
+
+	function onWasmProgress(progress) {
+		downloadStage = $_('player.downloadSteps.wasm');
+		downloadProgress = progress;
+	}
+
+	function onWorkerProgress(progress) {
+		downloadStage = $_('player.downloadSteps.worker');
+		downloadProgress = progress;
 	}
 </script>
 
@@ -440,7 +461,12 @@
 
 		{#if downloadStage}
 			<article>
-				<h6>{downloadStage} ({Math.round(downloadProgress)}%)</h6>
+				<h6>
+					{downloadStage}
+					{#if downloadProgress > 0}
+						({Math.round(downloadProgress)}%)
+					{/if}
+				</h6>
 				<progress class="max" value={downloadProgress} max="100"></progress>
 			</article>
 		{/if}
@@ -546,7 +572,11 @@
 													video: onVideoDownloadProgress,
 													audio: onAudioDownloadProgress,
 													merging: onMergingProgress,
-													loadingFfmpeg: onLoadingFFmpeg
+													loadingFfmpeg: onLoadingFFmpeg,
+													classWorker: onClassWorkerProgress,
+													core: onCoreProgress,
+													wasm: onWasmProgress,
+													worker: onWorkerProgress
 												})}>{quality.resolution}</a
 										>
 									{/each}

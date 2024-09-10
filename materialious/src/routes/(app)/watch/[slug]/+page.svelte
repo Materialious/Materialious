@@ -38,6 +38,7 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
+	import { mergeMediaFromDASH } from '$lib/videoDownload';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -391,13 +392,26 @@
 		theatreMode = !theatreMode;
 	}
 
-	function downloadFile(url: string, container: string | undefined) {
-		const anchor = document.createElement('a');
-		anchor.href = url;
-		anchor.download = container || 'mp3';
-		anchor.target = '_blank';
-		anchor.click();
-		document.body.removeChild(anchor);
+	let downloadStage: string | undefined;
+	let downloadProgress: number = 0;
+
+	function onVideoDownloadProgress(progress: number) {
+		downloadStage = $_('player.downloadSteps.video');
+		downloadProgress = progress;
+	}
+
+	function onAudioDownloadProgress(progress: number) {
+		downloadStage = $_('player.downloadSteps.audio');
+		downloadProgress = progress;
+	}
+
+	function onMergingProgress(progress: number) {
+		downloadStage = $_('player.downloadSteps.merging');
+		downloadProgress = progress;
+
+		if (progress >= 100) {
+			downloadStage = undefined;
+		}
 	}
 </script>
 
@@ -418,6 +432,14 @@
 				</div>
 			{/key}
 		</div>
+
+		{#if downloadStage}
+			<article>
+				<h6>{downloadStage} ({Math.round(downloadProgress)}%)</h6>
+				<progress class="max" value={downloadProgress} max="100"></progress>
+			</article>
+		{/if}
+
 		<h5>{letterCase(data.video.title)}</h5>
 
 		<div class="grid no-padding">
@@ -506,22 +528,28 @@
 							<ShareVideo video={data.video} />
 						</menu></button
 					>
-					{#if data.downloadOptions.length > 0}
-						<button class="border"
-							><i>download</i>
-							<div class="tooltip">{$_('player.download')}</div>
-							<menu class="no-wrap">
-								{#each data.downloadOptions as download}
-									<a
-										class="row"
-										href="#download"
-										on:click={() => downloadFile(download.url, download.container)}
-										>{download.title}</a
-									>
-								{/each}
-							</menu></button
-						>
-					{/if}
+					{#await data.streamed.downloadQualitiesDash then downloadQualitiesDash}
+						{#if downloadQualitiesDash}
+							<button class="border"
+								><i>download</i>
+								<div class="tooltip">{$_('player.download')}</div>
+								<menu class="no-wrap">
+									{#each downloadQualitiesDash as quality}
+										<a
+											class="row"
+											href="#download"
+											on:click={async () =>
+												await mergeMediaFromDASH(quality, data.video.title, {
+													video: onVideoDownloadProgress,
+													audio: onAudioDownloadProgress,
+													merging: onMergingProgress
+												})}>{quality.resolution}</a
+										>
+									{/each}
+								</menu></button
+							>
+						{/if}
+					{/await}
 					{#if personalPlaylists}
 						<button class="border">
 							<i>add</i>

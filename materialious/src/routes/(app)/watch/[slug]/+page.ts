@@ -9,10 +9,12 @@ import {
 import { phaseDescription } from '$lib/misc';
 import {
 	authStore,
+	playerDashStore,
 	playerProxyVideosStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
+import { listCombinedQualities } from '$lib/videoDownload';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
@@ -22,26 +24,6 @@ export async function load({ params, url }) {
 		video = await getVideo(params.slug, get(playerProxyVideosStore));
 	} catch (errorMessage: any) {
 		error(500, errorMessage);
-	}
-
-	let downloadOptions: { title: string; url: string; container: string | undefined; }[] = [];
-
-	if (!video.hlsUrl) {
-		video.formatStreams.forEach((format) => {
-			downloadOptions.push({
-				title: `${format.type.split(';')[0].trim()} - ${format.qualityLabel} (With audio)`,
-				url: format.url,
-				container: format.container
-			});
-		});
-
-		video.adaptiveFormats.forEach((format) => {
-			downloadOptions.push({
-				title: `${format.type.split(';')[0].trim()} - ${format.qualityLabel || format.bitrate + ' bitrate'}`,
-				url: format.url,
-				container: format.container
-			});
-		});
 	}
 
 	let personalPlaylists;
@@ -61,7 +43,7 @@ export async function load({ params, url }) {
 		comments = null;
 	}
 
-	let returnYTDislikes = null;
+	let returnYTDislikes;
 	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
 	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
 		try {
@@ -69,16 +51,25 @@ export async function load({ params, url }) {
 		} catch { }
 	}
 
+	let downloadQualitiesDash;
+	if (
+		typeof import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED !== 'undefined' &&
+		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString() === 'true' &&
+		typeof video.hlsUrl === 'undefined' && get(playerDashStore)
+	) {
+		downloadQualitiesDash = listCombinedQualities(video.dashUrl);
+	}
+
 	return {
 		video: video,
 		content: phaseDescription(video.descriptionHtml),
 		playlistId: url.searchParams.get('playlist'),
-		downloadOptions: downloadOptions,
 		streamed: {
 			personalPlaylists: personalPlaylists,
 			returnYTDislikes: returnYTDislikes,
 			comments: comments,
-			subscribed: amSubscribed(video.authorId)
+			subscribed: amSubscribed(video.authorId),
+			downloadQualitiesDash: downloadQualitiesDash
 		}
 	};
 }

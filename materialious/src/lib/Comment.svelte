@@ -9,6 +9,11 @@
 
 	let replies: Comments | undefined = undefined;
 
+	async function loadPfp(url: string): Promise<string> {
+		const resp = await fetch(url);
+		return URL.createObjectURL(await resp.blob());
+	}
+
 	async function loadReplies(continuation: string) {
 		try {
 			replies = await getComments(videoId, {
@@ -31,11 +36,9 @@
 </script>
 
 <div class="comment">
-	<img
-		class="circle small"
-		src={proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))}
-		alt="comment profile"
-	/>
+	{#await loadPfp(proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))) then pfp}
+		<img class="circle small" src={pfp} alt="comment profile" />
+	{/await}
 	<div>
 		<div class="row">
 			<a href={`/channel/${comment.authorId}`}>
@@ -60,12 +63,9 @@
 			<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
 			{#if comment.creatorHeart}
 				<div>
-					<img
-						class="circle"
-						style="width: 25px; height: 25px"
-						src={proxyGoogleImage(comment.creatorHeart.creatorThumbnail)}
-						alt="Creator profile"
-					/>
+					{#await loadPfp(proxyGoogleImage(comment.creatorHeart.creatorThumbnail)) then pfp}
+						<img class="circle" style="width: 25px; height: 25px" src={pfp} alt="Creator profile" />
+					{/await}
 					<i style="font-size: 20px;margin-left: 5px;" class="absolute left red-text bottom fill"
 						>favorite</i
 					>

@@ -58,8 +58,14 @@
 		displayContent = await getChannelContent(data.channel.authorId, { type: tab });
 	}
 
+	let channelPfp: string;
 	onMount(async () => {
 		displayContent = await getChannelContent(data.channel.authorId, { type: 'videos' });
+
+		const channelPfpResp = await fetch(
+			proxyGoogleImage(getBestThumbnail(data.channel.authorThumbnails))
+		);
+		channelPfp = URL.createObjectURL(await channelPfpResp.blob());
 
 		if (get(authStore)) {
 			isSubscribed = await amSubscribed(data.channel.authorId);
@@ -86,12 +92,16 @@
 		/>
 	{/if}
 	<div class="description">
-		<img
-			style="margin-right: 1em;"
-			class="circle extra m l"
-			src={proxyGoogleImage(getBestThumbnail(data.channel.authorThumbnails))}
-			alt="Channel profile"
-		/>
+		{#if channelPfp}
+			<img
+				style="margin-right: 1em;"
+				class="circle extra m l"
+				src={channelPfp}
+				alt="Channel profile"
+			/>
+		{:else}
+			<progress style="padding: 15px;" class="circle"></progress>
+		{/if}
 
 		<div>
 			<h2>{data.channel.author}</h2>

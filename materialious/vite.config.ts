@@ -1,7 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
+import { fileURLToPath, URL } from 'node:url';
 import { vite as vidstack } from 'vidstack/plugins';
 import { defineConfig } from 'vite';
+
 
 export default defineConfig({
 	plugins: [
@@ -32,5 +34,13 @@ export default defineConfig({
 		}),
 		vidstack(),
 		sveltekit()
-	]
+	],
+	resolve: {
+		alias: {
+			'@': fileURLToPath(new URL('./src', import.meta.url))
+		}
+	},
+	optimizeDeps: {
+		exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
+	}
 });

@@ -1,5 +1,3 @@
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-
 interface MediaQuality {
   bandwidth: string;
   videoUrl: string;
@@ -129,7 +127,9 @@ export async function mergeMediaFromDASH(
     merging?: (progress: number) => void,
   }
 ) {
-  const ffmpeg = new FFmpeg();
+  const FFmpeg = await import('@ffmpeg/ffmpeg');
+
+  const ffmpeg = new FFmpeg.FFmpeg();
 
   ffmpeg.on('progress', ({ progress }) => {
     if (progressCallbacks?.merging) {
@@ -138,6 +138,7 @@ export async function mergeMediaFromDASH(
   });
 
   await ffmpeg.load({
+    classWorkerURL: await toBlobURL('/ffmpeg/ffmpeg-worker.js', 'text/javascript'),
     coreURL: await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript'),
     wasmURL: await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm'),
     workerURL: await toBlobURL('/ffmpeg/ffmpeg-core.worker.js', 'text/javascript')

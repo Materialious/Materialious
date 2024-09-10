@@ -51,11 +51,12 @@ export async function load({ params, url }) {
 		} catch { }
 	}
 
+
 	let downloadQualitiesDash;
 	if (
-		typeof import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED !== 'undefined' &&
-		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString() === 'true' &&
-		typeof video.hlsUrl === 'undefined' && get(playerDashStore)
+		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED &&
+		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString().toLowerCase() === 'true' &&
+		!video.liveNow && get(playerDashStore)
 	) {
 		downloadQualitiesDash = listCombinedQualities(video.dashUrl);
 	}

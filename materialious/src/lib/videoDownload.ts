@@ -1,6 +1,3 @@
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { proxyVideoUrl } from './misc';
-
 interface MediaQuality {
   bandwidth: string;
   videoUrl: string;
@@ -69,7 +66,7 @@ async function fetchDASHManifest(manifestUrl: string) {
 
 
 export async function listCombinedQualities(manifestUrl: string): Promise<MediaQuality[]> {
-  const manifest = await fetchDASHManifest(manifestUrl);
+  const manifest = await fetchDASHManifest(`${manifestUrl}?local=true`);
   const qualities: MediaQuality[] = [];
 
   // Fetch all AdaptationSets (both video and audio)
@@ -93,7 +90,7 @@ export async function listCombinedQualities(manifestUrl: string): Promise<MediaQ
   // Combine video and audio representations
   videoRepresentations.forEach((videoRep) => {
     const videoBandwidth = videoRep.getAttribute('bandwidth');
-    const videoUrl = proxyVideoUrl(videoRep.getElementsByTagName('BaseURL')[0].textContent as string);
+    const videoUrl = videoRep.getElementsByTagName('BaseURL')[0].textContent as string;
     const width = videoRep.getAttribute('width');
     const height = videoRep.getAttribute('height');
     const resolution = width && height ? `${width}x${height}` : undefined;
@@ -101,7 +98,7 @@ export async function listCombinedQualities(manifestUrl: string): Promise<MediaQ
 
     // Pair this video representation with each audio representation
     audioRepresentations.forEach((audioRep) => {
-      const audioUrl = proxyVideoUrl(audioRep.getElementsByTagName('BaseURL')[0].textContent as string);
+      const audioUrl = audioRep.getElementsByTagName('BaseURL')[0].textContent as string;
       const audioChannels = audioRep.getElementsByTagName('AudioChannelConfiguration')[0]?.getAttribute('value') || '';
       const audioBandwidth = audioRep.getAttribute('bandwidth') || '';
 
@@ -128,9 +125,16 @@ export async function mergeMediaFromDASH(
     video?: (progress: number) => void,
     audio?: (progress: number) => void,
     merging?: (progress: number) => void,
+    loadingFfmpeg?: (completed: boolean) => void;
   }
 ) {
-  const ffmpeg = new FFmpeg();
+  if (progressCallbacks?.loadingFfmpeg) {
+    progressCallbacks.loadingFfmpeg(false);
+  }
+
+  const FFmpeg = await import('@ffmpeg/ffmpeg');
+
+  const ffmpeg = new FFmpeg.FFmpeg();
 
   ffmpeg.on('progress', ({ progress }) => {
     if (progressCallbacks?.merging) {
@@ -139,10 +143,15 @@ export async function mergeMediaFromDASH(
   });
 
   await ffmpeg.load({
+    classWorkerURL: await toBlobURL('/ffmpeg/ffmpeg-worker.js', 'text/javascript'),
     coreURL: await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript'),
     wasmURL: await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm'),
     workerURL: await toBlobURL('/ffmpeg/ffmpeg-core.worker.js', 'text/javascript')
   });
+
+  if (progressCallbacks?.loadingFfmpeg) {
+    progressCallbacks.loadingFfmpeg(true);
+  }
 
   const { videoUrl, audioUrl } = selectedQuality;
 
@@ -156,7 +165,7 @@ export async function mergeMediaFromDASH(
   const url = URL.createObjectURL(mergedFile);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${fileName}.mp4`;
+  a.download = `${fileName} - ${selectedQuality.resolution}.mp4`;
   document.body.appendChild(a);
   a.click();
 

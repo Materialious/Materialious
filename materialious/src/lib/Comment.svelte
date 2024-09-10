@@ -2,17 +2,12 @@
 	import { _ } from 'svelte-i18n';
 	import { getComments } from './Api';
 	import { type Comment, type Comments } from './Api/model';
-	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from './misc';
+	import { getBestThumbnail, loadPfp, numberWithCommas, proxyGoogleImage } from './misc';
 
 	export let comment: Comment;
 	export let videoId: string;
 
 	let replies: Comments | undefined = undefined;
-
-	async function loadPfp(url: string): Promise<string> {
-		const resp = await fetch(url);
-		return URL.createObjectURL(await resp.blob());
-	}
 
 	async function loadReplies(continuation: string) {
 		try {

@@ -52,7 +52,11 @@ export async function load({ params, url }) {
 	}
 
 	let downloadQualitiesDash;
-	if (import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString() === 'true' && typeof video.hlsUrl === 'undefined' && get(playerDashStore)) {
+	if (
+		typeof import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED !== 'undefined' &&
+		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString() === 'true' &&
+		typeof video.hlsUrl === 'undefined' && get(playerDashStore)
+	) {
 		downloadQualitiesDash = listCombinedQualities(video.dashUrl);
 	}
 

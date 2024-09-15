@@ -85,7 +85,9 @@
 
 	async function loadAuthor() {
 		const channel = await getChannel(video.authorId);
-		const imgResp = await fetch(proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)));
+		const imgResp = await fetch(
+			proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75))
+		);
 		authorImg = URL.createObjectURL(await imgResp.blob());
 	}
 

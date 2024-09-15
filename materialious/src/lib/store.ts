@@ -74,7 +74,7 @@ export const sponsorBlockDisplayToastStore: Writable<boolean> = persisted(
 );
 export const sponsorBlockTimelineStore: Writable<boolean> = persisted(
 	'sponsorBlockTimeline',
-	true
+	false
 );
 
 export const deArrowInstanceStore = persisted(

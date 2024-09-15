@@ -27,6 +27,19 @@
 	margin-right: 5px !important;
 }
 
+.sponsorskip-bar {
+	position: absolute;
+	margin-top: 2px;
+	height: 5px;
+	top: -1;
+	border-radius: 1em;
+}
+
+.vds-time-slider {
+	position: relative !important;
+	width: 100% !important;
+}
+
 .vds-poster :where(img) {
 	object-fit: cover !important;
 }

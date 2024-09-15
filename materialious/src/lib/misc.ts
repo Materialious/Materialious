@@ -175,6 +175,19 @@ export async function loadPfp(url: string): Promise<string> {
 	return URL.createObjectURL(await resp.blob());
 }
 
+export function pullBitratePreference(): number {
+	const vidstack = localStorage.getItem('video-player');
+
+	if (vidstack) {
+		const vidstackSettings = JSON.parse(vidstack);
+		if (vidstackSettings.quality && vidstackSettings.quality.bitrate) {
+			return vidstackSettings.quality.bitrate;
+		}
+	}
+
+	return -1;
+}
+
 export function proxyGoogleImage(source: string): string {
 	if (source.startsWith('//')) source = `https:${source}`;
 

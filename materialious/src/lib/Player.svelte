@@ -12,7 +12,13 @@
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
 	import type { VideoPlay } from './Api/model';
-	import { getBestThumbnail, proxyVideoUrl, videoLength, type PhasedDescription } from './misc';
+	import {
+		getBestThumbnail,
+		proxyVideoUrl,
+		pullBitratePreference,
+		videoLength,
+		type PhasedDescription
+	} from './misc';
 	import {
 		authStore,
 		instanceStore,
@@ -205,6 +211,29 @@
 				userVideoSpeed = player.playbackRate;
 			});
 
+			player.addEventListener('provider-change', (event) => {
+				const provider = event.detail;
+				const bitrate = pullBitratePreference();
+				if (provider?.type === 'dash') {
+					(provider as any).config = {
+						streaming: {
+							abr: {
+								ABRStrategy: 'abrBola',
+								movingAverageMethod: 'ewma',
+								autoSwitchBitrate: {
+									video: false,
+									audio: false
+								},
+								initialBitrate: {
+									video: bitrate,
+									audio: bitrate
+								}
+							}
+						}
+					};
+				}
+			});
+
 			if (get(sponsorBlockStore) && get(sponsorBlockCategoriesStore)) {
 				const currentCategories = get(sponsorBlockCategoriesStore);
 
@@ -382,6 +411,7 @@
 	title={data.video.title}
 	streamType={playerIsLive ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
+	fullscreen={false}
 	keep-alive
 	{src}
 >

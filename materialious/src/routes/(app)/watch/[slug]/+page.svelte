@@ -491,8 +491,8 @@
 								<img class="circle large" src={pfp} alt="Channel profile" />
 							{/await}
 							<div>
-								<p class="bold">{data.video.author}</p>
-								<p>{data.video.subCountText}</p>
+								<p style="margin: 0;" class="bold">{data.video.author}</p>
+								<p style="margin: 0;">{data.video.subCountText}</p>
 							</div>
 						</nav>
 					</a>

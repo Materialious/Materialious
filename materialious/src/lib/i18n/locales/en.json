@@ -130,6 +130,7 @@
 		"sponsors": {
 			"sponsor": "Sponsor",
 			"disableToast": "Disable toast",
+			"disableTimeline": "Disable segments on timeline",
 			"Catagories": "Catagories",
 			"unpaidSelfPromotion": "Unpaid/Self Promotion",
 			"interactionReminder": "Interaction Reminder (Subscribe)",

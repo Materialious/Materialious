@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
 	import type { Page } from '@sveltejs/kit';
-	import { SponsorBlock, type Category } from 'sponsorblock-api';
+	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
@@ -32,6 +32,7 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
+		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore
@@ -43,6 +44,7 @@
 	export let player: MediaPlayerElement;
 	export let isSyncing: boolean = false;
 	export let isEmbed: boolean = false;
+	export let segments: Segment[] = [];
 
 	let src: PlayerSrc = [];
 	let categoryBeingSkipped = '';
@@ -53,6 +55,50 @@
 	let silenceIsFastForwarding = false;
 
 	let silenceSkipperInterval: NodeJS.Timeout;
+
+	let sponsorBlockElements: Element[] = [];
+
+	function setSponsorTimeline() {
+		if (!get(sponsorBlockTimelineStore)) return;
+		if (segments.length === 0) return;
+
+		const timeline = document.getElementsByClassName('vds-time-slider')[0];
+
+		if (sponsorBlockElements.length > 0) {
+			sponsorBlockElements.forEach((barDiv) => {
+				if (timeline.contains(barDiv)) {
+					timeline.removeChild(barDiv);
+				}
+			});
+		}
+
+		const segmentColors = {
+			sponsor: '00d400',
+			selfpromo: 'ffff00',
+			interaction: 'cc00ff',
+			intro: '00ffff',
+			outro: '0202ed',
+			preview: '008fd6',
+			music_offtopic: 'ff9900',
+			filler: '7300FF'
+		};
+
+		segments.forEach((segment) => {
+			const startPercent = (segment.startTime / data.video.lengthSeconds) * 100;
+			const endPercent = (segment.endTime / data.video.lengthSeconds) * 100;
+			const widthPercent = endPercent - startPercent;
+
+			const barDiv = document.createElement('div');
+			barDiv.classList.add('sponsorskip-bar');
+			barDiv.style.left = `${startPercent}%`;
+			barDiv.style.width = `${widthPercent}%`;
+			barDiv.style.backgroundColor =
+				segment.category in segmentColors ? `#${segmentColors[segment.category]}` : 'grey';
+
+			timeline.appendChild(barDiv);
+			sponsorBlockElements.push(barDiv);
+		});
+	}
 
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
@@ -243,10 +289,16 @@
 					const sponsorBlock = new SponsorBlock('', { baseURL: sponsorBlockUrl });
 
 					try {
-						const segments = await sponsorBlock.getSegments(
+						segments = await sponsorBlock.getSegments(
 							data.video.videoId,
 							get(sponsorBlockCategoriesStore) as Category[]
 						);
+
+						setSponsorTimeline();
+
+						addEventListener('resize', () => {
+							setSponsorTimeline();
+						});
 
 						player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
 							segments.forEach((segment) => {
@@ -275,6 +327,9 @@
 				}
 
 				player.addEventListener('dash-can-play', async () => {
+					if (get(playerAutoPlayStore)) {
+						player.play();
+					}
 					await loadPlayerPos();
 				});
 			} else {

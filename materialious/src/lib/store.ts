@@ -72,6 +72,10 @@ export const sponsorBlockDisplayToastStore: Writable<boolean> = persisted(
 	'sponsorBlockDisplayToast',
 	false
 );
+export const sponsorBlockTimelineStore: Writable<boolean> = persisted(
+	'sponsorBlockTimeline',
+	true
+);
 
 export const deArrowInstanceStore = persisted(
 	'deArrowInstance',
@@ -92,6 +96,5 @@ export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; 
 
 export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | null> =
 	writable(null);
-
 
 export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);

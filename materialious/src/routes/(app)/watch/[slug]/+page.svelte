@@ -40,6 +40,7 @@
 	} from '$lib/store';
 	import { mergeMediaFromDASH } from '$lib/videoDownload';
 	import type { DataConnection } from 'peerjs';
+	import { type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
@@ -73,6 +74,8 @@
 
 	let audioMode = get(playerListenByDefaultStore);
 	let player: MediaPlayerElement;
+
+	let segments: Segment[] = [];
 
 	let showTranscript = false;
 
@@ -454,7 +457,13 @@
 				<div
 					style="max-height: 80vh;max-width: calc(80vh * 16 / 9);overflow: hidden;position: relative;flex: 1;"
 				>
-					<Player {data} {audioMode} isSyncing={$syncPartyPeerStore !== null} bind:player />
+					<Player
+						bind:segments
+						{data}
+						{audioMode}
+						isSyncing={$syncPartyPeerStore !== null}
+						bind:player
+					/>
 				</div>
 			{/key}
 		</div>
@@ -482,8 +491,8 @@
 								<img class="circle large" src={pfp} alt="Channel profile" />
 							{/await}
 							<div>
-								<p class="bold">{data.video.author}</p>
-								<p>{data.video.subCountText}</p>
+								<p style="margin: 0;" class="bold">{data.video.author}</p>
+								<p style="margin: 0;">{data.video.subCountText}</p>
 							</div>
 						</nav>
 					</a>

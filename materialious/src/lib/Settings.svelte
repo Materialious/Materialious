@@ -36,6 +36,7 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
+		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore,
@@ -546,6 +547,20 @@
 				<input
 					bind:checked={$sponsorBlockDisplayToastStore}
 					on:click={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
+					type="checkbox"
+				/>
+				<span></span>
+			</label>
+		</nav>
+
+		<nav class="no-padding">
+			<div class="max">
+				<p>{$_('layout.sponsors.disableTimeline')}</p>
+			</div>
+			<label class="switch">
+				<input
+					bind:checked={$sponsorBlockTimelineStore}
+					on:click={() => sponsorBlockTimelineStore.set(!$sponsorBlockTimelineStore)}
 					type="checkbox"
 				/>
 				<span></span>

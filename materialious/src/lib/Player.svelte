@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
 	import type { Page } from '@sveltejs/kit';
-	import { SponsorBlock, type Category } from 'sponsorblock-api';
+	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
@@ -48,6 +48,8 @@
 	let categoryBeingSkipped = '';
 	let playerIsLive = false;
 	let playerPosSet = false;
+
+	let segments: Segment[];
 
 	let userVideoSpeed = 1;
 	let silenceIsFastForwarding = false;
@@ -243,7 +245,7 @@
 					const sponsorBlock = new SponsorBlock('', { baseURL: sponsorBlockUrl });
 
 					try {
-						const segments = await sponsorBlock.getSegments(
+						segments = await sponsorBlock.getSegments(
 							data.video.videoId,
 							get(sponsorBlockCategoriesStore) as Category[]
 						);
@@ -275,6 +277,9 @@
 				}
 
 				player.addEventListener('dash-can-play', async () => {
+					if (get(playerAutoPlayStore)) {
+						player.play();
+					}
 					await loadPlayerPos();
 				});
 			} else {

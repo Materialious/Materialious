@@ -46,7 +46,17 @@
         "audioOnly": "仅音频",
         "theatreMode": "剧院模式",
         "noPlaylists": "尚无播放列表",
-        "unableToLoadComments": "无法加载评论 :("
+        "unableToLoadComments": "无法加载评论 :(",
+        "downloadSteps": {
+            "video": "正在下载视频",
+            "audio": "正在下载音频",
+            "ffmpeg": "正在下载 ffmpeg 库和组件",
+            "classWorker": "正在下载 ffmpeg class worker",
+            "worker": "正在下载 ffmpeg worker",
+            "wasm": "正在下载 ffmpeg wasm",
+            "merging": "将视频和音频合并在一起",
+            "core": "正在下载 ffmpeg core"
+        }
     },
     "layout": {
         "notifications": "通知",
@@ -84,7 +94,8 @@
             "miniPlayer": "迷你播放器",
             "proxyVideos": "代理视频",
             "backgroundPlay": "在后台播放音频",
-            "dash": "MPEG-DASH 支持"
+            "dash": "MPEG-DASH 支持",
+            "silenceSkipper": "沉默船长（实验性）"
         },
         "instanceUrl": "实例 URL",
         "sponsors": {
@@ -104,7 +115,8 @@
             "titleOnly": "仅标题"
         },
         "expandComments": "默认展开评论",
-        "expandDescription": "默认展开描述"
+        "expandDescription": "默认展开描述",
+        "interface": "界面"
     },
     "subscribe": "订阅",
     "copyUrl": "复制 URL",

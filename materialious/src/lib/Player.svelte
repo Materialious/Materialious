@@ -59,7 +59,7 @@
 	let sponsorBlockElements: Element[] = [];
 
 	function setSponsorTimeline() {
-		if (!get(sponsorBlockTimelineStore)) return;
+		if (get(sponsorBlockTimelineStore)) return;
 		if (segments.length === 0) return;
 
 		const timeline = document.getElementsByClassName('vds-time-slider')[0];

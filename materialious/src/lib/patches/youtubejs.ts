@@ -4,7 +4,7 @@ import { numberWithCommas } from '$lib/misc';
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const innertube = (await import('youtubei.js')).Innertube;
 
-  const tokens = await window.electron.generatePoToken();
+  const tokens = await (window as any).electron.generatePoToken();
 
   const youtube = await innertube.create({
     visitor_data: tokens.visitorData,

@@ -1,21 +1,15 @@
 import type { Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
-import { playerYouTubeJsPoToken, playerYouTubeJsVisitorData } from '$lib/store';
-import { get } from 'svelte/store';
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const innertube = (await import('youtubei.js')).Innertube;
 
-  let innertubeConfig: Record<string, string> = {
-    visitor_data: get(playerYouTubeJsVisitorData),
-    po_token: get(playerYouTubeJsPoToken)
-  };
+  const tokens = await window.electron.generatePoToken();
 
-  if (innertubeConfig.visitor_data === '' || innertubeConfig.po_token === '') {
-    innertubeConfig = {};
-  }
-
-  const youtube = await innertube.create(innertubeConfig);
+  const youtube = await innertube.create({
+    visitor_data: tokens.visitorData,
+    po_token: tokens.poToken
+  });
 
   const video = await youtube.getInfo(videoId);
 

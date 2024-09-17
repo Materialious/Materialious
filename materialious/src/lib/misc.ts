@@ -170,11 +170,6 @@ export function proxyVideoUrl(source: string): string {
 	return rawSrc.toString();
 }
 
-export async function loadPfp(url: string): Promise<string> {
-	const resp = await fetch(url);
-	return URL.createObjectURL(await resp.blob());
-}
-
 export function pullBitratePreference(): number {
 	const vidstack = localStorage.getItem('video-player');
 

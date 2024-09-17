@@ -2,7 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { getComments } from './Api';
 	import { type Comment, type Comments } from './Api/model';
-	import { getBestThumbnail, loadPfp, numberWithCommas, proxyGoogleImage } from './misc';
+	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from './misc';
 
 	export let comment: Comment;
 	export let videoId: string;
@@ -31,9 +31,12 @@
 </script>
 
 <div class="comment">
-	{#await loadPfp(proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))) then pfp}
-		<img class="circle small" src={pfp} alt="comment profile" />
-	{/await}
+	<img
+		class="circle small"
+		src={proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))}
+		alt="comment profile"
+	/>
+
 	<div>
 		<div class="row">
 			<a href={`/channel/${comment.authorId}`}>
@@ -58,9 +61,12 @@
 			<p><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
 			{#if comment.creatorHeart}
 				<div>
-					{#await loadPfp(proxyGoogleImage(comment.creatorHeart.creatorThumbnail)) then pfp}
-						<img class="circle" style="width: 25px; height: 25px" src={pfp} alt="Creator profile" />
-					{/await}
+					<img
+						class="circle"
+						style="width: 25px; height: 25px"
+						src={proxyGoogleImage(comment.creatorHeart.creatorThumbnail)}
+						alt="Creator profile"
+					/>
 					<i style="font-size: 20px;margin-left: 5px;" class="absolute left red-text bottom fill"
 						>favorite</i
 					>

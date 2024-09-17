@@ -11,6 +11,7 @@ import {
 	synciousInstanceStore
 } from '../store';
 import type {
+	Captions,
 	Channel,
 	ChannelContentPlaylists,
 	ChannelContentVideos,
@@ -80,6 +81,8 @@ export async function getVideo(videoId: string, local: boolean = false): Promise
 
 		const video = await youtube.getInfo(videoId);
 
+		console.log(video);
+
 		if (!video.primary_info || !video.secondary_info) {
 			throw new Error('Unable to pull video info from youtube.js');
 		}
@@ -109,6 +112,15 @@ export async function getVideo(videoId: string, local: boolean = false): Promise
 			});
 		});
 
+		let captions: Captions[] = [];
+		video.captions?.caption_tracks?.forEach((caption: Record<string, any>) => {
+			captions.push({
+				url: caption.base_url,
+				label: caption.name.toString(),
+				language_code: caption.language_code
+			});
+		});
+
 		return {
 			type: 'video',
 			title: video.primary_info.title.toString(),
@@ -127,7 +139,7 @@ export async function getVideo(videoId: string, local: boolean = false): Promise
 			formatStreams: [],
 			recommendedVideos: recommendedVideos,
 			authorThumbnails: authorThumbnails,
-			captions: [],
+			captions: captions,
 			authorId: video.basic_info.channel_id || '',
 			authorUrl: `/channel/${video.basic_info.channel_id}`,
 			authorVerified: false,

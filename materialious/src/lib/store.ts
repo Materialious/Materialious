@@ -39,6 +39,9 @@ export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault',
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerMiniPlayerStore = persisted('miniPlayer', true);
 export const playerAndroidBackgroundPlayStore = persisted('androidBackgroundPlayer', true);
+export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
+export const playerYouTubeJsVisitorData = persisted('youTubeJsVisitorData', '');
+export const playerYouTubeJsPoToken = persisted('youTubeJsPoToken', '');
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(

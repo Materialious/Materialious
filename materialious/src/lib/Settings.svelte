@@ -30,6 +30,9 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
+		playerYouTubeJsFallback,
+		playerYouTubeJsPoToken,
+		playerYouTubeJsVisitorData,
 		returnYTDislikesInstanceStore,
 		returnYtDislikesStore,
 		silenceSkipperStore,
@@ -47,6 +50,8 @@
 	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
 
 	let sponsorBlockInstance = get(sponsorBlockUrlStore);
+	let youTubeJsVisitorData = get(playerYouTubeJsVisitorData);
+	let youTubeJsPoToken = get(playerYouTubeJsPoToken);
 	let synciousInstance = get(synciousInstanceStore);
 	let returnYTInstance = get(returnYTDislikesInstanceStore);
 	let invidiousInstance = get(instanceStore);
@@ -130,8 +135,8 @@
 			>
 				<nav>
 					<div class="field label border max">
-						<input bind:value={invidiousInstance} name="returnyt-instance" type="text" />
-						<label for="returnyt-instance">{$_('layout.instanceUrl')}</label>
+						<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
+						<label for="invidious-instance">{$_('layout.instanceUrl')}</label>
 					</div>
 					<button class="square round">
 						<i>done</i>
@@ -439,6 +444,56 @@
 				</label>
 			</nav>
 		</div>
+
+		{#if Capacitor.getPlatform() !== 'web'}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.youtubeJsFallback')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerYouTubeJsFallback}
+							on:click={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+
+			<form
+				on:submit|preventDefault={() => {
+					playerYouTubeJsVisitorData.set(youTubeJsVisitorData);
+				}}
+			>
+				<nav>
+					<div class="field label border max">
+						<input bind:value={youTubeJsVisitorData} name="visitor-data" type="text" />
+						<label for="visitor-data">Visitor data</label>
+					</div>
+					<button class="square round">
+						<i>done</i>
+					</button>
+				</nav>
+			</form>
+
+			<form
+				on:submit|preventDefault={() => {
+					playerYouTubeJsPoToken.set(youTubeJsPoToken);
+				}}
+			>
+				<nav>
+					<div class="field label border max">
+						<input bind:value={youTubeJsPoToken} name="po-token" type="text" />
+						<label for="po-token">Po token</label>
+					</div>
+					<button class="square round">
+						<i>done</i>
+					</button>
+				</nav>
+			</form>
+		{/if}
 	</div>
 
 	<div class="settings">

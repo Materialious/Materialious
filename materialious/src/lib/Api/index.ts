@@ -1,4 +1,4 @@
-import { numberWithCommas } from '$lib/misc';
+import { patchYoutubeJs } from '$lib/patches/youtubejs';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
@@ -7,11 +7,11 @@ import {
 	deArrowThumbnailInstanceStore,
 	instanceStore,
 	interfaceRegionStore,
+	playerYouTubeJsFallback,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
 } from '../store';
 import type {
-	Captions,
 	Channel,
 	ChannelContentPlaylists,
 	ChannelContentVideos,
@@ -19,16 +19,13 @@ import type {
 	Comments,
 	DeArrow,
 	Feed,
-	Image,
 	Playlist,
 	PlaylistPage,
 	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
 	SynciousProgressModel,
-	Thumbnail,
 	Video,
-	VideoBase,
 	VideoPlay
 } from './model';
 
@@ -75,90 +72,8 @@ export async function getPopular(): Promise<Video[]> {
 
 export async function getVideo(videoId: string, local: boolean = false): Promise<VideoPlay> {
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)));
-	if (!resp.ok && Capacitor.getPlatform() !== 'web') {
-		const innertube = (await import('youtubei.js')).Innertube;
-		const youtube = await innertube.create();
-
-		const video = await youtube.getInfo(videoId);
-
-		console.log(video);
-
-		if (!video.primary_info || !video.secondary_info) {
-			throw new Error('Unable to pull video info from youtube.js');
-		}
-
-		const manifest = await video.toDash();
-		const dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
-
-		const descString = video.secondary_info.description.toString();
-
-		let authorThumbnails: Image[];
-		if (video.basic_info.channel_id) {
-			authorThumbnails = (await youtube.getChannel(video.basic_info.channel_id)).metadata.avatar as Image[];
-		} else {
-			authorThumbnails = [];
-		}
-
-		let recommendedVideos: VideoBase[] = [];
-		video.watch_next_feed?.forEach((recommended: Record<string, any>) => {
-			recommendedVideos.push({
-				videoThumbnails: recommended?.thumbnails as Thumbnail[] || [],
-				videoId: recommended?.id || '',
-				title: recommended?.title.toString() || '',
-				viewCountText: numberWithCommas(Number(recommended?.view_count.toString().replace(/\D/g, '') || 0)) || '',
-				lengthSeconds: recommended?.duration?.seconds || 0,
-				author: recommended?.author.name || '',
-				authorId: recommended?.author.id || ''
-			});
-		});
-
-		let captions: Captions[] = [];
-		video.captions?.caption_tracks?.forEach((caption: Record<string, any>) => {
-			captions.push({
-				url: caption.base_url,
-				label: caption.name.toString(),
-				language_code: caption.language_code
-			});
-		});
-
-		return {
-			type: 'video',
-			title: video.primary_info.title.toString(),
-			viewCount: Number(video.primary_info.view_count.toString().replace(/\D/g, '')),
-			viewCountText: video.primary_info.view_count.toString(),
-			likeCount: video.basic_info.like_count || 0,
-			dislikeCount: 0,
-			allowRatings: false,
-			rating: 0,
-			isListed: 0,
-			isFamilyFriendly: video.basic_info.is_family_safe || true,
-			genre: video.basic_info.category || '',
-			genreUrl: '',
-			dashUrl: dashUri,
-			adaptiveFormats: [],
-			formatStreams: [],
-			recommendedVideos: recommendedVideos,
-			authorThumbnails: authorThumbnails,
-			captions: captions,
-			authorId: video.basic_info.channel_id || '',
-			authorUrl: `/channel/${video.basic_info.channel_id}`,
-			authorVerified: false,
-			description: descString,
-			descriptionHtml: video.secondary_info.description.toHTML() || descString,
-			published: 0,
-			publishedText: video.primary_info.published.toString(),
-			premiereTimestamp: 0,
-			liveNow: false,
-			premium: false,
-			isUpcoming: false,
-			videoId: videoId,
-			videoThumbnails: video.basic_info.thumbnail as Thumbnail[],
-			author: video.basic_info.author || 'Unknown',
-			lengthSeconds: video.basic_info.duration || 0,
-			subCountText: '',
-			keywords: video.basic_info.keywords || [],
-			allowedRegions: []
-		};
+	if (!resp.ok && Capacitor.getPlatform() !== 'web' && get(playerYouTubeJsFallback)) {
+		return await patchYoutubeJs(videoId);
 	} else {
 		await fetchErrorHandle(resp);
 	}

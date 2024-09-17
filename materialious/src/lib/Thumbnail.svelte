@@ -39,7 +39,7 @@
 	let videoPreviewVolume: number = 0.4;
 	let imgHeight: number;
 
-	let authorImg: string = '';
+	let authorImg: HTMLImageElement | undefined;
 
 	let proxyVideos = get(playerProxyVideosStore);
 
@@ -85,10 +85,12 @@
 
 	async function loadAuthor() {
 		const channel = await getChannel(video.authorId);
-		const imgResp = await fetch(
-			proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75))
-		);
-		authorImg = URL.createObjectURL(await imgResp.blob());
+		const img = new Image();
+		img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
+
+		img.onload = () => {
+			authorImg = img;
+		};
 	}
 
 	onMount(async () => {
@@ -228,6 +230,10 @@
 		showVideoPreview = true;
 		try {
 			videoPreview = await getVideo(video.videoId);
+			if (videoPreview.formatStreams.length === 0) {
+				showVideoPreview = false;
+			}
+
 			if (videoPreview.hlsUrl) {
 				showVideoPreview = false;
 				videoPreview = null;
@@ -353,8 +359,8 @@
 		<div class="thumbnail-details video-title">
 			{#if !sideways}
 				<div style="margin-right: 1em;">
-					{#if authorImg !== ''}
-						<img class="circle small" src={authorImg} alt="Author" />
+					{#if authorImg}
+						<img src={authorImg.src} alt="Author" class="circle small" />
 					{:else}
 						<progress style="padding: 15px;" class="circle small"></progress>
 					{/if}

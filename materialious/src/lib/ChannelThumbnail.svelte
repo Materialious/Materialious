@@ -6,11 +6,15 @@
 
 	export let channel: Channel;
 
-	let channelPfp: string;
+	let channelPfp: HTMLImageElement | undefined;
 
 	onMount(async () => {
-		const pfpResp = await fetch(proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)));
-		channelPfp = URL.createObjectURL(await pfpResp.blob());
+		const img = new Image();
+		img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails));
+
+		img.onload = () => {
+			channelPfp = img;
+		};
 	});
 </script>
 
@@ -23,7 +27,7 @@
 				<img
 					class="circle"
 					style="width: 90px;height: 90px;"
-					src={channelPfp}
+					src={channelPfp.src}
 					alt={channel.author}
 				/>
 			{/if}

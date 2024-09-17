@@ -170,11 +170,6 @@ export function proxyVideoUrl(source: string): string {
 	return rawSrc.toString();
 }
 
-export async function loadPfp(url: string): Promise<string> {
-	const resp = await fetch(url);
-	return URL.createObjectURL(await resp.blob());
-}
-
 export function pullBitratePreference(): number {
 	const vidstack = localStorage.getItem('video-player');
 
@@ -239,15 +234,15 @@ export function getBestThumbnail(
 	maxHeightDimension = 360
 ): string {
 	if (images && images.length > 0) {
-		images = images.filter(
+		const imagesFiltered = images.filter(
 			(image) => image.width < maxWidthDimension && image.height < maxHeightDimension
 		);
 
-		if (images.length === 0) {
-			return '';
+		if (imagesFiltered.length === 0) {
+			return images[0].url;
 		}
 
-		images.sort((a, b) => {
+		imagesFiltered.sort((a, b) => {
 			return b.width * b.height - a.width * a.height;
 		});
 

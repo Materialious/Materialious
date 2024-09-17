@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.3.7",
+	"version": "1.4.0",
 	"description": "Modern material design for Invidious.",
 	"author": {
 		"name": "Ward Pearce",
@@ -27,7 +27,8 @@
 		"electron-unhandled": "^4.0.1",
 		"electron-updater": "^6.3.4",
 		"electron-window-state": "^5.0.3",
-		"jsonfile": "^6.1.0"
+		"jsonfile": "^6.1.0",
+		"youtube-po-token-generator": "^0.2.0"
 	},
 	"devDependencies": {
 		"electron": "^32.1.0",

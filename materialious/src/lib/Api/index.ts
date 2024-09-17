@@ -1,3 +1,5 @@
+import { patchYoutubeJs } from '$lib/patches/youtubejs';
+import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
 	authStore,
@@ -5,6 +7,7 @@ import {
 	deArrowThumbnailInstanceStore,
 	instanceStore,
 	interfaceRegionStore,
+	playerYouTubeJsFallback,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
 } from '../store';
@@ -68,7 +71,12 @@ export async function getPopular(): Promise<Video[]> {
 }
 
 export async function getVideo(videoId: string, local: boolean = false): Promise<VideoPlay> {
-	const resp = await fetchErrorHandle(await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`))));
+	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)));
+	if (!resp.ok && Capacitor.getPlatform() === 'electron' && get(playerYouTubeJsFallback)) {
+		return await patchYoutubeJs(videoId);
+	} else {
+		await fetchErrorHandle(resp);
+	}
 	return await resp.json();
 }
 

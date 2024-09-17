@@ -30,6 +30,7 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
+		playerYouTubeJsFallback,
 		returnYTDislikesInstanceStore,
 		returnYtDislikesStore,
 		silenceSkipperStore,
@@ -130,8 +131,8 @@
 			>
 				<nav>
 					<div class="field label border max">
-						<input bind:value={invidiousInstance} name="returnyt-instance" type="text" />
-						<label for="returnyt-instance">{$_('layout.instanceUrl')}</label>
+						<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
+						<label for="invidious-instance">{$_('layout.instanceUrl')}</label>
 					</div>
 					<button class="square round">
 						<i>done</i>
@@ -439,6 +440,24 @@
 				</label>
 			</nav>
 		</div>
+
+		{#if Capacitor.getPlatform() === 'electron'}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.youtubeJsFallback')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerYouTubeJsFallback}
+							on:click={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+		{/if}
 	</div>
 
 	<div class="settings">

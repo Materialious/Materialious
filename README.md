@@ -24,6 +24,7 @@
 - Mini player.
 - Silence skipper (Experimental.)
 - ffmpeg integration for downloading videos with audio at any quality ([Configuration required](./docs/DOCKER.md#step-7-optional-enabling-downloads)).
+- [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop.
 - Preview video on hover.
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.

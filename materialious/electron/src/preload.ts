@@ -1,4 +1,6 @@
 require('./rt/electron-rt');
-//////////////////////////////
-// User Defined Preload scripts below
-console.log('User Preload!');
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electron', {
+  generatePoToken: () => ipcRenderer.invoke('generate-po-token')
+});

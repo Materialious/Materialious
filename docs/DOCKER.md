@@ -276,24 +276,32 @@ VITE_DEFAULT_PEERJS_PORT: 443
 
 ## Step 7 (Optional): Enabling downloads
 
-### Step 1: Add the following to your reverse proxy
+### Step 1: Add the following to your reverse proxies
 
 #### Caddy
 
 ```caddy
+# Materialious
 materialious.example.com {
 	reverse_proxy localhost:3001
 
     header {
-        Cross-Origin-Opener-Policy "same-origin"
-        Cross-Origin-Embedder-Policy "require-corp"
+      Cross-Origin-Opener-Policy "same-origin"
+      Cross-Origin-Embedder-Policy "require-corp"
     }
+}
 
+# Invidious
+invidious.example.com {
+  # Other configurations
+
+  header /ggpht/* Cross-Origin-Resource-Policy cross-origin
 }
 ```
 
 #### Nginx
 ```nginx
+# Materialious
 server {
     listen 80;
     server_name materialious.example.com;
@@ -305,12 +313,23 @@ server {
         proxy_pass http://localhost:3001;
     }
 }
+
+# Invidious
+server {
+    listen 80;
+    server_name invidious.example.com;
+
+    location /ggpht/ {
+        add_header Cross-Origin-Resource-Policy cross-origin;
+    }
+}
 ```
 
 #### Traefik
 Add the following to Materialious
 
 ```yaml
+# Materialious
 http:
   middlewares:
     materialious-downloads:
@@ -318,6 +337,21 @@ http:
         customResponseHeaders:
           Cross-Origin-Opener-Policy: "same-origin"
           Cross-Origin-Embedder-Policy: "require-corp"
+
+# Invidious
+http:
+  routers:
+    ggpht-router:
+      rule: "PathPrefix(`/ggpht/`)"
+      service: ggpht-service
+      middlewares:
+        - headers-ggpht
+
+  middlewares:
+    headers-ggpht:
+      headers:
+        customResponseHeaders:
+          Cross-Origin-Resource-Policy: cross-origin
 ```
 
 

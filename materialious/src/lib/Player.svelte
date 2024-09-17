@@ -193,7 +193,10 @@
 						label: caption.label,
 						kind: 'captions',
 						language: caption.language_code,
-						src: `${get(instanceStore)}${caption.url}`
+						// Need if captions are generated when youtube.js is being used.
+						src: caption.url.startsWith('blob:')
+							? caption.url
+							: `${get(instanceStore)}${caption.url}`
 					});
 				});
 			}

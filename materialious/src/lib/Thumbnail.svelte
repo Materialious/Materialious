@@ -230,6 +230,10 @@
 		showVideoPreview = true;
 		try {
 			videoPreview = await getVideo(video.videoId);
+			if (videoPreview.formatStreams.length === 0) {
+				showVideoPreview = false;
+			}
+
 			if (videoPreview.hlsUrl) {
 				showVideoPreview = false;
 				videoPreview = null;

@@ -246,7 +246,7 @@ export function getBestThumbnail(
 			return b.width * b.height - a.width * a.height;
 		});
 
-		return images[0].url;
+		return imagesFiltered[0].url;
 	} else {
 		return '';
 	}

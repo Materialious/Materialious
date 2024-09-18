@@ -17,12 +17,16 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     throw new Error('Unable to pull video info from youtube.js');
   }
 
-  let manifest = await video.toDash();
+  let dashUri: string = '';
 
-  // Hack to fix video not displaying.
-  // Thanks to absidue & Andrews54757
-  manifest = manifest.replaceAll('<EssentialProperty', '<SupplementalProperty');
-  const dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
+  if (!video.basic_info.is_live) {
+    let manifest = await video.toDash();
+
+    // Hack to fix video not displaying.
+    // Thanks to absidue & Andrews54757
+    manifest = manifest.replaceAll('<EssentialProperty', '<SupplementalProperty');
+    dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
+  }
 
   const descString = video.secondary_info.description.toString();
 
@@ -73,7 +77,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     published: 0,
     publishedText: video.primary_info.published.toString(),
     premiereTimestamp: 0,
-    liveNow: false,
+    hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
+    liveNow: video.basic_info.is_live || false,
     premium: false,
     isUpcoming: false,
     videoId: videoId,

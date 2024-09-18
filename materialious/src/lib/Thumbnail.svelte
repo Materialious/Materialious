@@ -232,6 +232,7 @@
 			videoPreview = await getVideo(video.videoId);
 			if (videoPreview.formatStreams.length === 0) {
 				showVideoPreview = false;
+				videoPreview = null;
 			}
 
 			if (videoPreview.hlsUrl) {

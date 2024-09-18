@@ -25,9 +25,6 @@ Materialious allows you to customize various settings by overwriting the default
       + [Theatre mode by default](#theatre-mode-by-default)
       + [Autoplay next by default](#autoplay-next-by-default)
       + [Dash](#dash)
-   * [Return YT Dislikes](#return-yt-dislikes)
-   * [Syncious](#syncious)
-      + [Syncious Instance](#syncious-instance)
    * [Sponsorblock](#sponsorblock)
       + [Sponsor](#sponsor)
       + [Unpaid/Self Promotion](#unpaidself-promotion)
@@ -195,15 +192,6 @@ Configures an open-source proxy for the Return YouTube Dislike API, with optiona
 ```json
 "returnYtDislikes": true
 ```
-
-## Syncious
-
-Syncious keeps your watch progress synced across Invidious clients.
-
-```json
-"syncious": true
-```
-
 
 ## Sponsorblock
 

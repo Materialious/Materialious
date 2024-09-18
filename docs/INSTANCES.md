@@ -6,7 +6,7 @@
   - **Man in the Middle:** No
   - **Accounts:** Yes
   - **RYD-Proxy:** Yes
-  - **Syncious integration:** Yes
+  - **API Extended integration:** Yes
   - **Self-hosted PeerJS:** No
 
 - [materialious.einfachzocken.eu](https://materialious.einfachzocken.eu/)
@@ -16,5 +16,5 @@
   - **Man in the Middle:** No
   - **Accounts:** Yes
   - **RYD-Proxy:** No
-  - **Syncious integration:** No
+  - **API Extended integration:** No
   - **Self-hosted PeerJS:** No

@@ -50,7 +50,7 @@ export const returnYTDislikesInstanceStore: Writable<string | null | undefined> 
 export const synciousStore = persisted('syncious', true);
 export const synciousInstanceStore: Writable<string | null | undefined> = persisted(
 	'synciousInstance',
-	platformDependentDefault(import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE, 'https://syncious.materialio.us')
+	platformDependentDefault(import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE || import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE, 'https://extended-api.materialio.us')
 );
 
 export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');

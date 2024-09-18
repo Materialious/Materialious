@@ -494,7 +494,7 @@
 	</div>
 
 	<div class="settings">
-		<h6>Syncious</h6>
+		<h6>API Extended</h6>
 
 		<form
 			on:submit|preventDefault={() =>

@@ -235,7 +235,6 @@ http:
 Modify/add `VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.
 
 ## Step 5 (Optional, but recommended): Self-host Invidious API extended
-Please note, Materialious configuration using the env var `VITE_DEFAULT_SYNCIOUS_INSTANCE` for Invidious API extended, this will change in the future (no-breaking.)
 
 ### Step 1: Docker compose
 Add the following to your docker compose
@@ -259,7 +258,7 @@ services:
 
 Add these additional environment variables to Materialious.
 ```yaml
-VITE_DEFAULT_SYNCIOUS_INSTANCE: "https://syncious.example.com"
+VITE_DEFAULT_API_EXTENDED_INSTANCE: "https://syncious.example.com"
 ```
 
 ## Step 6 (Optional): Self-host PeerJS

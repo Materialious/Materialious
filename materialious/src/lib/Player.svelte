@@ -259,10 +259,11 @@
 			});
 
 			player.addEventListener('provider-change', (event) => {
-				const provider = event.detail;
+				const provider = event.detail as any;
 				const bitrate = pullBitratePreference();
 				if (provider?.type === 'dash') {
-					(provider as any).config = {
+					provider.library = () => import('dashjs');
+					provider.config = {
 						streaming: {
 							abr: {
 								ABRStrategy: 'abrBola',

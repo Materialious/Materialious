@@ -32,7 +32,7 @@ export const activePageStore: Writable<string | null> = writable('home');
 
 export const playerAutoPlayStore = persisted('autoPlay', true);
 export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
-export const playerProxyVideosStore = persisted('proxyVideos', false);
+export const playerProxyVideosStore = persisted('proxyVideos', true);
 export const playerListenByDefaultStore = persisted('listenByDefault', false);
 export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);

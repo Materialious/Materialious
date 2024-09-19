@@ -124,9 +124,9 @@
 			<h6>Invidious</h6>
 			<form
 				on:submit|preventDefault={() => {
+					instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
 					authStore.set(null);
 					goto('/');
-					instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
 					ui('#dialog-settings');
 				}}
 			>
@@ -306,7 +306,7 @@
 			</nav>
 		</div>
 
-		{#if Capacitor.getPlatform() !== 'android'}
+		{#if Capacitor.isNativePlatform()}
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">

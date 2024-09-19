@@ -10,15 +10,11 @@ export async function getPoToken(): Promise<PoTokens> {
   return new Promise((resolve, reject) => {
     const messageListener = async (data: any) => {
       await InAppBrowser.close();
-      resolve(data);
-      await InAppBrowser.clearAllCookies();
-      await InAppBrowser.clearCache();
       await InAppBrowser.removeAllListeners();
+      resolve(data);
     };
 
     const closeListener = async () => {
-      await InAppBrowser.clearAllCookies();
-      await InAppBrowser.clearCache();
       await InAppBrowser.removeAllListeners();
     };
 

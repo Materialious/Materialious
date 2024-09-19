@@ -75,9 +75,9 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   return {
     type: 'video',
-    title: video.primary_info.title.toString(),
-    viewCount: Number(video.primary_info.view_count.toString().replace(/\D/g, '')),
-    viewCountText: video.primary_info.view_count.toString(),
+    title: video.primary_info.title ? video.primary_info.title.toString() : '',
+    viewCount: video.primary_info.view_count ? Number(video.primary_info.view_count.toString().replace(/\D/g, '')) : 0,
+    viewCountText: video.primary_info.view_count ? video.primary_info.view_count.toString() : '',
     likeCount: video.basic_info.like_count || 0,
     dislikeCount: 0,
     allowRatings: false,
@@ -98,7 +98,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     description: descString,
     descriptionHtml: video.secondary_info.description.toHTML() || descString,
     published: 0,
-    publishedText: video.primary_info.published.toString(),
+    publishedText: video.primary_info.published ? video.primary_info.published.toString() : '',
     premiereTimestamp: 0,
     hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
     liveNow: video.basic_info.is_live || false,

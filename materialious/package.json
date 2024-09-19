@@ -53,6 +53,7 @@
 		"@capgo/inappbrowser": "^6.6.8",
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"beercss": "^3.7.7",
+		"dashjs": "^4.7.4",
 		"fuse.js": "^7.0.0",
 		"he": "^1.2.0",
 		"human-number": "^2.0.4",

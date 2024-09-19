@@ -22,7 +22,6 @@
 		interfaceRegionStore,
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
-		playerAndroidBackgroundPlayStore,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
@@ -389,25 +388,6 @@
 			</nav>
 		</div>
 
-		{#if Capacitor.getPlatform() === 'android'}
-			<div class="field no-margin">
-				<nav class="no-padding">
-					<div class="max">
-						<div>{$_('layout.player.backgroundPlay')}</div>
-					</div>
-					<label class="switch">
-						<input
-							type="checkbox"
-							bind:checked={$playerAndroidBackgroundPlayStore}
-							on:click={() =>
-								playerAndroidBackgroundPlayStore.set(!$playerAndroidBackgroundPlayStore)}
-						/>
-						<span></span>
-					</label>
-				</nav>
-			</div>
-		{/if}
-
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
@@ -424,7 +404,7 @@
 			</nav>
 		</div>
 
-		{#if Capacitor.getPlatform() === 'electron'}
+		{#if Capacitor.isNativePlatform()}
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">

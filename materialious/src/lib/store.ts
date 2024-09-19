@@ -38,7 +38,6 @@ export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition',
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerMiniPlayerStore = persisted('miniPlayer', true);
-export const playerAndroidBackgroundPlayStore = persisted('androidBackgroundPlayer', true);
 export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);

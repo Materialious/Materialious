@@ -13,7 +13,6 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import {
 		activePageStore,
-		androidPoToken,
 		authStore,
 		darkModeStore,
 		instanceStore,
@@ -157,13 +156,6 @@
 
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));
-		}
-
-		// Po token is generated for android on startup
-		if (Capacitor.getPlatform() === 'android') {
-			const getPoToken = (await import('../../lib/patches/poTokenAndroid')).getPoToken;
-
-			androidPoToken.set(await getPoToken());
 		}
 	});
 

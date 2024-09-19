@@ -100,4 +100,4 @@ export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | 
 
 export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);
 
-export const androidPoToken: Writable<PoTokens> = writable();
+export const poTokenCacheStore: Writable<PoTokens> = writable();

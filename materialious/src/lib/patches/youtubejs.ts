@@ -1,24 +1,33 @@
 import type { Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
-import { androidPoToken } from '$lib/store';
+import { poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
+import { getPoToken, type PoTokens } from './poTokenAndroid';
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const innertube = (await import('youtubei.js')).Innertube;
 
-  let tokens;
-  if (Capacitor.getPlatform() === 'electron') {
-    tokens = await (window as any).electron.generatePoToken();
-  } else if (Capacitor.getPlatform() === 'android' && get(androidPoToken)) {
-    tokens = get(androidPoToken);
+  let tokens: PoTokens;
+
+  const poTokenCache = get(poTokenCacheStore);
+  if (!poTokenCache) {
+    if (Capacitor.getPlatform() === 'electron') {
+      tokens = await (window as any).electron.generatePoToken();
+    } else if (Capacitor.getPlatform() === 'android') {
+      tokens = await getPoToken();
+    } else {
+      throw new Error('This platform cant generate po tokens');
+    }
+
+    poTokenCacheStore.set(tokens);
   } else {
-    throw new Error('This platform cant generate po tokens');
+    tokens = poTokenCache;
   }
 
   const youtube = await innertube.create({
-    visitor_data: tokens.visitorData,
-    po_token: tokens.poToken,
+    visitor_data: tokens.visitor_data,
+    po_token: tokens.po_token,
     // Custom fetch method required so capacitor http patch is used
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
       return window.fetch(input, init);

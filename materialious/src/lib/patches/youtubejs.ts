@@ -3,7 +3,7 @@ import { numberWithCommas } from '$lib/misc';
 import { poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
-import { getPoToken, type PoTokens } from './poTokenAndroid';
+import { type PoTokens } from './poTokenAndroid';
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const innertube = (await import('youtubei.js')).Innertube;
@@ -15,7 +15,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     if (Capacitor.getPlatform() === 'electron') {
       tokens = await (window as any).electron.generatePoToken();
     } else if (Capacitor.getPlatform() === 'android') {
-      tokens = await getPoToken();
+      tokens = await (await import('../../lib/patches/poTokenAndroid')).getPoToken();
     } else {
       throw new Error('This platform cant generate po tokens');
     }

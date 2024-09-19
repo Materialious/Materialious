@@ -11,16 +11,18 @@ export async function getPoToken(): Promise<PoTokens> {
     const messageListener = async (data: any) => {
       await InAppBrowser.close();
       resolve(data);
-      InAppBrowser.removeAllListeners(); // Clean up the listener
+      await InAppBrowser.clearAllCookies();
+      await InAppBrowser.clearCache();
+      await InAppBrowser.removeAllListeners();
     };
 
     const closeListener = async () => {
+      await InAppBrowser.clearAllCookies();
+      await InAppBrowser.clearCache();
       await InAppBrowser.removeAllListeners();
     };
 
     const urlChangeListener = async () => {
-      await InAppBrowser.clearAllCookies();
-      await InAppBrowser.clearCache();
 
       // Code must be minified to ensure runs correctly.
       await InAppBrowser.executeScript({
@@ -67,7 +69,7 @@ attemptClickPlayButton();
     InAppBrowser.addListener('urlChangeEvent', urlChangeListener);
 
     setTimeout(() => {
-      reject(new Error('Timeout waiting for message'));
+      reject(new Error('Timeout trying to pull Po tokens'));
       InAppBrowser.removeAllListeners();
     }, 10000);
 

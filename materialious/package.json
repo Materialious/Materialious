@@ -31,6 +31,7 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.44.0",
 		"i": "^0.3.7",
+		"jsdom": "^25.0.0",
 		"npm": "^10.8.3",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.6",
@@ -49,6 +50,7 @@
 		"@capacitor/browser": "^6.0.2",
 		"@capacitor/cli": "6.1.2",
 		"@capacitor/core": "^6.1.2",
+		"@capgo/inappbrowser": "^6.6.8",
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"beercss": "^3.7.7",
 		"fuse.js": "^7.0.0",
@@ -64,6 +66,7 @@
 		"svelte-i18n": "^4.0.0",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.11.0",
+		"terser": "^5.33.0",
 		"vidstack": "^1.12.9"
 	}
 }

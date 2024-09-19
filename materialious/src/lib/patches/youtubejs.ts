@@ -28,10 +28,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const youtube = await innertube.create({
     visitor_data: tokens.visitor_data,
     po_token: tokens.po_token,
-    // Custom fetch method required so capacitor http patch is used
-    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
-      return window.fetch(input, init);
-    }
   });
 
   const video = await youtube.getInfo(videoId);

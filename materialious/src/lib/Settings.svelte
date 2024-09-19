@@ -127,6 +127,7 @@
 					authStore.set(null);
 					goto('/');
 					instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
+					ui('#dialog-settings');
 				}}
 			>
 				<nav>

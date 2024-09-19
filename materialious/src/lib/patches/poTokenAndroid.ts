@@ -70,8 +70,8 @@ attemptClickPlayButton();
     }, 10000);
 
     InAppBrowser.openWebView({
-      url: "https://www.youtube.com/embed/jNQXAC9IVRw",
-      isPresentAfterPageLoad: true,
+      url: 'https://www.youtube.com/embed/4UdEFmxRmNE',
+      title: 'Pulling po tokens'
     });
   });
 }

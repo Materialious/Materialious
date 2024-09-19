@@ -102,6 +102,7 @@ export interface VideoPlay extends Video {
 		storyboardHeight: number;
 		storyboardCount: number;
 	}[];
+	fallbackPatch?: 'youtubejs' | 'piped';
 }
 
 export interface ReturnYTDislikes {

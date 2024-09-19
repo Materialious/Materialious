@@ -1,14 +1,28 @@
 import type { Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
+import { androidPoToken } from '$lib/store';
+import { Capacitor } from '@capacitor/core';
+import { get } from 'svelte/store';
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const innertube = (await import('youtubei.js')).Innertube;
 
-  const tokens = await (window as any).electron.generatePoToken();
+  let tokens;
+  if (Capacitor.getPlatform() === 'electron') {
+    tokens = await (window as any).electron.generatePoToken();
+  } else if (Capacitor.getPlatform() === 'android' && get(androidPoToken)) {
+    tokens = get(androidPoToken);
+  } else {
+    throw new Error('This platform cant generate po tokens');
+  }
 
   const youtube = await innertube.create({
     visitor_data: tokens.visitorData,
-    po_token: tokens.poToken
+    po_token: tokens.poToken,
+    // Custom fetch method required so capacitor http patch is used
+    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+      return window.fetch(input, init);
+    }
   });
 
   const video = await youtube.getInfo(videoId);
@@ -87,6 +101,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     lengthSeconds: video.basic_info.duration || 0,
     subCountText: '',
     keywords: video.basic_info.keywords || [],
-    allowedRegions: []
+    allowedRegions: [],
+    fallbackPatch: 'youtubejs'
   };
 }

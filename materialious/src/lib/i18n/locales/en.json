@@ -82,7 +82,8 @@
 		},
 		"noPlaylists": "No playlists",
 		"unableToLoadComments": "Unable to load comments",
-		"addToPlaylist": "Add to playlist"
+		"addToPlaylist": "Add to playlist",
+		"youtubeJsFallBack": "Local video fallback being used"
 	},
 	"layout": {
 		"interface": "Interface",

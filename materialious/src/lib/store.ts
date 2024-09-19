@@ -5,6 +5,7 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './misc';
+import type { PoTokens } from './patches/poTokenAndroid';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
@@ -34,7 +35,6 @@ export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
 export const playerProxyVideosStore = persisted('proxyVideos', false);
 export const playerListenByDefaultStore = persisted('listenByDefault', false);
 export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
-export const playerDashStore = persisted('dashEnabled', false);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerMiniPlayerStore = persisted('miniPlayer', true);
@@ -99,3 +99,5 @@ export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | 
 	writable(null);
 
 export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);
+
+export const androidPoToken: Writable<PoTokens> = writable();

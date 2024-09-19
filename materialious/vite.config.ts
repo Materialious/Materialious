@@ -8,6 +8,9 @@ export default defineConfig({
 	plugins: [
 		SvelteKitPWA({
 			injectRegister: 'inline',
+			workbox: {
+				maximumFileSizeToCacheInBytes: 4000000
+			},
 			manifest: {
 				description: 'Modern material design for Invidious.',
 				theme_color: '#8936FF',

@@ -9,8 +9,8 @@ export interface PoTokens {
 export async function getPoToken(): Promise<PoTokens> {
   return new Promise((resolve, reject) => {
     const messageListener = async (data: any) => {
-      await InAppBrowser.close();
       await InAppBrowser.removeAllListeners();
+      await InAppBrowser.close();
       resolve(data);
     };
 

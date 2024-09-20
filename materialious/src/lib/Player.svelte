@@ -354,7 +354,8 @@
 					audioSource: proxyVideoUrl(highestBitrateAudio.url),
 					friendlyTitle: data.video.title,
 					useForNotification: true,
-					loop: player.loop
+					loop: player.loop,
+					isBackgroundMusic: false
 				});
 
 				AudioPlayer.onAppGainsFocus(audioId, async () => {
@@ -362,16 +363,15 @@
 
 					const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
 
-					player.currentTime = Number(audioPlayerTime.currentTime);
+					player.currentTime = Math.round(audioPlayerTime.currentTime);
+					await player.play();
 				});
 
 				AudioPlayer.onAppLosesFocus(audioId, async () => {
-					await player.pause();
-
 					await AudioPlayer.play(audioId);
 					await AudioPlayer.seek({
 						...audioId,
-						timeInSeconds: Number(player.duration)
+						timeInSeconds: Math.round(player.currentTime)
 					});
 				});
 
@@ -475,13 +475,15 @@
 	}
 
 	onDestroy(async () => {
+		if (Capacitor.getPlatform() === 'android') {
+			await AudioPlayer.destroy({ audioId: data.video.videoId });
+		}
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);
 		}
 		savePlayerPos();
 		await player.pause();
 		player.destroy();
-		await AudioPlayer.destroy({ audioId: data.video.videoId });
 		playerPosSet = false;
 	});
 </script>

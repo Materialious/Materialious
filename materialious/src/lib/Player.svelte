@@ -357,7 +357,7 @@
 					loop: player.loop
 				});
 
-				await AudioPlayer.onAppGainsFocus(audioId, async () => {
+				AudioPlayer.onAppGainsFocus(audioId, async () => {
 					await AudioPlayer.pause(audioId);
 
 					const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
@@ -365,7 +365,7 @@
 					player.currentTime = Number(audioPlayerTime.currentTime);
 				});
 
-				await AudioPlayer.onAppLosesFocus(audioId, async () => {
+				AudioPlayer.onAppLosesFocus(audioId, async () => {
 					await player.pause();
 
 					await AudioPlayer.play(audioId);

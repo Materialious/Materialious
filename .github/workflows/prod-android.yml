@@ -26,11 +26,11 @@ jobs:
       - name: Install modules
         run: cd ../ && npm install
 
-      - name: Build package
-        run: cd ../ && npm run build
-
       - name: Build android nodejs packages
         run: cd ../static/nodejs-android && npm install
+
+      - name: Build package
+        run: cd ../ && npm run build
 
       - name: Sync package
         run: cd ../ && npx cap sync

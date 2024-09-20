@@ -111,7 +111,7 @@ attemptClickPlayButton();
     setTimeout(() => {
       reject(new Error('Timeout trying to pull Po tokens'));
       InAppBrowser.removeAllListeners();
-    }, 20000);
+    }, 30000);
 
     InAppBrowser.openWebView({
       url: 'https://www.youtube.com/embed/jNQXAC9IVRw',

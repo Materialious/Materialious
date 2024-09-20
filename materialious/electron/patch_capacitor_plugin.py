@@ -3,7 +3,6 @@
 
 import json
 import os
-import subprocess
 
 WORKING_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -32,8 +31,6 @@ def run():
 
         with open(PACKAGE_JSON, "w") as f_:
             f_.write(json.dumps(package, indent="\t"))
-
-    subprocess.call(["npm", "install"])
 
 
 if __name__ == "__main__":

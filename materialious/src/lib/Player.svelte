@@ -3,6 +3,7 @@
 
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
+	import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
@@ -14,6 +15,7 @@
 	import type { VideoPlay } from './Api/model';
 	import {
 		getBestThumbnail,
+		proxyVideoUrl,
 		pullBitratePreference,
 		videoLength,
 		type PhasedDescription
@@ -23,6 +25,7 @@
 		instanceStore,
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
+		playerAndroidBgPlayer,
 		playerAutoPlayStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
@@ -326,7 +329,7 @@
 			src = [{ src: data.video.dashUrl, type: 'application/dash+xml' }];
 
 			if (!data.video.fallbackPatch) {
-				if (Capacitor.getPlatform() !== 'electron' || proxyVideos) {
+				if (!Capacitor.isNativePlatform() || proxyVideos) {
 					(src[0] as { src: string }).src += '?local=true';
 				}
 			}
@@ -337,6 +340,46 @@
 				}
 				await loadPlayerPos();
 			});
+
+			if (Capacitor.getPlatform() === 'android' && get(playerAndroidBgPlayer)) {
+				const highestBitrateAudio = data.video.adaptiveFormats
+					.filter((format) => format.type.startsWith('audio/'))
+					.reduce((prev, current) => {
+						return parseInt(prev.bitrate) > parseInt(current.bitrate) ? prev : current;
+					});
+
+				const audioId = { audioId: data.video.videoId };
+
+				await AudioPlayer.create({
+					...audioId,
+					audioSource: proxyVideoUrl(highestBitrateAudio.url),
+					friendlyTitle: data.video.title,
+					useForNotification: true,
+					loop: player.loop,
+					isBackgroundMusic: false
+				});
+
+				AudioPlayer.onAppGainsFocus(audioId, async () => {
+					await AudioPlayer.pause(audioId);
+
+					const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
+
+					player.currentTime = Math.round(audioPlayerTime.currentTime);
+					await player.play();
+				});
+
+				AudioPlayer.onAppLosesFocus(audioId, async () => {
+					if (!player.paused) {
+						await AudioPlayer.play(audioId);
+						await AudioPlayer.seek({
+							...audioId,
+							timeInSeconds: Math.round(player.currentTime)
+						});
+					}
+				});
+
+				await AudioPlayer.initialize(audioId);
+			}
 		} else {
 			playerIsLive = true;
 			src = [
@@ -434,12 +477,15 @@
 		}
 	}
 
-	onDestroy(() => {
+	onDestroy(async () => {
+		if (Capacitor.getPlatform() === 'android') {
+			await AudioPlayer.destroy({ audioId: data.video.videoId });
+		}
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);
 		}
 		savePlayerPos();
-		player.pause();
+		await player.pause();
 		player.destroy();
 		playerPosSet = false;
 	});

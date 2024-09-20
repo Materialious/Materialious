@@ -4,4 +4,5 @@
     <string name="title_activity_main">Materialious</string>
     <string name="package_name">us.materialio.app</string>
     <string name="custom_url_scheme">us.materialio.app</string>
+    <string name="audio_player_service_description">Allows for audio to play in the background.</string>
 </resources>

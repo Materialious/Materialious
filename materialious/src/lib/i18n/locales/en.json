@@ -125,7 +125,8 @@
 			"backgroundPlay": "Play audio in background",
 			"dash": "Dash",
 			"silenceSkipper": "Silence skipper (Experimental)",
-			"youtubeJsFallback": "Local video processing fallback"
+			"youtubeJsFallback": "Local video processing fallback",
+			"youtubeJsAlways": "Always use local video processing"
 		},
 		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",

@@ -60,18 +60,18 @@ export function buildAuthHeaders(): { headers: { Authorization: string; }; } {
 	return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
 }
 
-export async function getTrending(): Promise<Video[]> {
-	const resp = await fetchErrorHandle(await fetch(setRegion(buildPath('trending'))));
+export async function getTrending(fetchOptions?: RequestInit): Promise<Video[]> {
+	const resp = await fetchErrorHandle(await fetch(setRegion(buildPath('trending')), fetchOptions));
 	return await resp.json();
 }
 
-export async function getPopular(): Promise<Video[]> {
-	const resp = await fetchErrorHandle(await fetch(buildPath('popular')));
+export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
+	const resp = await fetchErrorHandle(await fetch(buildPath('popular'), fetchOptions));
 	return await resp.json();
 }
 
-export async function getVideo(videoId: string, local: boolean = false): Promise<VideoPlay> {
-	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)));
+export async function getVideo(videoId: string, local: boolean = false, fetchOptions?: RequestInit): Promise<VideoPlay> {
+	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
 	if (!resp.ok && Capacitor.isNativePlatform() && get(playerYouTubeJsFallback)) {
 		return await patchYoutubeJs(videoId);
 	} else {
@@ -80,9 +80,9 @@ export async function getVideo(videoId: string, local: boolean = false): Promise
 	return await resp.json();
 }
 
-export async function getDislikes(videoId: string): Promise<ReturnYTDislikes> {
+export async function getDislikes(videoId: string, fetchOptions?: RequestInit): Promise<ReturnYTDislikes> {
 	const resp = await fetchErrorHandle(
-		await fetch(`${get(returnYTDislikesInstanceStore)}/votes?videoId=${videoId}`)
+		await fetch(`${get(returnYTDislikesInstanceStore)}/votes?videoId=${videoId}`, fetchOptions)
 	);
 	return await resp.json();
 }
@@ -93,7 +93,8 @@ export async function getComments(
 		sort_by?: 'top' | 'new';
 		source?: 'youtube' | 'reddit';
 		continuation?: string;
-	}
+	},
+	fetchOptions?: RequestInit
 ): Promise<Comments> {
 	if (typeof parameters.sort_by === 'undefined') {
 		parameters.sort_by = 'top';
@@ -105,12 +106,12 @@ export async function getComments(
 
 	const path = buildPath(`comments/${videoId}`);
 	path.search = new URLSearchParams(parameters).toString();
-	const resp = await fetchErrorHandle(await fetch(path));
+	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
 
-export async function getChannel(channelId: string): Promise<ChannelPage> {
-	const resp = await fetchErrorHandle(await fetch(buildPath(`channels/${channelId}`)));
+export async function getChannel(channelId: string, fetchOptions?: RequestInit): Promise<ChannelPage> {
+	const resp = await fetchErrorHandle(await fetch(buildPath(`channels/${channelId}`), fetchOptions));
 	return await resp.json();
 }
 
@@ -119,7 +120,8 @@ export async function getChannelContent(
 	parameters: {
 		type?: 'videos' | 'playlists' | 'streams' | 'shorts';
 		continuation?: string;
-	}
+	},
+	fetchOptions?: RequestInit
 ): Promise<ChannelContentVideos | ChannelContentPlaylists> {
 	if (typeof parameters.type === 'undefined') parameters.type = 'videos';
 
@@ -128,14 +130,14 @@ export async function getChannelContent(
 	if (typeof parameters.continuation !== 'undefined')
 		url.searchParams.set('continuation', parameters.continuation);
 
-	const resp = await fetchErrorHandle(await fetch(url.toString()));
+	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
 	return await resp.json();
 }
 
-export async function getSearchSuggestions(search: string): Promise<SearchSuggestion> {
+export async function getSearchSuggestions(search: string, fetchOptions?: RequestInit): Promise<SearchSuggestion> {
 	const path = buildPath('search/suggestions');
 	path.search = new URLSearchParams({ q: search }).toString();
-	const resp = await fetchErrorHandle(await fetch(path));
+	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
 
@@ -145,7 +147,8 @@ export async function getSearch(
 		sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
 		type?: 'video' | 'playlist' | 'channel' | 'all';
 		page?: string;
-	}
+	},
+	fetchOptions?: RequestInit
 ): Promise<(Channel | Video | Playlist)[]> {
 	if (typeof options.sort_by === 'undefined') {
 		options.sort_by = 'relevance';
@@ -161,67 +164,69 @@ export async function getSearch(
 
 	const path = buildPath('search');
 	path.search = new URLSearchParams({ ...options, q: search }).toString();
-	const resp = await fetchErrorHandle(await fetch(setRegion(path)));
+	const resp = await fetchErrorHandle(await fetch(setRegion(path), fetchOptions));
 	return await resp.json();
 }
 
-export async function getFeed(maxResults: number, page: number): Promise<Feed> {
+export async function getFeed(maxResults: number, page: number, fetchOptions: RequestInit = {}): Promise<Feed> {
 	const path = buildPath('auth/feed');
 	path.search = new URLSearchParams({
 		max_results: maxResults.toString(),
 		page: page.toString()
 	}).toString();
-	const resp = await fetchErrorHandle(await fetch(path, buildAuthHeaders()));
+	const resp = await fetchErrorHandle(await fetch(path, { ...buildAuthHeaders(), ...fetchOptions }));
 	return await resp.json();
 }
 
-export async function getSubscriptions(): Promise<Subscription[]> {
+export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<Subscription[]> {
 	const resp = await fetchErrorHandle(
-		await fetch(buildPath('auth/subscriptions'), buildAuthHeaders())
+		await fetch(buildPath('auth/subscriptions'), { ...buildAuthHeaders(), ...fetchOptions })
 	);
 	return await resp.json();
 }
 
-export async function amSubscribed(authorId: string): Promise<boolean> {
+export async function amSubscribed(authorId: string, fetchOptions: RequestInit = {}): Promise<boolean> {
 	if (!get(authStore)) return false;
 
 	try {
-		const subscriptions = (await getSubscriptions()).filter((sub) => sub.authorId === authorId);
+		const subscriptions = (await getSubscriptions(fetchOptions)).filter((sub) => sub.authorId === authorId);
 		return subscriptions.length === 1;
 	} catch {
 		return false;
 	}
 }
 
-export async function postSubscribe(authorId: string) {
+export async function postSubscribe(authorId: string, fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/subscriptions/${authorId}`), {
 			method: 'POST',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }
 
-export async function deleteUnsubscribe(authorId: string) {
+export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/subscriptions/${authorId}`), {
 			method: 'DELETE',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }
 
-export async function getHistory(page: number = 1, maxResults: number = 20): Promise<string[]> {
+export async function getHistory(page: number = 1, maxResults: number = 20, fetchOptions: RequestInit = {}): Promise<string[]> {
 	const resp = await fetchErrorHandle(
 		await fetch(
 			buildPath(`auth/history?page=${page}&max_results=${maxResults}`),
-			buildAuthHeaders()
+			{ ...buildAuthHeaders(), ...fetchOptions },
 		)
 	);
 	return await resp.json();
 }
 
-export async function deleteHistory(videoId: string | undefined = undefined) {
+export async function deleteHistory(videoId: string | undefined = undefined, fetchOptions: RequestInit = {}) {
 	let url = '/api/v1/auth/history';
 	if (typeof videoId !== 'undefined') {
 		url += `/${videoId}`;
@@ -230,34 +235,36 @@ export async function deleteHistory(videoId: string | undefined = undefined) {
 	await fetchErrorHandle(
 		await fetch(buildPath(url), {
 			method: 'DELETE',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }
 
-export async function postHistory(videoId: string) {
+export async function postHistory(videoId: string, fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/history/${videoId}`), {
 			method: 'POST',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }
 
-export async function getPlaylist(playlistId: string, page: number = 1): Promise<PlaylistPage> {
+export async function getPlaylist(playlistId: string, page: number = 1, fetchOptions: RequestInit = {}): Promise<PlaylistPage> {
 	let resp;
 
 	if (get(authStore)) {
-		resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), buildAuthHeaders());
+		resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), { ...buildAuthHeaders(), ...fetchOptions });
 	} else {
-		resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`));
+		resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`), fetchOptions);
 	}
 	await fetchErrorHandle(resp);
 	return await resp.json();
 }
 
-export async function getPersonalPlaylists(): Promise<PlaylistPage[]> {
-	const resp = await fetchErrorHandle(await fetch(buildPath('auth/playlists'), buildAuthHeaders()));
+export async function getPersonalPlaylists(fetchOptions: RequestInit = {}): Promise<PlaylistPage[]> {
+	const resp = await fetchErrorHandle(await fetch(buildPath('auth/playlists'), { ...buildAuthHeaders(), ...fetchOptions }));
 	return await resp.json();
 }
 
@@ -272,7 +279,8 @@ export async function deletePersonalPlaylist(playlistId: string) {
 
 export async function postPersonalPlaylist(
 	title: string,
-	privacy: 'public' | 'private' | 'unlisted'
+	privacy: 'public' | 'private' | 'unlisted',
+	fetchOptions: RequestInit = {}
 ) {
 	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
 	headers['headers']['Content-type'] = 'application/json';
@@ -284,12 +292,13 @@ export async function postPersonalPlaylist(
 				title: title,
 				privacy: privacy
 			}),
-			...headers
+			...headers,
+			...fetchOptions
 		})
 	);
 }
 
-export async function addPlaylistVideo(playlistId: string, videoId: string) {
+export async function addPlaylistVideo(playlistId: string, videoId: string, fetchOptions: RequestInit = {}) {
 	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
 	headers['headers']['Content-type'] = 'application/json';
 
@@ -299,48 +308,51 @@ export async function addPlaylistVideo(playlistId: string, videoId: string) {
 			body: JSON.stringify({
 				videoId: videoId
 			}),
-			...headers
+			...headers,
+			...fetchOptions
 		})
 	);
 }
 
-export async function removePlaylistVideo(playlistId: string, indexId: string) {
+export async function removePlaylistVideo(playlistId: string, indexId: string, fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/playlists/${playlistId}/videos/${indexId}`), {
 			method: 'DELETE',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }
 
-export async function getDeArrow(videoId: string): Promise<DeArrow> {
+export async function getDeArrow(videoId: string, fetchOptions?: RequestInit): Promise<DeArrow> {
 	const resp = await fetchErrorHandle(
-		await fetch(`${get(deArrowInstanceStore)}/api/branding?videoID=${videoId}`)
+		await fetch(`${get(deArrowInstanceStore)}/api/branding?videoID=${videoId}`, fetchOptions)
 	);
 	return await resp.json();
 }
 
-export async function getThumbnail(videoId: string, time: number): Promise<string> {
+export async function getThumbnail(videoId: string, time: number, fetchOptions?: RequestInit): Promise<string> {
 	const resp = await fetchErrorHandle(
 		await fetch(
-			`${get(deArrowThumbnailInstanceStore)}/api/v1/getThumbnail?videoID=${videoId}&time=${time}`
+			`${get(deArrowThumbnailInstanceStore)}/api/v1/getThumbnail?videoID=${videoId}&time=${time}`,
+			fetchOptions
 		)
 	);
 	return URL.createObjectURL(await resp.blob());
 }
 
-export async function getVideoProgress(videoId: string): Promise<SynciousProgressModel[]> {
+export async function getVideoProgress(videoId: string, fetchOptions: RequestInit = {}): Promise<SynciousProgressModel[]> {
 	const resp = await fetchErrorHandle(
 		await fetch(
 			`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`,
-			buildAuthHeaders()
+			{ ...buildAuthHeaders(), ...fetchOptions }
 		)
 	);
 
 	return resp.json();
 }
 
-export async function saveVideoProgress(videoId: string, time: number) {
+export async function saveVideoProgress(videoId: string, time: number, fetchOptions: RequestInit = {}) {
 	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
 	headers['headers']['Content-type'] = 'application/json';
 
@@ -350,25 +362,28 @@ export async function saveVideoProgress(videoId: string, time: number) {
 			method: 'POST',
 			body: JSON.stringify({
 				time: time
-			})
+			}),
+			...fetchOptions
 		})
 	);
 }
 
-export async function deleteVideoProgress(videoId: string) {
+export async function deleteVideoProgress(videoId: string, fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(
 		await fetch(`${get(synciousInstanceStore)}/video/${videoId}`, {
 			method: 'DELETE',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }
 
-export async function deleteAllVideoProgress() {
+export async function deleteAllVideoProgress(fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(
 		await fetch(`${get(synciousInstanceStore)}/videos`, {
 			method: 'DELETE',
-			...buildAuthHeaders()
+			...buildAuthHeaders(),
+			...fetchOptions
 		})
 	);
 }

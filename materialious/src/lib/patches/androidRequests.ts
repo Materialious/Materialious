@@ -1,6 +1,7 @@
 import { goto } from "$app/navigation";
 import { Capacitor } from "@capacitor/core";
 
+
 if (Capacitor.getPlatform() === 'android') {
   const originalFetch = window.fetch;
 
@@ -13,7 +14,7 @@ if (Capacitor.getPlatform() === 'android') {
       typeof requestInput === 'string' ? requestInput : requestInput.toString();
 
     // Check if the URL is already proxied, to avoid double proxying
-    if (!requestUrl.startsWith(corsAnywhereProxyUrl)) {
+    if (!requestUrl.startsWith(corsAnywhereProxyUrl) && !requestUrl.startsWith('/')) {
       requestInput = corsAnywhereProxyUrl + requestUrl;
     }
 

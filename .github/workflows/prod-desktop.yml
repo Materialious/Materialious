@@ -51,6 +51,9 @@ jobs:
       - name: Install electron modules
         run: cd ./materialious/electron && npm install
 
+      - name: Patch capacitor plugin
+        run: cd ./materialious/electron && python patch_capacitor_plugin.py
+
       - name: Set up environment variables
         run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
         shell: bash

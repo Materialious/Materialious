@@ -126,7 +126,7 @@
 				on:submit|preventDefault={() => {
 					instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
 					authStore.set(null);
-					goto('/');
+					goto('/', { replaceState: true });
 					ui('#dialog-settings');
 				}}
 			>

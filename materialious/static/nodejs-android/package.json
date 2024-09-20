@@ -1,0 +1,8 @@
+{
+    "name": "cors-patch",
+    "version": "0.0.1",
+    "main": "./index.js",
+    "dependencies": {
+        "cors-anywhere": "^0.4.4"
+    }
+}

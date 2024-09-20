@@ -5,9 +5,9 @@ const config: CapacitorConfig = {
   appName: 'Materialious',
   webDir: 'build',
   plugins: {
-    CapacitorHttp: {
-      enabled: true
-    },
+    CapacitorNodeJS: {
+      nodeDir: 'nodejs-android'
+    }
   },
 };
 

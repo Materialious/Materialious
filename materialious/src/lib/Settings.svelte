@@ -29,6 +29,7 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
+		playerYouTubeJsAlways,
 		playerYouTubeJsFallback,
 		returnYTDislikesInstanceStore,
 		returnYtDislikesStore,
@@ -258,6 +259,40 @@
 	<div class="settings">
 		<h6>{$_('layout.player.title')}</h6>
 
+		{#if Capacitor.isNativePlatform()}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.youtubeJsAlways')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerYouTubeJsAlways}
+							on:click={() => playerYouTubeJsAlways.set(!$playerYouTubeJsAlways)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.player.youtubeJsFallback')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$playerYouTubeJsFallback}
+							on:click={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
+		{/if}
+
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
@@ -404,24 +439,6 @@
 				</label>
 			</nav>
 		</div>
-
-		{#if Capacitor.isNativePlatform()}
-			<div class="field no-margin">
-				<nav class="no-padding">
-					<div class="max">
-						<div>{$_('layout.player.youtubeJsFallback')}</div>
-					</div>
-					<label class="switch">
-						<input
-							type="checkbox"
-							bind:checked={$playerYouTubeJsFallback}
-							on:click={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
-						/>
-						<span></span>
-					</label>
-				</nav>
-			</div>
-		{/if}
 	</div>
 
 	<div class="settings">

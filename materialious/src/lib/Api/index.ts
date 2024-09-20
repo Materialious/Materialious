@@ -7,6 +7,7 @@ import {
 	deArrowThumbnailInstanceStore,
 	instanceStore,
 	interfaceRegionStore,
+	playerYouTubeJsAlways,
 	playerYouTubeJsFallback,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
@@ -72,7 +73,9 @@ export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 
 export async function getVideo(videoId: string, local: boolean = false, fetchOptions?: RequestInit): Promise<VideoPlay> {
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
-	if (!resp.ok && Capacitor.isNativePlatform() && get(playerYouTubeJsFallback)) {
+	if (
+		(get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) ||
+		(!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform())) {
 		return await patchYoutubeJs(videoId);
 	} else {
 		await fetchErrorHandle(resp);

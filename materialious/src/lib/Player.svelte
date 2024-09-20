@@ -326,7 +326,7 @@
 			src = [{ src: data.video.dashUrl, type: 'application/dash+xml' }];
 
 			if (!data.video.fallbackPatch) {
-				if (Capacitor.getPlatform() !== 'electron' || proxyVideos) {
+				if (!Capacitor.isNativePlatform() || proxyVideos) {
 					(src[0] as { src: string }).src += '?local=true';
 				}
 			}

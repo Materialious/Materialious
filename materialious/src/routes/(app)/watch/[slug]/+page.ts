@@ -9,7 +9,6 @@ import {
 import { phaseDescription } from '$lib/misc';
 import {
 	authStore,
-	playerDashStore,
 	playerProxyVideosStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
@@ -56,7 +55,7 @@ export async function load({ params, url }) {
 	if (
 		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED &&
 		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString().toLowerCase() === 'true' &&
-		!video.liveNow && get(playerDashStore)
+		!video.liveNow
 	) {
 		downloadQualitiesDash = listCombinedQualities(video.dashUrl);
 	}

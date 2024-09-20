@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.4.3",
+	"version": "1.5.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -31,6 +31,7 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.44.0",
 		"i": "^0.3.7",
+		"jsdom": "^25.0.0",
 		"npm": "^10.8.3",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.6",
@@ -49,8 +50,11 @@
 		"@capacitor/browser": "^6.0.2",
 		"@capacitor/cli": "6.1.2",
 		"@capacitor/core": "^6.1.2",
+		"@capgo/inappbrowser": "^6.6.8",
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"beercss": "^3.7.7",
+		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
+		"dashjs": "^4.7.4",
 		"fuse.js": "^7.0.0",
 		"he": "^1.2.0",
 		"human-number": "^2.0.4",
@@ -64,6 +68,7 @@
 		"svelte-i18n": "^4.0.0",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.11.0",
+		"terser": "^5.33.0",
 		"vidstack": "^1.12.9"
 	}
 }

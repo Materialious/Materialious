@@ -43,6 +43,13 @@
 - PWA support.
 - YT path redirects (So your redirect plugins should still work!)
 
+# Support table
+|         | Dash | HLS | Local video fallback | API-Extended | ffmpeg download merging | Dearrow | RYD |
+|---------|------|-----|----------------------|--------------|-------------------------|---------|-----|
+| Web     | ✅    | ✅   | ❌                    | ✅            | ✅                       | ✅       | ✅   |
+| Desktop | ✅    | ✅   | ✅                    | ✅            | ❌                       | ✅       | ✅   |
+| Android | ✅    | ✅   | ✅                    | ✅            | ❌                       | ✅       | ✅   |
+
 # Public instances
 [Public instances are listed here](./docs/INSTANCES.md).
 

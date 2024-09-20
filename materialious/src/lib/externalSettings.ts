@@ -14,7 +14,6 @@ import {
 	playerAlwaysLoopStore,
 	playerAutoPlayStore,
 	playerAutoplayNextByDefaultStore,
-	playerDashStore,
 	playerListenByDefaultStore,
 	playerMiniPlayerStore,
 	playerProxyVideosStore,
@@ -72,11 +71,6 @@ const persistedStores = [
 	{
 		name: 'savePlaybackPosition',
 		store: playerSavePlaybackPositionStore,
-		type: 'boolean'
-	},
-	{
-		name: 'dashEnabled',
-		store: playerDashStore,
 		type: 'boolean'
 	},
 	{

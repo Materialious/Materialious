@@ -8,13 +8,12 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent, PlayerSrc, VideoSrc } from 'vidstack';
+	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
 	import type { VideoPlay } from './Api/model';
 	import {
 		getBestThumbnail,
-		proxyVideoUrl,
 		pullBitratePreference,
 		videoLength,
 		type PhasedDescription
@@ -25,7 +24,6 @@
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
 		playerAutoPlayStore,
-		playerDashStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		silenceSkipperStore,
@@ -47,7 +45,7 @@
 	export let segments: Segment[] = [];
 
 	let src: PlayerSrc = [];
-	let categoryBeingSkipped = '';
+	let snackBarAlert = '';
 	let playerIsLive = false;
 	let playerPosSet = false;
 
@@ -261,10 +259,11 @@
 			});
 
 			player.addEventListener('provider-change', (event) => {
-				const provider = event.detail;
+				const provider = event.detail as any;
 				const bitrate = pullBitratePreference();
 				if (provider?.type === 'dash') {
-					(provider as any).config = {
+					provider.library = () => import('dashjs');
+					provider.config = {
 						streaming: {
 							abr: {
 								ABRStrategy: 'abrBola',
@@ -312,9 +311,11 @@
 									if (Math.round(player.currentTime) >= Math.round(player.duration)) {
 										return;
 									}
-									categoryBeingSkipped = segment.category;
 									player.currentTime = segment.endTime + 1;
-									ui('#sponsorblock-alert');
+									if (!get(sponsorBlockDisplayToastStore)) {
+										snackBarAlert = `${get(_)('skipping')} ${segment.category}`;
+										ui('#snackbar-alert');
+									}
 								}
 							});
 						});
@@ -322,38 +323,20 @@
 				}
 			}
 
-			if (get(playerDashStore)) {
-				src = [{ src: data.video.dashUrl, type: 'application/dash+xml' }];
+			src = [{ src: data.video.dashUrl, type: 'application/dash+xml' }];
 
+			if (!data.video.fallbackPatch) {
 				if (Capacitor.getPlatform() !== 'electron' || proxyVideos) {
 					(src[0] as { src: string }).src += '?local=true';
 				}
-
-				player.addEventListener('dash-can-play', async () => {
-					if (get(playerAutoPlayStore)) {
-						player.play();
-					}
-					await loadPlayerPos();
-				});
-			} else {
-				let formattedSrc;
-				src = data.video.formatStreams.map((format) => {
-					if (proxyVideos) {
-						formattedSrc = proxyVideoUrl(format.url);
-					} else {
-						formattedSrc = format.url;
-					}
-					const quality = format.size.split('x');
-					return {
-						src: formattedSrc,
-						type: format.type.split(';')[0],
-						height: Number(quality[1]),
-						width: Number(quality[0])
-					};
-				}) as VideoSrc[];
-
-				await loadPlayerPos();
 			}
+
+			player.addEventListener('dash-can-play', async () => {
+				if (get(playerAutoPlayStore)) {
+					player.play();
+				}
+				await loadPlayerPos();
+			});
 		} else {
 			playerIsLive = true;
 			src = [
@@ -367,6 +350,11 @@
 		player.storage = 'video-player';
 
 		const currentTheme = await getDynamicTheme();
+
+		if (data.video.fallbackPatch === 'youtubejs') {
+			snackBarAlert = get(_)('player.youtubeJsFallBack');
+			ui('#snackbar-alert');
+		}
 
 		document.documentElement.style.setProperty(
 			'--media-slider-track-fill-bg',
@@ -488,11 +476,8 @@
 	{/if}
 </media-player>
 
-{#if !isEmbed && !$sponsorBlockDisplayToastStore}
-	<div class="snackbar" id="sponsorblock-alert">
-		<span
-			>{$_('skipping')}
-			<span class="bold" style="text-transform: capitalize;">{categoryBeingSkipped}</span></span
-		>
+{#if !isEmbed}
+	<div class="snackbar" id="snackbar-alert">
+		<span class="bold" style="text-transform: capitalize;">{snackBarAlert}</span>
 	</div>
 {/if}

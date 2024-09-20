@@ -11,6 +11,7 @@
 	import SyncParty from '$lib/SyncParty.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
+	import '$lib/patches/androidRequests';
 	import {
 		activePageStore,
 		authStore,

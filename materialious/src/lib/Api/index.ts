@@ -72,7 +72,7 @@ export async function getPopular(): Promise<Video[]> {
 
 export async function getVideo(videoId: string, local: boolean = false): Promise<VideoPlay> {
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)));
-	if (!resp.ok && Capacitor.getPlatform() === 'electron' && get(playerYouTubeJsFallback)) {
+	if (!resp.ok && Capacitor.isNativePlatform() && get(playerYouTubeJsFallback)) {
 		return await patchYoutubeJs(videoId);
 	} else {
 		await fetchErrorHandle(resp);

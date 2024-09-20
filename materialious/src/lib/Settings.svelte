@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -21,10 +22,8 @@
 		interfaceRegionStore,
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
-		playerAndroidBackgroundPlayStore,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
-		playerDashStore,
 		playerListenByDefaultStore,
 		playerMiniPlayerStore,
 		playerProxyVideosStore,
@@ -125,8 +124,10 @@
 			<h6>Invidious</h6>
 			<form
 				on:submit|preventDefault={() => {
-					authStore.set(null);
 					instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
+					authStore.set(null);
+					goto('/', { replaceState: true });
+					ui('#dialog-settings');
 				}}
 			>
 				<nav>
@@ -305,7 +306,7 @@
 			</nav>
 		</div>
 
-		{#if Capacitor.getPlatform() !== 'android'}
+		{#if Capacitor.isNativePlatform()}
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">
@@ -388,43 +389,6 @@
 			</nav>
 		</div>
 
-		{#if Capacitor.getPlatform() === 'android'}
-			<div class="field no-margin">
-				<nav class="no-padding">
-					<div class="max">
-						<div>{$_('layout.player.backgroundPlay')}</div>
-					</div>
-					<label class="switch">
-						<input
-							type="checkbox"
-							bind:checked={$playerAndroidBackgroundPlayStore}
-							on:click={() =>
-								playerAndroidBackgroundPlayStore.set(!$playerAndroidBackgroundPlayStore)}
-						/>
-						<span></span>
-					</label>
-				</nav>
-			</div>
-		{/if}
-
-		{#if Capacitor.getPlatform() !== 'android'}
-			<div class="field no-margin">
-				<nav class="no-padding">
-					<div class="max">
-						<div>{$_('layout.player.dash')}</div>
-					</div>
-					<label class="switch">
-						<input
-							type="checkbox"
-							bind:checked={$playerDashStore}
-							on:click={() => playerDashStore.set(!$playerDashStore)}
-						/>
-						<span></span>
-					</label>
-				</nav>
-			</div>
-		{/if}
-
 		<div class="field no-margin">
 			<nav class="no-padding">
 				<div class="max">
@@ -441,7 +405,7 @@
 			</nav>
 		</div>
 
-		{#if Capacitor.getPlatform() === 'electron'}
+		{#if Capacitor.isNativePlatform()}
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">

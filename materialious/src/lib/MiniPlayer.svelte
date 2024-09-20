@@ -27,7 +27,7 @@
 	}
 </script>
 
-{#if $miniPlayerSrcStore}
+{#if $miniPlayerSrcStore && $miniPlayerSrcStore.video.formatStreams.length > 0}
 	<nav class="bottom no-padding">
 		<article class="surface-bright">
 			<button on:click={() => miniPlayerSrcStore.set(null)} class="s circle transparent no-margin">

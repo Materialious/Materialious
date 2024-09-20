@@ -82,7 +82,8 @@
 		},
 		"noPlaylists": "No playlists",
 		"unableToLoadComments": "Unable to load comments",
-		"addToPlaylist": "Add to playlist"
+		"addToPlaylist": "Add to playlist",
+		"youtubeJsFallBack": "Local video fallback being used"
 	},
 	"layout": {
 		"interface": "Interface",
@@ -124,7 +125,7 @@
 			"backgroundPlay": "Play audio in background",
 			"dash": "Dash",
 			"silenceSkipper": "Silence skipper (Experimental)",
-			"youtubeJsFallback": "Locally video processing fallback"
+			"youtubeJsFallback": "Local video processing fallback"
 		},
 		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",

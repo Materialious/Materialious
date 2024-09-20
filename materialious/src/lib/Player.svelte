@@ -357,10 +357,6 @@
 					loop: player.loop
 				});
 
-				await AudioPlayer.onAudioReady(audioId, async () => {
-					await AudioPlayer.initialize(audioId);
-				});
-
 				await AudioPlayer.onAppGainsFocus(audioId, async () => {
 					await AudioPlayer.pause(audioId);
 
@@ -378,6 +374,8 @@
 						timeInSeconds: Number(player.duration)
 					});
 				});
+
+				await AudioPlayer.initialize(audioId);
 			}
 		} else {
 			playerIsLive = true;

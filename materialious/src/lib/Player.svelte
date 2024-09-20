@@ -25,6 +25,7 @@
 		instanceStore,
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
+		playerAndroidBgPlayer,
 		playerAutoPlayStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
@@ -340,7 +341,7 @@
 				await loadPlayerPos();
 			});
 
-			if (Capacitor.getPlatform() === 'android') {
+			if (Capacitor.getPlatform() === 'android' && get(playerAndroidBgPlayer)) {
 				const highestBitrateAudio = data.video.adaptiveFormats
 					.filter((format) => format.type.startsWith('audio/'))
 					.reduce((prev, current) => {
@@ -368,11 +369,13 @@
 				});
 
 				AudioPlayer.onAppLosesFocus(audioId, async () => {
-					await AudioPlayer.play(audioId);
-					await AudioPlayer.seek({
-						...audioId,
-						timeInSeconds: Math.round(player.currentTime)
-					});
+					if (!player.paused) {
+						await AudioPlayer.play(audioId);
+						await AudioPlayer.seek({
+							...audioId,
+							timeInSeconds: Math.round(player.currentTime)
+						});
+					}
 				});
 
 				await AudioPlayer.initialize(audioId);

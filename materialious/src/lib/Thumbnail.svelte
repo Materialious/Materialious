@@ -84,7 +84,7 @@
 	}
 
 	async function loadAuthor() {
-		const channel = await getChannel(video.authorId);
+		const channel = await getChannel(video.authorId, { priority: 'low' });
 		const img = new Image();
 		img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
 
@@ -197,7 +197,7 @@
 
 		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 			try {
-				progress = (await getVideoProgress(video.videoId))[0].time.toString();
+				progress = (await getVideoProgress(video.videoId, { priority: 'low' }))[0].time.toString();
 			} catch {}
 		}
 	});

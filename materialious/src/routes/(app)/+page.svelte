@@ -11,7 +11,7 @@
 	<div class="space"></div>
 
 	<nav class="center-align">
-		<h3>Popular page has been disabled</h3>
+		<p>Popular page has been disabled</p>
 	</nav>
 {:else}
 	<VideoList videos={data.popular} />

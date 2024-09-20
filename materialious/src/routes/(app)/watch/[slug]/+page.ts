@@ -20,7 +20,7 @@ import { get } from 'svelte/store';
 export async function load({ params, url }) {
 	let video;
 	try {
-		video = await getVideo(params.slug, get(playerProxyVideosStore));
+		video = await getVideo(params.slug, get(playerProxyVideosStore), { priority: "high" });
 	} catch (errorMessage: any) {
 		error(500, errorMessage);
 	}
@@ -28,7 +28,7 @@ export async function load({ params, url }) {
 	let personalPlaylists;
 	if (get(authStore)) {
 		postHistory(video.videoId);
-		personalPlaylists = getPersonalPlaylists();
+		personalPlaylists = getPersonalPlaylists({ priority: 'low' });
 	} else {
 		personalPlaylists = null;
 	}
@@ -37,7 +37,7 @@ export async function load({ params, url }) {
 	try {
 		comments = video.liveNow
 			? null
-			: getComments(params.slug, { sort_by: 'top', source: 'youtube' });
+			: getComments(params.slug, { sort_by: 'top', source: 'youtube' }, { priority: "low" });
 	} catch {
 		comments = null;
 	}
@@ -46,7 +46,7 @@ export async function load({ params, url }) {
 	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
 	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
 		try {
-			returnYTDislikes = get(returnYtDislikesStore) ? getDislikes(params.slug) : null;
+			returnYTDislikes = get(returnYtDislikesStore) ? getDislikes(params.slug, { priority: "low" }) : null;
 		} catch { }
 	}
 

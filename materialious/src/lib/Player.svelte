@@ -3,6 +3,7 @@
 
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
+	import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
@@ -14,6 +15,7 @@
 	import type { VideoPlay } from './Api/model';
 	import {
 		getBestThumbnail,
+		proxyVideoUrl,
 		pullBitratePreference,
 		videoLength,
 		type PhasedDescription
@@ -337,6 +339,46 @@
 				}
 				await loadPlayerPos();
 			});
+
+			if (Capacitor.getPlatform() === 'android') {
+				const highestBitrateAudio = data.video.adaptiveFormats
+					.filter((format) => format.type.startsWith('audio/'))
+					.reduce((prev, current) => {
+						return parseInt(prev.bitrate) > parseInt(current.bitrate) ? prev : current;
+					});
+
+				const audioId = { audioId: data.video.videoId };
+
+				await AudioPlayer.create({
+					...audioId,
+					audioSource: proxyVideoUrl(highestBitrateAudio.url),
+					friendlyTitle: data.video.title,
+					useForNotification: true,
+					loop: player.loop
+				});
+
+				await AudioPlayer.onAudioReady(audioId, async () => {
+					await AudioPlayer.initialize(audioId);
+				});
+
+				await AudioPlayer.onAppGainsFocus(audioId, async () => {
+					await AudioPlayer.pause(audioId);
+
+					const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
+
+					player.currentTime = Number(audioPlayerTime.currentTime);
+				});
+
+				await AudioPlayer.onAppLosesFocus(audioId, async () => {
+					await player.pause();
+
+					await AudioPlayer.play(audioId);
+					await AudioPlayer.seek({
+						...audioId,
+						timeInSeconds: Number(player.duration)
+					});
+				});
+			}
 		} else {
 			playerIsLive = true;
 			src = [
@@ -434,13 +476,14 @@
 		}
 	}
 
-	onDestroy(() => {
+	onDestroy(async () => {
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);
 		}
 		savePlayerPos();
-		player.pause();
+		await player.pause();
 		player.destroy();
+		await AudioPlayer.destroy({ audioId: data.video.videoId });
 		playerPosSet = false;
 	});
 </script>

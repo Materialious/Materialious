@@ -3,6 +3,7 @@ import { numberWithCommas } from '$lib/misc';
 import { poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
+import { capacitorFetch } from './capacitorFetch';
 import { type PoTokens } from './poTokenAndroid';
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
@@ -28,6 +29,13 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const youtube = await innertube.create({
     visitor_data: tokens.visitor_data,
     po_token: tokens.po_token,
+    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (Capacitor.getPlatform() === 'android') {
+        return capacitorFetch(input, init);
+      } else {
+        return fetch(input, init);
+      }
+    }
   });
 
   const video = await youtube.getInfo(videoId);

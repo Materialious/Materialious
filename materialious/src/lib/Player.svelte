@@ -350,6 +350,8 @@
 
 				const audioId = { audioId: data.video.videoId };
 
+				let isPlayingInBackground = false;
+
 				await AudioPlayer.create({
 					...audioId,
 					audioSource: proxyVideoUrl(highestBitrateAudio.url),
@@ -360,6 +362,10 @@
 				});
 
 				AudioPlayer.onAppGainsFocus(audioId, async () => {
+					if (!isPlayingInBackground) return;
+
+					isPlayingInBackground = false;
+
 					await AudioPlayer.pause(audioId);
 
 					const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
@@ -369,13 +375,14 @@
 				});
 
 				AudioPlayer.onAppLosesFocus(audioId, async () => {
-					if (!player.paused) {
-						await AudioPlayer.play(audioId);
-						await AudioPlayer.seek({
-							...audioId,
-							timeInSeconds: Math.round(player.currentTime)
-						});
-					}
+					if (player.paused) return;
+
+					isPlayingInBackground = true;
+					await AudioPlayer.play(audioId);
+					await AudioPlayer.seek({
+						...audioId,
+						timeInSeconds: Math.round(player.currentTime)
+					});
 				});
 
 				await AudioPlayer.initialize(audioId);

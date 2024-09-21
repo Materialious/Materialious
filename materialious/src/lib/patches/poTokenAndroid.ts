@@ -115,7 +115,7 @@ attemptClickPlayButton();
 
     InAppBrowser.openWebView({
       url: 'https://www.youtube.com/embed/jNQXAC9IVRw',
-      title: 'Pulling po tokens',
+      title: 'Pulling po tokens (This may take a moment)',
       headers: headers
     });
   });

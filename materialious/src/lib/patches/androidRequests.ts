@@ -1,6 +1,6 @@
 import { goto } from "$app/navigation";
 import { Capacitor } from "@capacitor/core";
-
+import { NodeJS } from 'capacitor-nodejs';
 
 if (Capacitor.getPlatform() === 'android') {
   const originalFetch = window.fetch;
@@ -9,17 +9,32 @@ if (Capacitor.getPlatform() === 'android') {
   const corsAnywhereProxyUrl: string = 'http://localhost:3000/';
 
   // Overwrite fetch to use CORS-Anywhere proxy
-  window.fetch = async (requestInput: RequestInfo | URL, requestOptions: RequestInit = {}): Promise<Response> => {
-    const requestUrl: string =
-      typeof requestInput === 'string' ? requestInput : requestInput.toString();
+  window.fetch = async (requestInput: string | URL | Request, requestOptions?: RequestInit): Promise<Response> => {
+    let requestUrl: string;
 
-    // Check if the URL is already proxied, to avoid double proxying
-    if (!requestUrl.startsWith(corsAnywhereProxyUrl) && !requestUrl.startsWith('/') && !requestUrl.startsWith('blob:') && !requestUrl.startsWith('/')) {
+    if (typeof requestInput === 'string') {
+      requestUrl = requestInput;
+    } else if ('url' in requestInput) {
+      requestUrl = requestInput.url;
+      requestOptions = {
+        body: requestInput.body,
+        cache: requestInput.cache,
+        credentials: requestInput.credentials,
+        headers: requestInput.headers,
+        method: requestInput.method,
+        mode: requestInput.mode,
+        redirect: requestInput.redirect,
+        referrer: requestInput.referrer,
+        signal: requestInput.signal,
+      };
+    } else {
+      requestUrl = requestInput.toString();
+    }
+
+    if (!requestUrl.startsWith(corsAnywhereProxyUrl) && !requestUrl.startsWith('/') && !requestUrl.startsWith('blob:')) {
       requestInput = corsAnywhereProxyUrl + requestUrl;
     }
 
-    // Ensure options.method is set to a valid value
-    requestOptions.method = requestOptions.method ? requestOptions.method.toUpperCase() : 'GET';
 
     // Use the original fetch with the proxied URL and options
     return originalFetch(requestInput, requestOptions);
@@ -38,5 +53,7 @@ if (Capacitor.getPlatform() === 'android') {
   };
 
   // Must reload page after patches
-  goto('/', { replaceState: true });
+  NodeJS.whenReady().then(() => {
+    goto('/', { replaceState: true });
+  });
 }

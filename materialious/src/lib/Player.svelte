@@ -341,7 +341,11 @@
 				await loadPlayerPos();
 			});
 
-			if (Capacitor.getPlatform() === 'android' && get(playerAndroidBgPlayer)) {
+			if (
+				Capacitor.getPlatform() === 'android' &&
+				get(playerAndroidBgPlayer) &&
+				data.video.adaptiveFormats.length > 0
+			) {
 				const highestBitrateAudio = data.video.adaptiveFormats
 					.filter((format) => format.type.startsWith('audio/'))
 					.reduce((prev, current) => {
@@ -354,7 +358,9 @@
 
 				await AudioPlayer.create({
 					...audioId,
-					audioSource: proxyVideoUrl(highestBitrateAudio.url),
+					audioSource: !data.video.fallbackPatch
+						? proxyVideoUrl(highestBitrateAudio.url)
+						: highestBitrateAudio.url,
 					friendlyTitle: data.video.title,
 					useForNotification: true,
 					loop: player.loop,

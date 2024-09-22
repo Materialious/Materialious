@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { peerJs, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
+	import { Clipboard } from '@capacitor/clipboard';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
@@ -130,7 +131,7 @@
 			</div>
 			<button
 				on:click={async () => {
-					await navigator.clipboard.writeText(`${location.origin}?sync=${$syncPartyPeerStore?.id}`);
+					await Clipboard.write({ string: `${location.origin}?sync=${$syncPartyPeerStore?.id}` });
 				}}
 				class="square round"
 			>

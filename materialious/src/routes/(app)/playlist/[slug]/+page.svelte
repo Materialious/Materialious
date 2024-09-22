@@ -4,6 +4,7 @@
 	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber, unsafeRandomItem } from '$lib/misc.js';
 	import { activePageStore, playlistSettingsStore } from '$lib/store';
+	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -90,16 +91,16 @@
 				<a
 					href="#share"
 					on:click={async () => {
-						await navigator.clipboard.writeText(location.href);
+						await Clipboard.write({ string: location.href });
 					}}>{$_('player.share.materialiousLink')}</a
 				>
 			{/if}
 			<a
 				href="#share"
 				on:click={async () => {
-					await navigator.clipboard.writeText(
-						`https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
-					);
+					await Clipboard.write({
+						string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
+					});
 				}}>{$_('player.share.youtubeLink')}</a
 			>
 		</menu>

@@ -41,7 +41,6 @@ Materialious allows you to customize various settings by overwriting the default
       + [DeArrow Instance](#dearrow-instance)
       + [DeArrow Thumbnail Instance](#dearrow-thumbnail-instance)
       + [DeArrow Titles Only](#dearrow-titles-only)
-   * [Bookmarklet](#bookmarklet)
 
 ## Theme
 

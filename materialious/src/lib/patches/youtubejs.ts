@@ -70,7 +70,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
       videoThumbnails: recommended?.thumbnails as Thumbnail[] || [],
       videoId: recommended?.id || '',
       title: recommended?.title.toString() || '',
-      viewCountText: numberWithCommas(Number(recommended?.view_count.toString().replace(/\D/g, '') || 0)) || '',
+      viewCountText: recommended.view_count ? numberWithCommas(Number(recommended?.view_count.toString().replace(/\D/g, ''))) as string : '',
       lengthSeconds: recommended?.duration?.seconds || 0,
       author: recommended?.author.name || '',
       authorId: recommended?.author.id || ''

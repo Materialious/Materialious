@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.5.6",
+	"version": "1.5.7",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -49,6 +49,7 @@
 		"@capacitor/app": "^6.0.1",
 		"@capacitor/browser": "^6.0.2",
 		"@capacitor/cli": "6.1.2",
+		"@capacitor/clipboard": "^6.0.1",
 		"@capacitor/core": "^6.1.2",
 		"@capgo/inappbrowser": "^6.6.8",
 		"@ffmpeg/ffmpeg": "^0.12.10",

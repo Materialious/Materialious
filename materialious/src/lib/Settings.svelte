@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
+	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
@@ -673,7 +674,7 @@
 			<h6>{$_('layout.bookmarklet')}</h6>
 			<button
 				class="no-margin"
-				on:click={async () => await navigator.clipboard.writeText(bookmarkletSaveToUrl())}
+				on:click={async () => await Clipboard.write({ string: bookmarkletSaveToUrl() })}
 				>{$_('copyUrl')}</button
 			>
 		</div>

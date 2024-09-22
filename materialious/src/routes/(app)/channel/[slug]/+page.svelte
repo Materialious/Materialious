@@ -6,6 +6,7 @@
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { cleanNumber, getBestThumbnail, proxyGoogleImage } from '$lib/misc';
 	import { activePageStore, authStore } from '$lib/store';
+	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
@@ -132,16 +133,16 @@
 							<a
 								href="#share"
 								on:click={async () => {
-									await navigator.clipboard.writeText(location.href);
+									await Clipboard.write({ string: location.href });
 								}}>{$_('player.share.materialiousLink')}</a
 							>
 						{/if}
 						<a
 							href="#share"
 							on:click={async () => {
-								await navigator.clipboard.writeText(
-									`https://www.youtube.com/channel/${data.channel.authorId}`
-								);
+								await Clipboard.write({
+									string: `https://www.youtube.com/channel/${data.channel.authorId}`
+								});
 							}}>{$_('player.share.youtubeLink')}</a
 						>
 					</menu>

@@ -263,8 +263,11 @@
 
 			player.addEventListener('provider-change', (event) => {
 				const provider = event.detail as any;
-				const bitrate = pullBitratePreference();
 				if (provider?.type === 'dash') {
+					const bitrate = pullBitratePreference();
+					const instanceDefaultBitrate = import.meta.env.VITE_DEFAULT_DASH_BITRATE
+						? Number(import.meta.env.VITE_DEFAULT_DASH_BITRATE)
+						: -1;
 					provider.library = () => import('dashjs');
 					provider.config = {
 						streaming: {
@@ -276,8 +279,8 @@
 									audio: false
 								},
 								initialBitrate: {
-									video: bitrate,
-									audio: bitrate
+									video: bitrate === -1 ? instanceDefaultBitrate : bitrate,
+									audio: bitrate === -1 ? instanceDefaultBitrate : bitrate
 								}
 							}
 						}

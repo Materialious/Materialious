@@ -12,5 +12,6 @@ find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VI
 find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_PEERJS_PORT_PLACEHOLDER|'"$VITE_DEFAULT_PEERJS_PORT"'|g' {} +
 find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_DOWNLOAD_ENABLED_PLACEHOLDER|'"$VITE_DEFAULT_DOWNLOAD_ENABLED"'|g' {} +
 find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_SYNCIOUS_INSTANCE_PLACEHOLDER|'"$VITE_DEFAULT_SYNCIOUS_INSTANCE"'|g' {} +
+find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_DASH_BITRATE_PLACEHOLDER|'"$VITE_DEFAULT_DASH_BITRATE"'|g' {} +
 find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_API_EXTENDED_INSTANCE_PLACEHOLDER|'"$VITE_DEFAULT_API_EXTENDED_INSTANCE"'|g' {} +
 find "$ROOT_DIR" -type f \( -name "*.js" -o -name "*.html" \) -exec sed -i 's|VITE_DEFAULT_SETTINGS_PLACEHOLDER|'"$VITE_DEFAULT_SETTINGS"'|g' {} +

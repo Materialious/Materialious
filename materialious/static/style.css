@@ -68,3 +68,13 @@ main.root {
 		padding-right: 0.1em !important;
 	}
 }
+
+@media screen and (max-width: 650px) {
+	main.root {
+		scrollbar-width: none !important;
+	}
+	
+	main.root::-webkit-scrollbar {
+		display: none !important;
+	}
+}

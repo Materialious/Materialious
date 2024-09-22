@@ -149,6 +149,9 @@ services:
       # Look at "Overwriting Materialious defaults" for all the accepted values.
       VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
 
+      # Set the default video/audio bitrate to use, -1 automatic, 999999 always best quality
+      VITE_DEFAULT_DASH_BITRATE: -1
+
       # Please look at step 7 about enabling this.
       VITE_DEFAULT_DOWNLOAD_ENABLED: false
 ```

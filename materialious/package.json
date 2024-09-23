@@ -40,7 +40,7 @@
 		"tslib": "^2.7.0",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.6",
-		"youtubei.js": "^10.4.0"
+		"youtubei.js": "^10.5.0"
 	},
 	"type": "module",
 	"dependencies": {

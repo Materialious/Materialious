@@ -31,7 +31,7 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.44.0",
 		"i": "^0.3.7",
-		"jsdom": "^25.0.0",
+		"jsdom": "^25.0.1",
 		"npm": "^10.8.3",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.6",

@@ -62,7 +62,7 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
 The latest release can be downloaded [here](https://github.com/Materialious/Materialious/releases/latest).
 
 # Android
-Due to Google's policies on custom YouTube frontends, Materialious isn't available on Google play. The best way to install is via the [release page](https://github.com/Materialious/Materialious/releases/latest). It is recommended to use [Obtainium](https://github.com/ImranR98/Obtainium), to keep Materialious up to date.
+Due to Google's policies on custom YouTube frontends, Materialious isn't available on Google play. The best way to install is via the [release page](https://github.com/Materialious/Materialious/releases/latest) or through [F-Droid](https://f-droid.org/packages/us.materialio.app/). It is recommended to use [Obtainium](https://github.com/ImranR98/Obtainium) if you downloaded the app through the release page, to keep Materialious up to date.
 
 # Previews
 

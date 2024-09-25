@@ -108,15 +108,16 @@ attemptClickPlayButton();
     InAppBrowser.addListener('closeEvent', closeListener);
     InAppBrowser.addListener('urlChangeEvent', urlChangeListener);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       reject(new Error('Timeout trying to pull Po tokens'));
-      InAppBrowser.removeAllListeners();
-    }, 30000);
+      await InAppBrowser.removeAllListeners();
+      await InAppBrowser.close();
+    }, 60000);
 
     InAppBrowser.openWebView({
       url: 'https://www.youtube.com/embed/jNQXAC9IVRw',
       title: 'Pulling po tokens (This may take a moment)',
-      headers: headers
+      headers: headers,
     });
   });
 }

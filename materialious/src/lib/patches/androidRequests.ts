@@ -1,6 +1,5 @@
 import { goto } from "$app/navigation";
 import { Capacitor } from "@capacitor/core";
-import { NodeJS } from 'capacitor-nodejs';
 
 if (Capacitor.getPlatform() === 'android') {
   const originalFetch = window.fetch;
@@ -52,8 +51,5 @@ if (Capacitor.getPlatform() === 'android') {
     return originalXhrOpen.apply(this, args);
   };
 
-  // Must reload page after patches
-  NodeJS.whenReady().then(() => {
-    goto('/', { replaceState: true });
-  });
+  setTimeout(() => goto('/', { replaceState: true }), 300);
 }

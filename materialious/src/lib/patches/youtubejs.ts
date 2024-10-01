@@ -2,31 +2,75 @@ import type { Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
 import { poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
+import { BG } from 'bgutils-js';
 import { get } from 'svelte/store';
+import { Innertube, ProtoUtils, UniversalCache, Utils } from 'youtubei.js';
 import { capacitorFetch } from './capacitorFetch';
-import { type PoTokens } from './poTokenAndroid';
+
+
+export interface PoTokens {
+  visitor_data: string;
+  po_token: string;
+}
+
+async function getPo(identifier: string): Promise<string | undefined> {
+  const requestKey = 'O43z0dpjhgX20SCx4KAo';
+
+  const bgConfig = {
+    fetch: fetch,
+    globalObj: window,
+    requestKey,
+    identifier
+  };
+
+  const challenge = await BG.Challenge.create(bgConfig);
+
+  if (!challenge)
+    throw new Error('Could not get challenge');
+
+  if (challenge.script) {
+    const script = challenge.script.find((sc) => sc !== null);
+    if (script)
+      new Function(script)();
+  }
+
+  const poToken = await BG.PoToken.generate({
+    program: challenge.challenge,
+    globalName: challenge.globalName,
+    bgConfig
+  });
+
+  return poToken;
+}
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
-  const innertube = (await import('youtubei.js')).Innertube;
-
   let tokens: PoTokens;
+
+  if (!Capacitor.isNativePlatform()) {
+    throw new Error('Platform not supported');
+  }
 
   const poTokenCache = get(poTokenCacheStore);
   if (!poTokenCache) {
-    if (Capacitor.getPlatform() === 'electron') {
-      tokens = await (window as any).electron.generatePoToken();
-    } else if (Capacitor.getPlatform() === 'android') {
-      tokens = await (await import('../../lib/patches/poTokenAndroid')).getPoToken();
-    } else {
-      throw new Error('This platform cant generate po tokens');
+    const visitorData = ProtoUtils.encodeVisitorData(Utils.generateRandomString(11), Math.floor(Date.now() / 1000));
+    const poToken = await getPo(visitorData);
+
+    if (!poToken) {
+      throw new Error('Unable to generate PO token');
     }
 
+    tokens = {
+      visitor_data: visitorData,
+      po_token: poToken
+    };
     poTokenCacheStore.set(tokens);
   } else {
     tokens = poTokenCache;
   }
 
-  const youtube = await innertube.create({
+  console.log(tokens);
+
+  const youtube = await Innertube.create({
     visitor_data: tokens.visitor_data,
     po_token: tokens.po_token,
     fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -35,7 +79,9 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
       } else {
         return fetch(input, init);
       }
-    }
+    },
+    generate_session_locally: true,
+    cache: new UniversalCache(false)
   });
 
   const video = await youtube.getInfo(videoId);

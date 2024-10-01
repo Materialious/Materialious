@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.5.9",
+	"version": "1.6.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -55,6 +55,7 @@
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"@mediagrid/capacitor-native-audio": "^1.0.0",
 		"beercss": "^3.7.8",
+		"bgutils-js": "^2.2.0",
 		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
 		"dashjs": "^4.7.4",
 		"fuse.js": "^7.0.0",

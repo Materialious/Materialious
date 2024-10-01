@@ -493,7 +493,7 @@
 								alt="Channel profile"
 							/>
 							<div>
-								<p style="margin: 0;" class="bold">{truncate(data.video.author, 24)}</p>
+								<p style="margin: 0;" class="bold">{truncate(data.video.author, 16)}</p>
 								<p style="margin: 0;">{data.video.subCountText}</p>
 							</div>
 						</nav>

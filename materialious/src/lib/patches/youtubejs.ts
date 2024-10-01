@@ -92,6 +92,10 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   if (!video.basic_info.is_live) {
     let manifest = await video.toDash();
+
+    // Hack to fix video not displaying.
+    // Thanks to absidue & Andrews54757
+    manifest = manifest.replaceAll('<EssentialProperty', '<SupplementalProperty');
     dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
   }
 

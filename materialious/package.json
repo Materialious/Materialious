@@ -39,8 +39,7 @@
 		"svelte-check": "^3.8.6",
 		"tslib": "^2.7.0",
 		"typescript": "^5.5.4",
-		"vite": "^5.4.6",
-		"youtubei.js": "^10.5.0"
+		"vite": "^5.4.6"
 	},
 	"type": "module",
 	"dependencies": {
@@ -72,6 +71,7 @@
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.11.0",
 		"terser": "^5.34.1",
-		"vidstack": "^1.12.9"
+		"vidstack": "^1.12.9",
+		"youtubei.js": "^10.5.0"
 	}
 }

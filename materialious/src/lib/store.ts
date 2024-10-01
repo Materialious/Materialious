@@ -5,7 +5,7 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './misc';
-import type { PoTokens } from './patches/poTokenAndroid';
+import type { PoTokens } from './patches/youtubejs';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {

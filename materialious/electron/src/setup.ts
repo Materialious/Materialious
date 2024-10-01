@@ -6,12 +6,11 @@ import {
 } from '@capacitor-community/electron';
 import chokidar from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, BrowserWindow, ipcMain, Menu, MenuItem, nativeImage, session, Tray } from 'electron';
+import { app, BrowserWindow, Menu, MenuItem, nativeImage, session, Tray } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
-import { generate } from 'youtube-po-token-generator';
 
 // Define components for a watcher to detect when the webapp is changed so we can reload in Dev mode.
 const reloadWatcher = {
@@ -214,15 +213,6 @@ export class ElectronCapacitorApp {
         }
         CapElectronEventEmitter.emit('CAPELECTRON_DeeplinkListenerInitialized', '');
       }, 400);
-    });
-
-    ipcMain.handle('generate-po-token', async () => {
-      try {
-        return await generate();
-      } catch (error) {
-        console.error('Error generating token:', error);
-        return { error: error.message }; // Return error to renderer
-      }
     });
   }
 }

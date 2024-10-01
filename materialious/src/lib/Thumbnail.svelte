@@ -425,11 +425,8 @@
 	}
 
 	.video-title {
-		display: inline-block;
-		white-space: nowrap;
-		width: 100%;
+		word-wrap: break-word;
 		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
 	.thumbnail-details {

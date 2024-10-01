@@ -21,6 +21,7 @@
 		letterCase,
 		numberWithCommas,
 		proxyGoogleImage,
+		truncate,
 		unsafeRandomItem
 	} from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
@@ -492,7 +493,7 @@
 								alt="Channel profile"
 							/>
 							<div>
-								<p style="margin: 0;" class="bold">{data.video.author}</p>
+								<p style="margin: 0;" class="bold">{truncate(data.video.author, 16)}</p>
 								<p style="margin: 0;">{data.video.subCountText}</p>
 							</div>
 						</nav>

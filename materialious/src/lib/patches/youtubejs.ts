@@ -1,6 +1,6 @@
 import type { Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
-import { poTokenCacheStore } from '$lib/store';
+import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { BG } from 'bgutils-js';
 import { get } from 'svelte/store';
@@ -79,7 +79,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
       }
     },
     generate_session_locally: true,
-    cache: new UniversalCache(false)
+    cache: new UniversalCache(false),
+    location: get(interfaceRegionStore)
   });
 
   const video = await youtube.getInfo(videoId);

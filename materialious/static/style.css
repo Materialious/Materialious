@@ -78,3 +78,27 @@ main.root {
 		display: none !important;
 	}
 }
+
+@media screen and (max-width: 1030px) {
+	nav.tabbed {
+		display: flex !important;
+		flex-direction: column !important;
+		gap: 0 !important;
+		flex: 0 !important;
+		margin-bottom: 1em !important;
+		align-items: start !important;
+		padding: 1em 0 !important;
+	}
+
+	nav.tabbed>a {
+		font-size: 1.5rem !important;
+		padding: .5em .3em !important;
+		border-radius: 3em !important;
+		margin-bottom: .5em;
+	}
+
+	nav.tabbed.small {
+		block-size: 100% !important;
+		border-radius: 0 !important;
+	}
+}

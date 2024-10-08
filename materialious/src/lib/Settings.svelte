@@ -113,7 +113,7 @@
 	</nav>
 
 	<div>
-		<nav class="tabbed small scroll">
+		<nav class="tabbed small">
 			<a class:active={activeTab === 'interface'} on:click={() => (activeTab = 'interface')}>
 				<i>grid_view</i>
 				<span>{$_('layout.interface')}</span>
@@ -727,5 +727,11 @@
 
 	.tabbed {
 		overflow-y: hidden;
+	}
+
+	@media screen and (max-width: 650px) {
+		dialog {
+			padding: 0;
+		}
 	}
 </style>

@@ -10,6 +10,7 @@
 		letterCase,
 		proxyGoogleImage,
 		proxyVideoUrl,
+		truncate,
 		videoLength
 	} from './misc';
 	import type { PlayerEvents } from './player';
@@ -374,7 +375,7 @@
 					data-sveltekit-preload-data="off"
 					href={watchUrl.toString()}
 				>
-					<span class="bold">{letterCase(video.title.trimEnd())}</span>
+					<span class="bold">{letterCase(truncate(video.title.trimEnd(), 80))}</span>
 				</a>
 
 				<div>

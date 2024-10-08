@@ -737,6 +737,7 @@
 			max-block-size: 100%;
 			transform: translateY(0);
 			background-color: var(--surface);
+			border-radius: 0;
 		}
 	}
 </style>

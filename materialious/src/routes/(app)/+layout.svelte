@@ -86,15 +86,29 @@
 
 	// Auth response handling for Mobile
 	App.addListener('appUrlOpen', (data) => {
-		const authUrl = new URL(data.url);
-		const username = authUrl.searchParams.get('username');
-		const token = authUrl.searchParams.get('token');
+		const url = new URL(data.url);
 
-		if (username && token) {
-			authStore.set({
-				username: username,
-				token: token
-			});
+		if (data.url.includes('youtu')) {
+			let videoId = url.searchParams.get('v');
+			if (!videoId) {
+				videoId = url.pathname.split('/')[1];
+			}
+
+			if (!videoId) {
+				return;
+			}
+
+			goto(`/watch/${videoId}`);
+		} else {
+			const username = url.searchParams.get('username');
+			const token = url.searchParams.get('token');
+
+			if (username && token) {
+				authStore.set({
+					username: username,
+					token: token
+				});
+			}
 		}
 	});
 

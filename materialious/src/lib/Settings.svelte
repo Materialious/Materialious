@@ -106,7 +106,7 @@
 		| 'dearrow' = 'interface';
 </script>
 
-<dialog class="max" id="dialog-settings">
+<dialog id="dialog-settings">
 	<nav style="margin-bottom: 1em;">
 		<h4 class="max">{$_('layout.settings')}</h4>
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
@@ -156,22 +156,20 @@
 			</a>
 		</nav>
 		<div class="page padding" class:active={activeTab === 'interface'}>
-			<nav class="wrap">
-				<button on:click={toggleDarkMode} class="no-margin">
-					{#if !$darkModeStore}
-						<i>dark_mode</i>
-						<span>{$_('layout.theme.darkMode')}</span>
-					{:else}
-						<i>light_mode</i>
-						<span>{$_('layout.theme.lightMode')}</span>
-					{/if}
-				</button>
-				<button>
-					<i>palette</i>
-					<span>{$_('layout.theme.color')}</span>
-					<input on:change={setColor} type="color" />
-				</button>
-			</nav>
+			<button on:click={toggleDarkMode} class="no-margin">
+				{#if !$darkModeStore}
+					<i>dark_mode</i>
+					<span>{$_('layout.theme.darkMode')}</span>
+				{:else}
+					<i>light_mode</i>
+					<span>{$_('layout.theme.lightMode')}</span>
+				{/if}
+			</button>
+			<button>
+				<i>palette</i>
+				<span>{$_('layout.theme.color')}</span>
+				<input on:change={setColor} type="color" />
+			</button>
 
 			<div class="margin"></div>
 
@@ -732,6 +730,14 @@
 	@media screen and (max-width: 650px) {
 		dialog {
 			padding: 0;
+			inset: 0 auto auto 0;
+			inline-size: 100%;
+			block-size: 100%;
+			max-inline-size: 100%;
+			max-block-size: 100%;
+			transform: translateY(0);
+			background-color: var(--surface);
+			border-radius: 0;
 		}
 	}
 </style>

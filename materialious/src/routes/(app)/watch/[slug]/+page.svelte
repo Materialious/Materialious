@@ -423,22 +423,22 @@
 		downloadStage = $_('player.downloadSteps.ffmpeg');
 	}
 
-	function onClassWorkerProgress(progress) {
+	function onClassWorkerProgress(progress: number) {
 		downloadStage = $_('player.downloadSteps.classWorker');
 		downloadProgress = progress;
 	}
 
-	function onCoreProgress(progress) {
+	function onCoreProgress(progress: number) {
 		downloadStage = $_('player.downloadSteps.core');
 		downloadProgress = progress;
 	}
 
-	function onWasmProgress(progress) {
+	function onWasmProgress(progress: number) {
 		downloadStage = $_('player.downloadSteps.wasm');
 		downloadProgress = progress;
 	}
 
-	function onWorkerProgress(progress) {
+	function onWorkerProgress(progress: number) {
 		downloadStage = $_('player.downloadSteps.worker');
 		downloadProgress = progress;
 	}
@@ -707,17 +707,7 @@
 			{#if player && showTranscript}
 				<Transcript bind:player video={data.video} />
 			{/if}
-			{#if !playlist}
-				{#if data.video.recommendedVideos}
-					{#each data.video.recommendedVideos as recommendedVideo}
-						<article class="no-padding">
-							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} sideways={true} />
-							{/key}
-						</article>
-					{/each}
-				{/if}
-			{:else}
+			{#if playlist}
 				<article
 					style="height: 85vh; position: relative;"
 					id="playlist"
@@ -733,12 +723,14 @@
 						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
 						<nav>
 							<button
-								on:click={() => (
-									(loopPlaylist = !loopPlaylist),
+								on:click={() => {
+									if (!playlist) return;
+
+									loopPlaylist = !loopPlaylist;
 									playlistSettingsStore.set({
 										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
-									})
-								)}
+									});
+								}}
 								class="circle"
 								class:fill={!loopPlaylist}
 							>
@@ -748,12 +740,14 @@
 								</div>
 							</button>
 							<button
-								on:click={() => (
-									(shufflePlaylist = !shufflePlaylist),
+								on:click={() => {
+									if (!playlist) return;
+
+									shufflePlaylist = !shufflePlaylist;
 									playlistSettingsStore.set({
 										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
-									})
-								)}
+									});
+								}}
 								class="circle"
 								class:fill={!shufflePlaylist}
 							>
@@ -787,6 +781,14 @@
 						</article>
 					{/each}
 				</article>
+			{:else if data.video.recommendedVideos}
+				{#each data.video.recommendedVideos as recommendedVideo}
+					<article class="no-padding">
+						{#key recommendedVideo.videoId}
+							<Thumbnail video={recommendedVideo} sideways={true} />
+						{/key}
+					</article>
+				{/each}
 			{/if}
 		</div>
 	{/if}

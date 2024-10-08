@@ -231,12 +231,7 @@
 		showVideoPreview = true;
 		try {
 			videoPreview = await getVideo(video.videoId);
-			if (videoPreview.formatStreams.length === 0) {
-				showVideoPreview = false;
-				videoPreview = null;
-			}
-
-			if (videoPreview.hlsUrl) {
+			if (videoPreview.hlsUrl || videoPreview.formatStreams.length === 0) {
 				showVideoPreview = false;
 				videoPreview = null;
 			} else {

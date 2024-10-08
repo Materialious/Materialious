@@ -519,7 +519,6 @@
 	title={data.video.title}
 	streamType={playerIsLive ? 'live' : 'on-demand'}
 	viewType={audioMode ? 'audio' : 'video'}
-	fullscreen={false}
 	keep-alive
 	{src}
 >

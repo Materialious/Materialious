@@ -84,11 +84,11 @@
 		}
 	});
 
-	// Auth response handling for Mobile
 	App.addListener('appUrlOpen', (data) => {
 		const url = new URL(data.url);
 
-		if (data.url.includes('youtu')) {
+		// Handle youtube deeplinks
+		if (url.protocol !== 'materialious-auth:') {
 			let videoId = url.searchParams.get('v');
 			if (!videoId) {
 				videoId = url.pathname.split('/')[1];
@@ -100,6 +100,7 @@
 
 			goto(`/watch/${videoId}`);
 		} else {
+			// Auth response handling for Mobile
 			const username = url.searchParams.get('username');
 			const token = url.searchParams.get('token');
 

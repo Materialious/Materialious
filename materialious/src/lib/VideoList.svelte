@@ -24,7 +24,7 @@
 	onMount(() => {
 		addEventListener('resize', () => {
 			if (innerWidth <= 1750) {
-				largeCol = '6';
+				largeCol = '4';
 			} else {
 				largeCol = '2';
 			}

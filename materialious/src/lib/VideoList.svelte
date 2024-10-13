@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { removePlaylistVideo } from './Api';
@@ -7,18 +8,28 @@
 	import { authStore } from './store';
 
 	export let videos: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[] = [];
-	export let oneItemPerRow: boolean = false;
 	export let playlistId: string = '';
 	export let playlistAuthor: string = '';
 
 	let hiddenVideos: string[] = [];
 	let auth = get(authStore);
+	let largeCol = '2';
 
 	async function removePlaylistItem(indexId: string, videoId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
 		hiddenVideos = [...hiddenVideos, videoId];
 	}
+
+	onMount(() => {
+		addEventListener('resize', () => {
+			if (innerWidth <= 1750) {
+				largeCol = '4';
+			} else {
+				largeCol = '2';
+			}
+		});
+	});
 </script>
 
 <div class="page right active">
@@ -26,7 +37,7 @@
 	<div class="grid">
 		{#each videos as video}
 			{#if !hiddenVideos.includes(video.videoId)}
-				<div class={`s12 m${oneItemPerRow ? '12' : '6'} l${oneItemPerRow ? '12' : '2'}`}>
+				<div class="s12 m6 l{largeCol}">
 					<article class="no-padding" style="height: 100%;">
 						<Thumbnail
 							on:videoHidden={() => (hiddenVideos = [...hiddenVideos, video.videoId])}

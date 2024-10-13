@@ -21,14 +21,18 @@
 		hiddenVideos = [...hiddenVideos, videoId];
 	}
 
+	function checkWidth() {
+		if (innerWidth <= 1750) {
+			largeCol = '4';
+		} else {
+			largeCol = '2';
+		}
+	}
+
 	onMount(() => {
-		addEventListener('resize', () => {
-			if (innerWidth <= 1750) {
-				largeCol = '4';
-			} else {
-				largeCol = '2';
-			}
-		});
+		checkWidth();
+
+		addEventListener('resize', () => checkWidth());
 	});
 </script>
 

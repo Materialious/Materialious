@@ -108,14 +108,18 @@
 
 	let dialogType = '';
 
+	function checkWidth() {
+		if (innerWidth <= 1320) {
+			dialogType = 'right';
+		} else {
+			dialogType = '';
+		}
+	}
+
 	onMount(() => {
-		addEventListener('resize', () => {
-			if (innerWidth <= 1320) {
-				dialogType = 'right';
-			} else {
-				dialogType = '';
-			}
-		});
+		checkWidth();
+
+		addEventListener('resize', () => checkWidth());
 	});
 </script>
 

@@ -5,6 +5,7 @@
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
+	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash, titleCase, titleCases } from './misc';
@@ -104,9 +105,21 @@
 		| 'api extended'
 		| 'sponsorblock'
 		| 'dearrow' = 'interface';
+
+	let dialogType = '';
+
+	onMount(() => {
+		addEventListener('resize', () => {
+			if (innerWidth <= 1320) {
+				dialogType = 'right';
+			} else {
+				dialogType = '';
+			}
+		});
+	});
 </script>
 
-<dialog id="dialog-settings">
+<dialog id="dialog-settings" class={dialogType}>
 	<nav style="margin-bottom: 1em;">
 		<h4 class="max">{$_('layout.settings')}</h4>
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
@@ -723,21 +736,36 @@
 		margin: 1em 0;
 	}
 
-	.tabbed {
-		overflow-y: hidden;
+	dialog {
+		width: 1320px;
 	}
 
-	@media screen and (max-width: 650px) {
-		dialog {
-			padding: 0;
-			inset: 0 auto auto 0;
-			inline-size: 100%;
-			block-size: 100%;
-			max-inline-size: 100%;
-			max-block-size: 100%;
-			transform: translateY(0);
-			background-color: var(--surface);
-			border-radius: 0;
+	.tabbed > a {
+		flex: none;
+	}
+
+	@media screen and (max-width: 1320px) {
+		.tabbed {
+			display: flex !important;
+			flex-direction: column !important;
+			gap: 0 !important;
+			flex: 0 !important;
+			margin-bottom: 1em !important;
+			align-items: start !important;
+			padding: 1em 0 !important;
+			background-color: transparent;
+			border-bottom: solid 1px var(--outline-variant);
+		}
+
+		.tabbed > a {
+			font-size: 1.5rem !important;
+			padding: 0.5em 0.3em !important;
+			border-radius: 3em !important;
+		}
+
+		.tabbed.small {
+			block-size: 100% !important;
+			border-radius: 0 !important;
 		}
 	}
 </style>

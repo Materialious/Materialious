@@ -17,6 +17,7 @@
 		deArrowThumbnailInstanceStore,
 		deArrowTitlesOnly,
 		instanceStore,
+		interfaceAmoledTheme,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceForceCase,
@@ -25,6 +26,7 @@
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
 		playerAndroidBgPlayer,
+		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
@@ -46,6 +48,7 @@
 		synciousStore,
 		themeColorStore
 	} from './store';
+	import { setAmoledTheme } from './theme';
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
@@ -82,6 +85,7 @@
 		const target = color.target;
 		const hex = (target as { value: string }).value;
 		await ui('theme', hex);
+		setAmoledTheme();
 		themeColorStore.set(hex);
 	}
 
@@ -189,6 +193,24 @@
 			</button>
 
 			<div class="margin"></div>
+
+			{#if $darkModeStore}
+				<div class="field no-margin">
+					<nav class="no-padding">
+						<div class="max">
+							<div>{$_('layout.theme.AmoledTheme')}</div>
+						</div>
+						<label class="switch">
+							<input
+								type="checkbox"
+								bind:checked={$interfaceAmoledTheme}
+								on:click={() => interfaceAmoledTheme.set(!$interfaceAmoledTheme)}
+							/>
+							<span></span>
+						</label>
+					</nav>
+				</div>
+			{/if}
 
 			{#if Capacitor.isNativePlatform()}
 				<form
@@ -381,6 +403,22 @@
 								type="checkbox"
 								bind:checked={$playerAndroidBgPlayer}
 								on:click={() => playerAndroidBgPlayer.set(!$playerAndroidBgPlayer)}
+							/>
+							<span></span>
+						</label>
+					</nav>
+				</div>
+
+				<div class="field no-margin">
+					<nav class="no-padding">
+						<div class="max">
+							<div>{$_('layout.player.lockOrientation')}</div>
+						</div>
+						<label class="switch">
+							<input
+								type="checkbox"
+								bind:checked={$playerAndroidLockOrientation}
+								on:click={() => playerAndroidLockOrientation.set(!$playerAndroidLockOrientation)}
 							/>
 							<span></span>
 						</label>

@@ -103,6 +103,7 @@
 			"theme": "Theme",
 			"darkMode": "Dark mode",
 			"lightMode": "Light mode",
+			"AmoledTheme": "Amoled theme",
 			"color": "Color"
 		},
 		"searchSuggestions": "Search suggestions",
@@ -127,7 +128,8 @@
 			"dash": "Dash",
 			"silenceSkipper": "Silence skipper (Experimental)",
 			"youtubeJsFallback": "Local video processing fallback",
-			"youtubeJsAlways": "Always use local video processing"
+			"youtubeJsAlways": "Always use local video processing",
+			"lockOrientation": "Orientation locked to aspect ratio"
 		},
 		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",

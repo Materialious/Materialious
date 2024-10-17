@@ -12,6 +12,8 @@ dependencies {
     implementation project(':capacitor-app')
     implementation project(':capacitor-browser')
     implementation project(':capacitor-clipboard')
+    implementation project(':capacitor-screen-orientation')
+    implementation project(':capacitor-status-bar')
     implementation project(':capgo-inappbrowser')
     implementation project(':mediagrid-capacitor-native-audio')
     implementation project(':capacitor-nodejs')

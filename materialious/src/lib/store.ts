@@ -41,6 +41,7 @@ export const playerMiniPlayerStore = persisted('miniPlayer', true);
 export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);
 export const playerAndroidBgPlayer = persisted('androidBgPlayer', true);
+export const playerAndroidLockOrientation = persisted('androidLockOrientation', true);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
@@ -60,6 +61,8 @@ export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover'
 export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
 export const interfaceAutoExpandComments: Writable<boolean> = persisted('autoExpandComments', true);
 export const interfaceAutoExpandDesc: Writable<boolean> = persisted('autoExpandDesc', false);
+export const interfaceAmoledTheme = persisted('amoledTheme', false);
+
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(

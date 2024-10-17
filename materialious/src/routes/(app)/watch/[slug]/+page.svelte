@@ -698,8 +698,6 @@
 					</div>
 				</details>
 			</article>
-		{:else}
-			<h6>{$_('player.unableToLoadComments')}</h6>
 		{/if}
 	</div>
 	{#if !theatreMode}

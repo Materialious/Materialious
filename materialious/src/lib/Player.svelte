@@ -3,13 +3,15 @@
 
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
+	import { ScreenOrientation } from '@capacitor/screen-orientation';
+	import { StatusBar } from '@capacitor/status-bar';
 	import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
+	import type { FullscreenChangeEvent, MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
 	import type { VideoPlay } from './Api/model';
@@ -26,6 +28,7 @@
 		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
 		playerAndroidBgPlayer,
+		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
@@ -195,7 +198,7 @@
 						kind: 'captions',
 						language: caption.language_code,
 						// Need if captions are generated when youtube.js is being used.
-						src: caption.url.startsWith('blob:')
+						src: caption.url.startsWith('http')
 							? caption.url
 							: `${get(instanceStore)}${caption.url}`
 					});
@@ -344,57 +347,80 @@
 				await loadPlayerPos();
 			});
 
-			if (
-				Capacitor.getPlatform() === 'android' &&
-				get(playerAndroidBgPlayer) &&
-				data.video.adaptiveFormats.length > 0
-			) {
-				const highestBitrateAudio = data.video.adaptiveFormats
-					.filter((format) => format.type.startsWith('audio/'))
-					.reduce((prev, current) => {
-						return parseInt(prev.bitrate) > parseInt(current.bitrate) ? prev : current;
-					});
+			if (Capacitor.getPlatform() === 'android' && data.video.adaptiveFormats.length > 0) {
+				if (get(playerAndroidBgPlayer)) {
+					const highestBitrateAudio = data.video.adaptiveFormats
+						.filter((format) => format.type.startsWith('audio/'))
+						.reduce((prev, current) => {
+							return parseInt(prev.bitrate) > parseInt(current.bitrate) ? prev : current;
+						});
 
-				const audioId = { audioId: data.video.videoId };
+					const audioId = { audioId: data.video.videoId };
 
-				let isPlayingInBackground = false;
+					let isPlayingInBackground = false;
 
-				await AudioPlayer.create({
-					...audioId,
-					audioSource: !data.video.fallbackPatch
-						? proxyVideoUrl(highestBitrateAudio.url)
-						: highestBitrateAudio.url,
-					friendlyTitle: data.video.title,
-					useForNotification: true,
-					loop: player.loop,
-					isBackgroundMusic: false
-				});
-
-				AudioPlayer.onAppGainsFocus(audioId, async () => {
-					if (!isPlayingInBackground) return;
-
-					isPlayingInBackground = false;
-
-					await AudioPlayer.pause(audioId);
-
-					const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
-
-					player.currentTime = Math.round(audioPlayerTime.currentTime);
-					await player.play();
-				});
-
-				AudioPlayer.onAppLosesFocus(audioId, async () => {
-					if (player.paused) return;
-
-					isPlayingInBackground = true;
-					await AudioPlayer.play(audioId);
-					await AudioPlayer.seek({
+					await AudioPlayer.create({
 						...audioId,
-						timeInSeconds: Math.round(player.currentTime)
+						audioSource: !data.video.fallbackPatch
+							? proxyVideoUrl(highestBitrateAudio.url)
+							: highestBitrateAudio.url,
+						friendlyTitle: data.video.title,
+						useForNotification: true,
+						loop: player.loop,
+						isBackgroundMusic: false
 					});
-				});
 
-				await AudioPlayer.initialize(audioId);
+					AudioPlayer.onAppGainsFocus(audioId, async () => {
+						if (!isPlayingInBackground) return;
+
+						isPlayingInBackground = false;
+
+						await AudioPlayer.pause(audioId);
+
+						const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
+
+						player.currentTime = Math.round(audioPlayerTime.currentTime);
+						await player.play();
+					});
+
+					AudioPlayer.onAppLosesFocus(audioId, async () => {
+						if (player.paused) return;
+
+						isPlayingInBackground = true;
+						await AudioPlayer.play(audioId);
+						await AudioPlayer.seek({
+							...audioId,
+							timeInSeconds: Math.round(player.currentTime)
+						});
+					});
+
+					await AudioPlayer.initialize(audioId);
+				}
+
+				if (get(playerAndroidLockOrientation)) {
+					const videoFormats = data.video.adaptiveFormats.filter((format) =>
+						format.type.startsWith('video/')
+					);
+
+					const originalOrigination = await ScreenOrientation.orientation();
+					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
+						if (event.detail && videoFormats[0].resolution) {
+							const widthHeight = videoFormats[0].resolution.split('x');
+
+							if (widthHeight.length !== 2) return;
+
+							if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+								await StatusBar.setOverlaysWebView({ overlay: true });
+								await ScreenOrientation.lock({ orientation: 'landscape' });
+							} else {
+								await ScreenOrientation.lock({ orientation: 'portrait' });
+							}
+						} else {
+							await StatusBar.setOverlaysWebView({ overlay: false });
+							await ScreenOrientation.lock({ orientation: originalOrigination.type });
+						}
+					});
+				}
 			}
 		} else {
 			playerIsLive = true;

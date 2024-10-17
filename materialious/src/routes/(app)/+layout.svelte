@@ -17,9 +17,11 @@
 		authStore,
 		darkModeStore,
 		instanceStore,
+		interfaceAmoledTheme,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
+	import { setAmoledTheme, setTheme } from '$lib/theme';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
@@ -76,12 +78,13 @@
 		}
 	];
 
-	darkModeStore.subscribe((isDark) => {
-		if (isDark) {
-			ui('mode', 'dark');
-		} else {
-			ui('mode', 'light');
-		}
+	interfaceAmoledTheme.subscribe(() => {
+		setAmoledTheme();
+	});
+
+	darkModeStore.subscribe(() => {
+		setTheme();
+		setAmoledTheme();
 	});
 
 	App.addListener('appUrlOpen', (data) => {
@@ -147,28 +150,13 @@
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
 
-		const isDark = get(darkModeStore);
-
-		if (isDark === null) {
-			if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				darkModeStore.set(true);
-				ui('mode', 'dark');
-			} else {
-				darkModeStore.set(false);
-				ui('mode', 'light');
-			}
-		} else {
-			if (isDark) {
-				ui('mode', 'dark');
-			} else {
-				ui('mode', 'light');
-			}
-		}
-
 		const themeHex = get(themeColorStore);
 		if (themeHex) {
 			await ui('theme', themeHex);
 		}
+
+		setTheme();
+		setAmoledTheme();
 
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));

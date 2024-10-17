@@ -1,4 +1,4 @@
-import type { Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
+import type { AdaptiveFormats, Captions, Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
@@ -85,6 +85,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   const video = await youtube.getInfo(videoId);
 
+  console.log(video);
+
   if (!video.primary_info || !video.secondary_info) {
     throw new Error('Unable to pull video info from youtube.js');
   }
@@ -104,7 +106,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   let authorThumbnails: Image[];
   if (video.basic_info.channel_id) {
-    authorThumbnails = (await youtube.getChannel(video.basic_info.channel_id)).metadata.avatar as Image[];
+    const channel = await youtube.getChannel(video.basic_info.channel_id);
+    authorThumbnails = channel.metadata.avatar as Image[];
   } else {
     authorThumbnails = [];
   }
@@ -122,6 +125,31 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     });
   });
 
+  let captions: Captions[] = [];
+  video.captions?.caption_tracks?.forEach(caption => {
+    captions.push({
+      label: caption.name.toString(),
+      language_code: caption.language_code,
+      url: caption.base_url
+    });
+  });
+
+  let adaptiveFormats: AdaptiveFormats[] = [];
+  video.streaming_data?.adaptive_formats.forEach(format => {
+    adaptiveFormats.push({
+      index: format.index_range?.start.toString() || '',
+      bitrate: format.bitrate.toString(),
+      init: format.init_range?.start.toString() || '',
+      url: format.url || '',
+      itag: format.itag.toString(),
+      type: format.mime_type,
+      clen: '',
+      lmt: '',
+      projectionType: 0,
+      resolution: format.width ? `${format.width}x${format.height}` : undefined
+    });
+  });
+
   return {
     type: 'video',
     title: video.primary_info.title ? video.primary_info.title.toString() : '',
@@ -136,11 +164,11 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     genre: video.basic_info.category || '',
     genreUrl: '',
     dashUrl: dashUri,
-    adaptiveFormats: [],
+    adaptiveFormats: adaptiveFormats,
     formatStreams: [],
     recommendedVideos: recommendedVideos,
     authorThumbnails: authorThumbnails,
-    captions: [],
+    captions: captions,
     authorId: video.basic_info.channel_id || '',
     authorUrl: `/channel/${video.basic_info.channel_id}`,
     authorVerified: false,

@@ -25,6 +25,7 @@
 		interfaceSearchSuggestionsStore,
 		playerAlwaysLoopStore,
 		playerAndroidBgPlayer,
+		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
@@ -381,6 +382,22 @@
 								type="checkbox"
 								bind:checked={$playerAndroidBgPlayer}
 								on:click={() => playerAndroidBgPlayer.set(!$playerAndroidBgPlayer)}
+							/>
+							<span></span>
+						</label>
+					</nav>
+				</div>
+
+				<div class="field no-margin">
+					<nav class="no-padding">
+						<div class="max">
+							<div>{$_('layout.player.lockOrientation')}</div>
+						</div>
+						<label class="switch">
+							<input
+								type="checkbox"
+								bind:checked={$playerAndroidLockOrientation}
+								on:click={() => playerAndroidLockOrientation.set(!$playerAndroidLockOrientation)}
 							/>
 							<span></span>
 						</label>

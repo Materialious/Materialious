@@ -127,7 +127,8 @@
 			"dash": "Dash",
 			"silenceSkipper": "Silence skipper (Experimental)",
 			"youtubeJsFallback": "Local video processing fallback",
-			"youtubeJsAlways": "Always use local video processing"
+			"youtubeJsAlways": "Always use local video processing",
+			"lockOrientation": "Orientation locked to aspect ratio"
 		},
 		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",

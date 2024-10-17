@@ -51,6 +51,7 @@
 		"@capacitor/clipboard": "^6.0.1",
 		"@capacitor/core": "^6.1.2",
 		"@capacitor/screen-orientation": "^6.0.2",
+		"@capacitor/status-bar": "^6.0.1",
 		"@capgo/inappbrowser": "^6.6.8",
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"@mediagrid/capacitor-native-audio": "^1.0.0",

@@ -18,6 +18,7 @@
 		darkModeStore,
 		instanceStore,
 		interfaceAmoledTheme,
+		showWarningStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -284,6 +285,28 @@
 </dialog>
 
 <main class="responsive max root">
+	{#if Capacitor.getPlatform() === 'web' && $showWarningStore}
+		<dialog class="active small" style="height: fit-content;">
+			<h5>Warning</h5>
+			<div>
+				<p>
+					{@html $_('invidiousBlockWarning', {
+						values: {
+							android:
+								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
+							desktop:
+								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
+						}
+					})}
+				</p>
+			</div>
+			<nav class="right-align no-space">
+				<button class="transparent link" on:click={() => showWarningStore.set(false)}
+					>Don't show again</button
+				>
+			</nav>
+		</dialog>
+	{/if}
 	{#if $navigating}
 		<PageLoading />
 	{:else}

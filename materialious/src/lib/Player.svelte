@@ -3,7 +3,7 @@
 
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
-	import { ScreenOrientation } from '@capacitor/screen-orientation';
+	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { StatusBar } from '@capacitor/status-bar';
 	import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 	import type { Page } from '@sveltejs/kit';
@@ -59,6 +59,8 @@
 	let silenceIsFastForwarding = false;
 
 	let silenceSkipperInterval: NodeJS.Timeout;
+
+	let originalOrigination: ScreenOrientationResult | undefined;
 
 	let sponsorBlockElements: Element[] = [];
 
@@ -402,7 +404,7 @@
 						format.type.startsWith('video/')
 					);
 
-					const originalOrigination = await ScreenOrientation.orientation();
+					originalOrigination = await ScreenOrientation.orientation();
 					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
 						if (event.detail && videoFormats[0].resolution) {
 							const widthHeight = videoFormats[0].resolution.split('x');
@@ -417,7 +419,9 @@
 							}
 						} else {
 							await StatusBar.setOverlaysWebView({ overlay: false });
-							await ScreenOrientation.lock({ orientation: originalOrigination.type });
+							await ScreenOrientation.lock({
+								orientation: (originalOrigination as ScreenOrientationResult).type
+							});
 						}
 					});
 				}
@@ -522,6 +526,13 @@
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android') {
 			await AudioPlayer.destroy({ audioId: data.video.videoId });
+
+			if (originalOrigination) {
+				await StatusBar.setOverlaysWebView({ overlay: false });
+				await ScreenOrientation.lock({
+					orientation: originalOrigination.type
+				});
+			}
 		}
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);

@@ -9,6 +9,7 @@ import {
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
 	interfaceForceCase,
+	interfaceLowBandwidthMode,
 	interfacePreviewVideoOnHoverStore,
 	interfaceRegionStore,
 	interfaceSearchSuggestionsStore,
@@ -188,6 +189,11 @@ const persistedStores = [
 	{
 		name: 'showWarning',
 		store: showWarningStore,
+		type: 'boolean'
+	},
+	{
+		name: 'lowBandwidthMode',
+		store: interfaceLowBandwidthMode,
 		type: 'boolean'
 	}
 ];

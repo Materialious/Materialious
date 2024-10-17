@@ -413,12 +413,14 @@
 
 							if (Number(widthHeight[0]) > Number(widthHeight[1])) {
 								await StatusBar.setOverlaysWebView({ overlay: true });
+								await StatusBar.hide();
 								await ScreenOrientation.lock({ orientation: 'landscape' });
 							} else {
 								await ScreenOrientation.lock({ orientation: 'portrait' });
 							}
 						} else {
 							await StatusBar.setOverlaysWebView({ overlay: false });
+							await StatusBar.show();
 							await ScreenOrientation.lock({
 								orientation: (originalOrigination as ScreenOrientationResult).type
 							});
@@ -529,6 +531,7 @@
 
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
+				await StatusBar.show();
 				await ScreenOrientation.lock({
 					orientation: originalOrigination.type
 				});

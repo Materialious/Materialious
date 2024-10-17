@@ -17,6 +17,7 @@ Materialious allows you to customize various settings by overwriting the default
       + [Letter case for titles](#letter-case-for-titles)
       + [Auto expand comments](#auto-expand-comments)
       + [Auto expand description](#auto-expand-desc)
+      + [Low bandwidth mode](#low-bandwidth-mode)
    * [Player](#player)
       + [Mini player](#mini-player)
       + [Autoplay video](#autoplay-video)
@@ -126,6 +127,14 @@ Automatically expands video descriptions.
 
 ```json
 "autoExpandDesc": true
+```
+
+### Low bandwidth mode
+
+Avoids loading images.
+
+```json
+"lowBandwidthMode": true
 ```
 
 ## Player

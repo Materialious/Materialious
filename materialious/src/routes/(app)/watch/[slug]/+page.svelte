@@ -30,6 +30,7 @@
 		authStore,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
+		interfaceLowBandwidthMode,
 		miniPlayerSrcStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
@@ -487,11 +488,13 @@
 				<nav>
 					<a href={`/channel/${data.video.authorId}`}>
 						<nav>
-							<img
-								class="circle large"
-								src={proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))}
-								alt="Channel profile"
-							/>
+							{#if !$interfaceLowBandwidthMode}
+								<img
+									class="circle large"
+									src={proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))}
+									alt="Channel profile"
+								/>
+							{/if}
 							<div>
 								<p style="margin: 0;" class="bold">{truncate(data.video.author, 16)}</p>
 								<p style="margin: 0;">{data.video.subCountText}</p>

@@ -21,6 +21,7 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceForceCase,
+		interfaceLowBandwidthMode,
 		interfacePreviewVideoOnHoverStore,
 		interfaceRegionStore,
 		interfaceSearchSuggestionsStore,
@@ -177,6 +178,29 @@
 			</a>
 		</nav>
 		<div class="page padding" class:active={activeTab === 'interface'}>
+			{#if Capacitor.isNativePlatform()}
+				<form
+					on:submit|preventDefault={() => {
+						instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
+						authStore.set(null);
+						goto('/', { replaceState: true });
+						ui('#dialog-settings');
+					}}
+				>
+					<nav>
+						<div class="field label border max">
+							<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
+							<label for="invidious-instance">{$_('layout.instanceUrl')}</label>
+						</div>
+						<button class="square round">
+							<i>done</i>
+						</button>
+					</nav>
+				</form>
+			{/if}
+
+			<div class="margin"></div>
+
 			<button on:click={toggleDarkMode} class="no-margin">
 				{#if !$darkModeStore}
 					<i>dark_mode</i>
@@ -212,26 +236,21 @@
 				</div>
 			{/if}
 
-			{#if Capacitor.isNativePlatform()}
-				<form
-					on:submit|preventDefault={() => {
-						instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
-						authStore.set(null);
-						goto('/', { replaceState: true });
-						ui('#dialog-settings');
-					}}
-				>
-					<nav>
-						<div class="field label border max">
-							<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
-							<label for="invidious-instance">{$_('layout.instanceUrl')}</label>
-						</div>
-						<button class="square round">
-							<i>done</i>
-						</button>
-					</nav>
-				</form>
-			{/if}
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.lowBandwidthMode')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$interfaceLowBandwidthMode}
+							on:click={() => interfaceLowBandwidthMode.set(!$interfaceLowBandwidthMode)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
 
 			<div class="field no-margin">
 				<nav class="no-padding">

@@ -3,6 +3,7 @@
 	import { getComments } from './Api';
 	import { type Comment, type Comments } from './Api/model';
 	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from './misc';
+	import { interfaceLowBandwidthMode } from './store';
 
 	export let comment: Comment;
 	export let videoId: string;
@@ -31,12 +32,13 @@
 </script>
 
 <div class="comment">
-	<img
-		class="circle small"
-		src={proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))}
-		alt="comment profile"
-	/>
-
+	{#if !$interfaceLowBandwidthMode}
+		<img
+			class="circle small"
+			src={proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))}
+			alt="comment profile"
+		/>
+	{/if}
 	<div>
 		<div class="row">
 			<a href={`/channel/${comment.authorId}`}>

@@ -6,7 +6,7 @@
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber, getBestThumbnail, proxyGoogleImage } from '$lib/misc';
-	import { activePageStore, authStore } from '$lib/store';
+	import { activePageStore, authStore, interfaceLowBandwidthMode } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
@@ -64,10 +64,12 @@
 	onMount(async () => {
 		displayContent = await getChannelContent(data.channel.authorId, { type: 'videos' });
 
-		const channelPfpResp = await fetch(
-			proxyGoogleImage(getBestThumbnail(data.channel.authorThumbnails))
-		);
-		channelPfp = URL.createObjectURL(await channelPfpResp.blob());
+		if (!get(interfaceLowBandwidthMode)) {
+			const channelPfpResp = await fetch(
+				proxyGoogleImage(getBestThumbnail(data.channel.authorThumbnails))
+			);
+			channelPfp = URL.createObjectURL(await channelPfpResp.blob());
+		}
 
 		if (get(authStore)) {
 			isSubscribed = await amSubscribed(data.channel.authorId);
@@ -86,7 +88,7 @@
 </script>
 
 <div class="padding">
-	{#if data.channel.authorBanners.length > 0}
+	{#if data.channel.authorBanners.length > 0 && !$interfaceLowBandwidthMode}
 		<img
 			src={proxyGoogleImage(data.channel.authorBanners[0].url)}
 			width="100%"
@@ -94,15 +96,17 @@
 		/>
 	{/if}
 	<div class="description">
-		{#if channelPfp}
-			<img
-				style="margin-right: 1em;"
-				class="circle extra m l"
-				src={channelPfp}
-				alt="Channel profile"
-			/>
-		{:else}
-			<progress style="padding: 15px;" class="circle"></progress>
+		{#if !$interfaceLowBandwidthMode}
+			{#if channelPfp}
+				<img
+					style="margin-right: 1em;"
+					class="circle extra m l"
+					src={channelPfp}
+					alt="Channel profile"
+				/>
+			{:else}
+				<progress style="padding: 15px;" class="circle"></progress>
+			{/if}
 		{/if}
 
 		<div>

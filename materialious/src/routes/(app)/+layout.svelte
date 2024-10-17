@@ -1,17 +1,15 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { navigating } from '$app/stores';
 	import { getFeed } from '$lib/Api/index';
 	import type { Notification } from '$lib/Api/model';
+	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
+	import '$lib/patches/androidRequests';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
-	import SyncParty from '$lib/SyncParty.svelte';
-	import Thumbnail from '$lib/Thumbnail.svelte';
-	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
-	import '$lib/patches/androidRequests';
 	import {
 		activePageStore,
 		authStore,
@@ -22,14 +20,16 @@
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
+	import SyncParty from '$lib/SyncParty.svelte';
 	import { setAmoledTheme, setTheme } from '$lib/theme';
+	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
@@ -143,8 +143,38 @@
 		notifications = feed.notifications;
 	}
 
+	let scrollPositions = new Map();
+	let scrollableRoot: HTMLElement | null = null;
+
+	beforeNavigate(({ from }) => {
+		if (from?.url && scrollableRoot) {
+			// Save the scroll position of the root element
+			scrollPositions.set(from.url.pathname, scrollableRoot.scrollTop);
+		}
+	});
+
+	// Restore the scroll position after navigating to a new page
+	afterNavigate(async ({ to, type }) => {
+		if (!scrollableRoot) return;
+
+		if (to?.url && scrollPositions.has(to.url.pathname)) {
+			// Check user went back
+			if (type === 'popstate') {
+				await tick();
+				scrollableRoot.scrollTo(0, scrollPositions.get(to.url.pathname) || 0);
+			} else {
+				scrollPositions.delete(to.url.pathname);
+			}
+		} else {
+			// Default behavior: scroll to top
+			scrollableRoot.scrollTo(0, 0);
+		}
+	});
+
 	onMount(async () => {
 		ui();
+
+		scrollableRoot = document.querySelector('.root');
 
 		loadSettingsFromEnv();
 		// Should always be loaded after env settings

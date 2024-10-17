@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
+	import { get } from 'svelte/store';
 	import type { Playlist } from './Api/model';
 	import { getBestThumbnail, letterCase, truncate } from './misc';
+	import { interfaceLowBandwidthMode } from './store';
 
 	export let playlist: Playlist;
 	export let disabled: boolean = false;
@@ -15,6 +17,8 @@
 	const playlistLink = `/playlist/${playlist.playlistId}`;
 
 	onMount(() => {
+		if (get(interfaceLowBandwidthMode)) return;
+
 		img = new Image();
 		if (playlist.videos.length > 0) {
 			img.src = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
@@ -42,7 +46,7 @@
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
 >
-	{#if playlist.videoCount > 0}
+	{#if playlist.videoCount > 0 && !$interfaceLowBandwidthMode}
 		{#if loading}
 			<progress class="circle"></progress>
 		{:else if img.src !== ''}

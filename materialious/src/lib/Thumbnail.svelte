@@ -18,6 +18,7 @@
 		authStore,
 		deArrowEnabledStore,
 		deArrowTitlesOnly,
+		interfaceLowBandwidthMode,
 		interfacePreviewVideoOnHoverStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
@@ -113,6 +114,8 @@
 			disableSideways();
 			calcThumbnailPlaceholderHeight();
 		});
+
+		if (get(interfaceLowBandwidthMode)) return;
 
 		// Load author details in background.
 		if (!sideways) {
@@ -283,32 +286,37 @@
 				data-sveltekit-preload-data="off"
 				on:click={syncChangeVideo}
 			>
-				{#if loading}
-					<div class="secondary-container" style="width: 100%;height: {placeholderHeight}px;"></div>
-				{:else if loaded}
-					{#if showVideoPreview && videoPreview}
-						<div style="max-width: 100%; max-height: {imgHeight}px;">
-							<video
-								id="video-preview"
-								style="max-width: 100%; max-height: {imgHeight}px;"
-								autoplay
-								poster={img.src}
-								width="100%"
-								height="100%"
-								muted={videoPreviewMuted}
-								controls={false}
-								volume={videoPreviewVolume}
-								src={proxyVideos
-									? proxyVideoUrl(videoPreview.formatStreams[0].url)
-									: videoPreview.formatStreams[0].url}
-							>
-							</video>
-						</div>
+				{#if !$interfaceLowBandwidthMode}
+					{#if loading}
+						<div
+							class="secondary-container"
+							style="width: 100%;height: {placeholderHeight}px;"
+						></div>
+					{:else if loaded}
+						{#if showVideoPreview && videoPreview}
+							<div style="max-width: 100%; max-height: {imgHeight}px;">
+								<video
+									id="video-preview"
+									style="max-width: 100%; max-height: {imgHeight}px;"
+									autoplay
+									poster={img.src}
+									width="100%"
+									height="100%"
+									muted={videoPreviewMuted}
+									controls={false}
+									volume={videoPreviewVolume}
+									src={proxyVideos
+										? proxyVideoUrl(videoPreview.formatStreams[0].url)
+										: videoPreview.formatStreams[0].url}
+								>
+								</video>
+							</div>
+						{:else}
+							<img class="responsive" src={img.src} alt="Thumbnail for video" />
+						{/if}
 					{:else}
-						<img class="responsive" src={img.src} alt="Thumbnail for video" />
+						<p>{$_('thumbnail.failedToLoadImage')}</p>
 					{/if}
-				{:else}
-					<p>{$_('thumbnail.failedToLoadImage')}</p>
 				{/if}
 				{#if progress}
 					<progress
@@ -320,18 +328,24 @@
 				{/if}
 				{#if !('liveVideo' in video) || !video.liveVideo}
 					{#if video.lengthSeconds !== 0}
-						<div
-							class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
-						>
-							&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
-						</div>
+						{#if !$interfaceLowBandwidthMode}
+							<div
+								class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
+							>
+								&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
+							</div>
+						{:else}
+							<h3>{videoLength(video.lengthSeconds)}</h3>
+						{/if}
 					{/if}
-				{:else}
+				{:else if video.lengthSeconds !== 0}
 					<div
 						class="absolute right bottom small-margin red white-text small-text thumbnail-corner"
 					>
 						{$_('thumbnail.live')}
 					</div>
+				{:else}
+					<h3>{$_('thumbnail.live')}</h3>
 				{/if}
 			</a>
 			{#if showVideoPreview && videoPreview}
@@ -354,7 +368,7 @@
 		</div>
 
 		<div class="thumbnail-details video-title">
-			{#if !sideways}
+			{#if !sideways && !$interfaceLowBandwidthMode}
 				<div style="margin-right: 1em;">
 					{#if authorImg}
 						<img src={authorImg.src} alt="Author" class="circle small" />

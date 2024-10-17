@@ -52,7 +52,7 @@ main.root {
 	padding-left: 7em !important;
 	padding-top: 5em !important;
 	max-height: 100vh;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 

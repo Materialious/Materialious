@@ -540,7 +540,9 @@
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);
 		}
-		savePlayerPos();
+		try {
+			savePlayerPos();
+		} catch (error) {}
 		await player.pause();
 		player.destroy();
 		playerPosSet = false;

@@ -195,7 +195,7 @@
 						kind: 'captions',
 						language: caption.language_code,
 						// Need if captions are generated when youtube.js is being used.
-						src: caption.url.startsWith('blob:')
+						src: caption.url.startsWith('http')
 							? caption.url
 							: `${get(instanceStore)}${caption.url}`
 					});

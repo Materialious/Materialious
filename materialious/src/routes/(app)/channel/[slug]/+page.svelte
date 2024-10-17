@@ -3,7 +3,7 @@
 	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/Api/model';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
-	import Thumbnail from '$lib/Thumbnail.svelte';
+	import VideoList from '$lib/VideoList.svelte';
 	import { cleanNumber, getBestThumbnail, proxyGoogleImage } from '$lib/misc';
 	import { activePageStore, authStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
@@ -188,13 +188,7 @@
 		<div class="space"></div>
 		<div class="grid">
 			{#if 'videos' in displayContent}
-				{#each displayContent.videos as video}
-					<div class="s12 m6 l2">
-						<article class="no-padding" style="height: 100%;">
-							<Thumbnail {video} />
-						</article>
-					</div>
-				{/each}
+				<VideoList videos={displayContent.videos} />
 			{:else}
 				{#each displayContent.playlists as playlist}
 					<div class="s12 m6 l2">

@@ -61,6 +61,8 @@ export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover'
 export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
 export const interfaceAutoExpandComments: Writable<boolean> = persisted('autoExpandComments', true);
 export const interfaceAutoExpandDesc: Writable<boolean> = persisted('autoExpandDesc', false);
+export const interfaceAmoledTheme = persisted('amoledTheme', false);
+
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(

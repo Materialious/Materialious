@@ -28,6 +28,8 @@ export const authStore: Writable<null | { username: string; token: string; }> = 
 export const darkModeStore: Writable<null | boolean> = persisted('darkMode', null);
 export const themeColorStore: Writable<null | string> = persisted('themeColor', null);
 
+export const showWarningStore = persisted('showWarning', true);
+
 export const activePageStore: Writable<string | null> = writable('home');
 
 export const playerAutoPlayStore = persisted('autoPlay', true);

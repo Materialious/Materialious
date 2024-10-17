@@ -5,9 +5,11 @@ Materialious allows you to customize various settings by overwriting the default
 ## TOC
 
 - [Materialious Settings](#materialious-settings)
+   * [Show warning](#Show-Warning)
    * [Theme](#theme)
       + [Dark mode / Light mode](#dark-mode-light-mode)
       + [Color](#color)
+      + [Amoled](#color)
    * [Interface](#interface)
       + [Search suggestions](#search-suggestions)
       + [Preview video on hover](#preview-video-on-hover)
@@ -42,6 +44,14 @@ Materialious allows you to customize various settings by overwriting the default
       + [DeArrow Thumbnail Instance](#dearrow-thumbnail-instance)
       + [DeArrow Titles Only](#dearrow-titles-only)
 
+## Show Warning
+
+Show warning about Invidious being blocked.
+
+```json
+"showWarning": true
+```
+
 ## Theme
 
 ### Dark mode / Light mode
@@ -58,6 +68,14 @@ Sets the theme color using a hexadecimal value.
 
 ```json
 "themeColor": "#ff0000"
+```
+
+## Amoled
+
+Use pure black theme for Materialious, Dark mode must be true.
+
+```json
+"amoledTheme": true
 ```
 
 ## Interface

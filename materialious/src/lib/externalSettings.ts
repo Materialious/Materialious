@@ -5,6 +5,7 @@ import {
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
 	deArrowTitlesOnly,
+	interfaceAmoledTheme,
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
 	interfaceForceCase,
@@ -21,6 +22,7 @@ import {
 	playerTheatreModeByDefaultStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore,
+	showWarningStore,
 	silenceSkipperStore,
 	sponsorBlockCategoriesStore,
 	sponsorBlockDisplayToastStore,
@@ -176,6 +178,16 @@ const persistedStores = [
 	{
 		name: 'silenceSkipper',
 		store: silenceSkipperStore,
+		type: 'boolean'
+	},
+	{
+		name: 'amoledTheme',
+		store: interfaceAmoledTheme,
+		type: 'boolean'
+	},
+	{
+		name: 'showWarning',
+		store: showWarningStore,
 		type: 'boolean'
 	}
 ];

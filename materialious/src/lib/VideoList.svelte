@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { removePlaylistVideo } from './Api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './Api/model';
+	import ContentColumn from './ContentColumn.svelte';
 	import Thumbnail from './Thumbnail.svelte';
 	import { authStore } from './store';
 
@@ -20,20 +20,6 @@
 		await removePlaylistVideo(playlistId, indexId);
 		hiddenVideos = [...hiddenVideos, videoId];
 	}
-
-	function checkWidth() {
-		if (innerWidth <= 1750) {
-			largeCol = '4';
-		} else {
-			largeCol = '2';
-		}
-	}
-
-	onMount(() => {
-		checkWidth();
-
-		addEventListener('resize', () => checkWidth());
-	});
 </script>
 
 <div class="page right active">
@@ -41,7 +27,7 @@
 	<div class="grid">
 		{#each videos as video}
 			{#if !hiddenVideos.includes(video.videoId)}
-				<div class="s12 m6 l{largeCol}">
+				<ContentColumn>
 					<article class="no-padding" style="height: 100%;">
 						<Thumbnail
 							on:videoHidden={() => (hiddenVideos = [...hiddenVideos, video.videoId])}
@@ -60,7 +46,7 @@
 							</div>
 						{/if}
 					</article>
-				</div>
+				</ContentColumn>
 			{/if}
 		{/each}
 	</div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { amSubscribed, deleteUnsubscribe, getChannelContent, postSubscribe } from '$lib/Api';
 	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/Api/model';
+	import ContentColumn from '$lib/ContentColumn.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import VideoList from '$lib/VideoList.svelte';
@@ -184,22 +185,22 @@
 </div>
 
 {#if displayContent}
-	<div class="page right active">
-		<div class="space"></div>
-		<div class="grid">
-			{#if 'videos' in displayContent}
-				<VideoList videos={displayContent.videos} />
-			{:else}
+	{#if 'videos' in displayContent}
+		<VideoList videos={displayContent.videos} />
+	{:else}
+		<div class="page right active">
+			<div class="space"></div>
+			<div class="grid">
 				{#each displayContent.playlists as playlist}
-					<div class="s12 m6 l2">
+					<ContentColumn>
 						<article class="no-padding" style="height: 100%;">
 							<PlaylistThumbnail {playlist} />
 						</article>
-					</div>
+					</ContentColumn>
 				{/each}
-			{/if}
+			</div>
 		</div>
-	</div>
+	{/if}
 
 	<InfiniteLoading on:infinite={loadMore} />
 {:else}

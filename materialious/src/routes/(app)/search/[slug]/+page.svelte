@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getSearch } from '$lib/Api';
 	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
+	import ContentColumn from '$lib/ContentColumn.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/Thumbnail.svelte';
@@ -79,7 +80,7 @@
 		<div class="space"></div>
 		<div class="grid">
 			{#each data.search as item}
-				<div class="s12 m6 l2">
+				<ContentColumn>
 					{#key item}
 						<article class="no-padding" style="height: 100%;">
 							{#if item.type === 'video'}
@@ -91,7 +92,7 @@
 							{/if}
 						</article>
 					{/key}
-				</div>
+				</ContentColumn>
 			{/each}
 		</div>
 	</div>

@@ -290,21 +290,14 @@
 			<h5>Warning</h5>
 			<div>
 				<p>
-					Invidious is currently being blocked by Google. If videos aren't loading for this
-					instance, please use this instance on Materialious on
-					<a
-						href="https://github.com/Materialious/Materialious/releases/latest"
-						target="_blank"
-						class="link"
-						rel="noopener noreferrer">Android</a
-					>
-					or
-					<a
-						href="https://github.com/Materialious/Materialious/releases/latest"
-						target="_blank"
-						class="link"
-						rel="noopener noreferrer">Desktop</a
-					> to get around this with local video fallback.
+					{@html $_('invidiousBlockWarning', {
+						values: {
+							android:
+								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
+							desktop:
+								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
+						}
+					})}
 				</p>
 			</div>
 			<nav class="right-align no-space">

@@ -3,6 +3,7 @@
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",
 	"views": "views",
+	"invidiousBlockWarning": "Invidious is currently being blocked by Google. If videos aren't loading for this instance, please use this instance on Materialious on {android} or {desktop} to get around this with local video fallback.",
 	"videos": "videos",
 	"cancel": "Cancel",
 	"create": "Create",

@@ -1,3 +1,7 @@
+
+> [!WARNING]  
+> Invidious is currently being blocked by Google. Please use Materialious on Android or Desktop to get around this with local fallback.
+
 <div align="center">
   <img src="./materialious/static/logo.svg" width="200px" />
   <br />

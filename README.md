@@ -1,6 +1,6 @@
 
 > [!WARNING]  
-> Invidious is currently being blocked by Google. Please use Materialious on Android or Desktop to get around this with local video fallback.
+> Invidious is currently being blocked by Google. Please use Materialious on [Android](https://github.com/Materialious/Materialious/releases/latest) or [Desktop](https://github.com/Materialious/Materialious/releases/latest) to get around this with local video fallback.
 
 <div align="center">
   <img src="./materialious/static/logo.svg" width="200px" />

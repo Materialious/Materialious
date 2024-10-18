@@ -85,8 +85,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   const video = await youtube.getInfo(videoId);
 
-  console.log(video);
-
   if (!video.primary_info || !video.secondary_info) {
     throw new Error('Unable to pull video info from youtube.js');
   }

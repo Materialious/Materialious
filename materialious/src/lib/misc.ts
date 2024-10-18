@@ -160,6 +160,25 @@ function convertToSeconds(time: string): number {
 	return seconds;
 }
 
+export function humanizeSeconds(totalSeconds: number): string {
+	const secondsInMinute = 60;
+	const secondsInHour = 3600;
+
+	const hours = Math.floor(totalSeconds / secondsInHour);
+	const minutes = Math.floor((totalSeconds % secondsInHour) / secondsInMinute);
+
+	const parts: string[] = [];
+
+	if (hours > 0) {
+		parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+	}
+	if (minutes > 0) {
+		parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
+	}
+
+	return parts.join(', ');
+}
+
 export function proxyVideoUrl(source: string): string {
 	const rawSrc = new URL(source);
 	rawSrc.host = get(instanceStore).replace('http://', '').replace(

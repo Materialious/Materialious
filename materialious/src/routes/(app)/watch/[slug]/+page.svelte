@@ -11,13 +11,10 @@
 	} from '$lib/Api/index.js';
 	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
 	import Comment from '$lib/Comment.svelte';
-	import Player from '$lib/Player.svelte';
-	import ShareVideo from '$lib/ShareVideo.svelte';
-	import Thumbnail from '$lib/Thumbnail.svelte';
-	import Transcript from '$lib/Transcript.svelte';
 	import {
 		cleanNumber,
 		getBestThumbnail,
+		humanizeSeconds,
 		letterCase,
 		numberWithCommas,
 		proxyGoogleImage,
@@ -25,6 +22,8 @@
 		unsafeRandomItem
 	} from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
+	import Player from '$lib/Player.svelte';
+	import ShareVideo from '$lib/ShareVideo.svelte';
 	import {
 		activePageStore,
 		authStore,
@@ -40,7 +39,10 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
+	import Thumbnail from '$lib/Thumbnail.svelte';
+	import Transcript from '$lib/Transcript.svelte';
 	import { mergeMediaFromDASH } from '$lib/videoDownload';
+	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
@@ -77,6 +79,8 @@
 	let player: MediaPlayerElement;
 
 	let segments: Segment[] = [];
+
+	let pauseTimerSeconds: number = -1;
 
 	let showTranscript = false;
 
@@ -296,6 +300,10 @@
 		// Reset title when page left.
 		document.title = 'Materialious';
 
+		if (pauseTimeout) {
+			clearTimeout(pauseTimeout);
+		}
+
 		if (
 			get(playerMiniPlayerStore) &&
 			!player.paused &&
@@ -393,8 +401,20 @@
 		subscribed = !subscribed;
 	}
 
-	async function toggleTheatreMode() {
+	function toggleTheatreMode() {
 		theatreMode = !theatreMode;
+	}
+
+	let pauseTimeout: NodeJS.Timeout;
+	function setPauseTimer() {
+		if (pauseTimeout) {
+			clearTimeout(pauseTimeout);
+		}
+		pauseTimeout = setTimeout(() => {
+			player.pause();
+		}, pauseTimerSeconds * 1000);
+
+		ui('#pause-timer');
 	}
 
 	let downloadStage: string | undefined;
@@ -553,6 +573,21 @@
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
+					{#if data.video.lengthSeconds > 60}
+						<button
+							on:click={() => {
+								if (pauseTimeout) {
+									clearTimeout(pauseTimeout);
+								}
+								pauseTimerSeconds = 0;
+								ui('#pause-timer');
+							}}
+							class:border={pauseTimerSeconds < 1}
+						>
+							<i>schedule</i>
+							<div class="tooltip">{$_('player.pauseTimer')}</div>
+						</button>
+					{/if}
 					<button
 						on:click={() => ((showTranscript = !showTranscript), (theatreMode = false))}
 						class:border={!showTranscript}
@@ -794,6 +829,38 @@
 		</div>
 	{/if}
 </div>
+
+<dialog class="modal" id="pause-timer">
+	{#if player}
+		<div class="field middle-align">
+			<label class="slider">
+				<input
+					type="range"
+					bind:value={pauseTimerSeconds}
+					min="0"
+					step="60"
+					max={data.video.lengthSeconds - player.currentTime - 60}
+				/>
+				<span></span>
+			</label>
+			{#if pauseTimerSeconds > 0}
+				<span class="helper">{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</span>
+			{/if}
+		</div>
+	{/if}
+	<nav class="right-align no-space">
+		<button
+			class="transparent link"
+			on:click={() => {
+				ui('#pause-timer');
+				pauseTimerSeconds = 0;
+			}}>Cancel</button
+		>
+		<button disabled={pauseTimerSeconds < 1} class="transparent link" on:click={setPauseTimer}
+			>Confirm</button
+		>
+	</nav>
+</dialog>
 
 <style>
 	:root {

@@ -65,6 +65,8 @@
 	"player": {
 		"audioOnly": "Audio only",
 		"theatreMode": "Theatre mode",
+		"pauseTimer": "Pause timer",
+		"pauseVideoIn": "Pause video in ",
 		"share": {
 			"title": "Share",
 			"materialiousLink": "Copy Materialious link",

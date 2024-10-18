@@ -381,7 +381,11 @@
 
 						const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
 
-						player.currentTime = Math.round(audioPlayerTime.currentTime);
+						const audioPlayerTimeRounded = Math.round(audioPlayerTime.currentTime);
+						if (audioPlayerTimeRounded > player.currentTime) {
+							player.currentTime = audioPlayerTimeRounded;
+						}
+
 						await player.play();
 					});
 

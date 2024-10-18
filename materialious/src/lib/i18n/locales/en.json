@@ -8,7 +8,7 @@
 	"cancel": "Cancel",
 	"create": "Create",
 	"title": "Title",
-	"searchPlaceholder": "Search (ctrl + k)",
+	"searchPlaceholder": "Search",
 	"delete": "Delete",
 	"donate": "Donate",
 	"deleteAllHistory": "Delete all history",
@@ -65,6 +65,8 @@
 	"player": {
 		"audioOnly": "Audio only",
 		"theatreMode": "Theatre mode",
+		"pauseTimer": "Pause timer",
+		"pauseVideoIn": "Pause video in ",
 		"share": {
 			"title": "Share",
 			"materialiousLink": "Copy Materialious link",

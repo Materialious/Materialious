@@ -412,6 +412,8 @@
 		}
 		pauseTimeout = setTimeout(() => {
 			player.pause();
+			pauseTimerSeconds = 0;
+			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
 
 		ui('#pause-timer');
@@ -573,7 +575,7 @@
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
-					{#if data.video.lengthSeconds > 60}
+					{#if data.video.lengthSeconds > 60 && !data.video.hlsUrl}
 						<button
 							on:click={() => {
 								if (pauseTimeout) {

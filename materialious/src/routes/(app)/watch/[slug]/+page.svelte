@@ -48,6 +48,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
+	import type { MediaTimeUpdateEvent } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 
 	export let data;
@@ -83,6 +84,16 @@
 	let pauseTimerSeconds: number = -1;
 
 	let showTranscript = false;
+
+	let playerCurrentTime: number = 0;
+	// @ts-ignore
+	$: if (typeof player !== 'undefined') {
+		playerCurrentTime = player.currentTime;
+		player.addEventListener(
+			'time-update',
+			(event: MediaTimeUpdateEvent) => (playerCurrentTime = event.detail.currentTime)
+		);
+	}
 
 	playlistSettingsStore.subscribe((playlistSetting) => {
 		if (!data.playlistId) return;
@@ -841,7 +852,7 @@
 					bind:value={pauseTimerSeconds}
 					min="0"
 					step="60"
-					max={data.video.lengthSeconds - player.currentTime - 60}
+					max={data.video.lengthSeconds - playerCurrentTime - 60}
 				/>
 				<span></span>
 			</label>

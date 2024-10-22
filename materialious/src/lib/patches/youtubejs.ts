@@ -1,4 +1,4 @@
-import type { AdaptiveFormats, Captions, Image, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
+import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase, VideoPlay } from '$lib/Api/model';
 import { numberWithCommas } from '$lib/misc';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
@@ -148,6 +148,23 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     });
   });
 
+  let storyboard: StoryBoard[] = [];
+  if (video.storyboards && 'boards' in video.storyboards) {
+    video.storyboards.boards.forEach(board => {
+      storyboard.push({
+        templateUrl: board.template_url,
+        url: board.template_url,
+        count: board.storyboard_count,
+        height: board.thumbnail_height,
+        width: board.thumbnail_width,
+        interval: board.interval,
+        storyboardCount: board.storyboard_count,
+        storyboardHeight: board.thumbnail_height,
+        storyboardWidth: board.thumbnail_width
+      });
+    });
+  }
+
   return {
     type: 'video',
     title: video.primary_info.title ? video.primary_info.title.toString() : '',
@@ -178,6 +195,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
     liveNow: video.basic_info.is_live || false,
     premium: false,
+    storyboards: storyboard,
     isUpcoming: false,
     videoId: videoId,
     videoThumbnails: video.basic_info.thumbnail as Thumbnail[],

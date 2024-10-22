@@ -91,18 +91,20 @@ export interface VideoPlay extends Video {
 	recommendedVideos: VideoBase[];
 	authorThumbnails: Image[];
 	captions: Captions[];
-	storyboards?: {
-		url: string;
-		templateUrl: string;
-		width: number;
-		height: number;
-		count: number;
-		interval: number;
-		storyboardWidth: number;
-		storyboardHeight: number;
-		storyboardCount: number;
-	}[];
+	storyboards?: StoryBoard[];
 	fallbackPatch?: 'youtubejs' | 'piped';
+}
+
+export interface StoryBoard {
+	url: string;
+	templateUrl: string;
+	width: number;
+	height: number;
+	count: number;
+	interval: number;
+	storyboardWidth: number;
+	storyboardHeight: number;
+	storyboardCount: number;
 }
 
 export interface ReturnYTDislikes {

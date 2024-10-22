@@ -128,7 +128,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     captions.push({
       label: caption.name.toString(),
       language_code: caption.language_code,
-      url: caption.base_url
+      // Add correct format to url.
+      url: caption.base_url + '&fmt=vtt'
     });
   });
 

@@ -387,7 +387,7 @@
 			await addPlaylistVideo(playlistId, data.video.videoId);
 		}
 
-		personalPlaylists = await getPersonalPlaylists();
+		setTimeout(async () => (personalPlaylists = await getPersonalPlaylists()), 500);
 	}
 
 	async function loadMoreComments() {

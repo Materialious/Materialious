@@ -45,7 +45,7 @@
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { MediaTimeUpdateEvent } from 'vidstack';
@@ -252,7 +252,7 @@
 		}
 
 		if (player) {
-			player.addEventListener('end', () => {
+			player.addEventListener('end', async () => {
 				if (playlistVideos.length === 0) {
 					if ($playerAutoplayNextByDefaultStore) {
 						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
@@ -260,7 +260,7 @@
 					return;
 				}
 
-				goToCurrentPlaylistItem();
+				await goToCurrentPlaylistItem();
 
 				const playlistVideoIds = playlistVideos.map((value) => {
 					return value.videoId;
@@ -321,7 +321,8 @@
 			!$syncPartyPeerStore &&
 			!data.video.hlsUrl &&
 			data.video.formatStreams &&
-			data.video.formatStreams.length > 0
+			data.video.formatStreams.length > 0 &&
+			data.video.fallbackPatch === undefined
 		) {
 			miniPlayerSrcStore.set({
 				video: data.video,
@@ -352,7 +353,8 @@
 		}
 	}
 
-	function goToCurrentPlaylistItem() {
+	async function goToCurrentPlaylistItem() {
+		await tick();
 		const playlistCurrentVideo = document.getElementById(data.video.videoId);
 		const playlistScrollable = document.getElementById('playlist');
 

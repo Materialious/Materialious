@@ -304,7 +304,7 @@
 
 		await loadPlaylist(data.playlistId);
 
-		goToCurrentPlaylistItem();
+		await goToCurrentPlaylistItem();
 	});
 
 	onDestroy(() => {

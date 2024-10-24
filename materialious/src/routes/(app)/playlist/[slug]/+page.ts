@@ -1,4 +1,4 @@
-import { getPlaylist } from '$lib/Api/index.js';
+import { getPlaylist } from '$lib/api/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {

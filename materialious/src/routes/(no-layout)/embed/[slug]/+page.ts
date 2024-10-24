@@ -1,4 +1,4 @@
-import { getVideo } from '$lib/Api/index.js';
+import { getVideo } from '$lib/api/index.js';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { PhasedDescription } from '../../../../lib/misc.js';

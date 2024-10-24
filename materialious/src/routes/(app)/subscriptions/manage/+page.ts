@@ -1,4 +1,4 @@
-import { getSubscriptions } from '$lib/Api';
+import { getSubscriptions } from '$lib/api';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

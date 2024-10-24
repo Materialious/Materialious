@@ -1,4 +1,4 @@
-import { getChannel } from '$lib/Api/index.js';
+import { getChannel } from '$lib/api/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {

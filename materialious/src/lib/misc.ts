@@ -4,7 +4,7 @@ import he from 'he';
 import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
-import type { Image } from './Api/model';
+import type { Image } from './api/model';
 import { instanceStore, interfaceForceCase } from './store';
 
 

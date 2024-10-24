@@ -1,4 +1,4 @@
-import type { VideoPlay } from '$lib/Api/model';
+import type { VideoPlay } from '$lib/api/model';
 import { Capacitor } from '@capacitor/core';
 import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';

@@ -1,5 +1,5 @@
-import { getTrending } from '$lib/Api/index.js';
-import type { Video } from '$lib/Api/model';
+import { getTrending } from '$lib/api/index.js';
+import type { Video } from '$lib/api/model';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

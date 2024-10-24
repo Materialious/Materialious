@@ -1,4 +1,4 @@
-import { getSearch } from '$lib/Api/index';
+import { getSearch } from '$lib/api/index';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, url }) {

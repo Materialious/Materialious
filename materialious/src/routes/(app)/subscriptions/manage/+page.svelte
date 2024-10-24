@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deleteUnsubscribe } from '$lib/Api';
+	import { deleteUnsubscribe } from '$lib/api';
 	import { activePageStore } from '$lib/store';
 	import Fuse from 'fuse.js';
 	import { _ } from 'svelte-i18n';

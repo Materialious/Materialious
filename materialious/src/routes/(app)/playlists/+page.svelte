@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/Api';
+	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
 	import ContentColumn from '$lib/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import { activePageStore } from '$lib/store';

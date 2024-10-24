@@ -1,4 +1,4 @@
-name: Development Vite workflow
+name: Check web
 
 on:
   pull_request:

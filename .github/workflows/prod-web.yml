@@ -1,4 +1,4 @@
-name: Production Vite workflow
+name: Build web
 
 on:
   push:

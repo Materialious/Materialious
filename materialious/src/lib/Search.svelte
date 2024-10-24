@@ -3,7 +3,7 @@
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
-	import { getSearchSuggestions } from './Api';
+	import { getSearchSuggestions } from './api';
 	import { interfaceSearchSuggestionsStore } from './store';
 
 	const dispatch = createEventDispatcher();
@@ -89,7 +89,9 @@
 			id="search-box"
 			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
-			on:click={() => (showSearchBox = true)}
+			on:click={async () => {
+				showSearchBox = true;
+			}}
 		/>
 		{#if showSearchBox}
 			<menu class="min suggestions-container">
@@ -98,7 +100,7 @@
 					<input
 						placeholder={$_('searchPlaceholder')}
 						type="text"
-						autofocus={true}
+						autofocus
 						required
 						bind:value={search}
 						on:keydown={handleKeyDown}

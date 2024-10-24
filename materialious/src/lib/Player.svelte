@@ -13,8 +13,8 @@
 	import { get } from 'svelte/store';
 	import type { FullscreenChangeEvent, MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
-	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './Api';
-	import type { VideoPlay } from './Api/model';
+	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './api';
+	import type { VideoPlay } from './api/model';
 	import {
 		getBestThumbnail,
 		proxyVideoUrl,
@@ -491,15 +491,15 @@
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
 			} catch {}
-		}
-
-		if (get(playerSavePlaybackPositionStore)) {
-			try {
-				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-				if (playerPos && Number(playerPos) > toSetTime) {
-					toSetTime = Number(playerPos);
-				}
-			} catch {}
+		} else {
+			if (get(playerSavePlaybackPositionStore)) {
+				try {
+					const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
+					if (playerPos && Number(playerPos) > toSetTime) {
+						toSetTime = Number(playerPos);
+					}
+				} catch {}
+			}
 		}
 
 		if (toSetTime > 0) player.currentTime = toSetTime;

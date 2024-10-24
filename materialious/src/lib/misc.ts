@@ -4,7 +4,7 @@ import he from 'he';
 import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
-import type { Image } from './Api/model';
+import type { Image } from './api/model';
 import { instanceStore, interfaceForceCase } from './store';
 
 
@@ -110,7 +110,7 @@ export function phaseDescription(content: string, usingYoutubeJs: boolean = fals
 	// Regular expressions for different timestamp formats
 	const urlRegex = /<a href="([^"]+)"/;
 	const timestampRegexInvidious = /<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">(\d+:\d+(?::\d+)?)<\/a>\s*(.+)/;
-	const timestampRegexYtJs = /&t=(\d+)\s*s.*?<span[^>]*>([^<]*)<\/span>.*?>(.*?)<\/span>/;
+	const timestampRegexYtJs = /&(?:\S*?&)?t=(\d+)\s*s.*?<span[^>]*>([^<]*)<\/span>.*?>(.*?)<\/span>/;
 
 	let filteredLines: string[] = [];
 	lines.forEach((line) => {

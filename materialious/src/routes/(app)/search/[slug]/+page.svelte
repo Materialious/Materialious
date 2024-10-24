@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { getSearch } from '$lib/Api';
+	import { getSearch } from '$lib/api';
 	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
 	import ContentColumn from '$lib/ContentColumn.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
-	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { activePageStore } from '$lib/store';
+	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 

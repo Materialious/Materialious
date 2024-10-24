@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { deleteAllVideoProgress, deleteHistory, getHistory, getVideo } from '$lib/Api';
-	import type { VideoPlay } from '$lib/Api/model';
+	import { deleteAllVideoProgress, deleteHistory, getHistory, getVideo } from '$lib/api';
+	import type { VideoPlay } from '$lib/api/model';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import VideoList from '$lib/VideoList.svelte';
 	import { activePageStore, synciousStore } from '$lib/store';

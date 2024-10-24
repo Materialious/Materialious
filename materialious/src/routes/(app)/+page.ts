@@ -1,4 +1,4 @@
-import { getPopular } from '$lib/Api/index.js';
+import { getPopular } from '$lib/api/index';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

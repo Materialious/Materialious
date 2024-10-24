@@ -5,7 +5,7 @@ import {
 	getPersonalPlaylists,
 	getVideo,
 	postHistory
-} from '$lib/Api/index.js';
+} from '$lib/api/index';
 import { phaseDescription } from '$lib/misc';
 import {
 	authStore,

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/Api';
+	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
+	import ContentColumn from '$lib/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import { activePageStore } from '$lib/store';
 	import { _ } from 'svelte-i18n';
@@ -35,7 +36,7 @@
 	<div class="space"></div>
 	<div class="grid">
 		{#each data.playlists as playlist}
-			<div class="s12 m6 l2">
+			<ContentColumn>
 				<article class="no-padding" style="height: 100%;">
 					<PlaylistThumbnail disabled={playlist.videoCount === 0} {playlist} />
 
@@ -48,16 +49,16 @@
 						</button>
 					</nav>
 				</article>
-			</div>
+			</ContentColumn>
 		{/each}
-		<div class="s12 m6 l2">
+		<ContentColumn>
 			<article style="height: 100%;display: flex;align-items: center;justify-content: center;">
 				<button on:click={() => ui('#create-playlist')} class="round extra">
 					<i>add_circle</i>
 					<span>{$_('playlist.createPlaylist')}</span>
 				</button>
 			</article>
-		</div>
+		</ContentColumn>
 	</div>
 </div>
 

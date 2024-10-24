@@ -5,7 +5,6 @@ node_modules
 /package
 # Lock files of most package managers
 bun.lockb
-package-lock.json
 pnpm-lock.yaml
 yarn.lock
 .env
@@ -15,4 +14,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 resources/android/**/*
 android/release.jks*
-!static/nodejs-android/package-lock.json
+.electron-cache

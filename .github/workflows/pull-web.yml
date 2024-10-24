@@ -1,13 +1,11 @@
-name: Development Vite workflow
+name: Check web
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  build:
+  web-check:
     runs-on: ubuntu-latest
     defaults:
       run:

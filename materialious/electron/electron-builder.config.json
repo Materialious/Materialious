@@ -15,6 +15,9 @@
     "capacitor.config.*",
     "app/**/*"
   ],
+  "electronDownload": {
+    "cache": "./.electron-cache"
+  },
   "nsis": {
     "allowElevation": true,
     "oneClick": false,

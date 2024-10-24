@@ -21,7 +21,7 @@
       "XDG_CACHE_HOME": "/run/build/us.materialio.app/flatpak-node/cache",
       "npm_config_cache": "/run/build/us.materialio.app/flatpak-node/npm-cache",
       "npm_config_nodedir": "/usr/lib/sdk/node20",
-      "npm_config_offline": false
+      "npm_config_offline": true
     }
   },
   "modules": [
@@ -34,7 +34,7 @@
         "cd ./main && npx cap sync @capacitor-community/electron",
         "cd ./main/electron && python patch_capacitor_plugin.py",
         "cd ./main/electron && npm install --offline",
-        ". ../flatpak-node/electron-builder-arch-args.sh && cd ./main/electron && npm run dist -- $ELECTRON_BUILDER_ARCH_ARGS  --linux --dir",
+        "cd ./main/electron && npm run dist --linux --dir",
         "cp -a ./main/electron/dist/linux*unpacked /app/main",
         "install -Dm755 -t /app/bin/ ../run.sh"
       ],
@@ -50,6 +50,12 @@
           "commands": [
             "zypak-wrapper.sh /app/main/us.materialio.app \"$@\""
           ]
+        },
+        {
+          "type": "archive",
+          "url": "https://github.com/electron/electron/releases/download/v33.0.2/electron-v33.0.2-linux-x64.zip",
+          "sha256": "933dc1eae3f2db67912b3ab056fd15a7ca3e1328fe8dd6a1f5266c5a063b1121",
+          "dest": "main/electron/.electron-cache"
         },
         "generated-sources.json"
       ]

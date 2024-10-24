@@ -105,3 +105,7 @@ Due to Google's policies on custom YouTube frontends, Materialious isn't availab
 - [Vidstack player](https://github.com/vidstack/player)
 - [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
 - Every dependency in [package.json](/materialious/package.json).
+
+# Developers
+- [How Materialious is built](./docs/BUILDING.md)
+- [How to contribute to Materialious](./docs/DEV.md)

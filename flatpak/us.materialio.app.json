@@ -34,9 +34,9 @@
         "cd ./main && npx cap sync @capacitor-community/electron",
         "cd ./main/electron && python patch_capacitor_plugin.py",
         "cd ./main/electron && npm install --offline",
-        "cd ./main/electron && npm run dist --linux --dir",
-        "cp -a ./main/electron/dist/linux*unpacked /app/main",
-        "install -Dm755 -t /app/bin/ ../run.sh"
+        "cd ./main/electron && npm run electron:pack",
+        "cp -a ./main/electron/dist/linux*unpacked /app/main/",
+        "install -Dm755 -t /app/bin/ ./run.sh"
       ],
       "sources": [
         {
@@ -48,7 +48,7 @@
           "type": "script",
           "dest-filename": "run.sh",
           "commands": [
-            "zypak-wrapper.sh /app/main/us.materialio.app \"$@\""
+            "zypak-wrapper.sh /app/main \"$@\""
           ]
         },
         {

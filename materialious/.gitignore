@@ -14,5 +14,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 resources/android/**/*
 android/release.jks*
-!static/nodejs-android/package-lock.json
 .electron-cache

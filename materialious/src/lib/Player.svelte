@@ -491,15 +491,15 @@
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
 			} catch {}
-		}
-
-		if (get(playerSavePlaybackPositionStore)) {
-			try {
-				const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-				if (playerPos && Number(playerPos) > toSetTime) {
-					toSetTime = Number(playerPos);
-				}
-			} catch {}
+		} else {
+			if (get(playerSavePlaybackPositionStore)) {
+				try {
+					const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
+					if (playerPos && Number(playerPos) > toSetTime) {
+						toSetTime = Number(playerPos);
+					}
+				} catch {}
+			}
 		}
 
 		if (toSetTime > 0) player.currentTime = toSetTime;

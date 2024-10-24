@@ -45,7 +45,7 @@
 
 		isLoading = true;
 		transcript = null;
-		const resp = await fetch(`${get(instanceStore)}${url}`);
+		const resp = await fetch(`${!video.fallbackPatch ? get(instanceStore) : ''}${url}`);
 		transcript = await parseText(await resp.text(), { strict: false });
 		transcriptCues = transcript.cues;
 		isLoading = false;
@@ -114,7 +114,7 @@
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
-						<p class="transcript-text">{decodeHtmlCharCodes(cue.text)}</p>
+						<p class="transcript-text">{decodeHtmlCharCodes(cue.text.replace(/<[^>]+>/g, ''))}</p>
 					</div>
 				{/each}
 			{:else}

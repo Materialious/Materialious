@@ -1,0 +1,58 @@
+name: Check desktop
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  desktop-build:
+    strategy:
+      matrix:
+        node-version: [20]
+        runtime:
+          - linux-x64
+          - win-x64
+          - osx-x64
+
+        include:
+          - runtime: linux-x64
+            os: ubuntu-latest
+          - runtime: osx-x64
+            os: macOS-latest
+          - runtime: win-x64
+            os: windows-latest
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install modules
+        run: cd ./materialious && npm install
+
+      - name: Build package
+        run: cd ./materialious && npm run build
+
+      - name: Sync electron package
+        run: cd ./materialious && npx cap sync @capacitor-community/electron
+
+      - name: Patch capacitor plugin
+        run: cd ./materialious/electron && python patch_capacitor_plugin.py
+
+      - name: Install electron modules
+        run: cd ./materialious/electron && npm install
+
+      - name: Build desktop packages
+        run: cd ./materialious/electron && npm run electron:pack

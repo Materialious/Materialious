@@ -18,15 +18,15 @@
   "build-options": {
     "append-path": "/usr/lib/sdk/node20/bin",
     "env": {
-      "XDG_CACHE_HOME": "/run/build/us.materialio.app/flatpak-node/cache",
-      "npm_config_cache": "/run/build/us.materialio.app/flatpak-node/npm-cache",
+      "XDG_CACHE_HOME": "/run/build/materialious-app/flatpak-node/cache",
+      "npm_config_cache": "/run/build/materialious-app/flatpak-node/npm-cache",
       "npm_config_nodedir": "/usr/lib/sdk/node20",
       "npm_config_offline": true
     }
   },
   "modules": [
     {
-      "name": "electron-build",
+      "name": "materialious-app",
       "buildsystem": "simple",
       "build-commands": [
         "cd ./main && npm install --offline",
@@ -35,8 +35,8 @@
         "cd ./main/electron && python patch_capacitor_plugin.py",
         "cd ./main/electron && npm install --offline",
         "cd ./main/electron && npm run electron:pack",
-        "cp -a ./main/electron/dist/linux*unpacked /app/main/",
-        "install -Dm755 -t /app/bin/ ./run.sh"
+        "cp -a ./main/electron/dist/linux-unpacked /app/main",
+        "install -Dm755 -t /app/bin ./run.sh"
       ],
       "sources": [
         {
@@ -48,7 +48,7 @@
           "type": "script",
           "dest-filename": "run.sh",
           "commands": [
-            "zypak-wrapper.sh /app/main \"$@\""
+            "zypak-wrapper.sh /app/main/materialious \"$@\""
           ]
         },
         {

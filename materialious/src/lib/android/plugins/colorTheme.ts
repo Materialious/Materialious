@@ -9,7 +9,7 @@ export interface ColorTheme {
   }>;
 }
 
-export function convertToHexColorCode(color: number) {
+export function convertToHexColorCode(color: number): string {
   // Convert the negative number to a positive unsigned integer
   const unsignedColor = color < 0 ? color + 0x100000000 : color;
 

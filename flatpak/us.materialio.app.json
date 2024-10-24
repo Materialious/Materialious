@@ -29,20 +29,21 @@
       "name": "materialious-app",
       "buildsystem": "simple",
       "build-commands": [
-        "cd ./main && npm install --offline",
-        "cd ./main && npm run build",
-        "cd ./main && npx cap sync @capacitor-community/electron",
-        "cd ./main/electron && python patch_capacitor_plugin.py",
-        "cd ./main/electron && npm install --offline",
-        "cd ./main/electron && npm run electron:pack",
-        "cp -a ./main/electron/dist/linux-unpacked /app/main",
+        "cd ./main/materialious && npm install --offline",
+        "cd ./main/materialious && npm run build",
+        "cd ./main/materialious && npx cap sync @capacitor-community/electron",
+        "cd ./main/materialious/electron && python patch_capacitor_plugin.py",
+        "cd ./main/materialious/electron && npm install --offline",
+        "cd ./main/materialious/electron && npm run electron:pack",
+        "cp -a ./main/materialious/electron/dist/linux-unpacked /app/main",
         "install -Dm755 -t /app/bin ./run.sh"
       ],
       "sources": [
         {
-          "type": "dir",
-          "path": "../materialious",
-          "dest": "main"
+          "type": "git",
+          "url": "https://github.com/Materialious/Materialious.git",
+          "dest": "main",
+          "branch": "main"
         },
         {
           "type": "script",
@@ -55,7 +56,7 @@
           "type": "archive",
           "url": "https://github.com/electron/electron/releases/download/v33.0.2/electron-v33.0.2-linux-x64.zip",
           "sha256": "933dc1eae3f2db67912b3ab056fd15a7ca3e1328fe8dd6a1f5266c5a063b1121",
-          "dest": "main/electron/.electron-cache"
+          "dest": "main/materialious/electron/.electron-cache"
         },
         "generated-sources.json"
       ]

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { Playlist } from './Api/model';
+	import type { Playlist } from './api/model';
 	import { getBestThumbnail, letterCase, truncate } from './misc';
 	import { interfaceLowBandwidthMode } from './store';
 

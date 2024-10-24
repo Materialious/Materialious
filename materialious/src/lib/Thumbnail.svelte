@@ -2,8 +2,8 @@
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from './Api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './Api/model';
+	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from './api';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './api/model';
 	import {
 		cleanNumber,
 		getBestThumbnail,

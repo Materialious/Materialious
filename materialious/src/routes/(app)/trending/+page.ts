@@ -1,4 +1,4 @@
-import { getTrending } from '$lib/api/index.js';
+import { getTrending } from '$lib/api/index.';
 import type { Video } from '$lib/api/model';
 import { error } from '@sveltejs/kit';
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
-	import { getComments } from './Api';
-	import { type Comment, type Comments } from './Api/model';
+	import { getComments } from './api';
+	import { type Comment, type Comments } from './api/model';
 	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from './misc';
 	import { interfaceLowBandwidthMode } from './store';
 

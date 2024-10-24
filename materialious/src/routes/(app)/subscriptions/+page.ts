@@ -1,4 +1,4 @@
-import { getFeed } from '$lib/api/index.js';
+import { getFeed } from '$lib/api/index';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {

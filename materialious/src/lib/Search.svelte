@@ -3,7 +3,7 @@
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
-	import { getSearchSuggestions } from './Api';
+	import { getSearchSuggestions } from './api';
 	import { interfaceSearchSuggestionsStore } from './store';
 
 	const dispatch = createEventDispatcher();

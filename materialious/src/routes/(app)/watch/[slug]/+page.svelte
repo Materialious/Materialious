@@ -8,8 +8,8 @@
 		getPlaylist,
 		postSubscribe,
 		removePlaylistVideo
-	} from '$lib/Api/index.js';
-	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/Api/model.js';
+	} from '$lib/api/index';
+	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/api/model.js';
 	import Comment from '$lib/Comment.svelte';
 	import {
 		cleanNumber,

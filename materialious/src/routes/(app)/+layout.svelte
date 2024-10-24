@@ -3,8 +3,8 @@
 	import { navigating } from '$app/stores';
 	import '$lib/android/http/androidRequests';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/ColorTheme';
-	import { getFeed } from '$lib/Api/index';
-	import type { Notification } from '$lib/Api/model';
+	import { getFeed } from '$lib/api/index';
+	import type { Notification } from '$lib/api/model';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { amSubscribed, deleteUnsubscribe, getChannelContent, postSubscribe } from '$lib/Api';
-	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/Api/model';
+	import { amSubscribed, deleteUnsubscribe, getChannelContent, postSubscribe } from '$lib/api';
+	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/api/model';
 	import ContentColumn from '$lib/ContentColumn.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';

@@ -1,8 +1,6 @@
 name: Check desktop
 
 on:
-  push:
-    branches: ["main"]
   pull_request:
     branches: ["main"]
 
@@ -12,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  desktop-build:
+  desktop-check:
     strategy:
       matrix:
         node-version: [20]

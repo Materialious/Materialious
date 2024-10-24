@@ -89,7 +89,9 @@
 			id="search-box"
 			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
-			on:click={() => (showSearchBox = true)}
+			on:click={async () => {
+				showSearchBox = true;
+			}}
 		/>
 		{#if showSearchBox}
 			<menu class="min suggestions-container">
@@ -98,7 +100,7 @@
 					<input
 						placeholder={$_('searchPlaceholder')}
 						type="text"
-						autofocus={true}
+						autofocus
 						required
 						bind:value={search}
 						on:keydown={handleKeyDown}

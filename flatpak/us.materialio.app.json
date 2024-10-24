@@ -1,0 +1,61 @@
+{
+  "app-id": "us.materialio.app",
+  "runtime": "org.freedesktop.Platform",
+  "runtime-version": "23.08",
+  "sdk": "org.freedesktop.Sdk",
+  "base": "org.electronjs.Electron2.BaseApp",
+  "base-version": "23.08",
+  "command": "./app/materialious",
+  "finish-args": [
+    "--share=network",
+    "--socket=x11",
+    "--socket=wayland",
+    "--device=all",
+    "--share=ipc",
+    "--share=home",
+    "--talk-name=org.freedesktop.Flatpak",
+    "--talk-name=org.freedesktop.portal.Desktop"
+  ],
+  "sdk-extensions": [
+    "org.freedesktop.Sdk.Extension.node18"
+  ],
+  "build-options": {
+    "append-path": "/usr/lib/sdk/node18/bin"
+  },
+  "modules": [
+    {
+      "name": "nodejs",
+      "buildsystem": "simple",
+      "build-commands": [
+        "cd ./materialious",
+        "npm install",
+        "npm run build",
+        "npx cap sync @capacitor-community/electron",
+        "cd ./electron",
+        "python patch_capacitor_plugin.py",
+        "npm install",
+        "npm run electron:make"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/Materialious/Materialious.git",
+          "tag": "main"
+        }
+      ]
+    },
+    {
+      "name": "materialious",
+      "buildsystem": "simple",
+      "build-commands": [
+        "cp -r ./materialious/electron/dist/linux-unpacked /app/"
+      ],
+      "sources": [
+        {
+          "type": "path",
+          "path": "dist"
+        }
+      ]
+    }
+  ]
+}

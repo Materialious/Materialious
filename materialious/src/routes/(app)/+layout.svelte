@@ -2,7 +2,7 @@
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { navigating } from '$app/stores';
 	import '$lib/android/http/androidRequests';
-	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/ColorTheme';
+	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';

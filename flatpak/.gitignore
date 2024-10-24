@@ -1,1 +1,4 @@
 .flatpak-builder
+build
+builddir
+generated-sources.json

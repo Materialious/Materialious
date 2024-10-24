@@ -25,7 +25,10 @@ def run():
         if "dependencies" not in package:
             return
 
-        package["dependencies"].pop("capacitor-nodejs")
+        try:
+            package["dependencies"].pop("capacitor-nodejs")
+        except KeyError:
+            return
 
         f_.close()
 

@@ -5,56 +5,53 @@
   "sdk": "org.freedesktop.Sdk",
   "base": "org.electronjs.Electron2.BaseApp",
   "base-version": "23.08",
-  "command": "./app/materialious",
+  "command": "run.sh",
   "finish-args": [
-    "--share=network",
-    "--socket=x11",
-    "--socket=wayland",
-    "--device=all",
     "--share=ipc",
-    "--share=home",
-    "--talk-name=org.freedesktop.Flatpak",
-    "--talk-name=org.freedesktop.portal.Desktop"
+    "--socket=x11",
+    "--socket=pulseaudio",
+    "--share=network"
   ],
   "sdk-extensions": [
-    "org.freedesktop.Sdk.Extension.node18"
+    "org.freedesktop.Sdk.Extension.node20"
   ],
   "build-options": {
-    "append-path": "/usr/lib/sdk/node18/bin"
+    "append-path": "/usr/lib/sdk/node20/bin",
+    "env": {
+      "XDG_CACHE_HOME": "/run/build/us.materialio.app/flatpak-node/cache",
+      "npm_config_cache": "/run/build/us.materialio.app/flatpak-node/npm-cache",
+      "npm_config_nodedir": "/usr/lib/sdk/node20",
+      "npm_config_offline": false
+    }
   },
   "modules": [
     {
-      "name": "nodejs",
+      "name": "electron-build",
       "buildsystem": "simple",
       "build-commands": [
-        "cd ./materialious",
-        "npm install",
-        "npm run build",
-        "npx cap sync @capacitor-community/electron",
-        "cd ./electron",
-        "python patch_capacitor_plugin.py",
-        "npm install",
-        "npm run electron:make"
+        "cd ./main && npm install --offline",
+        "cd ./main && npm run build",
+        "cd ./main && npx cap sync @capacitor-community/electron",
+        "cd ./main/electron && python patch_capacitor_plugin.py",
+        "cd ./main/electron && npm install --offline",
+        ". ../flatpak-node/electron-builder-arch-args.sh && cd ./main/electron && npm run dist -- $ELECTRON_BUILDER_ARCH_ARGS  --linux --dir",
+        "cp -a ./main/electron/dist/linux*unpacked /app/main",
+        "install -Dm755 -t /app/bin/ ../run.sh"
       ],
       "sources": [
         {
-          "type": "git",
-          "url": "https://github.com/Materialious/Materialious.git",
-          "tag": "main"
-        }
-      ]
-    },
-    {
-      "name": "materialious",
-      "buildsystem": "simple",
-      "build-commands": [
-        "cp -r ./materialious/electron/dist/linux-unpacked /app/"
-      ],
-      "sources": [
+          "type": "dir",
+          "path": "../materialious",
+          "dest": "main"
+        },
         {
-          "type": "path",
-          "path": "dist"
-        }
+          "type": "script",
+          "dest-filename": "run.sh",
+          "commands": [
+            "zypak-wrapper.sh /app/main/us.materialio.app \"$@\""
+          ]
+        },
+        "generated-sources.json"
       ]
     }
   ]

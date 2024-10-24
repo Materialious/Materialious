@@ -11,5 +11,6 @@
     "i18n-ally.keystyle": "nested",
     "cSpell.words": [
         "Materialious"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

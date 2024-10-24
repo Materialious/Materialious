@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { BG } from 'bgutils-js';
 import { get } from 'svelte/store';
 import { Innertube, ProtoUtils, UniversalCache, Utils } from 'youtubei.js';
-import { capacitorFetch } from './capacitorFetch';
+import { capacitorFetch } from '../android/http/capacitorFetch';
 
 
 export interface PoTokens {

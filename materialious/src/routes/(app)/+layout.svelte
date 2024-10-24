@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { navigating } from '$app/stores';
+	import '$lib/android/http/androidRequests';
+	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/ColorTheme';
 	import { getFeed } from '$lib/Api/index';
 	import type { Notification } from '$lib/Api/model';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
-	import '$lib/patches/androidRequests';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
 	import {
@@ -184,6 +185,11 @@
 		const themeHex = get(themeColorStore);
 		if (themeHex) {
 			await ui('theme', themeHex);
+		} else if (Capacitor.getPlatform() === 'android') {
+			try {
+				const colorPalette = await colorTheme.getColorPalette();
+				await ui('theme', convertToHexColorCode(colorPalette.primary));
+			} catch {}
 		}
 
 		setTheme();

@@ -30,6 +30,10 @@
       "portable",
       "7z",
       "zip"
+    ],
+    "arch": [
+      "x64",
+      "arm64"
     ]
   },
   "mac": {
@@ -44,6 +48,10 @@
       "rpm",
       "AppImage",
       "zip"
+    ],
+    "arch": [
+      "x64",
+      "arm64"
     ],
     "category": "AudioVideo"
   },

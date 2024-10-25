@@ -26,6 +26,10 @@ jobs:
             os: macOS-latest
           - runtime: win-x64
             os: windows-latest
+          - runtime: linux-arm64
+            os: ubuntu-latest
+          - runtime: win-arm64
+            os: windows-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -53,4 +57,4 @@ jobs:
         run: cd ./materialious/electron && npm install
 
       - name: Build desktop packages
-        run: cd ./materialious/electron && npm run electron:pack
+        run: cd ./materialious/electron && npm run electron:make-no-publish

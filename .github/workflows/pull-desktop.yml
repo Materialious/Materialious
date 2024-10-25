@@ -26,10 +26,7 @@ jobs:
             os: macOS-latest
           - runtime: win-x64
             os: windows-latest
-          - runtime: linux-arm64
-            os: ubuntu-latest
-          - runtime: win-arm64
-            os: windows-latest
+
 
     runs-on: ${{ matrix.os }}
 

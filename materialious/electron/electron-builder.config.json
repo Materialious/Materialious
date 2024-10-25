@@ -1,5 +1,6 @@
 {
   "appId": "us.materialio.app",
+  "artifactName": "${productName}-${version}-${platform}-${arch}.${ext}",
   "directories": {
     "buildResources": "resources"
   },
@@ -25,10 +26,34 @@
   },
   "win": {
     "target": [
-      "nsis",
-      "portable",
-      "7z",
-      "zip"
+      {
+        "target": "nsis",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "portable",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "7z",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "zip",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }
     ]
   },
   "mac": {
@@ -37,12 +62,41 @@
   },
   "linux": {
     "target": [
-      "deb",
-      "zip",
-      "7z",
-      "rpm",
-      "AppImage",
-      "zip"
+      {
+        "target": "deb",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "zip",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "7z",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "rpm",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      {
+        "target": "AppImage",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }
     ],
     "category": "AudioVideo"
   },

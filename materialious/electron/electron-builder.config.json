@@ -1,6 +1,6 @@
 {
   "appId": "us.materialio.app",
-  "artifactName": "${productName}-${version}-${platform}-${arch}",
+  "artifactName": "${productName}-${version}-${platform}-${arch}.${ext}",
   "directories": {
     "buildResources": "resources"
   },

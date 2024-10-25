@@ -24,7 +24,12 @@
     "allowToChangeInstallationDirectory": true
   },
   "win": {
-    "target": "nsis"
+    "target": [
+      "nsis",
+      "portable",
+      "7z",
+      "zip"
+    ]
   },
   "mac": {
     "category": "Entertainment",
@@ -37,7 +42,8 @@
       "7z",
       "rpm",
       "AppImage",
-      "zip"
+      "zip",
+      "portable"
     ],
     "category": "AudioVideo"
   },

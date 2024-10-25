@@ -5,6 +5,7 @@ on:
       - 'main'
     paths-ignore:
       - '**/README.md'
+      - 'flatpak/**'
 
 permissions:
   contents: write

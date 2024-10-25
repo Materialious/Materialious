@@ -36,7 +36,8 @@
       "zip",
       "7z",
       "rpm",
-      "AppImage"
+      "AppImage",
+      "zip"
     ],
     "category": "AudioVideo"
   },

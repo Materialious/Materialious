@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths-ignore:
       - '**/README.md'
+      - 'flatpak/**'
 
   workflow_dispatch:
 

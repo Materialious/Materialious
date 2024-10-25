@@ -18,6 +18,7 @@
 		"electron:start": "npm run build && electron --inspect=5858 ./",
 		"electron:pack": "npm run build && electron-builder build --dir -c ./electron-builder.config.json",
 		"electron:make": "npm run build && electron-builder build -c ./electron-builder.config.json -p always",
+		"electron:make-no-publish": "npm run build && electron-builder build -c ./electron-builder.config.json -p never",
 		"dist": "electron-builder"
 	},
 	"dependencies": {

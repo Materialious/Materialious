@@ -4,11 +4,19 @@
   "directories": {
     "buildResources": "resources"
   },
-  "publish": {
-    "provider": "github",
-    "vPrefixedTagName": false,
-    "releaseType": "release"
-  },
+  "publish": [
+    {
+      "provider": "github",
+      "vPrefixedTagName": false,
+      "releaseType": "release"
+    },
+    {
+      "provider": "snapStore",
+      "channels": [
+        "stable"
+      ]
+    }
+  ],
   "icon": "appIcon.png",
   "files": [
     "assets/**/*",
@@ -104,7 +112,7 @@
         ]
       }
     ],
-    "category": "AudioVideo"
+    "category": "GNOME;GTK;AudioVideo;Network;Utility;"
   },
   "rpm": {
     "fpm": [

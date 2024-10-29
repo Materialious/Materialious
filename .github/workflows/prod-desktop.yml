@@ -58,20 +58,20 @@ jobs:
         run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
         shell: bash
         if: runner.os != 'Windows'
-            
+
       - name: Set up environment variables
         run: echo GH_TOKEN=${{ secrets.GITHUB_TOKEN }} >> $env:GITHUB_ENV
         shell: powershell
         if: runner.os == 'Windows'
 
+      - name: Install snapcraft
+        if: matrix.runtime == 'linux-x64'
+        run: sudo snap install snapcraft --classic
+
+      - name: Set up snapcraft environment variables
+        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_LOGIN }}" >> $GITHUB_ENV
+        shell: bash
+        if: matrix.runtime == 'linux-x64'
+
       - name: Build desktop packages
         run: cd ./materialious/electron && npm run electron:make
-
-      - name: Upload Snap to Snapcraft
-        if: matrix.runtime == 'linux-x64'
-        uses: snapcore/action-publish@v1
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
-        with:
-          snap: ./materialious/electron/dist/*.snap
-          release: stable

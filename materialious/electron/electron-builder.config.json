@@ -33,6 +33,9 @@
     "allowToChangeInstallationDirectory": true
   },
   "win": {
+    "publish": [
+      "github"
+    ],
     "target": [
       {
         "target": "nsis",
@@ -65,10 +68,16 @@
     ]
   },
   "mac": {
+    "publish": [
+      "github"
+    ],
     "category": "Entertainment",
     "target": "dmg"
   },
   "linux": {
+    "publish": [
+      "github"
+    ],
     "target": [
       {
         "target": "deb",

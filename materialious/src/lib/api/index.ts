@@ -20,6 +20,7 @@ import type {
 	Comments,
 	DeArrow,
 	Feed,
+	HashTag,
 	Playlist,
 	PlaylistPage,
 	ResolvedUrl,
@@ -150,6 +151,11 @@ export async function getSearchSuggestions(search: string, fetchOptions?: Reques
 	return await resp.json();
 }
 
+export async function getHashtag(tag: string): Promise<Video> {
+	const resp = await fetchErrorHandle(await fetch(buildPath(`hashtag/${tag}`)));
+	return await resp.json();
+}
+
 export async function getSearch(
 	search: string,
 	options: {
@@ -158,7 +164,7 @@ export async function getSearch(
 		page?: string;
 	},
 	fetchOptions?: RequestInit
-): Promise<(Channel | Video | Playlist)[]> {
+): Promise<(Channel | Video | Playlist | HashTag)[]> {
 	if (typeof options.sort_by === 'undefined') {
 		options.sort_by = 'relevance';
 	}

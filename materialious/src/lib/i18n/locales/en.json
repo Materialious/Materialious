@@ -17,6 +17,7 @@
 	"region": "Region",
 	"noResult": "No results",
 	"language": "Language",
+	"channels": "channels",
 	"transcript": "Transcript",
 	"noCaptionData": "Captions don't have any data.",
 	"selectLang": "Select language",

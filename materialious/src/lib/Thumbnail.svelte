@@ -86,13 +86,15 @@
 	}
 
 	async function loadAuthor() {
-		const channel = await getChannel(video.authorId, { priority: 'low' });
-		const img = new Image();
-		img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
+		try {
+			const channel = await getChannel(video.authorId, { priority: 'low' });
+			const img = new Image();
+			img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
 
-		img.onload = () => {
-			authorImg = img;
-		};
+			img.onload = () => {
+				authorImg = img;
+			};
+		} catch {}
 	}
 
 	onMount(async () => {

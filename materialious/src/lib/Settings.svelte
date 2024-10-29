@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, titleCase, titleCases } from './misc';
+	import { ensureNoTrailingSlash, letterCase, titleCases } from './misc';
 	import {
 		authStore,
 		darkModeStore,
@@ -343,7 +343,7 @@
 					<option selected={$interfaceForceCase === null} value={null}>Default</option>
 					{#each titleCases as caseType}
 						<option selected={$interfaceForceCase === caseType} value={caseType}
-							>{titleCase(`${caseType}`)}</option
+							>{letterCase(`${caseType}`, caseType)}</option
 						>
 					{/each}
 				</select>

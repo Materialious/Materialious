@@ -2,6 +2,7 @@
 	import { getSearch } from '$lib/api';
 	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
 	import ContentColumn from '$lib/ContentColumn.svelte';
+	import HashtagThumbnail from '$lib/HashtagThumbnail.svelte';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
 	import { activePageStore } from '$lib/store';
@@ -89,6 +90,8 @@
 								<ChannelThumbnail channel={item} />
 							{:else if item.type === 'playlist'}
 								<PlaylistThumbnail playlist={item} />
+							{:else if item.type === 'hashtag'}
+								<HashtagThumbnail hashtag={item} />
 							{/if}
 						</article>
 					{/key}

@@ -227,6 +227,14 @@ export interface SearchSuggestion {
 	suggestions: string[];
 }
 
+export interface HashTag {
+	channelCount: number;
+	title: string;
+	type: 'hashtag';
+	url: string;
+	videoCount: number;
+}
+
 export interface Notification extends VideoBase {
 	type: 'video' | 'shortVideo' | 'stream';
 }

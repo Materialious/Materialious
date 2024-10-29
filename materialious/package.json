@@ -14,7 +14,7 @@
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",
 		"@ffmpeg/util": "^0.12.1",
-		"@sveltejs/adapter-auto": "^3.2.5",
+		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/adapter-static": "^3.0.5",
 		"@sveltejs/kit": "^2.5.27",
 		"@sveltejs/vite-plugin-svelte": "^3.1.1",

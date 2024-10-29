@@ -63,10 +63,30 @@ Open an issue to add your instance.
 Deploy Materialious for your Invidious instance using Docker. Follow the steps outlined [here](./docs/DOCKER.md) for easy setup.
 
 # Desktop (Windows/MacOS/Linux)
-The latest release can be downloaded [here](https://github.com/Materialious/Materialious/releases/latest).
+<div style="display: flex; gap: 5px;">
+  <a href="https://github.com/Materialious/Materialious/releases/latest">
+    <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
+  </a>
+  <a href="https://snapcraft.io/materialious">
+    <img height="50" alt="Get it from the Snap Store" style="padding-top: .9em;" src="https://snapcraft.io/en/dark/install.svg" />
+  </a>
+</div>
 
 # Android
-Due to Google's policies on custom YouTube frontends, Materialious isn't available on Google play. The best way to install is via the [release page](https://github.com/Materialious/Materialious/releases/latest) or through [F-Droid](https://f-droid.org/packages/us.materialio.app/). It is recommended to use [Obtainium](https://github.com/ImranR98/Obtainium) if you downloaded the app through the release page, to keep Materialious up to date.
+<div style="display: flex; gap: 5px;">
+  <a href="https://github.com/Materialious/Materialious/releases/latest">
+    <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
+  </a>
+  <a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/Materialious/Materialious">
+    <img height="55" style="padding-top: .8em;" alt="Get it on Obtainium" src="https://raw.githubusercontent.com/ImranR98/Obtainium/e3fcf6e0b5187445a76462b4042aba6b2fc15047/assets/graphics/badge_obtainium.png" />
+  </a>
+  <a href="https://f-droid.org/packages/us.materialio.app/">
+    <img height="80" alt="Get it on F-Droid" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />
+  </a>
+  <a href="https://apt.izzysoft.de/fdroid/index/apk/us.materialio.app">
+    <img height="80" alt="Get it on Izzysoft" src="https://codeberg.org/IzzyOnDroid/repo/raw/commit/9873f08e282332a231e64d9729f810f427a521e4/assets/IzzyOnDroid.png" />
+  </a>
+</div>
 
 # Previews
 

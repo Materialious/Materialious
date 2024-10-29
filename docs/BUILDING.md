@@ -19,11 +19,7 @@ Materialious desktop builds are handled through GitHub using [prod-desktop.yml](
 - From here, the process follows standard [electron-builder](https://www.electron.build/) steps to complete the build.
 
 ### Desktop Release (via Flatpak)
-Flatpak builds for desktop releases are managed via [us.materailio.app](../flatpak/us.materialio.app.json).
-
-- We generate the necessary remote npm packages with `flatpak-node-generator npm -r ../materialious/package-lock.json -R ../materialious/electron/package-lock.json`, which creates [generated-sources.json](../flatpak/generated-sources.json).
-- The Linux x64 runtime is downloaded as part of the Flatpak build sources and placed in `main/materialious/electron/.electron-cache`. The [electron-builder.config.json](../materialious/electron/electron-builder.config.json) is configured to use this cache directory to avoid downloading the runtime again during the build.
-- The build process is similar to [prod-desktop.yml](../.github/workflows/prod-desktop.yml), following the guidelines for [Flatpak Electron](https://docs.flatpak.org/en/latest/electron.html).
+TODO
 
 ### Android Release
 Android builds are handled using the workflow [prod-android.yml](../.github/workflows/prod-android.yml).

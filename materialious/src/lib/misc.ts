@@ -16,8 +16,8 @@ export const titleCases: TitleCase[] = [
 	'sentence case'
 ];
 
-export function letterCase(text: string): string {
-	const casing = get(interfaceForceCase);
+export function letterCase(text: string, caseTypeOverwrite?: TitleCase): string {
+	const casing = caseTypeOverwrite ? caseTypeOverwrite : get(interfaceForceCase);
 	if (!casing) return text;
 
 	switch (casing) {
@@ -47,11 +47,20 @@ export function sentenceCase(text: string): string {
 export function titleCase(text: string): string {
 	if (!text) return '';
 
-	let words: string[] = text.split(/\s+/);
+	let words: string[] = text.split(/(\s+)/).filter(word => word.trim().length > 0);
 
 	let titleCasedWords: string[] = words.map(word => {
 		if (word.length === 0) return '';
-		return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+
+		const firstChar = word.charAt(0);
+		const restOfWord = word.slice(1).toLowerCase();
+
+		// Capitalize if the first character is a letter
+		if (/[a-zA-Z]/.test(firstChar)) {
+			return firstChar.toUpperCase() + restOfWord;
+		}
+
+		return word;
 	});
 
 	return titleCasedWords.join(' ');

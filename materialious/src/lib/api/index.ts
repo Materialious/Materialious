@@ -20,8 +20,10 @@ import type {
 	Comments,
 	DeArrow,
 	Feed,
+	HashTag,
 	Playlist,
 	PlaylistPage,
+	ResolvedUrl,
 	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
@@ -68,6 +70,11 @@ export async function getTrending(fetchOptions?: RequestInit): Promise<Video[]> 
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	const resp = await fetchErrorHandle(await fetch(buildPath('popular'), fetchOptions));
+	return await resp.json();
+}
+
+export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
+	const resp = await fetchErrorHandle(await fetch(`${buildPath('resolveurl')}?url=${url}`));
 	return await resp.json();
 }
 
@@ -144,6 +151,11 @@ export async function getSearchSuggestions(search: string, fetchOptions?: Reques
 	return await resp.json();
 }
 
+export async function getHashtag(tag: string, page: number = 0): Promise<{ results: Video[]; }> {
+	const resp = await fetchErrorHandle(await fetch(buildPath(`hashtag/${tag}?page=${page}`)));
+	return await resp.json();
+}
+
 export async function getSearch(
 	search: string,
 	options: {
@@ -152,7 +164,7 @@ export async function getSearch(
 		page?: string;
 	},
 	fetchOptions?: RequestInit
-): Promise<(Channel | Video | Playlist)[]> {
+): Promise<(Channel | Video | Playlist | HashTag)[]> {
 	if (typeof options.sort_by === 'undefined') {
 		options.sort_by = 'relevance';
 	}

@@ -68,7 +68,7 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
     <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
   </a>
   <a href="https://snapcraft.io/materialious">
-    <img height="50" alt="Get it from the Snap Store" style="padding-top: .9em;" src="https://snapcraft.io/en/dark/install.svg" />
+    <img height="50" alt="Get it from the Snap Store" src="https://snapcraft.io/en/dark/install.svg" />
   </a>
 </div>
 
@@ -78,7 +78,7 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
     <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
   </a>
   <a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/Materialious/Materialious">
-    <img height="55" style="padding-top: .8em;" alt="Get it on Obtainium" src="https://raw.githubusercontent.com/ImranR98/Obtainium/e3fcf6e0b5187445a76462b4042aba6b2fc15047/assets/graphics/badge_obtainium.png" />
+    <img height="55" alt="Get it on Obtainium" src="https://raw.githubusercontent.com/ImranR98/Obtainium/e3fcf6e0b5187445a76462b4042aba6b2fc15047/assets/graphics/badge_obtainium.png" />
   </a>
   <a href="https://f-droid.org/packages/us.materialio.app/">
     <img height="80" alt="Get it on F-Droid" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />

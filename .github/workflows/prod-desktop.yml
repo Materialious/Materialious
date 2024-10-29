@@ -5,7 +5,6 @@ on:
     branches: [ main ]
     paths-ignore:
       - '**/README.md'
-      - 'flatpak/**'
 
   workflow_dispatch:
 
@@ -67,3 +66,12 @@ jobs:
 
       - name: Build desktop packages
         run: cd ./materialious/electron && npm run electron:make
+
+      - name: Upload Snap to Snapcraft
+        if: matrix.runtime == 'linux-x64'
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
+        with:
+          snap: ./materialious/electron/dist/*.snap
+          release: stable

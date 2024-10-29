@@ -6,7 +6,6 @@ on:
     - main
     paths-ignore:
       - '**/README.md'
-      - 'flatpak/**'
 
 jobs:
   web-build:

@@ -151,8 +151,8 @@ export async function getSearchSuggestions(search: string, fetchOptions?: Reques
 	return await resp.json();
 }
 
-export async function getHashtag(tag: string): Promise<{ results: Video[]; }> {
-	const resp = await fetchErrorHandle(await fetch(buildPath(`hashtag/${tag}`)));
+export async function getHashtag(tag: string, page: number = 0): Promise<{ results: Video[]; }> {
+	const resp = await fetchErrorHandle(await fetch(buildPath(`hashtag/${tag}?page=${page}`)));
 	return await resp.json();
 }
 

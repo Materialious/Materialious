@@ -64,13 +64,14 @@ jobs:
         shell: powershell
         if: runner.os == 'Windows'
 
-      - name: Setup Snapcraft
+      - name: Install snapcraft
         if: matrix.runtime == 'linux-x64'
-        run: |
-          sudo snap install snapcraft --classic
-          echo "$SNAP_TOKEN" | snapcraft login --with -
-        env:
-          SNAP_TOKEN: ${{ secrets.SNAPCRAFT_LOGIN }} 
+        run: sudo snap install snapcraft --classic
+
+      - name: Set up snapcraft environment variables
+        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_LOGIN }}" >> $GITHUB_ENV
+        shell: bash
+        if: matrix.runtime == 'linux-x64'
 
       - name: Build desktop packages
         run: cd ./materialious/electron && npm run electron:make

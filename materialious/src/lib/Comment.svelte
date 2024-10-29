@@ -22,8 +22,8 @@
 
 	function commentTimestamps(html: string): string {
 		const regex =
-			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">(\d+:\d+(?::\d+)?)<\/a>\s*(.+)/;
-		const replacement = `<a href="/watch/${videoId}?time=$2" data-sveltekit-preload-data="off" class="link">$3</a>`;
+			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">([^<]+)<\/a>\s*(.+)/g;
+		const replacement = `<a href="/watch/${videoId}?time=$2" data-sveltekit-preload-data="off" class="link">$3 $4</a>`;
 
 		const processedHtml = html.replace(regex, replacement);
 
@@ -107,6 +107,7 @@
 	.comment {
 		display: flex;
 		margin-bottom: 0.8em;
+		white-space: pre-line;
 	}
 
 	.channel-owner {

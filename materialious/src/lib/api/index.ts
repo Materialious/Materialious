@@ -22,6 +22,7 @@ import type {
 	Feed,
 	Playlist,
 	PlaylistPage,
+	ResolvedUrl,
 	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
@@ -68,6 +69,11 @@ export async function getTrending(fetchOptions?: RequestInit): Promise<Video[]> 
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	const resp = await fetchErrorHandle(await fetch(buildPath('popular'), fetchOptions));
+	return await resp.json();
+}
+
+export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
+	const resp = await fetchErrorHandle(await fetch(`${buildPath('resolveurl')}?url=${url}`));
 	return await resp.json();
 }
 

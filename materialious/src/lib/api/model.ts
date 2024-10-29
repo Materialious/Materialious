@@ -21,6 +21,12 @@ export interface VideoBase {
 	viewCountText: string;
 }
 
+export interface ResolvedUrl {
+	ucid: string;
+	params: string;
+	pageType: string;
+}
+
 export interface Video extends VideoBase {
 	type: 'video';
 	title: string;

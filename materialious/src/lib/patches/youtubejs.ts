@@ -7,7 +7,6 @@ import { get } from 'svelte/store';
 import { Innertube, ProtoUtils, UniversalCache, Utils } from 'youtubei.js';
 import { capacitorFetch } from '../android/http/capacitorFetch';
 
-
 export interface PoTokens {
   visitor_data: string;
   po_token: string;
@@ -100,7 +99,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
   }
 
-  const descString = video.secondary_info.description.toString();
+  const descString = video.secondary_info.description?.toString() || '';
 
   let authorThumbnails: Image[];
   if (video.basic_info.channel_id) {
@@ -115,18 +114,18 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     recommendedVideos.push({
       videoThumbnails: recommended?.thumbnails as Thumbnail[] || [],
       videoId: recommended?.id || '',
-      title: recommended?.title.toString() || '',
-      viewCountText: recommended.view_count ? numberWithCommas(Number(recommended?.view_count.toString().replace(/\D/g, ''))) as string : '',
+      title: recommended?.title?.toString() || '',
+      viewCountText: recommended.view_count ? numberWithCommas(Number(recommended?.view_count.toString().replace(/\D/g, ''))) || '' : '',
       lengthSeconds: recommended?.duration?.seconds || 0,
-      author: recommended?.author.name || '',
-      authorId: recommended?.author.id || ''
+      author: recommended?.author?.name || '',
+      authorId: recommended?.author?.id || ''
     });
   });
 
   let captions: Captions[] = [];
   video.captions?.caption_tracks?.forEach(caption => {
     captions.push({
-      label: caption.name.toString(),
+      label: caption.name?.toString() || '',
       language_code: caption.language_code,
       // Add correct format to url.
       url: caption.base_url + '&fmt=vtt'
@@ -136,11 +135,11 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   let adaptiveFormats: AdaptiveFormats[] = [];
   video.streaming_data?.adaptive_formats.forEach(format => {
     adaptiveFormats.push({
-      index: format.index_range?.start.toString() || '',
-      bitrate: format.bitrate.toString(),
-      init: format.init_range?.start.toString() || '',
+      index: format.index_range?.start?.toString() || '',
+      bitrate: format.bitrate?.toString() || '',
+      init: format.init_range?.start?.toString() || '',
       url: format.url || '',
-      itag: format.itag.toString(),
+      itag: format.itag?.toString() || '',
       type: format.mime_type,
       clen: '',
       lmt: '',
@@ -168,9 +167,9 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   return {
     type: 'video',
-    title: video.primary_info.title ? video.primary_info.title.toString() : '',
-    viewCount: video.primary_info.view_count ? Number(video.primary_info.view_count.toString().replace(/\D/g, '')) : 0,
-    viewCountText: video.primary_info.view_count ? video.primary_info.view_count.toString() : '',
+    title: video.primary_info.title?.toString() || '',
+    viewCount: video.primary_info.view_count ? Number(video.primary_info.view_count?.toString()?.replace(/\D/g, '')) : 0,
+    viewCountText: video.primary_info.view_count?.toString() || '',
     likeCount: video.basic_info.like_count || 0,
     dislikeCount: 0,
     allowRatings: false,
@@ -189,9 +188,9 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     authorUrl: `/channel/${video.basic_info.channel_id}`,
     authorVerified: false,
     description: descString,
-    descriptionHtml: video.secondary_info.description.toHTML() || descString,
+    descriptionHtml: video.secondary_info.description?.toHTML() || descString,
     published: 0,
-    publishedText: video.primary_info.published ? video.primary_info.published.toString() : '',
+    publishedText: video.primary_info.published?.toString() || '',
     premiereTimestamp: 0,
     hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
     liveNow: video.basic_info.is_live || false,

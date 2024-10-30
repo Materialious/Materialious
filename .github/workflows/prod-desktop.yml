@@ -18,11 +18,14 @@ jobs:
         node-version: [20]
         runtime:
           - linux-x64
+          - linux-arm64
           - win-x64
           - osx-x64
 
         include:
         - runtime: linux-x64
+          os: ubuntu-latest
+        - runtime: linux-arm64
           os: ubuntu-latest
         - runtime: osx-x64
           os: macOS-latest
@@ -65,13 +68,13 @@ jobs:
         if: runner.os == 'Windows'
 
       - name: Install snapcraft
-        if: matrix.runtime == 'linux-x64'
+        if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
         run: sudo snap install snapcraft --classic
 
       - name: Set up snapcraft environment variables
         run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_LOGIN }}" >> $GITHUB_ENV
         shell: bash
-        if: matrix.runtime == 'linux-x64'
+        if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
 
       - name: Build desktop packages
         run: cd ./materialious/electron && npm run electron:make

@@ -9,7 +9,8 @@
       "provider": "github",
       "vPrefixedTagName": false,
       "releaseType": "release",
-      "draft": false
+      "draft": false,
+      "tagPrefix": ""
     },
     {
       "provider": "snapStore",

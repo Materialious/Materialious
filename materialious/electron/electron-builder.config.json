@@ -45,14 +45,6 @@
         ]
       },
       {
-        "target": "portable",
-        "arch": [
-          "x64",
-          "arm64"
-        ],
-        "artifactName": "portable-${productName}-${version}-${platform}-${arch}.${ext}"
-      },
-      {
         "target": "7z",
         "arch": [
           "x64",

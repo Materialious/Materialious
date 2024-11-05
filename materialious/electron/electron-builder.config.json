@@ -45,13 +45,6 @@
         ]
       },
       {
-        "target": "portable",
-        "arch": [
-          "x64",
-          "arm64"
-        ]
-      },
-      {
         "target": "7z",
         "arch": [
           "x64",

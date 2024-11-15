@@ -27,7 +27,7 @@
 	"syncParty": {
 		"userJoined": "De gebruiker heeft zich aangesloten bij jouw kijkgroep.",
 		"userLeft": "De gebruiker heeft je kijkgroep verlaten.",
-		"userOnPrivatePage": "De gebruiker bekijkt momenteel een privépagina. De synchronisatie wordt binnenkort hervat."
+		"userOnPrivatePage": "De gebruiker wie bekijkt momenteel een privépagina, de synchronisatie wordt binnenkort hervat."
 	},
 	"videoTabs": {
 		"all": "Alle",

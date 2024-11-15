@@ -25,8 +25,8 @@
 	"hideReplies": "Antworten verstecken",
 	"hideVideo": "Video verstecken",
 	"syncParty": {
-		"userJoined": "Ein Benutzer ist Ihrer Watch-Party beigetreten.",
-		"userLeft": "Ein Benutzer hat ihre Watch-Party verlassen.",
+		"userJoined": "Ein Benutzer ist Ihrer Anzeiggruppe beigetreten.",
+		"userLeft": "Ein Benutzer hat ihre Anzeiggruppe verlassen.",
 		"userOnPrivatePage": "Der Benutzer sieht gerade eine private Seite, die Synchronisierung wird in Kürze fortgesetzt."
 	},
 	"videoTabs": {
@@ -92,7 +92,7 @@
 	},
 	"layout": {
 		"interface": "Schnittstelle",
-		"star": "Sternchen auf GitHub vergeben",
+		"star": "Sternchen auf GitHub vergeben!",
 		"syncParty": "Synchronisierung der Partei",
 		"syncPartyWarning": "Bitte beachten Sie, dass Ihre IP für die von Ihnen eingeladenen Benutzer sichtbar ist.",
 		"startSyncParty": "Synchronisierung der Partei starten",
@@ -130,7 +130,7 @@
 			"miniPlayer": "Minispieler",
 			"proxyVideos": "Proxy-Videos",
 			"backgroundPlay": "Ton im Hintergrund abspielen",
-			"dash": "Bindestrich",
+			"dash": "Bindestrichmodus",
 			"silenceSkipper": "Schweigenüberspringer (Experimentell)",
 			"youtubeJsFallback": "Fallback für lokale Videoverarbeitung",
 			"youtubeJsAlways": "Verwenden Sie immer die lokale Videoverarbeitung",
@@ -143,11 +143,11 @@
 			"disableToast": "Toast deaktivieren",
 			"disableTimeline": "Segmente auf der Zeitleiste deaktivieren",
 			"Catagories": "Kategorien",
-			"unpaidSelfPromotion": "Unbezahlte / Selbstständige Förderung",
+			"unpaidSelfPromotion": "Unbezahlte/Selbstständige Förderung",
 			"interactionReminder": "Interaktionserinnerung (Abonnieren)",
 			"intermissionIntroAnimation": "Unterbrechung/Einstiegsanimation",
 			"credits": "Endkarten/Gutschriften",
-			"preViewRecapHook": "Vorschau/Rückblick/Hook",
+			"preViewRecapHook": "Vorschau/Rückblick/Haken",
 			"tangentJokes": "Füller Tangent/Witze"
 		},
 		"deArrow": {

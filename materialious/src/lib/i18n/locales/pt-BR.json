@@ -21,5 +21,20 @@
 	"transcript": "Transcrição",
 	"noCaptionData": "Legendas não contêm dados.",
 	"selectLang": "Selecione o idioma",
-	"letterCase": "Letras maiúsculas para títulos"
+	"letterCase": "Letras maiúsculas/minúsculas para títulos",
+	"hideReplies": "Ocultar respostas",
+	"hideVideo": "Ocultar vídeo",
+	"syncParty": {
+		"userJoined": "Usuário adicionado à sua sala de cinema.",
+		"userLeft": "Usuário deixou sua sala de cinema.",
+		"userOnPrivatePage": "O usuário está visualizando uma página privada, a sincronização será retomada em breve."
+	},
+	"videoTabs": {
+		"all": "Todos",
+		"videos": "Vídeos",
+		"playlists": "Listas de reprodução",
+		"channels": "Canais",
+		"shorts": "Shorts",
+		"streams": "Ao vivo"
+	}
 }

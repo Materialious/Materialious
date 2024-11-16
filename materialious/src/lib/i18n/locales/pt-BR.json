@@ -84,6 +84,39 @@
 			"core": "Baixando o núcleo do ffmpeg",
 			"wasm": "Baixando o wasm do ffmpeg",
 			"worker": "Baixando o worker do ffmpeg"
+		},
+		"noPlaylists": "Sem listas de reprodução",
+		"unableToLoadComments": "Incapaz de carregar os comentários",
+		"addToPlaylist": "Adicionar à lista de reprodução",
+		"youtubeJsFallBack": "Fallback de vídeo local sendo usado"
+	},
+	"layout": {
+		"interface": "Interface",
+		"star": "Avalie-nos com uma estrela no Github! ☆",
+		"syncParty": "Sincronizar sala",
+		"syncPartyWarning": "Por gentileza, lembre-se que seu IP ficará visível para os usuários que você convidar.",
+		"startSyncParty": "Iniciar sincronização da sala",
+		"endSyncParty": "Encerrar sincronização da sala",
+		"notifications": "Notificações",
+		"noNewNotifications": "Sem notificações recentes por aqui",
+		"settings": "Configurações",
+		"login": "Fazer login",
+		"logout": "Sair",
+		"customize": "Personalizar",
+		"lowBandwidthMode": "Modo de baixo consumo de banda larga",
+		"theme": {
+			"theme": "Tema",
+			"darkMode": "Modo escuro",
+			"lightMode": "Modo claro",
+			"AmoledTheme": "Tema Amoled",
+			"color": "Cor"
+		},
+		"searchSuggestions": "Sugestões de pesquisa",
+		"previewVideoOnHover": "Pré-visualizar vídeo com passagem do mouse",
+		"expandDescription": "Expandir descrição por padrão",
+		"expandComments": "Expandir comentários por padrão",
+		"dataPreferences": {
+			"content": "Procurando importar/exportar inscrições, alterar senha ou excluir conta? Clique aqui e navegue até o fim da página."
 		}
 	}
 }

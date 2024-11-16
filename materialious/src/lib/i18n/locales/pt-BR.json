@@ -50,6 +50,12 @@
 		"loopPlaylist": "Repetir reprodução"
 	},
 	"thumbnail": {
-		"live": "AO VIVO"
+		"live": "AO VIVO",
+		"failedToLoadImage": "Falha ao carregar a imagem"
+	},
+	"pages": {
+		"home": "Início",
+		"trending": "Popular",
+		"subscriptions": "Inscrições"
 	}
 }

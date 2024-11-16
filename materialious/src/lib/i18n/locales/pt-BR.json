@@ -13,5 +13,6 @@
 	"deleteAllHistory": "Apagar todo o histórico",
 	"skipping": "Pulando",
 	"replies": "respostas",
-	"region": "Região"
+	"region": "Região",
+	"noResult": "Sem resultados"
 }

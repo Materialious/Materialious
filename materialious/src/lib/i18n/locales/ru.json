@@ -3,18 +3,21 @@
 	"copyUrl": "Копировать ссылку",
 	"loadMore": "Загрузить ещё",
 	"views": "просмотров",
+	"invidiousBlockWarning": "Google блокирует Invidious. Если видео не загружается для этого экземпляра, используйте этот экземпляр Materialious на {android} или {desktop}, чтобы обойти эту проблему с помощью локального резервного видео.",
 	"videos": "видео",
 	"cancel": "Отмена",
 	"create": "Создать",
 	"title": "Заголовок",
 	"searchPlaceholder": "Искать...",
 	"delete": "Удалить",
+	"donate": "Пожертвовать",
 	"deleteAllHistory": "Удалить всю историю",
 	"skipping": "Пропускаю",
 	"replies": "ответ(а/ов)",
 	"region": "Регион",
 	"noResult": "Без результатов",
 	"language": "Язык",
+	"channels": "каналы",
 	"transcript": "Транскрипция",
 	"noCaptionData": "Субтитры не содержат данных.",
 	"selectLang": "Выбрать язык",
@@ -63,6 +66,8 @@
 	"player": {
 		"audioOnly": "Только звук",
 		"theatreMode": "Широкий экран",
+		"pauseTimer": "Таймер паузы",
+		"pauseVideoIn": "Приостановите видео на",
 		"share": {
 			"title": "Поделиться",
 			"materialiousLink": "Скопировать ссылку на Materialious",
@@ -70,11 +75,18 @@
 			"youtubeLink": "Скопировать ссылку на Youtube"
 		},
 		"download": "Скачать",
+		"downloadSteps": {
+			"merging": "Объединение видео и аудио",
+			"video": "Загрузка видео",
+			"audio": "Загрузка аудио",
+			"ffmpeg": "Загрузка библиотеки и компонентов ffmpeg"
+		},
 		"noPlaylists": "Нет списков воспроизведения",
 		"unableToLoadComments": "Невозможно загрузить комментарии",
 		"addToPlaylist": "Добавить в плейлист"
 	},
 	"layout": {
+		"interface": "Интерфейс",
 		"star": "Поставить нам звезду на GitHub!",
 		"syncParty": "Совместный просмотр",
 		"syncPartyWarning": "Помните, ваш IP должен быть доступен для тех кого вы приглашаете.",
@@ -117,6 +129,7 @@
 		"instanceUrl": "URL инстанса",
 		"sponsors": {
 			"sponsor": "Спонсор",
+			"Catagories": "Категории",
 			"unpaidSelfPromotion": "Самореклама",
 			"interactionReminder": "Напоминание о подписке",
 			"intermissionIntroAnimation": "Интро",

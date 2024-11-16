@@ -116,7 +116,20 @@
 		"expandDescription": "Expandir descrição por padrão",
 		"expandComments": "Expandir comentários por padrão",
 		"dataPreferences": {
-			"content": "Procurando importar/exportar inscrições, alterar senha ou excluir conta? Clique aqui e navegue até o fim da página."
+			"content": "Procurando importar/exportar inscrições, alterar senha ou excluir conta? Clique aqui e navegue até o fim da página.",
+			"dataPreferences": "Preferências de dados"
+		},
+		"player": {
+			"title": "Reprodutor",
+			"autoPlay": "Reprodução automática de vídeo",
+			"alwaysLoopVideo": "Sempre repetir o vídeo",
+			"savePlaybackPosition": "Salvar progresso da reprodução",
+			"listenByDefault": "Apenas escutar por padrão",
+			"theatreModeByDefault": "Modo teatro por padrão",
+			"autoPlayNextByDefault": "Reprodução automática por padrão",
+			"miniPlayer": "Reprodutor pequeno",
+			"proxyVideos": "Vídeos proxy",
+			"backgroundPlay": "Reproduzir áudio em segundo plano"
 		}
 	}
 }

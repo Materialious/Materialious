@@ -15,5 +15,11 @@
 	"skipping": "Pulando",
 	"replies": "respostas",
 	"region": "Região",
-	"noResult": "Sem resultados"
+	"noResult": "Sem resultados",
+	"language": "Idioma",
+	"channels": "canais",
+	"transcript": "Transcrição",
+	"noCaptionData": "Legendas não contêm dados.",
+	"selectLang": "Selecione o idioma",
+	"letterCase": "Letras maiúsculas para títulos"
 }

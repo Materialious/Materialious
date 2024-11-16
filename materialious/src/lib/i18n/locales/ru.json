@@ -129,6 +129,7 @@
 		"instanceUrl": "URL инстанса",
 		"sponsors": {
 			"sponsor": "Спонсор",
+			"Catagories": "Категории",
 			"unpaidSelfPromotion": "Самореклама",
 			"interactionReminder": "Напоминание о подписке",
 			"intermissionIntroAnimation": "Интро",

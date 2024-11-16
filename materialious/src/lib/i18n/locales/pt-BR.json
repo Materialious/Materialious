@@ -129,7 +129,32 @@
 			"autoPlayNextByDefault": "Reprodução automática por padrão",
 			"miniPlayer": "Reprodutor pequeno",
 			"proxyVideos": "Vídeos proxy",
-			"backgroundPlay": "Reproduzir áudio em segundo plano"
+			"backgroundPlay": "Reproduzir áudio em segundo plano",
+			"dash": "Hífen",
+			"silenceSkipper": "Pular silêncio (Experimental)",
+			"youtubeJsFallback": "Fallback para processamento de vídeo local",
+			"youtubeJsAlways": "Sempre usar processamento de vídeo local",
+			"lockOrientation": "Orientação travada para igualar aspecto de proporção"
+		},
+		"bookmarklet": "Favoritos",
+		"instanceUrl": "URL da instância",
+		"sponsors": {
+			"sponsor": "Patrocinador",
+			"disableToast": "Desativar avisos",
+			"disableTimeline": "Desabilitar segmentos na linha do tempo",
+			"Catagories": "Categorias",
+			"unpaidSelfPromotion": "Não remunerado/Auto promoção",
+			"interactionReminder": "Lembrete de interação (Inscreva-se)",
+			"intermissionIntroAnimation": "Intervalo/Animação de introdução",
+			"credits": "Cartões finais/Créditos",
+			"preViewRecapHook": "Prévia/Recapitulação/Gancho",
+			"tangentJokes": "Tangente não relacionada/Piadas"
+		},
+		"deArrow": {
+			"title": "DeArrow",
+			"thumbnailInstanceUrl": "URL da instância de miniatura",
+			"titleOnly": "Somente títulos"
 		}
-	}
+	},
+	"subscribe": "Inscrever-se"
 }

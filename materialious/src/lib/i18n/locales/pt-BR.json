@@ -3,5 +3,10 @@
 	"copyUrl": "Copiar URL",
 	"loadMore": "Carregar mais",
 	"views": "visualizações",
-	"invidiousBlockWarning": "Invidious está sendo bloqueado pelo Google. Se os vídeos não estiverem carregando para esta instância, por gentileza, use esta instância do Materialious no {android} ou {desktop} para contornar isso com o fallback de vídeo local."
+	"invidiousBlockWarning": "Invidious está sendo bloqueado pelo Google. Se os vídeos não estiverem carregando para esta instância, por gentileza, use esta instância do Materialious no {android} ou {desktop} para contornar isso com o fallback de vídeo local.",
+	"videos": "vídeos",
+	"cancel": "Cancelar",
+	"create": "Criar",
+	"title": "Título",
+	"searchPlaceholder": "Pesquisar"
 }

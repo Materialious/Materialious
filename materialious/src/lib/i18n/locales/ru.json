@@ -66,6 +66,8 @@
 	"player": {
 		"audioOnly": "Только звук",
 		"theatreMode": "Широкий экран",
+		"pauseTimer": "Таймер паузы",
+		"pauseVideoIn": "Приостановите видео на",
 		"share": {
 			"title": "Поделиться",
 			"materialiousLink": "Скопировать ссылку на Materialious",
@@ -73,6 +75,12 @@
 			"youtubeLink": "Скопировать ссылку на Youtube"
 		},
 		"download": "Скачать",
+		"downloadSteps": {
+			"merging": "Объединение видео и аудио",
+			"video": "Загрузка видео",
+			"audio": "Загрузка аудио",
+			"ffmpeg": "Загрузка библиотеки и компонентов ffmpeg"
+		},
 		"noPlaylists": "Нет списков воспроизведения",
 		"unableToLoadComments": "Невозможно загрузить комментарии",
 		"addToPlaylist": "Добавить в плейлист"

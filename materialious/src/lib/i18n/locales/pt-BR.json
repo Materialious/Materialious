@@ -56,6 +56,34 @@
 	"pages": {
 		"home": "Início",
 		"trending": "Popular",
-		"subscriptions": "Inscrições"
+		"subscriptions": "Inscrições",
+		"history": "Histórico",
+		"playlists": "Listas de reprodução"
+	},
+	"subscribers": "inscritos",
+	"unsubscribe": "Cancelar inscrição",
+	"loginRequired": "Login necessário",
+	"player": {
+		"audioOnly": "Somente áudio",
+		"theatreMode": "Modo teatro",
+		"pauseTimer": "Pausar temporizador",
+		"pauseVideoIn": "Pausar vídeo em ",
+		"share": {
+			"title": "Compartilhar",
+			"materialiousLink": "Copiar link Materialious",
+			"invidiousRedirect": "Copiar link de redirecionamento Invidious",
+			"youtubeLink": "Copiar link do Youtube"
+		},
+		"download": "Baixar",
+		"downloadSteps": {
+			"merging": "Mesclando vídeo e áudio juntos",
+			"video": "Baixando vídeo",
+			"audio": "Baixando áudio",
+			"ffmpeg": "Baixando biblioteca e componentes ffmpeg",
+			"classWorker": "Baixando o webworker do ffmpeg",
+			"core": "Baixando o núcleo do ffmpeg",
+			"wasm": "Baixando o wasm do ffmpeg",
+			"worker": "Baixando o worker do ffmpeg"
+		}
 	}
 }

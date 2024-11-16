@@ -8,5 +8,10 @@
 	"cancel": "Cancelar",
 	"create": "Criar",
 	"title": "Título",
-	"searchPlaceholder": "Pesquisar"
+	"searchPlaceholder": "Pesquisar",
+	"donate": "Doar",
+	"deleteAllHistory": "Apagar todo o histórico",
+	"skipping": "Pulando",
+	"replies": "respostas",
+	"region": "Região"
 }

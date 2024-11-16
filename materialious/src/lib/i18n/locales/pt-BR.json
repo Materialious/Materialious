@@ -36,5 +36,20 @@
 		"channels": "Canais",
 		"shorts": "Shorts",
 		"streams": "Ao vivo"
+	},
+	"subscriptions": {
+		"manageSubscriptions": "Gerenciar assinaturas"
+	},
+	"playlist": {
+		"createPlaylist": "Criar lista de reprodução",
+		"public": "Pública",
+		"unlisted": "Não listada",
+		"private": "Privada",
+		"playVideos": "Reproduzir vídeos",
+		"shuffleVideos": "Aleatorizar reprodução",
+		"loopPlaylist": "Repetir reprodução"
+	},
+	"thumbnail": {
+		"live": "AO VIVO"
 	}
 }

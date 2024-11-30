@@ -49,8 +49,8 @@ jobs:
 
       - name: Move files
         run: |
-          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
-          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          mv app/build/outputs/apk/release/*.apk app/build/outputs/
+          mv app/build/outputs/bundle/release/*.aab app/build/outputs/
 
       - name: Sign App
         id: sign_app

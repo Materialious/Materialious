@@ -67,18 +67,19 @@ jobs:
       - name: Make release dir
         run: mkdir app/release
 
-      - name: Delete unsigned files
-        run: find app/build/outputs/ -type f -name '*unsigned*' ! -name '*signed*' -exec rm {} +
-        continue-on-error: true
-
       - name: Delete temp apks
         run: rm app/build/outputs/*temp*
         continue-on-error: true
 
       - name: Move files to release
         run: |
-          mv app/build/outputs/*signed.aab app/release/
-          mv app/build/outputs/*signed.apk app/release/
+          mv app/build/outputs/*-signed.aab app/release/
+          mv app/build/outputs/*-signed.apk app/release/
+        continue-on-error: true
+
+      - name: Remove unsigned from file name
+        run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; done
+        continue-on-error: true
 
       - name: get-npm-version
         id: package-version

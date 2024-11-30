@@ -82,7 +82,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./materialious/android/app/release/*
           tag: v${{ steps.package-version.outputs.current-version }}
-          release_name: v${{ steps.package-version.outputs.current-version }}
+          release_name: ${{ steps.package-version.outputs.current-version }}
           overwrite: true
           file_glob: true
           draft: false

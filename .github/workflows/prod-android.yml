@@ -64,11 +64,17 @@ jobs:
 
       - name: Make release dir
         run: mkdir app/release
-
+        
       - name: Move files to release
         run: |
           mv app/build/outputs/*.aab app/release/
           mv app/build/outputs/*.apk app/release/
+
+      - name: Delete temp apks
+        run: rm app/release/*temp*
+
+      - name: Remove unsigned
+        run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; dones
 
       - name: get-npm-version
         id: package-version
@@ -85,4 +91,4 @@ jobs:
           release_name: ${{ steps.package-version.outputs.current-version }}
           overwrite: true
           file_glob: true
-          draft: false
+          draft: true

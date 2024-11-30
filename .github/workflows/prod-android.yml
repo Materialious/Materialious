@@ -49,8 +49,8 @@ jobs:
 
       - name: Move files
         run: |
-          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
-          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+          mv app/build/outputs/apk/release/*.apk app/build/outputs/
+          mv app/build/outputs/bundle/release/*.aab app/build/outputs/
 
       - name: Sign App
         id: sign_app
@@ -67,8 +67,8 @@ jobs:
 
       - name: Move files to release
         run: |
-          mv app/build/outputs/app-release-signed.aab app/release/app-release-signed.aab
-          mv app/build/outputs/app-release-signed.apk app/release/app-release-signed.apk
+          mv app/build/outputs/*.aab app/release/
+          mv app/build/outputs/*.apk app/release/
 
       - name: get-npm-version
         id: package-version
@@ -81,8 +81,8 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./materialious/android/app/release/*
-          tag: ${{ steps.package-version.outputs.current-version}}
-          release_name: ${{ steps.package-version.outputs.current-version}}
+          tag: v${{ steps.package-version.outputs.current-version }}
+          release_name: ${{ steps.package-version.outputs.current-version }}
           overwrite: true
           file_glob: true
           draft: false

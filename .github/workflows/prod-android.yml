@@ -69,8 +69,8 @@ jobs:
 
       - name: Delete unsigned files
         run: |
-          rm app/build/outputs/*unsigned.apk
-          rm app/build/outputs/*unsigned.aab
+          rm app/build/outputs/*unsigned*
+          rm app/build/outputs/*unsigned*
         continue-on-error: true
 
       - name: Move files to release

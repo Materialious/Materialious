@@ -74,9 +74,11 @@ jobs:
 
       - name: Delete temp apks
         run: rm app/release/*temp*
+        continue-on-error: true
 
       - name: Remove unsigned
         run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; done
+        continue-on-error: true
 
       - name: get-npm-version
         id: package-version

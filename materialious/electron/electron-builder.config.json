@@ -34,7 +34,11 @@
   },
   "win": {
     "publish": [
-      "github"
+      {
+        "provider": "github",
+        "vPrefixedTagName": false,
+        "releaseType": "release"
+      }
     ],
     "target": [
       {
@@ -62,14 +66,22 @@
   },
   "mac": {
     "publish": [
-      "github"
+      {
+        "provider": "github",
+        "vPrefixedTagName": false,
+        "releaseType": "release"
+      }
     ],
     "category": "Entertainment",
     "target": "dmg"
   },
   "linux": {
     "publish": [
-      "github"
+      {
+        "provider": "github",
+        "vPrefixedTagName": false,
+        "releaseType": "release"
+      }
     ],
     "target": [
       {

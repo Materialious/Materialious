@@ -67,8 +67,8 @@ jobs:
         
       - name: Move files to release
         run: |
-          mv app/build/outputs/*.aab app/release/
-          mv app/build/outputs/*.apk app/release/
+          mv app/build/outputs/*signed.aab app/release/
+          mv app/build/outputs/*signed.apk app/release/
 
       - name: Delete temp apks
         run: rm app/release/*temp*
@@ -87,8 +87,8 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./materialious/android/app/release/*
-          tag: v${{ steps.package-version.outputs.current-version }}
+          tag: ${{ steps.package-version.outputs.current-version }}
           release_name: ${{ steps.package-version.outputs.current-version }}
           overwrite: true
           file_glob: true
-          draft: true
+          draft: false

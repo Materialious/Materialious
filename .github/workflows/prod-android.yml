@@ -67,8 +67,8 @@ jobs:
 
       - name: Move files to release
         run: |
-          mv app/build/outputs/app-release-signed.aab app/release/app-release-signed.aab
-          mv app/build/outputs/app-release-signed.apk app/release/app-release-signed.apk
+          mv app/build/outputs/*.aab app/release/
+          mv app/build/outputs/*.apk app/release/
 
       - name: get-npm-version
         id: package-version

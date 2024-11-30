@@ -1,10 +1,9 @@
 name: Build Android
 on:
-  push:
-    branches:
-      - 'main'
-    paths-ignore:
-      - '**/README.md'
+  workflow_run:
+    workflows: ["Build desktop"]
+    types:
+      - completed
 
 permissions:
   contents: write

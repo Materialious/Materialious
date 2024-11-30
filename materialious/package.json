@@ -70,7 +70,7 @@
 		"sponsorblock-api": "^0.2.4",
 		"svelte-i18n": "^4.0.0",
 		"svelte-infinite-loading": "^1.4.0",
-		"svelte-persisted-store": "^0.11.0",
+		"svelte-persisted-store": "^0.12.0",
 		"terser": "^5.34.1",
 		"vidstack": "^1.12.9",
 		"youtubei.js": "^10.5.0"

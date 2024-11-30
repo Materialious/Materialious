@@ -66,7 +66,13 @@ jobs:
 
       - name: Make release dir
         run: mkdir app/release
-        
+
+      - name: Delete unsigned files
+        run: |
+          rm app/build/outputs/*unsigned.apk
+          rm app/build/outputs/*unsigned.aab
+        continue-on-error: true
+
       - name: Move files to release
         run: |
           mv app/build/outputs/*signed.aab app/release/
@@ -76,7 +82,7 @@ jobs:
         run: rm app/release/*temp*
         continue-on-error: true
 
-      - name: Remove unsigned
+      - name: Remove unsigned from file name
         run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; done
         continue-on-error: true
 

@@ -74,7 +74,7 @@ jobs:
         run: rm app/release/*temp*
 
       - name: Remove unsigned
-        run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; dones
+        run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; done
 
       - name: get-npm-version
         id: package-version

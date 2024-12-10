@@ -22,24 +22,24 @@ async function getPo(identifier: string): Promise<string | undefined> {
     identifier
   };
 
-  const challenge = await BG.Challenge.create(bgConfig);
+  const bgChallenge = await BG.Challenge.create(bgConfig);
 
-  if (!challenge)
+  if (!bgChallenge)
     throw new Error('Could not get challenge');
 
-  if (challenge.script) {
-    const script = challenge.script.find((sc) => sc !== null);
-    if (script)
-      new Function(script)();
-  }
+  const interpreterJavascript = bgChallenge.interpreterJavascript.privateDoNotAccessOrElseSafeScriptWrappedValue;
 
-  const poToken = await BG.PoToken.generate({
-    program: challenge.challenge,
-    globalName: challenge.globalName,
+  if (interpreterJavascript) {
+    new Function(interpreterJavascript)();
+  } else throw new Error('Could not load VM');
+
+  const poTokenResult = await BG.PoToken.generate({
+    program: bgChallenge.program,
+    globalName: bgChallenge.globalName,
     bgConfig
   });
 
-  return poToken;
+  return poTokenResult.poToken;
 }
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {

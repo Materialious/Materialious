@@ -5,7 +5,7 @@ import json
 import os
 import re
 
-LATEST_VERSION = "1.6.23"
+LATEST_VERSION = "1.6.24"
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
 
 ROOT_PACKAGE = os.path.join(WORKING_DIR, "package.json")

@@ -70,6 +70,9 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
   <a href="https://snapcraft.io/materialious">
     <img height="60" alt="Get it from the Snap Store" src="https://snapcraft.io/en/dark/install.svg" />
   </a>
+  <a href='https://flathub.org/apps/us.materialio.Materialious'>
+    <img width='190' alt='Get it on Flathub' src='https://flathub.org/api/badge?locale=en'/>
+  </a>
 </div>
 
 # Android

@@ -52,17 +52,15 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const poTokenCache = get(poTokenCacheStore);
   if (!poTokenCache) {
     const visitorData = ProtoUtils.encodeVisitorData(Utils.generateRandomString(11), Math.floor(Date.now() / 1000));
-    const poToken = await getPo(visitorData);
-
-    if (!poToken) {
-      throw new Error('Unable to generate PO token');
-    }
 
     tokens = {
       visitor_data: visitorData,
-      po_token: poToken
+      po_token: BG.PoToken.generatePlaceholder(visitorData)
     };
-    poTokenCacheStore.set(tokens);
+    getPo(visitorData).then((webPo) => {
+      tokens.po_token = webPo as string;
+      poTokenCacheStore.set(tokens);
+    });
   } else {
     tokens = poTokenCache;
   }
@@ -70,13 +68,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const youtube = await Innertube.create({
     visitor_data: tokens.visitor_data,
     po_token: tokens.po_token,
-    fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
-      if (Capacitor.getPlatform() === 'android') {
-        return capacitorFetch(input, init);
-      } else {
-        return fetch(input, init);
-      }
-    },
+    fetch: Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch,
     generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore)

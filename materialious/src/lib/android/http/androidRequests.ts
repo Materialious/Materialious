@@ -51,5 +51,5 @@ if (Capacitor.getPlatform() === 'android') {
     return originalXhrOpen.apply(this, args);
   };
 
-  setTimeout(() => goto('/', { replaceState: true }), 300);
+  setTimeout(() => goto('/', { replaceState: true }), 10);
 }

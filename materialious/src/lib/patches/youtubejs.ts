@@ -159,11 +159,13 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     });
   }
 
+  console.log(video.primary_info);
+
   return {
     type: 'video',
     title: video.primary_info.title?.toString() || '',
-    viewCount: video.primary_info.view_count ? Number(video.primary_info.view_count?.toString()?.replace(/\D/g, '')) : 0,
-    viewCountText: video.primary_info.view_count?.toString() || '',
+    viewCount: Number(video.primary_info.view_count?.original_view_count || 0),
+    viewCountText: video.primary_info.view_count?.original_view_count.toString() || '0',
     likeCount: video.basic_info.like_count || 0,
     dislikeCount: 0,
     allowRatings: false,

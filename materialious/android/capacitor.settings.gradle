@@ -20,6 +20,9 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 include ':capgo-inappbrowser'
 project(':capgo-inappbrowser').projectDir = new File('../node_modules/@capgo/inappbrowser/android')
 
+include ':hugotomazi-capacitor-navigation-bar'
+project(':hugotomazi-capacitor-navigation-bar').projectDir = new File('../node_modules/@hugotomazi/capacitor-navigation-bar/android')
+
 include ':mediagrid-capacitor-native-audio'
 project(':mediagrid-capacitor-native-audio').projectDir = new File('../node_modules/@mediagrid/capacitor-native-audio/android')
 

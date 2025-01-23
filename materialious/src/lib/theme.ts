@@ -1,3 +1,6 @@
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 import ui from 'beercss';
 import { get } from 'svelte/store';
 import { darkModeStore, interfaceAmoledTheme } from './store';
@@ -15,6 +18,26 @@ export async function getDynamicTheme(mode?: string): Promise<Record<string, str
 	return themeVars;
 }
 
+export async function setStatusBarColor() {
+	if (Capacitor.getPlatform() === 'android') {
+		const surfaceColor = (await getDynamicTheme())['--surface-container'];
+
+		await StatusBar.setBackgroundColor({
+			color: surfaceColor
+		});
+
+		await NavigationBar.setColor({
+			color: surfaceColor,
+			darkButtons: !get(darkModeStore)
+		});
+
+		if (get(darkModeStore)) {
+			await StatusBar.setStyle({ style: Style.Dark });
+		} else {
+			await StatusBar.setStyle({ style: Style.Light });
+		}
+	}
+}
 
 
 export function setAmoledTheme() {

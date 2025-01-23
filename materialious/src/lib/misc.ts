@@ -1,14 +1,11 @@
 import { pushState } from '$app/navigation';
 import { page } from '$app/stores';
-import { Capacitor } from '@capacitor/core';
-import { StatusBar } from '@capacitor/status-bar';
 import he from 'he';
 import humanNumber from 'human-number';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import type { Image } from './api/model';
 import { instanceStore, interfaceForceCase } from './store';
-import { getDynamicTheme } from './theme';
 
 
 export type TitleCase = 'uppercase' | 'lowercase' | 'sentence case' | 'title case' | null;
@@ -290,12 +287,4 @@ export function ensureNoTrailingSlash(url: any): string {
 	if (typeof url !== 'string') return '';
 
 	return url.endsWith('/') ? url.slice(0, -1) : url;
-}
-
-export async function setStatusBarColor() {
-	if (Capacitor.getPlatform() === 'android') {
-		await StatusBar.setBackgroundColor({
-			color: (await getDynamicTheme())['--surface-container']
-		});
-	}
 }

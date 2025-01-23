@@ -8,7 +8,6 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';
-	import { setStatusBarColor } from '$lib/misc';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
@@ -23,7 +22,7 @@
 		themeColorStore
 	} from '$lib/store';
 	import SyncParty from '$lib/SyncParty.svelte';
-	import { setAmoledTheme, setTheme } from '$lib/theme';
+	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';

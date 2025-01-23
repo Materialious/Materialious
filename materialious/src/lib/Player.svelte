@@ -19,7 +19,6 @@
 		getBestThumbnail,
 		proxyVideoUrl,
 		pullBitratePreference,
-		setStatusBarColor,
 		videoLength,
 		type PhasedDescription
 	} from './misc';
@@ -43,7 +42,7 @@
 		synciousInstanceStore,
 		synciousStore
 	} from './store';
-	import { getDynamicTheme } from './theme';
+	import { getDynamicTheme, setStatusBarColor } from './theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 	export let audioMode = false;
@@ -365,6 +364,7 @@
 
 				if (get(playerAutoPlayStore)) {
 					player.play();
+					player.exitFullscreen();
 				}
 				await loadPlayerPos();
 			});
@@ -424,8 +424,6 @@
 				}
 
 				if (Capacitor.getPlatform() === 'android') {
-					let initialFullscreen = true;
-
 					const videoFormats = data.video.adaptiveFormats.filter((format) =>
 						format.type.startsWith('video/')
 					);
@@ -433,14 +431,6 @@
 					originalOrigination = await ScreenOrientation.orientation();
 
 					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
-						// A bit of a hack to fix Android automatically
-						// fullscreening when opening a video.
-						if (initialFullscreen) {
-							player.exitFullscreen();
-							initialFullscreen = false;
-							return;
-						}
-
 						if (event.detail) {
 							// Ensure bar color is black while in fullscreen
 							await StatusBar.setBackgroundColor({ color: '#000000' });

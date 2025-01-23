@@ -20,7 +20,7 @@ export async function getDynamicTheme(mode?: string): Promise<Record<string, str
 
 export async function setStatusBarColor() {
 	if (Capacitor.getPlatform() === 'android') {
-		const surfaceColor = (await getDynamicTheme())['--surface-container'];
+		const surfaceColor = get(interfaceAmoledTheme) ? '#000000' : (await getDynamicTheme())['--surface-container'];
 
 		await StatusBar.setBackgroundColor({
 			color: surfaceColor

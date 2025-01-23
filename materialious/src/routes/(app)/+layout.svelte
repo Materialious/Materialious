@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
-	import { navigating } from '$app/stores';
+
+	import { navigating, page } from '$app/stores';
 	import '$lib/android/http/androidRequests';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed } from '$lib/api/index';
@@ -8,6 +9,7 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';
+	import { getPages } from '$lib/navPages';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
@@ -17,6 +19,7 @@
 		darkModeStore,
 		instanceStore,
 		interfaceAmoledTheme,
+		interfaceDefaultPage,
 		showWarningStore,
 		syncPartyPeerStore,
 		themeColorStore
@@ -46,39 +49,6 @@
 	});
 
 	let notifications: Notification[] = [];
-
-	const pages = [
-		{
-			icon: 'home',
-			href: '/',
-			name: $_('pages.home'),
-			requiresAuth: false
-		},
-		{
-			icon: 'whatshot',
-			href: '/trending',
-			name: $_('pages.trending'),
-			requiresAuth: false
-		},
-		{
-			icon: 'subscriptions',
-			href: '/subscriptions',
-			name: $_('pages.subscriptions'),
-			requiresAuth: true
-		},
-		{
-			icon: 'video_library',
-			href: '/playlists',
-			name: $_('pages.playlists'),
-			requiresAuth: true
-		},
-		{
-			icon: 'history',
-			href: '/history',
-			name: $_('pages.history'),
-			requiresAuth: true
-		}
-	];
 
 	interfaceAmoledTheme.subscribe(() => {
 		setAmoledTheme();
@@ -177,6 +147,19 @@
 	onMount(async () => {
 		ui();
 
+		if (
+			$interfaceDefaultPage &&
+			$interfaceDefaultPage !== '/' &&
+			$interfaceDefaultPage.startsWith('/') &&
+			$page.url.pathname === '/'
+		) {
+			getPages().forEach((page) => {
+				if (page.href === $interfaceDefaultPage && (!page.requiresAuth || $authStore)) {
+					goto($interfaceDefaultPage);
+				}
+			});
+		}
+
 		scrollableRoot = document.querySelector('.root');
 
 		loadSettingsFromEnv();
@@ -215,7 +198,7 @@
 
 <nav class="left m l small">
 	<header></header>
-	{#each pages as page}
+	{#each getPages() as page}
 		{#if !page.requiresAuth || isLoggedIn}
 			<a href={page.href} class:active={currentPage === page.name.toLowerCase()}
 				><i>{page.icon}</i>
@@ -296,7 +279,7 @@
 </nav>
 
 <nav class="bottom s">
-	{#each pages as page}
+	{#each getPages() as page}
 		{#if !page.requiresAuth || isLoggedIn}
 			<a class="round" href={page.href} class:active={currentPage === page.name.toLowerCase()}
 				><i>{page.icon}</i>

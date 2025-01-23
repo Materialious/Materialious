@@ -24,6 +24,7 @@
 	"letterCase": "Letter case for titles",
 	"hideReplies": "Hide replies",
 	"hideVideo": "Hide video",
+	"defaultPage": "Default page",
 	"syncParty": {
 		"userJoined": "User joined your watch party.",
 		"userLeft": "User left your watch party.",

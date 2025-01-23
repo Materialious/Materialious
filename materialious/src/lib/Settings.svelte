@@ -10,6 +10,7 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash, letterCase, titleCase, titleCases } from './misc';
+	import { getPages } from './navPages';
 	import {
 		authStore,
 		darkModeStore,
@@ -21,6 +22,7 @@
 		interfaceAmoledTheme,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
+		interfaceDefaultPage,
 		interfaceDisplayThumbnailAvatars,
 		interfaceForceCase,
 		interfaceLowBandwidthMode,
@@ -66,6 +68,7 @@
 	let region = get(interfaceRegionStore);
 	let forceCase = get(interfaceForceCase);
 	let defaultLanguage = get(playerDefaultLanguage);
+	let defaultPage = get(interfaceDefaultPage);
 
 	const languageNames = ISO6391.getAllCodes().map((code) =>
 		ISO6391.getName(code).toLocaleLowerCase()
@@ -382,6 +385,24 @@
 					{/each}
 				</select>
 				<label for="case">{$_('letterCase')}</label>
+				<i>arrow_drop_down</i>
+			</div>
+
+			<div class="field label suffix border">
+				<select
+					name="defaultPage"
+					bind:value={defaultPage}
+					on:change={() => interfaceDefaultPage.set(defaultPage)}
+				>
+					{#each getPages() as page}
+						{#if !page.requiresAuth || get(authStore)}
+							<option selected={$interfaceDefaultPage === page.href} value={page.href}
+								>{page.name}</option
+							>
+						{/if}
+					{/each}
+				</select>
+				<label for="defaultPage">{$_('defaultPage')}</label>
 				<i>arrow_drop_down</i>
 			</div>
 

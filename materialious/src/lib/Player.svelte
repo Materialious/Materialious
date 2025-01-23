@@ -64,6 +64,8 @@
 
 	let sponsorBlockElements: Element[] = [];
 
+	let watchProgressTimeout: NodeJS.Timeout;
+
 	function setSponsorTimeline() {
 		if (get(sponsorBlockTimelineStore)) return;
 		if (segments.length === 0) return;
@@ -232,6 +234,9 @@
 					});
 				}
 			}
+
+			// Auto save watch progress every minute.
+			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
 
 			player.addEventListener('pause', () => {
 				savePlayerPos();
@@ -543,6 +548,9 @@
 		}
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);
+		}
+		if (watchProgressTimeout) {
+			clearTimeout(watchProgressTimeout);
 		}
 		try {
 			savePlayerPos();

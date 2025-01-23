@@ -19,6 +19,7 @@
 		getBestThumbnail,
 		proxyVideoUrl,
 		pullBitratePreference,
+		setStatusBarColor,
 		videoLength,
 		type PhasedDescription
 	} from './misc';
@@ -408,6 +409,17 @@
 					await AudioPlayer.initialize(audioId);
 				}
 
+				if (Capacitor.getPlatform() === 'android') {
+					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
+						if (event.detail) {
+							// Ensure bar color is black while in fullscreen
+							await StatusBar.setBackgroundColor({ color: '#000000' });
+						} else {
+							await setStatusBarColor();
+						}
+					});
+				}
+
 				if (get(playerAndroidLockOrientation)) {
 					const videoFormats = data.video.adaptiveFormats.filter((format) =>
 						format.type.startsWith('video/')
@@ -430,6 +442,7 @@
 						} else {
 							await StatusBar.setOverlaysWebView({ overlay: false });
 							await StatusBar.show();
+
 							await ScreenOrientation.lock({
 								orientation: (originalOrigination as ScreenOrientationResult).type
 							});

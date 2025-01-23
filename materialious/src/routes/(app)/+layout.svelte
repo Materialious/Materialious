@@ -8,6 +8,7 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';
+	import { setStatusBarColor } from '$lib/misc';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
@@ -22,12 +23,11 @@
 		themeColorStore
 	} from '$lib/store';
 	import SyncParty from '$lib/SyncParty.svelte';
-	import { getDynamicTheme, setAmoledTheme, setTheme } from '$lib/theme';
+	import { setAmoledTheme, setTheme } from '$lib/theme';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
-	import { StatusBar } from '@capacitor/status-bar';
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
@@ -89,11 +89,7 @@
 		setTheme();
 		setAmoledTheme();
 
-		if (Capacitor.getPlatform() === 'android') {
-			await StatusBar.setBackgroundColor({
-				color: (await getDynamicTheme())['--surface-container']
-			});
-		}
+		await setStatusBarColor();
 	});
 
 	App.addListener('appUrlOpen', (data) => {
@@ -198,9 +194,7 @@
 					const colorPalette = await colorTheme.getColorPalette();
 					themeHex = convertToHexColorCode(colorPalette.primary);
 					await ui('theme', themeHex);
-					await StatusBar.setBackgroundColor({
-						color: (await getDynamicTheme())['--surface-container']
-					});
+					await setStatusBarColor();
 				} catch {}
 			}
 		}

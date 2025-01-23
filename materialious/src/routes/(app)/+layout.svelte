@@ -22,11 +22,12 @@
 		themeColorStore
 	} from '$lib/store';
 	import SyncParty from '$lib/SyncParty.svelte';
-	import { setAmoledTheme, setTheme } from '$lib/theme';
+	import { getDynamicTheme, setAmoledTheme, setTheme } from '$lib/theme';
 	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
+	import { StatusBar } from '@capacitor/status-bar';
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
@@ -84,9 +85,15 @@
 		setAmoledTheme();
 	});
 
-	darkModeStore.subscribe(() => {
+	darkModeStore.subscribe(async () => {
 		setTheme();
 		setAmoledTheme();
+
+		if (Capacitor.getPlatform() === 'android') {
+			await StatusBar.setBackgroundColor({
+				color: (await getDynamicTheme())['--surface-container']
+			});
+		}
 	});
 
 	App.addListener('appUrlOpen', (data) => {
@@ -182,14 +189,20 @@
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
 
-		const themeHex = get(themeColorStore);
+		let themeHex = get(themeColorStore);
 		if (themeHex) {
 			await ui('theme', themeHex);
 		} else if (Capacitor.getPlatform() === 'android') {
-			try {
-				const colorPalette = await colorTheme.getColorPalette();
-				await ui('theme', convertToHexColorCode(colorPalette.primary));
-			} catch {}
+			if (!themeHex) {
+				try {
+					const colorPalette = await colorTheme.getColorPalette();
+					themeHex = convertToHexColorCode(colorPalette.primary);
+					await ui('theme', themeHex);
+					await StatusBar.setBackgroundColor({
+						color: (await getDynamicTheme())['--surface-container']
+					});
+				} catch {}
+			}
 		}
 
 		setTheme();

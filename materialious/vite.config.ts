@@ -38,6 +38,9 @@ export default defineConfig({
 		sveltekit()
 	],
 	optimizeDeps: {
-		exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util']
+		exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+	},
+	ssr: {
+		noExternal: ['beercss']
 	}
 });

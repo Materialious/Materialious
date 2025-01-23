@@ -8,6 +8,7 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import Logo from '$lib/Logo.svelte';
 	import MiniPlayer from '$lib/MiniPlayer.svelte';
+	import { setStatusBarColor } from '$lib/misc';
 	import PageLoading from '$lib/PageLoading.svelte';
 	import Search from '$lib/Search.svelte';
 	import Settings from '$lib/Settings.svelte';
@@ -84,9 +85,11 @@
 		setAmoledTheme();
 	});
 
-	darkModeStore.subscribe(() => {
+	darkModeStore.subscribe(async () => {
 		setTheme();
 		setAmoledTheme();
+
+		await setStatusBarColor();
 	});
 
 	App.addListener('appUrlOpen', (data) => {
@@ -182,14 +185,18 @@
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
 
-		const themeHex = get(themeColorStore);
+		let themeHex = get(themeColorStore);
 		if (themeHex) {
 			await ui('theme', themeHex);
 		} else if (Capacitor.getPlatform() === 'android') {
-			try {
-				const colorPalette = await colorTheme.getColorPalette();
-				await ui('theme', convertToHexColorCode(colorPalette.primary));
-			} catch {}
+			if (!themeHex) {
+				try {
+					const colorPalette = await colorTheme.getColorPalette();
+					themeHex = convertToHexColorCode(colorPalette.primary);
+					await ui('theme', themeHex);
+					await setStatusBarColor();
+				} catch {}
+			}
 		}
 
 		setTheme();

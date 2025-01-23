@@ -18,6 +18,7 @@ Materialious allows you to customize various settings by overwriting the default
       + [Auto expand comments](#auto-expand-comments)
       + [Auto expand description](#auto-expand-desc)
       + [Low bandwidth mode](#low-bandwidth-mode)
+      + [Display thumbnail avatars](#)
    * [Player](#player)
       + [Mini player](#mini-player)
       + [Autoplay video](#autoplay-video)
@@ -135,6 +136,11 @@ Avoids loading images.
 
 ```json
 "lowBandwidthMode": true
+```
+
+### Enable thumbnail avatars
+```json
+"displayThumbnailAvatars": true
 ```
 
 ## Player

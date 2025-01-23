@@ -19,6 +19,7 @@
 		getBestThumbnail,
 		proxyVideoUrl,
 		pullBitratePreference,
+		setStatusBarColor,
 		videoLength,
 		type PhasedDescription
 	} from './misc';
@@ -30,6 +31,7 @@
 		playerAndroidBgPlayer,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
+		playerDefaultLanguage,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		silenceSkipperStore,
@@ -63,6 +65,8 @@
 	let originalOrigination: ScreenOrientationResult | undefined;
 
 	let sponsorBlockElements: Element[] = [];
+
+	let watchProgressTimeout: NodeJS.Timeout;
 
 	function setSponsorTimeline() {
 		if (get(sponsorBlockTimelineStore)) return;
@@ -233,6 +237,9 @@
 				}
 			}
 
+			// Auto save watch progress every minute.
+			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
+
 			player.addEventListener('pause', () => {
 				savePlayerPos();
 				if (get(silenceSkipperStore)) {
@@ -343,6 +350,19 @@
 			}
 
 			player.addEventListener('dash-can-play', async () => {
+				const defaultLanguage = get(playerDefaultLanguage);
+				if (defaultLanguage) {
+					let trackIndex = 0;
+					for (const track of player.audioTracks) {
+						console.log(player.audioTracks);
+						if (track.label.toLowerCase().includes(defaultLanguage)) {
+							player.remoteControl.changeAudioTrack(trackIndex);
+							break;
+						}
+						trackIndex++;
+					}
+				}
+
 				if (get(playerAutoPlayStore)) {
 					player.play();
 				}
@@ -403,13 +423,33 @@
 					await AudioPlayer.initialize(audioId);
 				}
 
-				if (get(playerAndroidLockOrientation)) {
+				if (Capacitor.getPlatform() === 'android') {
+					let initialFullscreen = true;
+
 					const videoFormats = data.video.adaptiveFormats.filter((format) =>
 						format.type.startsWith('video/')
 					);
 
 					originalOrigination = await ScreenOrientation.orientation();
+
 					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
+						// A bit of a hack to fix Android automatically
+						// fullscreening when opening a video.
+						if (initialFullscreen) {
+							player.exitFullscreen();
+							initialFullscreen = false;
+							return;
+						}
+
+						if (event.detail) {
+							// Ensure bar color is black while in fullscreen
+							await StatusBar.setBackgroundColor({ color: '#000000' });
+						} else {
+							await setStatusBarColor();
+						}
+
+						if (!get(playerAndroidLockOrientation)) return;
+
 						if (event.detail && videoFormats[0].resolution) {
 							const widthHeight = videoFormats[0].resolution.split('x');
 
@@ -425,6 +465,7 @@
 						} else {
 							await StatusBar.setOverlaysWebView({ overlay: false });
 							await StatusBar.show();
+
 							await ScreenOrientation.lock({
 								orientation: (originalOrigination as ScreenOrientationResult).type
 							});
@@ -543,6 +584,9 @@
 		}
 		if (typeof silenceSkipperInterval !== 'undefined') {
 			clearInterval(silenceSkipperInterval);
+		}
+		if (watchProgressTimeout) {
+			clearTimeout(watchProgressTimeout);
 		}
 		try {
 			savePlayerPos();

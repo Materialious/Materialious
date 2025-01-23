@@ -5,10 +5,11 @@
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
+	import ISO6391 from 'iso-639-1';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, letterCase, titleCases } from './misc';
+	import { ensureNoTrailingSlash, letterCase, titleCase, titleCases } from './misc';
 	import {
 		authStore,
 		darkModeStore,
@@ -20,6 +21,7 @@
 		interfaceAmoledTheme,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
+		interfaceDisplayThumbnailAvatars,
 		interfaceForceCase,
 		interfaceLowBandwidthMode,
 		interfacePreviewVideoOnHoverStore,
@@ -30,6 +32,7 @@
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
+		playerDefaultLanguage,
 		playerListenByDefaultStore,
 		playerMiniPlayerStore,
 		playerProxyVideosStore,
@@ -62,6 +65,11 @@
 	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
 	let region = get(interfaceRegionStore);
 	let forceCase = get(interfaceForceCase);
+	let defaultLanguage = get(playerDefaultLanguage);
+
+	const languageNames = ISO6391.getAllCodes().map((code) =>
+		ISO6391.getName(code).toLocaleLowerCase()
+	);
 
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
@@ -125,6 +133,15 @@
 		checkWidth();
 
 		addEventListener('resize', () => checkWidth());
+
+		// Set default language if not set already based off browser.
+		if (!get(playerDefaultLanguage)) {
+			const languageCode = navigator.language || navigator.languages[0];
+			const languageName = ISO6391.getName(languageCode.split('-')[0]);
+			if (languageName) {
+				playerDefaultLanguage.set(languageName.toLowerCase());
+			}
+		}
 	});
 </script>
 
@@ -235,6 +252,23 @@
 					</nav>
 				</div>
 			{/if}
+
+			<div class="field no-margin">
+				<nav class="no-padding">
+					<div class="max">
+						<div>{$_('layout.displayThumbnailAvatars')}</div>
+					</div>
+					<label class="switch">
+						<input
+							type="checkbox"
+							bind:checked={$interfaceDisplayThumbnailAvatars}
+							on:click={() =>
+								interfaceDisplayThumbnailAvatars.set(!$interfaceDisplayThumbnailAvatars)}
+						/>
+						<span></span>
+					</label>
+				</nav>
+			</div>
 
 			<div class="field no-margin">
 				<nav class="no-padding">
@@ -363,6 +397,23 @@
 			{/if}
 		</div>
 		<div class="page padding" class:active={activeTab === 'player'}>
+			<div class="margin"></div>
+			<div class="field label suffix border">
+				<select
+					name="case"
+					bind:value={defaultLanguage}
+					on:change={() => playerDefaultLanguage.set(defaultLanguage)}
+				>
+					{#each languageNames as language}
+						<option selected={$playerDefaultLanguage === language} value={language}
+							>{titleCase(language)}</option
+						>
+					{/each}
+				</select>
+				<label for="case">{$_('player.defaultLanguage')}</label>
+				<i>arrow_drop_down</i>
+			</div>
+
 			<div class="field no-margin">
 				<nav class="no-padding">
 					<div class="max">

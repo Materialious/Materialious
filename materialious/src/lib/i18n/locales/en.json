@@ -88,7 +88,8 @@
 		"noPlaylists": "No playlists",
 		"unableToLoadComments": "Unable to load comments",
 		"addToPlaylist": "Add to playlist",
-		"youtubeJsFallBack": "Local video fallback being used"
+		"youtubeJsFallBack": "Local video fallback being used",
+		"defaultLanguage": "Default Language"
 	},
 	"layout": {
 		"interface": "Interface",
@@ -104,6 +105,7 @@
 		"logout": "Logout",
 		"customize": "Customize",
 		"lowBandwidthMode": "Low bandwidth mode",
+		"displayThumbnailAvatars": "Display channel avatars on thumbnail (Slow)",
 		"theme": {
 			"theme": "Theme",
 			"darkMode": "Dark mode",

@@ -8,6 +8,7 @@ import {
 	interfaceAmoledTheme,
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
+	interfaceDefaultPage,
 	interfaceDisplayThumbnailAvatars,
 	interfaceForceCase,
 	interfaceLowBandwidthMode,
@@ -207,6 +208,11 @@ const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'b
 		name: 'defaultLanguage',
 		store: playerDefaultLanguage,
 		type: 'boolean'
+	},
+	{
+		name: 'defaultPage',
+		store: interfaceDefaultPage,
+		type: 'string'
 	}
 ];
 

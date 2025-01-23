@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.6.28",
+	"version": "1.6.29",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -53,6 +53,7 @@
 		"@capacitor/status-bar": "^6.0.1",
 		"@capgo/inappbrowser": "^6.6.8",
 		"@ffmpeg/ffmpeg": "^0.12.10",
+		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
 		"@mediagrid/capacitor-native-audio": "^1.0.0",
 		"beercss": "^3.8.0",
 		"bgutils-js": "^3.1.1",

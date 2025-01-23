@@ -8,6 +8,7 @@ import {
 	interfaceAmoledTheme,
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
+	interfaceDisplayThumbnailAvatars,
 	interfaceForceCase,
 	interfaceLowBandwidthMode,
 	interfacePreviewVideoOnHoverStore,
@@ -33,9 +34,9 @@ import {
 	synciousStore,
 	themeColorStore
 } from '$lib/store';
-import { get } from 'svelte/store';
+import { get, type Writable } from 'svelte/store';
 
-const persistedStores = [
+const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'boolean' | 'array'; }[] = [
 	{
 		name: 'returnYTDislikesInstance',
 		store: returnYTDislikesInstanceStore,
@@ -194,6 +195,11 @@ const persistedStores = [
 	{
 		name: 'lowBandwidthMode',
 		store: interfaceLowBandwidthMode,
+		type: 'boolean'
+	},
+	{
+		name: 'displayThumbnailAvatars',
+		store: interfaceDisplayThumbnailAvatars,
 		type: 'boolean'
 	}
 ];

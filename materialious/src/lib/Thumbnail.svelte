@@ -18,6 +18,7 @@
 		authStore,
 		deArrowEnabledStore,
 		deArrowTitlesOnly,
+		interfaceDisplayThumbnailAvatars,
 		interfaceLowBandwidthMode,
 		interfacePreviewVideoOnHoverStore,
 		playerProxyVideosStore,
@@ -86,6 +87,8 @@
 	}
 
 	async function loadAuthor() {
+		if (!get(interfaceDisplayThumbnailAvatars)) return;
+
 		try {
 			const channel = await getChannel(video.authorId, { priority: 'low' });
 			const img = new Image();
@@ -370,7 +373,7 @@
 		</div>
 
 		<div class="thumbnail-details video-title">
-			{#if !sideways && !$interfaceLowBandwidthMode}
+			{#if !sideways && !$interfaceLowBandwidthMode && $interfaceDisplayThumbnailAvatars}
 				<div style="margin-right: 1em;">
 					{#if authorImg}
 						<img src={authorImg.src} alt="Author" class="circle small" />

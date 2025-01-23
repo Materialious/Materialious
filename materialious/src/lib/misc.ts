@@ -292,7 +292,6 @@ export function ensureNoTrailingSlash(url: any): string {
 	return url.endsWith('/') ? url.slice(0, -1) : url;
 }
 
-
 export async function setStatusBarColor() {
 	if (Capacitor.getPlatform() === 'android') {
 		await StatusBar.setBackgroundColor({

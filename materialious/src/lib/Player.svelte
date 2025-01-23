@@ -410,23 +410,32 @@
 				}
 
 				if (Capacitor.getPlatform() === 'android') {
+					let initialFullscreen = true;
+
+					const videoFormats = data.video.adaptiveFormats.filter((format) =>
+						format.type.startsWith('video/')
+					);
+
+					originalOrigination = await ScreenOrientation.orientation();
+
 					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
+						// A bit of a hack to fix Android automatically
+						// fullscreening when opening a video.
+						if (initialFullscreen) {
+							player.exitFullscreen();
+							initialFullscreen = false;
+							return;
+						}
+
 						if (event.detail) {
 							// Ensure bar color is black while in fullscreen
 							await StatusBar.setBackgroundColor({ color: '#000000' });
 						} else {
 							await setStatusBarColor();
 						}
-					});
-				}
 
-				if (get(playerAndroidLockOrientation)) {
-					const videoFormats = data.video.adaptiveFormats.filter((format) =>
-						format.type.startsWith('video/')
-					);
+						if (!get(playerAndroidLockOrientation)) return;
 
-					originalOrigination = await ScreenOrientation.orientation();
-					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
 						if (event.detail && videoFormats[0].resolution) {
 							const widthHeight = videoFormats[0].resolution.split('x');
 

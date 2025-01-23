@@ -44,6 +44,7 @@ export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);
 export const playerAndroidBgPlayer = persisted('androidBgPlayer', true);
 export const playerAndroidLockOrientation = persisted('androidLockOrientation', true);
+export const playerDefaultLanguage = persisted('defaultLanguage', '');
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(

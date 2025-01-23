@@ -31,6 +31,7 @@
 		playerAndroidBgPlayer,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
+		playerDefaultLanguage,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		silenceSkipperStore,
@@ -349,6 +350,19 @@
 			}
 
 			player.addEventListener('dash-can-play', async () => {
+				const defaultLanguage = get(playerDefaultLanguage);
+				if (defaultLanguage) {
+					let trackIndex = 0;
+					for (const track of player.audioTracks) {
+						console.log(player.audioTracks);
+						if (track.label.toLowerCase().includes(defaultLanguage)) {
+							player.remoteControl.changeAudioTrack(trackIndex);
+							break;
+						}
+						trackIndex++;
+					}
+				}
+
 				if (get(playerAutoPlayStore)) {
 					player.play();
 				}

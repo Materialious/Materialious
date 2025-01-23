@@ -17,6 +17,7 @@ import {
 	playerAlwaysLoopStore,
 	playerAutoPlayStore,
 	playerAutoplayNextByDefaultStore,
+	playerDefaultLanguage,
 	playerListenByDefaultStore,
 	playerMiniPlayerStore,
 	playerProxyVideosStore,
@@ -200,6 +201,11 @@ const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'b
 	{
 		name: 'displayThumbnailAvatars',
 		store: interfaceDisplayThumbnailAvatars,
+		type: 'boolean'
+	},
+	{
+		name: 'defaultLanguage',
+		store: playerDefaultLanguage,
 		type: 'boolean'
 	}
 ];

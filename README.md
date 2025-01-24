@@ -47,8 +47,6 @@
 - YT path redirects (So your redirect plugins should still work!)
 
 # Support table
-Here’s the updated table with the "ffmpeg download merging" column completely removed:
-
 |         | Dash | HLS | Local video fallback | API-Extended | Dearrow | RYD |
 |---------|------|-----|----------------------|--------------|---------|-----|
 | Web     | ✅    | ✅   | ❌                    | ✅            | ✅       | ✅   |

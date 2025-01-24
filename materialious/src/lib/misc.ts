@@ -107,6 +107,30 @@ export interface PhasedDescription {
 	timestamps: { title: string; time: number; timePretty: string; }[];
 }
 
+export function padTime(time: string): string {
+	let timeParts = time.split(':');
+
+	if (timeParts.length < 3) {
+		timeParts = ('00:' + time).split(':');
+	}
+
+	const hours = (timeParts[0] || '0').padStart(2, '0');
+	const minutes = (timeParts[1] || '0').padStart(2, '0');
+
+	let seconds = timeParts[2] || '0';
+	let milliseconds = '';
+
+	if (seconds.includes('.')) {
+		const [sec, ms] = seconds.split('.');
+		seconds = sec.padStart(2, '0');
+		milliseconds = `.${ms.padStart(3, '0')}`;
+	} else {
+		seconds = seconds.padStart(2, '0');
+	}
+
+	return `${hours}:${minutes}:${seconds}${milliseconds}`;
+}
+
 export function decodeHtmlCharCodes(str: string): string {
 	const { decode } = he;
 	return decode(str);

@@ -37,9 +37,6 @@ export default defineConfig({
 		vidstack(),
 		sveltekit()
 	],
-	optimizeDeps: {
-		exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
-	},
 	ssr: {
 		noExternal: ['beercss']
 	}

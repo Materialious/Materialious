@@ -18,6 +18,7 @@
 	import type { VideoPlay } from './api/model';
 	import {
 		getBestThumbnail,
+		padTime,
 		proxyVideoUrl,
 		pullBitratePreference,
 		videoLength,
@@ -223,7 +224,7 @@
 						endTime = data.content.timestamps[timestampIndex + 1].timePretty;
 					}
 
-					chapterWebVTT += `${timestamp.timePretty} --> ${endTime}\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
+					chapterWebVTT += `${padTime(timestamp.timePretty)} --> ${padTime(endTime)}\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
 
 					timestampIndex += 1;
 				});

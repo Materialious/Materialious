@@ -13,7 +13,6 @@
 
 	let hiddenVideos: string[] = [];
 	let auth = get(authStore);
-	let largeCol = '2';
 
 	async function removePlaylistItem(indexId: string, videoId: string) {
 		if (!playlistId) return;

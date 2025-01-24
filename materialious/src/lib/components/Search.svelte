@@ -4,7 +4,11 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { getSearchSuggestions } from '../api';
-	import { interfaceSearchSuggestionsStore } from '../store';
+	import {
+		interfaceSearchHistoryEnabled,
+		interfaceSearchSuggestionsStore,
+		searchHistoryStore
+	} from '../store';
 
 	const dispatch = createEventDispatcher();
 
@@ -38,7 +42,12 @@
 		goto(`/search/${encodeURIComponent(search)}`);
 		dispatch('searchSubmitted');
 
+		suggestionsForSearch = [];
 		showSearchBox = false;
+
+		if ($interfaceSearchHistoryEnabled && !$searchHistoryStore.includes(search)) {
+			searchHistoryStore.set([search, ...$searchHistoryStore]);
+		}
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
@@ -128,6 +137,13 @@
 							href={`/search/${encodeURIComponent(suggestion)}`}
 						>
 							<div>{suggestion}</div>
+						</a>
+					{/each}
+				{/if}
+				{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
+					{#each $searchHistoryStore as history}
+						<a class="row" href={`/search/${encodeURIComponent(history)}`}>
+							<div>{history}</div>
 						</a>
 					{/each}
 				{/if}

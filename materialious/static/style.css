@@ -48,6 +48,10 @@
 	display: none !important;
 }
 
+#dialog-settings form {
+	margin: 1em 0;
+}
+
 main.root {
 	padding-left: 7em !important;
 	padding-top: 5em !important;

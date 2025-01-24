@@ -10,7 +10,7 @@
 	import MiniPlayer from '$lib/components/MiniPlayer.svelte';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import Search from '$lib/components/Search.svelte';
-	import Settings from '$lib/components/Settings.svelte';
+	import Settings from '$lib/components/Settings/Settings.svelte';
 	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';

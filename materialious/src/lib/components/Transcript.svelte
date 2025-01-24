@@ -5,9 +5,9 @@
 	import { get } from 'svelte/store';
 	import type { MediaTimeUpdateEvent } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
-	import type { VideoPlay } from './api/model';
-	import { decodeHtmlCharCodes, videoLength } from './misc';
-	import { instanceStore } from './store';
+	import type { VideoPlay } from '../api/model';
+	import { decodeHtmlCharCodes, videoLength } from '../misc';
+	import { instanceStore } from '../store';
 
 	export let video: VideoPlay;
 	export let player: MediaPlayerElement;

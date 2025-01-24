@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import PageLoading from '$lib/PageLoading.svelte';
+	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { authStore } from '$lib/store';
 	import { onMount } from 'svelte';
 

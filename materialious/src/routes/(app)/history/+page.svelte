@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { deleteAllVideoProgress, deleteHistory, getHistory, getVideo } from '$lib/api';
 	import type { VideoPlay } from '$lib/api/model';
-	import PageLoading from '$lib/PageLoading.svelte';
-	import VideoList from '$lib/VideoList.svelte';
+	import PageLoading from '$lib/components/PageLoading.svelte';
+	import VideoList from '$lib/components/VideoList.svelte';
 	import { activePageStore, synciousStore } from '$lib/store';
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';

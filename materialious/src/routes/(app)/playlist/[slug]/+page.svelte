@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { getPlaylist } from '$lib/api/index';
 	import type { PlaylistPageVideo } from '$lib/api/model.js';
+	import VideoList from '$lib/components/VideoList.svelte';
 	import { cleanNumber, unsafeRandomItem } from '$lib/misc.js';
 	import { activePageStore, playlistSettingsStore } from '$lib/store';
-	import VideoList from '$lib/VideoList.svelte';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';

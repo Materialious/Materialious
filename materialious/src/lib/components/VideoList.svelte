@@ -1,11 +1,11 @@
 <script lang="ts">
+	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { removePlaylistVideo } from './api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './api/model';
+	import { removePlaylistVideo } from '../api';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
+	import { authStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
-	import { authStore } from './store';
-	import Thumbnail from './Thumbnail.svelte';
 
 	export let videos: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[] = [];
 	export let playlistId: string = '';

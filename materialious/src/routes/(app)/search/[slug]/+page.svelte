@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { getSearch } from '$lib/api';
-	import ChannelThumbnail from '$lib/ChannelThumbnail.svelte';
-	import ContentColumn from '$lib/ContentColumn.svelte';
-	import HashtagThumbnail from '$lib/HashtagThumbnail.svelte';
-	import PageLoading from '$lib/PageLoading.svelte';
-	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
+	import ChannelThumbnail from '$lib/components/ChannelThumbnail.svelte';
+	import ContentColumn from '$lib/components/ContentColumn.svelte';
+	import HashtagThumbnail from '$lib/components/HashtagThumbnail.svelte';
+	import PageLoading from '$lib/components/PageLoading.svelte';
+	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
+	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { activePageStore } from '$lib/store';
-	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 

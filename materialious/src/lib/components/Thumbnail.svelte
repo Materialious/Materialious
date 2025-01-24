@@ -2,8 +2,8 @@
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from './api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from './api/model';
+	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from '../api';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from '../api/model';
 	import {
 		cleanNumber,
 		getBestThumbnail,
@@ -12,8 +12,8 @@
 		proxyVideoUrl,
 		truncate,
 		videoLength
-	} from './misc';
-	import type { PlayerEvents } from './player';
+	} from '../misc';
+	import type { PlayerEvents } from '../player';
 	import {
 		authStore,
 		deArrowEnabledStore,
@@ -27,7 +27,7 @@
 		syncPartyPeerStore,
 		synciousInstanceStore,
 		synciousStore
-	} from './store';
+	} from '../store';
 
 	const dispatch = createEventDispatcher();
 

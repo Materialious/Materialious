@@ -2,15 +2,14 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { Playlist } from './api/model';
-	import { getBestThumbnail, letterCase, truncate } from './misc';
-	import { interfaceLowBandwidthMode } from './store';
+	import type { Playlist } from '../api/model';
+	import { getBestThumbnail, letterCase, truncate } from '../misc';
+	import { interfaceLowBandwidthMode } from '../store';
 
 	export let playlist: Playlist;
 	export let disabled: boolean = false;
 
 	let loading = true;
-	let failed = false;
 
 	let img: HTMLImageElement;
 
@@ -35,7 +34,6 @@
 		};
 		img.onerror = () => {
 			loading = false;
-			failed = true;
 		};
 	});
 </script>

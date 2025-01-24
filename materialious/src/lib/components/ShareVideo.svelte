@@ -2,7 +2,7 @@
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from 'svelte-i18n';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase } from './api/model';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
 
 	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
 </script>

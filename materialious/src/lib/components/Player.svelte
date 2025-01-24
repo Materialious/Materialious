@@ -14,8 +14,8 @@
 	import { get } from 'svelte/store';
 	import type { FullscreenChangeEvent, MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
-	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from './api';
-	import type { VideoPlay } from './api/model';
+	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
+	import type { VideoPlay } from '../api/model';
 	import {
 		getBestThumbnail,
 		padTime,
@@ -23,7 +23,7 @@
 		pullBitratePreference,
 		videoLength,
 		type PhasedDescription
-	} from './misc';
+	} from '../misc';
 	import {
 		authStore,
 		instanceStore,
@@ -43,8 +43,8 @@
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore
-	} from './store';
-	import { getDynamicTheme, setStatusBarColor } from './theme';
+	} from '../store';
+	import { getDynamicTheme, setStatusBarColor } from '../theme';
 
 	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 	export let audioMode = false;

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import ui from 'beercss';
 	import { onMount } from 'svelte';
-	import { darkModeStore, themeColorStore } from './store';
-	import { getDynamicTheme } from './theme';
+	import { darkModeStore, themeColorStore } from '../store';
+	import { getDynamicTheme } from '../theme';
 
 	export let classes = '';
 

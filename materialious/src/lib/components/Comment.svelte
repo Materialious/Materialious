@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { getComments } from '$lib/api';
+	import { type Comment, type Comments } from '$lib/api/model';
+	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from '$lib/misc';
+	import { interfaceLowBandwidthMode } from '$lib/store';
 	import { _ } from 'svelte-i18n';
-	import { getComments } from './api';
-	import { type Comment, type Comments } from './api/model';
-	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from './misc';
-	import { interfaceLowBandwidthMode } from './store';
 
 	export let comment: Comment;
 	export let videoId: string;

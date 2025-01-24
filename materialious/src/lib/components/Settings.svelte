@@ -9,8 +9,8 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, letterCase, titleCase, titleCases } from './misc';
-	import { getPages } from './navPages';
+	import { ensureNoTrailingSlash, letterCase, titleCase, titleCases } from '../misc';
+	import { getPages } from '../navPages';
 	import {
 		authStore,
 		darkModeStore,
@@ -53,8 +53,8 @@
 		synciousInstanceStore,
 		synciousStore,
 		themeColorStore
-	} from './store';
-	import { setAmoledTheme } from './theme';
+	} from '../store';
+	import { setAmoledTheme } from '../theme';
 
 	let sponsorCategoriesList: string[] = [];
 	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));

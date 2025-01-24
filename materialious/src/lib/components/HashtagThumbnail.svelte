@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
-	import type { HashTag } from './api/model';
-	import { cleanNumber, truncate } from './misc';
+	import type { HashTag } from '../api/model';
+	import { cleanNumber, truncate } from '../misc';
 
 	export let hashtag: HashTag;
 

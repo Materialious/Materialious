@@ -346,6 +346,8 @@
 			}
 
 			player.addEventListener('dash-can-play', async () => {
+				await loadPlayerPos();
+
 				const defaultLanguage = get(playerDefaultLanguage);
 				if (defaultLanguage) {
 					let trackIndex = 0;
@@ -363,7 +365,6 @@
 					player.play();
 					player.exitFullscreen();
 				}
-				await loadPlayerPos();
 			});
 
 			if (
@@ -544,7 +545,7 @@
 	function savePlayerPos() {
 		if (data.video.hlsUrl) return;
 
-		if (get(playerSavePlaybackPositionStore) && player.currentTime) {
+		if (get(playerSavePlaybackPositionStore) && player && player.currentTime) {
 			if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
 				try {
 					localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());

@@ -23,35 +23,26 @@ function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
                     return reject(new Error('Too many redirects'));
                 }
 
-                let redirectHeaderLocation = res.headers.location;
-
-                // Handle relative URLs
-                if (redirectHeaderLocation.startsWith('/')) {
-                    redirectHeaderLocation = targetUrl.host + redirectHeaderLocation;
-                }
-
-                // Add http:// if missing from the Location header
-                if (!redirectHeaderLocation.startsWith('http')) {
-                    redirectHeaderLocation = 'http://' + redirectHeaderLocation;
-                }
-
                 try {
                     // Attempt to create the redirect URL
-                    let redirectUrl = new URL(redirectHeaderLocation);
+                    const redirectUrl = new URL(res.headers.location, targetUrl);
                     return resolve(fetchWithRedirects(redirectUrl, options, redirectCount + 1));
                 } catch (error) {
-                    // Catch invalid URL errors
                     return reject(new Error(`Invalid URL in redirect: ${error.message}`));
                 }
             }
             resolve(res); // Resolve with the final response if not a redirect
         });
 
-        req.on('error', reject);
+        if (options.body && (req.method === 'POST' || req.method === 'PUT')) {
+            req.write(options.body);
+        }
+
+        req.setTimeout(10000, () => reject(new Error('Request timeout')), req.end());
+        req.on('error', (error) => reject(error), req.end());
         req.end();
     });
 }
-
 
 const server = http.createServer(async (req, res) => {
     setCorsHeaders(res);
@@ -66,10 +57,11 @@ const server = http.createServer(async (req, res) => {
         return res.end('No URL provided to fetch.');
     }
 
-    const targetUrl = req.url.slice(1); // Remove leading '/'
+    let targetUrl = req.url.slice(1); // Remove leading '/'
     let parsedTarget;
     try {
-        if (!targetUrl.startsWith('http')) {
+        // Ensure protocol (http) is added if missing
+        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
             targetUrl = 'http://' + targetUrl;
         }
         parsedTarget = new URL(targetUrl);
@@ -78,30 +70,51 @@ const server = http.createServer(async (req, res) => {
         return res.end(`Invalid URL: ${error.message}`);
     }
 
-    const options = {
-        method: req.method,
-        headers: {
-            ...req.headers,
-            host: parsedTarget.hostname, // Ensure correct host header
-        },
-    };
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk;
+    });
 
-    try {
-        const proxyRes = await fetchWithRedirects(parsedTarget, options);
-        res.writeHead(proxyRes.statusCode, {
-            ...proxyRes.headers,
-            'Access-Control-Allow-Origin': ORIGIN,
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': '*',
-            'Access-Control-Allow-Credentials': 'true',
-        });
+    req.on('end', async () => {
+        const options = {
+            method: req.method,
+            headers: {
+                ...req.headers,
+                host: parsedTarget.hostname, // Ensure correct host header
+            }
+        };
 
-        proxyRes.pipe(res); // Pipe response data back to the client
-    } catch (error) {
-        console.error('Proxy error:', error);
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end(`Error: ${error.message}`);
-    }
+        // For POST and PUT methods, pass the body to the outgoing request
+        if (req.method === 'POST' || req.method === 'PUT') {
+            options.headers['Content-Length'] = Buffer.byteLength(body);
+            options.body = body;
+        }
+
+        try {
+            const proxyRes = await fetchWithRedirects(parsedTarget, options);
+
+            req.on('close', () => {
+                console.log('Request canceled by the client.');
+                proxyRes.destroy();
+            });
+
+            res.writeHead(proxyRes.statusCode, {
+                ...proxyRes.headers,
+                'Access-Control-Allow-Origin': ORIGIN,
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Credentials': 'true',
+            });
+
+            // Pipe response data back to the client
+            proxyRes.pipe(res);
+
+        } catch (error) {
+            console.error('Proxy error:', error);
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end(`Error: ${error.message}`);
+        }
+    });
 });
 
 server.listen(PORT, () => {

@@ -4,10 +4,9 @@ const https = require('https');
 const HOST = 'localhost';
 const PORT = 3000;
 const MAX_REDIRECTS = 5;
-const ORIGIN = `https://${HOST}`;
 
 function setCorsHeaders(res) {
-    res.setHeader('Access-Control-Allow-Origin', ORIGIN);
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -16,6 +15,7 @@ function setCorsHeaders(res) {
 function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
     return new Promise((resolve, reject) => {
         const httpClient = targetUrl.protocol.startsWith('https') ? https : http;
+
 
         const req = httpClient.request(targetUrl, options, (res) => {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
@@ -78,10 +78,11 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
         const options = {
             method: req.method,
-            headers: {
-                ...req.headers,
-                host: parsedTarget.hostname, // Ensure correct host header
-            }
+            headers: Object.fromEntries(
+                Object.entries(req.headers).filter(([key]) => ![
+                    'host', 'origin', 'referer', 'x-forwarded-for', 'x-requested-with'
+                ].includes(key.toLowerCase()))
+            )
         };
 
         // For POST and PUT methods, pass the body to the outgoing request
@@ -100,7 +101,7 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(proxyRes.statusCode, {
                 ...proxyRes.headers,
-                'Access-Control-Allow-Origin': ORIGIN,
+                'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': '*',
                 'Access-Control-Allow-Credentials': 'true',

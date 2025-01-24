@@ -37,6 +37,8 @@
 		selectedSuggestionIndex = -1;
 		goto(`/search/${encodeURIComponent(search)}`);
 		dispatch('searchSubmitted');
+
+		showSearchBox = false;
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {

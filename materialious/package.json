@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.6.29",
+	"version": "1.6.30",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -13,7 +13,6 @@
 	},
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",
-		"@ffmpeg/util": "^0.12.1",
 		"@sveltejs/adapter-auto": "^3.2.5",
 		"@sveltejs/adapter-static": "^3.0.5",
 		"@sveltejs/kit": "^2.9.1",
@@ -52,7 +51,6 @@
 		"@capacitor/screen-orientation": "^6.0.2",
 		"@capacitor/status-bar": "^6.0.1",
 		"@capgo/inappbrowser": "^6.6.8",
-		"@ffmpeg/ffmpeg": "^0.12.10",
 		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
 		"@mediagrid/capacitor-native-audio": "^1.0.0",
 		"beercss": "^3.8.0",

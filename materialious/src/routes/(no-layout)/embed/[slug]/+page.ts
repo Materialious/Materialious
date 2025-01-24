@@ -1,8 +1,8 @@
 import { getVideo } from '$lib/api/index';
+import type { PhasedDescription } from '$lib/misc';
+import { playerProxyVideosStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import type { PhasedDescription } from '../../../../lib/misc.js';
-import { playerProxyVideosStore } from '../../../../lib/store.js';
 
 export async function load({ params }) {
   let video;

@@ -2,6 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 import ui from 'beercss';
+import { tick } from 'svelte';
 import { get } from 'svelte/store';
 import { darkModeStore, interfaceAmoledTheme } from './store';
 
@@ -20,6 +21,8 @@ export async function getDynamicTheme(mode?: string): Promise<Record<string, str
 
 export async function setStatusBarColor() {
 	if (Capacitor.getPlatform() === 'android') {
+		await tick();
+
 		const surfaceColor = get(interfaceAmoledTheme) ? '#000000' : (await getDynamicTheme())['--surface-container'];
 
 		await StatusBar.setBackgroundColor({

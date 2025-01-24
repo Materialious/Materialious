@@ -9,21 +9,16 @@
 		postSubscribe,
 		removePlaylistVideo
 	} from '$lib/api/index';
-	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/api/model.js';
-	import Comment from '$lib/Comment.svelte';
-	import {
-		cleanNumber,
-		getBestThumbnail,
-		humanizeSeconds,
-		letterCase,
-		numberWithCommas,
-		proxyGoogleImage,
-		truncate,
-		unsafeRandomItem
-	} from '$lib/misc';
+	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/api/model';
+	import Comment from '$lib/components/Comment.svelte';
+	import Player from '$lib/components/Player.svelte';
+	import ShareVideo from '$lib/components/ShareVideo.svelte';
+	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import Transcript from '$lib/components/Transcript.svelte';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { letterCase } from '$lib/letterCasing';
+	import { truncate, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
-	import Player from '$lib/Player.svelte';
-	import ShareVideo from '$lib/ShareVideo.svelte';
 	import {
 		activePageStore,
 		authStore,
@@ -39,9 +34,7 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
-	import Thumbnail from '$lib/Thumbnail.svelte';
-	import Transcript from '$lib/Transcript.svelte';
-	import { mergeMediaFromDASH } from '$lib/videoDownload';
+	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/time';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';
@@ -434,50 +427,6 @@
 
 	let downloadStage: string | undefined;
 	let downloadProgress: number = 0;
-
-	function onVideoDownloadProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.video');
-		downloadProgress = progress;
-	}
-
-	function onAudioDownloadProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.audio');
-		downloadProgress = progress;
-	}
-
-	function onMergingProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.merging');
-		downloadProgress = progress;
-
-		if (progress >= 100) {
-			downloadStage = undefined;
-		}
-	}
-
-	function onLoadingFFmpeg(completed: boolean) {
-		downloadProgress = 0;
-		downloadStage = $_('player.downloadSteps.ffmpeg');
-	}
-
-	function onClassWorkerProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.classWorker');
-		downloadProgress = progress;
-	}
-
-	function onCoreProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.core');
-		downloadProgress = progress;
-	}
-
-	function onWasmProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.wasm');
-		downloadProgress = progress;
-	}
-
-	function onWorkerProgress(progress: number) {
-		downloadStage = $_('player.downloadSteps.worker');
-		downloadProgress = progress;
-	}
 </script>
 
 <svelte:head>
@@ -621,33 +570,6 @@
 							<ShareVideo video={data.video} />
 						</menu></button
 					>
-					{#await data.streamed.downloadQualitiesDash then downloadQualitiesDash}
-						{#if downloadQualitiesDash}
-							<button class="border"
-								><i>download</i>
-								<div class="tooltip">{$_('player.download')}</div>
-								<menu class="no-wrap">
-									{#each downloadQualitiesDash as quality}
-										<a
-											class="row"
-											href="#download"
-											on:click={async () =>
-												await mergeMediaFromDASH(quality, data.video.title, {
-													video: onVideoDownloadProgress,
-													audio: onAudioDownloadProgress,
-													merging: onMergingProgress,
-													loadingFfmpeg: onLoadingFFmpeg,
-													classWorker: onClassWorkerProgress,
-													core: onCoreProgress,
-													wasm: onWasmProgress,
-													worker: onWorkerProgress
-												})}>{quality.resolution}</a
-										>
-									{/each}
-								</menu></button
-							>
-						{/if}
-					{/await}
 					{#if personalPlaylists}
 						<button class="border">
 							<i>add</i>

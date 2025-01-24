@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { amSubscribed, deleteUnsubscribe, getChannelContent, postSubscribe } from '$lib/api';
 	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/api/model';
-	import ContentColumn from '$lib/ContentColumn.svelte';
-	import PageLoading from '$lib/PageLoading.svelte';
-	import PlaylistThumbnail from '$lib/PlaylistThumbnail.svelte';
-	import VideoList from '$lib/VideoList.svelte';
-	import { cleanNumber, getBestThumbnail, proxyGoogleImage } from '$lib/misc';
+	import ContentColumn from '$lib/components/ContentColumn.svelte';
+	import PageLoading from '$lib/components/PageLoading.svelte';
+	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
+	import VideoList from '$lib/components/VideoList.svelte';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { activePageStore, authStore, interfaceLowBandwidthMode } from '$lib/store';
+	import { cleanNumber } from '$lib/time';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';

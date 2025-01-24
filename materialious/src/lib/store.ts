@@ -4,7 +4,7 @@ import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
-import type { TitleCase } from './misc';
+import type { TitleCase } from './letterCasing';
 import type { PoTokens } from './patches/youtubejs';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
@@ -68,6 +68,7 @@ export const interfaceAmoledTheme = persisted('amoledTheme', false);
 export const interfaceLowBandwidthMode = persisted('lowBandwidthMode', false);
 export const interfaceDisplayThumbnailAvatars = persisted('disableThumbnailAvatars', false);
 export const interfaceDefaultPage = persisted('defaultPage', '/');
+export const interfaceSearchHistoryEnabled = persisted('searchHistoryEnabled', false);
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(
@@ -110,3 +111,5 @@ export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | 
 export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);
 
 export const poTokenCacheStore: Writable<PoTokens> = writable();
+
+export const searchHistoryStore: Writable<string[]> = persisted('searchHistory', []);

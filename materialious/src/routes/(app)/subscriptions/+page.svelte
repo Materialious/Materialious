@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getFeed } from '$lib/api/index';
+	import VideoList from '$lib/components/VideoList.svelte';
 	import { activePageStore } from '$lib/store';
-	import VideoList from '$lib/VideoList.svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 

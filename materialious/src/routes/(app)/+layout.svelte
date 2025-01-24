@@ -6,13 +6,15 @@
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
+	import Logo from '$lib/components/Logo.svelte';
+	import MiniPlayer from '$lib/components/MiniPlayer.svelte';
+	import PageLoading from '$lib/components/PageLoading.svelte';
+	import Search from '$lib/components/Search.svelte';
+	import Settings from '$lib/components/Settings/Settings.svelte';
+	import SyncParty from '$lib/components/SyncParty.svelte';
+	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
-	import Logo from '$lib/Logo.svelte';
-	import MiniPlayer from '$lib/MiniPlayer.svelte';
 	import { getPages } from '$lib/navPages';
-	import PageLoading from '$lib/PageLoading.svelte';
-	import Search from '$lib/Search.svelte';
-	import Settings from '$lib/Settings.svelte';
 	import {
 		activePageStore,
 		authStore,
@@ -24,9 +26,7 @@
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
-	import SyncParty from '$lib/SyncParty.svelte';
 	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
-	import Thumbnail from '$lib/Thumbnail.svelte';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
@@ -50,8 +50,10 @@
 
 	let notifications: Notification[] = [];
 
-	interfaceAmoledTheme.subscribe(() => {
+	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
+
+		await setStatusBarColor();
 	});
 
 	darkModeStore.subscribe(async () => {
@@ -176,10 +178,11 @@
 					const colorPalette = await colorTheme.getColorPalette();
 					themeHex = convertToHexColorCode(colorPalette.primary);
 					await ui('theme', themeHex);
-					await setStatusBarColor();
 				} catch {}
 			}
 		}
+
+		await setStatusBarColor();
 
 		setTheme();
 		setAmoledTheme();
@@ -318,9 +321,9 @@
 					{@html $_('invidiousBlockWarning', {
 						values: {
 							android:
-								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
+								'<a href="https://github.com/Materialious/Materialious?tab=readme-ov-file#android" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
 							desktop:
-								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
+								'<a href="https://github.com/Materialious/Materialious?tab=readme-ov-file#desktop-windowsmacoslinux" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
 						}
 					})}
 				</p>

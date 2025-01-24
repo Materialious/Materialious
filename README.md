@@ -27,7 +27,6 @@
 - Watch sync parties!
 - Mini player.
 - Silence skipper (Experimental.)
-- ffmpeg integration for downloading videos with audio at any quality ([Configuration required](./docs/DOCKER.md#step-7-optional-enabling-downloads)).
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
 - Preview video on hover.
 - Sponsorblock built-in.
@@ -48,11 +47,11 @@
 - YT path redirects (So your redirect plugins should still work!)
 
 # Support table
-|         | Dash | HLS | Local video fallback | API-Extended | ffmpeg download merging | Dearrow | RYD |
-|---------|------|-----|----------------------|--------------|-------------------------|---------|-----|
-| Web     | ✅    | ✅   | ❌                    | ✅            | ✅                       | ✅       | ✅   |
-| Desktop | ✅    | ✅   | ✅                    | ✅            | ❌                       | ✅       | ✅   |
-| Android | ✅    | ✅   | ✅                    | ✅            | ❌                       | ✅       | ✅   |
+|         | Dash | HLS | Local video fallback | API-Extended | Dearrow | RYD |
+|---------|------|-----|----------------------|--------------|---------|-----|
+| Web     | ✅    | ✅   | ❌                    | ✅            | ✅       | ✅   |
+| Desktop | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   |
+| Android | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   |
 
 # Public instances
 [Public instances are listed here](./docs/INSTANCES.md).

@@ -16,7 +16,7 @@ async function getPo(identifier: string): Promise<string | undefined> {
   const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
   const bgConfig = {
-    fetch: fetch,
+    fetch: Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch,
     globalObj: window,
     requestKey,
     identifier

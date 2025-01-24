@@ -2,7 +2,7 @@
 	import 'vidstack/bundle';
 
 	import { page } from '$app/stores';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
@@ -366,7 +366,11 @@
 				await loadPlayerPos();
 			});
 
-			if (Capacitor.getPlatform() === 'android' && data.video.adaptiveFormats.length > 0) {
+			if (
+				Capacitor.getPlatform() === 'android' &&
+				data.video.adaptiveFormats.length > 0 &&
+				data.video.fallbackPatch === undefined
+			) {
 				if (get(playerAndroidBgPlayer)) {
 					const highestBitrateAudio = data.video.adaptiveFormats
 						.filter((format) => format.type.startsWith('audio/'))
@@ -605,9 +609,7 @@
 >
 	<media-provider>
 		{#if !audioMode}
-			<media-poster
-				class="vds-poster"
-				src={proxyGoogleImage(getBestThumbnail(data.video.videoThumbnails, 1251, 781))}
+			<media-poster class="vds-poster" src={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
 			></media-poster>
 		{/if}
 	</media-provider>

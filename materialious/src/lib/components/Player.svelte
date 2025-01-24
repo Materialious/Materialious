@@ -367,12 +367,52 @@
 				}
 			});
 
-			if (
-				Capacitor.getPlatform() === 'android' &&
-				data.video.adaptiveFormats.length > 0 &&
-				data.video.fallbackPatch === undefined
-			) {
-				if (get(playerAndroidBgPlayer)) {
+			if (Capacitor.getPlatform() === 'android' && data.video.adaptiveFormats.length > 0) {
+				const videoFormats = data.video.adaptiveFormats.filter((format) =>
+					format.type.startsWith('video/')
+				);
+
+				originalOrigination = await ScreenOrientation.orientation();
+
+				player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
+					if (event.detail) {
+						// Ensure bar color is black while in fullscreen
+						await StatusBar.setBackgroundColor({ color: '#000000' });
+						await NavigationBar.setColor({
+							color: '#000000'
+						});
+						await StatusBar.setStyle({ style: Style.Dark });
+					} else {
+						await setStatusBarColor();
+					}
+
+					if (!get(playerAndroidLockOrientation)) return;
+
+					if (event.detail && videoFormats[0].resolution) {
+						const widthHeight = videoFormats[0].resolution.split('x');
+
+						if (widthHeight.length !== 2) return;
+
+						if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+							await StatusBar.setOverlaysWebView({ overlay: true });
+							await StatusBar.hide();
+							await NavigationBar.hide();
+							await ScreenOrientation.lock({ orientation: 'landscape' });
+						} else {
+							await ScreenOrientation.lock({ orientation: 'portrait' });
+						}
+					} else {
+						await StatusBar.setOverlaysWebView({ overlay: false });
+						await StatusBar.show();
+						await NavigationBar.show();
+
+						await ScreenOrientation.lock({
+							orientation: (originalOrigination as ScreenOrientationResult).type
+						});
+					}
+				});
+
+				if (data.video.fallbackPatch === undefined && get(playerAndroidBgPlayer)) {
 					const highestBitrateAudio = data.video.adaptiveFormats
 						.filter((format) => format.type.startsWith('audio/'))
 						.reduce((prev, current) => {
@@ -423,50 +463,6 @@
 					});
 
 					await AudioPlayer.initialize(audioId);
-				}
-
-				if (Capacitor.getPlatform() === 'android') {
-					const videoFormats = data.video.adaptiveFormats.filter((format) =>
-						format.type.startsWith('video/')
-					);
-
-					originalOrigination = await ScreenOrientation.orientation();
-
-					player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
-						if (event.detail) {
-							// Ensure bar color is black while in fullscreen
-							await StatusBar.setBackgroundColor({ color: '#000000' });
-							await NavigationBar.setColor({
-								color: '#000000'
-							});
-							await StatusBar.setStyle({ style: Style.Dark });
-						} else {
-							await setStatusBarColor();
-						}
-
-						if (!get(playerAndroidLockOrientation)) return;
-
-						if (event.detail && videoFormats[0].resolution) {
-							const widthHeight = videoFormats[0].resolution.split('x');
-
-							if (widthHeight.length !== 2) return;
-
-							if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-								await StatusBar.setOverlaysWebView({ overlay: true });
-								await StatusBar.hide();
-								await ScreenOrientation.lock({ orientation: 'landscape' });
-							} else {
-								await ScreenOrientation.lock({ orientation: 'portrait' });
-							}
-						} else {
-							await StatusBar.setOverlaysWebView({ overlay: false });
-							await StatusBar.show();
-
-							await ScreenOrientation.lock({
-								orientation: (originalOrigination as ScreenOrientationResult).type
-							});
-						}
-					});
 				}
 			}
 		} else {

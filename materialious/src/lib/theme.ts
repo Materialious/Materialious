@@ -34,6 +34,8 @@ export async function setStatusBarColor() {
 			darkButtons: !get(darkModeStore)
 		});
 
+		await NavigationBar.show();
+
 		if (get(darkModeStore)) {
 			await StatusBar.setStyle({ style: Style.Dark });
 		} else {

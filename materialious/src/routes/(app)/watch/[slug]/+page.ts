@@ -13,7 +13,6 @@ import {
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
-import { listCombinedQualities } from '$lib/videoDownload';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
@@ -51,15 +50,6 @@ export async function load({ params, url }) {
 	}
 
 
-	let downloadQualitiesDash;
-	if (
-		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED &&
-		import.meta.env.VITE_DEFAULT_DOWNLOAD_ENABLED.toString().toLowerCase() === 'true' &&
-		!video.liveNow
-	) {
-		downloadQualitiesDash = listCombinedQualities(video.dashUrl);
-	}
-
 	return {
 		video: video,
 		content: phaseDescription(video.descriptionHtml, video.fallbackPatch === 'youtubejs'),
@@ -69,7 +59,6 @@ export async function load({ params, url }) {
 			returnYTDislikes: returnYTDislikes,
 			comments: comments,
 			subscribed: amSubscribed(video.authorId),
-			downloadQualitiesDash: downloadQualitiesDash
 		}
 	};
 }

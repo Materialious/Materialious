@@ -321,9 +321,9 @@
 					{@html $_('invidiousBlockWarning', {
 						values: {
 							android:
-								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
+								'<a href="https://github.com/Materialious/Materialious?tab=readme-ov-file#android" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
 							desktop:
-								'<a href="https://github.com/Materialious/Materialious/releases/latest" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
+								'<a href="https://github.com/Materialious/Materialious?tab=readme-ov-file#desktop-windowsmacoslinux" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
 						}
 					})}
 				</p>

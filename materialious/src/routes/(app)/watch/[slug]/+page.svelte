@@ -9,22 +9,15 @@
 		postSubscribe,
 		removePlaylistVideo
 	} from '$lib/api/index';
-	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/api/model.js';
+	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/api/model';
 	import Comment from '$lib/components/Comment.svelte';
 	import Player from '$lib/components/Player.svelte';
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import Transcript from '$lib/components/Transcript.svelte';
-	import {
-		cleanNumber,
-		getBestThumbnail,
-		humanizeSeconds,
-		letterCase,
-		numberWithCommas,
-		proxyGoogleImage,
-		truncate,
-		unsafeRandomItem
-	} from '$lib/misc';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { letterCase } from '$lib/letterCasing';
+	import { truncate, unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		activePageStore,
@@ -41,6 +34,7 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
+	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/time';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';

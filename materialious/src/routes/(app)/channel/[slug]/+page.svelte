@@ -5,8 +5,9 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import VideoList from '$lib/components/VideoList.svelte';
-	import { cleanNumber, getBestThumbnail, proxyGoogleImage } from '$lib/misc';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { activePageStore, authStore, interfaceLowBandwidthMode } from '$lib/store';
+	import { cleanNumber } from '$lib/time';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';

@@ -1,18 +1,13 @@
 <script lang="ts">
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { letterCase } from '$lib/letterCasing';
+	import { cleanNumber, videoLength } from '$lib/time';
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from '../api/model';
-	import {
-		cleanNumber,
-		getBestThumbnail,
-		letterCase,
-		proxyGoogleImage,
-		proxyVideoUrl,
-		truncate,
-		videoLength
-	} from '../misc';
+	import { proxyVideoUrl, truncate } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,

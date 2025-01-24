@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { cleanNumber } from '$lib/time';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { Channel } from '../api/model';
-	import { cleanNumber, getBestThumbnail, proxyGoogleImage, truncate } from '../misc';
+	import { truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
 	export let channel: Channel;

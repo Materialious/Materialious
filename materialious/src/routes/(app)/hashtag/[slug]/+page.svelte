@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { getHashtag } from '$lib/api/index.js';
+	import { getHashtag } from '$lib/api';
 	import VideoList from '$lib/components/VideoList.svelte';
-	import { activePageStore } from '$lib/store.js';
+	import { activePageStore } from '$lib/store';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	export let data;

@@ -4,7 +4,7 @@ import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
-import type { TitleCase } from './misc';
+import type { TitleCase } from './letterCasing';
 import type { PoTokens } from './patches/youtubejs';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {

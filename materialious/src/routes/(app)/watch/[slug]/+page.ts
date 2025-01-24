@@ -6,13 +6,13 @@ import {
 	getVideo,
 	postHistory
 } from '$lib/api/index';
-import { phaseDescription } from '$lib/misc';
 import {
 	authStore,
 	playerProxyVideosStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
+import { phaseDescription } from '$lib/timestamps';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 

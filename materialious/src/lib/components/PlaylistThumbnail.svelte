@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { getBestThumbnail } from '$lib/images';
+	import { letterCase } from '$lib/letterCasing';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { Playlist } from '../api/model';
-	import { getBestThumbnail, letterCase, truncate } from '../misc';
+	import { truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
 	export let playlist: Playlist;

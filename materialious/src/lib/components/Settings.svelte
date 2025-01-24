@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
+	import { letterCase, titleCase, titleCases } from '$lib/letterCasing';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -9,7 +10,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, letterCase, titleCase, titleCases } from '../misc';
+	import { ensureNoTrailingSlash } from '../misc';
 	import { getPages } from '../navPages';
 	import {
 		authStore,

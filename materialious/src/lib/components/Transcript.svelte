@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { videoLength } from '$lib/time';
 	import Fuse from 'fuse.js';
 	import { VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from 'svelte-i18n';
@@ -6,7 +7,7 @@
 	import type { MediaTimeUpdateEvent } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import type { VideoPlay } from '../api/model';
-	import { decodeHtmlCharCodes, videoLength } from '../misc';
+	import { decodeHtmlCharCodes } from '../misc';
 	import { instanceStore } from '../store';
 
 	export let video: VideoPlay;

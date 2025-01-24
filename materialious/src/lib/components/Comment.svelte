@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { getComments } from '$lib/api';
 	import { type Comment, type Comments } from '$lib/api/model';
-	import { getBestThumbnail, numberWithCommas, proxyGoogleImage } from '$lib/misc';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { interfaceLowBandwidthMode } from '$lib/store';
+	import { numberWithCommas } from '$lib/time';
 	import { _ } from 'svelte-i18n';
 
 	export let comment: Comment;

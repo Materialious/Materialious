@@ -2,6 +2,8 @@
 	import 'vidstack/bundle';
 
 	import { page } from '$app/stores';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { StatusBar, Style } from '@capacitor/status-bar';
@@ -16,14 +18,7 @@
 	import type { MediaPlayerElement } from 'vidstack/elements';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
-	import {
-		getBestThumbnail,
-		padTime,
-		proxyVideoUrl,
-		pullBitratePreference,
-		videoLength,
-		type PhasedDescription
-	} from '../misc';
+	import { proxyVideoUrl, pullBitratePreference, type PhasedDescription } from '../misc';
 	import {
 		authStore,
 		instanceStore,
@@ -610,7 +605,9 @@
 >
 	<media-provider>
 		{#if !audioMode}
-			<media-poster class="vds-poster" src={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
+			<media-poster
+				class="vds-poster"
+				src={proxyGoogleImage(getBestThumbnail(data.video.videoThumbnails, 1251, 781))}
 			></media-poster>
 		{/if}
 	</media-provider>

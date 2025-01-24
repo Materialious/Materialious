@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { cleanNumber } from '$lib/time';
 	import { _ } from 'svelte-i18n';
 	import type { HashTag } from '../api/model';
-	import { cleanNumber, truncate } from '../misc';
+	import { truncate } from '../misc';
 
 	export let hashtag: HashTag;
 

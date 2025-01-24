@@ -4,7 +4,8 @@
 	import { page } from '$app/stores';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
-	import { StatusBar } from '@capacitor/status-bar';
+	import { StatusBar, Style } from '@capacitor/status-bar';
+	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -434,6 +435,10 @@
 						if (event.detail) {
 							// Ensure bar color is black while in fullscreen
 							await StatusBar.setBackgroundColor({ color: '#000000' });
+							await NavigationBar.setColor({
+								color: '#000000'
+							});
+							await StatusBar.setStyle({ style: Style.Dark });
 						} else {
 							await setStatusBarColor();
 						}

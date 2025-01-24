@@ -50,8 +50,10 @@
 
 	let notifications: Notification[] = [];
 
-	interfaceAmoledTheme.subscribe(() => {
+	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
+
+		await setStatusBarColor();
 	});
 
 	darkModeStore.subscribe(async () => {
@@ -176,10 +178,11 @@
 					const colorPalette = await colorTheme.getColorPalette();
 					themeHex = convertToHexColorCode(colorPalette.primary);
 					await ui('theme', themeHex);
-					await setStatusBarColor();
 				} catch {}
 			}
 		}
+
+		await setStatusBarColor();
 
 		setTheme();
 		setAmoledTheme();

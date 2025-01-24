@@ -4,10 +4,8 @@ import { Capacitor } from "@capacitor/core";
 if (Capacitor.getPlatform() === 'android') {
   const originalFetch = window.fetch;
 
-  // CORS-Anywhere proxy URL
-  const corsAnywhereProxyUrl: string = 'http://localhost:3000/';
+  const corsProxyUrl: string = 'http://localhost:3000/';
 
-  // Overwrite fetch to use CORS-Anywhere proxy
   window.fetch = async (requestInput: string | URL | Request, requestOptions?: RequestInit): Promise<Response> => {
     let requestUrl: string;
 
@@ -26,14 +24,17 @@ if (Capacitor.getPlatform() === 'android') {
         referrer: requestInput.referrer,
         signal: requestInput.signal,
       };
+
+      if (requestOptions.body && requestOptions.body instanceof ReadableStream) {
+        (requestOptions as RequestInit & { duplex?: 'half' | 'full'; }).duplex = 'half';
+      }
     } else {
       requestUrl = requestInput.toString();
     }
 
-    if (!requestUrl.startsWith(corsAnywhereProxyUrl) && !requestUrl.startsWith('/') && !requestUrl.startsWith('blob:')) {
-      requestInput = corsAnywhereProxyUrl + requestUrl;
+    if (!requestUrl.startsWith(corsProxyUrl) && !requestUrl.startsWith('/') && !requestUrl.startsWith('blob:')) {
+      requestInput = corsProxyUrl + requestUrl;
     }
-
 
     // Use the original fetch with the proxied URL and options
     return originalFetch(requestInput, requestOptions);
@@ -45,7 +46,7 @@ if (Capacitor.getPlatform() === 'android') {
   XMLHttpRequest.prototype.open = function (...args: any[]): void {
     const targetOriginMatch = /^https?:\/\/([^\/]+)/i.exec(args[1]);
     if (targetOriginMatch && targetOriginMatch[0].toLowerCase() !== currentOrigin) {
-      args[1] = corsAnywhereProxyUrl + args[1];
+      args[1] = corsProxyUrl + args[1];
     }
     /* @ts-ignore */
     return originalXhrOpen.apply(this, args);

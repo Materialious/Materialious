@@ -24,7 +24,9 @@
 		interfaceLowBandwidthMode,
 		interfacePreviewVideoOnHoverStore,
 		interfaceRegionStore,
+		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
+		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
 
@@ -122,6 +124,25 @@
 				type="checkbox"
 				bind:checked={$interfaceDisplayThumbnailAvatars}
 				on:click={() => interfaceDisplayThumbnailAvatars.set(!$interfaceDisplayThumbnailAvatars)}
+			/>
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<div>{$_('layout.searchHistory')}</div>
+		</div>
+		<label class="switch">
+			<input
+				type="checkbox"
+				bind:checked={$interfaceSearchHistoryEnabled}
+				on:click={() => {
+					interfaceSearchHistoryEnabled.set(!$interfaceSearchHistoryEnabled);
+					searchHistoryStore.set([]);
+				}}
 			/>
 			<span></span>
 		</label>

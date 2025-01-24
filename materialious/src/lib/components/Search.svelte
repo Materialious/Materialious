@@ -46,7 +46,11 @@
 		showSearchBox = false;
 
 		if ($interfaceSearchHistoryEnabled && !$searchHistoryStore.includes(search)) {
-			searchHistoryStore.set([search, ...$searchHistoryStore]);
+			let pastHistory = $searchHistoryStore;
+			if (pastHistory.length > 15) {
+				pastHistory.pop();
+			}
+			searchHistoryStore.set([search, ...pastHistory]);
 		}
 	}
 

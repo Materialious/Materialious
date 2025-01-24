@@ -106,7 +106,7 @@ export class ElectronCapacitorApp {
       defaultHeight: 800,
     });
     // Setup preload script path and construct our main window.
-    const preloadPath = join(app.getAppPath(), 'build', 'src', 'preload);
+    const preloadPath = join(app.getAppPath(), 'build', 'src', 'preload.js');
     this.MainWindow = new BrowserWindow({
       icon,
       show: false,

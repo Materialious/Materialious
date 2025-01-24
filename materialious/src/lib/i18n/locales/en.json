@@ -106,7 +106,7 @@
 		"logout": "Logout",
 		"customize": "Customize",
 		"lowBandwidthMode": "Low bandwidth mode",
-		"displayThumbnailAvatars": "Display channel avatars on thumbnail (Slow)",
+		"displayThumbnailAvatars": "Thumbnail avatars (Slow)",
 		"searchHistory": "Search history",
 		"theme": {
 			"theme": "Theme",

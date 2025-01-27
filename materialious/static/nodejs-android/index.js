@@ -2,7 +2,7 @@ const http = require('http');
 const https = require('https');
 
 const HOST = 'localhost';
-const PORT = 8888;
+const PORT = 3000;
 const MAX_REDIRECTS = 5;
 
 function setCorsHeaders(res) {

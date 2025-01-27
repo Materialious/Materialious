@@ -77,8 +77,18 @@ main.root {
 	main.root {
 		scrollbar-width: none !important;
 	}
-	
+
 	main.root::-webkit-scrollbar {
 		display: none !important;
+	}
+}
+
+@media screen and (max-width: 650px) {
+	::-webkit-scrollbar {
+		display: none !important;
+	}
+
+	html {
+		scrollbar-width: none !important;
 	}
 }

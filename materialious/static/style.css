@@ -63,6 +63,7 @@ main.root {
 @media screen and (max-width: 650px) {
 	dialog.right {
 		width: 100% !important;
+		border-radius: 0 !important;
 	}
 }
 

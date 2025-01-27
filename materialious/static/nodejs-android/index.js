@@ -20,6 +20,7 @@ function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
         const req = httpClient.request(targetUrl, options, (res) => {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 if (redirectCount >= MAX_REDIRECTS) {
+                    req.end();
                     return reject(new Error('Too many redirects'));
                 }
 
@@ -28,6 +29,7 @@ function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
                     const redirectUrl = new URL(res.headers.location, targetUrl);
                     return resolve(fetchWithRedirects(redirectUrl, options, redirectCount + 1));
                 } catch (error) {
+                    req.end();
                     return reject(new Error(`Invalid URL in redirect: ${error.message}`));
                 }
             }

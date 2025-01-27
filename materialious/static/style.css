@@ -63,6 +63,7 @@ main.root {
 @media screen and (max-width: 650px) {
 	dialog.right {
 		width: 100% !important;
+		border-radius: 0 !important;
 	}
 }
 
@@ -77,8 +78,18 @@ main.root {
 	main.root {
 		scrollbar-width: none !important;
 	}
-	
+
 	main.root::-webkit-scrollbar {
 		display: none !important;
+	}
+}
+
+@media screen and (max-width: 650px) {
+	::-webkit-scrollbar {
+		display: none !important;
+	}
+
+	html {
+		scrollbar-width: none !important;
 	}
 }

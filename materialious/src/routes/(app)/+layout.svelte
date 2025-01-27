@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 
-	import { navigating, page } from '$app/stores';
+	import { navigating } from '$app/stores';
 	import '$lib/android/http/androidRequests';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed } from '$lib/api/index';
@@ -21,7 +21,6 @@
 		darkModeStore,
 		instanceStore,
 		interfaceAmoledTheme,
-		interfaceDefaultPage,
 		showWarningStore,
 		syncPartyPeerStore,
 		themeColorStore
@@ -148,19 +147,6 @@
 
 	onMount(async () => {
 		ui();
-
-		if (
-			$interfaceDefaultPage &&
-			$interfaceDefaultPage !== '/' &&
-			$interfaceDefaultPage.startsWith('/') &&
-			$page.url.pathname === '/'
-		) {
-			getPages().forEach((page) => {
-				if (page.href === $interfaceDefaultPage && (!page.requiresAuth || $authStore)) {
-					goto($interfaceDefaultPage);
-				}
-			});
-		}
 
 		scrollableRoot = document.querySelector('.root');
 

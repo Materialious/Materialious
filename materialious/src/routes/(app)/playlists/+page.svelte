@@ -8,7 +8,9 @@
 	import { ui } from 'beercss';
 	import { _ } from 'svelte-i18n';
 
-	let { data = $bindable() } = $props();
+	let { data } = $props();
+
+	let playlists = $state(data);
 
 	activePageStore.set('playlists');
 
@@ -21,7 +23,7 @@
 
 	async function removePlaylistItem(playlistId: string) {
 		await deletePersonalPlaylist(playlistId);
-		data.playlists = data.playlists.filter((item) => {
+		playlists.playlists = playlists.playlists.filter((item) => {
 			if (item.playlistId !== playlistId) {
 				return item;
 			}
@@ -31,14 +33,14 @@
 	async function createPlaylist() {
 		await postPersonalPlaylist(playlistTitle, playlistPrivacy);
 		await ui('#create-playlist');
-		data.playlists = await getPersonalPlaylists();
+		playlists.playlists = await getPersonalPlaylists();
 	}
 </script>
 
 <div class="page right active">
 	<div class="space"></div>
 	<div class="grid">
-		{#each data.playlists as playlist}
+		{#each playlists.playlists as playlist}
 			<ContentColumn>
 				<article class="no-padding" style="height: 100%;">
 					<PlaylistThumbnail disabled={playlist.videoCount === 0} {playlist} />

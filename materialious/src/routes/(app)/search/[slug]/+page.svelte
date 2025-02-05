@@ -10,30 +10,32 @@
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
-	let { data = $bindable() } = $props();
+	let { data } = $props();
+
+	let searchResults = $state(data);
 
 	let currentPage = 1;
 
 	activePageStore.set(null);
 
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
-		data.searchType = type;
+		searchResults.searchType = type;
 		currentPage = 1;
-		data.search = [];
-		data.search = await getSearch(data.slug, { type: type });
+		searchResults.search = [];
+		searchResults.search = await getSearch(searchResults.slug, { type: type });
 	}
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
-		const newSearch = await getSearch(data.slug, {
+		const newSearch = await getSearch(searchResults.slug, {
 			page: currentPage.toString(),
-			type: data.searchType
+			type: searchResults.searchType
 		});
 
 		if (newSearch.length === 0) {
 			event.detail.complete();
 		} else {
-			data.search = [...data.search, ...newSearch];
+			searchResults.search = [...searchResults.search, ...newSearch];
 			event.detail.loaded();
 		}
 	}
@@ -42,7 +44,7 @@
 <div style="margin-top: 1em;">
 	<div class="tabs left-align min scroll">
 		<a
-			class:active={data.searchType === 'all'}
+			class:active={searchResults.searchType === 'all'}
 			href="#all"
 			onclick={async () => changeType('all')}
 		>
@@ -50,7 +52,7 @@
 			<span>{$_('videoTabs.all')}</span>
 		</a>
 		<a
-			class:active={data.searchType === 'video'}
+			class:active={searchResults.searchType === 'video'}
 			href="#videos"
 			onclick={async () => changeType('video')}
 		>
@@ -58,7 +60,7 @@
 			<span>{$_('videoTabs.videos')}</span>
 		</a>
 		<a
-			class:active={data.searchType === 'playlist'}
+			class:active={searchResults.searchType === 'playlist'}
 			href="#playlists"
 			onclick={async () => changeType('playlist')}
 		>
@@ -66,7 +68,7 @@
 			<span>{$_('videoTabs.playlists')}</span>
 		</a>
 		<a
-			class:active={data.searchType === 'channel'}
+			class:active={searchResults.searchType === 'channel'}
 			href="#channels"
 			onclick={async () => changeType('channel')}
 		>
@@ -76,11 +78,11 @@
 	</div>
 </div>
 
-{#if data.search.length > 0}
+{#if searchResults.search.length > 0}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each data.search as item}
+			{#each searchResults.search as item}
 				<ContentColumn>
 					{#key item}
 						<article class="no-padding" style="height: 100%;">

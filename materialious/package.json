@@ -15,8 +15,8 @@
 		"@capacitor/assets": "^3.0.5",
 		"@sveltejs/adapter-auto": "^3.2.5",
 		"@sveltejs/adapter-static": "^3.0.5",
-		"@sveltejs/kit": "^2.9.1",
-		"@sveltejs/vite-plugin-svelte": "^3.1.1",
+		"@sveltejs/kit": "^2.17.1",
+		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@types/eslint": "^8.56.7",
 		"@types/event-source-polyfill": "^1.0.5",
 		"@types/he": "^1.2.3",
@@ -33,11 +33,11 @@
 		"jsdom": "^25.0.1",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.7",
-		"svelte": "^4.2.19",
+		"svelte": "^5.19.7",
 		"svelte-check": "^3.8.6",
 		"tslib": "^2.7.0",
 		"typescript": "^5.6.3",
-		"vite": "^5.4.9"
+		"vite": "^6.0.11"
 	},
 	"type": "module",
 	"dependencies": {
@@ -68,7 +68,7 @@
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.4",
 		"sponsorblock-api": "^0.2.4",
-		"svelte-i18n": "^4.0.0",
+		"svelte-i18n": "^4.0.1",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
 		"terser": "^5.34.1",

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
@@ -9,11 +11,11 @@
 		deArrowTitlesOnly
 	} from '../../store';
 
-	let deArrowUrl = get(deArrowInstanceStore);
-	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
+	let deArrowUrl = $state(get(deArrowInstanceStore));
+	let deArrowThumbnailUrl = $state(get(deArrowThumbnailInstanceStore));
 </script>
 
-<form on:submit|preventDefault={() => deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl))}>
+<form onsubmit={preventDefault(() => deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl)))}>
 	<nav>
 		<div class="field label border max">
 			<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
@@ -25,7 +27,7 @@
 	</nav>
 </form>
 
-<form on:submit|preventDefault={() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl)}>
+<form onsubmit={preventDefault(() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl))}>
 	<nav>
 		<div class="field label border max">
 			<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
@@ -44,7 +46,7 @@
 	<label class="switch">
 		<input
 			bind:checked={$deArrowTitlesOnly}
-			on:click={() => deArrowTitlesOnly.set(!$deArrowTitlesOnly)}
+			onclick={() => deArrowTitlesOnly.set(!$deArrowTitlesOnly)}
 			type="checkbox"
 		/>
 		<span></span>
@@ -58,7 +60,7 @@
 	<label class="switch">
 		<input
 			bind:checked={$deArrowEnabledStore}
-			on:click={() => deArrowEnabledStore.set(!$deArrowEnabledStore)}
+			onclick={() => deArrowEnabledStore.set(!$deArrowEnabledStore)}
 			type="checkbox"
 		/>
 		<span></span>

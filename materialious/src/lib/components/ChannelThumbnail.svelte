@@ -8,9 +8,13 @@
 	import { truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
-	export let channel: Channel;
+	interface Props {
+		channel: Channel;
+	}
 
-	let channelPfp: HTMLImageElement | undefined;
+	let { channel }: Props = $props();
+
+	let channelPfp: HTMLImageElement | undefined = $state();
 
 	onMount(async () => {
 		if (get(interfaceLowBandwidthMode)) return;

@@ -15,15 +15,15 @@
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
 
-	export let data;
+	let { data } = $props();
 
 	activePageStore.set(null);
 
-	let isSubscribed = false;
+	let isSubscribed = $state(false);
 
-	let tab: 'videos' | 'playlists' | 'streams' | 'shorts' = 'videos';
+	let tab: 'videos' | 'playlists' | 'streams' | 'shorts' = $state('videos');
 
-	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined = undefined;
+	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined = $state(undefined);
 
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
@@ -61,7 +61,7 @@
 		displayContent = await getChannelContent(data.channel.authorId, { type: tab });
 	}
 
-	let channelPfp: string;
+	let channelPfp: string = $state();
 	onMount(async () => {
 		displayContent = await getChannelContent(data.channel.authorId, { type: 'videos' });
 
@@ -118,7 +118,7 @@
 		<div class="grid no-padding">
 			<div class="s12 m12 l5">
 				<button
-					on:click={toggleSubscribed}
+					onclick={toggleSubscribed}
 					class:inverse-surface={!isSubscribed}
 					class:border={isSubscribed}
 				>
@@ -138,14 +138,14 @@
 						{#if !Capacitor.isNativePlatform()}
 							<a
 								href="#share"
-								on:click={async () => {
+								onclick={async () => {
 									await Clipboard.write({ string: location.href });
 								}}>{$_('player.share.materialiousLink')}</a
 							>
 						{/if}
 						<a
 							href="#share"
-							on:click={async () => {
+							onclick={async () => {
 								await Clipboard.write({
 									string: `https://www.youtube.com/channel/${data.channel.authorId}`
 								});
@@ -159,19 +159,19 @@
 
 	<div class="tabs left-align scroll">
 		{#if data.channel.tabs.includes('videos')}
-			<a class:active={tab === 'videos'} on:click={() => changeTab('videos')} href={`#video`}>
+			<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href={`#video`}>
 				<i>movie</i>
 				<span>{$_('videoTabs.videos')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('shorts')}
-			<a class:active={tab === 'shorts'} on:click={() => changeTab('shorts')} href={`#short`}>
+			<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href={`#short`}>
 				<i>smartphone</i>
 				<span>{$_('videoTabs.shorts')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('streams')}
-			<a class:active={tab === 'streams'} on:click={() => changeTab('streams')} href={`#stream`}>
+			<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href={`#stream`}>
 				<i>stream</i>
 				<span>{$_('videoTabs.streams')}</span>
 			</a>
@@ -179,7 +179,7 @@
 		{#if data.channel.tabs.includes('playlists')}
 			<a
 				class:active={tab === 'playlists'}
-				on:click={() => changeTab('playlists')}
+				onclick={() => changeTab('playlists')}
 				href={`#playlist`}
 			>
 				<i>playlist_add_check</i>

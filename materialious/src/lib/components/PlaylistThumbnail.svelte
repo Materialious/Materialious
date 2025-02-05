@@ -8,12 +8,16 @@
 	import { truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
-	export let playlist: Playlist;
-	export let disabled: boolean = false;
+	interface Props {
+		playlist: Playlist;
+		disabled?: boolean;
+	}
 
-	let loading = true;
+	let { playlist, disabled = false }: Props = $props();
 
-	let img: HTMLImageElement;
+	let loading = $state(true);
+
+	let img: HTMLImageElement = $state();
 
 	const playlistLink = `/playlist/${playlist.playlistId}`;
 

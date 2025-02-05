@@ -26,22 +26,26 @@
 
 	const dispatch = createEventDispatcher();
 
-	export let video: VideoBase | Video | Notification | PlaylistPageVideo;
-	export let playlistId: string = '';
-	export let sideways: boolean = false;
+	interface Props {
+		video: VideoBase | Video | Notification | PlaylistPageVideo;
+		playlistId?: string;
+		sideways?: boolean;
+	}
 
-	let thumbnailHidden: boolean = false;
-	let showVideoPreview: boolean = false;
-	let videoPreview: VideoPlay | null = null;
-	let videoPreviewMuted: boolean = true;
-	let videoPreviewVolume: number = 0.4;
-	let imgHeight: number;
+	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
 
-	let authorImg: HTMLImageElement | undefined;
+	let thumbnailHidden: boolean = $state(false);
+	let showVideoPreview: boolean = $state(false);
+	let videoPreview: VideoPlay | null = $state(null);
+	let videoPreviewMuted: boolean = $state(true);
+	let videoPreviewVolume: number = $state(0.4);
+	let imgHeight: number = $state();
+
+	let authorImg: HTMLImageElement | undefined = $state();
 
 	let proxyVideos = get(playerProxyVideosStore);
 
-	let placeholderHeight: number = 0;
+	let placeholderHeight: number = $state(0);
 
 	let watchUrl = new URL(`${location.origin}/watch/${video.videoId}`);
 
@@ -55,12 +59,12 @@
 		}
 	});
 
-	let loading = true;
-	let loaded = false;
+	let loading = $state(true);
+	let loaded = $state(false);
 
-	let img: HTMLImageElement;
+	let img: HTMLImageElement = $state();
 
-	let progress: string | null;
+	let progress: string | null = $state();
 	if (get(playerSavePlaybackPositionStore)) {
 		try {
 			progress = localStorage.getItem(`v_${video.videoId}`);
@@ -274,9 +278,9 @@
 {#if !thumbnailHidden}
 	<div class:sideways-root={sideways}>
 		<div
-			on:mouseover={previewVideo}
-			on:mouseleave={() => (showVideoPreview = false)}
-			on:focus={() => {}}
+			onmouseover={previewVideo}
+			onmouseleave={() => (showVideoPreview = false)}
+			onfocus={() => {}}
 			id="thumbnail-container"
 			role="region"
 		>
@@ -284,7 +288,7 @@
 				class="wave thumbnail"
 				href={watchUrl.toString()}
 				data-sveltekit-preload-data="off"
-				on:click={syncChangeVideo}
+				onclick={syncChangeVideo}
 			>
 				{#if !$interfaceLowBandwidthMode}
 					{#if loading}
@@ -352,7 +356,7 @@
 				<button
 					class="no-padding"
 					style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px;"
-					on:click={() => {
+					onclick={() => {
 						videoPreviewMuted = !videoPreviewMuted;
 					}}
 				>

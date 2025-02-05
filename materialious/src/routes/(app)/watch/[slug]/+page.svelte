@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
@@ -44,49 +46,51 @@
 	import type { MediaTimeUpdateEvent } from 'vidstack';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 
-	export let data;
+	let { data = $bindable() } = $props();
 
-	let comments: Comments | null = null;
+	let comments: Comments | null = $state(null);
 	data.streamed.comments?.then((streamedComments) => {
 		comments = streamedComments;
 	});
 
-	let subscribed: boolean = false;
+	let subscribed: boolean = $state(false);
 	data.streamed.subscribed.then((streamedIsSubbed) => {
 		subscribed = streamedIsSubbed;
 	});
 
-	let personalPlaylists: PlaylistPage[] | null = null;
+	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
 
 	activePageStore.set(null);
 
-	let playlistVideos: PlaylistPageVideo[] = [];
-	let playlist: PlaylistPage | null = null;
+	let playlistVideos: PlaylistPageVideo[] = $state([]);
+	let playlist: PlaylistPage | null = $state(null);
 
-	let loopPlaylist: boolean = false;
-	let shufflePlaylist: boolean = false;
+	let loopPlaylist: boolean = $state(false);
+	let shufflePlaylist: boolean = $state(false);
 
-	let theatreMode = get(playerTheatreModeByDefaultStore);
+	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
 
-	let audioMode = get(playerListenByDefaultStore);
-	let player: MediaPlayerElement;
+	let audioMode = $state(get(playerListenByDefaultStore));
+	let player: MediaPlayerElement = $state();
 
-	let segments: Segment[] = [];
+	let segments: Segment[] = $state([]);
 
-	let pauseTimerSeconds: number = -1;
+	let pauseTimerSeconds: number = $state(-1);
 
-	let showTranscript = false;
+	let showTranscript = $state(false);
 
-	let playerCurrentTime: number = 0;
+	let playerCurrentTime: number = $state(0);
 	// @ts-ignore
-	$: if (typeof player !== 'undefined') {
-		playerCurrentTime = player.currentTime;
-		player.addEventListener(
-			'time-update',
-			(event: MediaTimeUpdateEvent) => (playerCurrentTime = event.detail.currentTime)
-		);
-	}
+	run(() => {
+		if (typeof player !== 'undefined') {
+			playerCurrentTime = player.currentTime;
+			player.addEventListener(
+				'time-update',
+				(event: MediaTimeUpdateEvent) => (playerCurrentTime = event.detail.currentTime)
+			);
+		}
+	});
 
 	playlistSettingsStore.subscribe((playlistSetting) => {
 		if (!data.playlistId) return;
@@ -411,7 +415,7 @@
 		theatreMode = !theatreMode;
 	}
 
-	let pauseTimeout: NodeJS.Timeout;
+	let pauseTimeout: NodeJS.Timeout = $state();
 	function setPauseTimer() {
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);
@@ -487,7 +491,7 @@
 					</a>
 					{#if $authStore}
 						<button
-							on:click={toggleSubscribed}
+							onclick={toggleSubscribed}
 							class:inverse-surface={!subscribed}
 							class:border={subscribed}
 						>
@@ -529,17 +533,17 @@
 				{/await}
 
 				<div>
-					<button on:click={() => (audioMode = !audioMode)} class:border={!audioMode}>
+					<button onclick={() => (audioMode = !audioMode)} class:border={!audioMode}>
 						<i>headphones</i>
 						<div class="tooltip">{$_('player.audioOnly')}</div>
 					</button>
-					<button on:click={toggleTheatreMode} class="m l" class:border={!theatreMode}>
+					<button onclick={toggleTheatreMode} class="m l" class:border={!theatreMode}>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
 					{#if data.video.lengthSeconds > 60 && !data.video.hlsUrl}
 						<button
-							on:click={() => {
+							onclick={() => {
 								if (pauseTimeout) {
 									clearTimeout(pauseTimeout);
 								}
@@ -553,7 +557,7 @@
 						</button>
 					{/if}
 					<button
-						on:click={() => ((showTranscript = !showTranscript), (theatreMode = false))}
+						onclick={() => ((showTranscript = !showTranscript), (theatreMode = false))}
 						class:border={!showTranscript}
 					>
 						<i>description</i>
@@ -578,7 +582,7 @@
 								{#each personalPlaylists as personalPlaylist}
 									<a
 										href="#add"
-										on:click={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
+										onclick={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
 									>
 										<nav>
 											<span class="max">{personalPlaylist.title}</span>
@@ -629,7 +633,7 @@
 						{#if data.content.timestamps.length > 0}
 							<h6 style="margin-bottom: .3em;">Chapters</h6>
 							{#each data.content.timestamps as timestamp}
-								<button on:click={() => (player.currentTime = timestamp.time)} class="timestamps"
+								<button onclick={() => (player.currentTime = timestamp.time)} class="timestamps"
 									>{timestamp.timePretty}
 									{#if !timestamp.title.startsWith('-')}
 										-
@@ -668,7 +672,7 @@
 							<Comment {comment} videoId={data.video.videoId}></Comment>
 						{/each}
 						{#if comments.continuation}
-							<button on:click={loadMoreComments} class="margin">{$_('loadMore')}</button>
+							<button onclick={loadMoreComments} class="margin">{$_('loadMore')}</button>
 						{/if}
 					</div>
 				</details>
@@ -696,7 +700,7 @@
 						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
 						<nav>
 							<button
-								on:click={() => {
+								onclick={() => {
 									if (!playlist) return;
 
 									loopPlaylist = !loopPlaylist;
@@ -713,7 +717,7 @@
 								</div>
 							</button>
 							<button
-								on:click={() => {
+								onclick={() => {
 									if (!playlist) return;
 
 									shufflePlaylist = !shufflePlaylist;
@@ -788,12 +792,12 @@
 	<nav class="right-align no-space">
 		<button
 			class="transparent link"
-			on:click={() => {
+			onclick={() => {
 				ui('#pause-timer');
 				pauseTimerSeconds = 0;
 			}}>Cancel</button
 		>
-		<button disabled={pauseTimerSeconds < 1} class="transparent link" on:click={setPauseTimer}
+		<button disabled={pauseTimerSeconds < 1} class="transparent link" onclick={setPauseTimer}
 			>Confirm</button
 		>
 	</nav>

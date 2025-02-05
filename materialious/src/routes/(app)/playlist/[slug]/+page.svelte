@@ -10,11 +10,11 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
-	export let data;
+	let { data } = $props();
 
 	activePageStore.set(null);
 
-	let videos: PlaylistPageVideo[] | undefined;
+	let videos: PlaylistPageVideo[] | undefined = $state();
 	if (data.playlist.videos.length > 0) {
 		videos = data.playlist.videos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
 			return a.index < b.index ? -1 : 1;
@@ -59,7 +59,7 @@
 
 			<a
 				href={`/watch/${unsafeRandomItem(videos).videoId}?playlist=${data.playlist.playlistId}`}
-				on:click={() =>
+				onclick={() =>
 					playlistSettingsStore.set({ [data.playlist.playlistId]: { shuffle: true, loop: false } })}
 				class="button circle extra no-margin border"
 			>
@@ -91,14 +91,14 @@
 			{#if !Capacitor.isNativePlatform()}
 				<a
 					href="#share"
-					on:click={async () => {
+					onclick={async () => {
 						await Clipboard.write({ string: location.href });
 					}}>{$_('player.share.materialiousLink')}</a
 				>
 			{/if}
 			<a
 				href="#share"
-				on:click={async () => {
+				onclick={async () => {
 					await Clipboard.write({
 						string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
 					});

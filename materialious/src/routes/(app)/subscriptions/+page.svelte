@@ -1,14 +1,19 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { getFeed } from '$lib/api/index';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { activePageStore } from '$lib/store';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
-	export let data;
+	let { data } = $props();
 
 	let currentPage = 1;
-	$: videos = [...data.feed.notifications, ...data.feed.videos];
+	let videos;
+	run(() => {
+		videos = [...data.feed.notifications, ...data.feed.videos];
+	});
 
 	activePageStore.set('subscriptions');
 

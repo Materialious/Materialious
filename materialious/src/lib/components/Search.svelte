@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount } from 'svelte';
@@ -12,14 +14,14 @@
 
 	const dispatch = createEventDispatcher();
 
-	let searchSuggestions = false;
+	let searchSuggestions = $state(false);
 	interfaceSearchSuggestionsStore.subscribe((value) => (searchSuggestions = value));
 
-	let search: string;
-	let suggestionsForSearch: string[] = [];
-	let selectedSuggestionIndex: number = -1;
+	let search: string = $state();
+	let suggestionsForSearch: string[] = $state([]);
+	let selectedSuggestionIndex: number = $state(-1);
 
-	let showSearchBox = false;
+	let showSearchBox = $state(false);
 
 	let debounceTimer: NodeJS.Timeout;
 	function debouncedSearch(event: any) {
@@ -97,29 +99,29 @@
 	});
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
+<form onsubmit={preventDefault(handleSubmit)}>
 	<div class="field prefix round fill no-margin search">
 		<i class="front">search</i>
 		<input
 			id="search-box"
 			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
-			on:click={async () => {
+			onclick={async () => {
 				showSearchBox = true;
 			}}
 		/>
 		{#if showSearchBox}
 			<menu class="min suggestions-container">
 				<div class="field large prefix suffix no-margin fixed">
-					<i class="front" on:click={() => dispatch('searchCancelled')}>arrow_back</i>
+					<i class="front" onclick={() => dispatch('searchCancelled')}>arrow_back</i>
 					<input
 						placeholder={$_('searchPlaceholder')}
 						type="text"
 						autofocus
 						required
 						bind:value={search}
-						on:keydown={handleKeyDown}
-						on:keyup={(event) => {
+						onkeydown={handleKeyDown}
+						onkeyup={(event) => {
 							if (event.key === 'Enter') {
 								handleSubmit();
 							} else {
@@ -127,12 +129,12 @@
 							}
 						}}
 					/>
-					<i class="front" on:click={resetSearch}>close</i>
+					<i class="front" onclick={resetSearch}>close</i>
 				</div>
 				{#if searchSuggestions}
 					{#each suggestionsForSearch as suggestion, index}
 						<a
-							on:click={() => {
+							onclick={() => {
 								search = suggestion;
 								handleSubmit();
 							}}

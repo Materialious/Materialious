@@ -10,7 +10,7 @@
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
-	export let data;
+	let { data = $bindable() } = $props();
 
 	let currentPage = 1;
 
@@ -44,7 +44,7 @@
 		<a
 			class:active={data.searchType === 'all'}
 			href="#all"
-			on:click={async () => changeType('all')}
+			onclick={async () => changeType('all')}
 		>
 			<i>home</i>
 			<span>{$_('videoTabs.all')}</span>
@@ -52,7 +52,7 @@
 		<a
 			class:active={data.searchType === 'video'}
 			href="#videos"
-			on:click={async () => changeType('video')}
+			onclick={async () => changeType('video')}
 		>
 			<i>movie</i>
 			<span>{$_('videoTabs.videos')}</span>
@@ -60,7 +60,7 @@
 		<a
 			class:active={data.searchType === 'playlist'}
 			href="#playlists"
-			on:click={async () => changeType('playlist')}
+			onclick={async () => changeType('playlist')}
 		>
 			<i>playlist_add_check</i>
 			<span>{$_('videoTabs.playlists')}</span>
@@ -68,7 +68,7 @@
 		<a
 			class:active={data.searchType === 'channel'}
 			href="#channels"
-			on:click={async () => changeType('channel')}
+			onclick={async () => changeType('channel')}
 		>
 			<i>person</i>
 			<span>{$_('videoTabs.channels')}</span>

@@ -4,7 +4,11 @@
 	import type { HashTag } from '../api/model';
 	import { truncate } from '../misc';
 
-	export let hashtag: HashTag;
+	interface Props {
+		hashtag: HashTag;
+	}
+
+	let { hashtag }: Props = $props();
 
 	let channelPfp: HTMLImageElement | undefined;
 </script>

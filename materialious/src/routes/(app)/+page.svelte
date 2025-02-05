@@ -2,7 +2,7 @@
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { activePageStore } from '$lib/store';
 
-	export let data;
+	let { data } = $props();
 
 	activePageStore.set('home');
 </script>

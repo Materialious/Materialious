@@ -2,9 +2,9 @@
 	import Player from '$lib/components/Player.svelte';
 	import type { MediaPlayerElement } from 'vidstack/elements';
 
-	export let data;
+	let { data } = $props();
 
-	let player: MediaPlayerElement;
+	let player: MediaPlayerElement = $state();
 </script>
 
 <Player bind:player isEmbed={true} {data} />

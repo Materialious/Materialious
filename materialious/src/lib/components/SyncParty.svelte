@@ -130,7 +130,7 @@
 				<label class="active" for="sync-share">Share URL</label>
 			</div>
 			<button
-				on:click={async () => {
+				onclick={async () => {
 					await Clipboard.write({ string: `${location.origin}?sync=${$syncPartyPeerStore?.id}` });
 				}}
 				class="square round"
@@ -142,7 +142,7 @@
 	<div class="space"></div>
 	<button
 		class="no-margin"
-		on:click={startWatchSync}
+		onclick={startWatchSync}
 		data-ui={`${$syncPartyPeerStore ? '#sync-party' : ''}`}
 		>{#if $syncPartyPeerStore}
 			{$_('layout.endSyncParty')}

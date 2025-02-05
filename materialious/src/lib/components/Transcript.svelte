@@ -10,17 +10,21 @@
 	import { decodeHtmlCharCodes } from '../misc';
 	import { instanceStore } from '../store';
 
-	export let video: VideoPlay;
-	export let player: MediaPlayerElement;
+	interface Props {
+		video: VideoPlay;
+		player: MediaPlayerElement;
+	}
 
-	let url: string | null = null;
-	let autoScroll: boolean = true;
+	let { video, player = $bindable() }: Props = $props();
 
-	let transcript: ParsedCaptionsResult | null = null;
-	let transcriptCues: VTTCue[] = [];
-	let isLoading = false;
-	let currentTime = 0;
-	let search: string = '';
+	let url: string | null = $state(null);
+	let autoScroll: boolean = $state(true);
+
+	let transcript: ParsedCaptionsResult | null = $state(null);
+	let transcriptCues: VTTCue[] = $state([]);
+	let isLoading = $state(false);
+	let currentTime = $state(0);
+	let search: string = $state('');
 
 	player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
 		currentTime = event.detail.currentTime;
@@ -72,7 +76,7 @@
 	<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
 		<h6>{$_('transcript')}</h6>
 		<div class="field label suffix border">
-			<select bind:value={url} on:change={loadTranscript} name="captions">
+			<select bind:value={url} onchange={loadTranscript} name="captions">
 				<option selected={true} value={null}>{$_('selectLang')}</option>
 				{#each video.captions as caption}
 					<option value={caption.url}>{caption.label}</option>
@@ -85,7 +89,7 @@
 			<div class="max field round suffix prefix small no-margin surface-variant">
 				<i class="front">search</i><input
 					bind:value={search}
-					on:input={searchTranscript}
+					oninput={searchTranscript}
 					type="text"
 					placeholder={$_('searchPlaceholder')}
 				/>
@@ -111,7 +115,7 @@
 					<div
 						class="transcript-line"
 						id={`transcript-line-${cue.startTime}`}
-						on:click={() => (player.currentTime = cue.startTime)}
+						onclick={() => (player.currentTime = cue.startTime)}
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>

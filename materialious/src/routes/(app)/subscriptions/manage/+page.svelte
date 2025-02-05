@@ -6,11 +6,11 @@
 
 	activePageStore.set(null);
 
-	export let data;
+	let { data } = $props();
 
-	let subscriptions = structuredClone(data.subscriptions);
+	let subscriptions = $state(structuredClone(data.subscriptions));
 
-	let search: string;
+	let search: string = $state('');
 
 	const fuse = new Fuse(subscriptions, {
 		keys: ['author']
@@ -39,7 +39,7 @@
 <div class="max field round suffix prefix small no-margin surface-variant">
 	<i class="front">search</i><input
 		bind:value={search}
-		on:input={searchSubs}
+		oninput={searchSubs}
 		type="text"
 		placeholder={$_('searchPlaceholder')}
 	/>
@@ -54,7 +54,7 @@
 				</h6></a
 			>
 			<div class="max"></div>
-			<button on:click={async () => unsubscribe(sub.authorId)} class="border">Unsubscribe</button>
+			<button onclick={async () => unsubscribe(sub.authorId)} class="border">Unsubscribe</button>
 		</nav>
 	</article>
 {/each}

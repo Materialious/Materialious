@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { getHashtag } from '$lib/api';
+	import type { Video } from '$lib/api/model.js';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { activePageStore } from '$lib/store';
+	import { onMount } from 'svelte';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
-	export let data;
+	let { data } = $props();
 
 	let currentPage = 1;
-	$: videos = [...data.hashTagVideos.results];
+	let videos: Video[] = $state([]);
+
+	onMount(() => {
+		videos = [...data.hashTagVideos.results];
+	});
 
 	activePageStore.set('hashtag');
 

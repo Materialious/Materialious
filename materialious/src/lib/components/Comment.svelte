@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Comment_1 from './Comment.svelte';
 	import { getComments } from '$lib/api';
 	import { type Comment, type Comments } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
@@ -6,10 +7,14 @@
 	import { numberWithCommas } from '$lib/time';
 	import { _ } from 'svelte-i18n';
 
-	export let comment: Comment;
-	export let videoId: string;
+	interface Props {
+		comment: Comment;
+		videoId: string;
+	}
 
-	let replies: Comments | undefined = undefined;
+	let { comment, videoId }: Props = $props();
+
+	let replies: Comments | undefined = $state(undefined);
 
 	async function loadReplies(continuation: string) {
 		try {
@@ -79,20 +84,20 @@
 
 		{#if replies}
 			{#each replies.comments as reply}
-				<svelte:self comment={reply} {videoId} />
+				<Comment_1 comment={reply} {videoId} />
 			{/each}
 		{/if}
 
 		{#if comment.replies && !replies}
 			<button
-				on:click={async () => loadReplies(comment.replies.continuation)}
+				onclick={async () => loadReplies(comment.replies.continuation)}
 				class="transparent replies"
 			>
 				<i class="primary-text">expand_more</i>
 				<span class="primary-text">{comment.replies.replyCount} {$_('replies')}</span>
 			</button>
 		{:else if replies}
-			<button on:click={() => (replies = undefined)} class="transparent replies">
+			<button onclick={() => (replies = undefined)} class="transparent replies">
 				<i class="primary-text">expand_less</i>
 				<span class="primary-text">{$_('hideReplies')}</span>
 			</button>

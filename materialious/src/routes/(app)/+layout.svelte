@@ -36,18 +36,23 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
+	interface Props {
+		children?: import('svelte').Snippet;
+	}
 
-	let mobileSearchShow = false;
+	let { children }: Props = $props();
 
-	let currentPage: string | null = '';
+	let mobileSearchShow = $state(false);
+
+	let currentPage: string | null = $state('');
 	activePageStore.subscribe((page) => (currentPage = page));
 
-	let isLoggedIn = false;
+	let isLoggedIn = $state(false);
 	authStore.subscribe((value) => {
 		isLoggedIn = value !== null;
 	});
 
-	let notifications: Notification[] = [];
+	let notifications: Notification[] = $state([]);
 
 	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
@@ -178,7 +183,7 @@
 		}
 	});
 
-	$: webManifestLink = pwaInfo ? pwaInfo.webManifest.linkTag : '';
+	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
 </script>
 
 <svelte:head>
@@ -200,7 +205,7 @@
 <nav class="top">
 	{#if !mobileSearchShow}
 		<button
-			on:click={() => (mobileSearchShow = !mobileSearchShow)}
+			onclick={() => (mobileSearchShow = !mobileSearchShow)}
 			class="transparent s circle large"
 		>
 			<i>search</i>
@@ -209,16 +214,16 @@
 
 	{#if Capacitor.getPlatform() === 'electron'}
 		<nav class="no-space">
-			<button on:click={() => window.history.back()} class="border left-round">
+			<button onclick={() => window.history.back()} class="border left-round">
 				<i>arrow_back</i>
 			</button>
-			<button on:click={() => window.history.forward()} class="border right-round">
+			<button onclick={() => window.history.forward()} class="border right-round">
 				<i>arrow_forward</i>
 			</button>
 		</nav>
 	{/if}
 
-	<nav on:click={() => goto('/')} style="cursor: pointer;" class="m l">
+	<nav onclick={() => goto('/')} style="cursor: pointer;" class="m l">
 		<Logo />
 		<h6 class="l">Materialious</h6>
 	</nav>
@@ -243,23 +248,23 @@
 			</button>
 		{/if}
 		{#if isLoggedIn}
-			<button class="circle large transparent" on:click={() => ui('#dialog-notifications')}
+			<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
 				><i>notifications</i>
 				<div class="tooltip bottom">{$_('layout.notifications')}</div>
 			</button>
 		{/if}
-		<button class="circle large transparent" on:click={() => ui('#dialog-settings')}>
+		<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
 			<i>settings</i>
 			<div class="tooltip bottom">{$_('layout.settings')}</div>
 		</button>
 
 		{#if !isLoggedIn}
-			<button on:click={login} class="circle large transparent">
+			<button onclick={login} class="circle large transparent">
 				<i>login</i>
 				<div class="tooltip bottom">{$_('layout.login')}</div>
 			</button>
 		{:else}
-			<button on:click={logout} class="circle large transparent">
+			<button onclick={logout} class="circle large transparent">
 				<i>logout</i>
 				<div class="tooltip bottom">{$_('layout.logout')}</div>
 			</button>
@@ -315,7 +320,7 @@
 				</p>
 			</div>
 			<nav class="right-align no-space">
-				<button class="transparent link" on:click={() => showWarningStore.set(false)}
+				<button class="transparent link" onclick={() => showWarningStore.set(false)}
 					>Don't show again</button
 				>
 			</nav>
@@ -324,7 +329,7 @@
 	{#if $navigating}
 		<PageLoading />
 	{:else}
-		<slot />
+		{@render children?.()}
 	{/if}
 
 	<SyncParty />

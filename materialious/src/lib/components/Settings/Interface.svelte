@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { goto } from '$app/navigation';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { letterCase, titleCases } from '$lib/letterCasing';
@@ -30,10 +32,10 @@
 		themeColorStore
 	} from '../../store';
 
-	let invidiousInstance = get(instanceStore);
-	let region = get(interfaceRegionStore);
-	let forceCase = get(interfaceForceCase);
-	let defaultPage = get(interfaceDefaultPage);
+	let invidiousInstance = $state(get(instanceStore));
+	let region = $state(get(interfaceRegionStore));
+	let forceCase = $state(get(interfaceForceCase));
+	let defaultPage = $state(get(interfaceDefaultPage));
 
 	async function setColor(color: any) {
 		const target = color.target;
@@ -58,12 +60,12 @@
 
 {#if Capacitor.isNativePlatform()}
 	<form
-		on:submit|preventDefault={() => {
+		onsubmit={preventDefault(() => {
 			instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
 			authStore.set(null);
 			goto('/', { replaceState: true });
 			ui('#dialog-settings');
-		}}
+		})}
 	>
 		<nav>
 			<div class="field label border max">
@@ -79,7 +81,7 @@
 
 <div class="margin"></div>
 
-<button on:click={toggleDarkMode} class="no-margin">
+<button onclick={toggleDarkMode} class="no-margin">
 	{#if !$darkModeStore}
 		<i>dark_mode</i>
 		<span>{$_('layout.theme.darkMode')}</span>
@@ -91,7 +93,7 @@
 <button>
 	<i>palette</i>
 	<span>{$_('layout.theme.color')}</span>
-	<input on:change={setColor} type="color" />
+	<input onchange={setColor} type="color" />
 </button>
 
 <div class="margin"></div>
@@ -106,7 +108,7 @@
 				<input
 					type="checkbox"
 					bind:checked={$interfaceAmoledTheme}
-					on:click={() => interfaceAmoledTheme.set(!$interfaceAmoledTheme)}
+					onclick={() => interfaceAmoledTheme.set(!$interfaceAmoledTheme)}
 				/>
 				<span></span>
 			</label>
@@ -123,7 +125,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceDisplayThumbnailAvatars}
-				on:click={() => interfaceDisplayThumbnailAvatars.set(!$interfaceDisplayThumbnailAvatars)}
+				onclick={() => interfaceDisplayThumbnailAvatars.set(!$interfaceDisplayThumbnailAvatars)}
 			/>
 			<span></span>
 		</label>
@@ -139,7 +141,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceSearchHistoryEnabled}
-				on:click={() => {
+				onclick={() => {
 					interfaceSearchHistoryEnabled.set(!$interfaceSearchHistoryEnabled);
 					searchHistoryStore.set([]);
 				}}
@@ -158,7 +160,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceLowBandwidthMode}
-				on:click={() => interfaceLowBandwidthMode.set(!$interfaceLowBandwidthMode)}
+				onclick={() => interfaceLowBandwidthMode.set(!$interfaceLowBandwidthMode)}
 			/>
 			<span></span>
 		</label>
@@ -174,7 +176,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceSearchSuggestionsStore}
-				on:click={() => interfaceSearchSuggestionsStore.set(!$interfaceSearchSuggestionsStore)}
+				onclick={() => interfaceSearchSuggestionsStore.set(!$interfaceSearchSuggestionsStore)}
 			/>
 			<span></span>
 		</label>
@@ -190,7 +192,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfacePreviewVideoOnHoverStore}
-				on:click={() => interfacePreviewVideoOnHoverStore.set(!$interfacePreviewVideoOnHoverStore)}
+				onclick={() => interfacePreviewVideoOnHoverStore.set(!$interfacePreviewVideoOnHoverStore)}
 			/>
 			<span></span>
 		</label>
@@ -206,7 +208,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandDesc}
-				on:click={() => interfaceAutoExpandDesc.set(!$interfaceAutoExpandDesc)}
+				onclick={() => interfaceAutoExpandDesc.set(!$interfaceAutoExpandDesc)}
 			/>
 			<span></span>
 		</label>
@@ -222,7 +224,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandComments}
-				on:click={() => interfaceAutoExpandComments.set(!$interfaceAutoExpandComments)}
+				onclick={() => interfaceAutoExpandComments.set(!$interfaceAutoExpandComments)}
 			/>
 			<span></span>
 		</label>
@@ -230,7 +232,7 @@
 </div>
 
 <div class="field label suffix border">
-	<select name="region" bind:value={region} on:change={() => interfaceRegionStore.set(region)}>
+	<select name="region" bind:value={region} onchange={() => interfaceRegionStore.set(region)}>
 		{#each iso31661 as region}
 			<option selected={$interfaceRegionStore === region.alpha2} value={region.alpha2}
 				>{region.alpha2} - {region.name}</option
@@ -242,7 +244,7 @@
 </div>
 
 <div class="field label suffix border">
-	<select name="case" bind:value={forceCase} on:change={() => interfaceForceCase.set(forceCase)}>
+	<select name="case" bind:value={forceCase} onchange={() => interfaceForceCase.set(forceCase)}>
 		<option selected={$interfaceForceCase === null} value={null}>Default</option>
 		{#each titleCases as caseType}
 			<option selected={$interfaceForceCase === caseType} value={caseType}
@@ -258,7 +260,7 @@
 	<select
 		name="defaultPage"
 		bind:value={defaultPage}
-		on:change={() => interfaceDefaultPage.set(defaultPage)}
+		onchange={() => interfaceDefaultPage.set(defaultPage)}
 	>
 		{#each getPages() as page}
 			{#if !page.requiresAuth || get(authStore)}
@@ -276,7 +278,7 @@
 		<h6>{$_('layout.bookmarklet')}</h6>
 		<button
 			class="no-margin"
-			on:click={async () => await Clipboard.write({ string: bookmarkletSaveToUrl() })}
+			onclick={async () => await Clipboard.write({ string: bookmarkletSaveToUrl() })}
 			>{$_('copyUrl')}</button
 		>
 	</div>

@@ -4,9 +4,13 @@
 	import { darkModeStore, themeColorStore } from '../store';
 	import { getDynamicTheme } from '../theme';
 
-	export let classes = '';
+	interface Props {
+		classes?: string;
+	}
 
-	let fillColor = '';
+	let { classes = '' }: Props = $props();
+
+	let fillColor = $state('');
 
 	async function setFill() {
 		fillColor = (await getDynamicTheme())['--primary'];

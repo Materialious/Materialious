@@ -4,7 +4,7 @@
 	import { proxyVideoUrl } from '../misc';
 	import { miniPlayerSrcStore, playerProxyVideosStore } from '../store';
 
-	let currentTime: number = 0;
+	let currentTime: number = $state(0);
 
 	function setTime() {
 		const player = (document.getElementById('video') as HTMLVideoElement) || null;
@@ -30,7 +30,7 @@
 {#if $miniPlayerSrcStore && $miniPlayerSrcStore.video.formatStreams.length > 0}
 	<nav class="bottom no-padding">
 		<article class="surface-bright">
-			<button on:click={() => miniPlayerSrcStore.set(null)} class="s circle transparent no-margin">
+			<button onclick={() => miniPlayerSrcStore.set(null)} class="s circle transparent no-margin">
 				<i>close</i>
 			</button>
 			<div class="flex-container">
@@ -39,7 +39,7 @@
 						{$miniPlayerSrcStore.video.title}
 					</p>
 					<button
-						on:click={() => miniPlayerSrcStore.set(null)}
+						onclick={() => miniPlayerSrcStore.set(null)}
 						class="m l circle transparent no-margin"
 					>
 						<i>close</i>
@@ -49,14 +49,14 @@
 				></progress>
 			</div>
 			<video
-				on:click={() => {
+				onclick={() => {
 					goto(`/watch/${$miniPlayerSrcStore.video.videoId}?time=${currentTime}`);
 					miniPlayerSrcStore.set(null);
 				}}
 				id="video"
 				style="cursor: pointer;"
 				bind:currentTime
-				on:loadedmetadata={setTime}
+				onloadedmetadata={setTime}
 				controls={false}
 				autoplay
 				src={get(playerProxyVideosStore)

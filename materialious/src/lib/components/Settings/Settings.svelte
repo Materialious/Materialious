@@ -68,9 +68,9 @@
 		| 'ryd'
 		| 'api extended'
 		| 'sponsorblock'
-		| 'dearrow' = 'interface';
+		| 'dearrow' = $state('interface');
 
-	let dialogType = '';
+	let dialogType = $state('');
 
 	function checkWidth() {
 		if (innerWidth <= 1320) {
@@ -104,31 +104,31 @@
 
 	<div>
 		<nav class="tabbed small">
-			<a class:active={activeTab === 'interface'} on:click={() => (activeTab = 'interface')}>
+			<a class:active={activeTab === 'interface'} onclick={() => (activeTab = 'interface')}>
 				<i>grid_view</i>
 				<span>{$_('layout.interface')}</span>
 			</a>
-			<a class:active={activeTab === 'player'} on:click={() => (activeTab = 'player')}>
+			<a class:active={activeTab === 'player'} onclick={() => (activeTab = 'player')}>
 				<i>smart_display</i>
 				<span>{$_('layout.player.title')}</span>
 			</a>
-			<a class:active={activeTab === 'data'} on:click={() => (activeTab = 'data')}>
+			<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
 				<i>save</i>
 				<span>{$_('layout.dataPreferences.dataPreferences')}</span>
 			</a>
-			<a class:active={activeTab === 'ryd'} on:click={() => (activeTab = 'ryd')}>
+			<a class:active={activeTab === 'ryd'} onclick={() => (activeTab = 'ryd')}>
 				<i>thumb_down</i>
 				<span>RYD</span>
 			</a>
-			<a class:active={activeTab === 'api extended'} on:click={() => (activeTab = 'api extended')}>
+			<a class:active={activeTab === 'api extended'} onclick={() => (activeTab = 'api extended')}>
 				<i>sync</i>
 				<span>API Extended</span>
 			</a>
-			<a class:active={activeTab === 'sponsorblock'} on:click={() => (activeTab = 'sponsorblock')}>
+			<a class:active={activeTab === 'sponsorblock'} onclick={() => (activeTab = 'sponsorblock')}>
 				<i>block</i>
 				<span>Sponsorblock</span>
 			</a>
-			<a class:active={activeTab === 'dearrow'} on:click={() => (activeTab = 'dearrow')}>
+			<a class:active={activeTab === 'dearrow'} onclick={() => (activeTab = 'dearrow')}>
 				<i>keyboard_double_arrow_down</i>
 				<span>{$_('layout.deArrow.title')}</span>
 			</a>

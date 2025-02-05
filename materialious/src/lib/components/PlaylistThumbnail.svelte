@@ -8,12 +8,16 @@
 	import { truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
-	export let playlist: Playlist;
-	export let disabled: boolean = false;
+	interface Props {
+		playlist: Playlist;
+		disabled?: boolean;
+	}
 
-	let loading = true;
+	let { playlist, disabled = false }: Props = $props();
 
-	let img: HTMLImageElement;
+	let loading = $state(true);
+
+	let img: HTMLImageElement | undefined = $state();
 
 	const playlistLink = `/playlist/${playlist.playlistId}`;
 
@@ -49,7 +53,7 @@
 	{#if playlist.videoCount > 0 && !$interfaceLowBandwidthMode}
 		{#if loading}
 			<progress class="circle"></progress>
-		{:else if img.src !== ''}
+		{:else if img && img.src !== ''}
 			<img
 				class="responsive"
 				style="max-width: 100%;height: 100%;"

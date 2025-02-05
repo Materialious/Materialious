@@ -1,15 +1,17 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
 	import { synciousInstanceStore, synciousStore } from '../../store';
 
-	let synciousInstance = get(synciousInstanceStore);
+	let synciousInstance = $state(get(synciousInstanceStore));
 </script>
 
 <form
-	on:submit|preventDefault={() =>
-		synciousInstanceStore.set(ensureNoTrailingSlash(synciousInstance))}
+	onsubmit={preventDefault(() =>
+		synciousInstanceStore.set(ensureNoTrailingSlash(synciousInstance)))}
 >
 	<nav>
 		<div class="field label border max">
@@ -29,7 +31,7 @@
 	<label class="switch">
 		<input
 			bind:checked={$synciousStore}
-			on:click={() => synciousStore.set(!$synciousStore)}
+			onclick={() => synciousStore.set(!$synciousStore)}
 			type="checkbox"
 		/>
 		<span></span>

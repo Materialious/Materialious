@@ -21,7 +21,7 @@
 		silenceSkipperStore
 	} from '../../store';
 
-	let defaultLanguage = get(playerDefaultLanguage);
+	let defaultLanguage = $state(get(playerDefaultLanguage));
 
 	const languageNames = ISO6391.getAllCodes().map((code) =>
 		ISO6391.getName(code).toLocaleLowerCase()
@@ -33,7 +33,7 @@
 	<select
 		name="case"
 		bind:value={defaultLanguage}
-		on:change={() => playerDefaultLanguage.set(defaultLanguage)}
+		onchange={() => playerDefaultLanguage.set(defaultLanguage)}
 	>
 		{#each languageNames as language}
 			<option selected={$playerDefaultLanguage === language} value={language}
@@ -54,7 +54,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerMiniPlayerStore}
-				on:click={() => playerMiniPlayerStore.set(!$playerMiniPlayerStore)}
+				onclick={() => playerMiniPlayerStore.set(!$playerMiniPlayerStore)}
 			/>
 			<span></span>
 		</label>
@@ -70,7 +70,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerAutoPlayStore}
-				on:click={() => playerAutoPlayStore.set(!$playerAutoPlayStore)}
+				onclick={() => playerAutoPlayStore.set(!$playerAutoPlayStore)}
 			/>
 			<span></span>
 		</label>
@@ -86,7 +86,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerAlwaysLoopStore}
-				on:click={() => playerAlwaysLoopStore.set(!$playerAlwaysLoopStore)}
+				onclick={() => playerAlwaysLoopStore.set(!$playerAlwaysLoopStore)}
 			/>
 			<span></span>
 		</label>
@@ -103,7 +103,7 @@
 				<input
 					type="checkbox"
 					bind:checked={$playerAndroidBgPlayer}
-					on:click={() => playerAndroidBgPlayer.set(!$playerAndroidBgPlayer)}
+					onclick={() => playerAndroidBgPlayer.set(!$playerAndroidBgPlayer)}
 				/>
 				<span></span>
 			</label>
@@ -119,7 +119,7 @@
 				<input
 					type="checkbox"
 					bind:checked={$playerAndroidLockOrientation}
-					on:click={() => playerAndroidLockOrientation.set(!$playerAndroidLockOrientation)}
+					onclick={() => playerAndroidLockOrientation.set(!$playerAndroidLockOrientation)}
 				/>
 				<span></span>
 			</label>
@@ -137,7 +137,7 @@
 				<input
 					type="checkbox"
 					bind:checked={$playerProxyVideosStore}
-					on:click={() => playerProxyVideosStore.set(!$playerProxyVideosStore)}
+					onclick={() => playerProxyVideosStore.set(!$playerProxyVideosStore)}
 				/>
 				<span></span>
 			</label>
@@ -154,7 +154,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerSavePlaybackPositionStore}
-				on:click={() => playerSavePlaybackPositionStore.set(!$playerSavePlaybackPositionStore)}
+				onclick={() => playerSavePlaybackPositionStore.set(!$playerSavePlaybackPositionStore)}
 			/>
 			<span></span>
 		</label>
@@ -170,7 +170,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerListenByDefaultStore}
-				on:click={() => playerListenByDefaultStore.set(!$playerListenByDefaultStore)}
+				onclick={() => playerListenByDefaultStore.set(!$playerListenByDefaultStore)}
 			/>
 			<span></span>
 		</label>
@@ -186,7 +186,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerTheatreModeByDefaultStore}
-				on:click={() => playerTheatreModeByDefaultStore.set(!$playerTheatreModeByDefaultStore)}
+				onclick={() => playerTheatreModeByDefaultStore.set(!$playerTheatreModeByDefaultStore)}
 			/>
 			<span></span>
 		</label>
@@ -202,7 +202,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerAutoplayNextByDefaultStore}
-				on:click={() => playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
+				onclick={() => playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
 			/>
 			<span></span>
 		</label>
@@ -218,7 +218,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$silenceSkipperStore}
-				on:click={() => silenceSkipperStore.set(!$silenceSkipperStore)}
+				onclick={() => silenceSkipperStore.set(!$silenceSkipperStore)}
 			/>
 			<span></span>
 		</label>
@@ -235,7 +235,7 @@
 				<input
 					type="checkbox"
 					bind:checked={$playerYouTubeJsAlways}
-					on:click={() => playerYouTubeJsAlways.set(!$playerYouTubeJsAlways)}
+					onclick={() => playerYouTubeJsAlways.set(!$playerYouTubeJsAlways)}
 				/>
 				<span></span>
 			</label>
@@ -251,7 +251,7 @@
 				<input
 					type="checkbox"
 					bind:checked={$playerYouTubeJsFallback}
-					on:click={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
+					onclick={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
 				/>
 				<span></span>
 			</label>

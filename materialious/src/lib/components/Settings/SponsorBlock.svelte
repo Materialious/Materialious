@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
@@ -10,10 +12,10 @@
 		sponsorBlockUrlStore
 	} from '../../store';
 
-	let sponsorCategoriesList: string[] = [];
+	let sponsorCategoriesList: string[] = $state([]);
 	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
 
-	let sponsorBlockInstance = get(sponsorBlockUrlStore);
+	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
 
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
@@ -36,8 +38,8 @@
 </script>
 
 <form
-	on:submit|preventDefault={() =>
-		sponsorBlockUrlStore.set(ensureNoTrailingSlash(sponsorBlockInstance))}
+	onsubmit={preventDefault(() =>
+		sponsorBlockUrlStore.set(ensureNoTrailingSlash(sponsorBlockInstance)))}
 >
 	<nav>
 		<div class="field label border max">
@@ -57,7 +59,7 @@
 	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockStore}
-			on:click={() => sponsorBlockStore.set(!$sponsorBlockStore)}
+			onclick={() => sponsorBlockStore.set(!$sponsorBlockStore)}
 			type="checkbox"
 		/>
 		<span></span>
@@ -71,7 +73,7 @@
 	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockDisplayToastStore}
-			on:click={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
+			onclick={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
 			type="checkbox"
 		/>
 		<span></span>
@@ -85,7 +87,7 @@
 	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockTimelineStore}
-			on:click={() => sponsorBlockTimelineStore.set(!$sponsorBlockTimelineStore)}
+			onclick={() => sponsorBlockTimelineStore.set(!$sponsorBlockTimelineStore)}
 			type="checkbox"
 		/>
 		<span></span>
@@ -106,7 +108,7 @@
 				<input
 					type="checkbox"
 					checked={sponsorCategoriesList.includes(sponsor.category)}
-					on:click={() => toggleSponsor(sponsor.category)}
+					onclick={() => toggleSponsor(sponsor.category)}
 				/>
 				<span></span>
 			</label>

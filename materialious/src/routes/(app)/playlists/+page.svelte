@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy';
+
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
@@ -6,12 +8,12 @@
 	import { ui } from 'beercss';
 	import { _ } from 'svelte-i18n';
 
-	export let data;
+	let { data = $bindable() } = $props();
 
 	activePageStore.set('playlists');
 
 	let playlistPrivacy: 'public' | 'private' | 'unlisted' = 'public';
-	let playlistTitle: string;
+	let playlistTitle: string = $state('');
 
 	function onPrivacyChange(event: any) {
 		playlistPrivacy = event.currentTarget.value;
@@ -43,7 +45,7 @@
 
 					<nav class="right-align padding">
 						<button
-							on:click={async () => await removePlaylistItem(playlist.playlistId)}
+							onclick={async () => await removePlaylistItem(playlist.playlistId)}
 							class="tertiary square round"
 						>
 							<i>delete</i>
@@ -54,7 +56,7 @@
 		{/each}
 		<ContentColumn>
 			<article style="height: 100%;display: flex;align-items: center;justify-content: center;">
-				<button on:click={() => ui('#create-playlist')} class="round extra">
+				<button onclick={() => ui('#create-playlist')} class="round extra">
 					<i>add_circle</i>
 					<span>{$_('playlist.createPlaylist')}</span>
 				</button>
@@ -64,7 +66,7 @@
 </div>
 
 <dialog id="create-playlist">
-	<form on:submit|preventDefault={createPlaylist}>
+	<form onsubmit={preventDefault(createPlaylist)}>
 		<div class="field label border">
 			<input bind:value={playlistTitle} required name="title" type="text" />
 			<label for="title">{$_('title')}</label>
@@ -72,21 +74,21 @@
 		<div class="field middle-align">
 			<nav>
 				<label class="radio">
-					<input checked on:change={onPrivacyChange} value="public" type="radio" name="privacy" />
+					<input checked onchange={onPrivacyChange} value="public" type="radio" name="privacy" />
 					<span>{$_('playlist.public')}</span>
 				</label>
 				<label class="radio">
-					<input on:change={onPrivacyChange} type="radio" value="unlisted" name="privacy" />
+					<input onchange={onPrivacyChange} type="radio" value="unlisted" name="privacy" />
 					<span>{$_('playlist.unlisted')}</span>
 				</label>
 				<label class="radio">
-					<input on:change={onPrivacyChange} type="radio" value="private" name="privacy" />
+					<input onchange={onPrivacyChange} type="radio" value="private" name="privacy" />
 					<span>{$_('playlist.private')}</span>
 				</label>
 			</nav>
 		</div>
 		<nav class="right-align">
-			<button type="button" on:click={() => ui('#create-playlist')}>{$_('cancel')}</button>
+			<button type="button" onclick={() => ui('#create-playlist')}>{$_('cancel')}</button>
 			<button type="submit">{$_('create')}</button>
 		</nav>
 	</form>

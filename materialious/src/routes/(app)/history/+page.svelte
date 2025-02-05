@@ -12,8 +12,8 @@
 
 	activePageStore.set('history');
 
-	let history: VideoPlay[] = [];
-	let loaded = false;
+	let history: VideoPlay[] = $state([]);
+	let loaded = $state(false);
 
 	let currentPage = 1;
 
@@ -61,7 +61,7 @@
 <div class="space"></div>
 <nav class="right-align">
 	<button
-		on:click={async () => {
+		onclick={async () => {
 			await deleteHistory();
 
 			if (get(synciousStore)) {

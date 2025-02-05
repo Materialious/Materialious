@@ -7,11 +7,15 @@
 	import { authStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
 
-	export let videos: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[] = [];
-	export let playlistId: string = '';
-	export let playlistAuthor: string = '';
+	interface Props {
+		videos?: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[];
+		playlistId?: string;
+		playlistAuthor?: string;
+	}
 
-	let hiddenVideos: string[] = [];
+	let { videos = [], playlistId = '', playlistAuthor = '' }: Props = $props();
+
+	let hiddenVideos: string[] = $state([]);
 	let auth = get(authStore);
 
 	async function removePlaylistItem(indexId: string, videoId: string) {
@@ -36,7 +40,7 @@
 						{#if auth && decodeURIComponent(auth.username) === playlistAuthor && 'indexId' in video}
 							<div class="right-align" style="margin: 1em .5em;">
 								<button
-									on:click={async () => removePlaylistItem(video.indexId, video.videoId)}
+									onclick={async () => removePlaylistItem(video.indexId, video.videoId)}
 									class="tertiary circle small"
 								>
 									<i>delete</i>

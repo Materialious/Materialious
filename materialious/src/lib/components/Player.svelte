@@ -41,16 +41,27 @@
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 
-	export let data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-	export let audioMode = false;
-	export let player: MediaPlayerElement;
-	export let isSyncing: boolean = false;
-	export let isEmbed: boolean = false;
-	export let segments: Segment[] = [];
+	interface Props {
+		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+		audioMode?: boolean;
+		player: MediaPlayerElement;
+		isSyncing?: boolean;
+		isEmbed?: boolean;
+		segments?: Segment[];
+	}
 
-	let src: PlayerSrc = [];
-	let snackBarAlert = '';
-	let playerIsLive = false;
+	let {
+		data,
+		audioMode = false,
+		player = $bindable(),
+		isSyncing = false,
+		isEmbed = false,
+		segments = $bindable([])
+	}: Props = $props();
+
+	let src: PlayerSrc = $state([]);
+	let snackBarAlert = $state('');
+	let playerIsLive = $state(false);
 	let playerPosSet = false;
 
 	let userVideoSpeed = 1;

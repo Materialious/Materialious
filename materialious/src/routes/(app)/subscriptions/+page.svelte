@@ -1,17 +1,18 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { getFeed } from '$lib/api/index';
+	import type { Notification, Video } from '$lib/api/model.js';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { activePageStore } from '$lib/store';
+	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	let { data } = $props();
 
 	let currentPage = 1;
-	let videos;
-	run(() => {
+	let videos: (Notification | Video)[] = $state([]);
+
+	onMount(() => {
 		videos = [...data.feed.notifications, ...data.feed.videos];
 	});
 
@@ -37,6 +38,6 @@
 	</a>
 </nav>
 
-<VideoList bind:videos />
+<VideoList {videos} />
 
 <InfiniteLoading on:infinite={loadMore} />

@@ -17,7 +17,7 @@
 	let searchSuggestions = $state(false);
 	interfaceSearchSuggestionsStore.subscribe((value) => (searchSuggestions = value));
 
-	let search: string = $state();
+	let search: string = $state('');
 	let suggestionsForSearch: string[] = $state([]);
 	let selectedSuggestionIndex: number = $state(-1);
 

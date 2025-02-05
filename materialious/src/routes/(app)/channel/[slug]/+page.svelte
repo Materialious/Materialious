@@ -23,7 +23,8 @@
 
 	let tab: 'videos' | 'playlists' | 'streams' | 'shorts' = $state('videos');
 
-	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined = $state(undefined);
+	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined =
+		$state(undefined);
 
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
@@ -61,7 +62,7 @@
 		displayContent = await getChannelContent(data.channel.authorId, { type: tab });
 	}
 
-	let channelPfp: string = $state();
+	let channelPfp: string | undefined = $state();
 	onMount(async () => {
 		displayContent = await getChannelContent(data.channel.authorId, { type: 'videos' });
 

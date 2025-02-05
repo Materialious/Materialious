@@ -10,7 +10,7 @@
 
 	let subscriptions = $state(structuredClone(data.subscriptions));
 
-	let search: string = $state();
+	let search: string = $state('');
 
 	const fuse = new Fuse(subscriptions, {
 		keys: ['author']

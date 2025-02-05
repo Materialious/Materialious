@@ -72,7 +72,7 @@
 	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
 
 	let audioMode = $state(get(playerListenByDefaultStore));
-	let player: MediaPlayerElement = $state();
+	let player: MediaPlayerElement;
 
 	let segments: Segment[] = $state([]);
 
@@ -415,7 +415,7 @@
 		theatreMode = !theatreMode;
 	}
 
-	let pauseTimeout: NodeJS.Timeout = $state();
+	let pauseTimeout: NodeJS.Timeout | undefined = $state();
 	function setPauseTimer() {
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);

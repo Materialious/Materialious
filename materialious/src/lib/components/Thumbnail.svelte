@@ -39,7 +39,7 @@
 	let videoPreview: VideoPlay | null = $state(null);
 	let videoPreviewMuted: boolean = $state(true);
 	let videoPreviewVolume: number = $state(0.4);
-	let imgHeight: number = $state();
+	let imgHeight: number = $state(0);
 
 	let authorImg: HTMLImageElement | undefined = $state();
 
@@ -62,17 +62,17 @@
 	let loading = $state(true);
 	let loaded = $state(false);
 
-	let img: HTMLImageElement = $state();
+	let img: HTMLImageElement | undefined = $state();
 
-	let progress: string | null = $state();
+	let progress: string | undefined = $state();
 	if (get(playerSavePlaybackPositionStore)) {
 		try {
-			progress = localStorage.getItem(`v_${video.videoId}`);
+			progress = localStorage.getItem(`v_${video.videoId}`) ?? undefined;
 		} catch {
-			progress = null;
+			progress = undefined;
 		}
 	} else {
-		progress = null;
+		progress = undefined;
 	}
 
 	let startedSideways = sideways === true;
@@ -90,11 +90,11 @@
 
 		try {
 			const channel = await getChannel(video.authorId, { priority: 'low' });
-			const img = new Image();
-			img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
+			const loadedPfp = new Image();
+			loadedPfp.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
 
-			img.onload = () => {
-				authorImg = img;
+			loadedPfp.onload = () => {
+				authorImg = loadedPfp;
 			};
 		} catch {}
 	}
@@ -297,7 +297,7 @@
 							style="width: 100%;height: {placeholderHeight}px;"
 						></div>
 					{:else if loaded}
-						{#if showVideoPreview && videoPreview}
+						{#if showVideoPreview && videoPreview && img}
 							<div style="max-width: 100%; max-height: {imgHeight}px;">
 								<video
 									id="video-preview"
@@ -315,7 +315,7 @@
 								>
 								</video>
 							</div>
-						{:else}
+						{:else if img}
 							<img class="responsive" src={img.src} alt="Thumbnail for video" />
 						{/if}
 					{:else}

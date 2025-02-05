@@ -17,7 +17,7 @@
 
 	let loading = $state(true);
 
-	let img: HTMLImageElement = $state();
+	let img: HTMLImageElement | undefined = $state();
 
 	const playlistLink = `/playlist/${playlist.playlistId}`;
 
@@ -53,7 +53,7 @@
 	{#if playlist.videoCount > 0 && !$interfaceLowBandwidthMode}
 		{#if loading}
 			<progress class="circle"></progress>
-		{:else if img.src !== ''}
+		{:else if img && img.src !== ''}
 			<img
 				class="responsive"
 				style="max-width: 100%;height: 100%;"

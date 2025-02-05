@@ -4,7 +4,7 @@
 
 	let { data } = $props();
 
-	let player: MediaPlayerElement = $state();
+	let player: MediaPlayerElement;
 </script>
 
 <Player bind:player isEmbed={true} {data} />

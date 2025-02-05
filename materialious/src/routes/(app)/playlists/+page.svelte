@@ -13,7 +13,7 @@
 	activePageStore.set('playlists');
 
 	let playlistPrivacy: 'public' | 'private' | 'unlisted' = 'public';
-	let playlistTitle: string = $state();
+	let playlistTitle: string = $state('');
 
 	function onPrivacyChange(event: any) {
 		playlistPrivacy = event.currentTarget.value;

@@ -36,7 +36,7 @@
 		"playlists": "Listas de reproducción",
 		"channels": "Canales",
 		"shorts": "Shorts",
-		"streams": "En vivo"
+		"streams": "En vivos"
 	},
 	"subscriptions": {
 		"manageSubscriptions": "Administrar suscripciones"
@@ -107,7 +107,7 @@
 		"customize": "Personalizar",
 		"lowBandwidthMode": "Modo ahorro de datos",
 		"displayThumbnailAvatars": "Carga de miniaturas (Lento)",
-		"searchHistory": "Buscar en historial",
+		"searchHistory": "Historial de búsqueda",
 		"theme": {
 			"theme": "Tema",
 			"darkMode": "Modo oscuro",
@@ -115,7 +115,7 @@
 			"AmoledTheme": "Tema Amoled",
 			"color": "Color"
 		},
-		"searchSuggestions": "Sugerencias en la barra de búsqueda",
+		"searchSuggestions": "Sugerencias de búsqueda",
 		"previewVideoOnHover": "Vista previa del video al pasar por encima",
 		"expandDescription": "Ampliar descripción por defecto",
 		"expandComments": "Desplegar comentarios por defecto",

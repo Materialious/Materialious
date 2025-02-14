@@ -9,6 +9,7 @@ register('zh-CN', () => import('./locales/zh-CN.json'));
 register('tr', () => import('./locales/tr.json'));
 register('nl', () => import('./locales/nl.json'));
 register('de', () => import('./locales/de.json'));
+register('es', () => import('./locales/es.json'));
 register('sh', () => import('./locales/sh.json'));
 register('pt-BR', () => import('./locales/pt-BR.json'));
 

@@ -93,3 +93,13 @@ main.root {
 		scrollbar-width: none !important;
 	}
 }
+
+@media screen and (max-width: 1000px) {
+	menu {
+		z-index: 9999 !important;
+		position: fixed !important;
+		top: 30% !important;
+		width: 100% !important;
+		background-color: var(--surface-variant) !important;
+	}
+}

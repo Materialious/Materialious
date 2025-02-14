@@ -25,6 +25,7 @@
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
+	import '$lib/style.css';
 	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';

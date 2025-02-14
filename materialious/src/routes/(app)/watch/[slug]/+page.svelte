@@ -845,18 +845,6 @@
 		}
 	}
 
-	@media screen and (max-width: 1000px) {
-		menu {
-			z-index: 9999;
-			position: fixed;
-			top: 30%;
-			left: 50%;
-			width: 100%;
-			transform: translate(-50%, 50%);
-			background-color: var(--surface-variant);
-		}
-	}
-
 	@media screen and (max-width: 1646px) {
 		.grid {
 			padding: 0;

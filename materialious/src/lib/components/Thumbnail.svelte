@@ -50,10 +50,7 @@
 		}
 	});
 
-	let loading = $state(true);
-	let loaded = $state(false);
-
-	let img: HTMLImageElement | undefined = $state();
+	let thumbnail: HTMLImageElement | undefined = $state();
 
 	let progress: string | undefined = $state();
 	if (get(playerSavePlaybackPositionStore)) {
@@ -183,15 +180,11 @@
 			}
 		}
 
-		img = new Image();
+		const img = new Image();
 		img.src = imageSrc;
 
 		img.onload = () => {
-			loaded = true;
-			loading = false;
-		};
-		img.onerror = () => {
-			loading = false;
+			thumbnail = img;
 		};
 
 		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
@@ -250,15 +243,13 @@
 				onclick={syncChangeVideo}
 			>
 				{#if !$interfaceLowBandwidthMode}
-					{#if loading}
+					{#if !thumbnail}
 						<div
 							class="secondary-container"
 							style="width: 100%;height: {placeholderHeight}px;"
 						></div>
-					{:else if loaded && img}
-						<img class="responsive" src={img.src} alt="Thumbnail for video" />
 					{:else}
-						<p>{$_('thumbnail.failedToLoadImage')}</p>
+						<img class="responsive" src={thumbnail.src} alt="Thumbnail for video" />
 					{/if}
 				{/if}
 				{#if progress}

@@ -27,10 +27,8 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
-		miniPlayerSrcStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
-		playerMiniPlayerStore,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
@@ -310,21 +308,6 @@
 
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);
-		}
-
-		if (
-			get(playerMiniPlayerStore) &&
-			!player.paused &&
-			!$syncPartyPeerStore &&
-			!data.video.hlsUrl &&
-			data.video.formatStreams &&
-			data.video.formatStreams.length > 0 &&
-			data.video.fallbackPatch === undefined
-		) {
-			miniPlayerSrcStore.set({
-				video: data.video,
-				time: player.currentTime
-			});
 		}
 	});
 

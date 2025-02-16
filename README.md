@@ -25,7 +25,6 @@
 - [Invidious API extended integration!](https://github.com/Materialious/api-extended)
   - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
-- Mini player.
 - Silence skipper (Experimental.)
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
 - Preview video on hover.
@@ -103,9 +102,6 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
 
 ## Settings
 ![Preview of settings](./previews/setting-preview.png)
-
-## Mini player
-![Preview of mini player](./previews/mini-player-desktop-preview.png)
 
 ## Channel
 ![Preview of channel](./previews/channel-preview.png)

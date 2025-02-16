@@ -570,7 +570,7 @@
 						<div class="tooltip">
 							{$_('player.share.title')}
 						</div>
-						<menu class="no-wrap">
+						<menu class="no-wrap mobile">
 							<ShareVideo video={data.video} />
 						</menu></button
 					>
@@ -578,7 +578,7 @@
 						<button class="border">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
-							<menu class="no-wrap">
+							<menu class="no-wrap mobile">
 								{#each personalPlaylists as personalPlaylist}
 									<a
 										href="#add"

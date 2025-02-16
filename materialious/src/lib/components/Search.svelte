@@ -162,12 +162,12 @@
 	.search {
 		width: 500px;
 	}
+	.selected {
+		background-color: var(--surface-variant);
+	}
 	@media screen and (max-width: 1140px) {
 		.search {
 			width: 100%;
 		}
-	}
-	.selected {
-		background-color: var(--surface-variant);
 	}
 </style>

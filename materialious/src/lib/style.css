@@ -95,7 +95,7 @@ main.root {
 }
 
 @media screen and (max-width: 1000px) {
-	menu {
+	menu.mobile {
 		z-index: 9999 !important;
 		position: fixed !important;
 		top: 30% !important;

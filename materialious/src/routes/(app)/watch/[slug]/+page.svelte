@@ -664,7 +664,7 @@
 	</div>
 	{#if !theatreMode}
 		<div class="s12 m12 l3">
-			{#if player && showTranscript}
+			{#if showTranscript}
 				<Transcript bind:player video={data.video} />
 			{/if}
 			{#if playlist}
@@ -755,23 +755,21 @@
 </div>
 
 <dialog class="modal" id="pause-timer">
-	{#if player}
-		<div class="field middle-align">
-			<label class="slider">
-				<input
-					type="range"
-					bind:value={pauseTimerSeconds}
-					min="0"
-					step="60"
-					max={data.video.lengthSeconds - playerCurrentTime - 60}
-				/>
-				<span></span>
-			</label>
-			{#if pauseTimerSeconds > 0}
-				<span class="helper">{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</span>
-			{/if}
-		</div>
-	{/if}
+	<div class="field middle-align">
+		<label class="slider">
+			<input
+				type="range"
+				bind:value={pauseTimerSeconds}
+				min="0"
+				step="60"
+				max={data.video.lengthSeconds - playerCurrentTime - 60}
+			/>
+			<span></span>
+		</label>
+		{#if pauseTimerSeconds > 0}
+			<span class="helper">{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</span>
+		{/if}
+	</div>
 	<nav class="right-align no-space">
 		<button
 			class="transparent link"

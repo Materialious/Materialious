@@ -2,79 +2,108 @@ import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { numberWithCommas } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
-import { BG } from 'bgutils-js';
+import type { WebPoSignalOutput } from 'bgutils-js';
+import { BG, buildURL, GOOG_API_KEY } from 'bgutils-js';
 import { get } from 'svelte/store';
-import { Innertube, ProtoUtils, UniversalCache, Utils } from 'youtubei.js';
+import { Innertube, UniversalCache } from 'youtubei.js';
 import { capacitorFetch } from '../android/http/capacitorFetch';
 
-export interface PoTokens {
-  visitor_data: string;
-  po_token: string;
-}
+type WebPoMinter = {
+  integrityTokenBasedMinter?: BG.WebPoMinter;
+  botguardClient?: BG.BotGuardClient;
+};
 
-async function getPo(identifier: string): Promise<string | undefined> {
+async function getWebPoMinter(): Promise<WebPoMinter> {
   const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
-  const bgConfig = {
-    fetch: Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch,
-    globalObj: window,
-    requestKey,
-    identifier
-  };
+  const challengeResponse = await fetch(buildURL('Create', true), {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json+protobuf',
+      'x-goog-api-key': GOOG_API_KEY,
+      'x-user-agent': 'grpc-web-javascript/0.1'
+    },
+    body: JSON.stringify([requestKey])
+  });
 
-  const bgChallenge = await BG.Challenge.create(bgConfig);
+  const challengeResponseData = await challengeResponse.json();
+
+  const bgChallenge = BG.Challenge.parseChallengeData(challengeResponseData);
 
   if (!bgChallenge)
     throw new Error('Could not get challenge');
 
   const interpreterJavascript = bgChallenge.interpreterJavascript.privateDoNotAccessOrElseSafeScriptWrappedValue;
 
-  if (interpreterJavascript) {
-    new Function(interpreterJavascript)();
-  } else throw new Error('Could not load VM');
+  if (!document.getElementById(bgChallenge.interpreterHash)) {
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.id = bgChallenge.interpreterHash;
+    script.textContent = interpreterJavascript;
+    document.head.appendChild(script);
+  }
 
-  const poTokenResult = await BG.PoToken.generate({
-    program: bgChallenge.program,
+  const botguardClient = await BG.BotGuardClient.create({
+    globalObj: globalThis,
     globalName: bgChallenge.globalName,
-    bgConfig
+    program: bgChallenge.program
   });
 
-  return poTokenResult.poToken;
+  if (bgChallenge) {
+    const webPoSignalOutput: WebPoSignalOutput = [];
+    const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
+
+    const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json+protobuf',
+        'x-goog-api-key': GOOG_API_KEY,
+        'x-user-agent': 'grpc-web-javacript/0.1'
+      },
+      body: JSON.stringify([requestKey, botguardResponse])
+    });
+
+    const integrityTokenResponseData = await integrityTokenResponse.json();
+    const integrityToken = integrityTokenResponseData[0] as string | undefined;
+
+    if (!integrityToken) {
+      console.error('Could not get integrity token. Interpreter Hash:', bgChallenge.interpreterHash);
+      return {};
+    }
+
+    const integrityTokenBasedMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
+
+    return {
+      integrityTokenBasedMinter,
+      botguardClient
+    };
+  }
+
+  return {};
 }
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
-  let tokens: PoTokens;
-
   if (!Capacitor.isNativePlatform()) {
     throw new Error('Platform not supported');
   }
 
-  const poTokenCache = get(poTokenCacheStore);
-  if (!poTokenCache) {
-    const visitorData = ProtoUtils.encodeVisitorData(Utils.generateRandomString(11), Math.floor(Date.now() / 1000));
-    const poToken = await getPo(visitorData);
-
-    if (!poToken) {
-      throw new Error('Unable to generate PO token');
-    }
-
-    tokens = {
-      visitor_data: visitorData,
-      po_token: poToken
-    };
-    poTokenCacheStore.set(tokens);
-  } else {
-    tokens = poTokenCache;
-  }
-
   const youtube = await Innertube.create({
-    visitor_data: tokens.visitor_data,
-    po_token: tokens.po_token,
     fetch: Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch,
     generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore)
   });
+
+  const { integrityTokenBasedMinter } = await getWebPoMinter();
+
+  let sessionWebPo: string | undefined;
+  const poTokensCached = get(poTokenCacheStore);
+  if (!poTokensCached && integrityTokenBasedMinter) {
+    sessionWebPo = await integrityTokenBasedMinter.mintAsWebsafeString(youtube.session.context.client.visitorData ?? '');
+    poTokenCacheStore.set(sessionWebPo);
+  } else {
+    sessionWebPo = poTokensCached;
+  }
 
   const video = await youtube.getInfo(videoId);
 
@@ -87,9 +116,20 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   if (!video.basic_info.is_live) {
     let manifest = await video.toDash();
 
-    // Hack to fix video not displaying.
-    // Thanks to absidue & Andrews54757
-    manifest = manifest.replaceAll('<EssentialProperty', '<SupplementalProperty');
+    let parser = new DOMParser();
+    let xmlDoc = parser.parseFromString(manifest, 'application/xml');
+
+    let baseURLs = xmlDoc.getElementsByTagName('BaseURL');
+
+    Array.from(baseURLs).forEach((baseURL) => {
+      let url = new URL(baseURL.textContent as string);
+      url.searchParams.set('pot', (sessionWebPo ?? BG.PoToken.generateColdStartToken(youtube.session.context.client.visitorData ?? '')));
+      baseURL.textContent = url.toString();
+    });
+
+    const serializer = new XMLSerializer();
+    manifest = serializer.serializeToString(xmlDoc);
+
     dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
   }
 

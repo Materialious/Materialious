@@ -4,7 +4,6 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './letterCasing';
-import type { PoTokens } from './patches/youtubejs';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
@@ -106,6 +105,6 @@ export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; 
 
 export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);
 
-export const poTokenCacheStore: Writable<PoTokens> = writable();
+export const poTokenCacheStore: Writable<string> = writable();
 
 export const searchHistoryStore: Writable<string[]> = persisted('searchHistory', []);

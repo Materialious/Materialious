@@ -3,7 +3,7 @@
 
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { getSearchSuggestions } from '../api';
 	import {
@@ -108,6 +108,8 @@
 			bind:value={search}
 			onclick={async () => {
 				showSearchBox = true;
+				await tick();
+				document.getElementById('search')?.focus();
 			}}
 		/>
 		{#if showSearchBox}
@@ -117,6 +119,7 @@
 					<input
 						placeholder={$_('searchPlaceholder')}
 						type="text"
+						id="search"
 						autofocus
 						required
 						bind:value={search}
@@ -162,12 +165,12 @@
 	.search {
 		width: 500px;
 	}
+	.selected {
+		background-color: var(--surface-variant);
+	}
 	@media screen and (max-width: 1140px) {
 		.search {
 			width: 100%;
 		}
-	}
-	.selected {
-		background-color: var(--surface-variant);
 	}
 </style>

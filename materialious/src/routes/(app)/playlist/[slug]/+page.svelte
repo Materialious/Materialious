@@ -87,7 +87,7 @@
 	<button class="border no-margin">
 		<i>share</i>
 		<span>{$_('player.share.title')}</span>
-		<menu class="no-wrap">
+		<menu class="no-wrap mobile">
 			{#if !Capacitor.isNativePlatform()}
 				<a
 					href="#share"

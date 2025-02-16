@@ -7,7 +7,6 @@
 	import { getFeed } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
 	import Logo from '$lib/components/Logo.svelte';
-	import MiniPlayer from '$lib/components/MiniPlayer.svelte';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import Settings from '$lib/components/Settings/Settings.svelte';
@@ -334,7 +333,6 @@
 	{/if}
 
 	<SyncParty />
-	<MiniPlayer />
 </main>
 
 <style>

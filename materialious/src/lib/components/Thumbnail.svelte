@@ -6,7 +6,7 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from '../api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase, VideoPlay } from '../api/model';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
 	import { proxyVideoUrl, truncate } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
@@ -15,8 +15,6 @@
 		deArrowTitlesOnly,
 		interfaceDisplayThumbnailAvatars,
 		interfaceLowBandwidthMode,
-		interfacePreviewVideoOnHoverStore,
-		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore,
@@ -35,15 +33,8 @@
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
 
 	let thumbnailHidden: boolean = $state(false);
-	let showVideoPreview: boolean = $state(false);
-	let videoPreview: VideoPlay | null = $state(null);
-	let videoPreviewMuted: boolean = $state(true);
-	let videoPreviewVolume: number = $state(0.4);
-	let imgHeight: number = $state(0);
 
 	let authorImg: HTMLImageElement | undefined = $state();
-
-	let proxyVideos = get(playerProxyVideosStore);
 
 	let placeholderHeight: number = $state(0);
 
@@ -59,10 +50,7 @@
 		}
 	});
 
-	let loading = $state(true);
-	let loaded = $state(false);
-
-	let img: HTMLImageElement | undefined = $state();
+	let thumbnail: HTMLImageElement | undefined = $state();
 
 	let progress: string | undefined = $state();
 	if (get(playerSavePlaybackPositionStore)) {
@@ -192,15 +180,11 @@
 			}
 		}
 
-		img = new Image();
+		const img = new Image();
 		img.src = imageSrc;
 
 		img.onload = () => {
-			loaded = true;
-			loading = false;
-		};
-		img.onerror = () => {
-			loading = false;
+			thumbnail = img;
 		};
 
 		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
@@ -232,32 +216,6 @@
 		}
 	}
 
-	async function previewVideo() {
-		if (!get(interfacePreviewVideoOnHoverStore)) return;
-
-		showVideoPreview = true;
-		try {
-			videoPreview = await getVideo(video.videoId);
-			if (videoPreview.hlsUrl || videoPreview.formatStreams.length === 0) {
-				showVideoPreview = false;
-				videoPreview = null;
-			} else {
-				try {
-					const vidstackDetails = localStorage.getItem('video-player');
-					if (vidstackDetails) {
-						const vidstackDetailsParsed = JSON.parse(vidstackDetails);
-						if ('volume' in vidstackDetailsParsed)
-							videoPreviewVolume = vidstackDetailsParsed.volume;
-					}
-				} catch {}
-			}
-		} catch {
-			showVideoPreview = false;
-		}
-
-		imgHeight = document.getElementById('thumbnail-container')?.clientHeight as number;
-	}
-
 	function calcThumbnailPlaceholderHeight() {
 		if (!sideways) {
 			if (innerWidth < 1000) {
@@ -277,13 +235,7 @@
 
 {#if !thumbnailHidden}
 	<div class:sideways-root={sideways}>
-		<div
-			onmouseover={previewVideo}
-			onmouseleave={() => (showVideoPreview = false)}
-			onfocus={() => {}}
-			id="thumbnail-container"
-			role="region"
-		>
+		<div onfocus={() => {}} id="thumbnail-container" role="region">
 			<a
 				class="wave thumbnail"
 				href={watchUrl.toString()}
@@ -291,35 +243,13 @@
 				onclick={syncChangeVideo}
 			>
 				{#if !$interfaceLowBandwidthMode}
-					{#if loading}
+					{#if !thumbnail}
 						<div
 							class="secondary-container"
 							style="width: 100%;height: {placeholderHeight}px;"
 						></div>
-					{:else if loaded}
-						{#if showVideoPreview && videoPreview && img}
-							<div style="max-width: 100%; max-height: {imgHeight}px;">
-								<video
-									id="video-preview"
-									style="max-width: 100%; max-height: {imgHeight}px;"
-									autoplay
-									poster={img.src}
-									width="100%"
-									height="100%"
-									muted={videoPreviewMuted}
-									controls={false}
-									volume={videoPreviewVolume}
-									src={proxyVideos
-										? proxyVideoUrl(videoPreview.formatStreams[0].url)
-										: videoPreview.formatStreams[0].url}
-								>
-								</video>
-							</div>
-						{:else if img}
-							<img class="responsive" src={img.src} alt="Thumbnail for video" />
-						{/if}
 					{:else}
-						<p>{$_('thumbnail.failedToLoadImage')}</p>
+						<img class="responsive" src={thumbnail.src} alt="Thumbnail for video" />
 					{/if}
 				{/if}
 				{#if progress}
@@ -352,23 +282,6 @@
 					<h3>{$_('thumbnail.live')}</h3>
 				{/if}
 			</a>
-			{#if showVideoPreview && videoPreview}
-				<button
-					class="no-padding"
-					style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px;"
-					onclick={() => {
-						videoPreviewMuted = !videoPreviewMuted;
-					}}
-				>
-					<i>
-						{#if videoPreviewMuted}
-							volume_off
-						{:else}
-							volume_up
-						{/if}
-					</i>
-				</button>
-			{/if}
 		</div>
 
 		<div class="thumbnail-details video-title">
@@ -432,10 +345,6 @@
 
 	.sideways-root .thumbnail {
 		width: 200px;
-	}
-
-	#video-preview[poster] {
-		object-fit: contain;
 	}
 
 	.video-title {

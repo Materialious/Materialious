@@ -20,7 +20,6 @@ Materialious allows you to customize various settings by overwriting the default
       + [Low bandwidth mode](#low-bandwidth-mode)
       + [Display thumbnail avatars](#)
    * [Player](#player)
-      + [Mini player](#mini-player)
       + [Autoplay video](#autoplay-video)
       + [Always loop video](#always-loop-video)
       + [Proxy videos](#proxy-videos)
@@ -144,14 +143,6 @@ Avoids loading images.
 ```
 
 ## Player
-
-### Mini player
-
-Enables or disables the mini player feature.
-
-```json
-"playerMiniPlayer": true
-```
 
 ### Autoplay video
 

@@ -21,13 +21,19 @@ export async function load({ url }) {
 		} catch { }
 	}
 
+	if (browser) {
+		locale.set(window.navigator.language);
+	}
+	await waitLocale();
+
 	const defaultPage = get(interfaceDefaultPage);
 
 	if (
 		defaultPage &&
 		defaultPage !== '/' &&
 		defaultPage.startsWith('/') &&
-		url.pathname === '/'
+		url.pathname === '/' &&
+		window.history.length < 3
 	) {
 		getPages().forEach((page) => {
 			if (page.href === defaultPage && (!page.requiresAuth || get(authStore))) {
@@ -35,9 +41,4 @@ export async function load({ url }) {
 			}
 		});
 	}
-
-	if (browser) {
-		locale.set(window.navigator.language);
-	}
-	await waitLocale();
 }

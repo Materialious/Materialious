@@ -1,4 +1,3 @@
-import type { VideoPlay } from '$lib/api/model';
 import { Capacitor } from '@capacitor/core';
 import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
@@ -104,9 +103,6 @@ export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writ
 
 export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean; }>> =
 	writable({});
-
-export const miniPlayerSrcStore: Writable<{ video: VideoPlay; time: number; } | null> =
-	writable(null);
 
 export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);
 

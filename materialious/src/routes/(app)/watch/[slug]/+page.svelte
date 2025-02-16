@@ -27,10 +27,8 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
-		miniPlayerSrcStore,
 		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
-		playerMiniPlayerStore,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
@@ -311,21 +309,6 @@
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);
 		}
-
-		if (
-			get(playerMiniPlayerStore) &&
-			!player.paused &&
-			!$syncPartyPeerStore &&
-			!data.video.hlsUrl &&
-			data.video.formatStreams &&
-			data.video.formatStreams.length > 0 &&
-			data.video.fallbackPatch === undefined
-		) {
-			miniPlayerSrcStore.set({
-				video: data.video,
-				time: player.currentTime
-			});
-		}
 	});
 
 	async function loadPlaylist(playlistId: string) {
@@ -570,7 +553,7 @@
 						<div class="tooltip">
 							{$_('player.share.title')}
 						</div>
-						<menu class="no-wrap">
+						<menu class="no-wrap mobile">
 							<ShareVideo video={data.video} />
 						</menu></button
 					>
@@ -578,7 +561,7 @@
 						<button class="border">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
-							<menu class="no-wrap">
+							<menu class="no-wrap mobile">
 								{#each personalPlaylists as personalPlaylist}
 									<a
 										href="#add"

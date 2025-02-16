@@ -22,7 +22,6 @@
 	import {
 		authStore,
 		instanceStore,
-		miniPlayerSrcStore,
 		playerAlwaysLoopStore,
 		playerAndroidBgPlayer,
 		playerAndroidLockOrientation,
@@ -200,8 +199,6 @@
 	}
 
 	onMount(async () => {
-		miniPlayerSrcStore.set(null);
-
 		if (!data.video.hlsUrl) {
 			playerIsLive = false;
 			if (data.video.captions) {

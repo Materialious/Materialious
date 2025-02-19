@@ -56,7 +56,9 @@
             "wasm": "正在下载 ffmpeg wasm",
             "merging": "将视频和音频合并在一起",
             "core": "正在下载 ffmpeg core"
-        }
+        },
+        "youtubeJsFallBack": "正在使用本地视频回退",
+        "defaultLanguage": "默认语言"
     },
     "layout": {
         "notifications": "通知",
@@ -66,8 +68,9 @@
         "theme": {
             "theme": "主题",
             "darkMode": "深色模式",
-            "lightMode": "亮色模式",
-            "color": "颜色"
+            "lightMode": "浅色模式",
+            "color": "颜色",
+            "AmoledTheme": "AMOLED 主题"
         },
         "bookmarklet": "书签",
         "star": "在 GitHub 上为我们加星⭐！",
@@ -95,7 +98,9 @@
             "proxyVideos": "代理视频",
             "backgroundPlay": "在后台播放音频",
             "dash": "MPEG-DASH 支持",
-            "silenceSkipper": "无声片段跳过（实验性）"
+            "silenceSkipper": "无声片段跳过（实验性）",
+            "youtubeJsAlways": "始终使用本地视频处理",
+            "youtubeJsFallback": "本地视频处理回退"
         },
         "instanceUrl": "实例 URL",
         "sponsors": {
@@ -117,12 +122,15 @@
         },
         "expandComments": "默认展开评论",
         "expandDescription": "默认展开描述",
-        "interface": "界面"
+        "interface": "界面",
+        "lowBandwidthMode": "低带宽模式",
+        "displayThumbnailAvatars": "缩略头像（慢）",
+        "searchHistory": "搜索历史记录"
     },
     "subscribe": "订阅",
     "copyUrl": "复制 URL",
     "loadMore": "加载更多",
-    "searchPlaceholder": "搜索(Ctrl + K)",
+    "searchPlaceholder": "搜索",
     "deleteAllHistory": "删除所有历史记录",
     "skipping": "跳过",
     "replies": "回复",
@@ -145,5 +153,8 @@
     "letterCase": "标题字母大小写",
     "transcript": "记录",
     "noResult": "无结果",
-    "region": "区域"
+    "region": "区域",
+    "donate": "捐赠",
+    "channels": "频道",
+    "defaultPage": "默认页面"
 }

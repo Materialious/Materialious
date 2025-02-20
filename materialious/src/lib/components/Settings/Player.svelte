@@ -12,7 +12,6 @@
 		playerAutoplayNextByDefaultStore,
 		playerDefaultLanguage,
 		playerListenByDefaultStore,
-		playerMiniPlayerStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
@@ -43,22 +42,6 @@
 	</select>
 	<label for="case">{$_('player.defaultLanguage')}</label>
 	<i>arrow_drop_down</i>
-</div>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.player.miniPlayer')}</div>
-		</div>
-		<label class="switch">
-			<input
-				type="checkbox"
-				bind:checked={$playerMiniPlayerStore}
-				onclick={() => playerMiniPlayerStore.set(!$playerMiniPlayerStore)}
-			/>
-			<span></span>
-		</label>
-	</nav>
 </div>
 
 <div class="field no-margin">

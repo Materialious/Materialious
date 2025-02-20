@@ -48,6 +48,11 @@ jobs:
           yq eval -i ".modules[0].sources[1].url = \"${{ steps.get_release.outputs.aarch64_url }}\"" $MANIFEST_FILE
           yq eval -i ".modules[0].sources[1].sha256 = \"${{ steps.sha256_arm.outputs.aarch64_sha256 }}\"" $MANIFEST_FILE
 
+      - name: Set Git user identity
+        run: |
+            git config --global user.name "WardPearce"
+            git config --global user.email "wardpearce@pm.me"
+
       - name: Create Release Branch
         run: |
           git checkout -b release-v${{ steps.get_release.outputs.version }}

@@ -12,7 +12,6 @@ import {
 	interfaceDisplayThumbnailAvatars,
 	interfaceForceCase,
 	interfaceLowBandwidthMode,
-	interfacePreviewVideoOnHoverStore,
 	interfaceRegionStore,
 	interfaceSearchSuggestionsStore,
 	playerAlwaysLoopStore,
@@ -20,7 +19,6 @@ import {
 	playerAutoplayNextByDefaultStore,
 	playerDefaultLanguage,
 	playerListenByDefaultStore,
-	playerMiniPlayerStore,
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
@@ -100,11 +98,6 @@ const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'b
 		type: 'boolean'
 	},
 	{
-		name: 'previewVideoOnHover',
-		store: interfacePreviewVideoOnHoverStore,
-		type: 'boolean'
-	},
-	{
 		name: 'sponsorBlock',
 		store: sponsorBlockStore,
 		type: 'boolean'
@@ -133,11 +126,6 @@ const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'b
 		name: 'deArrowThumbnailInstance',
 		store: deArrowThumbnailInstanceStore,
 		type: 'string'
-	},
-	{
-		name: 'playerMiniPlayer',
-		store: playerMiniPlayerStore,
-		type: 'boolean'
 	},
 	{
 		name: 'syncious',

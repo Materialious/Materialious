@@ -24,7 +24,6 @@
 		interfaceDisplayThumbnailAvatars,
 		interfaceForceCase,
 		interfaceLowBandwidthMode,
-		interfacePreviewVideoOnHoverStore,
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
@@ -177,22 +176,6 @@
 				type="checkbox"
 				bind:checked={$interfaceSearchSuggestionsStore}
 				onclick={() => interfaceSearchSuggestionsStore.set(!$interfaceSearchSuggestionsStore)}
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.previewVideoOnHover')}</div>
-		</div>
-		<label class="switch">
-			<input
-				type="checkbox"
-				bind:checked={$interfacePreviewVideoOnHoverStore}
-				onclick={() => interfacePreviewVideoOnHoverStore.set(!$interfacePreviewVideoOnHoverStore)}
 			/>
 			<span></span>
 		</label>

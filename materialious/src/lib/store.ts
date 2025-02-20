@@ -37,7 +37,6 @@ export const playerListenByDefaultStore = persisted('listenByDefault', false);
 export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
-export const playerMiniPlayerStore = persisted('miniPlayer', true);
 export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);
 export const playerAndroidBgPlayer = persisted('androidBgPlayer', true);
@@ -58,7 +57,6 @@ export const synciousInstanceStore: Writable<string | null | undefined> = persis
 
 export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');
 export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
-export const interfacePreviewVideoOnHoverStore = persisted('previewVideoOnHover', true);
 export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
 export const interfaceAutoExpandComments: Writable<boolean> = persisted('autoExpandComments', true);
 export const interfaceAutoExpandDesc: Writable<boolean> = persisted('autoExpandDesc', false);

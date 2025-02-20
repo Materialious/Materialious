@@ -1,0 +1,67 @@
+name: Update Flathub PR
+
+on:
+  workflow_run:
+    workflows: ["Build desktop"]
+    types:
+      - completed
+
+jobs:
+  flathub-create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the flathub/us.materialio.Materialious repository
+        uses: actions/checkout@v4
+        with:
+          repository: flathub/us.materialio.Materialious
+          token: ${{ secrets.FLATHUB_TOKEN }}
+
+      - name: Retrieve latest release version and assets
+        id: get_release
+        run: |
+          RELEASE_DATA=$(curl --silent "https://api.github.com/repos/Materialious/Materialious/releases/latest")
+          VERSION=$(echo $RELEASE_DATA | jq -r .tag_name)
+          X86_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-x64.zip")) | .browser_download_url')
+          AARCH64_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-arm64.zip")) | .browser_download_url')
+          echo "::set-output name=version::$VERSION"
+          echo "::set-output name=x86_url::$X86_URL"
+          echo "::set-output name=aarch64_url::$AARCH64_URL"
+
+      - name: Generate SHA256 checksum for x86_64 release
+        id: sha256_x86
+        run: |
+          CHECKSUM=$(curl -L ${{ steps.get_release.outputs.x86_url }} | sha256sum | awk '{ print $1 }')
+          echo "::set-output name=x86_64_sha256::$CHECKSUM"
+
+      - name: Generate SHA256 checksum for aarch64 release
+        id: sha256_arm
+        run: |
+          CHECKSUM=$(curl -L ${{ steps.get_release.outputs.aarch64_url }} | sha256sum | awk '{ print $1 }')
+          echo "::set-output name=aarch64_sha256::$CHECKSUM"
+
+      - name: Update manifest file with new version and checksums
+        run: |
+          MANIFEST_FILE="us.materialio.Materialious.yml"
+          yq eval -i ".version = \"${{ steps.get_release.outputs.version }}\"" $MANIFEST_FILE
+          yq eval -i ".modules[0].sources[0].url = \"${{ steps.get_release.outputs.x86_url }}\"" $MANIFEST_FILE
+          yq eval -i ".modules[0].sources[0].sha256 = \"${{ steps.sha256_x86.outputs.x86_64_sha256 }}\"" $MANIFEST_FILE
+          yq eval -i ".modules[0].sources[1].url = \"${{ steps.get_release.outputs.aarch64_url }}\"" $MANIFEST_FILE
+          yq eval -i ".modules[0].sources[1].sha256 = \"${{ steps.sha256_arm.outputs.aarch64_sha256 }}\"" $MANIFEST_FILE
+
+      - name: Create Release Branch
+        run: |
+          git checkout -b release-v${{ steps.get_release.outputs.version }}
+          git push --set-upstream origin release-v${{ steps.get_release.outputs.version }}
+
+      - name: Commit changes
+        run: |
+          git add us.materialio.Materialious.yml
+          git commit -m "Update manifest for v${{ steps.get_release.outputs.version }} release"
+          git push
+
+      - name: Create Pull Request
+        run: |
+          echo ${{ secrets.FLATHUB_TOKEN }} >> auth.txt
+          gh auth login --with-token < auth.txt
+          rm auth.txt
+          gh pr create --title "Release v${{ steps.get_release.outputs.version }}" --body "This is an automated PR for the v${{ steps.get_release.outputs.version }} release. This PR will be updated and merged once testing is complete." --repo flathub/us.materialio.Materialious

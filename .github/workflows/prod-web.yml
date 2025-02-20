@@ -23,10 +23,17 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Extract version from package.json
+        id: extract_version
+        run: |
+          VERSION=$(jq -r .version ./materialious/package.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./materialious
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
-          tags: wardpearce/materialious:latest
+          tags: |
+            wardpearce/materialious:latest
+            wardpearce/materialious:${{ steps.extract_version.outputs.version }}

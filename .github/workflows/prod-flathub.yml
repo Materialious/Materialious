@@ -23,21 +23,21 @@ jobs:
           VERSION=$(echo $RELEASE_DATA | jq -r .tag_name)
           X86_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-x64.zip")) | .browser_download_url')
           AARCH64_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-arm64.zip")) | .browser_download_url')
-          echo "version=${VERSION}" >> $GITHUB_STATE
-          echo "x86_url=${X86_URL}" >> $GITHUB_STATE
-          echo "aarch64_url=${AARCH64_URL}" >> $GITHUB_STATE
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "x86_url=$X86_URL" >> "$GITHUB_OUTPUT"
+          echo "aarch64_url=$AARCH64_URL" >> "$GITHUB_OUTPUT"
 
       - name: Generate SHA256 checksum for x86_64 release
         id: sha256_x86
         run: |
           CHECKSUM=$(curl -L ${{ steps.get_release.outputs.x86_url }} | sha256sum | awk '{ print $1 }')
-          echo "x86_64_sha256=${CHECKSUM}" >> $GITHUB_STATE
+          echo "x86_64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
       - name: Generate SHA256 checksum for aarch64 release
         id: sha256_arm
         run: |
           CHECKSUM=$(curl -L ${{ steps.get_release.outputs.aarch64_url }} | sha256sum | awk '{ print $1 }')
-          echo "aarch64_sha256=${CHECKSUM}" >> $GITHUB_STATE
+          echo "aarch64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
       - name: Update manifest file with new version and checksums
         run: |

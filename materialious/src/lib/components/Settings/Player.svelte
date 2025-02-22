@@ -6,7 +6,6 @@
 	import { get } from 'svelte/store';
 	import {
 		playerAlwaysLoopStore,
-		playerAndroidBgPlayer,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
@@ -76,22 +75,6 @@
 </div>
 
 {#if Capacitor.getPlatform() === 'android'}
-	<div class="field no-margin">
-		<nav class="no-padding">
-			<div class="max">
-				<div>{$_('layout.player.backgroundPlay')}</div>
-			</div>
-			<label class="switch">
-				<input
-					type="checkbox"
-					bind:checked={$playerAndroidBgPlayer}
-					onclick={() => playerAndroidBgPlayer.set(!$playerAndroidBgPlayer)}
-				/>
-				<span></span>
-			</label>
-		</nav>
-	</div>
-
 	<div class="field no-margin">
 		<nav class="no-padding">
 			<div class="max">

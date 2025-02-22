@@ -1,29 +1,21 @@
 <script lang="ts">
-	import 'vidstack/bundle';
-
 	import { page } from '$app/stores';
-	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
-	import { AudioPlayer } from '@mediagrid/capacitor-native-audio';
 	import type { Page } from '@sveltejs/kit';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { FullscreenChangeEvent, MediaTimeUpdateEvent, PlayerSrc } from 'vidstack';
-	import type { MediaPlayerElement } from 'vidstack/elements';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
-	import { proxyVideoUrl, pullBitratePreference, type PhasedDescription } from '../misc';
+	import { pullBitratePreference, type PhasedDescription } from '../misc';
 	import {
 		authStore,
 		instanceStore,
-		playerAlwaysLoopStore,
-		playerAndroidBgPlayer,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
@@ -311,59 +303,6 @@
 						});
 					}
 				});
-
-				if (data.video.fallbackPatch === undefined && get(playerAndroidBgPlayer)) {
-					const highestBitrateAudio = data.video.adaptiveFormats
-						.filter((format) => format.type.startsWith('audio/'))
-						.reduce((prev, current) => {
-							return parseInt(prev.bitrate) > parseInt(current.bitrate) ? prev : current;
-						});
-
-					const audioId = { audioId: data.video.videoId };
-
-					let isPlayingInBackground = false;
-
-					await AudioPlayer.create({
-						...audioId,
-						audioSource: !data.video.fallbackPatch
-							? proxyVideoUrl(highestBitrateAudio.url)
-							: highestBitrateAudio.url,
-						friendlyTitle: data.video.title,
-						useForNotification: true,
-						loop: player.loop,
-						isBackgroundMusic: false
-					});
-
-					AudioPlayer.onAppGainsFocus(audioId, async () => {
-						if (!isPlayingInBackground) return;
-
-						isPlayingInBackground = false;
-
-						await AudioPlayer.pause(audioId);
-
-						const audioPlayerTime = await AudioPlayer.getCurrentTime(audioId);
-
-						const audioPlayerTimeRounded = Math.round(audioPlayerTime.currentTime);
-						if (audioPlayerTimeRounded > player.currentTime) {
-							player.currentTime = audioPlayerTimeRounded;
-						}
-
-						await player.play();
-					});
-
-					AudioPlayer.onAppLosesFocus(audioId, async () => {
-						if (player.paused) return;
-
-						isPlayingInBackground = true;
-						await AudioPlayer.play(audioId);
-						await AudioPlayer.seek({
-							...audioId,
-							timeInSeconds: Math.round(player.currentTime)
-						});
-					});
-
-					await AudioPlayer.initialize(audioId);
-				}
 			}
 		} else {
 			playerIsLive = true;
@@ -464,8 +403,6 @@
 
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android') {
-			await AudioPlayer.destroy({ audioId: data.video.videoId });
-
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
 				await StatusBar.show();
@@ -489,32 +426,6 @@
 {#if audioMode}
 	<div style="margin-top: 40vh;"></div>
 {/if}
-
-<media-player
-	bind:this={player}
-	id="video"
-	autoPlay={$playerAutoPlayStore && !isSyncing}
-	loop={$playerAlwaysLoopStore}
-	title={data.video.title}
-	streamType={playerIsLive ? 'live' : 'on-demand'}
-	viewType={audioMode ? 'audio' : 'video'}
-	keep-alive
-	{src}
->
-	<media-provider>
-		{#if !audioMode}
-			<media-poster class="vds-poster" src={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
-			></media-poster>
-		{/if}
-	</media-provider>
-	<media-audio-layout></media-audio-layout>
-	{#if data.video.storyboards && data.video.storyboards.length > 3}
-		<media-video-layout thumbnails={`${get(instanceStore)}${data.video.storyboards[3].url}`}
-		></media-video-layout>
-	{:else}
-		<media-video-layout></media-video-layout>
-	{/if}
-</media-player>
 
 {#if !isEmbed}
 	<div class="snackbar" id="snackbar-alert">

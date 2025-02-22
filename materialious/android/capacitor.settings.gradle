@@ -23,8 +23,5 @@ project(':capgo-inappbrowser').projectDir = new File('../node_modules/@capgo/ina
 include ':hugotomazi-capacitor-navigation-bar'
 project(':hugotomazi-capacitor-navigation-bar').projectDir = new File('../node_modules/@hugotomazi/capacitor-navigation-bar/android')
 
-include ':mediagrid-capacitor-native-audio'
-project(':mediagrid-capacitor-native-audio').projectDir = new File('../node_modules/@mediagrid/capacitor-native-audio/android')
-
 include ':capacitor-nodejs'
 project(':capacitor-nodejs').projectDir = new File('../node_modules/capacitor-nodejs/android')

@@ -39,7 +39,6 @@ export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault',
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);
-export const playerAndroidBgPlayer = persisted('androidBgPlayer', true);
 export const playerAndroidLockOrientation = persisted('androidLockOrientation', true);
 export const playerDefaultLanguage = persisted('defaultLanguage', '');
 

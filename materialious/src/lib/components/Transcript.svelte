@@ -4,18 +4,15 @@
 	import { VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent } from 'vidstack';
-	import type { MediaPlayerElement } from 'vidstack/elements';
 	import type { VideoPlay } from '../api/model';
 	import { decodeHtmlCharCodes } from '../misc';
 	import { instanceStore } from '../store';
 
 	interface Props {
 		video: VideoPlay;
-		player: MediaPlayerElement;
 	}
 
-	let { video, player = $bindable() }: Props = $props();
+	let { video }: Props = $props();
 
 	let url: string | null = $state(null);
 	let autoScroll: boolean = $state(true);
@@ -26,21 +23,21 @@
 	let currentTime = $state(0);
 	let search: string = $state('');
 
-	player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
-		currentTime = event.detail.currentTime;
+	// player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
+	// 	currentTime = event.detail.currentTime;
 
-		if (autoScroll) {
-			const currentTranscriptLine = document.querySelector(
-				'.transcript-line.secondary-container'
-			) as HTMLElement;
-			const transcriptScrollable = document.getElementById('transcript');
+	// 	if (autoScroll) {
+	// 		const currentTranscriptLine = document.querySelector(
+	// 			'.transcript-line.secondary-container'
+	// 		) as HTMLElement;
+	// 		const transcriptScrollable = document.getElementById('transcript');
 
-			if (currentTranscriptLine && transcriptScrollable) {
-				transcriptScrollable.scrollTop =
-					currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
-			}
-		}
-	});
+	// 		if (currentTranscriptLine && transcriptScrollable) {
+	// 			transcriptScrollable.scrollTop =
+	// 				currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
+	// 		}
+	// 	}
+	// });
 
 	async function loadTranscript() {
 		if (!url) {

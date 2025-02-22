@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
-	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
 		deleteUnsubscribe,
@@ -19,30 +16,24 @@
 	import Transcript from '$lib/components/Transcript.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { truncate, unsafeRandomItem } from '$lib/misc';
-	import type { PlayerEvents } from '$lib/player';
+	import { truncate } from '$lib/misc';
 	import {
 		activePageStore,
 		authStore,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
-		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
-		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/time';
 	import ui from 'beercss';
-	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent } from 'vidstack';
-	import type { MediaPlayerElement } from 'vidstack/elements';
 
 	let { data = $bindable() } = $props();
 
@@ -70,7 +61,6 @@
 	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
 
 	let audioMode = $state(get(playerListenByDefaultStore));
-	let player: MediaPlayerElement;
 
 	let segments: Segment[] = $state([]);
 
@@ -79,16 +69,6 @@
 	let showTranscript = $state(false);
 
 	let playerCurrentTime: number = $state(0);
-	// @ts-ignore
-	run(() => {
-		if (typeof player !== 'undefined') {
-			playerCurrentTime = player.currentTime;
-			player.addEventListener(
-				'time-update',
-				(event: MediaTimeUpdateEvent) => (playerCurrentTime = event.detail.currentTime)
-			);
-		}
-	});
 
 	playlistSettingsStore.subscribe((playlistSetting) => {
 		if (!data.playlistId) return;
@@ -98,209 +78,209 @@
 		}
 	});
 
-	function playerSyncEvents(conn: DataConnection) {
-		if (player) {
-			conn.send({
-				events: [{ type: 'seek', time: player.currentTime }]
-			} as PlayerEvents);
-		}
+	// function playerSyncEvents(conn: DataConnection) {
+	// 	if (player) {
+	// 		conn.send({
+	// 			events: [{ type: 'seek', time: player.currentTime }]
+	// 		} as PlayerEvents);
+	// 	}
 
-		if (data.playlistId) {
-			conn.send({
-				events: [
-					{
-						type: 'playlist',
-						playlistId: data.playlistId
-					}
-				]
-			} as PlayerEvents);
-		}
+	// 	if (data.playlistId) {
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'playlist',
+	// 					playlistId: data.playlistId
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	}
 
-		conn.on('data', (rawData) => {
-			const events = rawData as PlayerEvents;
+	// 	conn.on('data', (rawData) => {
+	// 		const events = rawData as PlayerEvents;
 
-			events.events.forEach(async (event) => {
-				if (!player) return;
+	// 		events.events.forEach(async (event) => {
+	// 			if (!player) return;
 
-				if (event.type === 'pause') {
-					player.pause();
-				} else if (event.type === 'play') {
-					player.play();
-				} else if (event.type === 'seek' && event.time) {
-					const timeDiff = player.currentTime - event.time;
+	// 			if (event.type === 'pause') {
+	// 				player.pause();
+	// 			} else if (event.type === 'play') {
+	// 				player.play();
+	// 			} else if (event.type === 'seek' && event.time) {
+	// 				const timeDiff = player.currentTime - event.time;
 
-					if (timeDiff > 5 || timeDiff < -5) {
-						player.currentTime = event.time;
-					}
-				} else if (
-					event.type === 'playlist' &&
-					event.playlistId &&
-					event.playlistId !== data.playlistId
-				) {
-					data.playlistId = event.playlistId;
-					await loadPlaylist(event.playlistId);
-					goToCurrentPlaylistItem();
-				}
-			});
-		});
+	// 				if (timeDiff > 5 || timeDiff < -5) {
+	// 					player.currentTime = event.time;
+	// 				}
+	// 			} else if (
+	// 				event.type === 'playlist' &&
+	// 				event.playlistId &&
+	// 				event.playlistId !== data.playlistId
+	// 			) {
+	// 				data.playlistId = event.playlistId;
+	// 				await loadPlaylist(event.playlistId);
+	// 				goToCurrentPlaylistItem();
+	// 			}
+	// 		});
+	// 	});
 
-		if (!player) return;
+	// 	if (!player) return;
 
-		player.addEventListener('auto-play-fail', () => {
-			conn.send({
-				events: [
-					{
-						type: 'pause'
-					}
-				]
-			} as PlayerEvents);
-		});
+	// 	player.addEventListener('auto-play-fail', () => {
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'pause'
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
 
-		player.addEventListener('auto-play', () => {
-			if (!player) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: player.currentTime
-					},
-					{
-						type: 'play'
-					}
-				]
-			} as PlayerEvents);
-		});
+	// 	player.addEventListener('auto-play', () => {
+	// 		if (!player) return;
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'seek',
+	// 					time: player.currentTime
+	// 				},
+	// 				{
+	// 					type: 'play'
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
 
-		player.addEventListener('pause', () => {
-			conn.send({
-				events: [
-					{
-						type: 'pause'
-					}
-				]
-			} as PlayerEvents);
-		});
+	// 	player.addEventListener('pause', () => {
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'pause'
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
 
-		player.addEventListener('playing', () => {
-			if (!player) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: player.currentTime
-					},
-					{
-						type: 'play'
-					}
-				]
-			} as PlayerEvents);
-		});
+	// 	player.addEventListener('playing', () => {
+	// 		if (!player) return;
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'seek',
+	// 					time: player.currentTime
+	// 				},
+	// 				{
+	// 					type: 'play'
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
 
-		player.addEventListener('play', () => {
-			if (!player) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: player.currentTime
-					},
-					{
-						type: 'play'
-					}
-				]
-			} as PlayerEvents);
-		});
+	// 	player.addEventListener('play', () => {
+	// 		if (!player) return;
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'seek',
+	// 					time: player.currentTime
+	// 				},
+	// 				{
+	// 					type: 'play'
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
 
-		player.addEventListener('waiting', () => {
-			conn.send({
-				events: [
-					{
-						type: 'pause'
-					}
-				]
-			} as PlayerEvents);
-		});
+	// 	player.addEventListener('waiting', () => {
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'pause'
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
 
-		player.addEventListener('seeked', () => {
-			if (!player) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: player.currentTime
-					}
-				]
-			} as PlayerEvents);
-		});
-	}
+	// 	player.addEventListener('seeked', () => {
+	// 		if (!player) return;
+	// 		conn.send({
+	// 			events: [
+	// 				{
+	// 					type: 'seek',
+	// 					time: player.currentTime
+	// 				}
+	// 			]
+	// 		} as PlayerEvents);
+	// 	});
+	// }
 
-	syncPartyConnectionsStore.subscribe((connections) => {
-		if (!connections || !player) return;
-		playerSyncEvents(connections[connections.length - 1]);
-	});
+	// syncPartyConnectionsStore.subscribe((connections) => {
+	// 	if (!connections || !player) return;
+	// 	playerSyncEvents(connections[connections.length - 1]);
+	// });
 
-	onMount(async () => {
-		if ($syncPartyConnectionsStore) {
-			$syncPartyConnectionsStore.forEach((conn) => {
-				playerSyncEvents(conn);
-			});
-		}
+	// onMount(async () => {
+	// 	if ($syncPartyConnectionsStore) {
+	// 		$syncPartyConnectionsStore.forEach((conn) => {
+	// 			playerSyncEvents(conn);
+	// 		});
+	// 	}
 
-		if (player) {
-			player.addEventListener('end', async () => {
-				if (playlistVideos.length === 0) {
-					if ($playerAutoplayNextByDefaultStore) {
-						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
-					}
-					return;
-				}
+	// 	if (player) {
+	// 		player.addEventListener('end', async () => {
+	// 			if (playlistVideos.length === 0) {
+	// 				if ($playerAutoplayNextByDefaultStore) {
+	// 					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+	// 				}
+	// 				return;
+	// 			}
 
-				await goToCurrentPlaylistItem();
+	// 			await goToCurrentPlaylistItem();
 
-				const playlistVideoIds = playlistVideos.map((value) => {
-					return value.videoId;
-				});
+	// 			const playlistVideoIds = playlistVideos.map((value) => {
+	// 				return value.videoId;
+	// 			});
 
-				let goToVideo: PlaylistPageVideo | undefined;
+	// 			let goToVideo: PlaylistPageVideo | undefined;
 
-				if (shufflePlaylist) {
-					goToVideo = unsafeRandomItem(playlistVideos);
-				} else {
-					const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
-					const newIndex = currentVideoIndex + 1;
-					if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
-						goToVideo = playlistVideos[newIndex];
-					} else if (loopPlaylist) {
-						// Loop playlist on end
-						goToVideo = playlistVideos[0];
-					}
-				}
+	// 			if (shufflePlaylist) {
+	// 				goToVideo = unsafeRandomItem(playlistVideos);
+	// 			} else {
+	// 				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+	// 				const newIndex = currentVideoIndex + 1;
+	// 				if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
+	// 					goToVideo = playlistVideos[newIndex];
+	// 				} else if (loopPlaylist) {
+	// 					// Loop playlist on end
+	// 					goToVideo = playlistVideos[0];
+	// 				}
+	// 			}
 
-				if (typeof goToVideo !== 'undefined') {
-					if ($syncPartyConnectionsStore) {
-						$syncPartyConnectionsStore.forEach((conn) => {
-							if (typeof goToVideo === 'undefined') return;
+	// 			if (typeof goToVideo !== 'undefined') {
+	// 				if ($syncPartyConnectionsStore) {
+	// 					$syncPartyConnectionsStore.forEach((conn) => {
+	// 						if (typeof goToVideo === 'undefined') return;
 
-							conn.send({
-								events: [
-									{ type: 'change-video', videoId: goToVideo.videoId },
-									{ type: 'playlist', playlistId: data.playlistId }
-								]
-							} as PlayerEvents);
-						});
-					}
+	// 						conn.send({
+	// 							events: [
+	// 								{ type: 'change-video', videoId: goToVideo.videoId },
+	// 								{ type: 'playlist', playlistId: data.playlistId }
+	// 							]
+	// 						} as PlayerEvents);
+	// 					});
+	// 				}
 
-					goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
-				}
-			});
-		}
+	// 				goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
+	// 			}
+	// 		});
+	// 	}
 
-		if (!data.playlistId) return;
+	// 	if (!data.playlistId) return;
 
-		await loadPlaylist(data.playlistId);
+	// 	await loadPlaylist(data.playlistId);
 
-		await goToCurrentPlaylistItem();
-	});
+	// 	await goToCurrentPlaylistItem();
+	// });
 
 	onDestroy(() => {
 		// Reset title when page left.
@@ -404,7 +384,7 @@
 			clearTimeout(pauseTimeout);
 		}
 		pauseTimeout = setTimeout(() => {
-			player.pause();
+			// player.pause();
 			pauseTimerSeconds = 0;
 			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
@@ -429,13 +409,7 @@
 				<div
 					style="max-height: 80vh;max-width: calc(80vh * 16 / 9);overflow: hidden;position: relative;flex: 1;"
 				>
-					<Player
-						bind:segments
-						{data}
-						{audioMode}
-						isSyncing={$syncPartyPeerStore !== null}
-						bind:player
-					/>
+					<Player bind:segments {data} {audioMode} isSyncing={$syncPartyPeerStore !== null} />
 				</div>
 			{/key}
 		</div>
@@ -665,7 +639,7 @@
 	{#if !theatreMode}
 		<div class="s12 m12 l3">
 			{#if showTranscript}
-				<Transcript bind:player video={data.video} />
+				<Transcript video={data.video} />
 			{/if}
 			{#if playlist}
 				<article

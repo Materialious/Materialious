@@ -34,22 +34,13 @@
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 		audioMode?: boolean;
-		player: MediaPlayerElement;
 		isSyncing?: boolean;
 		isEmbed?: boolean;
 		segments?: Segment[];
 	}
 
-	let {
-		data,
-		audioMode = false,
-		player = $bindable(),
-		isSyncing = false,
-		isEmbed = false,
-		segments = $bindable([])
-	}: Props = $props();
+	let { data, audioMode = false, isEmbed = false, segments = $bindable([]) }: Props = $props();
 
-	let src: PlayerSrc = $state([]);
 	let snackBarAlert = $state('');
 	let playerIsLive = $state(false);
 	let playerPosSet = false;

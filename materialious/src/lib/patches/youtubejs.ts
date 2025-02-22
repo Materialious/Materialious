@@ -5,8 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import type { WebPoSignalOutput } from 'bgutils-js';
 import { BG, buildURL, GOOG_API_KEY } from 'bgutils-js';
 import { get } from 'svelte/store';
-import { Innertube, UniversalCache } from 'youtubei.js';
-import { capacitorFetch } from '../android/http/capacitorFetch';
+import { Innertube, UniversalCache, YT, YTNodes } from 'youtubei.js';
 
 type WebPoMinter = {
   integrityTokenBasedMinter?: BG.WebPoMinter;
@@ -88,7 +87,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   }
 
   const youtube = await Innertube.create({
-    fetch: Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch,
+    fetch: fetch,
     generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore)
@@ -105,7 +104,35 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     sessionWebPo = poTokensCached;
   }
 
-  const video = await youtube.getInfo(videoId);
+  const extraArgs: Record<string, any> = {
+    playbackContext: {
+      contentPlaybackContext: {
+        vis: 0,
+        splay: false,
+        lactMilliseconds: '-1',
+        signatureTimestamp: youtube.session.player?.sts
+      }
+    },
+    contentCheckOk: true,
+    racyCheckOk: true
+  };
+
+  // Generate content WebPO token.
+  if (integrityTokenBasedMinter) {
+    extraArgs.serviceIntegrityDimensions = {
+      poToken: await integrityTokenBasedMinter.mintAsWebsafeString(videoId)
+    };
+  }
+
+  const watchEndpoint = new YTNodes.NavigationEndpoint({ watchEndpoint: { videoId } });
+  const rawPlayerResponse = await watchEndpoint.call(youtube.actions, extraArgs);
+  const rawNextResponse = await watchEndpoint.call(youtube.actions, {
+    override_endpoint: '/next',
+    racyCheckOk: true,
+    contentCheckOk: true
+  });
+
+  const video = new YT.VideoInfo([rawPlayerResponse, rawNextResponse], youtube!.actions, '');
 
   if (!video.primary_info || !video.secondary_info) {
     throw new Error('Unable to pull video info from youtube.js');
@@ -115,21 +142,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   if (!video.basic_info.is_live) {
     let manifest = await video.toDash();
-
-    let parser = new DOMParser();
-    let xmlDoc = parser.parseFromString(manifest, 'application/xml');
-
-    let baseURLs = xmlDoc.getElementsByTagName('BaseURL');
-
-    Array.from(baseURLs).forEach((baseURL) => {
-      let url = new URL(baseURL.textContent as string);
-      url.searchParams.set('pot', (sessionWebPo ?? BG.PoToken.generateColdStartToken(youtube.session.context.client.visitorData ?? '')));
-      baseURL.textContent = url.toString();
-    });
-
-    const serializer = new XMLSerializer();
-    manifest = serializer.serializeToString(xmlDoc);
-
     dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
   }
 
@@ -198,8 +210,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
       });
     });
   }
-
-  console.log(video.primary_info);
 
   return {
     type: 'video',

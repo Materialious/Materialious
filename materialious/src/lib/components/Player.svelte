@@ -1,18 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { localProxy } from '$lib/android/http/androidRequests';
+	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
-	import type { Page } from '@sveltejs/kit';
+	import { error, type Page } from '@sveltejs/kit';
+	import 'shaka-player/dist/controls.css';
+	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
-	import { pullBitratePreference, type PhasedDescription } from '../misc';
+	import { type PhasedDescription } from '../misc';
 	import {
 		authStore,
 		instanceStore,
@@ -21,10 +25,10 @@
 		playerDefaultLanguage,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		poTokenCacheStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
-		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore
@@ -42,59 +46,19 @@
 	let { data, audioMode = false, isEmbed = false, segments = $bindable([]) }: Props = $props();
 
 	let snackBarAlert = $state('');
-	let playerIsLive = $state(false);
 	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let sponsorBlockElements: Element[] = [];
 	let watchProgressTimeout: NodeJS.Timeout;
 
-	function setSponsorTimeline() {
-		if (get(sponsorBlockTimelineStore)) return;
-		if (segments.length === 0) return;
-
-		const timeline = document.getElementsByClassName('vds-time-slider')[0];
-
-		if (sponsorBlockElements.length > 0) {
-			sponsorBlockElements.forEach((barDiv) => {
-				if (timeline.contains(barDiv)) {
-					timeline.removeChild(barDiv);
-				}
-			});
-		}
-
-		const segmentColors = {
-			sponsor: '00d400',
-			selfpromo: 'ffff00',
-			interaction: 'cc00ff',
-			intro: '00ffff',
-			outro: '0202ed',
-			preview: '008fd6',
-			music_offtopic: 'ff9900',
-			filler: '7300FF'
-		};
-
-		segments.forEach((segment) => {
-			const startPercent = (segment.startTime / data.video.lengthSeconds) * 100;
-			const endPercent = (segment.endTime / data.video.lengthSeconds) * 100;
-			const widthPercent = endPercent - startPercent;
-
-			const barDiv = document.createElement('div');
-			barDiv.classList.add('sponsorskip-bar');
-			barDiv.style.left = `${startPercent}%`;
-			barDiv.style.width = `${widthPercent}%`;
-			barDiv.style.backgroundColor =
-				segment.category in segmentColors ? `#${segmentColors[segment.category]}` : 'grey';
-
-			timeline.appendChild(barDiv);
-			sponsorBlockElements.push(barDiv);
-		});
-	}
+	let player: shaka.Player;
+	let playerElement: HTMLMediaElement;
 
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
 			const timeGivenUrl = page.url.searchParams.get('time');
 			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
-				player.currentTime = Number(timeGivenUrl);
+				playerElement.currentTime = Number(timeGivenUrl);
 				return true;
 			}
 		}
@@ -107,19 +71,83 @@
 	const proxyVideos = get(playerProxyVideosStore);
 
 	onMount(async () => {
+		shaka.polyfill.installAll();
+		if (!shaka.Player.isBrowserSupported()) {
+			error(400, 'Shaka not supported on your browser');
+		}
+
+		player = new shaka.Player();
+		playerElement = document.getElementById('player') as HTMLMediaElement;
+
+		await player.attach(playerElement);
+
+		const shakaUi = new shaka.ui.Overlay(
+			player,
+			document.getElementById('shaka-container') as HTMLElement,
+			playerElement
+		);
+
+		shakaUi.configure({
+			chapter: true,
+			play_pause: true,
+			time_and_duration: true,
+			overflowMenuButtons: ['chapter', 'cast', 'airplay', 'captions', 'quality', 'loop', 'language']
+		});
+
+		const playerConfig = player.getConfiguration();
+		const instanceDefaultBitrate = import.meta.env.VITE_DEFAULT_DASH_BITRATE
+			? Number(import.meta.env.VITE_DEFAULT_DASH_BITRATE)
+			: -1;
+		playerConfig.abr.defaultBandwidthEstimate = instanceDefaultBitrate;
+
+		player.configure(playerConfig);
+
+		const networkingEngine = player.getNetworkingEngine();
+
+		if (!networkingEngine) return;
+
+		networkingEngine.registerRequestFilter(async (type, request) => {
+			const uri = request.uris[0];
+			const url = new URL(uri);
+			const headers = request.headers;
+
+			let proxiedUrl = url.toString();
+
+			if (
+				Capacitor.getPlatform() === 'android' &&
+				(url.host.endsWith('.googlevideo.com') || url.href.includes('drm'))
+			) {
+				proxiedUrl = localProxy + proxiedUrl;
+			}
+
+			if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+				if (url.pathname.includes('videoplayback')) {
+					if (headers.Range) {
+						url.searchParams.set('range', headers.Range.split('=')[1]);
+						url.searchParams.set('ump', '1');
+						url.searchParams.set('srfvp', '1');
+						url.searchParams.set('pot', get(poTokenCacheStore));
+					}
+				}
+
+				request.method = 'POST';
+				request.body = new Uint8Array([120, 0]);
+			}
+
+			request.uris[0] = proxiedUrl;
+		});
+
 		if (!data.video.hlsUrl) {
-			playerIsLive = false;
 			if (data.video.captions) {
 				data.video.captions.forEach(async (caption) => {
-					player.textTracks.add({
-						label: caption.label,
-						kind: 'captions',
-						language: caption.language_code,
-						// Need if captions are generated when youtube.js is being used.
-						src: caption.url.startsWith('http')
-							? caption.url
-							: `${get(instanceStore)}${caption.url}`
-					});
+					player.addTextTrackAsync(
+						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
+						caption.language_code,
+						'captions',
+						undefined,
+						undefined,
+						caption.label
+					);
 				});
 			}
 
@@ -141,43 +169,15 @@
 				});
 
 				if (timestampIndex > 0) {
-					player.textTracks.add({
-						kind: 'chapters',
-						src: URL.createObjectURL(new Blob([chapterWebVTT])),
-						default: true
-					});
+					player.addChaptersTrack(
+						URL.createObjectURL(new Blob([chapterWebVTT])),
+						get(playerDefaultLanguage)
+					);
 				}
 			}
 
 			// Auto save watch progress every minute.
 			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
-
-			player.addEventListener('provider-change', (event) => {
-				const provider = event.detail as any;
-				if (provider?.type === 'dash') {
-					const bitrate = pullBitratePreference();
-					const instanceDefaultBitrate = import.meta.env.VITE_DEFAULT_DASH_BITRATE
-						? Number(import.meta.env.VITE_DEFAULT_DASH_BITRATE)
-						: -1;
-					provider.library = () => import('dashjs');
-					provider.config = {
-						streaming: {
-							abr: {
-								ABRStrategy: 'abrBola',
-								movingAverageMethod: 'ewma',
-								autoSwitchBitrate: {
-									video: false,
-									audio: false
-								},
-								initialBitrate: {
-									video: bitrate === -1 ? instanceDefaultBitrate : bitrate,
-									audio: bitrate === -1 ? instanceDefaultBitrate : bitrate
-								}
-							}
-						}
-					};
-				}
-			});
 
 			if (get(sponsorBlockStore) && get(sponsorBlockCategoriesStore)) {
 				const currentCategories = get(sponsorBlockCategoriesStore);
@@ -193,22 +193,16 @@
 							get(sponsorBlockCategoriesStore) as Category[]
 						);
 
-						setSponsorTimeline();
-
-						addEventListener('resize', () => {
-							setSponsorTimeline();
-						});
-
-						player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
+						player.addEventListener('time-update', () => {
 							segments.forEach((segment) => {
 								if (
-									event.detail.currentTime >= segment.startTime &&
-									event.detail.currentTime <= segment.endTime
+									playerElement.currentTime >= segment.startTime &&
+									playerElement.currentTime <= segment.endTime
 								) {
-									if (Math.round(player.currentTime) >= Math.round(player.duration)) {
+									if (Math.round(playerElement.currentTime) >= Math.round(playerElement.duration)) {
 										return;
 									}
-									player.currentTime = segment.endTime + 1;
+									playerElement.currentTime = segment.endTime + 1;
 									if (!get(sponsorBlockDisplayToastStore)) {
 										snackBarAlert = `${get(_)('skipping')} ${segment.category}`;
 										ui('#snackbar-alert');
@@ -220,35 +214,27 @@
 				}
 			}
 
-			src = [{ src: data.video.dashUrl, type: 'application/dash+xml' }];
+			let dashUrl = data.video.dashUrl;
 
 			if (!data.video.fallbackPatch) {
 				if (!Capacitor.isNativePlatform() || proxyVideos) {
-					(src[0] as { src: string }).src += '?local=true';
+					dashUrl += '?local=true';
 				}
 			}
 
-			player.addEventListener('dash-can-play', async () => {
-				await loadPlayerPos();
+			console.log(dashUrl);
 
-				const defaultLanguage = get(playerDefaultLanguage);
-				if (defaultLanguage) {
-					let trackIndex = 0;
-					for (const track of player.audioTracks) {
-						console.log(player.audioTracks);
-						if (track.label.toLowerCase().includes(defaultLanguage)) {
-							player.remoteControl.changeAudioTrack(trackIndex);
-							break;
-						}
-						trackIndex++;
-					}
-				}
+			await player.load(dashUrl);
 
-				if (get(playerAutoPlayStore)) {
-					player.play();
-					player.exitFullscreen();
+			await loadPlayerPos();
+
+			const defaultLanguage = get(playerDefaultLanguage);
+			if (defaultLanguage) {
+				const audioLanguages = player.getAudioLanguages();
+				if (audioLanguages.includes(defaultLanguage)) {
+					player.selectAudioLanguage(defaultLanguage);
 				}
-			});
+			}
 
 			if (Capacitor.getPlatform() === 'android' && data.video.adaptiveFormats.length > 0) {
 				const videoFormats = data.video.adaptiveFormats.filter((format) =>
@@ -257,8 +243,10 @@
 
 				originalOrigination = await ScreenOrientation.orientation();
 
-				player.addEventListener('fullscreen-change', async (event: FullscreenChangeEvent) => {
-					if (event.detail) {
+				player.addEventListener('fullscreen-change', async () => {
+					const isFullScreen = document.fullscreenElement;
+
+					if (isFullScreen) {
 						// Ensure bar color is black while in fullscreen
 						await StatusBar.setBackgroundColor({ color: '#000000' });
 						await NavigationBar.setColor({
@@ -271,7 +259,7 @@
 
 					if (!get(playerAndroidLockOrientation)) return;
 
-					if (event.detail && videoFormats[0].resolution) {
+					if (isFullScreen && videoFormats[0].resolution) {
 						const widthHeight = videoFormats[0].resolution.split('x');
 
 						if (widthHeight.length !== 2) return;
@@ -296,16 +284,8 @@
 				});
 			}
 		} else {
-			playerIsLive = true;
-			src = [
-				{
-					src: data.video.hlsUrl + '?local=true',
-					type: 'application/x-mpegurl'
-				}
-			];
+			await player.load(data.video.hlsUrl + '?local=true');
 		}
-
-		player.storage = 'video-player';
 
 		const currentTheme = await getDynamicTheme();
 
@@ -365,20 +345,23 @@
 			}
 		}
 
-		if (toSetTime > 0) player.currentTime = toSetTime;
+		if (toSetTime > 0) playerElement.currentTime = toSetTime;
 	}
 
 	function savePlayerPos() {
 		if (data.video.hlsUrl) return;
 
-		if (get(playerSavePlaybackPositionStore) && player && player.currentTime) {
-			if (player.currentTime < player.duration - 10 && player.currentTime > 10) {
+		if (get(playerSavePlaybackPositionStore) && player && playerElement.currentTime) {
+			if (
+				playerElement.currentTime < playerElement.duration - 10 &&
+				playerElement.currentTime > 10
+			) {
 				try {
-					localStorage.setItem(`v_${data.video.videoId}`, player.currentTime.toString());
+					localStorage.setItem(`v_${data.video.videoId}`, playerElement.currentTime.toString());
 				} catch {}
 
 				if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
-					saveVideoProgress(data.video.videoId, player.currentTime);
+					saveVideoProgress(data.video.videoId, playerElement.currentTime);
 				}
 			} else {
 				try {
@@ -408,8 +391,9 @@
 		try {
 			savePlayerPos();
 		} catch (error) {}
-		await player.pause();
+		await playerElement.pause();
 		player.destroy();
+		playerElement.remove();
 		playerPosSet = false;
 	});
 </script>
@@ -417,6 +401,16 @@
 {#if audioMode}
 	<div style="margin-top: 40vh;"></div>
 {/if}
+
+<div id="shaka-container" data-shaka-player-container>
+	<video
+		controls={false}
+		autoplay={$playerAutoPlayStore}
+		id="player"
+		width="100%"
+		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
+	></video>
+</div>
 
 {#if !isEmbed}
 	<div class="snackbar" id="snackbar-alert">

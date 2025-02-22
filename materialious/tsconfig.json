@@ -11,7 +11,7 @@
 		"strict": true,
 		"moduleResolution": "bundler",
 		"types": [
-			"vidstack/svelte"
+			"shaka-player"
 		]
 	},
 	"include": [

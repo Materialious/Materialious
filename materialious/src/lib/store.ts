@@ -101,7 +101,6 @@ export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writ
 export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean; }>> =
 	writable({});
 
-export const silenceSkipperStore: Writable<boolean> = persisted('silenceSkipper', false);
 
 export const poTokenCacheStore: Writable<string> = writable();
 

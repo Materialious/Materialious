@@ -16,8 +16,7 @@
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
 		playerYouTubeJsAlways,
-		playerYouTubeJsFallback,
-		silenceSkipperStore
+		playerYouTubeJsFallback
 	} from '../../store';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
@@ -186,22 +185,6 @@
 				type="checkbox"
 				bind:checked={$playerAutoplayNextByDefaultStore}
 				onclick={() => playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.player.silenceSkipper')}</div>
-		</div>
-		<label class="switch">
-			<input
-				type="checkbox"
-				bind:checked={$silenceSkipperStore}
-				onclick={() => silenceSkipperStore.set(!$silenceSkipperStore)}
 			/>
 			<span></span>
 		</label>

@@ -29,7 +29,6 @@
 		playerDefaultLanguage,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
-		silenceSkipperStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -62,16 +61,8 @@
 	let snackBarAlert = $state('');
 	let playerIsLive = $state(false);
 	let playerPosSet = false;
-
-	let userVideoSpeed = 1;
-	let silenceIsFastForwarding = false;
-
-	let silenceSkipperInterval: NodeJS.Timeout;
-
 	let originalOrigination: ScreenOrientationResult | undefined;
-
 	let sponsorBlockElements: Element[] = [];
-
 	let watchProgressTimeout: NodeJS.Timeout;
 
 	function setSponsorTimeline() {
@@ -130,73 +121,7 @@
 
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
-	let initStoreSilence = true;
-	silenceSkipperStore.subscribe((value) => {
-		if (initStoreSilence) {
-			initStoreSilence = false;
-			return;
-		}
-
-		if (typeof silenceSkipperInterval !== 'undefined') {
-			clearInterval(silenceSkipperInterval);
-		}
-
-		if (value) {
-			initSilenceSkipper();
-		}
-	});
-
 	const proxyVideos = get(playerProxyVideosStore);
-
-	function fastForwardToSound(
-		videoElement: HTMLAudioElement,
-		threshold: number = 0.01,
-		checkInterval: number = 100,
-		fastForwardRate: number = 4
-	): void {
-		if (!(videoElement instanceof HTMLMediaElement)) {
-			console.error('Provided element is not a valid HTMLMediaElement');
-			return;
-		}
-
-		const audioContext = new AudioContext();
-		const source = audioContext.createMediaElementSource(videoElement);
-		const analyser = audioContext.createAnalyser();
-
-		source.connect(analyser);
-		analyser.connect(audioContext.destination);
-		analyser.fftSize = 256;
-
-		const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-		const checkForSound = () => {
-			analyser.getByteFrequencyData(dataArray);
-
-			const averageVolume = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-			const volume = averageVolume / 255;
-
-			if (volume < threshold) {
-				if (!silenceIsFastForwarding) {
-					videoElement.playbackRate = fastForwardRate;
-					silenceIsFastForwarding = true;
-				}
-			} else {
-				if (silenceIsFastForwarding) {
-					videoElement.playbackRate = userVideoSpeed;
-					silenceIsFastForwarding = false;
-				}
-			}
-		};
-
-		silenceSkipperInterval = setInterval(checkForSound, checkInterval);
-	}
-
-	function initSilenceSkipper() {
-		const videoContainer = document.getElementById('video') as HTMLElement;
-		const videoElement = videoContainer.querySelector('video') as HTMLMediaElement;
-
-		fastForwardToSound(videoElement);
-	}
 
 	onMount(async () => {
 		if (!data.video.hlsUrl) {
@@ -243,39 +168,6 @@
 
 			// Auto save watch progress every minute.
 			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
-
-			player.addEventListener('pause', () => {
-				savePlayerPos();
-				if (get(silenceSkipperStore)) {
-					clearInterval(silenceSkipperInterval);
-				}
-			});
-
-			player.addEventListener('end', () => {
-				savePlayerPos();
-				if (get(silenceSkipperStore)) {
-					clearInterval(silenceSkipperInterval);
-				}
-			});
-
-			player.addEventListener('play', () => {
-				if (get(silenceSkipperStore)) {
-					initSilenceSkipper();
-				}
-			});
-
-			player.addEventListener('seeked', () => {
-				if (get(silenceSkipperStore)) {
-					clearInterval(silenceSkipperInterval);
-
-					initSilenceSkipper();
-				}
-			});
-
-			player.addEventListener('rate-change', () => {
-				if (silenceIsFastForwarding) return;
-				userVideoSpeed = player.playbackRate;
-			});
 
 			player.addEventListener('provider-change', (event) => {
 				const provider = event.detail as any;
@@ -581,9 +473,6 @@
 					orientation: originalOrigination.type
 				});
 			}
-		}
-		if (typeof silenceSkipperInterval !== 'undefined') {
-			clearInterval(silenceSkipperInterval);
 		}
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);

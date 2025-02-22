@@ -25,7 +25,6 @@
 - [Invidious API extended integration!](https://github.com/Materialious/api-extended)
   - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
-- Silence skipper (Experimental.)
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
 - Preview video on hover.
 - Sponsorblock built-in.

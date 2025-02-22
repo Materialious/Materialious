@@ -124,7 +124,7 @@
 							url.searchParams.set('range', headers.Range.split('=')[1]);
 							url.searchParams.set('ump', '1');
 							url.searchParams.set('srfvp', '1');
-							url.searchParams.set('pot', get(poTokenCacheStore).toString());
+							url.searchParams.set('pot', get(poTokenCacheStore));
 						}
 					}
 
@@ -132,7 +132,7 @@
 					request.body = new Uint8Array([120, 0]);
 				}
 
-				if (Capacitor.getPlatform() === 'android' && data.video.fallbackPatch === 'youtubejs') {
+				if (Capacitor.getPlatform() === 'android') {
 					request.uris[0] = localProxy + url.toString();
 				} else {
 					request.uris[0] = url.toString();

@@ -114,6 +114,10 @@
 				const url = new URL(uri);
 				const headers = request.headers;
 
+				if (url.protocol === 'data:') {
+					return;
+				}
+
 				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
 					if (url.pathname.includes('videoplayback')) {
 						if (headers.Range) {

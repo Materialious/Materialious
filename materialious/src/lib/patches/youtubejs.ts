@@ -4,6 +4,7 @@ import { numberWithCommas } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
 import type { WebPoSignalOutput } from 'bgutils-js';
 import { BG, buildURL, GOOG_API_KEY } from 'bgutils-js';
+import { Buffer } from 'buffer';
 import { get } from 'svelte/store';
 import { Innertube, UniversalCache, YT, YTNodes } from 'youtubei.js';
 
@@ -141,8 +142,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   let dashUri: string = '';
 
   if (!video.basic_info.is_live) {
-    let manifest = await video.toDash();
-    dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
+    const manifest = await video.toDash();
+    dashUri = `data:application/dash+xml;charset=utf-8;base64,${Buffer.from(manifest).toString('base64')}`;
   }
 
   const descString = video.secondary_info.description?.toString() || '';
@@ -250,6 +251,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     subCountText: '',
     keywords: video.basic_info.keywords || [],
     allowedRegions: [],
-    fallbackPatch: 'youtubejs'
+    fallbackPatch: 'youtubejs',
+    youtubeJsPatchInfo: video
   };
 }

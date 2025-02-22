@@ -7,7 +7,8 @@
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
-	import { error, type Page } from '@sveltejs/kit';
+	import { type Page } from '@sveltejs/kit';
+	import GoogleVideo, { Protos } from 'googlevideo';
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -73,13 +74,149 @@
 	onMount(async () => {
 		shaka.polyfill.installAll();
 		if (!shaka.Player.isBrowserSupported()) {
-			error(400, 'Shaka not supported on your browser');
+			return;
 		}
 
 		player = new shaka.Player();
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
 		await player.attach(playerElement);
+
+		if (data.video.youtubeJsPatchInfo) {
+			player.configure({
+				streaming: {
+					bufferingGoal:
+						(data.video.youtubeJsPatchInfo.page[0].player_config?.media_common_config
+							.dynamic_readahead_config.max_read_ahead_media_time_ms || 0) / 1000,
+					rebufferingGoal:
+						(data.video.youtubeJsPatchInfo.page[0].player_config?.media_common_config
+							.dynamic_readahead_config.read_ahead_growth_rate_ms || 0) / 1000,
+					bufferBehind: 300,
+					autoLowLatencyMode: true
+				},
+				abr: {
+					enabled: true,
+					restrictions: {
+						maxBandwidth: Number(
+							data.video.youtubeJsPatchInfo.page[0].player_config?.stream_selection_config
+								.max_bitrate
+						)
+					}
+				}
+			});
+
+			const networkingEngine = player.getNetworkingEngine();
+
+			if (!networkingEngine) return;
+
+			networkingEngine.registerRequestFilter(async (type, request) => {
+				const uri = request.uris[0];
+				const url = new URL(uri);
+				const headers = request.headers;
+
+				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+					if (url.pathname.includes('videoplayback')) {
+						if (headers.Range) {
+							url.searchParams.set('range', headers.Range.split('=')[1]);
+							url.searchParams.set('ump', '1');
+							url.searchParams.set('srfvp', '1');
+							url.searchParams.set('pot', get(poTokenCacheStore).toString());
+						}
+					}
+
+					request.method = 'POST';
+					request.body = new Uint8Array([120, 0]);
+				}
+
+				if (Capacitor.getPlatform() === 'android' && data.video.fallbackPatch === 'youtubejs') {
+					request.uris[0] = localProxy + url.toString();
+				} else {
+					request.uris[0] = url.toString();
+				}
+			});
+
+			const RequestType = shaka.net.NetworkingEngine.RequestType;
+
+			networkingEngine.registerResponseFilter(async (type, response) => {
+				let mediaData = new Uint8Array(0);
+
+				const handleRedirect = async (redirectData: Protos.SabrRedirect) => {
+					const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
+						[redirectData.url!],
+						player!.getConfiguration().streaming.retryParameters
+					);
+					const requestOperation = player!.getNetworkingEngine()!.request(type, redirectRequest);
+					const redirectResponse = await requestOperation.promise;
+
+					response.data = redirectResponse.data;
+					response.headers = redirectResponse.headers;
+					response.uri = redirectResponse.uri;
+				};
+
+				const handleMediaData = async (data: Uint8Array) => {
+					const combinedLength = mediaData.length + data.length;
+					const tempMediaData = new Uint8Array(combinedLength);
+
+					tempMediaData.set(mediaData);
+					tempMediaData.set(data, mediaData.length);
+
+					mediaData = tempMediaData;
+				};
+
+				if (type == RequestType.SEGMENT) {
+					const googUmp = new GoogleVideo.UMP(
+						new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
+					);
+
+					let redirect: Protos.SabrRedirect | undefined;
+
+					googUmp.parse((part) => {
+						try {
+							const data = part.data.chunks[0];
+							switch (part.type) {
+								case 20: {
+									const mediaHeader = Protos.MediaHeader.decode(data);
+									console.info('[MediaHeader]:', mediaHeader);
+									break;
+								}
+								case 21: {
+									handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
+									break;
+								}
+								case 43: {
+									redirect = Protos.SabrRedirect.decode(data);
+									console.info('[SABRRedirect]:', redirect);
+									break;
+								}
+								case 58: {
+									const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
+									switch (streamProtectionStatus.status) {
+										case 1:
+											console.info('[StreamProtectionStatus]: Ok');
+											break;
+										case 2:
+											console.error('[StreamProtectionStatus]: Attestation pending');
+											break;
+										case 3:
+											console.error('[StreamProtectionStatus]: Attestation required');
+											break;
+										default:
+											break;
+									}
+									break;
+								}
+							}
+						} catch (error) {
+							console.error('An error occurred while processing the part:', error);
+						}
+					});
+
+					if (redirect) return handleRedirect(redirect);
+
+					if (mediaData.length) response.data = mediaData;
+				}
+			});
+		}
 
 		const shakaUi = new shaka.ui.Overlay(
 			player,
@@ -88,56 +225,26 @@
 		);
 
 		shakaUi.configure({
-			chapter: true,
-			play_pause: true,
-			time_and_duration: true,
-			overflowMenuButtons: ['chapter', 'cast', 'airplay', 'captions', 'quality', 'loop', 'language']
-		});
-
-		const playerConfig = player.getConfiguration();
-		const instanceDefaultBitrate = import.meta.env.VITE_DEFAULT_DASH_BITRATE
-			? Number(import.meta.env.VITE_DEFAULT_DASH_BITRATE)
-			: -1;
-		playerConfig.abr.defaultBandwidthEstimate = instanceDefaultBitrate;
-
-		player.configure(playerConfig);
-
-		const networkingEngine = player.getNetworkingEngine();
-
-		if (!networkingEngine) return;
-
-		networkingEngine.registerRequestFilter(async (type, request) => {
-			const uri = request.uris[0];
-			const url = new URL(uri);
-			const headers = request.headers;
-
-			let proxiedUrl = url.toString();
-
-			if (
-				Capacitor.getPlatform() === 'android' &&
-				(url.host.endsWith('.googlevideo.com') || url.href.includes('drm'))
-			) {
-				proxiedUrl = localProxy + proxiedUrl;
-			}
-
-			if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-				if (url.pathname.includes('videoplayback')) {
-					if (headers.Range) {
-						url.searchParams.set('range', headers.Range.split('=')[1]);
-						url.searchParams.set('ump', '1');
-						url.searchParams.set('srfvp', '1');
-						url.searchParams.set('pot', get(poTokenCacheStore));
-					}
-				}
-
-				request.method = 'POST';
-				request.body = new Uint8Array([120, 0]);
-			}
-
-			request.uris[0] = proxiedUrl;
+			controlPanelElements: [
+				'play_pause',
+				'spacer',
+				'volume',
+				'chapter',
+				'time_and_duration',
+				'overflow_menu'
+			],
+			overflowMenuButtons: ['cast', 'airplay', 'captions', 'quality', 'loop', 'language']
 		});
 
 		if (!data.video.hlsUrl) {
+			let dashUrl = data.video.dashUrl;
+
+			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || proxyVideos)) {
+				dashUrl += '?local=true';
+			}
+
+			await player.load(dashUrl);
+
 			if (data.video.captions) {
 				data.video.captions.forEach(async (caption) => {
 					player.addTextTrackAsync(
@@ -213,18 +320,6 @@
 					} catch {}
 				}
 			}
-
-			let dashUrl = data.video.dashUrl;
-
-			if (!data.video.fallbackPatch) {
-				if (!Capacitor.isNativePlatform() || proxyVideos) {
-					dashUrl += '?local=true';
-				}
-			}
-
-			console.log(dashUrl);
-
-			await player.load(dashUrl);
 
 			await loadPlayerPos();
 

@@ -406,11 +406,7 @@
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#key data.video.videoId}
-				<div
-					style="max-height: 80vh;max-width: calc(80vh * 16 / 9);overflow: hidden;position: relative;flex: 1;"
-				>
-					<Player bind:segments {data} {audioMode} isSyncing={$syncPartyPeerStore !== null} />
-				</div>
+				<Player bind:segments {data} {audioMode} isSyncing={$syncPartyPeerStore !== null} />
 			{/key}
 		</div>
 

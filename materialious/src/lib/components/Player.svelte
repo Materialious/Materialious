@@ -8,7 +8,6 @@
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { type Page } from '@sveltejs/kit';
-	import GoogleVideo, { Protos } from 'googlevideo';
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -26,7 +25,6 @@
 		playerDefaultLanguage,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
-		poTokenCacheStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -34,7 +32,7 @@
 		synciousInstanceStore,
 		synciousStore
 	} from '../store';
-	import { getDynamicTheme, setStatusBarColor } from '../theme';
+	import { setStatusBarColor } from '../theme';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -109,115 +107,72 @@
 
 			if (!networkingEngine) return;
 
+			// Nased off the following
+			// https://github.com/FreeTubeApp/FreeTube/blob/d270c9e251a433f1e4246a3f6a37acef707d22aa/src/renderer/components/ft-shaka-video-player/ft-shaka-video-player.js#L1206
+			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
+
 			networkingEngine.registerRequestFilter(async (type, request) => {
-				const uri = request.uris[0];
-				const url = new URL(uri);
-				const headers = request.headers;
-
-				if (url.protocol === 'data:') {
-					return;
-				}
-
 				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					if (url.pathname.includes('videoplayback')) {
-						if (headers.Range) {
-							url.searchParams.set('range', headers.Range.split('=')[1]);
-							url.searchParams.set('ump', '1');
-							url.searchParams.set('srfvp', '1');
-							url.searchParams.set('pot', get(poTokenCacheStore));
+					const url = new URL(request.uris[0]);
+
+					if (url.hostname.endsWith('.googlevideo.com') && url.pathname === '/videoplayback') {
+						request.method = 'POST';
+						request.body = new Uint8Array([0x78, 0]);
+
+						if (request.headers.Range) {
+							request.uris[0] += `&range=${request.headers.Range.split('=')[1]}`;
+							delete request.headers.Range;
 						}
+
+						if (Capacitor.getPlatform() === 'android') {
+							request.uris[0] = localProxy + url.toString();
+						}
+
+						request.uris[0] += '&alr=yes';
 					}
-
-					request.method = 'POST';
-					request.body = new Uint8Array([120, 0]);
-				}
-
-				if (Capacitor.getPlatform() === 'android') {
-					request.uris[0] = localProxy + url.toString();
-				} else {
-					request.uris[0] = url.toString();
 				}
 			});
 
-			const RequestType = shaka.net.NetworkingEngine.RequestType;
-
-			networkingEngine.registerResponseFilter(async (type, response) => {
-				let mediaData = new Uint8Array(0);
-
-				const handleRedirect = async (redirectData: Protos.SabrRedirect) => {
-					const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
-						[redirectData.url!],
-						player!.getConfiguration().streaming.retryParameters
-					);
-					const requestOperation = player!.getNetworkingEngine()!.request(type, redirectRequest);
-					const redirectResponse = await requestOperation.promise;
-
-					response.data = redirectResponse.data;
-					response.headers = redirectResponse.headers;
-					response.uri = redirectResponse.uri;
-				};
-
-				const handleMediaData = async (data: Uint8Array) => {
-					const combinedLength = mediaData.length + data.length;
-					const tempMediaData = new Uint8Array(combinedLength);
-
-					tempMediaData.set(mediaData);
-					tempMediaData.set(data, mediaData.length);
-
-					mediaData = tempMediaData;
-				};
-
-				if (type == RequestType.SEGMENT) {
-					const googUmp = new GoogleVideo.UMP(
-						new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
-					);
-
-					let redirect: Protos.SabrRedirect | undefined;
-
-					googUmp.parse((part) => {
-						try {
-							const data = part.data.chunks[0];
-							switch (part.type) {
-								case 20: {
-									const mediaHeader = Protos.MediaHeader.decode(data);
-									console.info('[MediaHeader]:', mediaHeader);
-									break;
-								}
-								case 21: {
-									handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
-									break;
-								}
-								case 43: {
-									redirect = Protos.SabrRedirect.decode(data);
-									console.info('[SABRRedirect]:', redirect);
-									break;
-								}
-								case 58: {
-									const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
-									switch (streamProtectionStatus.status) {
-										case 1:
-											console.info('[StreamProtectionStatus]: Ok');
-											break;
-										case 2:
-											console.error('[StreamProtectionStatus]: Attestation pending');
-											break;
-										case 3:
-											console.error('[StreamProtectionStatus]: Attestation required');
-											break;
-										default:
-											break;
-									}
-									break;
-								}
+			networkingEngine.registerResponseFilter(async (type, response, context) => {
+				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+					if (
+						response.data &&
+						response.data.byteLength > 4 &&
+						new DataView(
+							response.data as ArrayBufferLike & {
+								BYTES_PER_ELEMENT?: never;
 							}
-						} catch (error) {
-							console.error('An error occurred while processing the part:', error);
+						).getUint32(0) === 0x68747470
+					) {
+						const responseAsString = shaka.util.StringUtils.fromUTF8(response.data);
+
+						const retryParameters = player.getConfiguration().streaming.retryParameters;
+						const uris = [responseAsString];
+						const redirectRequest = shaka.net.NetworkingEngine.makeRequest(uris, retryParameters);
+						const requestOperation = networkingEngine.request(type, redirectRequest, context);
+						const redirectResponse = await requestOperation.promise;
+
+						// Modify the original response to contain the results of the redirect
+						// response.
+						response.data = redirectResponse.data;
+						response.headers = redirectResponse.headers;
+						response.uri = redirectResponse.uri;
+					} else {
+						const url = new URL(response.uri);
+						if (
+							url.hostname.endsWith('.youtube.com') &&
+							url.pathname === '/api/timedtext' &&
+							url.searchParams.get('caps') === 'asr' &&
+							url.searchParams.get('kind') === 'asr' &&
+							url.searchParams.get('fmt') === 'vtt'
+						) {
+							const stringBody = new TextDecoder().decode(response.data);
+							// position:0% for LTR text and position:100% for RTL text
+							const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
+
+							response.data = new TextEncoder().encode(cleaned).buffer as ArrayBuffer;
 						}
-					});
-
-					if (redirect) return handleRedirect(redirect);
-
-					if (mediaData.length) response.data = mediaData;
+					}
 				}
 			});
 		}
@@ -232,7 +187,7 @@
 			controlPanelElements: [
 				'play_pause',
 				'spacer',
-				'volume',
+				Capacitor.getPlatform() === 'electron' ? 'volume' : '',
 				'chapter',
 				'time_and_duration',
 				'overflow_menu'
@@ -386,39 +341,10 @@
 			await player.load(data.video.hlsUrl + '?local=true');
 		}
 
-		const currentTheme = await getDynamicTheme();
-
 		if (data.video.fallbackPatch === 'youtubejs') {
 			snackBarAlert = get(_)('player.youtubeJsFallBack');
 			ui('#snackbar-alert');
 		}
-
-		document.documentElement.style.setProperty(
-			'--media-slider-track-fill-bg',
-			currentTheme['--primary']
-		);
-		document.documentElement.style.setProperty('--media-menu-bg', currentTheme['--background']);
-		document.documentElement.style.setProperty(
-			'--media-menu-top-bar-bg',
-			currentTheme['--surface']
-		);
-		document.documentElement.style.setProperty(
-			'--media-menu-text-color',
-			currentTheme['--on-background']
-		);
-		document.documentElement.style.setProperty(
-			'--media-menu-item-info-color',
-			currentTheme['--on-background']
-		);
-		document.documentElement.style.setProperty(
-			'--media-menu-section-bg',
-			currentTheme['--surface']
-		);
-		document.documentElement.style.setProperty(
-			'--media-menu-surface-container',
-			currentTheme['--surface']
-		);
-		document.documentElement.style.setProperty('--audio-bg', currentTheme['--surface']);
 	});
 
 	async function loadPlayerPos() {
@@ -501,12 +427,17 @@
 	<div style="margin-top: 40vh;"></div>
 {/if}
 
-<div id="shaka-container" data-shaka-player-container>
+<div
+	id="shaka-container"
+	class="youtube-theme"
+	style="max-height: 80vh; max-width: calc(80vh * 16 / 9); overflow: hidden; position: relative; flex: 1; background-color: black;"
+	data-shaka-player-container
+>
 	<video
 		controls={false}
 		autoplay={$playerAutoPlayStore}
 		id="player"
-		width="100%"
+		style="width: 100%; height: 100%; object-fit: contain;"
 		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
 	></video>
 </div>

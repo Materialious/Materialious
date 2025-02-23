@@ -16,7 +16,6 @@ function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
     return new Promise((resolve, reject) => {
         const httpClient = targetUrl.protocol.startsWith('https') ? https : http;
 
-
         const req = httpClient.request(targetUrl, options, (res) => {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 if (redirectCount >= MAX_REDIRECTS) {

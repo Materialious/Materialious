@@ -491,7 +491,6 @@
 
 <div
 	id="shaka-container"
-	class="youtube-theme"
 	style="max-height: 80vh; max-width: calc(80vh * 16 / 9); overflow: hidden; position: relative; flex: 1; background-color: black;"
 	data-shaka-player-container
 >

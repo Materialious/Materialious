@@ -1,3 +1,4 @@
+import { capacitorFetch } from '$lib/android/http/capacitorFetch';
 import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase, VideoPlay } from '$lib/api/model';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { numberWithCommas } from '$lib/time';
@@ -13,10 +14,12 @@ type WebPoMinter = {
   botguardClient?: BG.BotGuardClient;
 };
 
+const fetchClient = Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch;
+
 async function getWebPoMinter(): Promise<WebPoMinter> {
   const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
-  const challengeResponse = await fetch(buildURL('Create', true), {
+  const challengeResponse = await fetchClient(buildURL('Create', true), {
     method: 'POST',
     headers: {
       'content-type': 'application/json+protobuf',
@@ -53,7 +56,7 @@ async function getWebPoMinter(): Promise<WebPoMinter> {
     const webPoSignalOutput: WebPoSignalOutput = [];
     const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
 
-    const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
+    const integrityTokenResponse = await fetchClient(buildURL('GenerateIT', true), {
       method: 'POST',
       headers: {
         'content-type': 'application/json+protobuf',
@@ -88,7 +91,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   }
 
   const youtube = await Innertube.create({
-    fetch: fetch,
+    fetch: fetchClient,
     generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore)
@@ -252,6 +255,5 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     keywords: video.basic_info.keywords || [],
     allowedRegions: [],
     fallbackPatch: 'youtubejs',
-    youtubeJsPatchInfo: video
   };
 }

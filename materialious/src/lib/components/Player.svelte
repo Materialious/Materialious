@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { localProxy } from '$lib/android/http/androidRequests';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
@@ -25,6 +24,7 @@
 		playerDefaultLanguage,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		poTokenCacheStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -80,34 +80,31 @@
 
 		await player.attach(playerElement);
 
-		if (data.video.youtubeJsPatchInfo) {
-			player.configure({
-				streaming: {
-					bufferingGoal:
-						(data.video.youtubeJsPatchInfo.page[0].player_config?.media_common_config
-							.dynamic_readahead_config.max_read_ahead_media_time_ms || 0) / 1000,
-					rebufferingGoal:
-						(data.video.youtubeJsPatchInfo.page[0].player_config?.media_common_config
-							.dynamic_readahead_config.read_ahead_growth_rate_ms || 0) / 1000,
-					bufferBehind: 300,
-					autoLowLatencyMode: true
-				},
-				abr: {
-					enabled: true,
-					restrictions: {
-						maxBandwidth: Number(
-							data.video.youtubeJsPatchInfo.page[0].player_config?.stream_selection_config
-								.max_bitrate
-						)
-					}
-				}
-			});
+		player.configure({
+			streaming: {
+				bufferingGoal: 180,
+				rebufferingGoal: 0.02,
+				bufferBehind: 300
+			},
+			manifest: {
+				// disableVideo: format === 'audio',
+				segmentRelativeVttTiming: true
+			},
+			abr: {
+				enabled: false,
+				restrictToElementSize: true
+			},
+			autoShowText: shaka.config.AutoShowText.NEVER,
 
+			preferredDecodingAttributes: !data.video.hlsUrl ? ['smooth', 'powerEfficient'] : []
+		});
+
+		if (data.video.fallbackPatch === 'youtubejs') {
 			const networkingEngine = player.getNetworkingEngine();
 
 			if (!networkingEngine) return;
 
-			// Nased off the following
+			// Based off the following
 			// https://github.com/FreeTubeApp/FreeTube/blob/d270c9e251a433f1e4246a3f6a37acef707d22aa/src/renderer/components/ft-shaka-video-player/ft-shaka-video-player.js#L1206
 			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
 
@@ -117,18 +114,17 @@
 
 					if (url.hostname.endsWith('.googlevideo.com') && url.pathname === '/videoplayback') {
 						request.method = 'POST';
-						request.body = new Uint8Array([0x78, 0]);
+						request.body = new Uint8Array([120, 0]);
 
 						if (request.headers.Range) {
-							request.uris[0] += `&range=${request.headers.Range.split('=')[1]}`;
+							url.searchParams.set('range', request.headers.Range.split('=')[1]);
+							url.searchParams.set('pot', get(poTokenCacheStore));
+							url.searchParams.set('ump', '1');
+							url.searchParams.set('srfvp', '1');
 							delete request.headers.Range;
 						}
 
-						if (Capacitor.getPlatform() === 'android') {
-							request.uris[0] = localProxy + url.toString();
-						}
-
-						request.uris[0] += '&alr=yes';
+						request.uris[0] = url.toString();
 					}
 				}
 			});

@@ -7,6 +7,7 @@
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { type Page } from '@sveltejs/kit';
+	import GoogleVideo, { Protos } from 'googlevideo';
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -109,27 +110,55 @@
 			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
 
 			networkingEngine.registerRequestFilter(async (type, request) => {
+				const uri = request.uris[0];
+				const url = new URL(uri);
+				const headers = request.headers;
+
 				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					const url = new URL(request.uris[0]);
-
-					if (url.hostname.endsWith('.googlevideo.com') && url.pathname === '/videoplayback') {
-						request.method = 'POST';
-						request.body = new Uint8Array([120, 0]);
-
-						if (request.headers.Range) {
-							url.searchParams.set('range', request.headers.Range.split('=')[1]);
-							url.searchParams.set('pot', get(poTokenCacheStore));
+					if (url.pathname.includes('videoplayback')) {
+						if (headers.Range) {
+							url.searchParams.set('range', headers.Range.split('=')[1]);
 							url.searchParams.set('ump', '1');
 							url.searchParams.set('srfvp', '1');
-							delete request.headers.Range;
+							url.searchParams.set('pot', get(poTokenCacheStore));
+							request.headers = {};
+							delete headers.Range;
 						}
-
-						request.uris[0] = url.toString();
 					}
+
+					request.method = 'POST';
+					request.body = new Uint8Array([120, 0]);
 				}
+
+				request.uris[0] = url.toString();
 			});
 
-			networkingEngine.registerResponseFilter(async (type, response, context) => {
+			networkingEngine.registerResponseFilter(async (type, response) => {
+				let mediaData = new Uint8Array(0);
+
+				const handleRedirect = async (redirectData: Protos.SabrRedirect) => {
+					const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
+						[redirectData.url!],
+						player!.getConfiguration().streaming.retryParameters
+					);
+					const requestOperation = player!.getNetworkingEngine()!.request(type, redirectRequest);
+					const redirectResponse = await requestOperation.promise;
+
+					response.data = redirectResponse.data;
+					response.headers = redirectResponse.headers;
+					response.uri = redirectResponse.uri;
+				};
+
+				const handleMediaData = async (data: Uint8Array) => {
+					const combinedLength = mediaData.length + data.length;
+					const tempMediaData = new Uint8Array(combinedLength);
+
+					tempMediaData.set(mediaData);
+					tempMediaData.set(data, mediaData.length);
+
+					mediaData = tempMediaData;
+				};
+
 				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
 					if (
 						response.data &&
@@ -140,19 +169,56 @@
 							}
 						).getUint32(0) === 0x68747470
 					) {
-						const responseAsString = shaka.util.StringUtils.fromUTF8(response.data);
+						const googUmp = new GoogleVideo.UMP(
+							new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
+						);
 
-						const retryParameters = player.getConfiguration().streaming.retryParameters;
-						const uris = [responseAsString];
-						const redirectRequest = shaka.net.NetworkingEngine.makeRequest(uris, retryParameters);
-						const requestOperation = networkingEngine.request(type, redirectRequest, context);
-						const redirectResponse = await requestOperation.promise;
+						let redirect: Protos.SabrRedirect | undefined;
 
-						// Modify the original response to contain the results of the redirect
-						// response.
-						response.data = redirectResponse.data;
-						response.headers = redirectResponse.headers;
-						response.uri = redirectResponse.uri;
+						googUmp.parse((part) => {
+							try {
+								const data = part.data.chunks[0];
+								switch (part.type) {
+									case 20: {
+										const mediaHeader = Protos.MediaHeader.decode(data);
+										console.info('[MediaHeader]:', mediaHeader);
+										break;
+									}
+									case 21: {
+										handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
+										break;
+									}
+									case 43: {
+										redirect = Protos.SabrRedirect.decode(data);
+										console.info('[SABRRedirect]:', redirect);
+										break;
+									}
+									case 58: {
+										const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
+										switch (streamProtectionStatus.status) {
+											case 1:
+												console.info('[StreamProtectionStatus]: Ok');
+												break;
+											case 2:
+												console.error('[StreamProtectionStatus]: Attestation pending');
+												break;
+											case 3:
+												console.error('[StreamProtectionStatus]: Attestation required');
+												break;
+											default:
+												break;
+										}
+										break;
+									}
+								}
+							} catch (error) {
+								console.error('An error occurred while processing the part:', error);
+							}
+						});
+
+						if (redirect) return handleRedirect(redirect);
+
+						if (mediaData.length) response.data = mediaData;
 					} else {
 						const url = new URL(response.uri);
 						if (

@@ -74,6 +74,6 @@
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
 		"terser": "^5.34.1",
-		"youtubei.js": "^12.2.0"
+		"youtubei.js": "^13.1.0"
 	}
 }

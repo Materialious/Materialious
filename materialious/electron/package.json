@@ -32,7 +32,7 @@
 		"jsonfile": "^6.1.0"
 	},
 	"devDependencies": {
-		"electron": "^34.2.0",
+		"electron": "^35.0.1",
 		"electron-builder": "^25.1.8",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^5.7.3"

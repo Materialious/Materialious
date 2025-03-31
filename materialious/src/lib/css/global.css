@@ -17,6 +17,25 @@ main.root {
 	overflow-y: auto;
 }
 
+article, dialog {
+	border-radius: .25rem !important;
+}
+
+.row {
+	padding: 1em !important;
+}
+
+button.row {
+	padding: 0 !important;
+	background-color: transparent !important;
+	border: none !important;
+	color: var(--on-surface) !important;
+}
+
+button.row:hover {
+	box-shadow: none !important;
+	background-color: transparent !important;
+}
 
 @media screen and (max-width: 650px) {
 	dialog.right {

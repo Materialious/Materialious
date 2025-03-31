@@ -79,10 +79,13 @@ export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
 }
 
 export async function getVideo(videoId: string, local: boolean = false, fetchOptions?: RequestInit): Promise<VideoPlay> {
+	if (get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) {
+		return await patchYoutubeJs(videoId);
+	}
+
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
-	if (
-		(get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) ||
-		(!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform())) {
+
+	if (!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform()) {
 		return await patchYoutubeJs(videoId);
 	} else {
 		await fetchErrorHandle(resp);

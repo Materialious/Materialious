@@ -47,13 +47,13 @@
 	let snackBarAlert = $state('');
 	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
-	let sponsorBlockElements: Element[] = [];
 	let watchProgressTimeout: NodeJS.Timeout;
 
 	const HTTP_IN_HEX = 0x68747470;
 
 	let player: shaka.Player;
 	let playerElement: HTMLMediaElement;
+	let shakaUi: shaka.ui.Overlay;
 
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
@@ -81,6 +81,23 @@
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
 		await player.attach(playerElement);
+		shakaUi = new shaka.ui.Overlay(
+			player,
+			document.getElementById('shaka-container') as HTMLElement,
+			playerElement
+		);
+
+		shakaUi.configure({
+			controlPanelElements: [
+				'play_pause',
+				'spacer',
+				Capacitor.getPlatform() === 'electron' ? 'volume' : '',
+				'chapter',
+				'time_and_duration',
+				'overflow_menu'
+			],
+			overflowMenuButtons: ['cast', 'airplay', 'captions', 'quality', 'loop', 'language']
+		});
 
 		player.configure({
 			streaming: {
@@ -96,9 +113,7 @@
 				enabled: false,
 				restrictToElementSize: true
 			},
-			autoShowText: shaka.config.AutoShowText.NEVER,
-
-			preferredDecodingAttributes: !data.video.hlsUrl ? ['smooth', 'powerEfficient'] : []
+			autoShowText: shaka.config.AutoShowText.NEVER
 		});
 
 		if (data.video.fallbackPatch === 'youtubejs') {
@@ -121,6 +136,7 @@
 							url.searchParams.set('range', headers.Range.split('=')[1]);
 							url.searchParams.set('ump', '1');
 							url.searchParams.set('srfvp', '1');
+							url.searchParams.set('mpd_version', '7');
 							url.searchParams.set('pot', get(poTokenCacheStore));
 							delete headers.Range;
 						}
@@ -177,24 +193,6 @@
 				}
 			});
 		}
-
-		const shakaUi = new shaka.ui.Overlay(
-			player,
-			document.getElementById('shaka-container') as HTMLElement,
-			playerElement
-		);
-
-		shakaUi.configure({
-			controlPanelElements: [
-				'play_pause',
-				'spacer',
-				Capacitor.getPlatform() === 'electron' ? 'volume' : '',
-				'chapter',
-				'time_and_duration',
-				'overflow_menu'
-			],
-			overflowMenuButtons: ['cast', 'airplay', 'captions', 'quality', 'loop', 'language']
-		});
 
 		if (!data.video.hlsUrl) {
 			let dashUrl = data.video.dashUrl;
@@ -418,8 +416,8 @@
 			savePlayerPos();
 		} catch (error) {}
 		await playerElement.pause();
-		player.destroy();
-		playerElement.remove();
+		await player.destroy();
+		await shakaUi.destroy();
 		playerPosSet = false;
 	});
 </script>

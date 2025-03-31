@@ -100,7 +100,7 @@
 </script>
 
 <form onsubmit={preventDefault(handleSubmit)}>
-	<div class="field prefix round fill no-margin search">
+	<div class="field prefix fill no-margin search">
 		<i class="front">search</i>
 		<input
 			id="search-box"
@@ -151,7 +151,13 @@
 				{/if}
 				{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
 					{#each $searchHistoryStore as history}
-						<a class="row" href={`/search/${encodeURIComponent(history)}`}>
+						<a
+							class="row"
+							onclick={() => {
+								search = history;
+							}}
+							href={`/search/${encodeURIComponent(history)}`}
+						>
 							<div>{history}</div>
 						</a>
 					{/each}

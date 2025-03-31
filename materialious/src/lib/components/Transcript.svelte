@@ -10,9 +10,10 @@
 
 	interface Props {
 		video: VideoPlay;
+		playerElement: HTMLMediaElement;
 	}
 
-	let { video }: Props = $props();
+	let { video, playerElement = $bindable() }: Props = $props();
 
 	let url: string | null = $state(null);
 	let autoScroll: boolean = $state(true);
@@ -23,21 +24,23 @@
 	let currentTime = $state(0);
 	let search: string = $state('');
 
-	// player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
-	// 	currentTime = event.detail.currentTime;
+	console.log('playerElement', playerElement);
 
-	// 	if (autoScroll) {
-	// 		const currentTranscriptLine = document.querySelector(
-	// 			'.transcript-line.secondary-container'
-	// 		) as HTMLElement;
-	// 		const transcriptScrollable = document.getElementById('transcript');
+	playerElement.addEventListener('timeupdate', () => {
+		currentTime = playerElement.currentTime;
 
-	// 		if (currentTranscriptLine && transcriptScrollable) {
-	// 			transcriptScrollable.scrollTop =
-	// 				currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
-	// 		}
-	// 	}
-	// });
+		if (autoScroll) {
+			const currentTranscriptLine = document.querySelector(
+				'.transcript-line.secondary-container'
+			) as HTMLElement;
+			const transcriptScrollable = document.getElementById('transcript');
+
+			if (currentTranscriptLine && transcriptScrollable) {
+				transcriptScrollable.scrollTop =
+					currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
+			}
+		}
+	});
 
 	async function loadTranscript() {
 		if (!url) {
@@ -112,7 +115,7 @@
 					<div
 						class="transcript-line"
 						id={`transcript-line-${cue.startTime}`}
-						onclick={() => (player.currentTime = cue.startTime)}
+						onclick={() => (playerElement.currentTime = cue.startTime)}
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>

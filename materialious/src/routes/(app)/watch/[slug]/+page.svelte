@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
 		deleteUnsubscribe,
@@ -16,26 +17,32 @@
 	import Transcript from '$lib/components/Transcript.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { truncate } from '$lib/misc';
+	import { truncate, unsafeRandomItem } from '$lib/misc';
+	import type { PlayerEvents } from '$lib/player.js';
 	import {
 		activePageStore,
 		authStore,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
+		playerAutoplayNextByDefaultStore,
 		playerListenByDefaultStore,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
+		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/time';
 	import ui from 'beercss';
+	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';
-	import { onDestroy, tick } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 
 	let { data = $bindable() } = $props();
+
+	let playerElement: HTMLMediaElement;
 
 	let comments: Comments | null = $state(null);
 	data.streamed.comments?.then((streamedComments) => {
@@ -78,209 +85,203 @@
 		}
 	});
 
-	// function playerSyncEvents(conn: DataConnection) {
-	// 	if (player) {
-	// 		conn.send({
-	// 			events: [{ type: 'seek', time: player.currentTime }]
-	// 		} as PlayerEvents);
-	// 	}
+	function playerSyncEvents(conn: DataConnection) {
+		if (playerElement) {
+			conn.send({
+				events: [{ type: 'seek', time: playerElement.currentTime }]
+			} as PlayerEvents);
+		}
 
-	// 	if (data.playlistId) {
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'playlist',
-	// 					playlistId: data.playlistId
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	}
+		if (data.playlistId) {
+			conn.send({
+				events: [
+					{
+						type: 'playlist',
+						playlistId: data.playlistId
+					}
+				]
+			} as PlayerEvents);
+		}
 
-	// 	conn.on('data', (rawData) => {
-	// 		const events = rawData as PlayerEvents;
+		conn.on('data', (rawData) => {
+			const events = rawData as PlayerEvents;
 
-	// 		events.events.forEach(async (event) => {
-	// 			if (!player) return;
+			events.events.forEach(async (event) => {
+				if (!playerElement) return;
 
-	// 			if (event.type === 'pause') {
-	// 				player.pause();
-	// 			} else if (event.type === 'play') {
-	// 				player.play();
-	// 			} else if (event.type === 'seek' && event.time) {
-	// 				const timeDiff = player.currentTime - event.time;
+				if (event.type === 'pause') {
+					playerElement.pause();
+				} else if (event.type === 'play') {
+					playerElement.play();
+				} else if (event.type === 'seek' && event.time) {
+					const timeDiff = playerElement.currentTime - event.time;
 
-	// 				if (timeDiff > 5 || timeDiff < -5) {
-	// 					player.currentTime = event.time;
-	// 				}
-	// 			} else if (
-	// 				event.type === 'playlist' &&
-	// 				event.playlistId &&
-	// 				event.playlistId !== data.playlistId
-	// 			) {
-	// 				data.playlistId = event.playlistId;
-	// 				await loadPlaylist(event.playlistId);
-	// 				goToCurrentPlaylistItem();
-	// 			}
-	// 		});
-	// 	});
+					if (timeDiff > 5 || timeDiff < -5) {
+						playerElement.currentTime = event.time;
+					}
+				} else if (
+					event.type === 'playlist' &&
+					event.playlistId &&
+					event.playlistId !== data.playlistId
+				) {
+					data.playlistId = event.playlistId;
+					await loadPlaylist(event.playlistId);
+					goToCurrentPlaylistItem();
+				}
+			});
+		});
 
-	// 	if (!player) return;
+		if (!playerElement) return;
 
-	// 	player.addEventListener('auto-play-fail', () => {
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'pause'
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
+		playerElement.addEventListener('error', () => {
+			if (!playerElement) return;
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: playerElement.currentTime
+					},
+					{
+						type: 'play'
+					}
+				]
+			} as PlayerEvents);
+		});
 
-	// 	player.addEventListener('auto-play', () => {
-	// 		if (!player) return;
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'seek',
-	// 					time: player.currentTime
-	// 				},
-	// 				{
-	// 					type: 'play'
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
+		playerElement.addEventListener('pause', () => {
+			conn.send({
+				events: [
+					{
+						type: 'pause'
+					}
+				]
+			} as PlayerEvents);
+		});
 
-	// 	player.addEventListener('pause', () => {
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'pause'
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
+		playerElement.addEventListener('playing', () => {
+			if (!playerElement) return;
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: playerElement.currentTime
+					},
+					{
+						type: 'play'
+					}
+				]
+			} as PlayerEvents);
+		});
 
-	// 	player.addEventListener('playing', () => {
-	// 		if (!player) return;
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'seek',
-	// 					time: player.currentTime
-	// 				},
-	// 				{
-	// 					type: 'play'
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
+		playerElement.addEventListener('play', () => {
+			if (!playerElement) return;
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: playerElement.currentTime
+					},
+					{
+						type: 'play'
+					}
+				]
+			} as PlayerEvents);
+		});
 
-	// 	player.addEventListener('play', () => {
-	// 		if (!player) return;
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'seek',
-	// 					time: player.currentTime
-	// 				},
-	// 				{
-	// 					type: 'play'
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
+		playerElement.addEventListener('waiting', () => {
+			conn.send({
+				events: [
+					{
+						type: 'pause'
+					}
+				]
+			} as PlayerEvents);
+		});
 
-	// 	player.addEventListener('waiting', () => {
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'pause'
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
+		playerElement.addEventListener('seeked', () => {
+			if (!playerElement) return;
+			conn.send({
+				events: [
+					{
+						type: 'seek',
+						time: playerElement.currentTime
+					}
+				]
+			} as PlayerEvents);
+		});
+	}
 
-	// 	player.addEventListener('seeked', () => {
-	// 		if (!player) return;
-	// 		conn.send({
-	// 			events: [
-	// 				{
-	// 					type: 'seek',
-	// 					time: player.currentTime
-	// 				}
-	// 			]
-	// 		} as PlayerEvents);
-	// 	});
-	// }
+	syncPartyConnectionsStore.subscribe((connections) => {
+		if (!connections || !playerElement) return;
+		playerSyncEvents(connections[connections.length - 1]);
+	});
 
-	// syncPartyConnectionsStore.subscribe((connections) => {
-	// 	if (!connections || !player) return;
-	// 	playerSyncEvents(connections[connections.length - 1]);
-	// });
+	onMount(async () => {
+		if ($syncPartyConnectionsStore) {
+			$syncPartyConnectionsStore.forEach((conn) => {
+				playerSyncEvents(conn);
+			});
+		}
 
-	// onMount(async () => {
-	// 	if ($syncPartyConnectionsStore) {
-	// 		$syncPartyConnectionsStore.forEach((conn) => {
-	// 			playerSyncEvents(conn);
-	// 		});
-	// 	}
+		if (playerElement) {
+			playerElement.addEventListener('timeupdate', () => {
+				playerCurrentTime = playerElement.currentTime;
+			});
 
-	// 	if (player) {
-	// 		player.addEventListener('end', async () => {
-	// 			if (playlistVideos.length === 0) {
-	// 				if ($playerAutoplayNextByDefaultStore) {
-	// 					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
-	// 				}
-	// 				return;
-	// 			}
+			playerElement.addEventListener('end', async () => {
+				if (playlistVideos.length === 0) {
+					if ($playerAutoplayNextByDefaultStore) {
+						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+					}
+					return;
+				}
 
-	// 			await goToCurrentPlaylistItem();
+				await goToCurrentPlaylistItem();
 
-	// 			const playlistVideoIds = playlistVideos.map((value) => {
-	// 				return value.videoId;
-	// 			});
+				const playlistVideoIds = playlistVideos.map((value) => {
+					return value.videoId;
+				});
 
-	// 			let goToVideo: PlaylistPageVideo | undefined;
+				let goToVideo: PlaylistPageVideo | undefined;
 
-	// 			if (shufflePlaylist) {
-	// 				goToVideo = unsafeRandomItem(playlistVideos);
-	// 			} else {
-	// 				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
-	// 				const newIndex = currentVideoIndex + 1;
-	// 				if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
-	// 					goToVideo = playlistVideos[newIndex];
-	// 				} else if (loopPlaylist) {
-	// 					// Loop playlist on end
-	// 					goToVideo = playlistVideos[0];
-	// 				}
-	// 			}
+				if (shufflePlaylist) {
+					goToVideo = unsafeRandomItem(playlistVideos);
+				} else {
+					const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+					const newIndex = currentVideoIndex + 1;
+					if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
+						goToVideo = playlistVideos[newIndex];
+					} else if (loopPlaylist) {
+						// Loop playlist on end
+						goToVideo = playlistVideos[0];
+					}
+				}
 
-	// 			if (typeof goToVideo !== 'undefined') {
-	// 				if ($syncPartyConnectionsStore) {
-	// 					$syncPartyConnectionsStore.forEach((conn) => {
-	// 						if (typeof goToVideo === 'undefined') return;
+				if (typeof goToVideo !== 'undefined') {
+					if ($syncPartyConnectionsStore) {
+						$syncPartyConnectionsStore.forEach((conn) => {
+							if (typeof goToVideo === 'undefined') return;
 
-	// 						conn.send({
-	// 							events: [
-	// 								{ type: 'change-video', videoId: goToVideo.videoId },
-	// 								{ type: 'playlist', playlistId: data.playlistId }
-	// 							]
-	// 						} as PlayerEvents);
-	// 					});
-	// 				}
+							conn.send({
+								events: [
+									{ type: 'change-video', videoId: goToVideo.videoId },
+									{ type: 'playlist', playlistId: data.playlistId }
+								]
+							} as PlayerEvents);
+						});
+					}
 
-	// 				goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
-	// 			}
-	// 		});
-	// 	}
+					goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
+				}
+			});
+		}
 
-	// 	if (!data.playlistId) return;
+		if (!data.playlistId) return;
 
-	// 	await loadPlaylist(data.playlistId);
+		await loadPlaylist(data.playlistId);
 
-	// 	await goToCurrentPlaylistItem();
-	// });
+		await goToCurrentPlaylistItem();
+	});
 
 	onDestroy(() => {
 		// Reset title when page left.
@@ -406,7 +407,13 @@
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#key data.video.videoId}
-				<Player bind:segments {data} {audioMode} isSyncing={$syncPartyPeerStore !== null} />
+				<Player
+					bind:playerElement
+					bind:segments
+					{data}
+					{audioMode}
+					isSyncing={$syncPartyPeerStore !== null}
+				/>
 			{/key}
 		</div>
 
@@ -586,7 +593,9 @@
 						{#if data.content.timestamps.length > 0}
 							<h6 style="margin-bottom: .3em;">Chapters</h6>
 							{#each data.content.timestamps as timestamp}
-								<button onclick={() => (player.currentTime = timestamp.time)} class="timestamps"
+								<button
+									onclick={() => (playerElement.currentTime = timestamp.time)}
+									class="timestamps"
 									>{timestamp.timePretty}
 									{#if !timestamp.title.startsWith('-')}
 										-
@@ -635,7 +644,7 @@
 	{#if !theatreMode}
 		<div class="s12 m12 l3">
 			{#if showTranscript}
-				<Transcript video={data.video} />
+				<Transcript video={data.video} bind:playerElement />
 			{/if}
 			{#if playlist}
 				<article

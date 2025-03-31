@@ -30,7 +30,6 @@
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.45.1",
-		"jsdom": "^25.0.1",
 		"patch-package": "^8.0.0",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.7",
@@ -54,7 +53,7 @@
 		"@capgo/inappbrowser": "^6.6.8",
 		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
 		"beercss": "^3.8.0",
-		"bgutils-js": "^3.1.3",
+		"bgutils-js": "^3.2.0",
 		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
 		"fuse.js": "^7.0.0",
 		"googlevideo": "^2.0.0",
@@ -67,12 +66,12 @@
 		"media-icons": "^0.10.0",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.4",
-		"shaka-player": "^4.13.4",
+		"shaka-player": "^4.13.0",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-i18n": "^4.0.1",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
 		"terser": "^5.34.1",
-		"youtubei.js": "^13.1.0"
+		"youtubei.js": "^13.3.0"
 	}
 }

@@ -1,3 +1,5 @@
+import type { YT } from 'youtubei.js';
+
 
 export interface Image {
 	url: string;
@@ -99,6 +101,7 @@ export interface VideoPlay extends Video {
 	authorThumbnails: Image[];
 	captions: Captions[];
 	storyboards?: StoryBoard[];
+	ytJsVideoInfo?: YT.VideoInfo,
 	fallbackPatch?: 'youtubejs' | 'piped';
 }
 

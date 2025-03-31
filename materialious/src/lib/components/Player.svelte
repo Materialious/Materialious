@@ -7,6 +7,7 @@
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { type Page } from '@sveltejs/kit';
+	import { GoogleVideo, Protos } from 'googlevideo';
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -40,19 +41,23 @@
 		isSyncing?: boolean;
 		isEmbed?: boolean;
 		segments?: Segment[];
+		playerElement: HTMLMediaElement;
 	}
 
-	let { data, audioMode = false, isEmbed = false, segments = $bindable([]) }: Props = $props();
+	let {
+		data,
+		audioMode = false,
+		isEmbed = false,
+		segments = $bindable([]),
+		playerElement = $bindable()
+	}: Props = $props();
 
 	let snackBarAlert = $state('');
 	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
 
-	const HTTP_IN_HEX = 0x68747470;
-
 	let player: shaka.Player;
-	let playerElement: HTMLMediaElement;
 	let shakaUi: shaka.ui.Overlay;
 
 	function loadTimeFromUrl(page: Page): boolean {
@@ -101,18 +106,30 @@
 
 		player.configure({
 			streaming: {
-				bufferingGoal: 180,
-				rebufferingGoal: 0.02,
-				bufferBehind: 300
+				bufferingGoal: data.video.ytJsVideoInfo
+					? (data.video.ytJsVideoInfo.page[0].player_config?.media_common_config
+							.dynamic_readahead_config.max_read_ahead_media_time_ms || 0) / 1000
+					: 180,
+				rebufferingGoal: data.video.ytJsVideoInfo
+					? (data.video.ytJsVideoInfo.page[0].player_config?.media_common_config
+							.dynamic_readahead_config.read_ahead_growth_rate_ms || 0) / 1000
+					: 0.02,
+				bufferBehind: 300,
+				autoLowLatencyMode: true
 			},
-			manifest: {
-				// disableVideo: format === 'audio',
-				segmentRelativeVttTiming: true
-			},
+
 			abr: {
-				enabled: false,
-				restrictToElementSize: true
+				enabled: true,
+				restrictToElementSize: true,
+				restrictions: {
+					maxBandwidth: data.video.ytJsVideoInfo
+						? Number(
+								data.video.ytJsVideoInfo.page[0].player_config?.stream_selection_config.max_bitrate
+							)
+						: null
+				}
 			},
+			preferredDecodingAttributes: !data.video.hlsUrl ? ['smooth', 'powerEfficient'] : [],
 			autoShowText: shaka.config.AutoShowText.NEVER
 		});
 
@@ -126,70 +143,104 @@
 			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
 
 			networkingEngine.registerRequestFilter(async (type, request) => {
-				const uri = request.uris[0];
-				const url = new URL(uri);
-				const headers = request.headers;
-
 				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					if (url.pathname.includes('videoplayback')) {
-						if (headers.Range) {
-							url.searchParams.set('range', headers.Range.split('=')[1]);
+					const url = new URL(request.uris[0]);
+
+					if (url.hostname.endsWith('.googlevideo.com') && url.pathname === '/videoplayback') {
+						console.log('Modifying request');
+						if (request.headers.Range) {
+							url.searchParams.set('range', request.headers.Range.split('=')[1]);
 							url.searchParams.set('ump', '1');
 							url.searchParams.set('srfvp', '1');
-							url.searchParams.set('mpd_version', '7');
-							url.searchParams.set('pot', get(poTokenCacheStore));
-							delete headers.Range;
+							url.searchParams.set('pot', get(poTokenCacheStore).poToken);
+							delete request.headers.Range;
 						}
+
+						request.method = 'POST';
+						request.body = new Uint8Array([120, 0]);
 					}
 
-					request.method = 'POST';
-					request.body = new Uint8Array([120, 0]);
+					request.uris[0] = url.toString();
 				}
-
-				request.uris[0] = url.toString();
 			});
 
-			networkingEngine.registerResponseFilter(async (type, response, context) => {
-				if (
-					response.data &&
-					response.data.byteLength > 4 &&
-					new DataView(
-						response.data as ArrayBufferLike & { BYTES_PER_ELEMENT?: undefined }
-					).getUint32(0) === HTTP_IN_HEX
-				) {
-					// Interpret the response data as a URL string.
-					const responseAsString = shaka.util.StringUtils.fromUTF8(response.data);
+			networkingEngine.registerResponseFilter(async (type, response) => {
+				let mediaData = new Uint8Array(0);
 
-					const retryParameters = player.getConfiguration().streaming.retryParameters;
-
-					// Make another request for the redirect URL.
-					const uris = [responseAsString];
-					const redirectRequest = shaka.net.NetworkingEngine.makeRequest(uris, retryParameters);
-					const requestOperation = networkingEngine.request(type, redirectRequest, context);
+				const handleRedirect = async (redirectData: Protos.SabrRedirect) => {
+					const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
+						[redirectData.url!],
+						player!.getConfiguration().streaming.retryParameters
+					);
+					const requestOperation = player!.getNetworkingEngine()!.request(type, redirectRequest);
 					const redirectResponse = await requestOperation.promise;
 
-					// Modify the original response to contain the results of the redirect
-					// response.
 					response.data = redirectResponse.data;
 					response.headers = redirectResponse.headers;
 					response.uri = redirectResponse.uri;
-				} else {
-					const url = new URL(response.uri);
+				};
 
-					// Fix positioning for auto-generated subtitles
-					if (
-						url.hostname.endsWith('.youtube.com') &&
-						url.pathname === '/api/timedtext' &&
-						url.searchParams.get('caps') === 'asr' &&
-						url.searchParams.get('kind') === 'asr' &&
-						url.searchParams.get('fmt') === 'vtt'
-					) {
-						const stringBody = new TextDecoder().decode(response.data);
-						// position:0% for LTR text and position:100% for RTL text
-						const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
+				const handleMediaData = async (data: Uint8Array) => {
+					const combinedLength = mediaData.length + data.length;
+					const tempMediaData = new Uint8Array(combinedLength);
 
-						response.data = new TextEncoder().encode(cleaned).buffer as ArrayBuffer;
-					}
+					tempMediaData.set(mediaData);
+					tempMediaData.set(data, mediaData.length);
+
+					mediaData = tempMediaData;
+				};
+
+				if (type == shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+					const googUmp = new GoogleVideo.UMP(
+						new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
+					);
+
+					let redirect: Protos.SabrRedirect | undefined;
+
+					googUmp.parse((part) => {
+						try {
+							const data = part.data.chunks[0];
+							switch (part.type) {
+								case 20: {
+									const mediaHeader = Protos.MediaHeader.decode(data);
+									console.info('[MediaHeader]:', mediaHeader);
+									break;
+								}
+								case 21: {
+									handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
+									break;
+								}
+								case 43: {
+									redirect = Protos.SabrRedirect.decode(data);
+									console.info('[SABRRedirect]:', redirect);
+									break;
+								}
+								case 58: {
+									const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
+									switch (streamProtectionStatus.status) {
+										case 1:
+											console.info('[StreamProtectionStatus]: Ok');
+											break;
+										case 2:
+											console.error('[StreamProtectionStatus]: Attestation pending');
+											break;
+										case 3:
+											console.error('[StreamProtectionStatus]: Attestation required');
+											break;
+										default:
+											break;
+									}
+									break;
+								}
+							}
+						} catch (error) {
+							console.error('An error occurred while processing the part:', error);
+						}
+					});
+
+					if (redirect) return handleRedirect(redirect);
+
+					if (mediaData.length) response.data = mediaData;
 				}
 			});
 		}
@@ -258,7 +309,7 @@
 							get(sponsorBlockCategoriesStore) as Category[]
 						);
 
-						player.addEventListener('time-update', () => {
+						playerElement.addEventListener('timeupdate', () => {
 							segments.forEach((segment) => {
 								if (
 									playerElement.currentTime >= segment.startTime &&
@@ -296,7 +347,7 @@
 
 				originalOrigination = await ScreenOrientation.orientation();
 
-				player.addEventListener('fullscreen-change', async () => {
+				playerElement.addEventListener('fullscreenchange', async () => {
 					const isFullScreen = document.fullscreenElement;
 
 					if (isFullScreen) {

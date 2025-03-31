@@ -3,12 +3,13 @@ const https = require('https');
 
 const HOST = 'localhost';
 const PORT = 3000;
-const MAX_REDIRECTS = 5;
+const MAX_REDIRECTS = 10;
 
 function setCorsHeaders(res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Max-Age', '86400')
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 }
 
@@ -85,6 +86,9 @@ const server = http.createServer(async (req, res) => {
                 ].includes(key.toLowerCase()))
             )
         };
+
+        options.headers.host = parsedTarget.host;
+        options.headers.origin = parsedTarget.origin;
 
         // For POST and PUT methods, pass the body to the outgoing request
         if (req.method === 'POST' || req.method === 'PUT') {

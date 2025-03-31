@@ -24,8 +24,6 @@
 	let currentTime = $state(0);
 	let search: string = $state('');
 
-	console.log('playerElement', playerElement);
-
 	playerElement.addEventListener('timeupdate', () => {
 		currentTime = playerElement.currentTime;
 

@@ -1,4 +1,3 @@
-import { capacitorFetch } from '$lib/android/http/capacitorFetch';
 import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase, VideoPlay } from '$lib/api/model';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { numberWithCommas } from '$lib/time';
@@ -8,8 +7,6 @@ import { Buffer } from 'buffer';
 import { get } from 'svelte/store';
 import { Innertube, UniversalCache } from 'youtubei.js';
 
-const fetchClient = Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch;
-
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   if (!Capacitor.isNativePlatform()) {
     throw new Error('Platform not supported');
@@ -18,19 +15,23 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   let youtube: Innertube;
 
   if (!get(poTokenCacheStore)) {
-    youtube = await Innertube.create({ retrieve_player: false, fetch: fetchClient });
+    youtube = await Innertube.create({ retrieve_player: false, fetch: fetch });
 
     const requestKey = 'O43z0dpjhgX20SCx4KAo';
-    const visitorData = youtube.session.context.client.visitorData as string;
+    const visitorData = youtube.session.context.client.visitorData;
+
+    if (!visitorData)
+      throw new Error('Could not get visitor data');
 
     const bgConfig: BgConfig = {
-      fetch: fetchClient,
+      fetch: (input: string | URL | Request, init?: RequestInit) => fetch(input, init),
       globalObj: globalThis,
       identifier: visitorData,
       requestKey
     };
 
     const bgChallenge = await BG.Challenge.create(bgConfig);
+
     if (!bgChallenge)
       throw new Error('Could not get challenge');
 
@@ -55,7 +56,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   const cachedPoToken = get(poTokenCacheStore);
 
   youtube = await Innertube.create({
-    fetch: fetchClient,
+    fetch: fetch,
     generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore),

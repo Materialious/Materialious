@@ -147,7 +147,6 @@
 					const url = new URL(request.uris[0]);
 
 					if (url.hostname.endsWith('.googlevideo.com') && url.pathname === '/videoplayback') {
-						console.log('Modifying request');
 						if (request.headers.Range) {
 							url.searchParams.set('range', request.headers.Range.split('=')[1]);
 							url.searchParams.set('ump', '1');

@@ -151,7 +151,11 @@
 							url.searchParams.set('range', request.headers.Range.split('=')[1]);
 							url.searchParams.set('ump', '1');
 							url.searchParams.set('srfvp', '1');
-							url.searchParams.set('pot', get(poTokenCacheStore).poToken);
+
+							const cachedPoToken = get(poTokenCacheStore);
+
+							if (cachedPoToken) url.searchParams.set('pot', cachedPoToken);
+
 							delete request.headers.Range;
 						}
 

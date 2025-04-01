@@ -5,10 +5,14 @@ const HOST = 'localhost';
 const PORT = 3000;
 const MAX_REDIRECTS = 10;
 
+const CORS_HEADERS = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-goog-visitor-id, x-goog-api-key, x-origin, x-youtube-client-version, x-youtube-client-name, x-goog-api-format-version, x-user-agent, Accept-Language, Range, Referer'
+const CORS_ORIGIN = 'https://localhost'
+const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36(KHTML, like Gecko)'
+
 function setCorsHeaders(res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Headers', CORS_HEADERS);
     res.setHeader('Access-Control-Max-Age', '86400')
     res.setHeader('Access-Control-Allow-Credentials', 'true');
 }
@@ -89,6 +93,7 @@ const server = http.createServer(async (req, res) => {
 
         options.headers.host = parsedTarget.host;
         options.headers.origin = parsedTarget.origin;
+        options.headers['user-agent'] = USER_AGENT;
 
         // For POST and PUT methods, pass the body to the outgoing request
         if (req.method === 'POST' || req.method === 'PUT') {
@@ -106,9 +111,9 @@ const server = http.createServer(async (req, res) => {
 
             res.writeHead(proxyRes.statusCode, {
                 ...proxyRes.headers,
-                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Origin': CORS_ORIGIN,
                 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': '*',
+                'Access-Control-Allow-Headers': CORS_HEADERS,
                 'Access-Control-Allow-Credentials': 'true',
             });
 

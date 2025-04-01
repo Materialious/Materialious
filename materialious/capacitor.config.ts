@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'build',
   plugins: {
     CapacitorNodeJS: {
-      nodeDir: 'nodejs-android'
+      nodeDir: 'nodejs-android',
     }
   },
 };

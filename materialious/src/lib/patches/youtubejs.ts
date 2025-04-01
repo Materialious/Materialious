@@ -2,72 +2,124 @@ import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { numberWithCommas } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
-import { BG, type BgConfig } from 'bgutils-js';
+import { BG, buildURL, GOOG_API_KEY, type WebPoSignalOutput } from 'bgutils-js';
 import { Buffer } from 'buffer';
 import { get } from 'svelte/store';
-import { Innertube, UniversalCache } from 'youtubei.js';
+import { Innertube, UniversalCache, YT, YTNodes } from 'youtubei.js';
+
+type WebPoMinter = {
+  integrityTokenBasedMinter?: BG.WebPoMinter;
+  botguardClient?: BG.BotGuardClient;
+};
+
+async function getWebPoMinter(youtube: Innertube): Promise<WebPoMinter> {
+  const requestKey = 'O43z0dpjhgX20SCx4KAo';
+
+  const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+
+  if (!challengeResponse.bg_challenge)
+    throw new Error('Yt.js: Could not get challenge');
+
+  const interpreterUrl = challengeResponse.bg_challenge.interpreter_url.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
+  const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
+  const interpreterJavascript = await bgScriptResponse.text();
+
+  if (interpreterJavascript) {
+    new Function(interpreterJavascript)();
+  } else throw new Error('Yt.js: Could not load VM');
+
+  const botguardClient = await BG.BotGuardClient.create({
+    program: challengeResponse.bg_challenge.program,
+    globalName: challengeResponse.bg_challenge.global_name,
+    globalObj: globalThis
+  });
+
+  const webPoSignalOutput: WebPoSignalOutput = [];
+  const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
+
+  console.log('botguardResponse', botguardResponse);
+
+  const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json+protobuf',
+      'x-goog-api-key': GOOG_API_KEY,
+      'x-user-agent': 'grpc-web-javascript/0.1',
+    },
+    body: JSON.stringify([requestKey, botguardResponse])
+  });
+
+  const integrityTokenResponseData = await integrityTokenResponse.json();
+
+  console.log(integrityTokenResponseData);
+
+  if (typeof integrityTokenResponseData[0] !== 'string')
+    throw new Error('Yt.js: Could not get integrity token');
+
+  const integrityToken = integrityTokenResponseData[0] as string | undefined;
+
+  const integrityTokenBasedMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
+
+  return {
+    integrityTokenBasedMinter,
+    botguardClient
+  };
+}
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   if (!Capacitor.isNativePlatform()) {
-    throw new Error('Platform not supported');
+    throw new Error('Yt.js: Platform not supported');
   }
 
-  let youtube: Innertube;
-
-  if (!get(poTokenCacheStore)) {
-    youtube = await Innertube.create({ retrieve_player: false, fetch: fetch });
-
-    const requestKey = 'O43z0dpjhgX20SCx4KAo';
-    const visitorData = youtube.session.context.client.visitorData;
-
-    if (!visitorData)
-      throw new Error('Could not get visitor data');
-
-    const bgConfig: BgConfig = {
-      fetch: (input: string | URL | Request, init?: RequestInit) => fetch(input, init),
-      globalObj: globalThis,
-      identifier: visitorData,
-      requestKey
-    };
-
-    const bgChallenge = await BG.Challenge.create(bgConfig);
-
-    if (!bgChallenge)
-      throw new Error('Could not get challenge');
-
-    const interpreterJavascript = bgChallenge.interpreterJavascript.privateDoNotAccessOrElseSafeScriptWrappedValue;
-
-    if (interpreterJavascript) {
-      new Function(interpreterJavascript)();
-    } else throw new Error('Could not load VM');
-
-    const poTokenResult = await BG.PoToken.generate({
-      program: bgChallenge.program,
-      globalName: bgChallenge.globalName,
-      bgConfig
-    });
-
-    poTokenCacheStore.set({
-      poToken: poTokenResult.poToken,
-      visitorData: visitorData
-    });
-  }
-
-  const cachedPoToken = get(poTokenCacheStore);
-
-  youtube = await Innertube.create({
+  const youtube = await Innertube.create({
     fetch: fetch,
     generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore),
-    visitor_data: cachedPoToken.visitorData,
-    po_token: cachedPoToken.poToken
   });
 
-  const video = await youtube.getInfo(videoId);
+
+  let sessionWebPo: string | undefined;
+  const { integrityTokenBasedMinter } = await getWebPoMinter(youtube);
+
+  if (integrityTokenBasedMinter) {
+    sessionWebPo = await integrityTokenBasedMinter.mintAsWebsafeString(youtube.session.context.client.visitorData ?? '');
+  }
+
+  poTokenCacheStore.set(sessionWebPo);
+
+  const extraArgs: Record<string, any> = {
+    playbackContext: {
+      contentPlaybackContext: {
+        vis: 0,
+        splay: false,
+        lactMilliseconds: '-1',
+        signatureTimestamp: youtube.session.player?.sts
+      }
+    },
+    contentCheckOk: true,
+    racyCheckOk: true
+  };
+
+  // Generate content WebPO token.
+  if (integrityTokenBasedMinter) {
+    extraArgs.serviceIntegrityDimensions = {
+      poToken: await integrityTokenBasedMinter.mintAsWebsafeString(videoId)
+    };
+  }
+
+  const watchEndpoint = new YTNodes.NavigationEndpoint({ watchEndpoint: { videoId } });
+  const rawPlayerResponse = await watchEndpoint.call(youtube.actions, extraArgs);
+  const rawNextResponse = await watchEndpoint.call(youtube.actions, {
+    override_endpoint: '/next',
+    racyCheckOk: true,
+    contentCheckOk: true
+  });
+
+  const video = new YT.VideoInfo([rawPlayerResponse, rawNextResponse], youtube!.actions, '');
 
   if (!video.primary_info || !video.secondary_info) {
-    throw new Error('Unable to pull video info from youtube.js');
+    throw new Error('Yt.js: Unable to pull video info from youtube.js');
   }
 
   let dashUri: string = '';

@@ -101,6 +101,6 @@ export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; 
 	writable({});
 
 
-export const poTokenCacheStore: Writable<{ poToken: string, visitorData: string; }> = writable();
+export const poTokenCacheStore: Writable<string | undefined> = writable();
 
 export const searchHistoryStore: Writable<string[]> = persisted('searchHistory', []);

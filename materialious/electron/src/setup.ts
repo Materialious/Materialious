@@ -229,7 +229,12 @@ export function setupContentSecurityPolicy(customScheme: string): void {
   });
 
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    const uri = new URL(details.url);
+
     details.requestHeaders['User-Agent'] = USER_AGENT;
+    details.requestHeaders['origin'] = uri.origin;
+    details.requestHeaders['host'] = uri.host;
+
     callback({ requestHeaders: details.requestHeaders });
   });
 }

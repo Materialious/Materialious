@@ -7,6 +7,8 @@ if (Capacitor.getPlatform() === 'android') {
   const currentOrigin: string = window.location.protocol + '//' + window.location.host;
 
   function needsProxying(target: string): boolean {
+    if (!target.startsWith('http')) return false;
+
     const targetOriginMatch = /^https?:\/\/([^\/]+)/i.exec(target);
     return (targetOriginMatch && targetOriginMatch[0].toLowerCase()) !== currentOrigin;
   }
@@ -14,15 +16,27 @@ if (Capacitor.getPlatform() === 'android') {
   const corsProxyUrl: string = 'http://localhost:3000/';
 
   window.fetch = async (requestInput: string | URL | Request, requestOptions?: RequestInit): Promise<Response> => {
-    const uri = requestInput.toString();
-
-    console.log(uri, needsProxying(uri));
+    const uri = requestInput instanceof Request ? requestInput.url : requestInput.toString();
 
     if (needsProxying(uri)) {
-      requestInput = corsProxyUrl + uri;
+      if (requestInput instanceof Request) {
+        requestInput = new Request(corsProxyUrl + uri, {
+          method: requestInput.method,
+          headers: requestInput.headers,
+          body: requestInput.body,
+          mode: requestInput.mode,
+          credentials: requestInput.credentials,
+          cache: requestInput.cache,
+          redirect: requestInput.redirect,
+          referrer: requestInput.referrer,
+          integrity: requestInput.integrity,
+          keepalive: requestInput.keepalive,
+          ...(requestInput.body ? { duplex: "half" } : {})
+        });
+      } else {
+        requestInput = corsProxyUrl + uri;
+      }
     }
-
-    console.log(requestInput);
 
     // Use the original fetch with the proxied URL and options
     return originalFetch(requestInput, requestOptions);

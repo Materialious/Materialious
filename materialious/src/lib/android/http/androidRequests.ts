@@ -4,13 +4,9 @@ import { Capacitor } from "@capacitor/core";
 if (Capacitor.getPlatform() === 'android') {
   const originalFetch = window.fetch;
 
-  const currentOrigin: string = window.location.protocol + '//' + window.location.host;
-
   function needsProxying(target: string): boolean {
     if (!target.startsWith('http')) return false;
-
-    const targetOriginMatch = /^https?:\/\/([^\/]+)/i.exec(target);
-    return (targetOriginMatch && targetOriginMatch[0].toLowerCase()) !== currentOrigin;
+    return true;
   }
 
   const corsProxyUrl: string = 'http://localhost:3000/';

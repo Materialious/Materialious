@@ -6,7 +6,7 @@ const PORT = 3000;
 const MAX_REDIRECTS = 10;
 
 const CORS_HEADERS = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-goog-visitor-id, x-goog-api-key, x-origin, x-youtube-client-version, x-youtube-client-name, x-goog-api-format-version, x-user-agent, Accept-Language, Range, Referer'
-const CORS_ORIGIN = 'https://localhost'
+const CORS_ORIGIN = 'https://www.youtube.com'
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36(KHTML, like Gecko)'
 
 function setCorsHeaders(res) {
@@ -67,7 +67,7 @@ const server = http.createServer(async (req, res) => {
     let parsedTarget;
     try {
         // Ensure protocol (http) is added if missing
-        if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        if (!targetUrl.startsWith('http')) {
             targetUrl = 'http://' + targetUrl;
         }
         parsedTarget = new URL(targetUrl);

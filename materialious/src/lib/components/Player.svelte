@@ -153,7 +153,6 @@
 							url.searchParams.set('srfvp', '1');
 
 							const cachedPoToken = get(poTokenCacheStore);
-
 							if (cachedPoToken) url.searchParams.set('pot', cachedPoToken);
 
 							delete request.headers.Range;

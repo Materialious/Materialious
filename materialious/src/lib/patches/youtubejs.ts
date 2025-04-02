@@ -1,70 +1,12 @@
+import { androidPoTokenMinter } from '$lib/android/youtube/minter';
 import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase, VideoPlay } from '$lib/api/model';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { numberWithCommas } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
-import { BG, buildURL, GOOG_API_KEY, type WebPoSignalOutput } from 'bgutils-js';
+import { USER_AGENT } from 'bgutils-js';
 import { Buffer } from 'buffer';
 import { get } from 'svelte/store';
 import { Innertube, UniversalCache, YT, YTNodes } from 'youtubei.js';
-
-type WebPoMinter = {
-  integrityTokenBasedMinter?: BG.WebPoMinter;
-  botguardClient?: BG.BotGuardClient;
-};
-
-async function getWebPoMinter(youtube: Innertube): Promise<WebPoMinter> {
-  const requestKey = 'O43z0dpjhgX20SCx4KAo';
-
-  const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
-
-  if (!challengeResponse.bg_challenge)
-    throw new Error('Yt.js: Could not get challenge');
-
-  const interpreterUrl = challengeResponse.bg_challenge.interpreter_url.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
-  const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
-  const interpreterJavascript = await bgScriptResponse.text();
-
-  if (interpreterJavascript) {
-    new Function(interpreterJavascript)();
-  } else throw new Error('Yt.js: Could not load VM');
-
-  const botguardClient = await BG.BotGuardClient.create({
-    program: challengeResponse.bg_challenge.program,
-    globalName: challengeResponse.bg_challenge.global_name,
-    globalObj: globalThis
-  });
-
-  const webPoSignalOutput: WebPoSignalOutput = [];
-  const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
-
-  console.log('botguardResponse', botguardResponse);
-
-  const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json+protobuf',
-      'x-goog-api-key': GOOG_API_KEY,
-      'x-user-agent': 'grpc-web-javascript/0.1',
-    },
-    body: JSON.stringify([requestKey, botguardResponse])
-  });
-
-  const integrityTokenResponseData = await integrityTokenResponse.json();
-
-  console.log(integrityTokenResponseData);
-
-  if (typeof integrityTokenResponseData[0] !== 'string')
-    throw new Error('Yt.js: Could not get integrity token');
-
-  const integrityToken = integrityTokenResponseData[0] as string | undefined;
-
-  const integrityTokenBasedMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
-
-  return {
-    integrityTokenBasedMinter,
-    botguardClient
-  };
-}
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   if (!Capacitor.isNativePlatform()) {
@@ -73,20 +15,15 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   const youtube = await Innertube.create({
     fetch: fetch,
-    generate_session_locally: true,
     cache: new UniversalCache(false),
     location: get(interfaceRegionStore),
+    user_agent: USER_AGENT,
+    enable_session_cache: false
   });
 
+  const { sessionPoToken, contentPoToken } = await androidPoTokenMinter(youtube, videoId);
 
-  let sessionWebPo: string | undefined;
-  const { integrityTokenBasedMinter } = await getWebPoMinter(youtube);
-
-  if (integrityTokenBasedMinter) {
-    sessionWebPo = await integrityTokenBasedMinter.mintAsWebsafeString(youtube.session.context.client.visitorData ?? '');
-  }
-
-  poTokenCacheStore.set(sessionWebPo);
+  poTokenCacheStore.set(sessionPoToken);
 
   const extraArgs: Record<string, any> = {
     playbackContext: {
@@ -97,16 +34,12 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
         signatureTimestamp: youtube.session.player?.sts
       }
     },
+    serviceIntegrityDimensions: {
+      poToken: contentPoToken
+    },
     contentCheckOk: true,
     racyCheckOk: true
   };
-
-  // Generate content WebPO token.
-  if (integrityTokenBasedMinter) {
-    extraArgs.serviceIntegrityDimensions = {
-      poToken: await integrityTokenBasedMinter.mintAsWebsafeString(videoId)
-    };
-  }
 
   const watchEndpoint = new YTNodes.NavigationEndpoint({ watchEndpoint: { videoId } });
   const rawPlayerResponse = await watchEndpoint.call(youtube.actions, extraArgs);

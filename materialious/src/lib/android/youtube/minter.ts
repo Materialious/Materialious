@@ -1,16 +1,12 @@
 import { BG, buildURL, GOOG_API_KEY, type WebPoSignalOutput } from 'bgutils-js';
-import { Innertube } from 'youtubei.js';
+import { type IGetChallengeResponse } from 'youtubei.js';
 
-type WebPoMinter = {
-  sessionPoToken: string;
-  contentPoToken: string;
-};
-
-export async function androidPoTokenMinter(youtube: Innertube, videoId: string): Promise<WebPoMinter> {
-  const requestKey = 'O43z0dpjhgX20SCx4KAo';
-
-  const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
-
+export async function androidPoTokenMinter(
+  challengeResponse: IGetChallengeResponse,
+  requestKey: string,
+  visitorData: string,
+  videoId: string
+): Promise<[string, string]> {
   if (!challengeResponse.bg_challenge)
     throw new Error('Yt.js: Could not get challenge');
 
@@ -50,8 +46,8 @@ export async function androidPoTokenMinter(youtube: Innertube, videoId: string):
 
   const integrityTokenBasedMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
 
-  return {
-    sessionPoToken: await integrityTokenBasedMinter.mintAsWebsafeString(youtube.session.context.client.visitorData ?? ''),
-    contentPoToken: await integrityTokenBasedMinter.mintAsWebsafeString(videoId)
-  };
+  return [
+    await integrityTokenBasedMinter.mintAsWebsafeString(visitorData),
+    await integrityTokenBasedMinter.mintAsWebsafeString(videoId)
+  ];
 }

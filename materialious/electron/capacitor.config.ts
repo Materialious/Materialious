@@ -9,6 +9,10 @@ const config: CapacitorConfig = {
       nodeDir: 'nodejs-android',
     }
   },
+  server: {
+    hostname: 'www.youtube.com',
+    androidScheme: 'https'
+  }
 };
 
 export default config;

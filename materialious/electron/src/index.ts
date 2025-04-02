@@ -1,11 +1,13 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, MenuItem } from 'electron';
+import { app, ipcMain, MenuItem } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
+import { JSDOM } from 'jsdom';
 
+import BG, { buildURL, GOOG_API_KEY, USER_AGENT, WebPoSignalOutput } from 'bgutils-js';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
@@ -68,3 +70,71 @@ app.on('activate', async function () {
 });
 
 // Place all ipc or other electron api calls and custom functionality under this line
+ipcMain.handle('generatePoToken', async (
+  _,
+  challengeResponse: any,
+  requestKey: string,
+  visitorData: string,
+  videoId: string
+) => {
+  if (!challengeResponse.bg_challenge)
+    throw new Error('Yt.js: Could not get challenge');
+
+  const dom = new JSDOM('<!DOCTYPE html><html lang="en"><head><title></title></head><body></body></html>', {
+    url: 'https://www.youtube.com/',
+    referrer: 'https://www.youtube.com/',
+    USER_AGENT
+  });
+
+  Object.assign(globalThis, {
+    window: dom.window,
+    document: dom.window.document,
+    location: dom.window.location,
+    origin: dom.window.origin
+  });
+
+  if (!Reflect.has(globalThis, 'navigator')) {
+    Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator });
+  }
+
+  const interpreterUrl = challengeResponse.bg_challenge.interpreter_url.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
+  const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
+  const interpreterJavascript = await bgScriptResponse.text();
+
+  if (interpreterJavascript) {
+    new Function(interpreterJavascript)();
+  } else throw new Error('Could not load VM');
+
+  const botguardClient = await BG.BotGuardClient.create({
+    program: challengeResponse.bg_challenge.program,
+    globalName: challengeResponse.bg_challenge.global_name,
+    globalObj: globalThis
+  });
+
+  const webPoSignalOutput: WebPoSignalOutput = [];
+  const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
+
+  const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json+protobuf',
+      'x-goog-api-key': GOOG_API_KEY,
+      'x-user-agent': 'grpc-web-javascript/0.1',
+    },
+    body: JSON.stringify([requestKey, botguardResponse])
+  });
+
+  const integrityTokenResponseData = await integrityTokenResponse.json();
+
+  if (typeof integrityTokenResponseData[0] !== 'string')
+    throw new Error('Yt.js: Could not get integrity token');
+
+  const integrityToken = integrityTokenResponseData[0];
+
+  const integrityTokenBasedMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
+
+  return [
+    await integrityTokenBasedMinter.mintAsWebsafeString(visitorData),
+    await integrityTokenBasedMinter.mintAsWebsafeString(videoId)
+  ];
+});

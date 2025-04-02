@@ -21,7 +21,27 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     enable_session_cache: false
   });
 
-  const { sessionPoToken, contentPoToken } = await androidPoTokenMinter(youtube, videoId);
+  let sessionPoToken: string;
+  let contentPoToken: string;
+
+  const requestKey = 'O43z0dpjhgX20SCx4KAo';
+  const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+
+  if (Capacitor.getPlatform() === 'android') {
+    [sessionPoToken, contentPoToken] = await androidPoTokenMinter(
+      challengeResponse,
+      requestKey,
+      youtube.session.context.client.visitorData ?? '',
+      videoId
+    );
+  } else {
+    [sessionPoToken, contentPoToken] = await window.electronAPI.generatePoToken(
+      challengeResponse,
+      requestKey,
+      youtube.session.context.client.visitorData ?? '',
+      videoId
+    );
+  }
 
   poTokenCacheStore.set(sessionPoToken);
 

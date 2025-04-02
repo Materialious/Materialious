@@ -71,6 +71,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
   const video = new YT.VideoInfo([rawPlayerResponse, rawNextResponse], youtube!.actions, '');
 
+  console.log(video);
+
   if (!video.primary_info || !video.secondary_info) {
     throw new Error('Yt.js: Unable to pull video info from youtube.js');
   }
@@ -151,8 +153,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   return {
     type: 'video',
     title: video.primary_info.title?.toString() || '',
-    viewCount: Number(video.primary_info.view_count?.original_view_count || 0),
-    viewCountText: video.primary_info.view_count?.original_view_count.toString() || '0',
+    viewCount: Number(video.basic_info.view_count || 0),
+    viewCountText: video.basic_info.view_count?.toString() || '0',
     likeCount: video.basic_info.like_count || 0,
     dislikeCount: 0,
     allowRatings: false,

@@ -39,6 +39,13 @@ jobs:
           CHECKSUM=$(curl -L ${{ steps.get_release.outputs.aarch64_url }} | sha256sum | awk '{ print $1 }')
           echo "aarch64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
+      - name: Generate SHA256 checksum for materialious.metainfo.xml
+        id: sha256_metainfo
+        run: |
+          METAINFO_URL="https://raw.githubusercontent.com/Materialious/Materialious/main/materialious/electron/materialious.metainfo.xml"
+          CHECKSUM=$(curl -L $METAINFO_URL | sha256sum | awk '{ print $1 }')
+          echo "metainfo_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
+
       - name: Update manifest file with new urls and checksums
         run: |
           MANIFEST_FILE="us.materialio.Materialious.yml"
@@ -46,6 +53,7 @@ jobs:
           yq eval -i ".modules[0].sources[0].sha256 = \"${{ steps.sha256_x86.outputs.x86_64_sha256 }}\"" $MANIFEST_FILE
           yq eval -i ".modules[0].sources[1].url = \"${{ steps.get_release.outputs.aarch64_url }}\"" $MANIFEST_FILE
           yq eval -i ".modules[0].sources[1].sha256 = \"${{ steps.sha256_arm.outputs.aarch64_sha256 }}\"" $MANIFEST_FILE
+          yq eval -i ".modules[0].sources[5].sha256 = \"${{ steps.sha256_metainfo.outputs.metainfo_sha256 }}\"" $MANIFEST_FILE
 
       - name: Set Git user identity
         run: |

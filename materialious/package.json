@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.7.14",
+	"version": "1.7.15",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -9,7 +9,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"postinstall": "patch-package"
 	},
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",
@@ -29,7 +30,7 @@
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.45.1",
-		"jsdom": "^25.0.1",
+		"patch-package": "^8.0.0",
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.7",
 		"svelte": "^5.19.7",
@@ -51,12 +52,11 @@
 		"@capacitor/status-bar": "^6.0.1",
 		"@capgo/inappbrowser": "^6.6.8",
 		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
-		"@mediagrid/capacitor-native-audio": "^1.0.0",
 		"beercss": "^3.8.0",
-		"bgutils-js": "^3.1.3",
+		"bgutils-js": "^3.2.0",
 		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
-		"dashjs": "^4.7.4",
 		"fuse.js": "^7.0.0",
+		"googlevideo": "^2.0.0",
 		"he": "^1.2.0",
 		"human-number": "^2.0.4",
 		"iso-3166": "^4.3.0",
@@ -66,12 +66,12 @@
 		"media-icons": "^0.10.0",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.4",
+		"shaka-player": "^4.13.0",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-i18n": "^4.0.1",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
 		"terser": "^5.34.1",
-		"vidstack": "^1.12.12",
-		"youtubei.js": "^12.2.0"
+		"youtubei.js": "^13.3.0"
 	}
 }

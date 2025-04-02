@@ -1,136 +1,87 @@
+import { androidPoTokenMinter } from '$lib/android/youtube/minter';
 import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase, VideoPlay } from '$lib/api/model';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { numberWithCommas } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
-import type { WebPoSignalOutput } from 'bgutils-js';
-import { BG, buildURL, GOOG_API_KEY } from 'bgutils-js';
+import { USER_AGENT } from 'bgutils-js';
+import { Buffer } from 'buffer';
 import { get } from 'svelte/store';
-import { Innertube, UniversalCache } from 'youtubei.js';
-import { capacitorFetch } from '../android/http/capacitorFetch';
-
-type WebPoMinter = {
-  integrityTokenBasedMinter?: BG.WebPoMinter;
-  botguardClient?: BG.BotGuardClient;
-};
-
-async function getWebPoMinter(): Promise<WebPoMinter> {
-  const requestKey = 'O43z0dpjhgX20SCx4KAo';
-
-  const challengeResponse = await fetch(buildURL('Create', true), {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json+protobuf',
-      'x-goog-api-key': GOOG_API_KEY,
-      'x-user-agent': 'grpc-web-javascript/0.1'
-    },
-    body: JSON.stringify([requestKey])
-  });
-
-  const challengeResponseData = await challengeResponse.json();
-
-  const bgChallenge = BG.Challenge.parseChallengeData(challengeResponseData);
-
-  if (!bgChallenge)
-    throw new Error('Could not get challenge');
-
-  const interpreterJavascript = bgChallenge.interpreterJavascript.privateDoNotAccessOrElseSafeScriptWrappedValue;
-
-  if (!document.getElementById(bgChallenge.interpreterHash)) {
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.id = bgChallenge.interpreterHash;
-    script.textContent = interpreterJavascript;
-    document.head.appendChild(script);
-  }
-
-  const botguardClient = await BG.BotGuardClient.create({
-    globalObj: globalThis,
-    globalName: bgChallenge.globalName,
-    program: bgChallenge.program
-  });
-
-  if (bgChallenge) {
-    const webPoSignalOutput: WebPoSignalOutput = [];
-    const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
-
-    const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json+protobuf',
-        'x-goog-api-key': GOOG_API_KEY,
-        'x-user-agent': 'grpc-web-javacript/0.1'
-      },
-      body: JSON.stringify([requestKey, botguardResponse])
-    });
-
-    const integrityTokenResponseData = await integrityTokenResponse.json();
-    const integrityToken = integrityTokenResponseData[0] as string | undefined;
-
-    if (!integrityToken) {
-      console.error('Could not get integrity token. Interpreter Hash:', bgChallenge.interpreterHash);
-      return {};
-    }
-
-    const integrityTokenBasedMinter = await BG.WebPoMinter.create({ integrityToken }, webPoSignalOutput);
-
-    return {
-      integrityTokenBasedMinter,
-      botguardClient
-    };
-  }
-
-  return {};
-}
+import { Innertube, UniversalCache, YT, YTNodes } from 'youtubei.js';
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
   if (!Capacitor.isNativePlatform()) {
-    throw new Error('Platform not supported');
+    throw new Error('Yt.js: Platform not supported');
   }
 
   const youtube = await Innertube.create({
-    fetch: Capacitor.getPlatform() === 'android' ? capacitorFetch : fetch,
-    generate_session_locally: true,
+    fetch: fetch,
     cache: new UniversalCache(false),
-    location: get(interfaceRegionStore)
+    location: get(interfaceRegionStore),
+    user_agent: USER_AGENT,
+    enable_session_cache: false
   });
 
-  const { integrityTokenBasedMinter } = await getWebPoMinter();
+  let sessionPoToken: string;
+  let contentPoToken: string;
 
-  let sessionWebPo: string | undefined;
-  const poTokensCached = get(poTokenCacheStore);
-  if (!poTokensCached && integrityTokenBasedMinter) {
-    sessionWebPo = await integrityTokenBasedMinter.mintAsWebsafeString(youtube.session.context.client.visitorData ?? '');
-    poTokenCacheStore.set(sessionWebPo);
+  const requestKey = 'O43z0dpjhgX20SCx4KAo';
+  const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+
+  if (Capacitor.getPlatform() === 'android') {
+    [sessionPoToken, contentPoToken] = await androidPoTokenMinter(
+      challengeResponse,
+      requestKey,
+      youtube.session.context.client.visitorData ?? '',
+      videoId
+    );
   } else {
-    sessionWebPo = poTokensCached;
+    [sessionPoToken, contentPoToken] = await window.electronAPI.generatePoToken(
+      challengeResponse,
+      requestKey,
+      youtube.session.context.client.visitorData ?? '',
+      videoId
+    );
   }
 
-  const video = await youtube.getInfo(videoId);
+  poTokenCacheStore.set(sessionPoToken);
+
+  const extraArgs: Record<string, any> = {
+    playbackContext: {
+      contentPlaybackContext: {
+        vis: 0,
+        splay: false,
+        lactMilliseconds: '-1',
+        signatureTimestamp: youtube.session.player?.sts
+      }
+    },
+    serviceIntegrityDimensions: {
+      poToken: contentPoToken
+    },
+    contentCheckOk: true,
+    racyCheckOk: true
+  };
+
+  const watchEndpoint = new YTNodes.NavigationEndpoint({ watchEndpoint: { videoId } });
+  const rawPlayerResponse = await watchEndpoint.call(youtube.actions, extraArgs);
+  const rawNextResponse = await watchEndpoint.call(youtube.actions, {
+    override_endpoint: '/next',
+    racyCheckOk: true,
+    contentCheckOk: true
+  });
+
+  const video = new YT.VideoInfo([rawPlayerResponse, rawNextResponse], youtube!.actions, '');
+
+  console.log(video);
 
   if (!video.primary_info || !video.secondary_info) {
-    throw new Error('Unable to pull video info from youtube.js');
+    throw new Error('Yt.js: Unable to pull video info from youtube.js');
   }
 
   let dashUri: string = '';
 
   if (!video.basic_info.is_live) {
-    let manifest = await video.toDash();
-
-    let parser = new DOMParser();
-    let xmlDoc = parser.parseFromString(manifest, 'application/xml');
-
-    let baseURLs = xmlDoc.getElementsByTagName('BaseURL');
-
-    Array.from(baseURLs).forEach((baseURL) => {
-      let url = new URL(baseURL.textContent as string);
-      url.searchParams.set('pot', (sessionWebPo ?? BG.PoToken.generateColdStartToken(youtube.session.context.client.visitorData ?? '')));
-      baseURL.textContent = url.toString();
-    });
-
-    const serializer = new XMLSerializer();
-    manifest = serializer.serializeToString(xmlDoc);
-
-    dashUri = URL.createObjectURL(new Blob([manifest], { type: 'application/dash+xml;charset=utf8' }));
+    const manifest = await video.toDash();
+    dashUri = `data:application/dash+xml;charset=utf-8;base64,${Buffer.from(manifest).toString('base64')}`;
   }
 
   const descString = video.secondary_info.description?.toString() || '';
@@ -199,13 +150,11 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     });
   }
 
-  console.log(video.primary_info);
-
   return {
     type: 'video',
     title: video.primary_info.title?.toString() || '',
-    viewCount: Number(video.primary_info.view_count?.original_view_count || 0),
-    viewCountText: video.primary_info.view_count?.original_view_count.toString() || '0',
+    viewCount: Number(video.basic_info.view_count || 0),
+    viewCountText: video.basic_info.view_count?.toString() || '0',
     likeCount: video.basic_info.like_count || 0,
     dislikeCount: 0,
     allowRatings: false,
@@ -240,6 +189,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
     subCountText: '',
     keywords: video.basic_info.keywords || [],
     allowedRegions: [],
-    fallbackPatch: 'youtubejs'
+    ytJsVideoInfo: video,
+    fallbackPatch: 'youtubejs',
   };
 }

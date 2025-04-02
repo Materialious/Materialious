@@ -1,6 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
-import { vite as vidstack } from 'vidstack/plugins';
 import { defineConfig } from 'vite';
 
 
@@ -34,7 +33,6 @@ export default defineConfig({
 				name: 'Materialious'
 			}
 		}),
-		vidstack(),
 		sveltekit()
 	],
 	ssr: {

@@ -12,6 +12,7 @@
 	import Settings from '$lib/components/Settings/Settings.svelte';
 	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import '$lib/css/global.css';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
 	import {
@@ -24,7 +25,6 @@
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
-	import '$lib/style.css';
 	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
 	import { App } from '@capacitor/app';
 	import { Browser } from '@capacitor/browser';

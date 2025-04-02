@@ -6,9 +6,13 @@ const config: CapacitorConfig = {
   webDir: 'build',
   plugins: {
     CapacitorNodeJS: {
-      nodeDir: 'nodejs-android'
+      nodeDir: 'nodejs-android',
     }
   },
+  server: {
+    hostname: 'www.youtube.com',
+    androidScheme: 'https'
+  }
 };
 
 export default config;

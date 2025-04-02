@@ -4,18 +4,16 @@
 	import { VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import type { MediaTimeUpdateEvent } from 'vidstack';
-	import type { MediaPlayerElement } from 'vidstack/elements';
 	import type { VideoPlay } from '../api/model';
 	import { decodeHtmlCharCodes } from '../misc';
 	import { instanceStore } from '../store';
 
 	interface Props {
 		video: VideoPlay;
-		player: MediaPlayerElement;
+		playerElement: HTMLMediaElement;
 	}
 
-	let { video, player = $bindable() }: Props = $props();
+	let { video, playerElement = $bindable() }: Props = $props();
 
 	let url: string | null = $state(null);
 	let autoScroll: boolean = $state(true);
@@ -26,8 +24,8 @@
 	let currentTime = $state(0);
 	let search: string = $state('');
 
-	player.addEventListener('time-update', (event: MediaTimeUpdateEvent) => {
-		currentTime = event.detail.currentTime;
+	playerElement.addEventListener('timeupdate', () => {
+		currentTime = playerElement.currentTime;
 
 		if (autoScroll) {
 			const currentTranscriptLine = document.querySelector(
@@ -115,7 +113,7 @@
 					<div
 						class="transcript-line"
 						id={`transcript-line-${cue.startTime}`}
-						onclick={() => (player.currentTime = cue.startTime)}
+						onclick={() => (playerElement.currentTime = cue.startTime)}
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>

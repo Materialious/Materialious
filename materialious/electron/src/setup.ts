@@ -4,6 +4,7 @@ import {
   CapElectronEventEmitter,
   setupCapacitorElectronPlugins,
 } from '@capacitor-community/electron';
+import { USER_AGENT } from 'bgutils-js';
 import chokidar from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';
 import { app, BrowserWindow, Menu, MenuItem, nativeImage, session, Tray } from 'electron';
@@ -225,5 +226,15 @@ export function setupContentSecurityPolicy(customScheme: string): void {
         ...details.responseHeaders,
       },
     });
+  });
+
+  session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    const uri = new URL(details.url);
+
+    details.requestHeaders['User-Agent'] = USER_AGENT;
+    details.requestHeaders['origin'] = uri.origin;
+    details.requestHeaders['host'] = uri.host;
+
+    callback({ requestHeaders: details.requestHeaders });
   });
 }

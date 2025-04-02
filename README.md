@@ -25,7 +25,6 @@
 - [Invidious API extended integration!](https://github.com/Materialious/api-extended)
   - Sync your watch progress between Invidious sessions.
 - Watch sync parties!
-- Silence skipper (Experimental.)
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
 - Preview video on hover.
 - Sponsorblock built-in.
@@ -120,7 +119,6 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
 - [SecularSteve](https://github.com/SecularSteve) for creating Materialious' logo.
 - [Invidious](https://github.com/iv-org)
 - [Clipious](https://github.com/lamarios/clipious) for inspiration & a good source for learning more about undocumented Invidious routes.
-- [Vidstack player](https://github.com/vidstack/player)
 - [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
 - Every dependency in [package.json](/materialious/package.json).
 

@@ -2,48 +2,6 @@
 	padding: 0.1em 0.4em;
 }
 
-.vds-chapter-radio-label {
-	word-wrap: break-word !important;
-	overflow-wrap: break-word !important;
-	white-space: normal !important;
-}
-
-.vds-chapter-radio-content {
-	max-width: 200px !important;
-}
-
-.vds-kb-action {
-	position: absolute !important;
-	top: 50% !important;
-	left: 50% !important;
-}
-
-.vds-chapter-radio {
-	align-items: start !important;
-}
-
-.vds-time-divider {
-	font-size: 0 !important;
-	margin-right: 5px !important;
-}
-
-.sponsorskip-bar {
-	position: absolute;
-	margin-top: 2px;
-	height: 5px;
-	top: -1;
-	border-radius: 1em;
-}
-
-.vds-time-slider {
-	position: relative !important;
-	width: 100% !important;
-}
-
-.vds-poster :where(img) {
-	object-fit: cover !important;
-}
-
 .infinite-status-prompt {
 	display: none !important;
 }
@@ -59,6 +17,25 @@ main.root {
 	overflow-y: auto;
 }
 
+article, dialog {
+	border-radius: .25rem !important;
+}
+
+.row {
+	padding: 1em !important;
+}
+
+button.row {
+	padding: 0 !important;
+	background-color: transparent !important;
+	border: none !important;
+	color: var(--on-surface) !important;
+}
+
+button.row:hover {
+	box-shadow: none !important;
+	background-color: transparent !important;
+}
 
 @media screen and (max-width: 650px) {
 	dialog.right {

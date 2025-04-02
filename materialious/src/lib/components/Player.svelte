@@ -99,7 +99,8 @@
 				Capacitor.getPlatform() === 'electron' ? 'volume' : '',
 				'chapter',
 				'time_and_duration',
-				'overflow_menu'
+				'overflow_menu',
+				'fullscreen'
 			],
 			overflowMenuButtons: ['cast', 'airplay', 'captions', 'quality', 'loop', 'language']
 		});
@@ -349,8 +350,8 @@
 
 				originalOrigination = await ScreenOrientation.orientation();
 
-				playerElement.addEventListener('fullscreenchange', async () => {
-					const isFullScreen = document.fullscreenElement;
+				document.addEventListener('fullscreenchange', async () => {
+					const isFullScreen = !!document.fullscreenElement;
 
 					if (isFullScreen) {
 						// Ensure bar color is black while in fullscreen

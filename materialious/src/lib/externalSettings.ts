@@ -18,7 +18,6 @@ import {
 	playerAutoPlayStore,
 	playerAutoplayNextByDefaultStore,
 	playerDefaultLanguage,
-	playerListenByDefaultStore,
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
@@ -64,11 +63,6 @@ const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'b
 	{
 		name: 'proxyVideos',
 		store: playerProxyVideosStore,
-		type: 'boolean'
-	},
-	{
-		name: 'listenByDefault',
-		store: playerListenByDefaultStore,
 		type: 'boolean'
 	},
 	{

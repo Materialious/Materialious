@@ -38,7 +38,6 @@
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-		audioMode?: boolean;
 		isSyncing?: boolean;
 		isEmbed?: boolean;
 		segments?: Segment[];
@@ -47,7 +46,6 @@
 
 	let {
 		data,
-		audioMode = false,
 		isEmbed = false,
 		segments = $bindable([]),
 		playerElement = $bindable()
@@ -144,8 +142,8 @@
 		shakaUi.configure({
 			controlPanelElements: [
 				'play_pause',
+				Capacitor.getPlatform() === 'android' ? '' : 'volume',
 				'spacer',
-				Capacitor.getPlatform() === 'electron' ? 'volume' : '',
 				'chapter',
 				'time_and_duration',
 				'overflow_menu',
@@ -472,9 +470,7 @@
 			overflowMenuButton.innerHTML = 'settings';
 		}
 
-		const backToOverflowButton = document.querySelector(
-			'.shaka-back-to-overflow-button .material-icons-round'
-		);
+		const backToOverflowButton = document.querySelector('.shaka-back-to-overflow-button');
 		if (backToOverflowButton) {
 			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
 		}
@@ -555,10 +551,6 @@
 		playerPosSet = false;
 	});
 </script>
-
-{#if audioMode}
-	<div style="margin-top: 40vh;"></div>
-{/if}
 
 <div
 	id="shaka-container"

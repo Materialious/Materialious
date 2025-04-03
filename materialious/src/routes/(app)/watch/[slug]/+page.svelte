@@ -26,7 +26,6 @@
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
 		playerAutoplayNextByDefaultStore,
-		playerListenByDefaultStore,
 		playerTheatreModeByDefaultStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
@@ -66,8 +65,6 @@
 	let shufflePlaylist: boolean = $state(false);
 
 	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
-
-	let audioMode = $state(get(playerListenByDefaultStore));
 
 	let segments: Segment[] = $state([]);
 
@@ -407,13 +404,7 @@
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#key data.video.videoId}
-				<Player
-					bind:playerElement
-					bind:segments
-					{data}
-					{audioMode}
-					isSyncing={$syncPartyPeerStore !== null}
-				/>
+				<Player bind:playerElement bind:segments {data} isSyncing={$syncPartyPeerStore !== null} />
 			{/key}
 		</div>
 
@@ -493,10 +484,6 @@
 				{/await}
 
 				<div>
-					<button onclick={() => (audioMode = !audioMode)} class:border={!audioMode}>
-						<i>headphones</i>
-						<div class="tooltip">{$_('player.audioOnly')}</div>
-					</button>
 					<button onclick={toggleTheatreMode} class="m l" class:border={!theatreMode}>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>

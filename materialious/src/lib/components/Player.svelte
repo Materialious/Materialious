@@ -75,7 +75,7 @@
 		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
 	}
 
-	function restorePreferences() {
+	function restoreQualityPreference() {
 		const savedQuality =
 			localStorage.getItem(STORAGE_KEY_QUALITY) ??
 			(import.meta.env.VITE_DEFAULT_DASH_BITRATE as string | undefined);
@@ -96,11 +96,6 @@
 			if (preferredTrack) {
 				player.selectVariantTrack(preferredTrack, true);
 			}
-		}
-
-		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
-		if (savedVolume) {
-			playerElement.volume = parseFloat(savedVolume);
 		}
 	}
 
@@ -467,8 +462,13 @@
 		player.addEventListener('buffering', saveQualityPreference);
 		playerElement.addEventListener('volumechange', saveVolumePreference);
 
+		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
+		if (savedVolume) {
+			playerElement.volume = parseFloat(savedVolume);
+		}
+
 		player.addEventListener('loaded', () => {
-			restorePreferences();
+			restoreQualityPreference();
 
 			const defaultLanguage = get(playerDefaultLanguage);
 			if (defaultLanguage) {

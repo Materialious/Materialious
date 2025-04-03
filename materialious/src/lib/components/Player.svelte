@@ -60,6 +60,51 @@
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
 
+	const STORAGE_KEY_QUALITY = 'shaka-preferred-quality';
+	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
+
+	function saveQualityPreference() {
+		const tracks = player.getVariantTracks();
+		const selectedTrack = tracks.find((track) => track.active);
+		if (selectedTrack) {
+			localStorage.setItem(STORAGE_KEY_QUALITY, selectedTrack.bandwidth.toString());
+		}
+	}
+
+	function saveVolumePreference() {
+		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
+	}
+
+	function restorePreferences() {
+		const savedQuality =
+			localStorage.getItem(STORAGE_KEY_QUALITY) ??
+			(import.meta.env.VITE_DEFAULT_DASH_BITRATE as string);
+
+		if (savedQuality) {
+			const qualityBandwidth = parseInt(savedQuality, 10);
+			const tracks = player.getVariantTracks();
+
+			let preferredTrack = tracks.find((track) => track.bandwidth === qualityBandwidth);
+			if (!preferredTrack) {
+				preferredTrack = tracks.reduce((prev, curr) =>
+					Math.abs(curr.bandwidth - qualityBandwidth) < Math.abs(prev.bandwidth - qualityBandwidth)
+						? curr
+						: prev
+				);
+			}
+
+			if (preferredTrack) {
+				player.selectVariantTrack(preferredTrack, true);
+				player.configure({ abr: { enabled: false } });
+			}
+		}
+
+		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
+		if (savedVolume) {
+			playerElement.volume = parseFloat(savedVolume);
+		}
+	}
+
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
 			const timeGivenUrl = page.url.searchParams.get('time');
@@ -91,6 +136,9 @@
 			document.getElementById('shaka-container') as HTMLElement,
 			playerElement
 		);
+
+		player.addEventListener('adaptation', () => setTimeout(saveQualityPreference, 10000));
+		playerElement.addEventListener('volumechange', saveVolumePreference);
 
 		shakaUi.configure({
 			controlPanelElements: [
@@ -210,7 +258,6 @@
 
 						response.data = new TextEncoder().encode(cleaned).buffer as ArrayBuffer;
 					} else {
-						console.log('made it here');
 						const googUmp = new GoogleVideo.UMP(
 							new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
 						);
@@ -416,6 +463,8 @@
 			snackBarAlert = get(_)('player.youtubeJsFallBack');
 			ui('#snackbar-alert');
 		}
+
+		restorePreferences();
 	});
 
 	async function loadPlayerPos() {

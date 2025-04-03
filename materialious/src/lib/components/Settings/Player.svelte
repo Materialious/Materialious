@@ -10,7 +10,6 @@
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerDefaultLanguage,
-		playerListenByDefaultStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
@@ -120,22 +119,6 @@
 				type="checkbox"
 				bind:checked={$playerSavePlaybackPositionStore}
 				onclick={() => playerSavePlaybackPositionStore.set(!$playerSavePlaybackPositionStore)}
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.player.listenByDefault')}</div>
-		</div>
-		<label class="switch">
-			<input
-				type="checkbox"
-				bind:checked={$playerListenByDefaultStore}
-				onclick={() => playerListenByDefaultStore.set(!$playerListenByDefaultStore)}
 			/>
 			<span></span>
 		</label>

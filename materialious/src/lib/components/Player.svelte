@@ -124,6 +124,12 @@
 		player = new shaka.Player();
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
+		// Change instantly to stop video from being loud for a second
+		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
+		if (savedVolume) {
+			playerElement.volume = parseFloat(savedVolume);
+		}
+
 		await player.attach(playerElement);
 		shakaUi = new shaka.ui.Overlay(
 			player,
@@ -461,11 +467,6 @@
 
 		player.addEventListener('buffering', saveQualityPreference);
 		playerElement.addEventListener('volumechange', saveVolumePreference);
-
-		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
-		if (savedVolume) {
-			playerElement.volume = parseFloat(savedVolume);
-		}
 
 		player.addEventListener('loaded', () => {
 			restoreQualityPreference();

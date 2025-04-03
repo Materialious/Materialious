@@ -1,0 +1,314 @@
+.youtube-theme {
+  font-family: 'Roboto', sans-serif;
+}
+
+.youtube-theme .shaka-bottom-controls {
+  width: 100%;
+  padding: 0;
+  padding-bottom: 0;
+  z-index: 1;
+}
+
+.youtube-theme .shaka-bottom-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.youtube-theme .shaka-ad-controls {
+  -webkit-box-ordinal-group: 2;
+  -ms-flex-order: 1;
+  order: 1;
+}
+
+.youtube-theme .shaka-controls-button-panel {
+  -webkit-box-ordinal-group: 3;
+  -ms-flex-order: 2;
+  order: 2;
+  height: 40px;
+  padding: 0 10px;
+}
+
+.youtube-theme .shaka-range-container {
+  margin: 4px 10px 4px 10px;
+  top: 0;
+}
+
+.youtube-theme .shaka-small-play-button {
+  -webkit-box-ordinal-group: -2;
+  -ms-flex-order: -3;
+  order: -3;
+}
+
+.youtube-theme .shaka-mute-button {
+  -webkit-box-ordinal-group: -1;
+  -ms-flex-order: -2;
+  order: -2;
+}
+
+.youtube-theme .shaka-controls-button-panel>* {
+  margin: 0;
+  padding: 3px 8px;
+  color: var(--primary-text);
+  height: 40px;
+}
+
+.youtube-theme .shaka-controls-button-panel>*:focus {
+  outline: none;
+  -webkit-box-shadow: inset 0 0 0 2px var(--primary);
+  box-shadow: inset 0 0 0 2px var(--primary);
+  color: var(--surface-bright);
+}
+
+.youtube-theme .shaka-controls-button-panel>*:hover {
+  color: var(--surface-variant);
+}
+
+.youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container {
+  position: relative;
+  z-index: 10;
+  left: -1px;
+  -webkit-box-ordinal-group: 0;
+  -ms-flex-order: -1;
+  order: -1;
+  opacity: 0;
+  width: 0px;
+  -webkit-transition: width 0.2s cubic-bezier(0.4, 0, 1, 1);
+  transition: width 0.2s cubic-bezier(0.4, 0, 1, 1);
+  height: 3px;
+  padding: 0;
+}
+
+.youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container:hover,
+.youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container:focus {
+  display: block;
+  width: 50px;
+  opacity: 1;
+  padding: 0 6px;
+}
+
+.youtube-theme .shaka-mute-button:hover+div {
+  opacity: 1;
+  width: 50px;
+  padding: 0 6px;
+}
+
+.youtube-theme .shaka-current-time {
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.youtube-theme .shaka-seek-bar-container {
+  height: 3px;
+  position: relative;
+  top: -1px;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.youtube-theme .shaka-seek-bar-container .shaka-range-element {
+  opacity: 0;
+}
+
+.youtube-theme .shaka-seek-bar-container:hover {
+  height: 5px;
+  top: 0;
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-seek-bar-container:hover .shaka-range-element {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-seek-bar-container input[type=range]::-webkit-slider-thumb {
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-seek-bar-container input[type=range]::-moz-range-thumb {
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-seek-bar-container input[type=range]::-ms-thumb {
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-video-container * {
+  font-family: 'Roboto', sans-serif;
+}
+
+.youtube-theme .shaka-overflow-menu,
+.youtube-theme .shaka-settings-menu {
+  border-radius: 2px;
+  background: var(--surface-dim);
+  text-shadow: 0 0 2px rgb(0 0 0%);
+  -webkit-transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+  transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  right: 10px;
+  bottom: 50px;
+  padding: 8px 0;
+  min-width: 200px;
+}
+
+.youtube-theme .shaka-settings-menu {
+  padding: 0 0 8px 0;
+}
+
+.youtube-theme .shaka-settings-menu button {
+  font-size: 12px;
+}
+
+.youtube-theme .shaka-settings-menu button span {
+  margin-left: 33px;
+  font-size: 13px;
+}
+
+.youtube-theme .shaka-settings-menu button[aria-selected="true"] {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.youtube-theme .shaka-settings-menu button[aria-selected="true"] span {
+  -webkit-box-ordinal-group: 3;
+  -ms-flex-order: 2;
+  order: 2;
+  margin-left: 0;
+}
+
+.youtube-theme .shaka-settings-menu button[aria-selected="true"] i {
+  -webkit-box-ordinal-group: 2;
+  -ms-flex-order: 1;
+  order: 1;
+  font-size: 18px;
+  padding-left: 5px;
+}
+
+.youtube-theme .shaka-overflow-menu button {
+  padding: 0;
+}
+
+.youtube-theme .shaka-overflow-menu button i {
+  display: none;
+}
+
+.youtube-theme .shaka-overflow-menu button .shaka-overflow-button-label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  cursor: default;
+  outline: none;
+  height: 40px;
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 100%;
+  flex: 0 0 100%;
+}
+
+.youtube-theme .shaka-overflow-menu button .shaka-overflow-button-label span {
+  -ms-flex-negative: initial;
+  flex-shrink: initial;
+  padding-left: 15px;
+  font-size: 13px;
+  font-weight: 500;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.youtube-theme .shaka-overflow-menu span+span {
+  color: var(--primary-text);
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  padding-right: 8px;
+  padding-left: 0 !important;
+}
+
+
+.youtube-theme .shaka-overflow-menu .shaka-pip-button span+span {
+  padding-right: 15px !important;
+}
+
+.youtube-theme .shaka-overflow-menu .shaka-pip-button span+span:after {
+  content: "";
+}
+
+.youtube-theme .shaka-back-to-overflow-button {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 12px;
+  color: var(--primary-text);
+  height: 40px;
+}
+
+.youtube-theme .shaka-back-to-overflow-button .material-icons-round {
+  font-size: 15px;
+  padding-right: 10px;
+}
+
+.youtube-theme .shaka-back-to-overflow-button span {
+  margin-left: 3px !important;
+}
+
+.youtube-theme .shaka-overflow-menu button:hover,
+.youtube-theme .shaka-settings-menu button:hover {
+  background-color: var(--surface-bright);
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-overflow-menu button:hover label,
+.youtube-theme .shaka-settings-menu button:hover label {
+  cursor: pointer;
+}
+
+.youtube-theme .shaka-overflow-menu button:focus,
+.youtube-theme .shaka-settings-menu button:focus {
+  background-color: var(--surface-bright);
+  border: none;
+  outline: none;
+}
+.youtube-theme .shaka-overflow-menu button,
+.youtube-theme .shaka-settings-menu button {
+  color: var(--primary-text);
+}
+
+.youtube-theme .shaka-captions-off {
+  color: var(--surface-bright);
+}
+
+.youtube-theme .shaka-overflow-menu-button {
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+.youtube-theme .shaka-fullscreen-button:hover {
+  font-size: 25px;
+  -webkit-transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
+  transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.youtube-theme .shaka-controls-button-panel>*:hover {
+  color: var(--primary) !important;
+}

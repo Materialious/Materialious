@@ -540,8 +540,8 @@
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
 							<menu class="no-wrap mobile">
 								{#each personalPlaylists as personalPlaylist}
-									<a
-										href="#add"
+									<button
+										class="row"
 										onclick={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
 									>
 										<nav>
@@ -554,7 +554,7 @@
 												<i>add</i>
 											{/if}
 										</nav>
-									</a>
+									</button>
 								{/each}
 							</menu>
 						</button>

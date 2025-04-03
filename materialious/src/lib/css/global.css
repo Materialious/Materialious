@@ -26,15 +26,17 @@ article, dialog {
 }
 
 button.row {
-	padding: 0 !important;
 	background-color: transparent !important;
 	border: none !important;
 	color: var(--on-surface) !important;
+	width: 100%;
+	margin: 0 !important;
 }
 
 button.row:hover {
 	box-shadow: none !important;
 	background-color: transparent !important;
+	width: 100%;
 }
 
 @media screen and (max-width: 650px) {

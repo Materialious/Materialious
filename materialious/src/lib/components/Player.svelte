@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import '$lib/css/shaka-player-theme.css';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
@@ -60,6 +61,51 @@
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
 
+	const STORAGE_KEY_QUALITY = 'shaka-preferred-quality';
+	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
+
+	function saveQualityPreference() {
+		const tracks = player.getVariantTracks();
+		const selectedTrack = tracks.find((track) => track.active);
+		if (selectedTrack) {
+			localStorage.setItem(STORAGE_KEY_QUALITY, selectedTrack.bandwidth.toString());
+		}
+	}
+
+	function saveVolumePreference() {
+		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
+	}
+
+	function restorePreferences() {
+		const savedQuality =
+			localStorage.getItem(STORAGE_KEY_QUALITY) ??
+			(import.meta.env.VITE_DEFAULT_DASH_BITRATE as string);
+
+		if (savedQuality) {
+			const qualityBandwidth = parseInt(savedQuality, 10);
+			const tracks = player.getVariantTracks();
+
+			let preferredTrack = tracks.find((track) => track.bandwidth === qualityBandwidth);
+			if (!preferredTrack) {
+				preferredTrack = tracks.reduce((prev, curr) =>
+					Math.abs(curr.bandwidth - qualityBandwidth) < Math.abs(prev.bandwidth - qualityBandwidth)
+						? curr
+						: prev
+				);
+			}
+
+			if (preferredTrack) {
+				player.selectVariantTrack(preferredTrack, true);
+				player.configure({ abr: { enabled: false } });
+			}
+		}
+
+		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
+		if (savedVolume) {
+			playerElement.volume = parseFloat(savedVolume);
+		}
+	}
+
 	function loadTimeFromUrl(page: Page): boolean {
 		if (player) {
 			const timeGivenUrl = page.url.searchParams.get('time');
@@ -91,6 +137,9 @@
 			document.getElementById('shaka-container') as HTMLElement,
 			playerElement
 		);
+
+		player.addEventListener('adaptation', () => setTimeout(saveQualityPreference, 10000));
+		playerElement.addEventListener('volumechange', saveVolumePreference);
 
 		shakaUi.configure({
 			controlPanelElements: [
@@ -194,56 +243,73 @@
 				};
 
 				if (type == shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					const googUmp = new GoogleVideo.UMP(
-						new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
-					);
+					const url = new URL(response.uri);
 
-					let redirect: Protos.SabrRedirect | undefined;
+					// Fix positioning for auto-generated subtitles
+					if (
+						url.hostname.endsWith('.youtube.com') &&
+						url.pathname === '/api/timedtext' &&
+						url.searchParams.get('caps') === 'asr' &&
+						url.searchParams.get('kind') === 'asr' &&
+						url.searchParams.get('fmt') === 'vtt'
+					) {
+						const stringBody = new TextDecoder().decode(response.data);
+						// position:0% for LTR text and position:100% for RTL text
+						const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
 
-					googUmp.parse((part) => {
-						try {
-							const data = part.data.chunks[0];
-							switch (part.type) {
-								case 20: {
-									const mediaHeader = Protos.MediaHeader.decode(data);
-									console.info('[MediaHeader]:', mediaHeader);
-									break;
-								}
-								case 21: {
-									handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
-									break;
-								}
-								case 43: {
-									redirect = Protos.SabrRedirect.decode(data);
-									console.info('[SABRRedirect]:', redirect);
-									break;
-								}
-								case 58: {
-									const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
-									switch (streamProtectionStatus.status) {
-										case 1:
-											console.info('[StreamProtectionStatus]: Ok');
-											break;
-										case 2:
-											console.error('[StreamProtectionStatus]: Attestation pending');
-											break;
-										case 3:
-											console.error('[StreamProtectionStatus]: Attestation required');
-											break;
-										default:
-											break;
+						response.data = new TextEncoder().encode(cleaned).buffer as ArrayBuffer;
+					} else {
+						const googUmp = new GoogleVideo.UMP(
+							new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
+						);
+
+						let redirect: Protos.SabrRedirect | undefined;
+
+						googUmp.parse((part) => {
+							try {
+								const data = part.data.chunks[0];
+								switch (part.type) {
+									case 20: {
+										const mediaHeader = Protos.MediaHeader.decode(data);
+										console.info('[MediaHeader]:', mediaHeader);
+										break;
 									}
-									break;
+									case 21: {
+										handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
+										break;
+									}
+									case 43: {
+										redirect = Protos.SabrRedirect.decode(data);
+										console.info('[SABRRedirect]:', redirect);
+										break;
+									}
+									case 58: {
+										const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
+										switch (streamProtectionStatus.status) {
+											case 1:
+												console.info('[StreamProtectionStatus]: Ok');
+												break;
+											case 2:
+												console.error('[StreamProtectionStatus]: Attestation pending');
+												break;
+											case 3:
+												console.error('[StreamProtectionStatus]: Attestation required');
+												break;
+											default:
+												break;
+										}
+										break;
+									}
 								}
+							} catch (error) {
+								console.error('An error occurred while processing the part:', error);
 							}
-						} catch (error) {
-							console.error('An error occurred while processing the part:', error);
-						}
-					});
+						});
 
-					if (redirect) return handleRedirect(redirect);
+						if (redirect) return handleRedirect(redirect);
 
-					if (mediaData.length) response.data = mediaData;
+						if (mediaData.length) response.data = mediaData;
+					}
 				}
 			});
 		}
@@ -398,6 +464,20 @@
 			snackBarAlert = get(_)('player.youtubeJsFallBack');
 			ui('#snackbar-alert');
 		}
+
+		restorePreferences();
+
+		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
+		if (overflowMenuButton) {
+			overflowMenuButton.innerHTML = 'settings';
+		}
+
+		const backToOverflowButton = document.querySelector(
+			'.shaka-back-to-overflow-button .material-icons-round'
+		);
+		if (backToOverflowButton) {
+			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
+		}
 	});
 
 	async function loadPlayerPos() {
@@ -482,6 +562,7 @@
 
 <div
 	id="shaka-container"
+	class="youtube-theme"
 	style="max-height: 80vh; max-width: calc(80vh * 16 / 9); overflow: hidden; position: relative; flex: 1; background-color: black;"
 	data-shaka-player-container
 >

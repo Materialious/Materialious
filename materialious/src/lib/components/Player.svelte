@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import '$lib/css/shaka-player-theme.css';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/time';
 	import { Capacitor } from '@capacitor/core';
@@ -465,6 +466,18 @@
 		}
 
 		restorePreferences();
+
+		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
+		if (overflowMenuButton) {
+			overflowMenuButton.innerHTML = 'settings';
+		}
+
+		const backToOverflowButton = document.querySelector(
+			'.shaka-back-to-overflow-button .material-icons-round'
+		);
+		if (backToOverflowButton) {
+			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
+		}
 	});
 
 	async function loadPlayerPos() {
@@ -549,6 +562,7 @@
 
 <div
 	id="shaka-container"
+	class="youtube-theme"
 	style="max-height: 80vh; max-width: calc(80vh * 16 / 9); overflow: hidden; position: relative; flex: 1; background-color: black;"
 	data-shaka-player-container
 >

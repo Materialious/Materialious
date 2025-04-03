@@ -9,6 +9,7 @@
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { type Page } from '@sveltejs/kit';
 	import { GoogleVideo, Protos } from 'googlevideo';
+	import ISO6391 from 'iso-639-1';
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -77,10 +78,10 @@
 	function restorePreferences() {
 		const savedQuality =
 			localStorage.getItem(STORAGE_KEY_QUALITY) ??
-			(import.meta.env.VITE_DEFAULT_DASH_BITRATE as string);
+			(import.meta.env.VITE_DEFAULT_DASH_BITRATE as string | undefined);
 
 		if (savedQuality) {
-			const qualityBandwidth = parseInt(savedQuality, 10);
+			const qualityBandwidth = parseInt(savedQuality);
 			const tracks = player.getVariantTracks();
 
 			let preferredTrack = tracks.find((track) => track.bandwidth === qualityBandwidth);
@@ -94,7 +95,6 @@
 
 			if (preferredTrack) {
 				player.selectVariantTrack(preferredTrack, true);
-				player.configure({ abr: { enabled: false } });
 			}
 		}
 
@@ -136,9 +136,6 @@
 			playerElement
 		);
 
-		player.addEventListener('adaptation', () => setTimeout(saveQualityPreference, 10000));
-		playerElement.addEventListener('volumechange', saveVolumePreference);
-
 		shakaUi.configure({
 			controlPanelElements: [
 				'play_pause',
@@ -146,10 +143,22 @@
 				'spacer',
 				'chapter',
 				'time_and_duration',
+				'captions',
 				'overflow_menu',
 				'fullscreen'
 			],
-			overflowMenuButtons: ['cast', 'airplay', 'captions', 'quality', 'loop', 'language']
+			overflowMenuButtons: [
+				'cast',
+				'airplay',
+				'captions',
+				'quality',
+				'playback_rate',
+				'loop',
+				'language',
+				'save_video_frame',
+				'statistics'
+			],
+			enableTooltips: true
 		});
 
 		player.configure({
@@ -399,14 +408,6 @@
 
 			await loadPlayerPos();
 
-			const defaultLanguage = get(playerDefaultLanguage);
-			if (defaultLanguage) {
-				const audioLanguages = player.getAudioLanguages();
-				if (audioLanguages.includes(defaultLanguage)) {
-					player.selectAudioLanguage(defaultLanguage);
-				}
-			}
-
 			if (Capacitor.getPlatform() === 'android' && data.video.adaptiveFormats.length > 0) {
 				const videoFormats = data.video.adaptiveFormats.filter((format) =>
 					format.type.startsWith('video/')
@@ -463,7 +464,25 @@
 			ui('#snackbar-alert');
 		}
 
-		restorePreferences();
+		player.addEventListener('buffering', saveQualityPreference);
+		playerElement.addEventListener('volumechange', saveVolumePreference);
+
+		player.addEventListener('loaded', () => {
+			restorePreferences();
+
+			const defaultLanguage = get(playerDefaultLanguage);
+			if (defaultLanguage) {
+				const audioLanguages = player.getAudioLanguages();
+				const langCode = ISO6391.getCode(defaultLanguage);
+
+				for (const audioLanguage of audioLanguages) {
+					if (audioLanguage.startsWith(langCode)) {
+						player.selectAudioLanguage(audioLanguage);
+						break;
+					}
+				}
+			}
+		});
 
 		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
 		if (overflowMenuButton) {

@@ -25,11 +25,6 @@
   order: 1;
 }
 
-.youtube-theme > .shaka-controls-container button {
-  width: 60px;
-  height: 50px;
-}
-
 .youtube-theme .shaka-controls-button-panel {
   -webkit-box-ordinal-group: 3;
   -ms-flex-order: 2;
@@ -58,8 +53,9 @@
 .youtube-theme .shaka-controls-button-panel>* {
   margin: 0;
   padding: 3px 8px;
-  color: var(--white-text);
-  height: 50px;
+  color: #fff;
+  height: 40px;
+  font-size: 2em;
 }
 
 .youtube-theme .shaka-controls-button-panel>*:hover {
@@ -84,7 +80,6 @@
 .youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container:hover,
 .youtube-theme .shaka-controls-button-panel .shaka-volume-bar-container:focus {
   display: block;
-  width: 50px;
   opacity: 1;
   padding: 0 6px;
 }

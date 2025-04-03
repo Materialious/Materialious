@@ -239,7 +239,9 @@
 	{/if}
 
 	{#if mobileSearchShow}
-		<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+		<div style="width: 100%;">
+			<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+		</div>
 	{:else}
 		{#if !Capacitor.isNativePlatform()}
 			<button data-ui="#sync-party" class="circle large transparent">

@@ -194,56 +194,74 @@
 				};
 
 				if (type == shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					const googUmp = new GoogleVideo.UMP(
-						new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
-					);
+					const url = new URL(response.uri);
 
-					let redirect: Protos.SabrRedirect | undefined;
+					// Fix positioning for auto-generated subtitles
+					if (
+						url.hostname.endsWith('.youtube.com') &&
+						url.pathname === '/api/timedtext' &&
+						url.searchParams.get('caps') === 'asr' &&
+						url.searchParams.get('kind') === 'asr' &&
+						url.searchParams.get('fmt') === 'vtt'
+					) {
+						const stringBody = new TextDecoder().decode(response.data);
+						// position:0% for LTR text and position:100% for RTL text
+						const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
 
-					googUmp.parse((part) => {
-						try {
-							const data = part.data.chunks[0];
-							switch (part.type) {
-								case 20: {
-									const mediaHeader = Protos.MediaHeader.decode(data);
-									console.info('[MediaHeader]:', mediaHeader);
-									break;
-								}
-								case 21: {
-									handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
-									break;
-								}
-								case 43: {
-									redirect = Protos.SabrRedirect.decode(data);
-									console.info('[SABRRedirect]:', redirect);
-									break;
-								}
-								case 58: {
-									const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
-									switch (streamProtectionStatus.status) {
-										case 1:
-											console.info('[StreamProtectionStatus]: Ok');
-											break;
-										case 2:
-											console.error('[StreamProtectionStatus]: Attestation pending');
-											break;
-										case 3:
-											console.error('[StreamProtectionStatus]: Attestation required');
-											break;
-										default:
-											break;
+						response.data = new TextEncoder().encode(cleaned).buffer as ArrayBuffer;
+					} else {
+						console.log('made it here');
+						const googUmp = new GoogleVideo.UMP(
+							new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
+						);
+
+						let redirect: Protos.SabrRedirect | undefined;
+
+						googUmp.parse((part) => {
+							try {
+								const data = part.data.chunks[0];
+								switch (part.type) {
+									case 20: {
+										const mediaHeader = Protos.MediaHeader.decode(data);
+										console.info('[MediaHeader]:', mediaHeader);
+										break;
 									}
-									break;
+									case 21: {
+										handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
+										break;
+									}
+									case 43: {
+										redirect = Protos.SabrRedirect.decode(data);
+										console.info('[SABRRedirect]:', redirect);
+										break;
+									}
+									case 58: {
+										const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
+										switch (streamProtectionStatus.status) {
+											case 1:
+												console.info('[StreamProtectionStatus]: Ok');
+												break;
+											case 2:
+												console.error('[StreamProtectionStatus]: Attestation pending');
+												break;
+											case 3:
+												console.error('[StreamProtectionStatus]: Attestation required');
+												break;
+											default:
+												break;
+										}
+										break;
+									}
 								}
+							} catch (error) {
+								console.error('An error occurred while processing the part:', error);
 							}
-						} catch (error) {
-							console.error('An error occurred while processing the part:', error);
-						}
-					});
+						});
 
-					if (redirect) return handleRedirect(redirect);
+						if (redirect) return handleRedirect(redirect);
 
-					if (mediaData.length) response.data = mediaData;
+						if (mediaData.length) response.data = mediaData;
+					}
 				}
 			});
 		}

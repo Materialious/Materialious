@@ -89,21 +89,26 @@
 		<span>{$_('player.share.title')}</span>
 		<menu class="no-wrap mobile">
 			{#if !Capacitor.isNativePlatform()}
-				<a
-					href="#share"
+				<button
+					class="row"
 					onclick={async () => {
 						await Clipboard.write({ string: location.href });
-					}}>{$_('player.share.materialiousLink')}</a
+					}}>{$_('player.share.materialiousLink')}</button
 				>
 			{/if}
-			<a
-				href="#share"
-				onclick={async () => {
-					await Clipboard.write({
-						string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
-					});
-				}}>{$_('player.share.youtubeLink')}</a
-			>
+			<!--Silly hack so svelte doesnt error-->
+			{#if true}
+				<button
+					class="row"
+					onclick={async () => {
+						await Clipboard.write({
+							string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
+						});
+					}}
+				>
+					{$_('player.share.youtubeLink')}
+				</button>
+			{/if}
 		</menu>
 	</button>
 </article>

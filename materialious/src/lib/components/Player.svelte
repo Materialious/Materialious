@@ -10,6 +10,7 @@
 	import { type Page } from '@sveltejs/kit';
 	import { GoogleVideo, Protos } from 'googlevideo';
 	import ISO6391 from 'iso-639-1';
+	import Mousetrap from 'mousetrap';
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -156,7 +157,7 @@
 				'playback_rate',
 				'loop',
 				'language',
-				'save_video_frame',
+				Capacitor.getPlatform() === 'android' ? '' : 'save_video_frame',
 				'statistics'
 			],
 			enableTooltips: true
@@ -494,6 +495,61 @@
 		if (backToOverflowButton) {
 			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
 		}
+
+		Mousetrap.bind('space', () => {
+			if (playerElement.paused) {
+				playerElement.play();
+			} else {
+				playerElement.pause();
+			}
+			return false;
+		});
+
+		Mousetrap.bind('right', () => {
+			playerElement.currentTime = playerElement.currentTime + 10;
+			return false;
+		});
+
+		Mousetrap.bind('left', () => {
+			playerElement.currentTime = playerElement.currentTime - 10;
+			return false;
+		});
+
+		Mousetrap.bind('c', () => {
+			const isVisible = player.isTextTrackVisible();
+			if (isVisible) {
+				player.setTextTrackVisibility(false);
+			} else {
+				const defaultLanguage = get(playerDefaultLanguage);
+				const langCode = ISO6391.getCode(defaultLanguage);
+
+				const tracks = player.getTextTracks();
+				const subtitleTrack = tracks.find((track) => track.language === langCode);
+
+				if (subtitleTrack) {
+					player.selectTextTrack(subtitleTrack);
+					player.setTextTrackVisibility(true);
+				}
+			}
+			return false;
+		});
+
+		Mousetrap.bind('f', () => {
+			if (document.fullscreenElement) {
+				document.exitFullscreen();
+			} else {
+				playerElement.requestFullscreen();
+			}
+			return false;
+		});
+
+		Mousetrap.bind('shift+left', () => {
+			playerElement.playbackRate = playerElement.playbackRate - 0.25;
+		});
+
+		Mousetrap.bind('shift+right', () => {
+			playerElement.playbackRate = playerElement.playbackRate + 0.25;
+		});
 	});
 
 	async function loadPlayerPos() {

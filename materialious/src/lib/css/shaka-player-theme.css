@@ -140,10 +140,8 @@
 
 .youtube-theme .shaka-overflow-menu,
 .youtube-theme .shaka-settings-menu {
-  border-radius: 2px;
+  border-radius: 0.25em;
   background: var(--surface-dim);
-  text-shadow: 0 0 2px rgb(0 0 0%);
-  -webkit-transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
   transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
   right: 10px;
   bottom: 50px;
@@ -156,12 +154,14 @@
 }
 
 .youtube-theme .shaka-settings-menu button {
-  font-size: 12px;
+  font-size: 1em;
+  border: none;
+  margin: 0;
 }
 
 .youtube-theme .shaka-settings-menu button span {
   margin-left: 33px;
-  font-size: 13px;
+  font-size: 1em;
 }
 
 .youtube-theme .shaka-settings-menu button[aria-selected="true"] {
@@ -181,7 +181,7 @@
   -webkit-box-ordinal-group: 2;
   -ms-flex-order: 1;
   order: 1;
-  font-size: 18px;
+  font-size: 1em;
   padding-left: 5px;
 }
 
@@ -219,7 +219,7 @@
   -ms-flex-negative: initial;
   flex-shrink: initial;
   padding-left: 15px;
-  font-size: 13px;
+  font-size: 1em;
   font-weight: 500;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -232,7 +232,7 @@
 .youtube-theme .shaka-overflow-menu span+span {
   color: var(--primary-text);
   font-weight: 400 !important;
-  font-size: 12px !important;
+  font-size: 1em !important;
   padding-right: 8px;
   padding-left: 0 !important;
 }
@@ -249,13 +249,13 @@
 .youtube-theme .shaka-back-to-overflow-button {
   padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 12px;
+  font-size: 1em;
   color: var(--primary-text);
   height: 40px;
 }
 
 .youtube-theme .shaka-back-to-overflow-button .material-icons-round {
-  font-size: 15px;
+  font-size: 1em;
   padding-right: 10px;
 }
 
@@ -290,12 +290,20 @@
 }
 
 .youtube-theme .shaka-overflow-menu-button {
-  font-size: 18px;
+  font-size: 1em;
   margin-right: 5px;
 }
 
 .youtube-theme .shaka-fullscreen-button:hover {
-  font-size: 25px;
+  font-size: 1em;
   -webkit-transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
   transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media screen and (max-width: 650px) {
+  .youtube-theme .shaka-overflow-menu,
+    .youtube-theme .shaka-settings-menu {
+      top: 10px;
+      position: absolute;
+    }
 }

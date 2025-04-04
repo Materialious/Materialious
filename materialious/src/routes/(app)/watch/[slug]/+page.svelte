@@ -74,6 +74,15 @@
 
 	let playerCurrentTime: number = $state(0);
 
+	$effect(() => {
+		if ($interfaceAutoExpandComments && comments) {
+			const commentSectionElement = document.getElementById('comment-section');
+			if (commentSectionElement) {
+				commentSectionElement.click();
+			}
+		}
+	});
+
 	playlistSettingsStore.subscribe((playlistSetting) => {
 		if (!data.playlistId) return;
 		if (data.playlistId in playlistSetting) {
@@ -214,6 +223,13 @@
 	});
 
 	onMount(async () => {
+		if ($interfaceAutoExpandDesc) {
+			const descriptionElement = document.getElementById('description');
+			if (descriptionElement) {
+				descriptionElement.click();
+			}
+		}
+
 		if ($syncPartyConnectionsStore) {
 			$syncPartyConnectionsStore.forEach((conn) => {
 				playerSyncEvents(conn);
@@ -562,8 +578,8 @@
 		</div>
 
 		<article>
-			<details open={$interfaceAutoExpandDesc}>
-				<summary class="bold none">
+			<details>
+				<summary id="description" class="bold none">
 					<nav>
 						<div class="max">
 							{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
@@ -606,8 +622,8 @@
 
 		{#if comments && comments.comments.length > 0}
 			<article>
-				<details open={$interfaceAutoExpandComments}>
-					<summary class="none bold">
+				<details>
+					<summary id="comment-section" class="none bold">
 						<nav>
 							<div class="max">{numberWithCommas(comments.commentCount)} comments</div>
 							<i>expand_more</i>

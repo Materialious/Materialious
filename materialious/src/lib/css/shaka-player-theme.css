@@ -140,10 +140,8 @@
 
 .youtube-theme .shaka-overflow-menu,
 .youtube-theme .shaka-settings-menu {
-  border-radius: 2px;
+  border-radius: 0.25em;
   background: var(--surface-dim);
-  text-shadow: 0 0 2px rgb(0 0 0%);
-  -webkit-transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
   transition: opacity 0.1s cubic-bezier(0, 0, 0.2, 1);
   right: 10px;
   bottom: 50px;
@@ -298,4 +296,12 @@
   font-size: 25px;
   -webkit-transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
   transition: font-size 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@media screen and (max-width: 650px) {
+  .youtube-theme .shaka-overflow-menu,
+    .youtube-theme .shaka-settings-menu {
+      top: 10px;
+      position: absolute;
+    }
 }

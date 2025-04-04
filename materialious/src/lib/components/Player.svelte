@@ -156,7 +156,7 @@
 				'playback_rate',
 				'loop',
 				'language',
-				'save_video_frame',
+				Capacitor.getPlatform() === 'android' ? '' : 'save_video_frame',
 				'statistics'
 			],
 			enableTooltips: true

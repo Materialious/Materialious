@@ -1,7 +1,7 @@
 import { androidPoTokenMinter } from '$lib/android/youtube/minter';
 import type { AdaptiveFormats, Captions, Image, StoryBoard, Thumbnail, VideoBase, VideoPlay } from '$lib/api/model';
+import { numberWithCommas } from '$lib/numbers';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
-import { numberWithCommas } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
 import { USER_AGENT } from 'bgutils-js';
 import { Buffer } from 'buffer';

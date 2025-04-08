@@ -1,5 +1,5 @@
 import { decodeHtmlCharCodes } from "./misc";
-import { convertToSeconds } from "./time";
+import { convertToSeconds } from "./numbers";
 
 export interface PhasedDescription {
   description: string;

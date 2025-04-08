@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
-	import { cleanNumber } from '$lib/time';
+	import { cleanNumber } from '$lib/numbers';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';

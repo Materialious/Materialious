@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cleanNumber } from '$lib/time';
+	import { cleanNumber } from '$lib/numbers';
 	import { _ } from 'svelte-i18n';
 	import type { HashTag } from '../api/model';
 	import { truncate } from '../misc';

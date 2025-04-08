@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { cleanNumber, videoLength } from '$lib/time';
+	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';

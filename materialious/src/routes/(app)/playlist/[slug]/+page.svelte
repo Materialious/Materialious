@@ -3,8 +3,8 @@
 	import type { PlaylistPageVideo } from '$lib/api/model';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { unsafeRandomItem } from '$lib/misc';
+	import { cleanNumber } from '$lib/numbers';
 	import { activePageStore, playlistSettingsStore } from '$lib/store';
-	import { cleanNumber } from '$lib/time';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';

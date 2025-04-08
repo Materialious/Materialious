@@ -6,8 +6,8 @@
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { cleanNumber } from '$lib/numbers';
 	import { activePageStore, authStore, interfaceLowBandwidthMode } from '$lib/store';
-	import { cleanNumber } from '$lib/time';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';

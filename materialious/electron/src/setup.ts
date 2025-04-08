@@ -196,7 +196,6 @@ export class ElectronCapacitorApp {
         event.preventDefault();
       }
     });
-
     // Link electron plugins into the system.
     setupCapacitorElectronPlugins();
 

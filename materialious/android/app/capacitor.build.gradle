@@ -14,7 +14,6 @@ dependencies {
     implementation project(':capacitor-clipboard')
     implementation project(':capacitor-screen-orientation')
     implementation project(':capacitor-status-bar')
-    implementation project(':capgo-inappbrowser')
     implementation project(':hugotomazi-capacitor-navigation-bar')
     implementation project(':capacitor-nodejs')
 

@@ -1,6 +1,6 @@
 import { getVideo } from '$lib/api/index';
-import type { PhasedDescription } from '$lib/misc';
 import { playerProxyVideosStore } from '$lib/store';
+import type { PhasedDescription } from '$lib/timestamps';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 

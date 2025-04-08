@@ -6,8 +6,8 @@
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { cleanNumber } from '$lib/numbers';
 	import { activePageStore, authStore, interfaceLowBandwidthMode } from '$lib/store';
-	import { cleanNumber } from '$lib/time';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
@@ -137,21 +137,24 @@
 					<span>{$_('player.share.title')}</span>
 					<menu class="no-wrap mobile">
 						{#if !Capacitor.isNativePlatform()}
-							<a
-								href="#share"
+							<button
+								class="row"
 								onclick={async () => {
 									await Clipboard.write({ string: location.href });
-								}}>{$_('player.share.materialiousLink')}</a
+								}}>{$_('player.share.materialiousLink')}</button
 							>
 						{/if}
-						<a
-							href="#share"
-							onclick={async () => {
-								await Clipboard.write({
-									string: `https://www.youtube.com/channel/${data.channel.authorId}`
-								});
-							}}>{$_('player.share.youtubeLink')}</a
-						>
+						<!--Ugly hack to get pass svelte error-->
+						{#if true}
+							<button
+								class="row"
+								onclick={async () => {
+									await Clipboard.write({
+										string: `https://www.youtube.com/channel/${data.channel.authorId}`
+									});
+								}}>{$_('player.share.youtubeLink')}</button
+							>
+						{/if}
 					</menu>
 				</button>
 			</div>

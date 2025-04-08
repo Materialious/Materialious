@@ -52,7 +52,7 @@ export async function load({ params, url }) {
 
 	return {
 		video: video,
-		content: phaseDescription(video.descriptionHtml, video.fallbackPatch === 'youtubejs'),
+		content: phaseDescription(video.videoId, video.descriptionHtml, video.fallbackPatch),
 		playlistId: url.searchParams.get('playlist'),
 		streamed: {
 			personalPlaylists: personalPlaylists,

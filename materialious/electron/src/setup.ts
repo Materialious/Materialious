@@ -7,7 +7,7 @@ import {
 import { USER_AGENT } from 'bgutils-js';
 import chokidar from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, BrowserWindow, Menu, MenuItem, nativeImage, session, Tray } from 'electron';
+import { app, BrowserWindow, Menu, MenuItem, nativeImage, session, shell, Tray } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
@@ -185,18 +185,14 @@ export class ElectronCapacitorApp {
 
     // Security
     this.MainWindow.webContents.setWindowOpenHandler((details) => {
-      if (!details.url.includes(this.customScheme)) {
-        return { action: 'deny' };
-      } else {
-        return { action: 'allow' };
-      }
+      shell.openExternal(details.url);
+      return { action: 'deny' };
     });
     this.MainWindow.webContents.on('will-navigate', (event, _newURL) => {
       if (!this.MainWindow.webContents.getURL().includes(this.customScheme)) {
         event.preventDefault();
       }
     });
-
     // Link electron plugins into the system.
     setupCapacitorElectronPlugins();
 

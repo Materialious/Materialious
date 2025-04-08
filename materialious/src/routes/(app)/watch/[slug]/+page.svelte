@@ -18,6 +18,7 @@
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { truncate, unsafeRandomItem } from '$lib/misc';
+	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
 	import type { PlayerEvents } from '$lib/player.js';
 	import {
 		activePageStore,
@@ -31,7 +32,6 @@
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
 	} from '$lib/store';
-	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/time';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';

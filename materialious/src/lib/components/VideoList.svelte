@@ -15,13 +15,11 @@
 
 	let { videos = [], playlistId = '', playlistAuthor = '' }: Props = $props();
 
-	let hiddenVideos: string[] = $state([]);
 	let auth = get(authStore);
 
 	async function removePlaylistItem(indexId: string, videoId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
-		hiddenVideos = [...hiddenVideos, videoId];
 	}
 </script>
 
@@ -29,11 +27,9 @@
 	<div class="space"></div>
 	<div class="grid">
 		{#each videos as video}
-			{#if !hiddenVideos.includes(video.videoId)}
 				<ContentColumn>
 					<article class="no-padding" style="height: 100%;">
 						<Thumbnail
-							on:videoHidden={() => (hiddenVideos = [...hiddenVideos, video.videoId])}
 							{video}
 							{playlistId}
 						/>
@@ -50,7 +46,6 @@
 						{/if}
 					</article>
 				</ContentColumn>
-			{/if}
 		{/each}
 	</div>
 </div>

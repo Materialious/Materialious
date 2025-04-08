@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { videoLength } from '$lib/time';
+	import { videoLength } from '$lib/numbers';
 	import Fuse from 'fuse.js';
 	import { VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from 'svelte-i18n';

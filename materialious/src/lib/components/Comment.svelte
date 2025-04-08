@@ -2,8 +2,8 @@
 	import { getComments } from '$lib/api';
 	import { type Comment, type Comments } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { numberWithCommas } from '$lib/numbers';
 	import { interfaceLowBandwidthMode } from '$lib/store';
-	import { numberWithCommas } from '$lib/time';
 	import CommentSelf from './Comment.svelte';
 
 	interface Props {

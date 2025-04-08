@@ -42,7 +42,6 @@
 
 		selectedSuggestionIndex = -1;
 		goto(`/search/${encodeURIComponent(search)}`);
-		dispatch('searchSubmitted');
 
 		suggestionsForSearch = [];
 		showSearchBox = false;

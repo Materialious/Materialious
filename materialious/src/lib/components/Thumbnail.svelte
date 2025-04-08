@@ -2,17 +2,16 @@
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
-	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { getChannel, getDeArrow, getThumbnail, getVideo, getVideoProgress } from '../api';
+	import { getChannel, getDeArrow, getThumbnail, getVideoProgress } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { proxyVideoUrl, truncate } from '../misc';
+	import { truncate } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,
 		deArrowEnabledStore,
-		deArrowTitlesOnly,
 		interfaceDisplayThumbnailAvatars,
 		interfaceLowBandwidthMode,
 		playerSavePlaybackPositionStore,
@@ -22,8 +21,6 @@
 		synciousStore
 	} from '../store';
 
-	const dispatch = createEventDispatcher();
-
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
 		playlistId?: string;
@@ -31,8 +28,6 @@
 	}
 
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
-
-	let thumbnailHidden: boolean = $state(false);
 
 	let authorImg: HTMLImageElement | undefined = $state();
 
@@ -88,15 +83,6 @@
 	}
 
 	onMount(async () => {
-		try {
-			thumbnailHidden = localStorage.getItem(`v_h_${video.videoId}`) === '1';
-		} catch {}
-
-		if (thumbnailHidden) {
-			dispatch('videoHidden');
-			return;
-		}
-
 		calcThumbnailPlaceholderHeight();
 
 		// Check if sideways should be enabled or disabled.
@@ -138,46 +124,6 @@
 					}
 				}
 			} catch {}
-
-			if (!locatedThumbnail && !get(deArrowTitlesOnly)) {
-				// Process thumbnail locally.
-				const canvas = document.getElementById('canvas') as HTMLCanvasElement | null;
-				function generateThumbnail(): Promise<string> {
-					return new Promise<string>(async (resolve, reject) => {
-						if (canvas) {
-							const context = canvas.getContext('2d');
-							const mockVideo = document.createElement('video');
-							const videoContainer = document.getElementById('video-container');
-							videoContainer?.appendChild(mockVideo);
-
-							mockVideo.preload = 'auto';
-							mockVideo.id = 'video';
-							mockVideo.crossOrigin = 'anonymous';
-
-							const videoDetails = (await getVideo(video.videoId)).formatStreams[0];
-
-							mockVideo.src = proxyVideoUrl(videoDetails.url);
-
-							mockVideo.addEventListener('loadeddata', () => {
-								mockVideo.currentTime = mockVideo.duration / 50;
-
-								mockVideo.addEventListener('seeked', () => {
-									if (context) {
-										context.drawImage(mockVideo, 0, 0, canvas.width, canvas.height);
-										resolve(canvas.toDataURL('image/png'));
-										mockVideo.preload = 'none';
-										mockVideo.pause();
-										videoContainer?.removeChild(mockVideo);
-									}
-								});
-							});
-							mockVideo.load();
-						}
-					});
-				}
-
-				imageSrc = await generateThumbnail();
-			}
 		}
 
 		const img = new Image();
@@ -233,99 +179,89 @@
 	}
 </script>
 
-{#if !thumbnailHidden}
-	<div class:sideways-root={sideways}>
-		<div onfocus={() => {}} id="thumbnail-container" role="region">
-			<a
-				class="wave thumbnail"
-				href={watchUrl.toString()}
-				data-sveltekit-preload-data="off"
-				onclick={syncChangeVideo}
-			>
-				{#if !$interfaceLowBandwidthMode}
-					{#if !thumbnail}
-						<div
-							class="secondary-container"
-							style="width: 100%;height: {placeholderHeight}px;"
-						></div>
-					{:else}
-						<img class="responsive" src={thumbnail.src} alt="Thumbnail for video" />
-					{/if}
-				{/if}
-				{#if progress}
-					<progress
-						class="absolute right bottom"
-						style="z-index: 1;"
-						value={progress}
-						max={video.lengthSeconds}
-					></progress>
-				{/if}
-				{#if !('liveVideo' in video) || !video.liveVideo}
-					{#if video.lengthSeconds !== 0}
-						{#if !$interfaceLowBandwidthMode}
-							<div
-								class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
-							>
-								&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
-							</div>
-						{:else}
-							<h3>{videoLength(video.lengthSeconds)}</h3>
-						{/if}
-					{/if}
-				{:else if video.lengthSeconds !== 0}
-					<div
-						class="absolute right bottom small-margin red white-text small-text thumbnail-corner"
-					>
-						{$_('thumbnail.live')}
-					</div>
+<div class:sideways-root={sideways}>
+	<div onfocus={() => {}} id="thumbnail-container" role="region">
+		<a
+			class="wave thumbnail"
+			href={watchUrl.toString()}
+			data-sveltekit-preload-data="off"
+			onclick={syncChangeVideo}
+		>
+			{#if !$interfaceLowBandwidthMode}
+				{#if !thumbnail}
+					<div class="secondary-container" style="width: 100%;height: {placeholderHeight}px;"></div>
 				{:else}
-					<h3>{$_('thumbnail.live')}</h3>
+					<img class="responsive" src={thumbnail.src} alt="Thumbnail for video" />
 				{/if}
-			</a>
-		</div>
-
-		<div class="thumbnail-details video-title">
-			{#if !sideways && !$interfaceLowBandwidthMode && $interfaceDisplayThumbnailAvatars}
-				<div style="margin-right: 1em;">
-					{#if authorImg}
-						<img src={authorImg.src} alt="Author" class="circle small" />
-					{:else}
-						<progress style="padding: 15px;" class="circle small"></progress>
-					{/if}
-				</div>
 			{/if}
-			<div class="video-title">
-				<a
-					style="padding-left: 1px;"
-					class="video-title"
-					data-sveltekit-preload-data="off"
-					href={watchUrl.toString()}
-				>
-					<span class="bold">{letterCase(truncate(video.title.trimEnd(), 80))}</span>
-				</a>
-
-				<div>
-					<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
-					{#if !('publishedText' in video) && 'viewCountText' in video}
-						<span style="margin-top: 1em;">
-							• {video.viewCountText}
-							{$_('views')}
-						</span>
-					{/if}
-
-					{#if 'publishedText' in video}
-						<div class="max">
-							{cleanNumber(video.viewCount)} • {video.publishedText}
+			{#if progress}
+				<progress
+					class="absolute right bottom"
+					style="z-index: 1;"
+					value={progress}
+					max={video.lengthSeconds}
+				></progress>
+			{/if}
+			{#if !('liveVideo' in video) || !video.liveVideo}
+				{#if video.lengthSeconds !== 0}
+					{#if !$interfaceLowBandwidthMode}
+						<div
+							class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
+						>
+							&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
 						</div>
+					{:else}
+						<h3>{videoLength(video.lengthSeconds)}</h3>
 					{/if}
+				{/if}
+			{:else if video.lengthSeconds !== 0}
+				<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">
+					{$_('thumbnail.live')}
 				</div>
+			{:else}
+				<h3>{$_('thumbnail.live')}</h3>
+			{/if}
+		</a>
+	</div>
+
+	<div class="thumbnail-details video-title">
+		{#if !sideways && !$interfaceLowBandwidthMode && $interfaceDisplayThumbnailAvatars}
+			<div style="margin-right: 1em;">
+				{#if authorImg}
+					<img src={authorImg.src} alt="Author" class="circle small" />
+				{:else}
+					<progress style="padding: 15px;" class="circle small"></progress>
+				{/if}
+			</div>
+		{/if}
+		<div class="video-title">
+			<a
+				style="padding-left: 1px;"
+				class="video-title"
+				data-sveltekit-preload-data="off"
+				href={watchUrl.toString()}
+			>
+				<span class="bold">{letterCase(truncate(video.title.trimEnd(), 80))}</span>
+			</a>
+
+			<div>
+				<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+				{#if !('publishedText' in video) && 'viewCountText' in video}
+					<span style="margin-top: 1em;">
+						• {video.viewCountText}
+						{$_('views')}
+					</span>
+				{/if}
+
+				{#if 'publishedText' in video}
+					<div class="max">
+						{cleanNumber(video.viewCount)} • {video.publishedText}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
-{/if}
-
-<canvas id="canvas" style="display: none;"></canvas>
-<div id="video-container" style="display: none;"></div>
+</div>
 
 <style>
 	.thumbnail {

@@ -56,37 +56,150 @@
 
 Open an issue to add your instance.
 
-# Docker deployment
-Deploy Materialious for your Invidious instance using Docker. Follow the steps outlined [here](./docs/DOCKER.md) for easy setup.
+# Deploying as a website via docker
+[Please read the guide here](./docs/DOCKER.md)
 
-# Desktop (Windows/MacOS/Linux)
-<div style="display: flex; gap: 5px;">
-  <a href="https://github.com/Materialious/Materialious/releases/latest">
-    <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
-  </a>
-  <a href="https://snapcraft.io/materialious">
-    <img height="60" alt="Get it from the Snap Store" src="https://snapcraft.io/en/dark/install.svg" />
-  </a>
-  <a href='https://flathub.org/apps/us.materialio.Materialious'>
-    <img width='190' alt='Get it on Flathub' src='https://flathub.org/api/badge?locale=en'/>
-  </a>
-</div>
-
-# Android
-<div style="display: flex; gap: 5px;">
-  <a href="https://github.com/Materialious/Materialious/releases/latest">
-    <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
-  </a>
-  <a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/Materialious/Materialious">
-    <img height="60" alt="Get it on Obtainium" src="https://raw.githubusercontent.com/ImranR98/Obtainium/e3fcf6e0b5187445a76462b4042aba6b2fc15047/assets/graphics/badge_obtainium.png" />
-  </a>
-  <a href="https://f-droid.org/packages/us.materialio.app/">
-    <img height="80" alt="Get it on F-Droid" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />
-  </a>
-  <a href="https://apt.izzysoft.de/fdroid/index/apk/us.materialio.app">
-    <img height="80" alt="Get it on Izzysoft" src="https://codeberg.org/IzzyOnDroid/repo/raw/commit/9873f08e282332a231e64d9729f810f427a521e4/assets/IzzyOnDroid.png" />
-  </a>
-</div>
+# Installing as a local application
+<!--This layout is taken from spotube's README as I really liked its layout.
+I've commented out places what aren't relevant but might be in the future.-->
+<table>
+  <tr>
+    <th>Platform</th>
+    <th>Package/Installation Method</th>
+  </tr>
+  <tr>
+    <td>Windows</td>
+    <td>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img width="220" alt="Windows Download" src="https://get.todoist.help/hc/article_attachments/4403191721234/WindowsButton.svg">
+      </a>
+  </tr>
+  <tr>
+    <td>MacOS (x64)</td>
+    <td>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img width="220" alt="MacOS Download" src="https://reachify.io/wp-content/uploads/2018/09/mac-download-button-1.png">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Android</td>
+    <td>
+      <br>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
+      </a>
+      </br>
+      <br>
+        <a href="http://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/Materialious/Materialious">
+          <img height="60" alt="Get it on Obtainium" src="https://raw.githubusercontent.com/ImranR98/Obtainium/e3fcf6e0b5187445a76462b4042aba6b2fc15047/assets/graphics/badge_obtainium.png" />
+        </a>
+      </br>
+      <br>
+        <a href="https://f-droid.org/packages/us.materialio.app/">
+          <img height="80" alt="Get it on F-Droid" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />
+        </a>
+      </br>
+      <br>
+      <a href="https://apt.izzysoft.de/fdroid/index/apk/us.materialio.app">
+        <img height="80" alt="Get it on Izzysoft" src="https://codeberg.org/IzzyOnDroid/repo/raw/commit/9873f08e282332a231e64d9729f810f427a521e4/assets/IzzyOnDroid.png" />
+      </a>
+      </br>
+    </td>
+  </tr>
+  <tr>
+  <!-- <tr>
+    <td>iOS</td>
+    <td>
+      <a href="https://github.com/">
+        <img width="220" alt="Download iOS IPA" src="https://github.com/user-attachments/assets/3e50d93d-fb39-435c-be6b-337745f7c423">
+      </a>
+      <br/>
+      <blockquote style="color:red">
+        *iPA file only. Requires sideloading with <a href="https://altstore.io/">AltStore</a> or similar tools.
+      </blockquote>
+    </td>
+  </tr> -->
+  <tr>
+    <td>Flatpak</td>
+    <td>
+      <p><code>flatpak install flathub us.materialio.Materialious</code></p>
+      <a href="https://flathub.org/apps/us.materialio.Materialious">
+        <img width="220" alt="Download on Flathub" src="https://flathub.org/assets/badges/flathub-badge-en.png">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>AppImage</td>
+    <td>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img width="220" alt="Download on Flathub" src="https://user-images.githubusercontent.com/61944859/169455015-13385466-8901-48fe-ba90-b62d58b0be64.png">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>Debian/Ubuntu</td>
+    <td>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img width="220" alt="Debian/Ubuntu Download" src="https://user-images.githubusercontent.com/61944859/169097994-e92aff78-fd75-4c93-b6e4-f072a4b5a7ed.png">
+      </a>
+      <p>Then run: <code>sudo apt install ./Materialious-*-linux-amd64.deb</code></p>
+    </td>
+  </tr>
+  <!-- <tr>
+    <td>Arch/Manjaro</td>
+    <td>
+      <p>With pamac: <code>sudo pamac install spotube-bin</code></p>
+      <p>With yay: <code>yay -Sy spotube-bin</code></p>
+    </td>
+  </tr> -->
+  <tr>
+    <td>Fedora/OpenSuse</td>
+    <td>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img width="220" alt="Fedora/OpenSuse Download" src="https://user-images.githubusercontent.com/61944859/223638350-5926b9da-04d6-4edd-931d-ad533e4ff058.png">
+      </a>
+      <p>For Fedora: <code>sudo dnf install ./Materialious-*-linux-x86_64.rpm</code></p>
+      <p>For OpenSuse: <code>sudo zypper in ./Materialious-*-linux-x86_64.rpm</code></p>
+    </td>
+  </tr>
+  <tr>
+    <td>Linux (tarball)</td>
+    <td>
+      <a href="https://github.com/Materialious/Materialious/releases/latest">
+        <img width="220" alt="Tarball Download" src="https://user-images.githubusercontent.com/61944859/169456985-e0ba1fd4-10e8-4cc0-ab94-337acc6e0295.png">
+      </a>
+    </td>
+  </tr>
+  <!-- <tr>
+    <td>Macos - <a href="https://brew.sh">Homebrew</a></td>
+    <td>
+<pre lang="bash">
+brew tap krtirtho/apps
+brew install --cask spotube
+</pre>   
+    </td>
+  </tr>
+  <tr>
+    <td>Windows - <a href="https://chocolatey.org">Chocolatey</a></td>
+    <td>
+      <p><code>choco install spotube</code></p>
+    </td>
+  </tr>
+  <tr>
+    <td>Windows - <a href="https://scoop.sh">Scoop</a></td>
+    <td>
+      <p><code>scoop bucket add extras</code></p>
+      <p><code>scoop install spotube</code></p>
+    </td>
+  </tr>
+  <tr>
+    <td>Windows - <a href="https://github.com/microsoft/winget-cli">WinGet</a></td>
+    <td>
+      <p><code>winget install --id KRTirtho.Spotube</code></p>
+    </td>
+  </tr> -->
+</table>
 
 # Previews
 
@@ -121,6 +234,7 @@ Deploy Materialious for your Invidious instance using Docker. Follow the steps o
 - [Clipious](https://github.com/lamarios/clipious) for inspiration & a good source for learning more about undocumented Invidious routes.
 - [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
 - Every dependency in [package.json](/materialious/package.json).
+- [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.
 
 # Developers
 - [How Materialious is built](./docs/BUILDING.md)

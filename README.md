@@ -75,7 +75,7 @@ I've commented out places what aren't relevant but might be in the future.-->
       </a>
   </tr>
   <tr>
-    <td>MacOS (x64)</td>
+    <td>MacOS (x64 & arm64)</td>
     <td>
       <a href="https://github.com/Materialious/Materialious/releases/latest">
         <img width="220" alt="MacOS Download" src="https://reachify.io/wp-content/uploads/2018/09/mac-download-button-1.png">

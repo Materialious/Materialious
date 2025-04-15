@@ -73,7 +73,12 @@
       }
     ],
     "category": "Entertainment",
-    "target": "dmg"
+    "target": [
+      {
+        "target": "default",
+        "arch": "universal"
+      }
+    ]
   },
   "linux": {
     "publish": [

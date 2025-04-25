@@ -2,7 +2,7 @@ name: Check web
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   web-check:
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: latest
       - name: Install modules
         run: npm install
       - name: Check linting

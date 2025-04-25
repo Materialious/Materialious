@@ -36,7 +36,7 @@
 		synciousInstanceStore,
 		synciousStore
 	} from '../store';
-	import { setStatusBarColor } from '../theme';
+	import { getDynamicTheme, setStatusBarColor } from '../theme';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -157,10 +157,12 @@
 				'playback_rate',
 				'loop',
 				'language',
-				Capacitor.getPlatform() === 'android' ? '' : 'save_video_frame',
 				'statistics'
 			],
-			enableTooltips: true
+			enableTooltips: true,
+			seekBarColors: {
+				played: (await getDynamicTheme())['--primary']
+			}
 		});
 
 		player.configure({

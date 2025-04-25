@@ -2,9 +2,9 @@ name: Build Android
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths-ignore:
-      - '**/README.md'
+      - "**/README.md"
 
   workflow_dispatch:
 
@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: latest
 
       - name: Install modules
         run: cd ../ && npm install
@@ -40,9 +40,9 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '17'
-          cache: 'gradle'
+          distribution: "zulu"
+          java-version: "17"
+          cache: "gradle"
 
       - name: Build App
         run: |

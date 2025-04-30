@@ -9,6 +9,7 @@ import type {
 	VideoPlay
 } from '$lib/api/model';
 import { numberWithCommas } from '$lib/numbers';
+import { fromFormat } from '$lib/sabr/formatKeyUtils';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { USER_AGENT } from 'bgutils-js';
@@ -76,12 +77,11 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	const rawNextResponse = await watchEndpoint.call(youtube.actions, {
 		override_endpoint: '/next',
 		racyCheckOk: true,
-		contentCheckOk: true,
-		parse: false
+		contentCheckOk: true
 	});
 	const video = new YT.VideoInfo(
 		[rawPlayerResponse, rawNextResponse],
-		youtube!.actions,
+		youtube.actions,
 		clientPlaybackNonce
 	);
 
@@ -89,12 +89,32 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		throw new Error('Unable to pull video info from youtube.js');
 	}
 
-	let dashUri: string = '';
+	let dashUri: string | undefined;
 
-	if (!video.basic_info.is_live) {
-		const manifest = await video.toDash();
-		dashUri = `data:application/dash+xml;charset=utf-8;base64,${Buffer.from(manifest).toString('base64')}`;
+	if (video.streaming_data) {
+		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.map((format) => {
+			const formatKey = fromFormat(format) || '';
+			format.url = `https://sabr?___key=${formatKey}`;
+			format.signature_cipher = undefined;
+			format.decipher = () => format.url || '';
+
+			return format;
+		});
+
+		if (video.basic_info.is_live) {
+			dashUri = video.streaming_data.dash_manifest_url
+				? `${video.streaming_data.dash_manifest_url}/mpd_version/7`
+				: video.streaming_data.hls_manifest_url;
+		} else if (video.streaming_data.dash_manifest_url && video.basic_info.is_post_live_dvr) {
+			dashUri = video.streaming_data.hls_manifest_url
+				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
+				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
+		} else {
+			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash(undefined, undefined, { captions_format: 'vtt' }))}`;
+		}
 	}
+
+	if (!dashUri) throw Error('Unable to find suitable dash manifest');
 
 	const descString = video.secondary_info.description?.toString() || '';
 
@@ -207,7 +227,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			innertube: youtube,
 			video: video,
 			clientPlaybackNonce: clientPlaybackNonce,
-			rawApiResponse: rawResponse
+			rawApiResponse: rawPlayerResponse
 		},
 		fallbackPatch: 'youtubejs'
 	};

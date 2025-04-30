@@ -63,7 +63,6 @@ export function phaseDescription(
 				/<a href="([^"]+)"/,
 				'<a href="$1" target="_blank" rel="noopener noreferrer" class="link"'
 			);
-			console.log(modifiedLine);
 			filteredLines.push(modifiedLine);
 		} else if (timestampMatch !== null) {
 			// If line contains a timestamp, extract details and push into timestamps array

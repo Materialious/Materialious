@@ -174,8 +174,6 @@
 			return;
 		}
 
-		let dashUrl: string | undefined = undefined;
-
 		player = new shaka.Player();
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
@@ -221,11 +219,7 @@
 
 		player.configure({
 			abr: {
-				enabled: true,
-				restrictions: {
-					maxWidth: 1920,
-					maxHeight: 1080
-				}
+				enabled: true
 			},
 			streaming: {
 				bufferingGoal: 120,
@@ -267,13 +261,7 @@
 					.media_ustreamer_request_config?.video_playback_ustreamer_config;
 
 			if (data.video.ytjs.video.streaming_data) {
-				formatList = data.video.ytjs.video.streaming_data.adaptive_formats.map((format) => {
-					const formatKey = fromFormat(format) || '';
-					format.url = `https://sabr?___key=${formatKey}`;
-					format.signature_cipher = undefined;
-					format.decipher = () => format.url || '';
-					return format;
-				});
+				formatList = data.video.ytjs.video.streaming_data.adaptive_formats;
 			}
 
 			if (data.video.ytjs.video.streaming_data?.server_abr_streaming_url)
@@ -282,20 +270,6 @@
 						data.video.ytjs.video.streaming_data.server_abr_streaming_url
 					)
 				);
-
-			if (data.video.ytjs.video.streaming_data) {
-				if (isLive) {
-					dashUrl = data.video.ytjs.video.streaming_data.dash_manifest_url
-						? `${data.video.ytjs.video.streaming_data.dash_manifest_url}/mpd_version/7`
-						: data.video.ytjs.video.streaming_data.hls_manifest_url;
-				} else if (data.video.ytjs.video.streaming_data.dash_manifest_url && isPostLiveDVR) {
-					dashUrl = data.video.ytjs.video.streaming_data.hls_manifest_url
-						? data.video.ytjs.video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
-						: `${data.video.ytjs.video.streaming_data.dash_manifest_url}/mpd_version/7`;
-				} else {
-					dashUrl = `data:application/dash+xml;base64,${btoa(await data.video.ytjs.video.toDash(undefined, undefined, { captions_format: 'vtt' }))}`;
-				}
-			}
 
 			playerElement.addEventListener('seeked', () => (lastSeekMs = Date.now()));
 
@@ -526,7 +500,7 @@
 						}
 					}
 				} else if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
-					const innertube = await Innertube.create({ fetch: fetch });
+					const innertube = await Innertube.create({ fetch: window.fetch });
 					const wrapped = {} as Record<string, any>;
 					wrapped.context = innertube.session.context;
 					wrapped.cpn = data.video.ytjs?.clientPlaybackNonce;
@@ -635,9 +609,7 @@
 		}
 
 		if (!data.video.hlsUrl) {
-			if (!dashUrl) {
-				dashUrl = data.video.dashUrl;
-			}
+			let dashUrl = data.video.dashUrl;
 
 			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || proxyVideos)) {
 				dashUrl += '?local=true';
@@ -771,7 +743,11 @@
 				});
 			}
 		} else {
-			await player.load(data.video.hlsUrl + '?local=true');
+			if (data.video.fallbackPatch === 'youtubejs') {
+				await player.load(data.video.dashUrl);
+			} else {
+				await player.load(data.video.hlsUrl + '?local=true');
+			}
 		}
 
 		if (data.video.fallbackPatch === 'youtubejs') {

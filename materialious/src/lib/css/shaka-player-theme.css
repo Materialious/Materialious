@@ -119,10 +119,6 @@
 	right: 0.625rem; /* 10px */
 	bottom: 3.125rem; /* 50px */
 	min-width: 12.5rem; /* 200px */
-	transition:
-		transform var(--speed3),
-		border-radius var(--speed3),
-		padding var(--speed3);
 }
 
 .youtube-theme .shaka-settings-menu {

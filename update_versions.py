@@ -3,7 +3,7 @@ import os
 import re
 from datetime import datetime
 
-LATEST_VERSION = "1.7.22"
+LATEST_VERSION = "1.8.0"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(

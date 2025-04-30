@@ -1,5 +1,4 @@
-import type { YT } from 'youtubei.js';
-
+import type { ApiResponse, Innertube, YT } from 'youtubei.js';
 
 export interface Image {
 	url: string;
@@ -101,7 +100,12 @@ export interface VideoPlay extends Video {
 	authorThumbnails: Image[];
 	captions: Captions[];
 	storyboards?: StoryBoard[];
-	ytJsVideoInfo?: YT.VideoInfo,
+	ytjs?: {
+		innertube: Innertube;
+		video: YT.VideoInfo;
+		clientPlaybackNonce: string;
+		rawApiResponse: ApiResponse;
+	};
 	fallbackPatch?: 'youtubejs' | 'piped';
 }
 

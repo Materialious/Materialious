@@ -5,6 +5,8 @@ import type { Protos } from 'googlevideo';
 import { retrieveCachedSegment } from './cacheHelper';
 import { SabrUmpParser } from './sabrUmpParser';
 import { CacheManager } from './cacheManager';
+import { Capacitor } from '@capacitor/core';
+import { androidFetch } from '$lib/android/http/androidRequests';
 
 export interface SabrStreamingContext {
 	byteRange?: { start: number; end: number };
@@ -26,7 +28,7 @@ export interface SabrStreamingContext {
 }
 
 export class HttpFetchPlugin {
-	private static fetch_ = window.fetch;
+	private static fetch_ = Capacitor.getPlatform() === 'android' ? androidFetch : window.fetch;
 	private static AbortController_ = window.AbortController;
 	private static Headers_ = window.Headers;
 	public static cacheManager = new CacheManager();

@@ -39,7 +39,7 @@
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { HttpFetchPlugin, type SabrStreamingContext } from '$lib/sabr/shakaHttpPlugin';
-	import { Constants, Innertube, type Misc } from 'youtubei.js';
+	import { Constants, type Misc } from 'youtubei.js';
 	import {
 		fromFormat,
 		fromFormatInitializationMetadata,
@@ -173,6 +173,8 @@
 		if (!shaka.Player.isBrowserSupported()) {
 			return;
 		}
+
+		HttpFetchPlugin.cacheManager.clearCache();
 
 		player = new shaka.Player();
 		playerElement = document.getElementById('player') as HTMLMediaElement;
@@ -500,9 +502,8 @@
 						}
 					}
 				} else if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
-					const innertube = await Innertube.create({ fetch: window.fetch });
 					const wrapped = {} as Record<string, any>;
-					wrapped.context = innertube.session.context;
+					wrapped.context = data.video.ytjs?.innertube.session.context;
 					wrapped.cpn = data.video.ytjs?.clientPlaybackNonce;
 					wrapped.drmParams = decodeURIComponent(drmParams || '');
 					wrapped.drmSystem = 'DRM_SYSTEM_WIDEVINE';

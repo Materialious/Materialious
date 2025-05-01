@@ -51,7 +51,7 @@ export class HttpFetchPlugin {
 		const headers = new HttpFetchPlugin.Headers_();
 
 		HttpFetchPlugin.asMap(request.headers).forEach((value, key) => {
-			headers.append(key as string, value);
+			headers.append(key as string, value as string);
 		});
 
 		let sabrStreamingContext: string | null = null;

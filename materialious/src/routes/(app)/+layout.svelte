@@ -192,11 +192,9 @@
 
 		const link = (event.target as HTMLElement).closest('a');
 
-		if (link && link.href) {
-			if (link.href && link.href.startsWith('http') && link.target === '_blank') {
-				event.preventDefault();
-				Browser.open({ url: link.href });
-			}
+		if (link && link.href && link.href.startsWith('http') && link.target === '_blank') {
+			event.preventDefault();
+			Browser.open({ url: link.href });
 		}
 	}
 

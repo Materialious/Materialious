@@ -9,7 +9,8 @@
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { type Page } from '@sveltejs/kit';
-	import { GoogleVideo, Protos } from 'googlevideo';
+	import { base64ToU8, Protos } from 'googlevideo';
+	import ui from 'beercss';
 	import ISO6391 from 'iso-639-1';
 	import Mousetrap from 'mousetrap';
 	import 'shaka-player/dist/controls.css';
@@ -37,6 +38,14 @@
 		synciousStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
+	import { HttpFetchPlugin, type SabrStreamingContext } from '$lib/sabr/shakaHttpPlugin';
+	import { Constants, type Misc } from 'youtubei.js';
+	import {
+		fromFormat,
+		fromFormatInitializationMetadata,
+		fromMediaHeader,
+		getUniqueFormatId
+	} from '$lib/sabr/formatKeyUtils';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -60,6 +69,50 @@
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
+
+	// Shaka player required variables for SABR based off LuanRT's example
+	const sessionId = Array.from(Array(16), () => Math.floor(Math.random() * 36).toString(36)).join(
+		''
+	);
+	let isLive = false;
+	let isPostLiveDVR = false;
+	let videoPlaybackUstreamerConfig: string | undefined;
+	let serverAbrStreamingUrl: URL | undefined = undefined;
+	let drmParams: string | undefined;
+	let lastRequestMs = 0;
+	let lastSeekMs = 0;
+	let lastManualFormatSelectionMs = 0;
+	let lastActionMs = 0;
+	let playerElementResizeObserver: ResizeObserver | undefined;
+	let clientViewportHeight = playerElement?.clientHeight || 0;
+	let clientViewportWidth = playerElement?.clientWidth || 0;
+	let lastPlaybackCookie: Protos.PlaybackCookie | undefined;
+	const initializedFormats = new Map<
+		string,
+		{
+			lastSegmentMetadata?: {
+				formatId: Protos.FormatId;
+				startTimeMs: number;
+				startSequenceNumber: number;
+				endSequenceNumber: number;
+				durationMs: number;
+			};
+			formatInitializationMetadata: Protos.FormatInitializationMetadata;
+		}
+	>();
+	let formatList: Misc.Format[] = [];
+
+	shaka.net.NetworkingEngine.registerScheme(
+		'http',
+		HttpFetchPlugin.parse,
+		shaka.net.NetworkingEngine.PluginPriority.PREFERRED
+	);
+	shaka.net.NetworkingEngine.registerScheme(
+		'https',
+		HttpFetchPlugin.parse,
+		shaka.net.NetworkingEngine.PluginPriority.PREFERRED
+	);
+	// Shaka player SABR var end
 
 	const STORAGE_KEY_QUALITY = 'shaka-preferred-quality';
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
@@ -122,8 +175,19 @@
 			return;
 		}
 
+		HttpFetchPlugin.cacheManager.clearCache();
+
 		player = new shaka.Player();
 		playerElement = document.getElementById('player') as HTMLMediaElement;
+
+		playerElementResizeObserver = new ResizeObserver(() => {
+			if (playerElement) {
+				clientViewportHeight = playerElement.clientHeight;
+				clientViewportWidth = playerElement.clientWidth;
+			}
+		});
+
+		playerElementResizeObserver.observe(playerElement);
 
 		// Change instantly to stop video from being loud for a second
 		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
@@ -166,35 +230,70 @@
 		});
 
 		player.configure({
-			streaming: {
-				bufferingGoal: data.video.ytJsVideoInfo
-					? (data.video.ytJsVideoInfo.page[0].player_config?.media_common_config
-							.dynamic_readahead_config.max_read_ahead_media_time_ms || 0) / 1000
-					: 180,
-				rebufferingGoal: data.video.ytJsVideoInfo
-					? (data.video.ytJsVideoInfo.page[0].player_config?.media_common_config
-							.dynamic_readahead_config.read_ahead_growth_rate_ms || 0) / 1000
-					: 0.02,
-				bufferBehind: 300,
-				autoLowLatencyMode: true
-			},
-
 			abr: {
-				enabled: true,
-				restrictToElementSize: true,
-				restrictions: {
-					maxBandwidth: data.video.ytJsVideoInfo
-						? Number(
-								data.video.ytJsVideoInfo.page[0].player_config?.stream_selection_config.max_bitrate
-							)
-						: null
-				}
+				enabled: true
 			},
-			preferredDecodingAttributes: !data.video.hlsUrl ? ['smooth', 'powerEfficient'] : [],
-			autoShowText: shaka.config.AutoShowText.NEVER
+			streaming: {
+				bufferingGoal: 120,
+				rebufferingGoal: 0.01,
+				bufferBehind: 300,
+				retryParameters: {
+					maxAttempts: 30,
+					baseDelay: 1500,
+					backoffFactor: 2.5,
+					fuzzFactor: 0.7,
+					timeout: 120000
+				},
+				stallThreshold: 2,
+				stallSkip: 0.5
+			}
 		});
 
-		if (data.video.fallbackPatch === 'youtubejs') {
+		if (data.video.fallbackPatch === 'youtubejs' && data.video.ytjs) {
+			isLive = !!data.video.ytjs.video.basic_info.is_live;
+			isPostLiveDVR = !!data.video.ytjs.video.basic_info.is_post_live_dvr;
+
+			if (
+				data.video.ytjs.rawApiResponse.data.streamingData &&
+				(data.video.ytjs.rawApiResponse.data.streamingData as any).drmParams
+			) {
+				drmParams = (data.video.ytjs.rawApiResponse.data.streamingData as any).drmParams;
+				player.configure({
+					drm: {
+						servers: {
+							'com.widevine.alpha':
+								'https://www.youtube.com/youtubei/v1/player/get_drm_license?alt=json'
+						}
+					}
+				});
+			}
+
+			videoPlaybackUstreamerConfig =
+				data.video.ytjs.video.page[0].player_config?.media_common_config
+					.media_ustreamer_request_config?.video_playback_ustreamer_config;
+
+			if (data.video.ytjs.video.streaming_data) {
+				formatList = data.video.ytjs.video.streaming_data.adaptive_formats;
+			}
+
+			if (data.video.ytjs.video.streaming_data?.server_abr_streaming_url)
+				serverAbrStreamingUrl = new URL(
+					data.video.ytjs.innertube.session.player!.decipher(
+						data.video.ytjs.video.streaming_data.server_abr_streaming_url
+					)
+				);
+
+			playerElement.addEventListener('seeked', () => (lastSeekMs = Date.now()));
+
+			player.addEventListener('variantchanged', (event) => {
+				// Technically, all variant changes here are manual, given we don't handle ABR updates from the server.
+				if (event.type !== 'variant') {
+					lastManualFormatSelectionMs = Date.now();
+				}
+
+				lastActionMs = Date.now();
+			});
+
 			const networkingEngine = player.getNetworkingEngine();
 
 			if (!networkingEngine) return;
@@ -202,125 +301,322 @@
 			// Based off the following
 			// https://github.com/FreeTubeApp/FreeTube/blob/d270c9e251a433f1e4246a3f6a37acef707d22aa/src/renderer/components/ft-shaka-video-player/ft-shaka-video-player.js#L1206
 			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
+			// https://github.com/LuanRT/yt-sabr-shaka-demo/blob/main/src/components/VideoPlayer.vue
 
-			networkingEngine.registerRequestFilter(async (type, request) => {
-				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					const url = new URL(request.uris[0]);
+			networkingEngine.registerRequestFilter(async (type, request, context) => {
+				if (!player) return;
 
-					if (url.hostname.endsWith('.googlevideo.com') && url.pathname === '/videoplayback') {
-						if (request.headers.Range) {
-							url.searchParams.set('range', request.headers.Range.split('=')[1]);
-							url.searchParams.set('ump', '1');
-							url.searchParams.set('srfvp', '1');
+				const originalUrl = new URL(request.uris[0]);
+				let url = originalUrl.hostname === 'sabr' ? serverAbrStreamingUrl : originalUrl;
+				const headers = request.headers;
 
-							const cachedPoToken = get(poTokenCacheStore);
-							if (cachedPoToken) url.searchParams.set('pot', cachedPoToken);
+				if (!url) return;
 
-							delete request.headers.Range;
-						}
+				if (
+					type === shaka.net.NetworkingEngine.RequestType.SEGMENT &&
+					url.pathname.includes('videoplayback')
+				) {
+					const isUmp = url.searchParams.get('ump') === '1';
+					const isSabr = url.searchParams.get('sabr') === '1';
 
-						request.method = 'POST';
-						request.body = new Uint8Array([120, 0]);
-					}
-
-					request.uris[0] = url.toString();
-				}
-			});
-
-			networkingEngine.registerResponseFilter(async (type, response) => {
-				let mediaData = new Uint8Array(0);
-
-				const handleRedirect = async (redirectData: Protos.SabrRedirect) => {
-					const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
-						[redirectData.url!],
-						player!.getConfiguration().streaming.retryParameters
-					);
-					const requestOperation = player!.getNetworkingEngine()!.request(type, redirectRequest);
-					const redirectResponse = await requestOperation.promise;
-
-					response.data = redirectResponse.data;
-					response.headers = redirectResponse.headers;
-					response.uri = redirectResponse.uri;
-				};
-
-				const handleMediaData = async (data: Uint8Array) => {
-					const combinedLength = mediaData.length + data.length;
-					const tempMediaData = new Uint8Array(combinedLength);
-
-					tempMediaData.set(mediaData);
-					tempMediaData.set(data, mediaData.length);
-
-					mediaData = tempMediaData;
-				};
-
-				if (type == shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					const url = new URL(response.uri);
-
-					// Fix positioning for auto-generated subtitles
-					if (
-						url.hostname.endsWith('.youtube.com') &&
-						url.pathname === '/api/timedtext' &&
-						url.searchParams.get('caps') === 'asr' &&
-						url.searchParams.get('kind') === 'asr' &&
-						url.searchParams.get('fmt') === 'vtt'
-					) {
-						const stringBody = new TextDecoder().decode(response.data);
-						// position:0% for LTR text and position:100% for RTL text
-						const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
-
-						response.data = new TextEncoder().encode(cleaned).buffer as ArrayBuffer;
-					} else {
-						const googUmp = new GoogleVideo.UMP(
-							new GoogleVideo.ChunkedDataBuffer([new Uint8Array(response.data as ArrayBuffer)])
+					if (isSabr) {
+						const currentFormat = formatList.find(
+							(format) =>
+								fromFormat(format) === (new URL(request.uris[0]).searchParams.get('___key') || '')
 						);
 
-						let redirect: Protos.SabrRedirect | undefined;
+						if (!videoPlaybackUstreamerConfig) throw new Error('Ustreamer config not found.');
 
-						googUmp.parse((part) => {
-							try {
-								const data = part.data.chunks[0];
-								switch (part.type) {
-									case 20: {
-										const mediaHeader = Protos.MediaHeader.decode(data);
-										console.info('[MediaHeader]:', mediaHeader);
-										break;
-									}
-									case 21: {
-										handleMediaData(part.data.split(1).remainingBuffer.chunks[0]);
-										break;
-									}
-									case 43: {
-										redirect = Protos.SabrRedirect.decode(data);
-										console.info('[SABRRedirect]:', redirect);
-										break;
-									}
-									case 58: {
-										const streamProtectionStatus = Protos.StreamProtectionStatus.decode(data);
-										switch (streamProtectionStatus.status) {
-											case 1:
-												console.info('[StreamProtectionStatus]: Ok');
-												break;
-											case 2:
-												console.error('[StreamProtectionStatus]: Attestation pending');
-												break;
-											case 3:
-												console.error('[StreamProtectionStatus]: Attestation required');
-												break;
-											default:
-												break;
-										}
-										break;
-									}
+						if (!currentFormat) throw new Error('No format found for SABR request.');
+
+						if (!playerElement) throw new Error('No video element found.');
+
+						const activeVariant = player
+							.getVariantTracks()
+							.find(
+								(track) =>
+									getUniqueFormatId(currentFormat) ===
+									(currentFormat.has_video ? track.originalVideoId : track.originalAudioId)
+							);
+
+						let videoFormat: Misc.Format | undefined;
+						let audioFormat: Misc.Format | undefined;
+						let videoFormatId: Protos.FormatId | undefined;
+						let audioFormatId: Protos.FormatId | undefined;
+
+						if (activeVariant) {
+							for (const fmt of formatList) {
+								const uniqueFormatId = getUniqueFormatId(fmt);
+								if (uniqueFormatId === activeVariant.originalVideoId) {
+									videoFormat = fmt;
+								} else if (uniqueFormatId === activeVariant.originalAudioId) {
+									audioFormat = fmt;
 								}
-							} catch (error) {
-								console.error('An error occurred while processing the part:', error);
 							}
-						});
+						}
 
-						if (redirect) return handleRedirect(redirect);
+						if (videoFormat) {
+							videoFormatId = {
+								itag: videoFormat.itag,
+								lastModified: parseInt(videoFormat.last_modified_ms),
+								xtags: videoFormat.xtags
+							};
+						}
 
-						if (mediaData.length) response.data = mediaData;
+						if (audioFormat) {
+							audioFormatId = {
+								itag: audioFormat.itag,
+								lastModified: parseInt(audioFormat.last_modified_ms),
+								xtags: audioFormat.xtags
+							};
+						}
+
+						const isInit = context ? !context.segment : true;
+
+						const videoPlaybackAbrRequest: Protos.VideoPlaybackAbrRequest = {
+							clientAbrState: {
+								playbackRate: player.getPlaybackRate(),
+								playerTimeMs: Math.round(
+									(context?.segment?.getStartTime() ?? playerElement.currentTime) * 1000
+								),
+								elapsedWallTimeMs: Date.now() - lastRequestMs,
+								timeSinceLastSeek: lastSeekMs === 0 ? 0 : Date.now() - lastSeekMs,
+								timeSinceLastActionMs: lastActionMs === 0 ? 0 : Date.now() - lastActionMs,
+								timeSinceLastManualFormatSelectionMs:
+									lastManualFormatSelectionMs === 0 ? 0 : Date.now() - lastManualFormatSelectionMs,
+								clientViewportIsFlexible: false,
+								bandwidthEstimate: Math.round(player.getStats().estimatedBandwidth),
+								drcEnabled: currentFormat.is_drc === true,
+								enabledTrackTypesBitfield: currentFormat.has_audio ? 1 : 2,
+								clientViewportHeight,
+								clientViewportWidth
+							},
+							bufferedRanges: [],
+							selectedFormatIds: [],
+							selectedAudioFormatIds: [audioFormatId || {}],
+							selectedVideoFormatIds: [videoFormatId || {}],
+							videoPlaybackUstreamerConfig: base64ToU8(videoPlaybackUstreamerConfig),
+							streamerContext: {
+								poToken: base64ToU8(get(poTokenCacheStore) ?? ''),
+								playbackCookie: lastPlaybackCookie
+									? Protos.PlaybackCookie.encode(lastPlaybackCookie).finish()
+									: undefined,
+								clientInfo: {
+									clientName: parseInt(Constants.CLIENT_NAME_IDS.WEB),
+									clientVersion: data.video.ytjs?.innertube.session.context.client.clientVersion,
+									osName: 'Windows',
+									osVersion: '10.0'
+								},
+								field5: [],
+								field6: []
+							},
+							field1000: []
+						};
+
+						// Normalize the resolution.
+						if (currentFormat.width && currentFormat.height) {
+							let resolution = currentFormat.height;
+
+							const aspectRatio = currentFormat.height / currentFormat.width;
+
+							if (aspectRatio > 16 / 9) {
+								resolution = Math.round((currentFormat.width * 9) / 16);
+							}
+
+							if (resolution && videoPlaybackAbrRequest.clientAbrState) {
+								videoPlaybackAbrRequest.clientAbrState.stickyResolution = resolution;
+								videoPlaybackAbrRequest.clientAbrState.lastManualSelectedResolution = resolution;
+							}
+						}
+
+						if (!isInit) {
+							// Add the currently/previously active formats to the list of buffered ranges and selected formats
+							// so that the server doesn't send its init data again.
+							const initializedFormatsArray = Array.from(initializedFormats.values());
+
+							for (const initializedFormat of initializedFormatsArray) {
+								if (initializedFormat.lastSegmentMetadata) {
+									videoPlaybackAbrRequest.bufferedRanges.push({
+										formatId: initializedFormat.lastSegmentMetadata.formatId,
+										startSegmentIndex: initializedFormat.lastSegmentMetadata.startSequenceNumber,
+										durationMs: initializedFormat.lastSegmentMetadata.durationMs,
+										startTimeMs: 0,
+										endSegmentIndex: initializedFormat.lastSegmentMetadata.endSequenceNumber
+									});
+								}
+							}
+
+							if (audioFormatId) videoPlaybackAbrRequest.selectedFormatIds.push(audioFormatId);
+
+							if (videoFormatId) videoPlaybackAbrRequest.selectedFormatIds.push(videoFormatId);
+						}
+
+						console.log(videoPlaybackAbrRequest);
+
+						request.body = Protos.VideoPlaybackAbrRequest.encode(videoPlaybackAbrRequest).finish();
+
+						const byteRange = headers.Range
+							? {
+									start: Number(headers.Range.split('=')[1].split('-')[0]),
+									end: Number(headers.Range.split('=')[1].split('-')[1])
+								}
+							: null;
+
+						const sabrStreamingContext = {
+							byteRange,
+							format: currentFormat,
+							isInit,
+							isUMP: true,
+							isSABR: true,
+							playerTimeMs: videoPlaybackAbrRequest.clientAbrState?.playerTimeMs
+						};
+
+						// @NOTE: Not a real header. See the http plugin code for more info.
+						request.headers['X-Streaming-Context'] = btoa(JSON.stringify(sabrStreamingContext));
+						delete headers.Range;
+					} else if (isUmp) {
+						if (!isLive && !isPostLiveDVR) {
+							url.searchParams.set('ump', '1');
+							url.searchParams.set('srfvp', '1');
+							if (headers.Range) {
+								url.searchParams.set('range', headers.Range?.split('=')[1]);
+								delete headers.Range;
+							}
+						} else {
+							url.pathname += '/ump/1';
+							url.pathname += '/srfvp/1';
+						}
+
+						request.headers['X-Streaming-Context'] = btoa(
+							JSON.stringify({
+								isUMP: true,
+								isSABR: false
+							})
+						);
 					}
+
+					request.method = 'POST';
+
+					if (!isSabr) {
+						if (request.method === 'POST') {
+							request.body = new Uint8Array([120, 0]);
+						}
+
+						const poToken = get(poTokenCacheStore);
+
+						if (poToken) {
+							// Set Proof of Origin Token
+							if (isLive || isPostLiveDVR) {
+								url.pathname += '/pot/' + poToken;
+							} else {
+								url.searchParams.set('pot', poToken);
+							}
+						}
+					}
+				} else if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
+					const wrapped = {} as Record<string, any>;
+					wrapped.context = data.video.ytjs?.innertube.session.context;
+					wrapped.cpn = data.video.ytjs?.clientPlaybackNonce;
+					wrapped.drmParams = decodeURIComponent(drmParams || '');
+					wrapped.drmSystem = 'DRM_SYSTEM_WIDEVINE';
+					wrapped.drmVideoFeature = 'DRM_VIDEO_FEATURE_SDR';
+					wrapped.licenseRequest = shaka.util.Uint8ArrayUtils.toBase64(
+						request.body as ArrayBuffer | ArrayBufferView
+					);
+					wrapped.sessionId = sessionId;
+					wrapped.videoId = data.video.videoId;
+					request.body = shaka.util.StringUtils.toUTF8(JSON.stringify(wrapped));
+				}
+
+				request.uris[0] = url.toString();
+			});
+
+			networkingEngine.registerResponseFilter(async (type, response, context) => {
+				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
+					const sabrStreamingContext = response.headers['X-Streaming-Context'];
+
+					if (sabrStreamingContext) {
+						const { streamInfo, isSABR, format, byteRange } = JSON.parse(
+							atob(sabrStreamingContext)
+						) as SabrStreamingContext;
+
+						if (streamInfo) {
+							const sabrRedirect = streamInfo.redirect;
+							const playbackCookie = streamInfo.playbackCookie;
+							const streamProtectionStatus = streamInfo.streamProtectionStatus;
+							const formatInitMetadata = streamInfo.formatInitMetadata || [];
+							const mainSegmentMediaHeader = streamInfo.mediaHeader;
+
+							// If we have a redirect, follow it.
+							if (sabrRedirect?.url && !response.data.byteLength) {
+								let redirectUrl = new URL(sabrRedirect.url);
+
+								// For SABR, create a fake URL so we can identify it in the request filter.
+								if (isSABR) {
+									serverAbrStreamingUrl = redirectUrl;
+									redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
+								}
+
+								const retryParameters = player!.getConfiguration().streaming.retryParameters;
+
+								const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
+									[redirectUrl.toString()],
+									retryParameters
+								);
+
+								// Keep range so we can slice the response (only if it's the init segment).
+								if (isSABR && byteRange) {
+									redirectRequest.headers['Range'] = `bytes=${byteRange.start}-${byteRange.end}`;
+								}
+
+								const requestOperation = player!
+									.getNetworkingEngine()
+									?.request(type, redirectRequest, context);
+								const redirectResponse = await requestOperation!.promise;
+
+								// Modify the original response to contain the results of the redirect
+								// response.
+								Object.assign(response, redirectResponse);
+								return;
+							}
+
+							if (playbackCookie) lastPlaybackCookie = streamInfo.playbackCookie;
+
+							if (streamProtectionStatus && streamProtectionStatus.status === 3) {
+								console.warn('[UMP] Attestation required.');
+							}
+
+							for (const metadata of formatInitMetadata) {
+								const key = fromFormatInitializationMetadata(metadata);
+								if (!initializedFormats.has(key)) {
+									initializedFormats.set(key, {
+										formatInitializationMetadata: metadata
+									});
+									console.log(`[SABR] Initialized format ${key}`);
+								}
+							}
+
+							if (mainSegmentMediaHeader) {
+								const formatKey = fromMediaHeader(mainSegmentMediaHeader);
+								const initializedFormat = initializedFormats.get(formatKey);
+
+								if (initializedFormat) {
+									initializedFormat.lastSegmentMetadata = {
+										formatId: mainSegmentMediaHeader.formatId!,
+										startTimeMs: mainSegmentMediaHeader.startMs || 0,
+										startSequenceNumber: mainSegmentMediaHeader.sequenceNumber || 1,
+										endSequenceNumber: mainSegmentMediaHeader.sequenceNumber || 1,
+										durationMs: mainSegmentMediaHeader.durationMs || 0
+									};
+								}
+							}
+						}
+					}
+				} else if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
+					const wrappedString = shaka.util.StringUtils.fromUTF8(response.data);
+					const wrapped = JSON.parse(wrappedString);
+					const rawLicenseBase64 = wrapped.license;
+					response.data = shaka.util.Uint8ArrayUtils.fromBase64(rawLicenseBase64);
 				}
 			});
 		}
@@ -460,7 +756,11 @@
 				});
 			}
 		} else {
-			await player.load(data.video.hlsUrl + '?local=true');
+			if (data.video.fallbackPatch === 'youtubejs') {
+				await player.load(data.video.dashUrl);
+			} else {
+				await player.load(data.video.hlsUrl + '?local=true');
+			}
 		}
 
 		if (data.video.fallbackPatch === 'youtubejs') {
@@ -608,6 +908,12 @@
 	}
 
 	onDestroy(async () => {
+		HttpFetchPlugin.cacheManager.clearCache();
+
+		if (playerElementResizeObserver) {
+			playerElementResizeObserver.disconnect();
+		}
+
 		if (Capacitor.getPlatform() === 'android') {
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
@@ -623,7 +929,6 @@
 		try {
 			savePlayerPos();
 		} catch (error) {}
-		await playerElement.pause();
 		await player.destroy();
 		await shakaUi.destroy();
 		playerPosSet = false;

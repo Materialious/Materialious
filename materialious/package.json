@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.7.22",
+	"version": "1.8.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -26,7 +26,6 @@
 		"@typescript-eslint/eslint-plugin": "^7.16.0",
 		"@typescript-eslint/parser": "^7.18.0",
 		"@vite-pwa/sveltekit": "^0.6.6",
-		"buffer": "^6.0.3",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.45.1",
@@ -37,7 +36,7 @@
 		"svelte-check": "^4.0.0",
 		"tslib": "^2.7.0",
 		"typescript": "^5.6.3",
-		"vite": "^6.2.6"
+		"vite": "^6.3.4"
 	},
 	"type": "module",
 	"dependencies": {
@@ -55,7 +54,7 @@
 		"bgutils-js": "^3.2.0",
 		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
 		"fuse.js": "^7.0.0",
-		"googlevideo": "^2.0.0",
+		"googlevideo": "^3.0.0",
 		"he": "^1.2.0",
 		"human-number": "^2.0.4",
 		"iso-3166": "^4.3.0",

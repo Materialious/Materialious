@@ -83,6 +83,7 @@
 	let lastSeekMs = 0;
 	let lastManualFormatSelectionMs = 0;
 	let lastActionMs = 0;
+	let playerElementResizeObserver: ResizeObserver | undefined;
 	let clientViewportHeight = playerElement?.clientHeight || 0;
 	let clientViewportWidth = playerElement?.clientWidth || 0;
 	let lastPlaybackCookie: Protos.PlaybackCookie | undefined;
@@ -178,6 +179,15 @@
 
 		player = new shaka.Player();
 		playerElement = document.getElementById('player') as HTMLMediaElement;
+
+		playerElementResizeObserver = new ResizeObserver(() => {
+			if (playerElement) {
+				clientViewportHeight = playerElement.clientHeight;
+				clientViewportWidth = playerElement.clientWidth;
+			}
+		});
+
+		playerElementResizeObserver.observe(playerElement);
 
 		// Change instantly to stop video from being loud for a second
 		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
@@ -376,7 +386,7 @@
 									lastManualFormatSelectionMs === 0 ? 0 : Date.now() - lastManualFormatSelectionMs,
 								clientViewportIsFlexible: false,
 								bandwidthEstimate: Math.round(player.getStats().estimatedBandwidth),
-								drcEnabled: currentFormat.is_drc,
+								drcEnabled: currentFormat.is_drc === true,
 								enabledTrackTypesBitfield: currentFormat.has_audio ? 1 : 2,
 								clientViewportHeight,
 								clientViewportWidth
@@ -440,6 +450,8 @@
 
 							if (videoFormatId) videoPlaybackAbrRequest.selectedFormatIds.push(videoFormatId);
 						}
+
+						console.log(videoPlaybackAbrRequest);
 
 						request.body = Protos.VideoPlaybackAbrRequest.encode(videoPlaybackAbrRequest).finish();
 
@@ -897,6 +909,10 @@
 
 	onDestroy(async () => {
 		HttpFetchPlugin.cacheManager.clearCache();
+
+		if (playerElementResizeObserver) {
+			playerElementResizeObserver.disconnect();
+		}
 
 		if (Capacitor.getPlatform() === 'android') {
 			if (originalOrigination) {

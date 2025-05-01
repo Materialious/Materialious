@@ -37,7 +37,7 @@ function setCorsHeaders(res) {
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 }
 
-function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
+function fetchWithRedirects(targetUrl, options, bodyChunks, redirectCount = 0) {
 	return new Promise((resolve, reject) => {
 		const httpClient = targetUrl.protocol.startsWith('https') ? https : http;
 
@@ -51,7 +51,7 @@ function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
 				try {
 					// Attempt to create the redirect URL
 					const redirectUrl = new URL(res.headers.location, targetUrl);
-					return resolve(fetchWithRedirects(redirectUrl, options, redirectCount + 1));
+					return resolve(fetchWithRedirects(redirectUrl, options, bodyChunks, redirectCount + 1));
 				} catch (error) {
 					req.end();
 					return reject(new Error(`Invalid URL in redirect: ${error.message}`));
@@ -60,8 +60,12 @@ function fetchWithRedirects(targetUrl, options, redirectCount = 0) {
 			resolve(res); // Resolve with the final response if not a redirect
 		});
 
-		if (options.body && (req.method === 'POST' || req.method === 'PUT')) {
-			req.write(options.body);
+		// For POST and PUT methods, pass the body to the outgoing request
+		if (bodyChunks && (req.method === 'POST' || req.method === 'PUT')) {
+			const buffer = Buffer.concat(bodyChunks);
+			options.headers['Content-Length'] = buffer.length;
+
+			req.write(buffer);
 		}
 
 		req.setTimeout(10000, () => reject(new Error('Request timeout')), req.end());
@@ -96,9 +100,9 @@ const server = http.createServer(async (req, res) => {
 		return res.end(`Invalid URL: ${error.message}`);
 	}
 
-	let body = '';
+	let chunks = [];
 	req.on('data', (chunk) => {
-		body += chunk;
+		chunks.push(chunk);
 	});
 
 	req.on('end', async () => {
@@ -107,9 +111,14 @@ const server = http.createServer(async (req, res) => {
 			headers: Object.fromEntries(
 				Object.entries(req.headers).filter(
 					([key]) =>
-						!['host', 'origin', 'referer', 'x-forwarded-for', 'x-requested-with'].includes(
-							key.toLowerCase()
-						)
+						![
+							'referer',
+							'x-forwarded-for',
+							'x-requested-with',
+							'sec-ch-ua-mobile',
+							'sec-ch-ua',
+							'sec-ch-ua-platform'
+						].includes(key.toLowerCase())
 				)
 			)
 		};
@@ -118,14 +127,8 @@ const server = http.createServer(async (req, res) => {
 		options.headers.origin = parsedTarget.origin;
 		options.headers['user-agent'] = USER_AGENT;
 
-		// For POST and PUT methods, pass the body to the outgoing request
-		if (req.method === 'POST' || req.method === 'PUT') {
-			options.headers['Content-Length'] = Buffer.byteLength(body);
-			options.body = body;
-		}
-
 		try {
-			const proxyRes = await fetchWithRedirects(parsedTarget, options);
+			const proxyRes = await fetchWithRedirects(parsedTarget, options, chunks);
 
 			req.on('close', () => {
 				console.log('Request canceled by the client.');

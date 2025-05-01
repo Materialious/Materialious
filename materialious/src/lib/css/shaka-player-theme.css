@@ -115,10 +115,16 @@
 .youtube-theme .shaka-overflow-menu,
 .youtube-theme .shaka-settings-menu {
 	border-radius: 0.25rem;
-	background-color: var(--surface-container-low);
+	background: var(--surface-container-low);
 	right: 0.625rem; /* 10px */
 	bottom: 3.125rem; /* 50px */
 	min-width: 12.5rem; /* 200px */
+	animation: none !important;
+	transition: none !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+	z-index: 9999 !important;
+	pointer-events: auto !important;
 }
 
 .youtube-theme .shaka-settings-menu {

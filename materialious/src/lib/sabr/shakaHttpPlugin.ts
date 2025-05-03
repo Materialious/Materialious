@@ -101,13 +101,12 @@ export class HttpFetchPlugin {
 
 		const timeoutMs = request.retryParameters.timeout;
 		if (timeoutMs) {
-			const timer = new shaka.util.Timer(() => {
-				abortStatus.timedOut = true;
-				controller.abort();
-			});
-
-			timer.tickAfter(timeoutMs / 1000);
-			op.finally(() => timer.stop());
+			// const timer = new shaka.util.Timer(() => {
+			// 	abortStatus.timedOut = true;
+			// 	controller.abort();
+			// });
+			// timer.tickAfter(timeoutMs / 1000);
+			// op.finally(() => timer.stop());
 		}
 
 		return op;

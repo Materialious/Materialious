@@ -1,15 +1,9 @@
+import { DescrambledChallenge } from 'bgutils-js';
+
 const { contextBridge, ipcRenderer } = require('electron');
 require('./rt/electron-rt');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  generatePoToken: (challengeResponse: any,
-    requestKey: string,
-    visitorData: string,
-    videoId: string) => ipcRenderer.invoke(
-      'generatePoToken',
-      challengeResponse,
-      requestKey,
-      visitorData,
-      videoId
-    )
+	generatePoToken: (bgChallenge: DescrambledChallenge, requestKey: string, visitorData: string) =>
+		ipcRenderer.invoke('generatePoToken', bgChallenge, requestKey, visitorData)
 });

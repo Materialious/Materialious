@@ -451,8 +451,6 @@
 							if (videoFormatId) videoPlaybackAbrRequest.selectedFormatIds.push(videoFormatId);
 						}
 
-						console.log(videoPlaybackAbrRequest);
-
 						request.body = Protos.VideoPlaybackAbrRequest.encode(videoPlaybackAbrRequest).finish();
 
 						const byteRange = headers.Range

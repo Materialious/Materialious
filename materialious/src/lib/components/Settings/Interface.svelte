@@ -36,6 +36,8 @@
 	let forceCase = $state(get(interfaceForceCase));
 	let defaultPage = $state(get(interfaceDefaultPage));
 
+	let invalidInstance = $state(false);
+
 	async function setColor(color: any) {
 		const target = color.target;
 		const hex = (target as { value: string }).value;
@@ -55,21 +57,44 @@
 			darkModeStore.set(true);
 		}
 	}
+
+	async function setInstance(event: Event) {
+		event.preventDefault();
+
+		invalidInstance = false;
+
+		const instance = ensureNoTrailingSlash(invidiousInstance);
+
+		try {
+			new URL(instance);
+		} catch {
+			invalidInstance = true;
+		}
+
+		if (invalidInstance) return;
+
+		const resp = await fetch(`${instance}/api/v1/trending`);
+		if (!resp.ok) {
+			invalidInstance = true;
+			return;
+		}
+
+		instanceStore.set(instance);
+		authStore.set(null);
+		goto('/', { replaceState: true });
+		ui('#dialog-settings');
+	}
 </script>
 
 {#if Capacitor.isNativePlatform()}
-	<form
-		onsubmit={preventDefault(() => {
-			instanceStore.set(ensureNoTrailingSlash(invidiousInstance));
-			authStore.set(null);
-			goto('/', { replaceState: true });
-			ui('#dialog-settings');
-		})}
-	>
+	<form style="margin-bottom: 2em;" onsubmit={setInstance}>
 		<nav>
-			<div class="field label border max">
+			<div class="field label border max" class:invalid={invalidInstance}>
 				<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
 				<label for="invidious-instance">{$_('layout.instanceUrl')}</label>
+				{#if invalidInstance}
+					<span class="error">{$_('invalidInstance')}</span>
+				{/if}
 			</div>
 			<button class="square round">
 				<i>done</i>
@@ -77,8 +102,6 @@
 		</nav>
 	</form>
 {/if}
-
-<div class="margin"></div>
 
 <button onclick={toggleDarkMode} class="no-margin">
 	{#if !$darkModeStore}

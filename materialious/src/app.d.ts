@@ -1,6 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { IGetChallengeResponse } from "youtubei.js";
+import type { IGetChallengeResponse } from 'youtubei.js';
 
 // for information about these interfaces
 declare global {
@@ -14,14 +14,12 @@ declare global {
 	interface Window {
 		electronAPI: {
 			generatePoToken: (
-				challengeResponse: IGetChallengeResponse,
+				bgChallenge: IGetChallengeResponse,
 				requestKey: string,
-				visitorData: string,
-				videoId: string
-			) => Promise<[string, string]>;
+				visitorData: string
+			) => Promise<string>;
 		};
 	}
 }
 
-export { };
-
+export {};

@@ -533,81 +533,97 @@
 
 			networkingEngine.registerResponseFilter(async (type, response, context) => {
 				if (type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-					const sabrStreamingContext = response.headers['X-Streaming-Context'];
+					const url = new URL(response.uri);
+					if (
+						url.hostname.endsWith('.youtube.com') &&
+						url.pathname === '/api/timedtext' &&
+						url.searchParams.get('caps') === 'asr' &&
+						url.searchParams.get('kind') === 'asr' &&
+						url.searchParams.get('fmt') === 'vtt'
+					) {
+						const stringBody = new TextDecoder().decode(response.data);
+						// position:0% for LTR text and position:100% for RTL text
+						const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
 
-					if (sabrStreamingContext) {
-						const { streamInfo, isSABR, format, byteRange } = JSON.parse(
-							atob(sabrStreamingContext)
-						) as SabrStreamingContext;
+						/* @ts-ignore */
+						response.data = new TextEncoder().encode(cleaned).buffer;
+					} else {
+						const sabrStreamingContext = response.headers['X-Streaming-Context'];
 
-						if (streamInfo) {
-							const sabrRedirect = streamInfo.redirect;
-							const playbackCookie = streamInfo.playbackCookie;
-							const streamProtectionStatus = streamInfo.streamProtectionStatus;
-							const formatInitMetadata = streamInfo.formatInitMetadata || [];
-							const mainSegmentMediaHeader = streamInfo.mediaHeader;
+						if (sabrStreamingContext) {
+							const { streamInfo, isSABR, format, byteRange } = JSON.parse(
+								atob(sabrStreamingContext)
+							) as SabrStreamingContext;
 
-							// If we have a redirect, follow it.
-							if (sabrRedirect?.url && !response.data.byteLength) {
-								let redirectUrl = new URL(sabrRedirect.url);
+							if (streamInfo) {
+								const sabrRedirect = streamInfo.redirect;
+								const playbackCookie = streamInfo.playbackCookie;
+								const streamProtectionStatus = streamInfo.streamProtectionStatus;
+								const formatInitMetadata = streamInfo.formatInitMetadata || [];
+								const mainSegmentMediaHeader = streamInfo.mediaHeader;
 
-								// For SABR, create a fake URL so we can identify it in the request filter.
-								if (isSABR) {
-									serverAbrStreamingUrl = redirectUrl;
-									redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
+								// If we have a redirect, follow it.
+								if (sabrRedirect?.url && !response.data.byteLength) {
+									let redirectUrl = new URL(sabrRedirect.url);
+
+									// For SABR, create a fake URL so we can identify it in the request filter.
+									if (isSABR) {
+										serverAbrStreamingUrl = redirectUrl;
+										redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
+									}
+
+									const retryParameters = player!.getConfiguration().streaming.retryParameters;
+
+									const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
+										[redirectUrl.toString()],
+										retryParameters
+									);
+
+									// Keep range so we can slice the response (only if it's the init segment).
+									if (isSABR && byteRange) {
+										redirectRequest.headers['Range'] = `bytes=${byteRange.start}-${byteRange.end}`;
+									}
+
+									const requestOperation = player!
+										.getNetworkingEngine()
+										?.request(type, redirectRequest, context);
+									const redirectResponse = await requestOperation!.promise;
+
+									// Modify the original response to contain the results of the redirect
+									// response.
+									Object.assign(response, redirectResponse);
+									return;
 								}
 
-								const retryParameters = player!.getConfiguration().streaming.retryParameters;
+								if (playbackCookie) lastPlaybackCookie = streamInfo.playbackCookie;
 
-								const redirectRequest = shaka.net.NetworkingEngine.makeRequest(
-									[redirectUrl.toString()],
-									retryParameters
-								);
-
-								// Keep range so we can slice the response (only if it's the init segment).
-								if (isSABR && byteRange) {
-									redirectRequest.headers['Range'] = `bytes=${byteRange.start}-${byteRange.end}`;
+								if (streamProtectionStatus && streamProtectionStatus.status === 3) {
+									console.warn('[UMP] Attestation required.');
 								}
 
-								const requestOperation = player!
-									.getNetworkingEngine()
-									?.request(type, redirectRequest, context);
-								const redirectResponse = await requestOperation!.promise;
-
-								// Modify the original response to contain the results of the redirect
-								// response.
-								Object.assign(response, redirectResponse);
-								return;
-							}
-
-							if (playbackCookie) lastPlaybackCookie = streamInfo.playbackCookie;
-
-							if (streamProtectionStatus && streamProtectionStatus.status === 3) {
-								console.warn('[UMP] Attestation required.');
-							}
-
-							for (const metadata of formatInitMetadata) {
-								const key = fromFormatInitializationMetadata(metadata);
-								if (!initializedFormats.has(key)) {
-									initializedFormats.set(key, {
-										formatInitializationMetadata: metadata
-									});
-									console.log(`[SABR] Initialized format ${key}`);
+								for (const metadata of formatInitMetadata) {
+									const key = fromFormatInitializationMetadata(metadata);
+									if (!initializedFormats.has(key)) {
+										initializedFormats.set(key, {
+											formatInitializationMetadata: metadata
+										});
+										console.log(`[SABR] Initialized format ${key}`);
+									}
 								}
-							}
 
-							if (mainSegmentMediaHeader) {
-								const formatKey = fromMediaHeader(mainSegmentMediaHeader);
-								const initializedFormat = initializedFormats.get(formatKey);
+								if (mainSegmentMediaHeader) {
+									const formatKey = fromMediaHeader(mainSegmentMediaHeader);
+									const initializedFormat = initializedFormats.get(formatKey);
 
-								if (initializedFormat) {
-									initializedFormat.lastSegmentMetadata = {
-										formatId: mainSegmentMediaHeader.formatId!,
-										startTimeMs: mainSegmentMediaHeader.startMs || 0,
-										startSequenceNumber: mainSegmentMediaHeader.sequenceNumber || 1,
-										endSequenceNumber: mainSegmentMediaHeader.sequenceNumber || 1,
-										durationMs: mainSegmentMediaHeader.durationMs || 0
-									};
+									if (initializedFormat) {
+										initializedFormat.lastSegmentMetadata = {
+											formatId: mainSegmentMediaHeader.formatId!,
+											startTimeMs: mainSegmentMediaHeader.startMs || 0,
+											startSequenceNumber: mainSegmentMediaHeader.sequenceNumber || 1,
+											endSequenceNumber: mainSegmentMediaHeader.sequenceNumber || 1,
+											durationMs: mainSegmentMediaHeader.durationMs || 0
+										};
+									}
 								}
 							}
 						}

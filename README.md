@@ -1,5 +1,5 @@
 
-> [!WARNING]  
+> [!WARNING]
 > Invidious is currently being blocked by Google. Please use Materialious on [Android](https://github.com/Materialious/Materialious/releases/latest) or [Desktop](https://github.com/Materialious/Materialious/releases/latest) to get around this with local video fallback.
 
 <div align="center">
@@ -70,14 +70,14 @@ I've commented out places what aren't relevant but might be in the future.-->
   <tr>
     <td>Windows</td>
     <td>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-win32-x64.exe">
         <img width="220" alt="Windows Download" src="https://get.todoist.help/hc/article_attachments/4403191721234/WindowsButton.svg">
       </a>
   </tr>
   <tr>
     <td>MacOS (x64 & arm64)</td>
     <td>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-darwin-universal.dmg">
         <img width="220" alt="MacOS Download" src="https://reachify.io/wp-content/uploads/2018/09/mac-download-button-1.png">
       </a>
     </td>
@@ -86,7 +86,7 @@ I've commented out places what aren't relevant but might be in the future.-->
     <td>Android</td>
     <td>
       <br>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/app-universal-release-signed.apk">
         <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
       </a>
       </br>
@@ -132,7 +132,7 @@ I've commented out places what aren't relevant but might be in the future.-->
   <tr>
     <td>AppImage</td>
     <td>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-linux-x86_64.AppImage">
         <img width="220" alt="Download on Flathub" src="https://user-images.githubusercontent.com/61944859/169455015-13385466-8901-48fe-ba90-b62d58b0be64.png">
       </a>
     </td>
@@ -140,10 +140,10 @@ I've commented out places what aren't relevant but might be in the future.-->
   <tr>
     <td>Debian/Ubuntu</td>
     <td>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-linux-amd64.deb">
         <img width="220" alt="Debian/Ubuntu Download" src="https://user-images.githubusercontent.com/61944859/169097994-e92aff78-fd75-4c93-b6e4-f072a4b5a7ed.png">
       </a>
-      <p>Then run: <code>sudo apt install ./Materialious-*-linux-amd64.deb</code></p>
+      <p>Then run: <code>sudo apt install ./Materialious-linux-amd64.deb</code></p>
     </td>
   </tr>
   <!-- <tr>
@@ -156,17 +156,17 @@ I've commented out places what aren't relevant but might be in the future.-->
   <tr>
     <td>Fedora/OpenSuse</td>
     <td>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-linux-x86_64.rpm">
         <img width="220" alt="Fedora/OpenSuse Download" src="https://user-images.githubusercontent.com/61944859/223638350-5926b9da-04d6-4edd-931d-ad533e4ff058.png">
       </a>
-      <p>For Fedora: <code>sudo dnf install ./Materialious-*-linux-x86_64.rpm</code></p>
-      <p>For OpenSuse: <code>sudo zypper in ./Materialious-*-linux-x86_64.rpm</code></p>
+      <p>For Fedora: <code>sudo dnf install ./Materialious-linux-x86_64.rpm</code></p>
+      <p>For OpenSuse: <code>sudo zypper in ./Materialious-linux-x86_64.rpm</code></p>
     </td>
   </tr>
   <tr>
     <td>Linux (tarball)</td>
     <td>
-      <a href="https://github.com/Materialious/Materialious/releases/latest">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-linux-x64.7z">
         <img width="220" alt="Tarball Download" src="https://user-images.githubusercontent.com/61944859/169456985-e0ba1fd4-10e8-4cc0-ab94-337acc6e0295.png">
       </a>
     </td>
@@ -177,7 +177,7 @@ I've commented out places what aren't relevant but might be in the future.-->
 <pre lang="bash">
 brew tap krtirtho/apps
 brew install --cask spotube
-</pre>   
+</pre>
     </td>
   </tr>
   <tr>
@@ -234,7 +234,9 @@ brew install --cask spotube
 - [Clipious](https://github.com/lamarios/clipious) for inspiration & a good source for learning more about undocumented Invidious routes.
 - [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
 - Every dependency in [package.json](/materialious/package.json).
-- [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.
+- [LuanRT](https://github.com/LuanRT) for YouTube.js & SABR implementation.
+- [FreeTube](https://github.com/FreeTubeApp/FreeTube) for their subtitle fix.
+- [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.free
 
 # Developers
 - [How Materialious is built](./docs/BUILDING.md)

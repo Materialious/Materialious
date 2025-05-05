@@ -48,7 +48,7 @@
 		"@capacitor/clipboard": "^6.0.1",
 		"@capacitor/core": "^6.1.2",
 		"@capacitor/screen-orientation": "^6.0.2",
-		"@capacitor/status-bar": "^6.0.1",
+		"@capacitor/status-bar": "^7.0.1",
 		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
 		"beercss": "^3.8.0",
 		"bgutils-js": "^3.2.0",

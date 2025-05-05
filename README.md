@@ -86,7 +86,7 @@ I've commented out places what aren't relevant but might be in the future.-->
     <td>Android</td>
     <td>
       <br>
-      <a href="https://github.com/Materialious/Materialious/releases/latest/download/app-universal-release-signed.ap">
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/app-universal-release-signed.apk">
         <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="80"/>
       </a>
       </br>

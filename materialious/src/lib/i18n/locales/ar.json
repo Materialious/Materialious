@@ -1,1 +1,165 @@
-{}
+{
+    "searchPlaceholder": "بحث",
+    "delete": "حذف",
+    "donate": "التبرع",
+    "deleteAllHistory": "حذف كل السجل",
+    "skipping": "التخطي",
+    "videoTabs": {
+        "channels": "القنوات",
+        "shorts": "الفيديوهات القصيرة",
+        "streams": "البث المباشر",
+        "all": "الكل",
+        "videos": "الفيديوهات",
+        "playlists": "قوائم التشغيل"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "إدارة الاشتراكات"
+    },
+    "playlist": {
+        "unlisted": "غير مدرج",
+        "private": "خاص",
+        "playVideos": "تشغيل الفيديوهات",
+        "shuffleVideos": "تشغيل الفيديوهات بشكل عشوائي",
+        "loopPlaylist": "تكرار قائمة التشغيل",
+        "createPlaylist": "إنشاء قائمة تشغيل",
+        "public": "عام"
+    },
+    "thumbnail": {
+        "live": "مباشر",
+        "failedToLoadImage": "فشل تحميل الصورة"
+    },
+    "pages": {
+        "home": "الرئيسية",
+        "trending": "الرائج",
+        "subscriptions": "الاشتراكات",
+        "history": "السجل",
+        "playlists": "قوائم التشغيل"
+    },
+    "subscribers": "مشتركون",
+    "loginRequired": "تسجيل الدخول مطلوب",
+    "player": {
+        "audioOnly": "صوت فقط",
+        "theatreMode": "وضع المسرح",
+        "pauseTimer": "مؤقت الإيقاف",
+        "share": {
+            "title": "مشاركة",
+            "materialiousLink": "نسخ رابط Materialious",
+            "invidiousRedirect": "نسخ رابط إعادة توجيه Invidious",
+            "youtubeLink": "نسخ رابط YouTube"
+        },
+        "download": "تنزيل",
+        "downloadSteps": {
+            "merging": "دمج الفيديو والصوت معًا",
+            "video": "تنزيل الفيديو",
+            "audio": "تنزيل الصوت",
+            "ffmpeg": "تنزيل مكتبة ffmpeg والمكونات",
+            "classWorker": "تنزيل عامل فئة ffmpeg",
+            "core": "تنزيل نواة ffmpeg",
+            "wasm": "تنزيل ffmpeg wasm",
+            "worker": "تنزيل عامل ffmpeg"
+        },
+        "noPlaylists": "لا توجد قوائم تشغيل",
+        "unableToLoadComments": "تعذر تحميل التعليقات",
+        "addToPlaylist": "إضافة إلى قائمة التشغيل",
+        "youtubeJsFallBack": "يتم استخدام النسخة الاحتياطية المحلية للفيديو",
+        "defaultLanguage": "اللغة الافتراضية",
+        "pauseVideoIn": "إيقاف الفيديو خلال "
+    },
+    "layout": {
+        "interface": "الواجهة",
+        "star": "قيّمنا على GitHub!",
+        "syncParty": "حفلة المزامنة",
+        "syncPartyWarning": "يرجى ملاحظة أن عنوان IP الخاص بك سيكون مرئيًا للمستخدمين الذين تدعوهم.",
+        "startSyncParty": "بدء حفلة المزامنة",
+        "endSyncParty": "إنهاء حفلة المزامنة",
+        "notifications": "الإشعارات",
+        "noNewNotifications": "لا توجد إشعارات جديدة هنا",
+        "settings": "الإعدادات",
+        "login": "تسجيل الدخول",
+        "theme": {
+            "lightMode": "الوضع الفاتح",
+            "AmoledTheme": "ثيم Amoled",
+            "color": "اللون",
+            "theme": "الثيم",
+            "darkMode": "الوضع الداكن"
+        },
+        "searchSuggestions": "اقتراحات البحث",
+        "previewVideoOnHover": "معاينة الفيديو عند التمرير",
+        "expandDescription": "توسيع الوصف افتراضيًا",
+        "expandComments": "توسيع التعليقات افتراضيًا",
+        "dataPreferences": {
+            "content": "هل تتطلع إلى استيراد/تصدير الاشتراكات، تغيير كلمة المرور أو حذف الحساب؟ انقر هنا وانتقل إلى أسفل الصفحة.",
+            "dataPreferences": "تفضيلات البيانات"
+        },
+        "player": {
+            "title": "المشغل",
+            "autoPlay": "تشغيل تلقائي للفيديو",
+            "alwaysLoopVideo": "تكرار الفيديو دائمًا",
+            "savePlaybackPosition": "حفظ موضع التشغيل",
+            "silenceSkipper": "تخطي الصمت (تجريبي)",
+            "youtubeJsFallback": "النسخة الاحتياطية لمعالجة الفيديو المحلية",
+            "youtubeJsAlways": "استخدام معالجة الفيديو المحلية دائمًا",
+            "lockOrientation": "قفل الاتجاه حسب نسبة العرض إلى الارتفاع",
+            "listenByDefault": "الاستماع افتراضيًا",
+            "theatreModeByDefault": "وضع المسرح افتراضيًا",
+            "autoPlayNextByDefault": "تشغيل الفيديو التالي تلقائيًا افتراضيًا",
+            "miniPlayer": "المشغل المصغر",
+            "proxyVideos": "بروكسي الفيديوهات",
+            "backgroundPlay": "تشغيل الصوت في الخلفية",
+            "dash": "Dash"
+        },
+        "instanceUrl": "رابط الخدمة",
+        "sponsors": {
+            "sponsor": "الراعي",
+            "disableToast": "تعطيل الإشعارات",
+            "disableTimeline": "تعطيل الأجزاء على الخط الزمني",
+            "Catagories": "الفئات",
+            "unpaidSelfPromotion": "الترويج الذاتي/غير مدفوع",
+            "interactionReminder": "تذكير التفاعل (الاشتراك)",
+            "intermissionIntroAnimation": "الفاصل/الرسوم المتحركة التمهيدية",
+            "credits": "التترات/الشكر",
+            "preViewRecapHook": "المعاينة/الملخص/الجذب",
+            "tangentJokes": "النكات/المحتوى الجانبي"
+        },
+        "deArrow": {
+            "thumbnailInstanceUrl": "رابط خدمة الصور المصغرة",
+            "titleOnly": "العنوان فقط",
+            "title": "إزالة السهم"
+        },
+        "bookmarklet": "علامة مرجعية",
+        "logout": "تسجيل الخروج",
+        "customize": "تخصيص",
+        "lowBandwidthMode": "وضع النطاق الترددي المنخفض",
+        "displayThumbnailAvatars": "صور مصغرة للأفاتار (بطيء)",
+        "searchHistory": "سجل البحث"
+    },
+    "subscribe": "اشتراك",
+    "enabled": "مفعل",
+    "copyUrl": "نسخ الرابط",
+    "loadMore": "تحميل المزيد",
+    "views": "مشاهدات",
+    "invalidInstance": "يرجى التحقق من الرابط. إذا كان صحيحًا، فقد تكون الخدمة معطلة أو لا تدعم عملاء الطرف الثالث.",
+    "invidiousBlockWarning": "يتم حاليًا حظر Invidious من قِبل Google. إذا لم يتم تحميل الفيديوهات لهذه الخدمة، يرجى استخدام هذه الخدمة على Materialious على {android} أو {desktop} لتجاوز هذا باستخدام النسخة الاحتياطية المحلية للفيديو.",
+    "videos": "فيديوهات",
+    "cancel": "إلغاء",
+    "create": "إنشاء",
+    "title": "العنوان",
+    "replies": "ردود",
+    "region": "المنطقة",
+    "noResult": "لا توجد نتائج",
+    "language": "اللغة",
+    "channels": "قنوات",
+    "transcript": "النص",
+    "noCaptionData": "الترجمات لا تحتوي على أي بيانات.",
+    "selectLang": "اختر اللغة",
+    "letterCase": "حجم الحروف للعناوين",
+    "hideReplies": "إخفاء الردود",
+    "hideVideo": "إخفاء الفيديو",
+    "defaultPage": "الصفحة الافتراضية",
+    "syncParty": {
+        "userJoined": "انضم مستخدم إلى حفلة المشاهدة الخاصة بك.",
+        "userLeft": "غادر مستخدم حفلة المشاهدة الخاصة بك.",
+        "userOnPrivatePage": "المستخدم يشاهد حاليًا صفحة خاصة، سيتم استئناف المزامنة قريبًا."
+    },
+    "unsubscribe": "إلغاء الاشتراك"
+}

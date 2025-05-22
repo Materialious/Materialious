@@ -71,7 +71,7 @@
         "share": {
             "title": "Поделиться",
             "materialiousLink": "Скопировать ссылку на Materialious",
-            "invidiousRedirect": "Скопировать ссылку на инстанс Invidious",
+            "invidiousRedirect": "Скопировать ссылку на сервер Invidious",
             "youtubeLink": "Скопировать ссылку на Youtube"
         },
         "download": "Скачать",
@@ -137,25 +137,25 @@
             "lockOrientation": "Ориентация закреплена относительно соотношения сторон"
         },
         "bookmarklet": "Закладка",
-        "instanceUrl": "URL инстанса",
+        "instanceUrl": "URL-адрес сервера",
         "sponsors": {
             "sponsor": "Спонсор",
             "Catagories": "Категории",
-            "unpaidSelfPromotion": "Самореклама",
-            "interactionReminder": "Напоминание о подписке",
-            "intermissionIntroAnimation": "Интро",
-            "credits": "Титры/Авторы",
-            "preViewRecapHook": "Краткое содержание",
-            "tangentJokes": "Шутки",
+            "unpaidSelfPromotion": "Безвозмездная или самореклама",
+            "interactionReminder": "Призыв к подписке и взаимодействии",
+            "intermissionIntroAnimation": "Разделительная заставка или анимация",
+            "credits": "Титры, авторы, конечная заставка",
+            "preViewRecapHook": "Краткое содержание, предпросмотр, пересказ, завязка",
+            "tangentJokes": "Отвлечённые темы, шутки",
             "disableToast": "Отключить всплывашки",
             "disableTimeline": "Отключить сегменты на временной линии"
         },
         "deArrow": {
             "title": "DeArrow",
-            "thumbnailInstanceUrl": "URL инстанса обложек",
+            "thumbnailInstanceUrl": "URL-адрес сервера обложек",
             "titleOnly": "Только название"
         },
-        "lowBandwidthMode": "Режим низкой пропусности сети",
+        "lowBandwidthMode": "Режим низкой пропустительности сети",
         "displayThumbnailAvatars": "Миниатюрные аватары (Медленно)",
         "searchHistory": "История поиска"
     },

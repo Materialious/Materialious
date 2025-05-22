@@ -1,0 +1,80 @@
+{
+    "enabled": "Iespējots",
+    "views": "skatījumi",
+    "player": {
+        "share": {
+            "materialiousLink": "Kopēt Materialious saiti",
+            "invidiousRedirect": "Kopēt Invidious servera (instances) saiti",
+            "title": "Dalīties",
+            "youtubeLink": "Kopēt YouTube saiti"
+        },
+        "download": "Lejupielādēt",
+        "downloadSteps": {
+            "video": "Lejupielādē video",
+            "ffmpeg": "Lejupielādē ffmpeg bibliotēku un komponentes",
+            "audio": "Lejupielādē audio"
+        },
+        "audioOnly": "Tikai audio",
+        "unableToLoadComments": "Nevar ielādēt komentārus",
+        "addToPlaylist": "Pievienot atskaņošanas sarakstam"
+    },
+    "videos": "video",
+    "layout": {
+        "star": "Pievienojiet mūs GitHub iecienītāko sarakstam - ⭐!",
+        "interface": "Saskarne",
+        "notifications": "Paziņojumi",
+        "settings": "Iestatījumi",
+        "customize": "Pielāgot",
+        "searchHistory": "Meklēšanas vēsture",
+        "theme": {
+            "theme": "Motīvs"
+        },
+        "player": {
+            "savePlaybackPosition": "Saglabāt atskaņošanas pozīciju"
+        }
+    },
+    "channels": "kanāli",
+    "copyUrl": "Kopēt URL saiti",
+    "cancel": "Atcelt",
+    "create": "Izveidot",
+    "searchPlaceholder": "Meklēt",
+    "delete": "Dzēst",
+    "donate": "Ziedot",
+    "deleteAllHistory": "Dzēst visu vēsturi",
+    "replies": "atbilde(s)",
+    "language": "Valoda",
+    "selectLang": "Atlasiet valodu",
+    "hideReplies": "Paslēpt atbildes",
+    "hideVideo": "Paslēpt video",
+    "videoTabs": {
+        "videos": "Video",
+        "playlists": "Atskaņošanas saraksti",
+        "channels": "Kanāli",
+        "shorts": "Īsie video",
+        "all": "Viss"
+    },
+    "playlist": {
+        "createPlaylist": "Izveidot atskaņošanas sarakstu",
+        "public": "Publisks",
+        "private": "Privāts",
+        "playVideos": "Atskaņot video",
+        "shuffleVideos": "Atskaņot video jauktā secībā"
+    },
+    "pages": {
+        "subscriptions": "Abonementi",
+        "history": "Vēsture",
+        "playlists": "Atskaņošanas saraksti",
+        "trending": "Pašlaik populāri"
+    },
+    "subscribers": "abonenti",
+    "title": "Virsraksts",
+    "defaultPage": "Noklusējuma lapa",
+    "thumbnail": {
+        "failedToLoadImage": "Neizdevās ielādēt attēlu"
+    },
+    "unsubscribe": "Atcelt abonementu",
+    "subscriptions": {
+        "manageSubscriptions": "Pārvaldīt abonementus"
+    },
+    "region": "Reģions"
+}

@@ -1,147 +1,165 @@
 {
-	"enabled": "Включено",
-	"copyUrl": "Копировать ссылку",
-	"loadMore": "Загрузить ещё",
-	"views": "просмотров",
-	"invidiousBlockWarning": "Google блокирует Invidious. Если видео не загружается для этого экземпляра, используйте этот экземпляр Materialious на {android} или {desktop}, чтобы обойти эту проблему с помощью локального резервного видео.",
-	"videos": "видео",
-	"cancel": "Отмена",
-	"create": "Создать",
-	"title": "Заголовок",
-	"searchPlaceholder": "Искать...",
-	"delete": "Удалить",
-	"donate": "Пожертвовать",
-	"deleteAllHistory": "Удалить всю историю",
-	"skipping": "Пропускаю",
-	"replies": "ответ(а/ов)",
-	"region": "Регион",
-	"noResult": "Без результатов",
-	"language": "Язык",
-	"channels": "каналы",
-	"transcript": "Транскрипция",
-	"noCaptionData": "Субтитры не содержат данных.",
-	"selectLang": "Выбрать язык",
-	"letterCase": "Регистр для названий",
-	"hideReplies": "Скрыть ответы",
-	"hideVideo": "Скрыть видео",
-	"syncParty": {
-		"userJoined": "Пользователь вошел в вашу группу",
-		"userLeft": "Пользователь покинул вашу группу",
-		"userOnPrivatePage": "Сейчас пользователь просматривает приватную страницу, синхронизация вскоре возобновится."
-	},
-	"videoTabs": {
-		"all": "Всё",
-		"videos": "Видео",
-		"playlists": "Списки воспроизведения",
-		"channels": "Каналы",
-		"shorts": "Shorts",
-		"streams": "Трансляции"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Управление подписками"
-	},
-	"playlist": {
-		"createPlaylist": "Создать список воспроизведения",
-		"public": "Общедоступно",
-		"unlisted": "Недоступно",
-		"private": "Ограниченно",
-		"playVideos": "Воспроизвести видео",
-		"shuffleVideos": "Воспроизвести видео в случайном порядке",
-		"loopPlaylist": "Повторять список воспроизведения"
-	},
-	"thumbnail": {
-		"live": "В ЭФИРЕ",
-		"failedToLoadImage": "Ошибка загрузки изображения"
-	},
-	"pages": {
-		"home": "Главная",
-		"trending": "В тренде",
-		"subscriptions": "Подписки",
-		"history": "История",
-		"playlists": "Плейлисты"
-	},
-	"subscribers": "подписчик(а/ов)",
-	"unsubscribe": "Отписаться",
-	"loginRequired": "Нужно войти в учётную запись",
-	"player": {
-		"audioOnly": "Только звук",
-		"theatreMode": "Широкий экран",
-		"pauseTimer": "Таймер паузы",
-		"pauseVideoIn": "Приостановите видео на",
-		"share": {
-			"title": "Поделиться",
-			"materialiousLink": "Скопировать ссылку на Materialious",
-			"invidiousRedirect": "Скопировать ссылку на инстанс Invidious",
-			"youtubeLink": "Скопировать ссылку на Youtube"
-		},
-		"download": "Скачать",
-		"downloadSteps": {
-			"merging": "Объединение видео и аудио",
-			"video": "Загрузка видео",
-			"audio": "Загрузка аудио",
-			"ffmpeg": "Загрузка библиотеки и компонентов ffmpeg"
-		},
-		"noPlaylists": "Нет списков воспроизведения",
-		"unableToLoadComments": "Невозможно загрузить комментарии",
-		"addToPlaylist": "Добавить в плейлист"
-	},
-	"layout": {
-		"interface": "Интерфейс",
-		"star": "Поставить нам звезду на GitHub!",
-		"syncParty": "Совместный просмотр",
-		"syncPartyWarning": "Помните, ваш IP должен быть доступен для тех кого вы приглашаете.",
-		"startSyncParty": "Начать совместный просмотр",
-		"endSyncParty": "Закончить совместный просмотр",
-		"notifications": "Уведомления",
-		"noNewNotifications": "Нет новых уведомлений",
-		"settings": "Настройки",
-		"login": "Зайти в учетную запись",
-		"logout": "Выйти из учетной записи",
-		"customize": "Настроить под себя",
-		"theme": {
-			"theme": "Тема",
-			"darkMode": "Тёмный режим",
-			"lightMode": "Светлый режим",
-			"color": "Цвет"
-		},
-		"searchSuggestions": "Поисковые подсказки",
-		"previewVideoOnHover": "Предпросмотр видео при наведении",
-		"expandDescription": "Развернуть описание по умолчанию",
-		"expandComments": "Развернуть комментарий по умолчанию",
-		"dataPreferences": {
-			"content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз.",
-			"dataPreferences": "Настройки данных"
-		},
-		"player": {
-			"title": "Плеер",
-			"autoPlay": "Авто-воспроизведение видео",
-			"alwaysLoopVideo": "Зацикливать видео",
-			"savePlaybackPosition": "Сохранять позицию",
-			"listenByDefault": "Слушать по умолчанию",
-			"theatreModeByDefault": "Широкий формат по умолчанию",
-			"autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
-			"miniPlayer": "Мини-плеер",
-			"proxyVideos": "Прокси видео",
-			"backgroundPlay": "Играть аудио в фоне",
-			"dash": "Использовать DASH"
-		},
-		"bookmarklet": "Закладка",
-		"instanceUrl": "URL инстанса",
-		"sponsors": {
-			"sponsor": "Спонсор",
-			"Catagories": "Категории",
-			"unpaidSelfPromotion": "Самореклама",
-			"interactionReminder": "Напоминание о подписке",
-			"intermissionIntroAnimation": "Интро",
-			"credits": "Титры/Авторы",
-			"preViewRecapHook": "Краткое содержание",
-			"tangentJokes": "Шутки"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL инстанса обложек",
-			"titleOnly": "Только название"
-		}
-	},
-	"subscribe": "Подписаться"
+    "enabled": "Включено",
+    "copyUrl": "Копировать ссылку",
+    "loadMore": "Загрузить ещё",
+    "views": "просмотров",
+    "invidiousBlockWarning": "Google блокирует Invidious. Если видео не загружается для этого сервера, то попробуйте этот же сервер через Materialious на {android} или {desktop}, чтобы обойти эту проблему с помощью резервного локального видео.",
+    "videos": "видео",
+    "cancel": "Отмена",
+    "create": "Создать",
+    "title": "Заголовок",
+    "searchPlaceholder": "Искать...",
+    "delete": "Удалить",
+    "donate": "Пожертвовать",
+    "deleteAllHistory": "Удалить всю историю",
+    "skipping": "Пропускаю",
+    "replies": "ответ(а/ов)",
+    "region": "Регион",
+    "noResult": "Без результатов",
+    "language": "Язык",
+    "channels": "каналы",
+    "transcript": "Транскрипция",
+    "noCaptionData": "Субтитры не содержат данных.",
+    "selectLang": "Выбрать язык",
+    "letterCase": "Регистр для названий",
+    "hideReplies": "Скрыть ответы",
+    "hideVideo": "Скрыть видео",
+    "syncParty": {
+        "userJoined": "Пользователь присоединился к вашей группе просмотра.",
+        "userLeft": "Пользователь покинул вашу группу просмотра.",
+        "userOnPrivatePage": "Сейчас пользователь просматривает приватную страницу, синхронизация вскоре возобновится."
+    },
+    "videoTabs": {
+        "all": "Всё",
+        "videos": "Видео",
+        "playlists": "Списки воспроизведения",
+        "channels": "Каналы",
+        "shorts": "Моменты",
+        "streams": "Трансляции"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Управление подписками"
+    },
+    "playlist": {
+        "createPlaylist": "Создать список воспроизведения",
+        "public": "Общедоступно",
+        "unlisted": "Недоступно",
+        "private": "Ограниченно",
+        "playVideos": "Воспроизвести видео",
+        "shuffleVideos": "Воспроизвести видео в случайном порядке",
+        "loopPlaylist": "Повторять список воспроизведения"
+    },
+    "thumbnail": {
+        "live": "В ЭФИРЕ",
+        "failedToLoadImage": "Ошибка загрузки изображения"
+    },
+    "pages": {
+        "home": "Главная",
+        "trending": "В тренде",
+        "subscriptions": "Подписки",
+        "history": "История",
+        "playlists": "Плейлисты"
+    },
+    "subscribers": "подписчик(а/ов)",
+    "unsubscribe": "Отписаться",
+    "loginRequired": "Нужно войти в учётную запись",
+    "player": {
+        "audioOnly": "Только звук",
+        "theatreMode": "Широкий экран",
+        "pauseTimer": "Таймер паузы",
+        "pauseVideoIn": "Приостановить видео на ",
+        "share": {
+            "title": "Поделиться",
+            "materialiousLink": "Скопировать ссылку на Materialious",
+            "invidiousRedirect": "Скопировать ссылку на сервер Invidious",
+            "youtubeLink": "Скопировать ссылку на Youtube"
+        },
+        "download": "Скачать",
+        "downloadSteps": {
+            "merging": "Объединение видео и аудио",
+            "video": "Скачивание видео",
+            "audio": "Скачивание аудио",
+            "ffmpeg": "Скачивание библиотеки и компонентов ffmpeg",
+            "classWorker": "Скачивание ffmpeg class worker",
+            "core": "Скачивание ffmpeg core",
+            "wasm": "Скачивание ffmpeg wasm",
+            "worker": "Скачивание ffmpeg worker"
+        },
+        "noPlaylists": "Нет списков воспроизведения",
+        "unableToLoadComments": "Невозможно загрузить комментарии",
+        "addToPlaylist": "Добавить в плейлист",
+        "defaultLanguage": "Язык по умолчанию",
+        "youtubeJsFallBack": "Используются резервное локальное видео"
+    },
+    "layout": {
+        "interface": "Интерфейс",
+        "star": "Поставить нам звезду на GitHub!",
+        "syncParty": "Совместный просмотр",
+        "syncPartyWarning": "Помните, ваш IP должен быть доступен для тех кого вы приглашаете.",
+        "startSyncParty": "Начать совместный просмотр",
+        "endSyncParty": "Закончить совместный просмотр",
+        "notifications": "Уведомления",
+        "noNewNotifications": "Нет новых уведомлений",
+        "settings": "Настройки",
+        "login": "Зайти в учетную запись",
+        "logout": "Выйти из учетной записи",
+        "customize": "Настроить под себя",
+        "theme": {
+            "theme": "Тема",
+            "darkMode": "Тёмный режим",
+            "lightMode": "Светлый режим",
+            "color": "Цвет",
+            "AmoledTheme": "Полностью чёрная тема"
+        },
+        "searchSuggestions": "Поисковые подсказки",
+        "previewVideoOnHover": "Предпросмотр видео при наведении",
+        "expandDescription": "Развернуть описание по умолчанию",
+        "expandComments": "Развернуть комментарий по умолчанию",
+        "dataPreferences": {
+            "content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз.",
+            "dataPreferences": "Настройки данных"
+        },
+        "player": {
+            "title": "Плеер",
+            "autoPlay": "Авто-воспроизведение видео",
+            "alwaysLoopVideo": "Зацикливать видео",
+            "savePlaybackPosition": "Сохранять позицию",
+            "listenByDefault": "Слушать по умолчанию",
+            "theatreModeByDefault": "Широкий формат по умолчанию",
+            "autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
+            "miniPlayer": "Мини-плеер",
+            "proxyVideos": "Прокси видео",
+            "backgroundPlay": "Играть аудио в фоне",
+            "dash": "Использовать DASH",
+            "youtubeJsAlways": "Всегда использовать локальную обработку видео",
+            "youtubeJsFallback": "Резервная обработка видео локально",
+            "silenceSkipper": "Перескакивать тишину (экспериментально)",
+            "lockOrientation": "Ориентация закреплена относительно соотношения сторон"
+        },
+        "bookmarklet": "Закладка",
+        "instanceUrl": "URL-адрес сервера",
+        "sponsors": {
+            "sponsor": "Спонсор",
+            "Catagories": "Категории",
+            "unpaidSelfPromotion": "Безвозмездная или самореклама",
+            "interactionReminder": "Призыв к подписке и взаимодействии",
+            "intermissionIntroAnimation": "Разделительная заставка или анимация",
+            "credits": "Титры, авторы, конечная заставка",
+            "preViewRecapHook": "Краткое содержание, предпросмотр, пересказ, завязка",
+            "tangentJokes": "Отвлечённые темы, шутки",
+            "disableToast": "Отключить всплывашки",
+            "disableTimeline": "Отключить сегменты на временной линии"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL-адрес сервера обложек",
+            "titleOnly": "Только название"
+        },
+        "lowBandwidthMode": "Режим низкой пропустительности сети",
+        "displayThumbnailAvatars": "Миниатюрные аватары (Медленно)",
+        "searchHistory": "История поиска"
+    },
+    "subscribe": "Подписаться",
+    "invalidInstance": "Проверьте URL-адрес. Если он правильный, то возможно сервер сейчас недоступен или не поддерживает сторонние клиенты.",
+    "defaultPage": "Страница по умолчанию"
 }

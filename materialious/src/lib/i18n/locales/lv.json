@@ -12,11 +12,13 @@
         "downloadSteps": {
             "video": "Lejupielādē video",
             "ffmpeg": "Lejupielādē ffmpeg bibliotēku un komponentes",
-            "audio": "Lejupielādē audio"
+            "audio": "Lejupielādē audio",
+            "merging": "Apvieno video un audio"
         },
         "audioOnly": "Tikai audio",
         "unableToLoadComments": "Nevar ielādēt komentārus",
-        "addToPlaylist": "Pievienot atskaņošanas sarakstam"
+        "addToPlaylist": "Pievienot atskaņošanas sarakstam",
+        "defaultLanguage": "Noklusējuma valoda"
     },
     "videos": "video",
     "layout": {
@@ -31,6 +33,13 @@
         },
         "player": {
             "savePlaybackPosition": "Saglabāt atskaņošanas pozīciju"
+        },
+        "deArrow": {
+            "titleOnly": "Tikai virsrakstu",
+            "title": "DeArrow"
+        },
+        "sponsors": {
+            "Catagories": "Kategorijas"
         }
     },
     "channels": "kanāli",
@@ -76,5 +85,6 @@
     "subscriptions": {
         "manageSubscriptions": "Pārvaldīt abonementus"
     },
-    "region": "Reģions"
+    "region": "Reģions",
+    "subscribe": "Abonēt"
 }

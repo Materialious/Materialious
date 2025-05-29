@@ -36,11 +36,8 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	interface Props {
-		children?: import('svelte').Snippet;
-	}
 
-	let { children }: Props = $props();
+	let { children } = $props();
 
 	let mobileSearchShow = $state(false);
 

@@ -48,6 +48,22 @@
                         android:scheme="https"
                         android:host="youtu.be"
                         android:pathPrefix="/watch" />
+                <data
+                        android:scheme="https"
+                        android:host="youtube.com"
+                        android:pathPrefix="/shorts" />
+                <data
+                        android:scheme="https"
+                        android:host="www.youtube.com"
+                        android:pathPrefix="/shorts" />
+                <data
+                        android:scheme="https"
+                        android:host="m.youtube.com"
+                        android:pathPrefix="/shorts" />
+                <data
+                        android:scheme="https"
+                        android:host="youtu.be"
+                        android:pathPrefix="/shorts" />
             </intent-filter>
         </activity>
 

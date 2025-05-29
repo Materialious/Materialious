@@ -59,16 +59,6 @@ button.row:hover {
 	}
 }
 
-@media screen and (max-width: 650px) {
-	::-webkit-scrollbar {
-		display: none !important;
-	}
-
-	html {
-		scrollbar-width: none !important;
-	}
-}
-
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		z-index: 9999 !important;

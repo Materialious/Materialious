@@ -42,7 +42,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			: window.electronAPI.generatePoToken;
 
 	poTokenCacheStore.set(
-	    await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
+		await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
 	);
 
 	const extraArgs: Record<string, any> = {

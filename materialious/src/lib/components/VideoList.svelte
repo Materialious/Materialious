@@ -17,7 +17,7 @@
 
 	let auth = get(authStore);
 
-	async function removePlaylistItem(indexId: string, videoId: string) {
+	async function removePlaylistItem(indexId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
 	}
@@ -27,25 +27,22 @@
 	<div class="space"></div>
 	<div class="grid">
 		{#each videos as video}
-				<ContentColumn>
-					<article class="no-padding" style="height: 100%;">
-						<Thumbnail
-							{video}
-							{playlistId}
-						/>
-						{#if auth && decodeURIComponent(auth.username) === playlistAuthor && 'indexId' in video}
-							<div class="right-align" style="margin: 1em .5em;">
-								<button
-									onclick={async () => removePlaylistItem(video.indexId, video.videoId)}
-									class="tertiary circle small"
-								>
-									<i>delete</i>
-									<div class="tooltip">{$_('delete')}</div>
-								</button>
-							</div>
-						{/if}
-					</article>
-				</ContentColumn>
+			<ContentColumn>
+				<article class="no-padding" style="height: 100%;">
+					<Thumbnail {video} {playlistId} />
+					{#if auth && decodeURIComponent(auth.username) === playlistAuthor && 'indexId' in video}
+						<div class="right-align" style="margin: 1em .5em;">
+							<button
+								onclick={async () => removePlaylistItem(video.indexId)}
+								class="tertiary circle small"
+							>
+								<i>delete</i>
+								<div class="tooltip">{$_('delete')}</div>
+							</button>
+						</div>
+					{/if}
+				</article>
+			</ContentColumn>
 		{/each}
 	</div>
 </div>

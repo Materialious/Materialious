@@ -17,10 +17,6 @@ main.root {
 	overflow-y: auto;
 }
 
-article, dialog {
-	border-radius: .25rem !important;
-}
-
 .row {
 	padding: 1em !important;
 }
@@ -79,6 +75,5 @@ button.row:hover {
 		position: fixed !important;
 		top: 20% !important;
 		width: 100% !important;
-		background-color: var(--surface-variant) !important;
 	}
 }

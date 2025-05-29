@@ -99,12 +99,13 @@
 </script>
 
 <form onsubmit={preventDefault(handleSubmit)}>
-	<div class="field prefix fill no-margin search">
+	<div class="field prefix fill no-margin search rounded">
 		<i class="front">search</i>
 		<input
 			id="search-box"
 			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
+			class="rounded"
 			onclick={async () => {
 				showSearchBox = true;
 				await tick();
@@ -112,14 +113,13 @@
 			}}
 		/>
 		{#if showSearchBox}
-			<menu class="min suggestions-container">
+			<menu class="min suggestions-container rounded">
 				<div class="field large prefix suffix no-margin fixed">
 					<i class="front" onclick={() => dispatch('searchCancelled')}>arrow_back</i>
 					<input
 						placeholder={$_('searchPlaceholder')}
 						type="text"
 						id="search"
-						autofocus
 						required
 						bind:value={search}
 						onkeydown={handleKeyDown}

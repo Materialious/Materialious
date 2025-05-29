@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { goto } from '$app/navigation';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { letterCase, titleCases } from '$lib/letterCasing';
@@ -73,8 +71,16 @@
 
 		if (invalidInstance) return;
 
-		const resp = await fetch(`${instance}/api/v1/trending`);
-		if (!resp.ok) {
+		let resp;
+		try {
+			resp = await fetch(`${instance}/api/v1/trending`);
+		} catch {
+			invalidInstance = true;
+		}
+
+		if (invalidInstance) return;
+
+		if (resp && !resp.ok) {
 			invalidInstance = true;
 			return;
 		}
@@ -87,7 +93,7 @@
 </script>
 
 {#if Capacitor.isNativePlatform()}
-	<form style="margin-bottom: 2em;" onsubmit={setInstance}>
+	<form onsubmit={setInstance}>
 		<nav>
 			<div class="field label border max" class:invalid={invalidInstance}>
 				<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
@@ -101,6 +107,9 @@
 			</button>
 		</nav>
 	</form>
+	{#if invalidInstance}
+		<div style="margin-bottom: 4em;"></div>
+	{/if}
 {/if}
 
 <button onclick={toggleDarkMode} class="no-margin">

@@ -3,19 +3,6 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import {
-		deArrowInstanceStore,
-		deArrowThumbnailInstanceStore,
-		instanceStore,
-		interfaceDefaultPage,
-		interfaceForceCase,
-		interfaceRegionStore,
-		playerDefaultLanguage,
-		returnYTDislikesInstanceStore,
-		sponsorBlockCategoriesStore,
-		sponsorBlockUrlStore,
-		synciousInstanceStore
-	} from '../../store';
 	import ApiExtended from './ApiExtended.svelte';
 	import DataPreferences from './DataPreferences.svelte';
 	import DeArrow from './DeArrow.svelte';
@@ -23,43 +10,6 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-
-	let sponsorCategoriesList: string[] = [];
-	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
-
-	let sponsorBlockInstance = get(sponsorBlockUrlStore);
-	let synciousInstance = get(synciousInstanceStore);
-	let returnYTInstance = get(returnYTDislikesInstanceStore);
-	let invidiousInstance = get(instanceStore);
-	let deArrowUrl = get(deArrowInstanceStore);
-	let deArrowThumbnailUrl = get(deArrowThumbnailInstanceStore);
-	let region = get(interfaceRegionStore);
-	let forceCase = get(interfaceForceCase);
-	let defaultLanguage = get(playerDefaultLanguage);
-	let defaultPage = get(interfaceDefaultPage);
-
-	const languageNames = ISO6391.getAllCodes().map((code) =>
-		ISO6391.getName(code).toLocaleLowerCase()
-	);
-
-	const sponsorCategories = [
-		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
-		{ name: $_('layout.sponsors.unpaidSelfPromotion'), category: 'selfpromo' },
-		{ name: $_('layout.sponsors.interactionReminder'), category: 'interaction' },
-		{ name: $_('layout.sponsors.intermissionIntroAnimation'), category: 'intro' },
-		{ name: $_('layout.sponsors.credits'), category: 'outro' },
-		{ name: $_('layout.sponsors.preViewRecapHook'), category: 'preview' },
-		{ name: $_('layout.sponsors.tangentJokes'), category: 'filler' }
-	];
-
-	function toggleSponsor(category: string) {
-		if (sponsorCategoriesList.includes(category)) {
-			sponsorBlockCategoriesStore.set(sponsorCategoriesList.filter((value) => value !== category));
-		} else {
-			sponsorCategoriesList.push(category);
-			sponsorBlockCategoriesStore.set(sponsorCategoriesList);
-		}
-	}
 
 	let activeTab:
 		| 'interface'
@@ -84,15 +34,6 @@
 		checkWidth();
 
 		addEventListener('resize', () => checkWidth());
-
-		// Set default language if not set already based off browser.
-		if (!get(playerDefaultLanguage)) {
-			const languageCode = navigator.language || navigator.languages[0];
-			const languageName = ISO6391.getName(languageCode.split('-')[0]);
-			if (languageName) {
-				playerDefaultLanguage.set(languageName.toLowerCase());
-			}
-		}
 	});
 </script>
 
@@ -181,12 +122,11 @@
 	@media screen and (max-width: 1320px) {
 		.tabbed {
 			display: flex !important;
-			flex-direction: column !important;
 			gap: 0 !important;
 			flex: 0 !important;
-			margin-bottom: 1em !important;
 			align-items: start !important;
 			padding: 1em 0 !important;
+			overflow-x: scroll !important;
 			background-color: transparent;
 			border-bottom: solid 1px var(--outline-variant);
 		}

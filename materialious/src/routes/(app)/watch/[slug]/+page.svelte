@@ -443,7 +443,7 @@
 			<div class="s12 m12 l5">
 				<nav>
 					<a href={`/channel/${data.video.authorId}`}>
-						<nav>
+						<nav style="gap: 0.5em;">
 							{#if !$interfaceLowBandwidthMode}
 								<img
 									class="circle large"
@@ -482,18 +482,18 @@
 			<div class="s12 m12 l7 video-actions">
 				{#await data.streamed.returnYTDislikes then returnYTDislikes}
 					{#if returnYTDislikes}
-						<nav class="no-space" style="margin-right: .5em;">
+						<nav class="no-space">
 							<button style="cursor: default;" class="border left-round">
 								<i class="small">thumb_up</i>
 								<span>{cleanNumber(returnYTDislikes.likes)}</span>
 							</button>
-							<button style="cursor: default;" class="border right-round">
+							<button style="cursor: default;margin-right: 0.5em;" class="border right-round">
 								<i class="small">thumb_down_alt</i>
 								<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
 							</button>
 						</nav>
 					{:else}
-						<button style="cursor: default;" class="border">
+						<button style="cursor: default;margin-right: 0.5em;" class="border">
 							<i class="small">thumb_up</i>
 							<span>{cleanNumber(data.video.likeCount)}</span>
 						</button>

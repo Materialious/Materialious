@@ -21,6 +21,7 @@
 		darkModeStore,
 		instanceStore,
 		interfaceAmoledTheme,
+		interfaceDefaultPage,
 		showWarningStore,
 		syncPartyPeerStore,
 		themeColorStore
@@ -36,11 +37,8 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	interface Props {
-		children?: import('svelte').Snippet;
-	}
 
-	let { children }: Props = $props();
+	let { children } = $props();
 
 	let mobileSearchShow = $state(false);
 
@@ -238,7 +236,7 @@
 		</nav>
 	{/if}
 
-	<nav onclick={() => goto('/')} style="cursor: pointer;" class="m l">
+	<nav onclick={() => goto($interfaceDefaultPage)} style="cursor: pointer;" class="m l">
 		<Logo />
 		<h6 class="l">Materialious</h6>
 	</nav>

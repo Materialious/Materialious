@@ -285,7 +285,6 @@
 		height: 50vh !important;
 		transform: translate(-50%, -50%) !important;
 		pointer-events: all !important;
-		z-index: 99999999 !important;
 		pointer-events: auto !important;
 		opacity: 1 !important;
 		visibility: visible !important;
@@ -320,20 +319,18 @@
 		width: 100vw !important;
 		height: 100vh !important;
 		background: transparent !important;
-		z-index: 99999998 !important;
 		pointer-events: auto !important;
 	}
 
 	.youtube-theme .shaka-overflow-menu:hover,
 	.youtube-theme .shaka-settings-menu:hover {
-		z-index: 99999998 !important;
 		pointer-events: auto !important;
 		opacity: 1 !important;
 		visibility: visible !important;
 	}
 
 	#shaka-container {
-		z-index: 99999998 !important;
+		z-index: 98 !important;
 		pointer-events: auto !important;
 		opacity: 1 !important;
 		visibility: visible !important;

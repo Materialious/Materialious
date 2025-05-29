@@ -145,8 +145,4 @@
 	.transcript-text {
 		margin-left: 1em;
 	}
-
-	.transcript-line .chip {
-		padding: 0 1.5em;
-	}
 </style>

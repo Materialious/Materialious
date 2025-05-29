@@ -41,7 +41,7 @@
 
 	let { data = $bindable() } = $props();
 
-	let playerElement: HTMLMediaElement;
+	let playerElement: HTMLMediaElement | undefined = $state();
 
 	let comments: Comments | null = $state(null);
 	data.streamed.comments?.then((streamedComments) => {
@@ -238,10 +238,11 @@
 
 		if (playerElement) {
 			playerElement.addEventListener('timeupdate', () => {
+				if (!playerElement) return;
 				playerCurrentTime = playerElement.currentTime;
 			});
 
-			playerElement.addEventListener('end', async () => {
+			playerElement.addEventListener('ended', async () => {
 				if (playlistVideos.length === 0) {
 					if ($playerAutoplayNextByDefaultStore) {
 						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
@@ -504,7 +505,7 @@
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
-					{#if data.video.lengthSeconds > 60 && !data.video.hlsUrl}
+					{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
 						<button
 							onclick={() => {
 								if (pauseTimeout) {
@@ -597,7 +598,9 @@
 							<h6 style="margin-bottom: .3em;">Chapters</h6>
 							{#each data.content.timestamps as timestamp}
 								<button
-									onclick={() => (playerElement.currentTime = timestamp.time)}
+									onclick={() => {
+										if (playerElement) playerElement.currentTime = timestamp.time;
+									}}
 									class="timestamps"
 									>{timestamp.timePretty}
 									{#if !timestamp.title.startsWith('-')}
@@ -646,7 +649,7 @@
 	</div>
 	{#if !theatreMode}
 		<div class="s12 m12 l3">
-			{#if showTranscript}
+			{#if showTranscript && playerElement}
 				<Transcript video={data.video} bind:playerElement />
 			{/if}
 			{#if playlist}

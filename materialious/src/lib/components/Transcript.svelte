@@ -40,6 +40,118 @@
 		}
 	});
 
+	export function dedupeAndMergeOverlappingCues(cues: VTTCue[], timeOffset = -1): VTTCue[] {
+		const merged: VTTCue[] = [];
+
+		for (const cue of cues) {
+			const trimmedText = cue.text.trim();
+			if (!trimmedText) {
+				continue;
+			}
+
+			let wasMerged = false;
+
+			for (let i = 0; i < merged.length; i++) {
+				const existing = merged[i];
+
+				const timeGap = Math.abs(cue.startTime - existing.endTime);
+				const isTimeAdjacent = timeGap <= 1.5;
+
+				if (isTimeAdjacent && areCuesTextSimilar(existing.text, cue.text)) {
+					const mergedText = mergeCueText(existing.text, cue.text);
+
+					const newStart = Math.max(0, Math.min(existing.startTime, cue.startTime) + timeOffset);
+					const newEnd = Math.max(existing.endTime, cue.endTime) + timeOffset;
+
+					const mergedCue = new VTTCue(newStart, newEnd, mergedText);
+					copyCueMeta(mergedCue, cue);
+
+					merged[i] = mergedCue;
+					wasMerged = true;
+					break;
+				}
+			}
+
+			if (!wasMerged) {
+				const offsetCue = new VTTCue(
+					Math.max(0, cue.startTime + timeOffset),
+					cue.endTime + timeOffset,
+					cue.text
+				);
+				copyCueMeta(offsetCue, cue);
+				merged.push(offsetCue);
+			}
+		}
+
+		// Ensure no overlapping cues (each cue ends before the next starts)
+		for (let i = 0; i < merged.length - 1; i++) {
+			const current = merged[i];
+			const next = merged[i + 1];
+			if (current.endTime > next.startTime) {
+				current.endTime = Math.max(current.startTime, next.startTime - 0.01); // 10ms gap
+			}
+		}
+
+		return merged;
+	}
+
+	function areCuesTextSimilar(a: string, b: string): boolean {
+		if (a === b) return true;
+
+		// Normalize and compare overlap ratio
+		const cleanA = normalizeText(a);
+		const cleanB = normalizeText(b);
+
+		const overlap = getTextOverlap(cleanA, cleanB);
+		const minLength = Math.min(cleanA.length, cleanB.length);
+
+		// Consider similar if 60% or more overlap
+		return overlap / minLength >= 0.6;
+	}
+
+	function getTextOverlap(a: string, b: string): number {
+		const maxOverlap = Math.min(a.length, b.length);
+		for (let i = maxOverlap; i > 0; i--) {
+			if (a.endsWith(b.slice(0, i)) || b.endsWith(a.slice(0, i))) {
+				return i;
+			}
+		}
+		return 0;
+	}
+
+	function normalizeText(text: string): string {
+		return text
+			.trim()
+			.replace(/\s+/g, ' ')
+			.replace(/[.,?!"'”“]/g, '')
+			.toLowerCase();
+	}
+
+	function mergeCueText(a: string, b: string): string {
+		// Avoid duplicating overlap
+		const overlapLen = getTextOverlap(a, b);
+		if (a.endsWith(b.slice(0, overlapLen))) {
+			return a + b.slice(overlapLen);
+		}
+		if (b.endsWith(a.slice(0, overlapLen))) {
+			return b + a.slice(overlapLen);
+		}
+		return `${a} ${b}`;
+	}
+
+	function copyCueMeta(target: VTTCue, source: VTTCue): void {
+		target.region = source.region;
+		target.vertical = source.vertical;
+		target.snapToLines = source.snapToLines;
+		target.line = source.line;
+		target.lineAlign = source.lineAlign;
+		target.position = source.position;
+		target.positionAlign = source.positionAlign;
+		target.size = source.size;
+		target.align = source.align;
+		target.style = source.style;
+	}
+
 	async function loadTranscript() {
 		if (!url) {
 			transcript = null;
@@ -48,9 +160,11 @@
 
 		isLoading = true;
 		transcript = null;
+
 		const resp = await fetch(`${!video.fallbackPatch ? get(instanceStore) : ''}${url}`);
 		transcript = await parseText(await resp.text(), { strict: false });
-		transcriptCues = transcript.cues;
+
+		transcriptCues = dedupeAndMergeOverlappingCues(transcript.cues);
 		isLoading = false;
 	}
 
@@ -58,7 +172,7 @@
 		if (!transcript) return;
 
 		if (search.trim() === '') {
-			transcriptCues = transcript.cues;
+			transcriptCues = dedupeAndMergeOverlappingCues(transcript.cues);
 			return;
 		}
 
@@ -66,7 +180,8 @@
 			keys: ['text']
 		});
 
-		transcriptCues = fuse.search(search).map((item) => item.item);
+		const results = fuse.search(search).map((item) => item.item);
+		transcriptCues = dedupeAndMergeOverlappingCues(results);
 	}
 </script>
 

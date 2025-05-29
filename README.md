@@ -19,7 +19,6 @@
 
 ![Preview of homepage](./previews/home-preview.png)
 
-[Help translate Materialious!](https://fink.inlang.com/github.com/WardPearce/Materialious)
 
 # Features
 - [Invidious API extended integration!](https://github.com/Materialious/api-extended)
@@ -55,6 +54,14 @@
 [Public instances are listed here](./docs/INSTANCES.md).
 
 Open an issue to add your instance.
+
+# Translations
+
+Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)! 
+
+<a href="https://toolate.othing.xyz/projects/materialious/">
+<img src="https://toolate.othing.xyz/widget/materialious/materialious/multi-auto.svg" alt="Translation status" />
+</a>
 
 # Deploying as a website via docker
 [Please read the guide here](./docs/DOCKER.md)

@@ -238,10 +238,11 @@
 
 		if (playerElement) {
 			playerElement.addEventListener('timeupdate', () => {
+				if (!playerElement) return;
 				playerCurrentTime = playerElement.currentTime;
 			});
 
-			playerElement.addEventListener('end', async () => {
+			playerElement.addEventListener('ended', async () => {
 				if (playlistVideos.length === 0) {
 					if ($playerAutoplayNextByDefaultStore) {
 						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
@@ -504,7 +505,7 @@
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
-					{#if data.video.lengthSeconds > 60 && !data.video.hlsUrl}
+					{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
 						<button
 							onclick={() => {
 								if (pauseTimeout) {

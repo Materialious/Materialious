@@ -123,7 +123,8 @@
 	transition: none !important;
 	opacity: 1 !important;
 	visibility: visible !important;
-	z-index: 9999 !important;
+	z-index: 99999999 !important;
+	pointer-events: auto !important;
 	pointer-events: auto !important;
 }
 
@@ -157,10 +158,18 @@
 	padding-left: 0.3125rem; /* 5px */
 }
 
+.shaka-overflow-menu * {
+	z-index: 99999999 !important;
+	pointer-events: auto !important;
+}
+
 .youtube-theme .shaka-overflow-menu button,
 .youtube-theme .shaka-settings-menu button {
 	padding: 0;
 	margin-bottom: 0.5em;
+	visibility: visible !important;
+	z-index: 99999999 !important;
+	pointer-events: auto !important;
 }
 
 .youtube-theme .shaka-overflow-menu button i {
@@ -174,6 +183,10 @@
 	outline: none;
 	height: 2.5rem; /* 40px */
 	flex: 0 0 100%;
+	visibility: visible !important;
+	z-index: 99999999 !important;
+	pointer-events: auto !important;
+	pointer-events: auto !important;
 }
 
 .shaka-settings-menu {
@@ -264,11 +277,65 @@
 @media screen and (max-width: 650px) {
 	.youtube-theme .shaka-overflow-menu,
 	.youtube-theme .shaka-settings-menu {
-		min-width: 100%;
-		position: fixed;
-		top: 75%;
-		left: 50%;
-		height: 50vh;
-		transform: translate(-50%, -50%);
+		width: 100% !important;
+		min-width: 100% !important;
+		position: fixed !important;
+		top: 100% !important;
+		left: 50% !important;
+		height: 50vh !important;
+		transform: translate(-50%, -50%) !important;
+		pointer-events: all !important;
+		z-index: 99999999 !important;
+		pointer-events: auto !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		padding: 1rem !important;
+		box-shadow: var(--elevate2);
+		background-color: var(--surface-container);
+		z-index: 11;
+		inset: auto auto 0 0;
+		inline-size: 100%;
+		max-block-size: 50vh;
+		max-inline-size: none !important;
+		overflow-x: hidden;
+		overflow-y: auto;
+		font-size: 0.875rem;
+		font-weight: 400;
+		text-transform: none;
+		color: var(--on-surface);
+		line-height: normal;
+		text-align: start;
+		border-radius: 0.25rem;
+		transition:
+			all var(--speed2),
+			0s background-color;
+	}
+
+	.youtube-theme .shaka-overflow-menu::before,
+	.youtube-theme .shaka-settings-menu::before {
+		content: '' !important;
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+		width: 100vw !important;
+		height: 100vh !important;
+		background: transparent !important;
+		z-index: 99999998 !important;
+		pointer-events: auto !important;
+	}
+
+	.youtube-theme .shaka-overflow-menu:hover,
+	.youtube-theme .shaka-settings-menu:hover {
+		z-index: 99999998 !important;
+		pointer-events: auto !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+	}
+
+	#shaka-container {
+		z-index: 99999998 !important;
+		pointer-events: auto !important;
+		opacity: 1 !important;
+		visibility: visible !important;
 	}
 }

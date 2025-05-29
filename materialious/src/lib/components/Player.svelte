@@ -52,7 +52,7 @@
 		isSyncing?: boolean;
 		isEmbed?: boolean;
 		segments?: Segment[];
-		playerElement: HTMLMediaElement;
+		playerElement: HTMLMediaElement | undefined;
 	}
 
 	let {
@@ -126,6 +126,7 @@
 	}
 
 	function saveVolumePreference() {
+		if (!playerElement) return;
 		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
 	}
 
@@ -157,6 +158,7 @@
 		if (player) {
 			const timeGivenUrl = page.url.searchParams.get('time');
 			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
+				if (!playerElement) return false;
 				playerElement.currentTime = Number(timeGivenUrl);
 				return true;
 			}
@@ -178,6 +180,29 @@
 		HttpFetchPlugin.cacheManager.clearCache();
 
 		player = new shaka.Player();
+		player.configure({
+			abr: {
+				enabled: true,
+				restrictions: {
+					maxWidth: 1920,
+					maxHeight: 1080
+				}
+			},
+			streaming: {
+				bufferingGoal: 120,
+				rebufferingGoal: 0.01,
+				bufferBehind: 300,
+				retryParameters: {
+					maxAttempts: 30,
+					baseDelay: 1500,
+					backoffFactor: 2.5,
+					fuzzFactor: 0.7,
+					timeout: 120000
+				},
+				stallThreshold: 2,
+				stallSkip: 0.5
+			}
+		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
 		playerElementResizeObserver = new ResizeObserver(() => {
@@ -195,7 +220,6 @@
 			playerElement.volume = parseFloat(savedVolume);
 		}
 
-		await player.attach(playerElement);
 		shakaUi = new shaka.ui.Overlay(
 			player,
 			document.getElementById('shaka-container') as HTMLElement,
@@ -226,26 +250,6 @@
 			enableTooltips: true,
 			seekBarColors: {
 				played: (await getDynamicTheme())['--primary']
-			}
-		});
-
-		player.configure({
-			abr: {
-				enabled: true
-			},
-			streaming: {
-				bufferingGoal: 120,
-				rebufferingGoal: 0.01,
-				bufferBehind: 300,
-				retryParameters: {
-					maxAttempts: 30,
-					baseDelay: 1500,
-					backoffFactor: 2.5,
-					fuzzFactor: 0.7,
-					timeout: 120000
-				},
-				stallThreshold: 2,
-				stallSkip: 0.5
 			}
 		});
 
@@ -635,6 +639,8 @@
 			});
 		}
 
+		await player.attach(playerElement);
+
 		if (!data.video.hlsUrl) {
 			let dashUrl = data.video.dashUrl;
 
@@ -701,6 +707,8 @@
 
 						playerElement.addEventListener('timeupdate', () => {
 							segments.forEach((segment) => {
+								if (!playerElement) return;
+
 								if (
 									playerElement.currentTime >= segment.startTime &&
 									playerElement.currentTime <= segment.endTime
@@ -813,6 +821,8 @@
 		}
 
 		Mousetrap.bind('space', () => {
+			if (!playerElement) return;
+
 			if (playerElement.paused) {
 				playerElement.play();
 			} else {
@@ -822,11 +832,14 @@
 		});
 
 		Mousetrap.bind('right', () => {
+			if (!playerElement) return;
 			playerElement.currentTime = playerElement.currentTime + 10;
 			return false;
 		});
 
 		Mousetrap.bind('left', () => {
+			if (!playerElement) return;
+
 			playerElement.currentTime = playerElement.currentTime - 10;
 			return false;
 		});
@@ -854,16 +867,22 @@
 			if (document.fullscreenElement) {
 				document.exitFullscreen();
 			} else {
+				if (!playerElement) return;
+
 				playerElement.requestFullscreen();
 			}
 			return false;
 		});
 
 		Mousetrap.bind('shift+left', () => {
+			if (!playerElement) return;
+
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
 		});
 
 		Mousetrap.bind('shift+right', () => {
+			if (!playerElement) return;
+
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 		});
 	});
@@ -891,13 +910,18 @@
 			}
 		}
 
-		if (toSetTime > 0) playerElement.currentTime = toSetTime;
+		if (toSetTime > 0 && playerElement) playerElement.currentTime = toSetTime;
 	}
 
 	function savePlayerPos() {
 		if (data.video.hlsUrl) return;
 
-		if (get(playerSavePlaybackPositionStore) && player && playerElement.currentTime) {
+		if (
+			get(playerSavePlaybackPositionStore) &&
+			player &&
+			playerElement &&
+			playerElement.currentTime
+		) {
 			if (
 				playerElement.currentTime < playerElement.duration - 10 &&
 				playerElement.currentTime > 10

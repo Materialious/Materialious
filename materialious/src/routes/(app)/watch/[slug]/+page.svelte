@@ -598,7 +598,9 @@
 							<h6 style="margin-bottom: .3em;">Chapters</h6>
 							{#each data.content.timestamps as timestamp}
 								<button
-									onclick={() => (playerElement.currentTime = timestamp.time)}
+									onclick={() => {
+										if (playerElement) playerElement.currentTime = timestamp.time;
+									}}
 									class="timestamps"
 									>{timestamp.timePretty}
 									{#if !timestamp.title.startsWith('-')}
@@ -647,7 +649,7 @@
 	</div>
 	{#if !theatreMode}
 		<div class="s12 m12 l3">
-			{#if showTranscript}
+			{#if showTranscript && playerElement}
 				<Transcript video={data.video} bind:playerElement />
 			{/if}
 			{#if playlist}

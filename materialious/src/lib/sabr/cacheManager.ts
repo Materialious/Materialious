@@ -14,7 +14,7 @@ export class CacheManager {
 	private readonly maxCacheSize: number;
 	private readonly maxAge: number;
 
-	constructor(maxSizeMB = 100, maxAgeSeconds = 600) {
+	constructor(maxSizeMB = 50, maxAgeSeconds = 300) {
 		this.maxCacheSize = maxSizeMB * 1024 * 1024;
 		this.maxAge = maxAgeSeconds * 1000;
 		this.startGarbageCollection();

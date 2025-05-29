@@ -21,6 +21,7 @@
 		darkModeStore,
 		instanceStore,
 		interfaceAmoledTheme,
+		interfaceDefaultPage,
 		showWarningStore,
 		syncPartyPeerStore,
 		themeColorStore
@@ -235,7 +236,7 @@
 		</nav>
 	{/if}
 
-	<nav onclick={() => goto('/')} style="cursor: pointer;" class="m l">
+	<nav onclick={() => goto($interfaceDefaultPage)} style="cursor: pointer;" class="m l">
 		<Logo />
 		<h6 class="l">Materialious</h6>
 	</nav>

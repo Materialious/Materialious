@@ -7,7 +7,7 @@ import { authStore, interfaceDefaultPage } from '$lib/store.js';
 import { locale, waitLocale } from 'svelte-i18n';
 import { get } from 'svelte/store';
 
-export let ssr = false;
+export const ssr = false;
 
 export async function load({ url }) {
 	if (url.pathname.startsWith('/@')) {
@@ -18,7 +18,7 @@ export async function load({ url }) {
 			if (resolvedUrl.pageType === 'WEB_PAGE_TYPE_CHANNEL') {
 				goto(`/channel/${resolvedUrl.ucid}`);
 			}
-		} catch { }
+		} catch {}
 	}
 
 	if (browser) {

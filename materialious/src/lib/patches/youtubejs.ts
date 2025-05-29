@@ -29,23 +29,21 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		enable_session_cache: false
 	});
 
-	if (!get(poTokenCacheStore)) {
-		const visitorData = youtube.session.context.client.visitorData ?? '';
+	const visitorData = youtube.session.context.client.visitorData ?? '';
 
-		const requestKey = 'O43z0dpjhgX20SCx4KAo';
-		const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+	const requestKey = 'O43z0dpjhgX20SCx4KAo';
+	const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
 
-		if (!challengeResponse.bg_challenge) throw new Error('Could not get challenge');
+	if (!challengeResponse.bg_challenge) throw new Error('Could not get challenge');
 
-		const platformMinter =
-			Capacitor.getPlatform() === 'android'
-				? androidPoTokenMinter
-				: window.electronAPI.generatePoToken;
+	const platformMinter =
+		Capacitor.getPlatform() === 'android'
+			? androidPoTokenMinter
+			: window.electronAPI.generatePoToken;
 
-		poTokenCacheStore.set(
-			await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
-		);
-	}
+	poTokenCacheStore.set(
+	    await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
+	);
 
 	const extraArgs: Record<string, any> = {
 		playbackContext: {

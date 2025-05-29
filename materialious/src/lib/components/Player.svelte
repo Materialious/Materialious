@@ -185,10 +185,16 @@
 				enabled: true,
 				restrictions: {
 					maxWidth: 1920,
-					maxHeight: 1080
+					maxHeight: 1080,
+					maxBandwidth: data.video.ytjs
+						? Number(
+								data.video.ytjs?.video.page[0].player_config?.stream_selection_config.max_bitrate
+							)
+						: -1
 				}
 			},
 			streaming: {
+				autoLowLatencyMode: true,
 				bufferingGoal: 120,
 				rebufferingGoal: 0.01,
 				bufferBehind: 300,

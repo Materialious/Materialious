@@ -116,7 +116,7 @@
 						onclick={() => (playerElement.currentTime = cue.startTime)}
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>
-						<p class="chip no-margin no-padding">{videoLength(cue.startTime)}</p>
+						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
 						<p class="transcript-text">{decodeHtmlCharCodes(cue.text.replace(/<[^>]+>/g, ''))}</p>
 					</div>
 				{/each}

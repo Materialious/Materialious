@@ -243,7 +243,7 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 - Every dependency in [package.json](/materialious/package.json).
 - [LuanRT](https://github.com/LuanRT) for YouTube.js & SABR implementation.
 - [FreeTube](https://github.com/FreeTubeApp/FreeTube) for their subtitle fix.
-- [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.free
+- [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.
 
 # Developers
 - [How Materialious is built](./docs/BUILDING.md)

@@ -55,6 +55,14 @@
 
 Open an issue to add your instance.
 
+# Translations
+
+Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)! 
+
+<a href="https://toolate.othing.xyz/projects/materialious/">
+<img src="https://toolate.othing.xyz/widget/materialious/materialious/multi-auto.svg" alt="Translation status" />
+</a>
+
 # Deploying as a website via docker
 [Please read the guide here](./docs/DOCKER.md)
 
@@ -226,14 +234,6 @@ brew install --cask spotube
 
 # Have any questions?
 [Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
-
-# Translations
-
-Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)! 
-
-<a href="https://toolate.othing.xyz/projects/materialious/">
-<img src="https://toolate.othing.xyz/widget/materialious/materialious/multi-auto.svg" alt="Translation status" />
-</a>
 
 # Special thanks to
 - [SecularSteve](https://github.com/SecularSteve) for creating Materialious' logo.

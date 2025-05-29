@@ -119,6 +119,10 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	const recommendedVideos: VideoBase[] = [];
 	video.watch_next_feed?.forEach((recommended: Record<string, any>) => {
+		if (!recommended.title) {
+			return;
+		}
+
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.thumbnails as Thumbnail[]) || [],
 			videoId: recommended?.id || '',

@@ -41,7 +41,7 @@
 
 	let { data = $bindable() } = $props();
 
-	let playerElement: HTMLMediaElement;
+	let playerElement: HTMLMediaElement | undefined = $state();
 
 	let comments: Comments | null = $state(null);
 	data.streamed.comments?.then((streamedComments) => {

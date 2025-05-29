@@ -105,8 +105,8 @@
 		const overlap = getTextOverlap(cleanA, cleanB);
 		const minLength = Math.min(cleanA.length, cleanB.length);
 
-		// Consider similar if 60% or more overlap
-		return overlap / minLength >= 0.6;
+		// Consider similar if 50% or more overlap
+		return overlap / minLength >= 0.5;
 	}
 
 	function getTextOverlap(a: string, b: string): number {

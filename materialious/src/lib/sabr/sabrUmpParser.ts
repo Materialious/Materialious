@@ -120,7 +120,11 @@ export class SabrUmpParser {
 				this.handleNextRequestPolicy(part);
 				break;
 			case PART.MEDIA_HEADER:
-				this.handleMediaHeader(part);
+				try {
+					this.handleMediaHeader(part);
+				} catch (error) {
+					console.error();
+				}
 				break;
 			case PART.MEDIA:
 				this.handleMedia(part);

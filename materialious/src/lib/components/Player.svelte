@@ -488,8 +488,7 @@
 						request.headers['X-Streaming-Context'] = btoa(JSON.stringify(sabrStreamingContext));
 						delete headers.Range;
 					} else {
-						url.pathname += '/ump/1';
-						url.pathname += '/srfvp/1';
+						url.pathname += `/ump/1/srfvp/1/pot/${get(poTokenCacheStore)}`;
 
 						request.headers['X-Streaming-Context'] = btoa(
 							JSON.stringify({
@@ -497,8 +496,6 @@
 								isSABR: false
 							})
 						);
-
-						url.pathname += '/pot/' + get(poTokenCacheStore);
 					}
 
 					request.method = 'POST';

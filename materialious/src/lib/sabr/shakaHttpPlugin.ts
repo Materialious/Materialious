@@ -6,7 +6,6 @@ import { retrieveCachedSegment } from './cacheHelper';
 import { SabrUmpParser } from './sabrUmpParser';
 import { CacheManager } from './cacheManager';
 import { Capacitor } from '@capacitor/core';
-import { androidFetch } from '$lib/android/http/androidRequests';
 
 export interface SabrStreamingContext {
 	byteRange?: { start: number; end: number };
@@ -28,7 +27,7 @@ export interface SabrStreamingContext {
 }
 
 export class HttpFetchPlugin {
-	private static fetch_ = Capacitor.getPlatform() === 'android' ? androidFetch : window.fetch;
+	private static fetch_ = window.fetch;
 	private static AbortController_ = window.AbortController;
 	private static Headers_ = window.Headers;
 	public static cacheManager = new CacheManager();
@@ -51,7 +50,7 @@ export class HttpFetchPlugin {
 		const headers = new HttpFetchPlugin.Headers_();
 
 		HttpFetchPlugin.asMap(request.headers).forEach((value, key) => {
-			headers.append(key as string, value as string);
+			headers.append(key as string, value);
 		});
 
 		let sabrStreamingContext: string | null = null;
@@ -105,6 +104,7 @@ export class HttpFetchPlugin {
 				abortStatus.timedOut = true;
 				controller.abort();
 			});
+
 			timer.tickAfter(timeoutMs / 1000);
 			op.finally(() => timer.stop());
 		}

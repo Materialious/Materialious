@@ -66,6 +66,7 @@
 	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
+	let userWantsFullscreen = false;
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
@@ -75,7 +76,6 @@
 		''
 	);
 	let isLive = false;
-	let isPostLiveDVR = false;
 	let videoPlaybackUstreamerConfig: string | undefined;
 	let serverAbrStreamingUrl: URL | undefined = undefined;
 	let drmParams: string | undefined;
@@ -185,16 +185,10 @@
 				enabled: true,
 				restrictions: {
 					maxWidth: 1920,
-					maxHeight: 1080,
-					maxBandwidth: data.video.ytjs
-						? Number(
-								data.video.ytjs?.video.page[0].player_config?.stream_selection_config.max_bitrate
-							)
-						: -1
+					maxHeight: 1080
 				}
 			},
 			streaming: {
-				autoLowLatencyMode: true,
 				bufferingGoal: 120,
 				rebufferingGoal: 0.01,
 				bufferBehind: 300,
@@ -261,7 +255,6 @@
 
 		if (data.video.fallbackPatch === 'youtubejs' && data.video.ytjs) {
 			isLive = !!data.video.ytjs.video.basic_info.is_live;
-			isPostLiveDVR = !!data.video.ytjs.video.basic_info.is_post_live_dvr;
 
 			if (
 				data.video.ytjs.rawApiResponse.data.streamingData &&
@@ -304,15 +297,30 @@
 				lastActionMs = Date.now();
 			});
 
+			player.addEventListener('error', (event) => {
+				const error = (event as CustomEvent).detail as shaka.util.Error;
+				console.error('Player error:', error);
+			});
+
 			const networkingEngine = player.getNetworkingEngine();
 
 			if (!networkingEngine) return;
+
+			// Required to stop buttons from being still selected when fullscreening
+			document.addEventListener('fullscreenchange', async () => {
+				userWantsFullscreen = document.fullscreenElement !== null;
+				const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
+				buttons.forEach((button) => {
+					// Reset the button's focus and active states
+					(button as HTMLElement).blur(); // Remove focus from the button
+					button.removeAttribute('aria-pressed'); // Reset any ARIA attributes that might indicate selection
+				});
+			});
 
 			// Based off the following
 			// https://github.com/FreeTubeApp/FreeTube/blob/d270c9e251a433f1e4246a3f6a37acef707d22aa/src/renderer/components/ft-shaka-video-player/ft-shaka-video-player.js#L1206
 			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
 			// https://github.com/LuanRT/yt-sabr-shaka-demo/blob/main/src/components/VideoPlayer.vue
-
 			networkingEngine.registerRequestFilter(async (type, request, context) => {
 				if (!player) return;
 
@@ -326,10 +334,7 @@
 					type === shaka.net.NetworkingEngine.RequestType.SEGMENT &&
 					url.pathname.includes('videoplayback')
 				) {
-					const isUmp = url.searchParams.get('ump') === '1';
-					const isSabr = url.searchParams.get('sabr') === '1';
-
-					if (isSabr) {
+					if (!isLive) {
 						const currentFormat = formatList.find(
 							(format) =>
 								fromFormat(format) === (new URL(request.uris[0]).searchParams.get('___key') || '')
@@ -482,18 +487,8 @@
 						// @NOTE: Not a real header. See the http plugin code for more info.
 						request.headers['X-Streaming-Context'] = btoa(JSON.stringify(sabrStreamingContext));
 						delete headers.Range;
-					} else if (isUmp) {
-						if (!isLive && !isPostLiveDVR) {
-							url.searchParams.set('ump', '1');
-							url.searchParams.set('srfvp', '1');
-							if (headers.Range) {
-								url.searchParams.set('range', headers.Range?.split('=')[1]);
-								delete headers.Range;
-							}
-						} else {
-							url.pathname += '/ump/1';
-							url.pathname += '/srfvp/1';
-						}
+					} else {
+						url.pathname += `/ump/1/srfvp/1/pot/${get(poTokenCacheStore)}`;
 
 						request.headers['X-Streaming-Context'] = btoa(
 							JSON.stringify({
@@ -504,23 +499,6 @@
 					}
 
 					request.method = 'POST';
-
-					if (!isSabr) {
-						if (request.method === 'POST') {
-							request.body = new Uint8Array([120, 0]);
-						}
-
-						const poToken = get(poTokenCacheStore);
-
-						if (poToken) {
-							// Set Proof of Origin Token
-							if (isLive || isPostLiveDVR) {
-								url.pathname += '/pot/' + poToken;
-							} else {
-								url.searchParams.set('pot', poToken);
-							}
-						}
-					}
 				} else if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
 					const wrapped = {} as Record<string, any>;
 					wrapped.context = data.video.ytjs?.innertube.session.context;
@@ -559,7 +537,7 @@
 						const sabrStreamingContext = response.headers['X-Streaming-Context'];
 
 						if (sabrStreamingContext) {
-							const { streamInfo, isSABR, format, byteRange } = JSON.parse(
+							const { streamInfo, format, byteRange } = JSON.parse(
 								atob(sabrStreamingContext)
 							) as SabrStreamingContext;
 
@@ -574,11 +552,8 @@
 								if (sabrRedirect?.url && !response.data.byteLength) {
 									let redirectUrl = new URL(sabrRedirect.url);
 
-									// For SABR, create a fake URL so we can identify it in the request filter.
-									if (isSABR) {
-										serverAbrStreamingUrl = redirectUrl;
-										redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
-									}
+									serverAbrStreamingUrl = redirectUrl;
+									redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
 
 									const retryParameters = player!.getConfiguration().streaming.retryParameters;
 
@@ -588,7 +563,7 @@
 									);
 
 									// Keep range so we can slice the response (only if it's the init segment).
-									if (isSABR && byteRange) {
+									if (typeof byteRange !== 'undefined') {
 										redirectRequest.headers['Range'] = `bytes=${byteRange.start}-${byteRange.end}`;
 									}
 
@@ -688,7 +663,7 @@
 
 				if (timestampIndex > 0) {
 					player.addChaptersTrack(
-						URL.createObjectURL(new Blob([chapterWebVTT])),
+						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
 						get(playerDefaultLanguage)
 					);
 				}
@@ -834,12 +809,20 @@
 			} else {
 				playerElement.pause();
 			}
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
 		Mousetrap.bind('right', () => {
 			if (!playerElement) return;
 			playerElement.currentTime = playerElement.currentTime + 10;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
@@ -847,6 +830,10 @@
 			if (!playerElement) return;
 
 			playerElement.currentTime = playerElement.currentTime - 10;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
@@ -866,6 +853,10 @@
 					player.setTextTrackVisibility(true);
 				}
 			}
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
@@ -873,9 +864,7 @@
 			if (document.fullscreenElement) {
 				document.exitFullscreen();
 			} else {
-				if (!playerElement) return;
-
-				playerElement.requestFullscreen();
+				shakaUi.getControls()?.toggleFullScreen();
 			}
 			return false;
 		});
@@ -884,12 +873,20 @@
 			if (!playerElement) return;
 
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 		});
 
 		Mousetrap.bind('shift+right', () => {
 			if (!playerElement) return;
 
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 		});
 	});
 
@@ -952,12 +949,6 @@
 	}
 
 	onDestroy(async () => {
-		HttpFetchPlugin.cacheManager.clearCache();
-
-		if (playerElementResizeObserver) {
-			playerElementResizeObserver.disconnect();
-		}
-
 		if (Capacitor.getPlatform() === 'android') {
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
@@ -973,9 +964,25 @@
 		try {
 			savePlayerPos();
 		} catch (error) {}
-		await player.destroy();
-		await shakaUi.destroy();
 		playerPosSet = false;
+		HttpFetchPlugin.cacheManager.clearCache();
+
+		if (playerElementResizeObserver) {
+			playerElementResizeObserver.disconnect();
+		}
+
+		if (playerElement) {
+			playerElement.src = '';
+			playerElement.load();
+		}
+
+		if (player) {
+			player.destroy();
+		}
+
+		if (shakaUi) {
+			shakaUi.destroy();
+		}
 	});
 </script>
 

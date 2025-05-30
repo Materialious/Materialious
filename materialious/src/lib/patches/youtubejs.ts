@@ -67,8 +67,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	});
 	const rawNextResponse = await watchEndpoint.call(youtube.actions, {
 		override_endpoint: '/next',
-		racyCheckOk: true,
-		contentCheckOk: true
+		...extraArgs
 	});
 	const video = new YT.VideoInfo(
 		[rawPlayerResponse, rawNextResponse],
@@ -83,11 +82,12 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	let dashUri: string | undefined;
 
 	if (video.streaming_data) {
-		video.streaming_data.adaptive_formats.forEach((format) => {
+		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.map((format) => {
 			const formatKey = fromFormat(format) || '';
 			format.url = `https://sabr?___key=${formatKey}`;
 			format.signature_cipher = undefined;
 			format.decipher = () => format.url || '';
+			return format;
 		});
 
 		if (video.basic_info.is_live) {
@@ -99,7 +99,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
 				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
 		} else {
-			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash(undefined, undefined, { captions_format: 'vtt' }))}`;
+			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash(undefined, undefined))}`;
 		}
 	}
 

@@ -280,7 +280,7 @@
 		width: 100% !important;
 		min-width: 100% !important;
 		position: fixed !important;
-		top: 100% !important;
+		top: 70% !important;
 		left: 50% !important;
 		height: 50vh !important;
 		transform: translate(-50%, -50%) !important;
@@ -288,10 +288,10 @@
 		pointer-events: auto !important;
 		opacity: 1 !important;
 		visibility: visible !important;
-		padding: 1rem !important;
+		padding: 1rem 0.5rem !important;
 		box-shadow: var(--elevate2);
 		background-color: var(--surface-container);
-		z-index: 11;
+		z-index: 40;
 		inset: auto auto 0 0;
 		inline-size: 100%;
 		max-block-size: 50vh;

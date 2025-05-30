@@ -1,5 +1,4 @@
-import { GoogleVideo, Protos, concatenateChunks, PART } from 'googlevideo';
-import type { Part } from 'googlevideo';
+import { GoogleVideo, Protos, concatenateChunks, type Part, PART } from 'googlevideo';
 import shaka from 'shaka-player/dist/shaka-player.ui';
 
 import { cacheSegment } from './cacheHelper';

@@ -58,7 +58,7 @@ export function createSegmentCacheKey(
 	if (isInit && format) {
 		return `${mediaHeader.itag}:${mediaHeader.xtags || ''}:${format.content_length || ''}:${format.mime_type || ''}`;
 	}
-	/* @ts-ignore */
+	// @ts-expect-error Invalid typing
 	return `${mediaHeader.startRange || '0'}-${mediaHeader.itag}-${mediaHeader.xtags || ''}`;
 }
 

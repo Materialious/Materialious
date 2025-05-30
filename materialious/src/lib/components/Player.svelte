@@ -66,6 +66,7 @@
 	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
+	let userWantsFullscreen = false;
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
@@ -308,11 +309,21 @@
 
 			if (!networkingEngine) return;
 
+			// Required to stop buttons from being still selected when fullscreening
+			document.addEventListener('fullscreenchange', async () => {
+				userWantsFullscreen = document.fullscreenElement !== null;
+				const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
+				buttons.forEach((button) => {
+					// Reset the button's focus and active states
+					(button as HTMLElement).blur(); // Remove focus from the button
+					button.removeAttribute('aria-pressed'); // Reset any ARIA attributes that might indicate selection
+				});
+			});
+
 			// Based off the following
 			// https://github.com/FreeTubeApp/FreeTube/blob/d270c9e251a433f1e4246a3f6a37acef707d22aa/src/renderer/components/ft-shaka-video-player/ft-shaka-video-player.js#L1206
 			// https://github.com/LuanRT/BgUtils/blob/6b121166be1ccb0b952dee1bdac488808365ae6b/examples/browser/web/src/main.ts#L293
 			// https://github.com/LuanRT/yt-sabr-shaka-demo/blob/main/src/components/VideoPlayer.vue
-
 			networkingEngine.registerRequestFilter(async (type, request, context) => {
 				if (!player) return;
 
@@ -506,10 +517,7 @@
 					request.method = 'POST';
 
 					if (!isSabr) {
-						if (request.method === 'POST') {
-							request.body = new Uint8Array([120, 0]);
-						}
-
+						request.body = new Uint8Array([120, 0]);
 						const poToken = get(poTokenCacheStore);
 
 						if (poToken) {
@@ -688,7 +696,7 @@
 
 				if (timestampIndex > 0) {
 					player.addChaptersTrack(
-						URL.createObjectURL(new Blob([chapterWebVTT])),
+						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
 						get(playerDefaultLanguage)
 					);
 				}
@@ -834,12 +842,20 @@
 			} else {
 				playerElement.pause();
 			}
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
 		Mousetrap.bind('right', () => {
 			if (!playerElement) return;
 			playerElement.currentTime = playerElement.currentTime + 10;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
@@ -847,6 +863,10 @@
 			if (!playerElement) return;
 
 			playerElement.currentTime = playerElement.currentTime - 10;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
@@ -866,6 +886,10 @@
 					player.setTextTrackVisibility(true);
 				}
 			}
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 			return false;
 		});
 
@@ -873,9 +897,7 @@
 			if (document.fullscreenElement) {
 				document.exitFullscreen();
 			} else {
-				if (!playerElement) return;
-
-				playerElement.requestFullscreen();
+				shakaUi.getControls()?.toggleFullScreen();
 			}
 			return false;
 		});
@@ -884,12 +906,20 @@
 			if (!playerElement) return;
 
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 		});
 
 		Mousetrap.bind('shift+right', () => {
 			if (!playerElement) return;
 
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
+
+			if (!document.fullscreenElement && userWantsFullscreen) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 		});
 	});
 

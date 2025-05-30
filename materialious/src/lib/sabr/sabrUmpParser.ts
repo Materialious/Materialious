@@ -123,7 +123,7 @@ export class SabrUmpParser {
 				try {
 					this.handleMediaHeader(part);
 				} catch (error) {
-					console.error();
+					console.error(error);
 				}
 				break;
 			case PART.MEDIA:

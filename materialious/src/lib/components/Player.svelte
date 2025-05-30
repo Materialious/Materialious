@@ -76,7 +76,6 @@
 		''
 	);
 	let isLive = false;
-	let isPostLiveDVR = false;
 	let videoPlaybackUstreamerConfig: string | undefined;
 	let serverAbrStreamingUrl: URL | undefined = undefined;
 	let drmParams: string | undefined;
@@ -186,16 +185,10 @@
 				enabled: true,
 				restrictions: {
 					maxWidth: 1920,
-					maxHeight: 1080,
-					maxBandwidth: data.video.ytjs
-						? Number(
-								data.video.ytjs?.video.page[0].player_config?.stream_selection_config.max_bitrate
-							)
-						: -1
+					maxHeight: 1080
 				}
 			},
 			streaming: {
-				autoLowLatencyMode: true,
 				bufferingGoal: 120,
 				rebufferingGoal: 0.01,
 				bufferBehind: 300,
@@ -262,7 +255,6 @@
 
 		if (data.video.fallbackPatch === 'youtubejs' && data.video.ytjs) {
 			isLive = !!data.video.ytjs.video.basic_info.is_live;
-			isPostLiveDVR = !!data.video.ytjs.video.basic_info.is_post_live_dvr;
 
 			if (
 				data.video.ytjs.rawApiResponse.data.streamingData &&
@@ -305,6 +297,11 @@
 				lastActionMs = Date.now();
 			});
 
+			player.addEventListener('error', (event) => {
+				const error = (event as CustomEvent).detail as shaka.util.Error;
+				console.error('Player error:', error);
+			});
+
 			const networkingEngine = player.getNetworkingEngine();
 
 			if (!networkingEngine) return;
@@ -337,10 +334,7 @@
 					type === shaka.net.NetworkingEngine.RequestType.SEGMENT &&
 					url.pathname.includes('videoplayback')
 				) {
-					const isUmp = url.searchParams.get('ump') === '1';
-					const isSabr = url.searchParams.get('sabr') === '1';
-
-					if (isSabr) {
+					if (!isLive) {
 						const currentFormat = formatList.find(
 							(format) =>
 								fromFormat(format) === (new URL(request.uris[0]).searchParams.get('___key') || '')
@@ -493,18 +487,9 @@
 						// @NOTE: Not a real header. See the http plugin code for more info.
 						request.headers['X-Streaming-Context'] = btoa(JSON.stringify(sabrStreamingContext));
 						delete headers.Range;
-					} else if (isUmp) {
-						if (!isLive && !isPostLiveDVR) {
-							url.searchParams.set('ump', '1');
-							url.searchParams.set('srfvp', '1');
-							if (headers.Range) {
-								url.searchParams.set('range', headers.Range?.split('=')[1]);
-								delete headers.Range;
-							}
-						} else {
-							url.pathname += '/ump/1';
-							url.pathname += '/srfvp/1';
-						}
+					} else {
+						url.pathname += '/ump/1';
+						url.pathname += '/srfvp/1';
 
 						request.headers['X-Streaming-Context'] = btoa(
 							JSON.stringify({
@@ -512,23 +497,11 @@
 								isSABR: false
 							})
 						);
+
+						url.pathname += '/pot/' + get(poTokenCacheStore);
 					}
 
 					request.method = 'POST';
-
-					if (!isSabr) {
-						request.body = new Uint8Array([120, 0]);
-						const poToken = get(poTokenCacheStore);
-
-						if (poToken) {
-							// Set Proof of Origin Token
-							if (isLive || isPostLiveDVR) {
-								url.pathname += '/pot/' + poToken;
-							} else {
-								url.searchParams.set('pot', poToken);
-							}
-						}
-					}
 				} else if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
 					const wrapped = {} as Record<string, any>;
 					wrapped.context = data.video.ytjs?.innertube.session.context;
@@ -567,7 +540,7 @@
 						const sabrStreamingContext = response.headers['X-Streaming-Context'];
 
 						if (sabrStreamingContext) {
-							const { streamInfo, isSABR, format, byteRange } = JSON.parse(
+							const { streamInfo, format, byteRange } = JSON.parse(
 								atob(sabrStreamingContext)
 							) as SabrStreamingContext;
 
@@ -582,11 +555,8 @@
 								if (sabrRedirect?.url && !response.data.byteLength) {
 									let redirectUrl = new URL(sabrRedirect.url);
 
-									// For SABR, create a fake URL so we can identify it in the request filter.
-									if (isSABR) {
-										serverAbrStreamingUrl = redirectUrl;
-										redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
-									}
+									serverAbrStreamingUrl = redirectUrl;
+									redirectUrl = new URL(`https://sabr?___key=${fromFormat(format) || ''}`);
 
 									const retryParameters = player!.getConfiguration().streaming.retryParameters;
 
@@ -596,7 +566,7 @@
 									);
 
 									// Keep range so we can slice the response (only if it's the init segment).
-									if (isSABR && byteRange) {
+									if (typeof byteRange !== 'undefined') {
 										redirectRequest.headers['Range'] = `bytes=${byteRange.start}-${byteRange.end}`;
 									}
 
@@ -982,12 +952,6 @@
 	}
 
 	onDestroy(async () => {
-		HttpFetchPlugin.cacheManager.clearCache();
-
-		if (playerElementResizeObserver) {
-			playerElementResizeObserver.disconnect();
-		}
-
 		if (Capacitor.getPlatform() === 'android') {
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
@@ -1003,9 +967,25 @@
 		try {
 			savePlayerPos();
 		} catch (error) {}
-		await player.destroy();
-		await shakaUi.destroy();
 		playerPosSet = false;
+		HttpFetchPlugin.cacheManager.clearCache();
+
+		if (playerElementResizeObserver) {
+			playerElementResizeObserver.disconnect();
+		}
+
+		if (playerElement) {
+			playerElement.src = '';
+			playerElement.load();
+		}
+
+		if (player) {
+			player.destroy();
+		}
+
+		if (shakaUi) {
+			shakaUi.destroy();
+		}
 	});
 </script>
 

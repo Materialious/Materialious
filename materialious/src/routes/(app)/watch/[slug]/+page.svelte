@@ -21,7 +21,6 @@
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
 	import type { PlayerEvents } from '$lib/player.js';
 	import {
-		activePageStore,
 		authStore,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
@@ -55,8 +54,6 @@
 
 	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
-
-	activePageStore.set(null);
 
 	let playlistVideos: PlaylistPageVideo[] = $state([]);
 	let playlist: PlaylistPage | null = $state(null);

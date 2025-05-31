@@ -315,6 +315,10 @@
 					(button as HTMLElement).blur(); // Remove focus from the button
 					button.removeAttribute('aria-pressed'); // Reset any ARIA attributes that might indicate selection
 				});
+
+				const tempDiv = document.createElement('div');
+				tempDiv.click();
+				document.removeChild(tempDiv);
 			});
 
 			// Based off the following

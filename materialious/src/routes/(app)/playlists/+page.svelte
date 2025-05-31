@@ -4,15 +4,12 @@
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
-	import { activePageStore } from '$lib/store';
 	import { ui } from 'beercss';
 	import { _ } from 'svelte-i18n';
 
 	let { data } = $props();
 
 	let playlists = $state(data);
-
-	activePageStore.set('playlists');
 
 	let playlistPrivacy: 'public' | 'private' | 'unlisted' = 'public';
 	let playlistTitle: string = $state('');

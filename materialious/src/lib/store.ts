@@ -4,6 +4,7 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './letterCasing';
+import type { PlaylistPageVideo, Video, VideoBase } from './api/model';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
@@ -14,11 +15,14 @@ function platformDependentDefault(givenValue: any, defaultValue: any): any {
 }
 
 export const instanceStore: Writable<string> = persisted(
-	"invidiousInstance",
-	platformDependentDefault(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE, 'https://invidious.materialio.us')
+	'invidiousInstance',
+	platformDependentDefault(
+		import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE,
+		'https://invidious.materialio.us'
+	)
 );
 
-export const authStore: Writable<null | { username: string; token: string; }> = persisted(
+export const authStore: Writable<null | { username: string; token: string }> = persisted(
 	'authToken',
 	null
 );
@@ -27,8 +31,6 @@ export const darkModeStore: Writable<null | boolean> = persisted('darkMode', nul
 export const themeColorStore: Writable<null | string> = persisted('themeColor', null);
 
 export const showWarningStore = persisted('showWarning', true);
-
-export const activePageStore: Writable<string | null> = writable('home');
 
 export const playerAutoPlayStore = persisted('autoPlay', true);
 export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
@@ -44,13 +46,20 @@ export const playerDefaultLanguage = persisted('defaultLanguage', '');
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
 	'returnYTDislikesInstance',
-	platformDependentDefault(import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE, 'https://ryd-proxy.materialio.us')
+	platformDependentDefault(
+		import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+		'https://ryd-proxy.materialio.us'
+	)
 );
 
 export const synciousStore = persisted('syncious', true);
 export const synciousInstanceStore: Writable<string | null | undefined> = persisted(
 	'synciousInstance',
-	platformDependentDefault(import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE || import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE, 'https://extended-api.materialio.us')
+	platformDependentDefault(
+		import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE ||
+			import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
+		'https://extended-api.materialio.us'
+	)
 );
 
 export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');
@@ -96,10 +105,14 @@ export const deArrowThumbnailInstanceStore = persisted(
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
 export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writable();
 
-export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean; }>> =
+export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean }>> =
 	writable({});
-
 
 export const poTokenCacheStore: Writable<string | undefined> = writable();
 
 export const searchHistoryStore: Writable<string[]> = persisted('searchHistory', []);
+
+export const feedCacheStore: Writable<{
+	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];
+}> = writable({});
+export const feedLastItemId: Writable<string | undefined> = writable(undefined);

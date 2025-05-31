@@ -2,7 +2,6 @@
 	import { getHashtag } from '$lib/api';
 	import type { Video } from '$lib/api/model.js';
 	import VideoList from '$lib/components/VideoList.svelte';
-	import { activePageStore } from '$lib/store';
 	import { onMount } from 'svelte';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
@@ -14,8 +13,6 @@
 	onMount(() => {
 		videos = [...data.hashTagVideos.results];
 	});
-
-	activePageStore.set('hashtag');
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;

@@ -3,14 +3,12 @@
 	import type { VideoPlay } from '$lib/api/model';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import VideoList from '$lib/components/VideoList.svelte';
-	import { activePageStore, synciousStore } from '$lib/store';
+	import { synciousStore } from '$lib/store';
 	import { error } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
-
-	activePageStore.set('history');
 
 	let history: VideoPlay[] = $state([]);
 	let loaded = $state(false);

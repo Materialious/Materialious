@@ -6,7 +6,6 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import { activePageStore } from '$lib/store';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
@@ -15,8 +14,6 @@
 	let searchResults = $state(data);
 
 	let currentPage = 1;
-
-	activePageStore.set(null);
 
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
 		searchResults.searchType = type;

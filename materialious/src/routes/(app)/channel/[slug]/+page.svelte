@@ -7,7 +7,7 @@
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
-	import { activePageStore, authStore, interfaceLowBandwidthMode } from '$lib/store';
+	import { authStore, interfaceLowBandwidthMode } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
@@ -16,8 +16,6 @@
 	import { get } from 'svelte/store';
 
 	let { data } = $props();
-
-	activePageStore.set(null);
 
 	let isSubscribed = $state(false);
 

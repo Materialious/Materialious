@@ -4,15 +4,13 @@
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
-	import { activePageStore, playlistSettingsStore } from '$lib/store';
+	import { playlistSettingsStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
 	let { data } = $props();
-
-	activePageStore.set(null);
 
 	let videos: PlaylistPageVideo[] | undefined = $state();
 	if (data.playlist.videos.length > 0) {

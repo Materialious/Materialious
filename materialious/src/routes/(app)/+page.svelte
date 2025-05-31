@@ -1,10 +1,7 @@
 <script lang="ts">
 	import VideoList from '$lib/components/VideoList.svelte';
-	import { activePageStore } from '$lib/store';
 
 	let { data } = $props();
-
-	activePageStore.set('home');
 </script>
 
 {#if data.popularDisabled}

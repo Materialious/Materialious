@@ -1,26 +1,29 @@
 <script lang="ts">
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { _ } from 'svelte-i18n';
-	import { get } from 'svelte/store';
 	import { removePlaylistVideo } from '../api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { authStore } from '../store';
+	import type { PlaylistPageVideo, Video, VideoBase } from '../api/model';
+	import { authStore, feedLastItemId } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
+	import { onMount } from 'svelte';
 
 	interface Props {
-		videos?: VideoBase[] | Video[] | Notification[] | PlaylistPageVideo[];
+		videos?: (VideoBase | Video | PlaylistPageVideo)[];
 		playlistId?: string;
 		playlistAuthor?: string;
 	}
 
 	let { videos = [], playlistId = '', playlistAuthor = '' }: Props = $props();
 
-	let auth = get(authStore);
-
 	async function removePlaylistItem(indexId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
 	}
+
+	onMount(() => {
+		if ($feedLastItemId)
+			document.getElementById($feedLastItemId)?.scrollIntoView({ behavior: 'instant' });
+	});
 </script>
 
 <div class="page right active">
@@ -28,9 +31,14 @@
 	<div class="grid">
 		{#each videos as video}
 			<ContentColumn>
-				<article class="no-padding" style="height: 100%;">
+				<article
+					class="no-padding"
+					style="height: 100%;"
+					id={video.videoId}
+					onclick={() => feedLastItemId.set(video.videoId)}
+				>
 					<Thumbnail {video} {playlistId} />
-					{#if auth && decodeURIComponent(auth.username) === playlistAuthor && 'indexId' in video}
+					{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in video}
 						<div class="right-align" style="margin: 1em .5em;">
 							<button
 								onclick={async () => removePlaylistItem(video.indexId)}

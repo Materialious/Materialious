@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 
-	import { navigating } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import '$lib/android/http/androidRequests';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed } from '$lib/api/index';
@@ -16,7 +16,6 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
 	import {
-		activePageStore,
 		authStore,
 		darkModeStore,
 		instanceStore,
@@ -33,7 +32,7 @@
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
@@ -41,9 +40,6 @@
 	let { children } = $props();
 
 	let mobileSearchShow = $state(false);
-
-	let currentPage: string | null = $state('');
-	activePageStore.subscribe((page) => (currentPage = page));
 
 	let isLoggedIn = $state(false);
 	authStore.subscribe((value) => {
@@ -120,40 +116,10 @@
 		notifications = feed.notifications;
 	}
 
-	let scrollPositions = new Map();
-	let scrollableRoot: HTMLElement | null = null;
-
-	beforeNavigate(({ from }) => {
-		if (from?.url && scrollableRoot) {
-			// Save the scroll position of the root element
-			scrollPositions.set(from.url.pathname, scrollableRoot.scrollTop);
-		}
-	});
-
-	// Restore the scroll position after navigating to a new page
-	afterNavigate(async ({ to, type }) => {
-		if (!scrollableRoot) return;
-
-		if (to?.url && scrollPositions.has(to.url.pathname)) {
-			// Check user went back
-			if (type === 'popstate') {
-				await tick();
-				scrollableRoot.scrollTo(0, scrollPositions.get(to.url.pathname) || 0);
-			} else {
-				scrollPositions.delete(to.url.pathname);
-			}
-		} else {
-			// Default behavior: scroll to top
-			scrollableRoot.scrollTo(0, 0);
-		}
-	});
-
 	onMount(async () => {
 		ui();
 
 		document.addEventListener('click', linkClickOverwrite);
-
-		scrollableRoot = document.querySelector('.root');
 
 		loadSettingsFromEnv();
 		// Should always be loaded after env settings
@@ -205,11 +171,11 @@
 
 <nav class="left m l small">
 	<header></header>
-	{#each getPages() as page}
-		{#if !page.requiresAuth || isLoggedIn}
-			<a href={page.href} class:active={currentPage === page.name.toLowerCase()}
-				><i>{page.icon}</i>
-				<div>{page.name}</div>
+	{#each getPages() as navPage}
+		{#if !navPage.requiresAuth || isLoggedIn}
+			<a href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+				><i>{navPage.icon}</i>
+				<div>{navPage.name}</div>
 			</a>
 		{/if}
 	{/each}
@@ -288,12 +254,12 @@
 </nav>
 
 <nav class="bottom s">
-	{#each getPages() as page}
-		{#if !page.requiresAuth || isLoggedIn}
-			<a class="round" href={page.href} class:active={currentPage === page.name.toLowerCase()}
-				><i>{page.icon}</i>
-				{#if currentPage === page.name.toLowerCase()}
-					<span style="font-size: .8em;">{page.name}</span>
+	{#each getPages() as navPage}
+		{#if !navPage.requiresAuth || isLoggedIn}
+			<a class="round" href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+				><i>{navPage.icon}</i>
+				{#if $page.url.href.endsWith(navPage.href)}
+					<span style="font-size: .8em;">{navPage.name}</span>
 				{/if}
 			</a>
 		{/if}

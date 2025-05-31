@@ -1,22 +1,15 @@
 <script lang="ts">
 	import { getFeed } from '$lib/api/index';
-	import type { Notification, Video } from '$lib/api/model.js';
+	import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model.js';
 	import VideoList from '$lib/components/VideoList.svelte';
-	import { activePageStore } from '$lib/store';
-	import { onMount } from 'svelte';
+	import { feedCacheStore } from '$lib/store';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	let { data } = $props();
 
 	let currentPage = 1;
-	let videos: (Notification | Video)[] = $state([]);
-
-	onMount(() => {
-		videos = [...data.feed.notifications, ...data.feed.videos];
-	});
-
-	activePageStore.set('subscriptions');
+	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state(data.videos);
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
@@ -25,6 +18,7 @@
 			event.detail.complete();
 		} else {
 			videos = [...videos, ...feed.videos, ...feed.notifications];
+			feedCacheStore.set({ subscription: videos });
 			event.detail.loaded();
 		}
 	}

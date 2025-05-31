@@ -1,0 +1,26 @@
+<i>Materialious</i> — <a href='https://github.com/iv-org'>Invidious</a> klients ar modernu Material dizainu.
+Klients ļauj pārlūkot un skatīties YouTube video, pārvaldīt atskaņošanas sarakstus un izmantot kanālus.
+
+<b>Funkcionalitāte:</b>
+<ul>
+<li><a href='https://github.com/Materialious/api-extended'>Invidious API paplašinātā integrācija!</a></li>
+<li>Sinhronizē skatīšanās progresu starp Invidious sesijām</li>
+<li>Piedalīties sinhronizētās skatīšanās ballītēs!</li>
+<li>Priekšskatīt video, novietojot kursoru.</li>
+<li>Iebūvēta sponsoru un reklāmdevēju izlaišana (Sponsorblock).</li>
+<li>Iebūvēts nepatīk balsojums (Return YouTube dislikes).</li>
+<li>Iebūvēts DeArrow (ar iespēju ārkārtas gadījumos pārslēgties uz vietējo apstrādi).</li>
+<li>Video atskaņošanas pozīcijas saglabāšana un skatīšanās atsākšana no saglabātās pozīcijas.</li>
+<li>Nav kaitinošu reklāmu.</li>
+<li>Neizseko jūsu aktivitātes.</li>
+<li>Iespēja iestatīt gaišo vai tumšo motīvu.</li>
+<li>Pielāgoti krāsu motīvi.</li>
+<li>Strādā ar Invidious abonementiem, skatīšanās vēsturi un pārējām funkcijām.</li>
+<li>Iespēja skatīt tiešraides.</li>
+<li>Ir Dash atbalsts.</li>
+<li>Nodaļas.</li>
+<li>Kausīties tikai audio.</li>
+<li>Atskaņošanas saraksti.</li>
+<li>Ir PWA atbalsts.</li>
+<li>YT ceļa novirzīšanas (tātad jūsu novirzīšanas spraudņiem joprojām vajadzētu darboties!)</li>
+</ul>

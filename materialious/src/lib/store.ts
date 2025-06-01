@@ -4,7 +4,7 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './letterCasing';
-import type { PlaylistPageVideo, Video, VideoBase } from './api/model';
+import type { Channel, HashTag, Playlist, PlaylistPageVideo, Video, VideoBase } from './api/model';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
@@ -114,5 +114,8 @@ export const searchHistoryStore: Writable<string[]> = persisted('searchHistory',
 
 export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];
+}> = writable({});
+export const searchCacheStore: Writable<{
+	[searchType: string]: (Channel | Video | Playlist | HashTag)[];
 }> = writable({});
 export const feedLastItemId: Writable<string | undefined> = writable(undefined);

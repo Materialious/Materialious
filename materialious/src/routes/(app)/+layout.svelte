@@ -173,7 +173,10 @@
 	<header></header>
 	{#each getPages() as navPage}
 		{#if !navPage.requiresAuth || isLoggedIn}
-			<a href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+			<a
+				href={navPage.href}
+				class:active={$page.url.href.endsWith(navPage.href)}
+				data-sveltekit-preload-data="off"
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
 			</a>
@@ -256,7 +259,11 @@
 <nav class="bottom s">
 	{#each getPages() as navPage}
 		{#if !navPage.requiresAuth || isLoggedIn}
-			<a class="round" href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+			<a
+				class="round"
+				href={navPage.href}
+				class:active={$page.url.href.endsWith(navPage.href)}
+				data-sveltekit-preload-data="off"
 				><i>{navPage.icon}</i>
 				{#if $page.url.href.endsWith(navPage.href)}
 					<span style="font-size: .8em;">{navPage.name}</span>

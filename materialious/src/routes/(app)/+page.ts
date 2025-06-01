@@ -24,7 +24,6 @@ export async function load() {
 	}
 
 	return {
-		popular: popular,
 		popularDisabled: popularDisabled
 	};
 }

@@ -6,10 +6,8 @@
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
-	let { data } = $props();
-
 	let currentPage = 1;
-	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state(data.videos);
+	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state($feedCacheStore.subscription);
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
@@ -32,6 +30,6 @@
 	</a>
 </nav>
 
-<VideoList {videos} />
+<VideoList videos={videos ?? []} />
 
 <InfiniteLoading on:infinite={loadMore} />

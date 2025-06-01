@@ -247,7 +247,7 @@
 				'language',
 				'statistics'
 			],
-			enableTooltips: true,
+			enableTooltips: false,
 			seekBarColors: {
 				played: (await getDynamicTheme())['--primary']
 			}

@@ -19,9 +19,9 @@ export async function load() {
 		feedCacheStore.set({ subscription: videos });
 	} else {
 		await getFeed(100, 1).then((feeds) => {
-			const newVideos = [...feeds.notifications, ...feeds.videos];
+			const newVideos = [...feeds.notifications, ...feeds.videos, ...videos];
 			feedCacheStore.set({
-				subscription: [...newVideos, ...videos]
+				subscription: [...new Set(newVideos)]
 			});
 		});
 	}

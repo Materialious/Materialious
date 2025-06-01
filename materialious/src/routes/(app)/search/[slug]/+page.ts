@@ -1,5 +1,7 @@
 import { getSearch } from '$lib/api/index';
+import { searchCacheStore } from '$lib/store.js';
 import { error } from '@sveltejs/kit';
+import { get } from 'svelte/store';
 
 export async function load({ params, url }) {
 	let type: 'playlist' | 'all' | 'video' | 'channel';
@@ -11,16 +13,21 @@ export async function load({ params, url }) {
 		type = 'all';
 	}
 
-	let search;
+	const search = get(searchCacheStore).all;
 
-	try {
-		search = await getSearch(params.slug, { type: type });
-	} catch (errorMessage: any) {
-		error(500, errorMessage);
+	if (!search) {
+		try {
+			searchCacheStore.set({ [type]: await getSearch(params.slug, { type: type }) });
+		} catch (errorMessage: any) {
+			error(500, errorMessage);
+		}
+	} else {
+		getSearch(params.slug, { type: type }).then((newSearch) => {
+			searchCacheStore.set({ [type]: Array.from(new Set({ ...newSearch, ...search })) });
+		});
 	}
 
 	return {
-		search: search,
 		slug: params.slug,
 		searchType: type
 	};

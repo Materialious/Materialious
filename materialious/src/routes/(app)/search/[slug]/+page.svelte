@@ -6,33 +6,41 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import { feedLastItemId, searchCacheStore } from '$lib/store.js';
+	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	let { data } = $props();
 
-	let searchResults = $state(data);
-
+	let currentType: 'playlist' | 'all' | 'video' | 'channel' = $state('all');
 	let currentPage = 1;
 
+	onMount(() => {
+		if ($feedLastItemId) {
+			document.getElementById($feedLastItemId)?.scrollIntoView({ behavior: 'instant' });
+		}
+	});
+
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
-		searchResults.searchType = type;
+		currentType = type;
 		currentPage = 1;
-		searchResults.search = [];
-		searchResults.search = await getSearch(searchResults.slug, { type: type });
+		searchCacheStore.set({ [type]: await getSearch(data.slug, { type: type }) });
 	}
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
-		const newSearch = await getSearch(searchResults.slug, {
+		const newSearch = await getSearch(data.slug, {
 			page: currentPage.toString(),
-			type: searchResults.searchType
+			type: currentType
 		});
 
 		if (newSearch.length === 0) {
 			event.detail.complete();
 		} else {
-			searchResults.search = [...searchResults.search, ...newSearch];
+			searchCacheStore.set({
+				[currentType]: [...($searchCacheStore[currentType] ?? []), ...newSearch]
+			});
 			event.detail.loaded();
 		}
 	}
@@ -40,16 +48,12 @@
 
 <div style="margin-top: 1em;">
 	<div class="tabs left-align min scroll">
-		<a
-			class:active={searchResults.searchType === 'all'}
-			href="#all"
-			onclick={async () => changeType('all')}
-		>
+		<a class:active={currentType === 'all'} href="#all" onclick={async () => changeType('all')}>
 			<i>home</i>
 			<span>{$_('videoTabs.all')}</span>
 		</a>
 		<a
-			class:active={searchResults.searchType === 'video'}
+			class:active={currentType === 'video'}
 			href="#videos"
 			onclick={async () => changeType('video')}
 		>
@@ -57,7 +61,7 @@
 			<span>{$_('videoTabs.videos')}</span>
 		</a>
 		<a
-			class:active={searchResults.searchType === 'playlist'}
+			class:active={currentType === 'playlist'}
 			href="#playlists"
 			onclick={async () => changeType('playlist')}
 		>
@@ -65,7 +69,7 @@
 			<span>{$_('videoTabs.playlists')}</span>
 		</a>
 		<a
-			class:active={searchResults.searchType === 'channel'}
+			class:active={currentType === 'channel'}
 			href="#channels"
 			onclick={async () => changeType('channel')}
 		>
@@ -75,14 +79,26 @@
 	</div>
 </div>
 
-{#if searchResults.search.length > 0}
+{#if $searchCacheStore[currentType].length > 0}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each searchResults.search as item}
+			{#each $searchCacheStore[currentType] as item}
 				<ContentColumn>
 					{#key item}
-						<article class="no-padding" style="height: 100%;">
+						<article
+							class="no-padding"
+							style="height: 100%;"
+							onclick={() =>
+								feedLastItemId.set(
+									'videoId' in item ? item.videoId : 'authorId' in item ? item.authorId : item.title
+								)}
+							id={'videoId' in item
+								? item.videoId
+								: 'authorId' in item
+									? item.authorId
+									: item.title}
+						>
 							{#if item.type === 'video'}
 								<Thumbnail video={item} />
 							{:else if item.type === 'channel'}

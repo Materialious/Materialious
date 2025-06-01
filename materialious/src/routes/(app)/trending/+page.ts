@@ -17,6 +17,4 @@ export async function load() {
 	} else {
 		getTrending().then((newTrending) => feedCacheStore.set({ trending: newTrending }));
 	}
-
-	return { trending: trending };
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import VideoList from '$lib/components/VideoList.svelte';
-
-	let { data } = $props();
+	import { feedCacheStore } from '$lib/store';
 </script>
 
-<VideoList videos={data.trending} />
+<VideoList videos={$feedCacheStore.trending ?? []} />

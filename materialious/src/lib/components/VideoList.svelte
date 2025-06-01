@@ -22,7 +22,9 @@
 
 	onMount(() => {
 		if ($feedLastItemId)
-			document.getElementById($feedLastItemId)?.scrollIntoView({ behavior: 'instant' });
+			document
+				.getElementById($feedLastItemId)
+				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
 	});
 </script>
 

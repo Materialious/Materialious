@@ -23,7 +23,9 @@ export async function load({ params, url }) {
 		}
 	} else {
 		getSearch(params.slug, { type: type }).then((newSearch) => {
-			searchCacheStore.set({ [type]: Array.from(new Set({ ...newSearch, ...search })) });
+			searchCacheStore.set({
+				[type]: [...newSearch, ...search]
+			});
 		});
 	}
 

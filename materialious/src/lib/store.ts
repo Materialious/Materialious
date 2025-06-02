@@ -37,6 +37,7 @@ export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
 export const playerProxyVideosStore = persisted('proxyVideos', true);
 export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
 export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
+export const playerDefaultQualityStore = persisted('defaultQuality', 'auto');
 export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
 export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);

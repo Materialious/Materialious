@@ -10,6 +10,7 @@
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerDefaultLanguage,
+		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
@@ -22,6 +23,11 @@
 	const languageNames = ISO6391.getAllCodes().map((code) =>
 		ISO6391.getName(code).toLocaleLowerCase()
 	);
+
+	function onQualityChange(event: Event) {
+		const value = (event.target as HTMLSelectElement).value;
+		playerDefaultQualityStore.set(value);
+	}
 </script>
 
 <div class="margin"></div>
@@ -38,6 +44,27 @@
 		{/each}
 	</select>
 	<label for="case">{$_('player.defaultLanguage')}</label>
+	<i>arrow_drop_down</i>
+</div>
+
+<div class="field label suffix border">
+	<select
+		name="quality"
+		id="quality"
+		bind:value={$playerDefaultQualityStore}
+		onchange={onQualityChange}
+	>
+		<option value="auto">Auto (Recommended)</option>
+		<option value="144">144p (Low)</option>
+		<option value="240">240p</option>
+		<option value="360">360p (SD)</option>
+		<option value="480">480p (SD+)</option>
+		<option value="720">720p (HD)</option>
+		<option value="1080">1080p (Full HD)</option>
+		<option value="1440">1440p (2K)</option>
+		<option value="2160">2160p (4K UHD)</option>
+	</select>
+	<label for="quality">{$_('player.preferredQuality')}</label>
 	<i>arrow_drop_down</i>
 </div>
 

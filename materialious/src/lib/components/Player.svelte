@@ -127,14 +127,34 @@
 
 		if (isNaN(numericValue)) {
 			player.configure({ abr: { enabled: true } });
+			return;
+		}
+
+		// Get video-only variant tracks
+		const tracks = player.getVariantTracks().filter((t) => t.height !== null);
+
+		// Sort by resolution descending
+		const sortedTracks = tracks.sort((a, b) => (b.height as number) - (a.height as number));
+
+		// Try exact match
+		let selectedTrack = sortedTracks.find((t) => t.height === numericValue);
+
+		// Try next best (lower than target)
+		if (!selectedTrack) {
+			selectedTrack = sortedTracks.find((t) => (t.height as number) < numericValue);
+		}
+
+		// Try next higher
+		if (!selectedTrack) {
+			selectedTrack = sortedTracks.find((t) => (t.height as number) > numericValue);
+		}
+
+		if (selectedTrack) {
+			player.selectVariantTrack(selectedTrack, true);
+			HttpFetchPlugin.cacheManager.clearCache();
+			player.configure({ abr: { enabled: false } });
 		} else {
-			const tracks = player.getVariantTracks();
-			const track = tracks.find((t) => t.height === numericValue);
-			if (track) {
-				player.selectVariantTrack(track, true);
-				HttpFetchPlugin.cacheManager.clearCache();
-				player.configure({ abr: { enabled: false } });
-			}
+			player.configure({ abr: { enabled: true } });
 		}
 	}
 

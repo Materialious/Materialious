@@ -108,7 +108,7 @@
 		</nav>
 	</form>
 	{#if invalidInstance}
-		<div style="margin-bottom: 4em;"></div>
+		<div style="margin-bottom: 6em;"></div>
 	{/if}
 {/if}
 

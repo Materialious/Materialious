@@ -27,6 +27,7 @@
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
+		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		poTokenCacheStore,
@@ -114,16 +115,7 @@
 	);
 	// Shaka player SABR var end
 
-	const STORAGE_KEY_QUALITY = 'shaka-preferred-quality';
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
-
-	function saveQualityPreference() {
-		const tracks = player.getVariantTracks();
-		const selectedTrack = tracks.find((track) => track.active);
-		if (selectedTrack) {
-			localStorage.setItem(STORAGE_KEY_QUALITY, selectedTrack.bandwidth.toString());
-		}
-	}
 
 	function saveVolumePreference() {
 		if (!playerElement) return;
@@ -131,26 +123,38 @@
 	}
 
 	function restoreQualityPreference() {
-		const savedQuality =
-			localStorage.getItem(STORAGE_KEY_QUALITY) ??
-			(import.meta.env.VITE_DEFAULT_DASH_BITRATE as string | undefined);
+		const numericValue = parseInt($playerDefaultQualityStore, 10);
 
-		if (savedQuality) {
-			const qualityBandwidth = parseInt(savedQuality);
-			const tracks = player.getVariantTracks();
+		if (isNaN(numericValue)) {
+			player.configure({ abr: { enabled: true } });
+			return;
+		}
 
-			let preferredTrack = tracks.find((track) => track.bandwidth === qualityBandwidth);
-			if (!preferredTrack) {
-				preferredTrack = tracks.reduce((prev, curr) =>
-					Math.abs(curr.bandwidth - qualityBandwidth) < Math.abs(prev.bandwidth - qualityBandwidth)
-						? curr
-						: prev
-				);
-			}
+		// Get video-only variant tracks
+		const tracks = player.getVariantTracks().filter((t) => t.height !== null);
 
-			if (preferredTrack) {
-				player.selectVariantTrack(preferredTrack, true);
-			}
+		// Sort by resolution descending
+		const sortedTracks = tracks.sort((a, b) => (b.height as number) - (a.height as number));
+
+		// Try exact match
+		let selectedTrack = sortedTracks.find((t) => t.height === numericValue);
+
+		// Try next best (lower than target)
+		if (!selectedTrack) {
+			selectedTrack = sortedTracks.find((t) => (t.height as number) < numericValue);
+		}
+
+		// Try next higher
+		if (!selectedTrack) {
+			selectedTrack = sortedTracks.find((t) => (t.height as number) > numericValue);
+		}
+
+		if (selectedTrack) {
+			player.selectVariantTrack(selectedTrack, true);
+			HttpFetchPlugin.cacheManager.clearCache();
+			player.configure({ abr: { enabled: false } });
+		} else {
+			player.configure({ abr: { enabled: true } });
 		}
 	}
 
@@ -247,6 +251,7 @@
 				'language',
 				'statistics'
 			],
+			playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
 			enableTooltips: false,
 			seekBarColors: {
 				played: (await getDynamicTheme())['--primary']
@@ -775,25 +780,22 @@
 			ui('#snackbar-alert');
 		}
 
-		player.addEventListener('buffering', saveQualityPreference);
 		playerElement.addEventListener('volumechange', saveVolumePreference);
 
-		player.addEventListener('loaded', () => {
-			restoreQualityPreference();
+		restoreQualityPreference();
 
-			const defaultLanguage = get(playerDefaultLanguage);
-			if (defaultLanguage) {
-				const audioLanguages = player.getAudioLanguages();
-				const langCode = ISO6391.getCode(defaultLanguage);
+		const defaultLanguage = get(playerDefaultLanguage);
+		if (defaultLanguage) {
+			const audioLanguages = player.getAudioLanguages();
+			const langCode = ISO6391.getCode(defaultLanguage);
 
-				for (const audioLanguage of audioLanguages) {
-					if (audioLanguage.startsWith(langCode)) {
-						player.selectAudioLanguage(audioLanguage);
-						break;
-					}
+			for (const audioLanguage of audioLanguages) {
+				if (audioLanguage.startsWith(langCode)) {
+					player.selectAudioLanguage(audioLanguage);
+					break;
 				}
 			}
-		});
+		}
 
 		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
 		if (overflowMenuButton) {

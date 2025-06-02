@@ -1,80 +1,82 @@
 name: Build desktop
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "**/README.md"
+    push:
+        branches: [main]
+        paths-ignore:
+            - "**/*.md"
+            - "fastline/**"
+            - "materialious/src/i18n/locales/**"
 
-  workflow_dispatch:
+    workflow_dispatch:
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  desktop-build:
-    strategy:
-      matrix:
-        node-version: [latest]
-        runtime:
-          - linux-x64
-          - linux-arm64
-          - win-x64
-          - osx-x64
+    desktop-build:
+        strategy:
+            matrix:
+                node-version: [latest]
+                runtime:
+                    - linux-x64
+                    - linux-arm64
+                    - win-x64
+                    - osx-x64
 
-        include:
-          - runtime: linux-x64
-            os: ubuntu-latest
-          - runtime: linux-arm64
-            os: ubuntu-latest
-          - runtime: osx-x64
-            os: macOS-latest
-          - runtime: win-x64
-            os: windows-latest
+                include:
+                    - runtime: linux-x64
+                      os: ubuntu-latest
+                    - runtime: linux-arm64
+                      os: ubuntu-latest
+                    - runtime: osx-x64
+                      os: macOS-latest
+                    - runtime: win-x64
+                      os: windows-latest
 
-    runs-on: ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
 
-      - name: Install modules
-        run: cd ./materialious && npm install
+            - name: Install modules
+              run: cd ./materialious && npm install
 
-      - name: Build package
-        run: cd ./materialious && npm run build
+            - name: Build package
+              run: cd ./materialious && npm run build
 
-      - name: Sync electron package
-        run: cd ./materialious && npx cap sync @capacitor-community/electron
+            - name: Sync electron package
+              run: cd ./materialious && npx cap sync @capacitor-community/electron
 
-      - name: Patch capacitor plugin
-        run: cd ./materialious/electron && python patch_capacitor_plugin.py
+            - name: Patch capacitor plugin
+              run: cd ./materialious/electron && python patch_capacitor_plugin.py
 
-      - name: Install electron modules
-        run: cd ./materialious/electron && npm install
+            - name: Install electron modules
+              run: cd ./materialious/electron && npm install
 
-      - name: Set up environment variables
-        run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-        shell: bash
-        if: runner.os != 'Windows'
+            - name: Set up environment variables
+              run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+              shell: bash
+              if: runner.os != 'Windows'
 
-      - name: Set up environment variables
-        run: echo GH_TOKEN=${{ secrets.GITHUB_TOKEN }} >> $env:GITHUB_ENV
-        shell: powershell
-        if: runner.os == 'Windows'
+            - name: Set up environment variables
+              run: echo GH_TOKEN=${{ secrets.GITHUB_TOKEN }} >> $env:GITHUB_ENV
+              shell: powershell
+              if: runner.os == 'Windows'
 
-      - name: Install snapcraft
-        if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
-        run: sudo snap install snapcraft --classic
+            - name: Install snapcraft
+              if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
+              run: sudo snap install snapcraft --classic
 
-      - name: Set up snapcraft environment variables
-        run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_LOGIN }}" >> $GITHUB_ENV
-        shell: bash
-        if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
+            - name: Set up snapcraft environment variables
+              run: echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_LOGIN }}" >> $GITHUB_ENV
+              shell: bash
+              if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
 
-      - name: Build desktop packages
-        run: cd ./materialious/electron && npm run electron:make
+            - name: Build desktop packages
+              run: cd ./materialious/electron && npm run electron:make

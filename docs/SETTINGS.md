@@ -27,7 +27,7 @@ Materialious allows you to customize various settings by overwriting the default
       + [Listen by default](#listen-by-default)
       + [Theatre mode by default](#theatre-mode-by-default)
       + [Autoplay next by default](#autoplay-next-by-default)
-      + [Dash](#dash)
+      + [Default video quality](#default-video-quality)
    * [Sponsorblock](#sponsorblock)
       + [Sponsor](#sponsor)
       + [Unpaid/Self Promotion](#unpaidself-promotion)
@@ -143,6 +143,14 @@ Avoids loading images.
 ```
 
 ## Player
+
+### Default video quality
+
+Determines the default quality for videos.
+
+```json
+"defaultQuality": "1440"
+```
 
 ### Autoplay video
 

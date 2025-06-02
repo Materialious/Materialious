@@ -18,6 +18,7 @@ import {
 	playerAutoPlayStore,
 	playerAutoplayNextByDefaultStore,
 	playerDefaultLanguage,
+	playerDefaultQualityStore,
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
@@ -34,7 +35,11 @@ import {
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 
-const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'boolean' | 'array'; }[] = [
+const persistedStores: {
+	name: string;
+	store: Writable<any>;
+	type: 'string' | 'boolean' | 'array';
+}[] = [
 	{
 		name: 'returnYTDislikesInstance',
 		store: returnYTDislikesInstanceStore,
@@ -189,6 +194,11 @@ const persistedStores: { name: string, store: Writable<any>, type: 'string' | 'b
 		name: 'defaultPage',
 		store: interfaceDefaultPage,
 		type: 'string'
+	},
+	{
+		name: 'defaultQuality',
+		store: playerDefaultQualityStore,
+		type: 'string'
 	}
 ];
 
@@ -197,7 +207,7 @@ function setStores(toSet: Record<string, any>) {
 		let userOverwritten: boolean = false;
 		try {
 			userOverwritten = localStorage.getItem(store.name) !== null;
-		} catch { }
+		} catch {}
 
 		let paramValue = toSet[store.name];
 		if (typeof paramValue !== 'undefined' && !userOverwritten) {

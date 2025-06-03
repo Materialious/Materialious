@@ -136,11 +136,11 @@ const server = http.createServer((req, res) => {
 	// Quick way to quickly send commands between app and nodejs backend.
 	if (targetUrl === 'http://materialious__allow-insecure-requests') {
 		rejectUnauthorized = false;
-		res.writeHead(204);
+		res.writeHead(200);
 		return res.end();
 	} else if (targetUrl === 'http://materialious__deny-insecure-requests') {
 		rejectUnauthorized = true;
-		res.writeHead(204);
+		res.writeHead(200);
 		return res.end();
 	}
 

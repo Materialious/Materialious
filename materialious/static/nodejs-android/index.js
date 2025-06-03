@@ -103,9 +103,7 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 		if (!clientRes.headersSent) {
 			clientRes.writeHead(500, { 'Content-Type': 'text/plain' });
 		}
-		clientRes.end(
-			`Proxy error: ${err.message} ${rejectUnauthorized} rejectUnauthorized ${typeof rejectUnauthorized}`
-		);
+		clientRes.end(`Proxy error: ${err.message}`);
 	});
 
 	clientReq.on('aborted', () => proxyReq.destroy());

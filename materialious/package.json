@@ -52,7 +52,7 @@
 		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
 		"beercss": "^3.8.0",
 		"bgutils-js": "^3.2.0",
-		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
+		"capacitor-nodejs": "https://github.com/hampoelz/capacitor-nodejs/releases/download/v1.0.0-beta.8/capacitor-nodejs.tgz",
 		"fuse.js": "^7.0.0",
 		"googlevideo": "^3.0.0",
 		"he": "^1.2.0",

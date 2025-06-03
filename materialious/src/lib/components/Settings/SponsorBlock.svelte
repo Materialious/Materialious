@@ -8,7 +8,6 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
-		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore
 	} from '../../store';
 
@@ -39,7 +38,8 @@
 
 <form
 	onsubmit={preventDefault(() =>
-		sponsorBlockUrlStore.set(ensureNoTrailingSlash(sponsorBlockInstance)))}
+		sponsorBlockUrlStore.set(ensureNoTrailingSlash(sponsorBlockInstance))
+	)}
 >
 	<nav>
 		<div class="field label border max">
@@ -80,7 +80,7 @@
 	</label>
 </nav>
 
-<nav class="no-padding">
+<!-- <nav class="no-padding">
 	<div class="max">
 		<p>{$_('layout.sponsors.disableTimeline')}</p>
 	</div>
@@ -92,7 +92,7 @@
 		/>
 		<span></span>
 	</label>
-</nav>
+</nav> -->
 
 <hr style="margin: 1em 0;" />
 

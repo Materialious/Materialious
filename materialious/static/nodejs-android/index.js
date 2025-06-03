@@ -5,6 +5,9 @@ const HOST = 'localhost';
 const PORT = 3000;
 const MAX_REDIRECTS = 10;
 
+// Can be changed via channels to disable ssl validation.
+let rejectUnauthorized = true;
+
 const CORS_HEADERS = [
 	'Origin',
 	'X-Requested-With',
@@ -55,7 +58,8 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 			origin: parsedUrl.origin,
 			'user-agent': USER_AGENT,
 			connection: 'close'
-		}
+		},
+		rejectUnauthorized: rejectUnauthorized
 	};
 
 	// Remove headers that may cause issues or be auto-managed
@@ -99,7 +103,9 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 		if (!clientRes.headersSent) {
 			clientRes.writeHead(500, { 'Content-Type': 'text/plain' });
 		}
-		clientRes.end(`Proxy error: ${err.message}`);
+		clientRes.end(
+			`Proxy error: ${err.message} ${rejectUnauthorized} rejectUnauthorized ${typeof rejectUnauthorized}`
+		);
 	});
 
 	clientReq.on('aborted', () => proxyReq.destroy());
@@ -126,6 +132,18 @@ const server = http.createServer((req, res) => {
 	}
 
 	let targetUrl = req.url.slice(1);
+
+	// Quick way to quickly send commands between app and nodejs backend.
+	if (targetUrl === 'http://materialious__allow-insecure-requests') {
+		rejectUnauthorized = false;
+		res.writeHead(201);
+		return res.end();
+	} else if (targetUrl === 'http://materialious__deny-insecure-requests') {
+		rejectUnauthorized = true;
+		res.writeHead(201);
+		return res.end();
+	}
+
 	if (!targetUrl.startsWith('http')) {
 		targetUrl = 'http://' + targetUrl;
 	}

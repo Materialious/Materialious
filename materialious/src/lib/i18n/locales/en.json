@@ -121,6 +121,7 @@
 		"previewVideoOnHover": "Preview video on hover",
 		"expandDescription": "Expand description by default",
 		"expandComments": "Expand comments by default",
+		"allowInsecureRequests": "Allow insecure requests",
 		"dataPreferences": {
 			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page.",
 			"dataPreferences": "Data preferences"

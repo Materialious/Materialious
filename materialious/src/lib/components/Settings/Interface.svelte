@@ -15,6 +15,7 @@
 		authStore,
 		darkModeStore,
 		instanceStore,
+		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
@@ -90,6 +91,11 @@
 		goto('/', { replaceState: true });
 		ui('#dialog-settings');
 	}
+
+	function allowInsecureRequests() {
+		if (Capacitor.getPlatform() !== 'android') return;
+		interfaceAllowInsecureRequests.set(!$interfaceAllowInsecureRequests);
+	}
 </script>
 
 {#if Capacitor.isNativePlatform()}
@@ -110,6 +116,24 @@
 	{#if invalidInstance}
 		<div style="margin-bottom: 6em;"></div>
 	{/if}
+{/if}
+
+{#if Capacitor.getPlatform() === 'android' && (invalidInstance || $interfaceAllowInsecureRequests)}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.allowInsecureRequests')}</div>
+			</div>
+			<label class="switch">
+				<input
+					type="checkbox"
+					bind:checked={$interfaceAllowInsecureRequests}
+					onclick={allowInsecureRequests}
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
 {/if}
 
 <button onclick={toggleDarkMode} class="no-margin">

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
-
+	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/stores';
 	import '$lib/android/http/androidRequests';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';

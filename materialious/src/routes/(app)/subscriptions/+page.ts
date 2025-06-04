@@ -1,4 +1,6 @@
 import { getFeed } from '$lib/api/index';
+import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
+import { excludeDuplicateFeeds } from '$lib/misc';
 import { feedCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
@@ -21,7 +23,11 @@ export async function load() {
 		await getFeed(100, 1).then((feeds) => {
 			const newVideos = [...feeds.notifications, ...feeds.videos, ...videos];
 			feedCacheStore.set({
-				subscription: [...new Set(newVideos)]
+				subscription: excludeDuplicateFeeds(videos, newVideos) as (
+					| VideoBase
+					| Video
+					| PlaylistPageVideo
+				)[]
 			});
 		});
 	}

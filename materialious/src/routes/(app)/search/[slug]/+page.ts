@@ -1,4 +1,6 @@
 import { getSearch } from '$lib/api/index';
+import type { Channel, HashTag, Playlist, Video } from '$lib/api/model';
+import { excludeDuplicateFeeds } from '$lib/misc.js';
 import { searchCacheStore } from '$lib/store.js';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
@@ -25,7 +27,12 @@ export async function load({ params, url }) {
 	} else {
 		getSearch(params.slug, { type: type }).then((newSearch) => {
 			searchCacheStore.set({
-				[searchStoreId]: [...new Set([...newSearch, ...search])]
+				[searchStoreId]: excludeDuplicateFeeds(search, newSearch) as (
+					| Channel
+					| Video
+					| Playlist
+					| HashTag
+				)[]
 			});
 		});
 	}

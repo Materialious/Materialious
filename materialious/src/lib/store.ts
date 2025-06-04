@@ -18,7 +18,9 @@ function platformDependentDefault(givenValue: any, defaultValue: any): any {
 export const instanceStore: Writable<string> = persisted(
 	'invidiousInstance',
 	platformDependentDefault(
-		ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
+		!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
+			? undefined
+			: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
 		'https://invidious.materialio.us'
 	)
 );
@@ -26,7 +28,9 @@ export const instanceStore: Writable<string> = persisted(
 export const companionStore: Writable<string | undefined> = persisted(
 	'companionInstance',
 	platformDependentDefault(
-		ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE),
+		!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE
+			? undefined
+			: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE),
 		undefined
 	)
 );

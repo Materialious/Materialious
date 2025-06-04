@@ -4,6 +4,7 @@ import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import { instanceStore, interfaceAllowInsecureRequests } from './store';
+import type { Channel, HashTag, Playlist, PlaylistPageVideo, Video, VideoBase } from './api/model';
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
@@ -70,4 +71,34 @@ export async function insecureRequestImageHandler(source: string): Promise<HTMLI
 	}
 
 	return img;
+}
+
+export type feedItem = VideoBase | Video | PlaylistPageVideo | Channel | Video | Playlist | HashTag;
+export type feedItems = feedItem[];
+
+export function extractUniqueId(item: feedItem): string {
+	if ('videoId' in item) {
+		return item.videoId;
+	} else if ('authorId' in item) {
+		return item.authorId;
+	} else {
+		return item.title;
+	}
+}
+
+export function excludeDuplicateFeeds(currentItems: feedItems, newItems: feedItems): feedItems {
+	const existingIds: string[] = [];
+
+	currentItems.forEach((item) => {
+		existingIds.push(extractUniqueId(item));
+	});
+
+	const nonDuplicatedNewItems: feedItems = [];
+	newItems.forEach((item) => {
+		if (!existingIds.includes(extractUniqueId(item))) {
+			nonDuplicatedNewItems.push(item);
+		}
+	});
+
+	return [...nonDuplicatedNewItems, ...currentItems];
 }

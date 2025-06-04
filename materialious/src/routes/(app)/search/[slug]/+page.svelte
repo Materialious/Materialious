@@ -81,11 +81,11 @@
 	</div>
 </div>
 
-{#if $searchCacheStore[currentType].length > 0}
+{#if $searchCacheStore[data.searchStoreId]}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each $searchCacheStore[currentType] as item}
+			{#each $searchCacheStore[data.searchStoreId] as item}
 				<ContentColumn>
 					{#key item}
 						<article

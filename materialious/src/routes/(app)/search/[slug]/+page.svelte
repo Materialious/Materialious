@@ -27,7 +27,7 @@
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
 		currentType = type;
 		currentPage = 1;
-		searchCacheStore.set({ [type]: await getSearch(data.slug, { type: type }) });
+		searchCacheStore.set({ [data.searchStoreId]: await getSearch(data.slug, { type: type }) });
 	}
 
 	async function loadMore(event: InfiniteEvent) {
@@ -41,7 +41,7 @@
 			event.detail.complete();
 		} else {
 			searchCacheStore.set({
-				[currentType]: [...($searchCacheStore[currentType] ?? []), ...newSearch]
+				[data.searchStoreId]: [...($searchCacheStore[data.searchStoreId] ?? []), ...newSearch]
 			});
 			event.detail.loaded();
 		}
@@ -81,11 +81,11 @@
 	</div>
 </div>
 
-{#if $searchCacheStore[currentType].length > 0}
+{#if $searchCacheStore[data.searchStoreId]}
 	<div class="page right active">
 		<div class="space"></div>
 		<div class="grid">
-			{#each $searchCacheStore[currentType] as item}
+			{#each $searchCacheStore[data.searchStoreId] as item}
 				<ContentColumn>
 					{#key item}
 						<article

@@ -5,7 +5,7 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { Channel } from '../api/model';
-	import { truncate } from '../misc';
+	import { insecureRequestImageHandler, truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
 	interface Props {
@@ -19,9 +19,9 @@
 	onMount(async () => {
 		if (get(interfaceLowBandwidthMode)) return;
 
-		const img = new Image();
-		img.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails));
-
+		const img = await insecureRequestImageHandler(
+			proxyGoogleImage(getBestThumbnail(channel.authorThumbnails))
+		);
 		img.onload = () => {
 			channelPfp = img;
 		};

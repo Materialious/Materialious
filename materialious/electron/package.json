@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.8.12",
+	"version": "1.9.0",
 	"description": "Modern material design for Invidious.",
 	"author": {
 		"name": "Ward Pearce",
@@ -24,7 +24,7 @@
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.0",
 		"bgutils-js": "^3.2.0",
-		"capacitor-nodejs": "https://github.com/EdenwareApps/Capacitor-NodeJS/releases/download/v1.0.0-beta.7/capacitor6-nodejs.tgz",
+		"capacitor-nodejs": "https://github.com/hampoelz/capacitor-nodejs/releases/download/v1.0.0-beta.8/capacitor-nodejs.tgz",
 		"chokidar": "~4.0.3",
 		"electron-is-dev": "~2.0.0",
 		"electron-serve": "~1.1.0",

@@ -5,7 +5,7 @@
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 	import type { Playlist } from '../api/model';
-	import { truncate } from '../misc';
+	import { insecureRequestImageHandler, truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
 	interface Props {
@@ -21,19 +21,22 @@
 
 	const playlistLink = `/playlist/${playlist.playlistId}`;
 
-	onMount(() => {
+	onMount(async () => {
 		if (get(interfaceLowBandwidthMode)) return;
 
-		img = new Image();
+		let imgSrc = '';
+
 		if (playlist.videos.length > 0) {
-			img.src = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
+			imgSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
 		} else if (playlist.playlistThumbnail) {
-			img.src = playlist.playlistThumbnail;
+			imgSrc = playlist.playlistThumbnail;
 		} else {
-			img.src = '';
+			imgSrc = '';
 			loading = false;
 			return;
 		}
+
+		img = await insecureRequestImageHandler(imgSrc);
 
 		img.onload = () => {
 			loading = false;

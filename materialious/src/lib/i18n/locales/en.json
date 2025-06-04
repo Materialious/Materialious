@@ -110,6 +110,7 @@
 		"lowBandwidthMode": "Low bandwidth mode",
 		"displayThumbnailAvatars": "Thumbnail avatars (Slow)",
 		"searchHistory": "Search history",
+		"companionUrl": "Companion URL",
 		"theme": {
 			"theme": "Theme",
 			"darkMode": "Dark mode",

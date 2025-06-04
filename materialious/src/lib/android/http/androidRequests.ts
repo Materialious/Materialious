@@ -1,5 +1,4 @@
 import { goto } from '$app/navigation';
-import { interfaceAllowInsecureRequests } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 
 const originalFetch = window.fetch;
@@ -52,15 +51,6 @@ if (Capacitor.getPlatform() === 'android') {
 		/* @ts-ignore */
 		return originalXhrOpen.apply(this, args);
 	};
-
-	// Used to toggle rejectUnauthorized in the backend
-	interfaceAllowInsecureRequests.subscribe(async (isAllowed) => {
-		if (isAllowed) {
-			await fetch('http://materialious__allow-insecure-requests');
-		} else {
-			await fetch('http://materialious__deny-insecure-requests');
-		}
-	});
 
 	setTimeout(() => goto('/', { replaceState: true }), 100);
 }

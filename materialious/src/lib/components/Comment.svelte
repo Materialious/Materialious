@@ -4,7 +4,9 @@
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { numberWithCommas } from '$lib/numbers';
 	import { interfaceLowBandwidthMode } from '$lib/store';
+	import { onMount } from 'svelte';
 	import CommentSelf from './Comment.svelte';
+	import { insecureRequestImageHandler } from '$lib/misc';
 
 	interface Props {
 		comment: Comment;
@@ -36,16 +38,28 @@
 
 		return processedHtml;
 	}
+
+	let userPfp = $state('');
+	onMount(async () => {
+		if ($interfaceLowBandwidthMode) return;
+		const img = await insecureRequestImageHandler(
+			proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))
+		);
+
+		img.onload = () => {
+			userPfp = img.src;
+		};
+	});
 </script>
 
 <div class="comment">
 	{#if !$interfaceLowBandwidthMode}
 		<div class="comment-header">
-			<img
-				class="circle small"
-				src={proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))}
-				alt="comment profile"
-			/>
+			{#if userPfp}
+				<img class="circle small" src={userPfp} alt="comment profile" />
+			{:else}
+				<progress class="circle"></progress>
+			{/if}
 			<div class="comment-info">
 				<a href={`/channel/${comment.authorId}`} class="author">
 					<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>

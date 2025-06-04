@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 	import { get } from 'svelte/store';
-	import { getChannel, getDeArrow, getThumbnail, getVideoProgress } from '../api';
+	import { getDeArrow, getThumbnail, getVideoProgress } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { truncate } from '../misc';
+	import { insecureRequestImageHandler, truncate } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,
 		deArrowEnabledStore,
-		interfaceDisplayThumbnailAvatars,
 		interfaceLowBandwidthMode,
 		playerSavePlaybackPositionStore,
 		syncPartyConnectionsStore,
@@ -28,8 +27,6 @@
 	}
 
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
-
-	let authorImg: HTMLImageElement | undefined = $state();
 
 	let placeholderHeight: number = $state(0);
 
@@ -64,22 +61,7 @@
 
 		if (window.innerWidth <= 1500) {
 			sideways = false;
-			if (typeof authorImg === 'undefined') loadAuthor();
 		} else sideways = true;
-	}
-
-	async function loadAuthor() {
-		if (!get(interfaceDisplayThumbnailAvatars)) return;
-
-		try {
-			const channel = await getChannel(video.authorId, { priority: 'low' });
-			const loadedPfp = new Image();
-			loadedPfp.src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails, 75, 75));
-
-			loadedPfp.onload = () => {
-				authorImg = loadedPfp;
-			};
-		} catch {}
 	}
 
 	onMount(async () => {
@@ -95,16 +77,9 @@
 
 		if (get(interfaceLowBandwidthMode)) return;
 
-		// Load author details in background.
-		if (!sideways) {
-			loadAuthor();
-		}
-
 		let imageSrc = getBestThumbnail(video.videoThumbnails) as string;
 
 		if (get(deArrowEnabledStore)) {
-			let locatedThumbnail = false;
-
 			try {
 				const deArrow = await getDeArrow(video.videoId);
 				for (const title of deArrow.titles) {
@@ -119,16 +94,13 @@
 						if (thumbnail.timestamp !== null) {
 							imageSrc = await getThumbnail(video.videoId, thumbnail.timestamp);
 						}
-						locatedThumbnail = true;
 						break;
 					}
 				}
 			} catch {}
 		}
 
-		const img = new Image();
-		img.src = imageSrc;
-
+		const img = await insecureRequestImageHandler(imageSrc);
 		img.onload = () => {
 			thumbnail = img;
 		};
@@ -225,15 +197,6 @@
 	</div>
 
 	<div class="thumbnail-details video-title">
-		{#if !sideways && !$interfaceLowBandwidthMode && $interfaceDisplayThumbnailAvatars}
-			<div style="margin-right: 1em;">
-				{#if authorImg}
-					<img src={authorImg.src} alt="Author" class="circle small" />
-				{:else}
-					<progress style="padding: 15px;" class="circle small"></progress>
-				{/if}
-			</div>
-		{/if}
 		<div class="video-title">
 			<a
 				style="padding-left: 1px;"

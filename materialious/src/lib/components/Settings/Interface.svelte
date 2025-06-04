@@ -13,6 +13,7 @@
 	import { getPages } from '../../navPages';
 	import {
 		authStore,
+		companionStore,
 		darkModeStore,
 		instanceStore,
 		interfaceAllowInsecureRequests,
@@ -20,7 +21,6 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceDefaultPage,
-		interfaceDisplayThumbnailAvatars,
 		interfaceForceCase,
 		interfaceLowBandwidthMode,
 		interfaceRegionStore,
@@ -31,6 +31,7 @@
 	} from '../../store';
 
 	let invidiousInstance = $state(get(instanceStore));
+	let companionInstance = $state(get(companionStore));
 	let region = $state(get(interfaceRegionStore));
 	let forceCase = $state(get(interfaceForceCase));
 	let defaultPage = $state(get(interfaceDefaultPage));
@@ -92,10 +93,28 @@
 		ui('#dialog-settings');
 	}
 
+	function setCompanion(event: Event) {
+		event.preventDefault();
+		companionStore.set(ensureNoTrailingSlash(companionInstance));
+	}
+
 	function allowInsecureRequests() {
-		if (Capacitor.getPlatform() !== 'android') return;
+		if (!Capacitor.isNativePlatform()) return;
 		interfaceAllowInsecureRequests.set(!$interfaceAllowInsecureRequests);
 	}
+
+	// Used to toggle rejectUnauthorized in the backend
+	interfaceAllowInsecureRequests.subscribe(async (isAllowed) => {
+		if (Capacitor.getPlatform() === 'android') {
+			if (isAllowed) {
+				await fetch('http://materialious__allow-insecure-requests');
+			} else {
+				await fetch('http://materialious__deny-insecure-requests');
+			}
+		} else if (Capacitor.getPlatform() === 'electron') {
+			await window.electronAPI.setAllowInsecureSSL(isAllowed);
+		}
+	});
 </script>
 
 {#if Capacitor.isNativePlatform()}
@@ -116,24 +135,39 @@
 	{#if invalidInstance}
 		<div style="margin-bottom: 6em;"></div>
 	{/if}
-{/if}
 
-{#if Capacitor.getPlatform() === 'android' && (invalidInstance || $interfaceAllowInsecureRequests)}
-	<div class="field no-margin">
-		<nav class="no-padding">
-			<div class="max">
-				<div>{$_('layout.allowInsecureRequests')}</div>
+	{#if Capacitor.isNativePlatform() && (invalidInstance || $interfaceAllowInsecureRequests)}
+		<div class="field no-margin">
+			<nav class="no-padding">
+				<div class="max">
+					<div>{$_('layout.allowInsecureRequests')}</div>
+				</div>
+				<label class="switch">
+					<input
+						type="checkbox"
+						bind:checked={$interfaceAllowInsecureRequests}
+						onclick={allowInsecureRequests}
+					/>
+					<span></span>
+				</label>
+			</nav>
+		</div>
+	{/if}
+
+	<form onsubmit={setCompanion}>
+		<nav>
+			<div class="field label border max">
+				<input bind:value={companionInstance} name="companion-instance" type="text" />
+				<label for="companion-instance">{$_('layout.companionUrl')}</label>
 			</div>
-			<label class="switch">
-				<input
-					type="checkbox"
-					bind:checked={$interfaceAllowInsecureRequests}
-					onclick={allowInsecureRequests}
-				/>
-				<span></span>
-			</label>
+			<button class="square round">
+				<i>done</i>
+			</button>
 		</nav>
-	</div>
+	</form>
+	{#if invalidInstance}
+		<div style="margin-bottom: 6em;"></div>
+	{/if}
 {/if}
 
 <button onclick={toggleDarkMode} class="no-margin">
@@ -170,22 +204,6 @@
 		</nav>
 	</div>
 {/if}
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.displayThumbnailAvatars')}</div>
-		</div>
-		<label class="switch">
-			<input
-				type="checkbox"
-				bind:checked={$interfaceDisplayThumbnailAvatars}
-				onclick={() => interfaceDisplayThumbnailAvatars.set(!$interfaceDisplayThumbnailAvatars)}
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
 
 <div class="field no-margin">
 	<nav class="no-padding">

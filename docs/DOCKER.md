@@ -59,14 +59,14 @@ server {
 ```
 ### Nginx Proxy Manager example
 1. Tab: Details -  Create a new proxy host with SSL on (Let's Encrypt or your own certificate).
-2. Tab: Custom locations, fill in IP and port. Click gear icon to add some security headers.   
+2. Tab: Custom locations, fill in IP and port. Click gear icon to add some security headers.
 
-Click image for fullsize:   
+Click image for fullsize:
 <img src="https://github.com/user-attachments/assets/bd7be837-5f08-4ceb-9fdf-f0f445228075" width=15% height=15%>
 
 
 
-**Add:** 
+**Add:**
 ```nginx
     if ($request_method = OPTIONS) {
       return 204;
@@ -97,10 +97,35 @@ http:
           - PATCH
           - PUT
           - DELETE
-        accessControlAllowHeaders: 
+        accessControlAllowHeaders:
           - User-Agent
-          - Authorization 
+          - Authorization
           - Content-Type
+```
+
+### Invidious Companion support
+The `VITE_DEFAULT_COMPANION_INSTANCE` environment variable allows you to specify a custom [Invidious Companion](https://github.com/iv-org/invidious-companion) instance.
+
+To use this with Materialious, your Invidious Companion instance must be accessible with proper CORS headers. Fortunately, you can reuse the same reverse proxy configuration (with CORS modifications) that you applied to your Invidious instance—just apply it to your companion domain as well.
+
+For example, if you're using Caddy, you can configure your companion domain like this:
+
+```caddy
+companion.example.com {
+	@cors_preflight {
+		method OPTIONS
+	}
+	respond @cors_preflight 204
+
+	header Access-Control-Allow-Credentials true
+	header Access-Control-Allow-Origin "https://materialious.example.com" {
+		defer
+	}
+	header Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD, PATCH, PUT, DELETE"
+	header Access-Control-Allow-Headers "User-Agent, Authorization, Content-Type"
+
+	reverse_proxy localhost:3000
+}
 ```
 
 ### Other
@@ -132,10 +157,13 @@ services:
       # URL to your proxied Invidious instance
       VITE_DEFAULT_INVIDIOUS_INSTANCE: "https://invidious.materialio.us"
 
+      # URL to your proxied Companion instance
+      VITE_DEFAULT_COMPANION_INSTANCE: "https://companion.materialio.us"
+
       # URL TO RYD
       # Leave blank to disable completely.
       VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
-  
+
       # URL to Sponsorblock
       # Leave blank to completely disable sponsorblock.
       VITE_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"
@@ -148,9 +176,6 @@ services:
 
       # Look at "Overwriting Materialious defaults" for all the accepted values.
       VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
-
-      # Set the default video/audio bitrate to use, -1 automatic, 999999 always best quality
-      VITE_DEFAULT_DASH_BITRATE: -1
 ```
 
 ### Overwriting Materialious defaults

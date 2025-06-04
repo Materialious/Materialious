@@ -12,19 +12,16 @@ Materialious allows you to customize various settings by overwriting the default
       + [Amoled](#color)
    * [Interface](#interface)
       + [Search suggestions](#search-suggestions)
-      + [Preview video on hover](#preview-video-on-hover)
       + [Region](#region)
       + [Letter case for titles](#letter-case-for-titles)
       + [Auto expand comments](#auto-expand-comments)
       + [Auto expand description](#auto-expand-desc)
       + [Low bandwidth mode](#low-bandwidth-mode)
-      + [Display thumbnail avatars](#)
    * [Player](#player)
       + [Autoplay video](#autoplay-video)
       + [Always loop video](#always-loop-video)
       + [Proxy videos](#proxy-videos)
       + [Save playback position](#save-playback-position)
-      + [Listen by default](#listen-by-default)
       + [Theatre mode by default](#theatre-mode-by-default)
       + [Autoplay next by default](#autoplay-next-by-default)
       + [Default video quality](#default-video-quality)
@@ -89,13 +86,6 @@ Enables or disables search suggestions.
 "searchSuggestions": true
 ```
 
-### Preview video on hover
-
-Allows video previews when hovering over thumbnails.
-
-```json
-"previewVideoOnHover": true
-```
 
 ### Region
 
@@ -137,16 +127,7 @@ Avoids loading images.
 "lowBandwidthMode": true
 ```
 
-### Enable thumbnail avatars
-```json
-"displayThumbnailAvatars": true
-```
-
-## Player
-
-### Default video quality
-
-Determines the default quality for videos.
+### Default quality for videos.
 
 ```json
 "defaultQuality": "1440"
@@ -184,40 +165,7 @@ Saves the playback position of videos.
 "savePlaybackPosition": true
 ```
 
-### Listen by default
-
-Enables or disables listening by default.
-
-```json
-"listenByDefault": true
-```
-
-### Theatre mode by default
-
-Controls whether theatre mode is enabled by default.
-
-```json
-"theatreModeByDefault": false
-```
-
-### Autoplay next by default
-
-Determines if the next video should autoplay.
-
-```json
-"autoplayNextByDefault": false
-```
-
-### Dash
-
-Enables DASH streaming for higher resolutions.
-
-```json
-"dashEnabled": true
-```
-
-## Return YT Dislikes
-
+### Return YT Dislikes
 Configures an open-source proxy for the Return YouTube Dislike API, with optional self-hosting.
 
 ```json

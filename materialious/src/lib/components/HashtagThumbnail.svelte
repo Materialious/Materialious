@@ -9,8 +9,6 @@
 	}
 
 	let { hashtag }: Props = $props();
-
-	let channelPfp: HTMLImageElement | undefined;
 </script>
 
 <a href={hashtag.url} class="wave" style="min-width: 100%;min-height: 100%;">

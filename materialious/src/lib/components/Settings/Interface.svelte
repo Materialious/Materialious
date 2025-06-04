@@ -20,7 +20,6 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceDefaultPage,
-		interfaceDisplayThumbnailAvatars,
 		interfaceForceCase,
 		interfaceLowBandwidthMode,
 		interfaceRegionStore,
@@ -170,22 +169,6 @@
 		</nav>
 	</div>
 {/if}
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.displayThumbnailAvatars')}</div>
-		</div>
-		<label class="switch">
-			<input
-				type="checkbox"
-				bind:checked={$interfaceDisplayThumbnailAvatars}
-				onclick={() => interfaceDisplayThumbnailAvatars.set(!$interfaceDisplayThumbnailAvatars)}
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
 
 <div class="field no-margin">
 	<nav class="no-padding">

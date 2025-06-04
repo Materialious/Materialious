@@ -118,6 +118,6 @@ export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];
 }> = writable({});
 export const searchCacheStore: Writable<{
-	[searchType: string]: (Channel | Video | Playlist | HashTag)[];
+	[searchTypeAndQuery: string]: (Channel | Video | Playlist | HashTag)[];
 }> = writable({});
 export const feedLastItemId: Writable<string | undefined> = writable(undefined);

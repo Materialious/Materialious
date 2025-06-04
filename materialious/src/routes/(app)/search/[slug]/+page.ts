@@ -13,24 +13,26 @@ export async function load({ params, url }) {
 		type = 'all';
 	}
 
-	const search = get(searchCacheStore).all;
+	const searchStoreId = type + params.slug;
+	const search = get(searchCacheStore)[searchStoreId];
 
 	if (!search) {
 		try {
-			searchCacheStore.set({ [type]: await getSearch(params.slug, { type: type }) });
+			searchCacheStore.set({ [searchStoreId]: await getSearch(params.slug, { type: type }) });
 		} catch (errorMessage: any) {
 			error(500, errorMessage);
 		}
 	} else {
 		getSearch(params.slug, { type: type }).then((newSearch) => {
 			searchCacheStore.set({
-				[type]: [...new Set([...newSearch, ...search])]
+				[searchStoreId]: [...new Set([...newSearch, ...search])]
 			});
 		});
 	}
 
 	return {
 		slug: params.slug,
-		searchType: type
+		searchType: type,
+		searchStoreId: searchStoreId
 	};
 }

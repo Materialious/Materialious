@@ -1,6 +1,3 @@
-## Work in Progress
-This documentation is currently under development and subject to updates.
-
 ## Building
 ### Web Deployment (via Docker)
 Materialious supports web deployment through Docker.
@@ -18,8 +15,13 @@ Materialious desktop builds are handled through GitHub using [prod-desktop.yml](
 - The [patch_capacitor_plugin.py](../materialious/electron/patch_capacitor_plugin.py) script removes the [Capacitor-NodeJS](https://github.com/hampoelz/Capacitor-NodeJS) plugin from the desktop build, as it's not required and currently has no better alternative.
 - From here, the process follows standard [electron-builder](https://www.electron.build/) steps to complete the build.
 
-### Desktop Release (via Flatpak)
-TODO
+### Desktop Release (via Flathub)
+- After all workflows have completed, the [prod-flatpak](https://github.com/Materialious/Materialious/blob/update/readme/.github/workflows/prod-flathub.yml) workflow runs.
+- It downloads the AMD and ARM packages from the latest release.
+- It computes SHA-256 hashes for both packages.
+- It inserts the hashes into the Flatpak manifest.
+- It automatically opens a pull request on our [Flathub repository](https://github.com/flathub/us.materialio.Materialious).
+
 
 ### Android Release
 Android builds are handled using the workflow [prod-android.yml](../.github/workflows/prod-android.yml).

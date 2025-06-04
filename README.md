@@ -1,9 +1,4 @@
-
-> [!WARNING]
-> Invidious is currently being blocked by Google. Please use Materialious on [Android](https://github.com/Materialious/Materialious/releases/latest) or [Desktop](https://github.com/Materialious/Materialious/releases/latest) to get around this with local video fallback.
-
-<div align="center">
-  <img src="./materialious/static/logo.svg" width="200px" />
+<div align="center">  <img src="./materialious/static/logo.svg" width="200px" />
   <br />
   <br />
   <h1>Materialious</h1>
@@ -21,15 +16,14 @@
 
 
 # Features
+- [Invidious companion support.](./docs/DOCKER.md#invidious-companion-support)
 - [Invidious API extended integration!](https://github.com/Materialious/api-extended)
-  - Sync your watch progress between Invidious sessions.
-- Watch sync parties!
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
-- Preview video on hover.
+- Sync your watch progress between Invidious sessions.
+- Watch sync parties!
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
 - DeArrow built-in (With local processing fallback).
-- Video progress tracking & resuming.
 - No ads.
 - No tracking.
 - Light/Dark themes.
@@ -44,29 +38,16 @@
 - YT path redirects (So your redirect plugins should still work!)
 
 # Support table
-|         | Dash | HLS | Local video fallback | API-Extended | Dearrow | RYD |
-|---------|------|-----|----------------------|--------------|---------|-----|
-| Web     | ✅    | ✅   | ❌                    | ✅            | ✅       | ✅   |
-| Desktop | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   |
-| Android | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   |
-
-# Public instances
-[Public instances are listed here](./docs/INSTANCES.md).
-
-Open an issue to add your instance.
-
-# Translations
-
-Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)! 
-
-<a href="https://toolate.othing.xyz/projects/materialious/">
-<img src="https://toolate.othing.xyz/widget/materialious/materialious/multi-auto.svg" alt="Translation status" />
-</a>
+|         | Dash | HLS | Local video fallback | API-Extended | Dearrow | RYD | Watch Parties |
+|---------|------|-----|----------------------|--------------|---------|-----|----------------|
+| Web     | ✅    | ✅   | ❌                    | ✅            | ✅       | ✅   | ✅              |
+| Desktop | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   | ❌              |
+| Android | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   | ❌              |
 
 # Deploying as a website via docker
 [Please read the guide here](./docs/DOCKER.md)
 
-# Installing as a local application
+# Installing as a app
 <!--This layout is taken from spotube's README as I really liked its layout.
 I've commented out places what aren't relevant but might be in the future.-->
 <table>
@@ -207,6 +188,14 @@ brew install --cask spotube
     </td>
   </tr> -->
 </table>
+
+# Translations
+
+Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)! 
+
+<a href="https://toolate.othing.xyz/projects/materialious/">
+<img src="https://toolate.othing.xyz/widget/materialious/materialious/multi-auto.svg" alt="Translation status" />
+</a>
 
 # Previews
 

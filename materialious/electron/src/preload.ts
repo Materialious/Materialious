@@ -5,5 +5,8 @@ require('./rt/electron-rt');
 
 contextBridge.exposeInMainWorld('electronAPI', {
 	generatePoToken: (bgChallenge: DescrambledChallenge, requestKey: string, visitorData: string) =>
-		ipcRenderer.invoke('generatePoToken', bgChallenge, requestKey, visitorData)
+		ipcRenderer.invoke('generatePoToken', bgChallenge, requestKey, visitorData),
+	setAllowInsecureSSL: async (allow: boolean) => {
+		return await ipcRenderer.invoke('setAllowInsecureSSL', allow);
+	}
 });

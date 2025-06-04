@@ -4,19 +4,13 @@ import {
 	setupElectronDeepLinking
 } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, ipcMain, MenuItem } from 'electron';
+import { app, ipcMain, MenuItem, session, webContents } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
 import { JSDOM } from 'jsdom';
 
-import BG, {
-	buildURL,
-	DescrambledChallenge,
-	GOOG_API_KEY,
-	USER_AGENT,
-	WebPoSignalOutput
-} from 'bgutils-js';
+import BG, { buildURL, GOOG_API_KEY, USER_AGENT, WebPoSignalOutput } from 'bgutils-js';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
@@ -54,6 +48,8 @@ if (electronIsDev) {
 	setupReloadWatcher(myCapacitorApp);
 }
 
+let allowInsecureSSL = false;
+
 // Run Application
 (async () => {
 	// Wait for electron app to be ready.
@@ -65,6 +61,15 @@ if (electronIsDev) {
 	// Check for updates if we are in a packaged app.
 	autoUpdater.checkForUpdatesAndNotify();
 })();
+
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+	if (allowInsecureSSL) {
+		event.preventDefault(); // prevent default behavior (blocking the cert)
+		callback(true); // trust the certificate
+	} else {
+		callback(false); // reject others
+	}
+});
 
 // Handle when all of our windows are close (platforms have their own expectations).
 app.on('window-all-closed', function () {
@@ -154,3 +159,11 @@ ipcMain.handle(
 		return await integrityTokenBasedMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
 	}
 );
+
+ipcMain.handle('setAllowInsecureSSL', async (_, allow) => {
+	allowInsecureSSL = allow;
+	await session.defaultSession.clearAuthCache();
+	await session.defaultSession.clearCache();
+
+	return allowInsecureSSL;
+});

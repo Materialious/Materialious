@@ -23,6 +23,7 @@
 	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
+		companionStore,
 		instanceStore,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
@@ -76,7 +77,6 @@
 	const sessionId = Array.from(Array(16), () => Math.floor(Math.random() * 36).toString(36)).join(
 		''
 	);
-	let isLive = false;
 	let videoPlaybackUstreamerConfig: string | undefined;
 	let serverAbrStreamingUrl: URL | undefined = undefined;
 	let drmParams: string | undefined;
@@ -251,7 +251,7 @@
 				'language',
 				'statistics'
 			],
-			playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
+			playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
 			enableTooltips: false,
 			seekBarColors: {
 				played: (await getDynamicTheme())['--primary']
@@ -259,8 +259,6 @@
 		});
 
 		if (data.video.fallbackPatch === 'youtubejs' && data.video.ytjs) {
-			isLive = !!data.video.ytjs.video.basic_info.is_live;
-
 			if (
 				data.video.ytjs.rawApiResponse.data.streamingData &&
 				(data.video.ytjs.rawApiResponse.data.streamingData as any).drmParams
@@ -343,7 +341,7 @@
 					type === shaka.net.NetworkingEngine.RequestType.SEGMENT &&
 					url.pathname.includes('videoplayback')
 				) {
-					if (!isLive) {
+					if (!data.video.liveNow) {
 						const currentFormat = formatList.find(
 							(format) =>
 								fromFormat(format) === (new URL(request.uris[0]).searchParams.get('___key') || '')
@@ -632,7 +630,12 @@
 		await player.attach(playerElement);
 
 		if (!data.video.hlsUrl) {
-			let dashUrl = data.video.dashUrl;
+			let dashUrl: string = '';
+			if ($companionStore) {
+				dashUrl = `${$companionStore}/api/manifest/dash/id/${data.video.videoId}`;
+			} else {
+				dashUrl = data.video.dashUrl;
+			}
 
 			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || proxyVideos)) {
 				dashUrl += '?local=true';

@@ -5,6 +5,7 @@ import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './letterCasing';
 import type { Channel, HashTag, Playlist, PlaylistPageVideo, Video, VideoBase } from './api/model';
+import { ensureNoTrailingSlash } from './misc';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && typeof givenValue !== null) {
@@ -17,8 +18,16 @@ function platformDependentDefault(givenValue: any, defaultValue: any): any {
 export const instanceStore: Writable<string> = persisted(
 	'invidiousInstance',
 	platformDependentDefault(
-		import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE,
+		ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
 		'https://invidious.materialio.us'
+	)
+);
+
+export const companionStore: Writable<string | undefined> = persisted(
+	'companionInstance',
+	platformDependentDefault(
+		ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE),
+		undefined
 	)
 );
 

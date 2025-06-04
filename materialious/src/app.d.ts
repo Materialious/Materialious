@@ -18,6 +18,7 @@ declare global {
 				requestKey: string,
 				visitorData: string
 			) => Promise<string>;
+			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promoise<boolean>;
 		};
 	}
 }

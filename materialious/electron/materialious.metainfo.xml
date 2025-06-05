@@ -10,7 +10,7 @@
     <ul>
         <li>Invidious companion support</li>
         <li>Invidious API extended integration</li>
-        <li>YouTube.js fallback if Invidious fails loading videos for Desktop & Android</li>
+        <li>YouTube.js fallback if Invidious fails loading videos</li>
         <li>Support for disabling certificate validation for homelab users</li>
         <li>Sync your watch progress between Invidious sessions</li>
         <li>Watch sync parties</li>

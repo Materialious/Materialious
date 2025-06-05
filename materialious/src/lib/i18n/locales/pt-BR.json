@@ -1,160 +1,160 @@
 {
-	"enabled": "Ativado",
-	"copyUrl": "Copiar URL",
-	"loadMore": "Carregar mais",
-	"views": "visualizações",
-	"invidiousBlockWarning": "Invidious está sendo bloqueado pelo Google. Se os vídeos não estiverem carregando para esta instância, por gentileza, use esta instância do Materialious no {android} ou {desktop} para contornar isso com o fallback de vídeo local.",
-	"videos": "vídeos",
-	"cancel": "Cancelar",
-	"create": "Criar",
-	"title": "Título",
-	"searchPlaceholder": "Pesquisar",
-	"delete": "Excluir",
-	"donate": "Doar",
-	"deleteAllHistory": "Apagar todo o histórico",
-	"skipping": "Pulando",
-	"replies": "respostas",
-	"region": "Região",
-	"noResult": "Sem resultados",
-	"language": "Idioma",
-	"channels": "canais",
-	"transcript": "Transcrição",
-	"noCaptionData": "Legendas não contêm dados.",
-	"selectLang": "Selecione o idioma",
-	"letterCase": "Letras maiúsculas/minúsculas para títulos",
-	"hideReplies": "Ocultar respostas",
-	"hideVideo": "Ocultar vídeo",
-	"syncParty": {
-		"userJoined": "Usuário adicionado à sua sala de cinema.",
-		"userLeft": "Usuário deixou sua sala de cinema.",
-		"userOnPrivatePage": "O usuário está visualizando uma página privada, a sincronização será retomada em breve."
-	},
-	"videoTabs": {
-		"all": "Todos",
-		"videos": "Vídeos",
-		"playlists": "Listas de reprodução",
-		"channels": "Canais",
-		"shorts": "Shorts",
-		"streams": "Ao vivo"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Gerenciar assinaturas"
-	},
-	"playlist": {
-		"createPlaylist": "Criar lista de reprodução",
-		"public": "Pública",
-		"unlisted": "Não listada",
-		"private": "Privada",
-		"playVideos": "Reproduzir vídeos",
-		"shuffleVideos": "Aleatorizar reprodução",
-		"loopPlaylist": "Repetir reprodução"
-	},
-	"thumbnail": {
-		"live": "AO VIVO",
-		"failedToLoadImage": "Falha ao carregar a imagem"
-	},
-	"pages": {
-		"home": "Início",
-		"trending": "Popular",
-		"subscriptions": "Inscrições",
-		"history": "Histórico",
-		"playlists": "Listas de reprodução"
-	},
-	"subscribers": "inscritos",
-	"unsubscribe": "Cancelar inscrição",
-	"loginRequired": "Login necessário",
-	"player": {
-		"audioOnly": "Somente áudio",
-		"theatreMode": "Modo teatro",
-		"pauseTimer": "Pausar temporizador",
-		"pauseVideoIn": "Pausar vídeo em ",
-		"share": {
-			"title": "Compartilhar",
-			"materialiousLink": "Copiar link Materialious",
-			"invidiousRedirect": "Copiar link de redirecionamento Invidious",
-			"youtubeLink": "Copiar link do Youtube"
-		},
-		"download": "Baixar",
-		"downloadSteps": {
-			"merging": "Mesclando vídeo e áudio juntos",
-			"video": "Baixando vídeo",
-			"audio": "Baixando áudio",
-			"ffmpeg": "Baixando biblioteca e componentes ffmpeg",
-			"classWorker": "Baixando o webworker do ffmpeg",
-			"core": "Baixando o núcleo do ffmpeg",
-			"wasm": "Baixando o wasm do ffmpeg",
-			"worker": "Baixando o worker do ffmpeg"
-		},
-		"noPlaylists": "Sem listas de reprodução",
-		"unableToLoadComments": "Incapaz de carregar os comentários",
-		"addToPlaylist": "Adicionar à lista de reprodução",
-		"youtubeJsFallBack": "Fallback de vídeo local sendo usado"
-	},
-	"layout": {
-		"interface": "Interface",
-		"star": "Avalie-nos com uma estrela no Github! ☆",
-		"syncParty": "Sincronizar sala",
-		"syncPartyWarning": "Por gentileza, lembre-se que seu IP ficará visível para os usuários que você convidar.",
-		"startSyncParty": "Iniciar sincronização da sala",
-		"endSyncParty": "Encerrar sincronização da sala",
-		"notifications": "Notificações",
-		"noNewNotifications": "Sem notificações recentes por aqui",
-		"settings": "Configurações",
-		"login": "Fazer login",
-		"logout": "Sair",
-		"customize": "Personalizar",
-		"lowBandwidthMode": "Modo de baixo consumo de banda larga",
-		"theme": {
-			"theme": "Tema",
-			"darkMode": "Modo escuro",
-			"lightMode": "Modo claro",
-			"AmoledTheme": "Tema Amoled",
-			"color": "Cor"
-		},
-		"searchSuggestions": "Sugestões de pesquisa",
-		"previewVideoOnHover": "Pré-visualizar vídeo com passagem do mouse",
-		"expandDescription": "Expandir descrição por padrão",
-		"expandComments": "Expandir comentários por padrão",
-		"dataPreferences": {
-			"content": "Procurando importar/exportar inscrições, alterar senha ou excluir conta? Clique aqui e navegue até o fim da página.",
-			"dataPreferences": "Preferências de dados"
-		},
-		"player": {
-			"title": "Reprodutor",
-			"autoPlay": "Reprodução automática de vídeo",
-			"alwaysLoopVideo": "Sempre repetir o vídeo",
-			"savePlaybackPosition": "Salvar progresso da reprodução",
-			"listenByDefault": "Apenas escutar por padrão",
-			"theatreModeByDefault": "Modo teatro por padrão",
-			"autoPlayNextByDefault": "Reprodução automática por padrão",
-			"miniPlayer": "Reprodutor pequeno",
-			"proxyVideos": "Vídeos proxy",
-			"backgroundPlay": "Reproduzir áudio em segundo plano",
-			"dash": "Hífen",
-			"silenceSkipper": "Pular silêncio (Experimental)",
-			"youtubeJsFallback": "Fallback para processamento de vídeo local",
-			"youtubeJsAlways": "Sempre usar processamento de vídeo local",
-			"lockOrientation": "Orientação travada para igualar aspecto de proporção"
-		},
-		"bookmarklet": "Favoritos",
-		"instanceUrl": "URL da instância",
-		"sponsors": {
-			"sponsor": "Patrocinador",
-			"disableToast": "Desativar avisos",
-			"disableTimeline": "Desabilitar segmentos na linha do tempo",
-			"Catagories": "Categorias",
-			"unpaidSelfPromotion": "Não remunerado/Auto promoção",
-			"interactionReminder": "Lembrete de interação (Inscreva-se)",
-			"intermissionIntroAnimation": "Intervalo/Animação de introdução",
-			"credits": "Cartões finais/Créditos",
-			"preViewRecapHook": "Prévia/Recapitulação/Gancho",
-			"tangentJokes": "Tangente não relacionada/Piadas"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL da instância de miniatura",
-			"titleOnly": "Somente títulos"
-		}
-	},
-	"subscribe": "Inscrever-se"
+    "enabled": "Ativado",
+    "copyUrl": "Copiar URL",
+    "loadMore": "Carregar mais",
+    "views": "visualizações",
+    "invidiousBlockWarning": "Invidious está sendo bloqueado pelo Google. Se os vídeos não estiverem carregando para esta instância, por gentileza, use esta instância do Materialious no {android} ou {desktop} para contornar isso com o fallback de vídeo local.",
+    "videos": "vídeos",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "title": "Título",
+    "searchPlaceholder": "Pesquisar",
+    "delete": "Excluir",
+    "donate": "Doar",
+    "deleteAllHistory": "Apagar todo o histórico",
+    "skipping": "Pulando",
+    "replies": "respostas",
+    "region": "Região",
+    "noResult": "Sem resultados",
+    "language": "Idioma",
+    "channels": "canais",
+    "transcript": "Transcrição",
+    "noCaptionData": "Legendas não contêm dados.",
+    "selectLang": "Selecione o idioma",
+    "letterCase": "Letras maiúsculas/minúsculas para títulos",
+    "hideReplies": "Ocultar respostas",
+    "hideVideo": "Ocultar vídeo",
+    "syncParty": {
+        "userJoined": "Usuário adicionado à sua sala de cinema.",
+        "userLeft": "Usuário deixou sua sala de cinema.",
+        "userOnPrivatePage": "O usuário está visualizando uma página privada, a sincronização será retomada em breve."
+    },
+    "videoTabs": {
+        "all": "Todos",
+        "videos": "Vídeos",
+        "playlists": "Listas de reprodução",
+        "channels": "Canais",
+        "shorts": "Shorts",
+        "streams": "Ao vivo"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Gerenciar assinaturas"
+    },
+    "playlist": {
+        "createPlaylist": "Criar lista de reprodução",
+        "public": "Pública",
+        "unlisted": "Não listada",
+        "private": "Privada",
+        "playVideos": "Reproduzir vídeos",
+        "shuffleVideos": "Aleatorizar reprodução",
+        "loopPlaylist": "Repetir reprodução"
+    },
+    "thumbnail": {
+        "live": "AO VIVO",
+        "failedToLoadImage": "Falha ao carregar a imagem"
+    },
+    "pages": {
+        "home": "Início",
+        "trending": "Popular",
+        "subscriptions": "Inscrições",
+        "history": "Histórico",
+        "playlists": "Listas de reprodução"
+    },
+    "subscribers": "inscritos",
+    "unsubscribe": "Cancelar inscrição",
+    "loginRequired": "Login necessário",
+    "player": {
+        "audioOnly": "Somente áudio",
+        "theatreMode": "Modo teatro",
+        "pauseTimer": "Pausar temporizador",
+        "pauseVideoIn": "Pausar vídeo em ",
+        "share": {
+            "title": "Compartilhar",
+            "materialiousLink": "Copiar link Materialious",
+            "invidiousRedirect": "Copiar link de redirecionamento Invidious",
+            "youtubeLink": "Copiar link do Youtube"
+        },
+        "download": "Baixar",
+        "downloadSteps": {
+            "merging": "Mesclando vídeo e áudio juntos",
+            "video": "Baixando vídeo",
+            "audio": "Baixando áudio",
+            "ffmpeg": "Baixando biblioteca e componentes ffmpeg",
+            "classWorker": "Baixando o webworker do ffmpeg",
+            "core": "Baixando o núcleo do ffmpeg",
+            "wasm": "Baixando o wasm do ffmpeg",
+            "worker": "Baixando o worker do ffmpeg"
+        },
+        "noPlaylists": "Sem listas de reprodução",
+        "unableToLoadComments": "Incapaz de carregar os comentários",
+        "addToPlaylist": "Adicionar à lista de reprodução",
+        "youtubeJsFallBack": "Fallback de vídeo local sendo usado"
+    },
+    "layout": {
+        "interface": "Interface",
+        "star": "Avalie-nos com uma estrela no Github! ☆",
+        "syncParty": "Sincronizar sala",
+        "syncPartyWarning": "Por gentileza, lembre-se que seu IP ficará visível para os usuários que você convidar.",
+        "startSyncParty": "Iniciar sincronização da sala",
+        "endSyncParty": "Encerrar sincronização da sala",
+        "notifications": "Notificações",
+        "noNewNotifications": "Sem notificações recentes por aqui",
+        "settings": "Configurações",
+        "login": "Fazer login",
+        "logout": "Sair",
+        "customize": "Personalizar",
+        "lowBandwidthMode": "Modo de baixo consumo de banda larga",
+        "theme": {
+            "theme": "Tema",
+            "darkMode": "Modo escuro",
+            "lightMode": "Modo claro",
+            "AmoledTheme": "Tema Amoled",
+            "color": "Cor"
+        },
+        "searchSuggestions": "Sugestões de pesquisa",
+        "previewVideoOnHover": "Pré-visualizar vídeo com passagem do mouse",
+        "expandDescription": "Expandir descrição por padrão",
+        "expandComments": "Expandir comentários por padrão",
+        "dataPreferences": {
+            "content": "Procurando importar/exportar inscrições, alterar senha ou excluir conta? Clique aqui e navegue até o fim da página.",
+            "dataPreferences": "Preferências de dados"
+        },
+        "player": {
+            "title": "Reprodutor",
+            "autoPlay": "Reprodução automática de vídeo",
+            "alwaysLoopVideo": "Sempre repetir o vídeo",
+            "savePlaybackPosition": "Salvar progresso da reprodução",
+            "listenByDefault": "Apenas escutar por padrão",
+            "theatreModeByDefault": "Modo teatro por padrão",
+            "autoPlayNextByDefault": "Reprodução automática por padrão",
+            "miniPlayer": "Reprodutor pequeno",
+            "proxyVideos": "Vídeos proxy",
+            "backgroundPlay": "Reproduzir áudio em segundo plano",
+            "dash": "Hífen",
+            "silenceSkipper": "Pular silêncio (Experimental)",
+            "youtubeJsFallback": "Fallback para processamento de vídeo local",
+            "youtubeJsAlways": "Sempre usar processamento de vídeo local",
+            "lockOrientation": "Orientação travada para igualar aspecto de proporção"
+        },
+        "bookmarklet": "Favoritos",
+        "instanceUrl": "URL da instância",
+        "sponsors": {
+            "sponsor": "Patrocinador",
+            "disableToast": "Desativar avisos",
+            "disableTimeline": "Desabilitar segmentos na linha do tempo",
+            "Catagories": "Categorias",
+            "unpaidSelfPromotion": "Não remunerado/Auto promoção",
+            "interactionReminder": "Lembrete de interação (Inscreva-se)",
+            "intermissionIntroAnimation": "Intervalo/Animação de introdução",
+            "credits": "Cartões finais/Créditos",
+            "preViewRecapHook": "Prévia/Recapitulação/Gancho",
+            "tangentJokes": "Tangente não relacionada/Piadas"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL da instância de miniatura",
+            "titleOnly": "Somente títulos"
+        }
+    },
+    "subscribe": "Inscrever-se"
 }

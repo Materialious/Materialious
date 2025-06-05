@@ -3,7 +3,7 @@
 	import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model.js';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { feedCacheStore } from '$lib/store';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	let currentPage = 1;

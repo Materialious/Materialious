@@ -3,7 +3,7 @@
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail, getVideoProgress } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';

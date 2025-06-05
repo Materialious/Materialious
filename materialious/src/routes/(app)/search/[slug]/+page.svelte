@@ -6,9 +6,10 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import { extractUniqueId } from '$lib/misc.js';
 	import { feedLastItemId, searchCacheStore } from '$lib/store.js';
 	import { onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	let { data } = $props();
@@ -27,6 +28,7 @@
 	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
 		currentType = type;
 		currentPage = 1;
+		data.searchStoreId = type + data.slug;
 		searchCacheStore.set({ [data.searchStoreId]: await getSearch(data.slug, { type: type }) });
 	}
 
@@ -91,15 +93,8 @@
 						<article
 							class="no-padding"
 							style="height: 100%;"
-							onclick={() =>
-								feedLastItemId.set(
-									'videoId' in item ? item.videoId : 'authorId' in item ? item.authorId : item.title
-								)}
-							id={'videoId' in item
-								? item.videoId
-								: 'authorId' in item
-									? item.authorId
-									: item.title}
+							onclick={() => feedLastItemId.set(extractUniqueId(item))}
+							id={extractUniqueId(item)}
 						>
 							{#if item.type === 'video'}
 								<Thumbnail video={item} />

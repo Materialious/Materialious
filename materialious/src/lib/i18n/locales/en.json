@@ -1,5 +1,6 @@
 {
 	"enabled": "Enabled",
+	"disabled": "Disabled",
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",
 	"views": "views",
@@ -92,7 +93,11 @@
 		"unableToLoadComments": "Unable to load comments",
 		"addToPlaylist": "Add to playlist",
 		"youtubeJsFallBack": "Local video fallback being used",
-		"defaultLanguage": "Default Language"
+		"defaultLanguage": "Default Language",
+		"youtubeJsLoading": "Video failed to load, attempting to reload with local video fallback.",
+		"retryText": "Video failed to load, how would you like to continue?",
+		"enableYoutubejsTemp": "Use local video fallback once",
+		"enableYoutubejsPerm": "Always allow local video fallback"
 	},
 	"layout": {
 		"interface": "Interface",
@@ -140,8 +145,9 @@
 			"backgroundPlay": "Play audio in background",
 			"dash": "Dash",
 			"silenceSkipper": "Silence skipper (Experimental)",
+			"localVideoFallback": "Local video fallback",
 			"youtubeJsFallback": "Local video processing fallback",
-			"youtubeJsAlways": "Always use local video processing",
+			"youtubeJsAlways": "Always use",
 			"lockOrientation": "Orientation locked to aspect ratio"
 		},
 		"bookmarklet": "Bookmarklet",

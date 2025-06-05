@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { preventDefault } from 'svelte/legacy';
 
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
 	import { synciousInstanceStore, synciousStore } from '../../store';
@@ -11,7 +11,8 @@
 
 <form
 	onsubmit={preventDefault(() =>
-		synciousInstanceStore.set(ensureNoTrailingSlash(synciousInstance)))}
+		synciousInstanceStore.set(ensureNoTrailingSlash(synciousInstance))
+	)}
 >
 	<nav>
 		<div class="field label border max">

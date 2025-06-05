@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { getSearchSuggestions } from '../api';
 	import {
 		interfaceSearchHistoryEnabled,

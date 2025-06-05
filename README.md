@@ -17,10 +17,11 @@
 
 # Features
 - [Invidious companion support.](./docs/DOCKER.md#invidious-companion-support)
-- [Invidious API extended integration!](https://github.com/Materialious/api-extended)
+- [Invidious API extended integration.](https://github.com/Materialious/api-extended)
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
+- Support for disabling certificate validation for homelab users.
 - Sync your watch progress between Invidious sessions.
-- Watch sync parties!
+- Watch sync parties.
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
 - DeArrow built-in (With local processing fallback).
@@ -191,7 +192,7 @@ brew install --cask spotube
 
 # Translations
 
-Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)! 
+Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/materialious/)!
 
 <a href="https://toolate.othing.xyz/projects/materialious/">
 <img src="https://toolate.othing.xyz/widget/materialious/materialious/multi-auto.svg" alt="Translation status" />

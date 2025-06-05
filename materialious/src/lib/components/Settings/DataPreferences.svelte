@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { instanceStore } from '$lib/store';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 </script>
 

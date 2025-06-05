@@ -2,7 +2,7 @@
 	import { titleCase } from '$lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
 	import ISO6391 from 'iso-639-1';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import {
 		playerAlwaysLoopStore,
@@ -20,6 +20,13 @@
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 
+	let localVideoFallback: 'enabled' | 'disabled' | 'always' = $state('enabled');
+	if (!$playerYouTubeJsFallback) {
+		localVideoFallback = 'disabled';
+	} else if ($playerYouTubeJsAlways) {
+		localVideoFallback = 'always';
+	}
+
 	const languageNames = ISO6391.getAllCodes().map((code) =>
 		ISO6391.getName(code).toLocaleLowerCase()
 	);
@@ -27,6 +34,21 @@
 	function onQualityChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
 		playerDefaultQualityStore.set(value);
+	}
+
+	function onLocalVideoFallbackChange() {
+		switch (localVideoFallback) {
+			case 'enabled':
+				playerYouTubeJsFallback.set(true);
+				break;
+			case 'disabled':
+				playerYouTubeJsFallback.set(false);
+				break;
+			case 'always':
+				playerYouTubeJsAlways.set(true);
+				playerYouTubeJsFallback.set(true);
+				break;
+		}
 	}
 </script>
 
@@ -55,8 +77,8 @@
 		onchange={onQualityChange}
 	>
 		<option value="auto">Auto (Recommended)</option>
-		<option value="144">144p (Low)</option>
-		<option value="240">240p</option>
+		<option value="144">144p (Ultra low)</option>
+		<option value="240">240p (Low)</option>
 		<option value="360">360p (SD)</option>
 		<option value="480">480p (SD+)</option>
 		<option value="720">720p (HD)</option>
@@ -67,6 +89,18 @@
 	<label for="quality">{$_('player.preferredQuality')}</label>
 	<i>arrow_drop_down</i>
 </div>
+
+{#if Capacitor.isNativePlatform()}
+	<div class="field suffix border label">
+		<select name="ytfallback" bind:value={localVideoFallback} onchange={onLocalVideoFallbackChange}>
+			<option value="enabled">{$_('enabled')}</option>
+			<option value="always">{$_('layout.player.youtubeJsAlways')}</option>
+			<option value="disabled">{$_('disabled')}</option>
+		</select>
+		<label for="ytfallback">{$_('layout.player.localVideoFallback')}</label>
+		<i>arrow_drop_down</i>
+	</div>
+{/if}
 
 <div class="field no-margin">
 	<nav class="no-padding">
@@ -183,37 +217,3 @@
 		</label>
 	</nav>
 </div>
-
-{#if Capacitor.isNativePlatform()}
-	<div class="field no-margin">
-		<nav class="no-padding">
-			<div class="max">
-				<div>{$_('layout.player.youtubeJsAlways')}</div>
-			</div>
-			<label class="switch">
-				<input
-					type="checkbox"
-					bind:checked={$playerYouTubeJsAlways}
-					onclick={() => playerYouTubeJsAlways.set(!$playerYouTubeJsAlways)}
-				/>
-				<span></span>
-			</label>
-		</nav>
-	</div>
-
-	<div class="field no-margin">
-		<nav class="no-padding">
-			<div class="max">
-				<div>{$_('layout.player.youtubeJsFallback')}</div>
-			</div>
-			<label class="switch">
-				<input
-					type="checkbox"
-					bind:checked={$playerYouTubeJsFallback}
-					onclick={() => playerYouTubeJsFallback.set(!$playerYouTubeJsFallback)}
-				/>
-				<span></span>
-			</label>
-		</nav>
-	</div>
-{/if}

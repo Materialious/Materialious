@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { deleteUnsubscribe } from '$lib/api';
 	import Fuse from 'fuse.js';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 
 	let { data } = $props();
 

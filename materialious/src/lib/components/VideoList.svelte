@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { removePlaylistVideo } from '../api';
 	import type { PlaylistPageVideo, Video, VideoBase } from '../api/model';
 	import { authStore, feedLastItemId } from '../store';

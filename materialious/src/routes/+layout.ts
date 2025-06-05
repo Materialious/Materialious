@@ -2,14 +2,18 @@ import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
 import { getResolveUrl } from '$lib/api';
 import '$lib/i18n'; // Import to initialize. Important :)
+import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages.js';
 import { authStore, interfaceDefaultPage } from '$lib/store.js';
-import { locale, waitLocale } from 'svelte-i18n';
 import { get } from 'svelte/store';
 
 export const ssr = false;
 
 export async function load({ url }) {
+	if (browser) {
+		await initI18n();
+	}
+
 	if (url.pathname.startsWith('/@')) {
 		const username = url.pathname.split('/')[1];
 
@@ -20,11 +24,6 @@ export async function load({ url }) {
 			}
 		} catch {}
 	}
-
-	if (browser) {
-		locale.set(window.navigator.language);
-	}
-	await waitLocale();
 
 	const defaultPage = get(interfaceDefaultPage);
 

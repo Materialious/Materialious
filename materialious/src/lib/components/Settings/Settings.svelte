@@ -1,8 +1,6 @@
 <script lang="ts">
-	import ISO6391 from 'iso-639-1';
 	import { onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
-	import { get } from 'svelte/store';
+	import { _ } from '$lib/i18n';
 	import ApiExtended from './ApiExtended.svelte';
 	import DataPreferences from './DataPreferences.svelte';
 	import DeArrow from './DeArrow.svelte';
@@ -53,10 +51,6 @@
 				<i>smart_display</i>
 				<span>{$_('layout.player.title')}</span>
 			</a>
-			<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
-				<i>save</i>
-				<span>{$_('layout.dataPreferences.dataPreferences')}</span>
-			</a>
 			<a class:active={activeTab === 'ryd'} onclick={() => (activeTab = 'ryd')}>
 				<i>thumb_down</i>
 				<span>RYD</span>
@@ -72,6 +66,10 @@
 			<a class:active={activeTab === 'dearrow'} onclick={() => (activeTab = 'dearrow')}>
 				<i>keyboard_double_arrow_down</i>
 				<span>{$_('layout.deArrow.title')}</span>
+			</a>
+			<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
+				<i>save</i>
+				<span>{$_('layout.dataPreferences.dataPreferences')}</span>
 			</a>
 			<a href="https://github.com/sponsors/WardPearce" target="_blank" referrerpolicy="no-referrer">
 				<i>favorite</i>

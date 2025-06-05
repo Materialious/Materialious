@@ -1,160 +1,160 @@
 {
-	"enabled": "Omogućeno",
-	"copyUrl": "Kopiraj URL",
-	"loadMore": "Učitaj više",
-	"views": "pogleda",
-	"invidiousBlockWarning": "Google trenutno blokira Invidious. Ako se video snimci ne učitavaju za ovu instancu, koristite ovu instancu na Materialious na {android} ili {desktop} da biste to zaobišli pomoću lokalnog video povlačenja.",
-	"videos": "video snimci",
-	"cancel": "Otkaži",
-	"create": "Kreiraj",
-	"title": "Naslov",
-	"searchPlaceholder": "Traži",
-	"delete": "Izbriši",
-	"donate": "Donirajte",
-	"deleteAllHistory": "Izbrišite svu historiju",
-	"skipping": "Preskakanje",
-	"replies": "odgovori",
-	"region": "Regija",
-	"noResult": "Nema rezultata",
-	"language": "Jezik",
-	"channels": "kanali",
-	"transcript": "Transkript",
-	"noCaptionData": "Podnaslovi nemaju nikakve podatke.",
-	"selectLang": "Izaberite jezik",
-	"letterCase": "Velika slova za naslove",
-	"hideReplies": "Sakrijte odgovore",
-	"hideVideo": "Sakrijte video",
-	"syncParty": {
-		"userJoined": "Korisnik se pridružio vašem udruženju za gledanje.",
-		"userLeft": "Korisnik se napustio vaše udruženje za gledanje.",
-		"userOnPrivatePage": "Korisnik koji trenutno gleda privatnu stranicu, sinkronizacija će se uskoro nastaviti."
-	},
-	"videoTabs": {
-		"all": "Sve",
-		"videos": "Video snimci",
-		"playlists": "Zapisi",
-		"channels": "Kanali",
-		"shorts": "Shorts",
-		"streams": "Tokovi"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Upravljajte pretplatama"
-	},
-	"playlist": {
-		"createPlaylist": "Kreirajte zapis",
-		"public": "Javan",
-		"unlisted": "Nenaveden",
-		"private": "Privatan",
-		"playVideos": "Pusti video zapise",
-		"shuffleVideos": "Video snimci su pom(ij)ešani",
-		"loopPlaylist": "Ponavljaj zapis"
-	},
-	"thumbnail": {
-		"live": "UŽIVO",
-		"failedToLoadImage": "Učitavanje slike nije usp(j)elo"
-	},
-	"pages": {
-		"home": "Početna",
-		"trending": "U trendu",
-		"subscriptions": "Pretplate",
-		"history": "Historija",
-		"playlists": "Zapisi"
-	},
-	"subscribers": "pretplatnici",
-	"unsubscribe": "Otkažite pretplatu",
-	"loginRequired": "Potrebna je prijava",
-	"player": {
-		"audioOnly": "Samo zvuk",
-		"theatreMode": "Režim bioskopa",
-		"pauseTimer": "Pauziraj vremem(j)er",
-		"pauseVideoIn": "Pauzirajte video u",
-		"share": {
-			"title": "Pod(ij)eli",
-			"materialiousLink": "Kopiraj Materijalious poveznicu",
-			"invidiousRedirect": "Kopiraj Invidious poveznicu za preusm(j)eravanje",
-			"youtubeLink": "Kopirajte Youtube poveznicu"
-		},
-		"download": "Preuzmi",
-		"downloadSteps": {
-			"merging": "Spajaju se video i audio zapisi zajedno",
-			"video": "Preuzimanje videa",
-			"audio": "Preuzimanje zvuka",
-			"ffmpeg": "Preuzimanje ffmpeg biblioteke i komponenata",
-			"classWorker": "Preuzimanje ffmpeg klasnog radnika",
-			"core": "Preuzimanje ffmpeg jezgra",
-			"wasm": "Preuzimanje ffmpeg wasm",
-			"worker": "Preuzimanje ffmpeg radnika"
-		},
-		"noPlaylists": "Nema zapisa",
-		"unableToLoadComments": "Nije moguće učitati komentare",
-		"addToPlaylist": "Dodaj na listu za reprodukciju",
-		"youtubeJsFallBack": "Koristi se rezervni lokalni video"
-	},
-	"layout": {
-		"interface": "Sučelje",
-		"star": "Ozv(j)ezdite nas na Github-u!",
-		"syncParty": "Sinkronizacija žurke",
-		"syncPartyWarning": "Čuvajte na umu da će vaša IP adresa biti vidljiva korisnicima koje pozovete.",
-		"startSyncParty": "Započni žurku za sinkronizaciju",
-		"endSyncParty": "Završi žurku za sinkronizaciju",
-		"notifications": "Obav(j)eštenja",
-		"noNewNotifications": "Ovd(j)e nema novih obav(j)eštenja",
-		"settings": "Podešavanja/Postavke",
-		"login": "Upis",
-		"logout": "Ispis",
-		"customize": "Prilagodite",
-		"lowBandwidthMode": "Režim niske propusnosti",
-		"theme": {
-			"theme": "Tema",
-			"darkMode": "Tamni režim",
-			"lightMode": "Sv(j)etli režim",
-			"AmoledTheme": "Amoled tema",
-			"color": "Boja"
-		},
-		"searchSuggestions": "Pr(ij)edlozi za pretragu",
-		"previewVideoOnHover": "Pregledajte video pri lebdenju",
-		"expandDescription": "Zadano proširite opis",
-		"expandComments": "Zadano proširite komentare",
-		"dataPreferences": {
-			"content": "Želite da uvezete/izvezete pretplate, prom(j)enite lozinku ili izbrišete nalog? Kliknite ovd(j)e i pomaknite se do dna stranice.",
-			"dataPreferences": "Podešavanja podataka"
-		},
-		"player": {
-			"title": "Plejer",
-			"autoPlay": "Automatska reprodukcija videa",
-			"alwaysLoopVideo": "Uv(ij)ek ponovite video",
-			"savePlaybackPosition": "Sačuvajte poziciju reprodukcije",
-			"listenByDefault": "Zadano slušajte",
-			"theatreModeByDefault": "Zadan je režim bioskopa",
-			"autoPlayNextByDefault": "Zadano sl(j)edeće pokrenite",
-			"miniPlayer": "Mini plejer",
-			"proxyVideos": "Proksi video snimci",
-			"backgroundPlay": "Pustite audio u pozadini",
-			"dash": "Dash mod",
-			"silenceSkipper": "Preskoknik tišine (eksperimentalno)",
-			"youtubeJsFallback": "Povlačaj za lokalnu obradu video zapisa",
-			"youtubeJsAlways": "Uv(ij)ek koristite lokalnu obradu video zapisa",
-			"lockOrientation": "Or(ij)entacija je zaključana u odnosu na om(j)er"
-		},
-		"bookmarklet": "Oznaka",
-		"instanceUrl": "URL instance",
-		"sponsors": {
-			"sponsor": "Sponzor",
-			"disableToast": "Onemogući tost",
-			"disableTimeline": "Onemogućite segmente na vremenskoj liniji",
-			"Catagories": "Kategorije",
-			"unpaidSelfPromotion": "Neplaćeno/samounapređenje",
-			"interactionReminder": "Pods(j)etnik o interakciji (Pretplatite se)",
-			"intermissionIntroAnimation": "Pauza/uvodna animacija",
-			"credits": "Završne špice/zasluge",
-			"preViewRecapHook": "Pregled/Rekapitulacija/Kuka",
-			"tangentJokes": "Nadoknadna tangenta/vicevi"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL minijature za instance",
-			"titleOnly": "Samo naslov"
-		}
-	},
-	"subscribe": "Pretplatite se"
+    "enabled": "Omogućeno",
+    "copyUrl": "Kopiraj URL",
+    "loadMore": "Učitaj više",
+    "views": "pogleda",
+    "invidiousBlockWarning": "Google trenutno blokira Invidious. Ako se video snimci ne učitavaju za ovu instancu, koristite ovu instancu na Materialious na {android} ili {desktop} da biste to zaobišli pomoću lokalnog video povlačenja.",
+    "videos": "video snimci",
+    "cancel": "Otkaži",
+    "create": "Kreiraj",
+    "title": "Naslov",
+    "searchPlaceholder": "Traži",
+    "delete": "Izbriši",
+    "donate": "Donirajte",
+    "deleteAllHistory": "Izbrišite svu historiju",
+    "skipping": "Preskakanje",
+    "replies": "odgovori",
+    "region": "Regija",
+    "noResult": "Nema rezultata",
+    "language": "Jezik",
+    "channels": "kanali",
+    "transcript": "Transkript",
+    "noCaptionData": "Podnaslovi nemaju nikakve podatke.",
+    "selectLang": "Izaberite jezik",
+    "letterCase": "Velika slova za naslove",
+    "hideReplies": "Sakrijte odgovore",
+    "hideVideo": "Sakrijte video",
+    "syncParty": {
+        "userJoined": "Korisnik se pridružio vašem udruženju za gledanje.",
+        "userLeft": "Korisnik se napustio vaše udruženje za gledanje.",
+        "userOnPrivatePage": "Korisnik koji trenutno gleda privatnu stranicu, sinkronizacija će se uskoro nastaviti."
+    },
+    "videoTabs": {
+        "all": "Sve",
+        "videos": "Video snimci",
+        "playlists": "Zapisi",
+        "channels": "Kanali",
+        "shorts": "Shorts",
+        "streams": "Tokovi"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Upravljajte pretplatama"
+    },
+    "playlist": {
+        "createPlaylist": "Kreirajte zapis",
+        "public": "Javan",
+        "unlisted": "Nenaveden",
+        "private": "Privatan",
+        "playVideos": "Pusti video zapise",
+        "shuffleVideos": "Video snimci su pom(ij)ešani",
+        "loopPlaylist": "Ponavljaj zapis"
+    },
+    "thumbnail": {
+        "live": "UŽIVO",
+        "failedToLoadImage": "Učitavanje slike nije usp(j)elo"
+    },
+    "pages": {
+        "home": "Početna",
+        "trending": "U trendu",
+        "subscriptions": "Pretplate",
+        "history": "Historija",
+        "playlists": "Zapisi"
+    },
+    "subscribers": "pretplatnici",
+    "unsubscribe": "Otkažite pretplatu",
+    "loginRequired": "Potrebna je prijava",
+    "player": {
+        "audioOnly": "Samo zvuk",
+        "theatreMode": "Režim bioskopa",
+        "pauseTimer": "Pauziraj vremem(j)er",
+        "pauseVideoIn": "Pauzirajte video u",
+        "share": {
+            "title": "Pod(ij)eli",
+            "materialiousLink": "Kopiraj Materijalious poveznicu",
+            "invidiousRedirect": "Kopiraj Invidious poveznicu za preusm(j)eravanje",
+            "youtubeLink": "Kopirajte Youtube poveznicu"
+        },
+        "download": "Preuzmi",
+        "downloadSteps": {
+            "merging": "Spajaju se video i audio zapisi zajedno",
+            "video": "Preuzimanje videa",
+            "audio": "Preuzimanje zvuka",
+            "ffmpeg": "Preuzimanje ffmpeg biblioteke i komponenata",
+            "classWorker": "Preuzimanje ffmpeg klasnog radnika",
+            "core": "Preuzimanje ffmpeg jezgra",
+            "wasm": "Preuzimanje ffmpeg wasm",
+            "worker": "Preuzimanje ffmpeg radnika"
+        },
+        "noPlaylists": "Nema zapisa",
+        "unableToLoadComments": "Nije moguće učitati komentare",
+        "addToPlaylist": "Dodaj na listu za reprodukciju",
+        "youtubeJsFallBack": "Koristi se rezervni lokalni video"
+    },
+    "layout": {
+        "interface": "Sučelje",
+        "star": "Ozv(j)ezdite nas na Github-u!",
+        "syncParty": "Sinkronizacija žurke",
+        "syncPartyWarning": "Čuvajte na umu da će vaša IP adresa biti vidljiva korisnicima koje pozovete.",
+        "startSyncParty": "Započni žurku za sinkronizaciju",
+        "endSyncParty": "Završi žurku za sinkronizaciju",
+        "notifications": "Obav(j)eštenja",
+        "noNewNotifications": "Ovd(j)e nema novih obav(j)eštenja",
+        "settings": "Podešavanja/Postavke",
+        "login": "Upis",
+        "logout": "Ispis",
+        "customize": "Prilagodite",
+        "lowBandwidthMode": "Režim niske propusnosti",
+        "theme": {
+            "theme": "Tema",
+            "darkMode": "Tamni režim",
+            "lightMode": "Sv(j)etli režim",
+            "AmoledTheme": "Amoled tema",
+            "color": "Boja"
+        },
+        "searchSuggestions": "Pr(ij)edlozi za pretragu",
+        "previewVideoOnHover": "Pregledajte video pri lebdenju",
+        "expandDescription": "Zadano proširite opis",
+        "expandComments": "Zadano proširite komentare",
+        "dataPreferences": {
+            "content": "Želite da uvezete/izvezete pretplate, prom(j)enite lozinku ili izbrišete nalog? Kliknite ovd(j)e i pomaknite se do dna stranice.",
+            "dataPreferences": "Podešavanja podataka"
+        },
+        "player": {
+            "title": "Plejer",
+            "autoPlay": "Automatska reprodukcija videa",
+            "alwaysLoopVideo": "Uv(ij)ek ponovite video",
+            "savePlaybackPosition": "Sačuvajte poziciju reprodukcije",
+            "listenByDefault": "Zadano slušajte",
+            "theatreModeByDefault": "Zadan je režim bioskopa",
+            "autoPlayNextByDefault": "Zadano sl(j)edeće pokrenite",
+            "miniPlayer": "Mini plejer",
+            "proxyVideos": "Proksi video snimci",
+            "backgroundPlay": "Pustite audio u pozadini",
+            "dash": "Dash mod",
+            "silenceSkipper": "Preskoknik tišine (eksperimentalno)",
+            "youtubeJsFallback": "Povlačaj za lokalnu obradu video zapisa",
+            "youtubeJsAlways": "Uv(ij)ek koristite lokalnu obradu video zapisa",
+            "lockOrientation": "Or(ij)entacija je zaključana u odnosu na om(j)er"
+        },
+        "bookmarklet": "Oznaka",
+        "instanceUrl": "URL instance",
+        "sponsors": {
+            "sponsor": "Sponzor",
+            "disableToast": "Onemogući tost",
+            "disableTimeline": "Onemogućite segmente na vremenskoj liniji",
+            "Catagories": "Kategorije",
+            "unpaidSelfPromotion": "Neplaćeno/samounapređenje",
+            "interactionReminder": "Pods(j)etnik o interakciji (Pretplatite se)",
+            "intermissionIntroAnimation": "Pauza/uvodna animacija",
+            "credits": "Završne špice/zasluge",
+            "preViewRecapHook": "Pregled/Rekapitulacija/Kuka",
+            "tangentJokes": "Nadoknadna tangenta/vicevi"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL minijature za instance",
+            "titleOnly": "Samo naslov"
+        }
+    },
+    "subscribe": "Pretplatite se"
 }

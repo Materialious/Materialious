@@ -316,6 +316,10 @@
 			snackBarAlert = get(_)('player.youtubeJsFallBack');
 			ui('#snackbar-alert');
 		}
+
+	        restoreQualityPreference();
+		restoreDefaultLanguage();
+
 	}
 
 	async function reloadVideo() {
@@ -416,9 +420,6 @@
 		await player.attach(playerElement);
 
 		playerElement.addEventListener('volumechange', saveVolumePreference);
-
-		restoreQualityPreference();
-		restoreDefaultLanguage();
 
 		await androidHandleRotate();
 

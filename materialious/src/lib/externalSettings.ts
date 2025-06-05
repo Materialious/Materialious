@@ -31,7 +31,8 @@ import {
 	sponsorBlockUrlStore,
 	synciousInstanceStore,
 	synciousStore,
-	themeColorStore
+	themeColorStore,
+	interfaceAutoExpandChapters
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 
@@ -199,6 +200,11 @@ const persistedStores: {
 		name: 'defaultQuality',
 		store: playerDefaultQualityStore,
 		type: 'string'
+	},
+	{
+		name: 'autoExpandChapters',
+		store: interfaceAutoExpandChapters,
+		type: 'boolean'
 	}
 ];
 

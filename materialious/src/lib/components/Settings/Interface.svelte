@@ -17,6 +17,7 @@
 		instanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
+		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceDefaultPage,
@@ -244,6 +245,22 @@
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandDesc}
 				onclick={() => interfaceAutoExpandDesc.set(!$interfaceAutoExpandDesc)}
+			/>
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<div>{$_('layout.expandChapters')}</div>
+		</div>
+		<label class="switch">
+			<input
+				type="checkbox"
+				bind:checked={$interfaceAutoExpandChapters}
+				onclick={() => interfaceAutoExpandChapters.set(!$interfaceAutoExpandChapters)}
 			/>
 			<span></span>
 		</label>

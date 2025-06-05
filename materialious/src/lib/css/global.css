@@ -13,6 +13,7 @@
 main.root {
 	padding-left: 7em !important;
 	padding-top: 5em !important;
+	padding-bottom: 5em !important;
 	max-height: 100vh;
 	overflow-y: auto;
 }

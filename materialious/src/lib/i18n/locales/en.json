@@ -72,6 +72,7 @@
 		"pauseTimer": "Pause timer",
 		"pauseVideoIn": "Pause video in ",
 		"preferredQuality": "Preferred quality",
+		"chapters": "Chapters",
 		"share": {
 			"title": "Share",
 			"materialiousLink": "Copy Materialious link",
@@ -126,6 +127,7 @@
 		"searchSuggestions": "Search suggestions",
 		"previewVideoOnHover": "Preview video on hover",
 		"expandDescription": "Expand description by default",
+		"expandChapters": "Expand chapters by default",
 		"expandComments": "Expand comments by default",
 		"allowInsecureRequests": "Allow insecure requests",
 		"dataPreferences": {

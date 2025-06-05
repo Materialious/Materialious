@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { cleanNumber } from '$lib/numbers';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import type { HashTag } from '../api/model';
 	import { truncate } from '../misc';
 

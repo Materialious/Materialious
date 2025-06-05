@@ -7,7 +7,7 @@
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
 	import { getPages } from '../../navPages';

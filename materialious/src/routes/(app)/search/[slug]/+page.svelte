@@ -9,7 +9,7 @@
 	import { extractUniqueId } from '$lib/misc.js';
 	import { feedLastItemId, searchCacheStore } from '$lib/store.js';
 	import { onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 
 	let { data } = $props();

@@ -5,7 +5,7 @@
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import { ui } from 'beercss';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 
 	let { data } = $props();
 

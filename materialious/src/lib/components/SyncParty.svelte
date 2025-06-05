@@ -7,7 +7,7 @@
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { syncPartyConnectionsStore, syncPartyPeerStore } from '../store';
 

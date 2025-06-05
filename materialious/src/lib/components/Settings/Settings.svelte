@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ISO6391 from 'iso-639-1';
 	import { onMount } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import ApiExtended from './ApiExtended.svelte';
 	import DataPreferences from './DataPreferences.svelte';

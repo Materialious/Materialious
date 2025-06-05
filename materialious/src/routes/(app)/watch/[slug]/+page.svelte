@@ -35,7 +35,7 @@
 	import type { DataConnection } from 'peerjs';
 	import { type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
-	import { _ } from 'svelte-i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 
 	let { data = $bindable() } = $props();

@@ -80,6 +80,13 @@ export interface Captions {
 	url: string;
 }
 
+export interface Ytjs {
+	innertube: Innertube;
+	video: YT.VideoInfo;
+	clientPlaybackNonce: string;
+	rawApiResponse: ApiResponse;
+}
+
 export interface VideoPlay extends Video {
 	keywords: string[];
 	likeCount: number;
@@ -100,12 +107,7 @@ export interface VideoPlay extends Video {
 	authorThumbnails: Image[];
 	captions: Captions[];
 	storyboards?: StoryBoard[];
-	ytjs?: {
-		innertube: Innertube;
-		video: YT.VideoInfo;
-		clientPlaybackNonce: string;
-		rawApiResponse: ApiResponse;
-	};
+	ytjs?: Ytjs;
 	fallbackPatch?: 'youtubejs' | 'piped';
 }
 

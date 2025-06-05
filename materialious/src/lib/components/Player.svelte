@@ -23,7 +23,6 @@
 	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
-		companionStore,
 		instanceStore,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
@@ -318,10 +317,6 @@
 					(button as HTMLElement).blur(); // Remove focus from the button
 					button.removeAttribute('aria-pressed'); // Reset any ARIA attributes that might indicate selection
 				});
-
-				const tempDiv = document.createElement('div');
-				tempDiv.click();
-				document.removeChild(tempDiv);
 			});
 
 			// Based off the following
@@ -629,10 +624,16 @@
 
 		await player.attach(playerElement);
 
-		if (!data.video.hlsUrl) {
+		console.log(data.video.dashUrl);
+
+		if (!data.video.liveNow) {
 			let dashUrl: string = '';
-			if ($companionStore) {
-				dashUrl = `${$companionStore}/api/manifest/dash/id/${data.video.videoId}`;
+
+			// Due to CORs issues with redirects, hosted instances of Materialious
+			// dirctly provide the companion instance
+			// while clients can just use the reirect provided by Invidious' API
+			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && Capacitor.getPlatform() === 'web') {
+				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
 			} else {
 				dashUrl = data.video.dashUrl;
 			}

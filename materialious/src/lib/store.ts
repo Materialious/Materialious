@@ -25,16 +25,6 @@ export const instanceStore: Writable<string> = persisted(
 	)
 );
 
-export const companionStore: Writable<string | undefined> = persisted(
-	'companionInstance',
-	platformDependentDefault(
-		!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE
-			? undefined
-			: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE),
-		undefined
-	)
-);
-
 export const authStore: Writable<null | { username: string; token: string }> = persisted(
 	'authToken',
 	null

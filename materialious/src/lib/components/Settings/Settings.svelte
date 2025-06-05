@@ -53,10 +53,6 @@
 				<i>smart_display</i>
 				<span>{$_('layout.player.title')}</span>
 			</a>
-			<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
-				<i>save</i>
-				<span>{$_('layout.dataPreferences.dataPreferences')}</span>
-			</a>
 			<a class:active={activeTab === 'ryd'} onclick={() => (activeTab = 'ryd')}>
 				<i>thumb_down</i>
 				<span>RYD</span>
@@ -72,6 +68,10 @@
 			<a class:active={activeTab === 'dearrow'} onclick={() => (activeTab = 'dearrow')}>
 				<i>keyboard_double_arrow_down</i>
 				<span>{$_('layout.deArrow.title')}</span>
+			</a>
+			<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
+				<i>save</i>
+				<span>{$_('layout.dataPreferences.dataPreferences')}</span>
 			</a>
 			<a href="https://github.com/sponsors/WardPearce" target="_blank" referrerpolicy="no-referrer">
 				<i>favorite</i>

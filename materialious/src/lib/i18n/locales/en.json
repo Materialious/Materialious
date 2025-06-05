@@ -1,5 +1,6 @@
 {
 	"enabled": "Enabled",
+	"disabled": "Disabled",
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",
 	"views": "views",
@@ -144,8 +145,9 @@
 			"backgroundPlay": "Play audio in background",
 			"dash": "Dash",
 			"silenceSkipper": "Silence skipper (Experimental)",
+			"localVideoFallback": "Local video fallback",
 			"youtubeJsFallback": "Local video processing fallback",
-			"youtubeJsAlways": "Always use local video processing",
+			"youtubeJsAlways": "Always use",
 			"lockOrientation": "Orientation locked to aspect ratio"
 		},
 		"bookmarklet": "Bookmarklet",

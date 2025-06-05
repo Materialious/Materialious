@@ -1,164 +1,164 @@
 {
-	"enabled": "Activado",
-	"copyUrl": "Copiar URL",
-	"loadMore": "Cargar más",
-	"views": "vistas",
-	"invidiousBlockWarning": "Invidious está actualmente bloqueado por Google. Si los vídeos no se cargan en esta instancia, utilice esta instancia en Materialious en {android} o {desktop} para evitarlo con la opción de vídeo local.",
-	"videos": "videos",
-	"cancel": "Cancelar",
-	"create": "Crear",
-	"title": "Título",
-	"searchPlaceholder": "Buscar",
-	"delete": "Eliminar",
-	"donate": "Donar",
-	"deleteAllHistory": "Eliminar todo el historial",
-	"skipping": "Omitir",
-	"replies": "respuestas",
-	"region": "Región",
-	"noResult": "Sin resultados",
-	"language": "Idioma",
-	"channels": "canales",
-	"transcript": "Transcribir",
-	"noCaptionData": "Los subtítulos no contienen datos.",
-	"selectLang": "Seleccionar idioma",
-	"letterCase": "Títulos en mayúsculas o minúsculas",
-	"hideReplies": "Ocultar respuestas",
-	"hideVideo": "Ocultar video",
-	"defaultPage": "Página predeterminada",
-	"syncParty": {
-		"userJoined": "El usuario se unió a tu sala de visualización.",
-		"userLeft": "El usuario salió de tu sala de visualización.",
-		"userOnPrivatePage": "El usuario está visitando una página privada, la sincronización se reanudará en breve."
-	},
-	"videoTabs": {
-		"all": "Todos",
-		"videos": "Videos",
-		"playlists": "Listas de reproducción",
-		"channels": "Canales",
-		"shorts": "Shorts",
-		"streams": "En vivos"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Administrar suscripciones"
-	},
-	"playlist": {
-		"createPlaylist": "Crear lista de reproducción",
-		"public": "Público",
-		"unlisted": "Sin listar",
-		"private": "Privado",
-		"playVideos": "Reproducir videos",
-		"shuffleVideos": "Reproducir videos en aleatorio",
-		"loopPlaylist": "Repetir lista de reproducción"
-	},
-	"thumbnail": {
-		"live": "EN VIVO",
-		"failedToLoadImage": "Falló al cargar la imagen"
-	},
-	"pages": {
-		"home": "Inicio",
-		"trending": "Tendencia",
-		"subscriptions": "Suscripciones",
-		"history": "Historial",
-		"playlists": "Listas de reproducción"
-	},
-	"subscribers": "suscriptores",
-	"unsubscribe": "Anular suscripción",
-	"loginRequired": "Se requiere iniciar sesión",
-	"player": {
-		"audioOnly": "Solo audio",
-		"theatreMode": "Modo teatro",
-		"pauseTimer": "Pausar temporizador",
-		"pauseVideoIn": "Pausar video en",
-		"share": {
-			"title": "Compartir",
-			"materialiousLink": "Copiar enlace de Materialious",
-			"invidiousRedirect": "Copiar enlace de redirección de Invidious",
-			"youtubeLink": "Copiar enlace de Youtube"
-		},
-		"download": "Descargar",
-		"downloadSteps": {
-			"merging": "Combinar video y audio",
-			"video": "Descargando video",
-			"audio": "Descargando audio",
-			"ffmpeg": "Descargando la librería y componentes de ffmpeg",
-			"classWorker": "Descargando ffmpeg class worker",
-			"core": "Descargando el ffmpeg core",
-			"wasm": "Descargando ffmpeg wasm",
-			"worker": "Descargando ffmpeg worker"
-		},
-		"noPlaylists": "Sin listas de reproducción",
-		"unableToLoadComments": "No se pudo cargar los comentarios",
-		"addToPlaylist": "Agregar a lista de reproducción",
-		"youtubeJsFallBack": "Se está utilizando la opción de video local.",
-		"defaultLanguage": "Idioma predeterminado"
-	},
-	"layout": {
-		"interface": "Interfaz",
-		"star": "¡Danos una Star en Github!",
-		"syncParty": "Sincronizar sala",
-		"syncPartyWarning": "Ten en cuenta que tu IP será visible para los usuarios que invites.",
-		"startSyncParty": "Comenzar a sincronizar la sala",
-		"endSyncParty": "Terminar la sincronización de sala",
-		"notifications": "Notificaciones",
-		"noNewNotifications": "Sin notificaciones nuevas",
-		"settings": "Configuraciones",
-		"login": "Iniciar sesión",
-		"logout": "Salir",
-		"customize": "Personalizar",
-		"lowBandwidthMode": "Modo ahorro de datos",
-		"displayThumbnailAvatars": "Carga de miniaturas (Lento)",
-		"searchHistory": "Historial de búsqueda",
-		"theme": {
-			"theme": "Tema",
-			"darkMode": "Modo oscuro",
-			"lightMode": "Modo claro",
-			"AmoledTheme": "Tema Amoled",
-			"color": "Color"
-		},
-		"searchSuggestions": "Sugerencias de búsqueda",
-		"previewVideoOnHover": "Vista previa del video al pasar por encima",
-		"expandDescription": "Ampliar descripción por defecto",
-		"expandComments": "Desplegar comentarios por defecto",
-		"dataPreferences": {
-			"content": "¿Desea importar/exportar suscripciones, cambiar la contraseña o eliminar una cuenta? Haga clic aquí y desplácese hasta el final de la página.",
-			"dataPreferences": "Preferencia de datos"
-		},
-		"player": {
-			"title": "Reproductor",
-			"autoPlay": "Reproducción automática",
-			"alwaysLoopVideo": "Siempre repetir video",
-			"savePlaybackPosition": "Guardar la posición de reproductor",
-			"listenByDefault": "Escuchar por defecto",
-			"theatreModeByDefault": "Modo teatro por defecto",
-			"autoPlayNextByDefault": "Reproducción automática por defecto",
-			"miniPlayer": "Minirreproductor",
-			"proxyVideos": "Videos proxy",
-			"backgroundPlay": "Reproducir audio en segundo plano",
-			"dash": "Modo escritorio",
-			"silenceSkipper": "Omitir silencio (Experimental)",
-			"youtubeJsFallback": "Procesar video localmente",
-			"youtubeJsAlways": "Utilizar siempre el procesamiento de vídeo local",
-			"lockOrientation": "Bloquear orientación de pantalla"
-		},
-		"bookmarklet": "Favoritos",
-		"instanceUrl": "URL de la instancia",
-		"sponsors": {
-			"sponsor": "Patrocinador",
-			"disableToast": "Desactivar avisos",
-			"disableTimeline": "Desactivar segmentos en la barra de progreso",
-			"Catagories": "Categorías",
-			"unpaidSelfPromotion": "Propaganda no pagada / Propaganda propia",
-			"interactionReminder": "Recordatorio de interacción (Suscribirse)",
-			"intermissionIntroAnimation": "Pausa / Animación de introducción",
-			"credits": "Elementos finales / Créditos",
-			"preViewRecapHook": "Avance/Repetición/Enganche",
-			"tangentJokes": "Contenido de relleno/Chistes"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL de la instancia de la miniatura",
-			"titleOnly": "Solo títulos"
-		}
-	},
-	"subscribe": "Suscríbete"
+    "enabled": "Activado",
+    "copyUrl": "Copiar URL",
+    "loadMore": "Cargar más",
+    "views": "vistas",
+    "invidiousBlockWarning": "Invidious está actualmente bloqueado por Google. Si los vídeos no se cargan en esta instancia, utilice esta instancia en Materialious en {android} o {desktop} para evitarlo con la opción de vídeo local.",
+    "videos": "videos",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "title": "Título",
+    "searchPlaceholder": "Buscar",
+    "delete": "Eliminar",
+    "donate": "Donar",
+    "deleteAllHistory": "Eliminar todo el historial",
+    "skipping": "Omitir",
+    "replies": "respuestas",
+    "region": "Región",
+    "noResult": "Sin resultados",
+    "language": "Idioma",
+    "channels": "canales",
+    "transcript": "Transcribir",
+    "noCaptionData": "Los subtítulos no contienen datos.",
+    "selectLang": "Seleccionar idioma",
+    "letterCase": "Títulos en mayúsculas o minúsculas",
+    "hideReplies": "Ocultar respuestas",
+    "hideVideo": "Ocultar video",
+    "defaultPage": "Página predeterminada",
+    "syncParty": {
+        "userJoined": "El usuario se unió a tu sala de visualización.",
+        "userLeft": "El usuario salió de tu sala de visualización.",
+        "userOnPrivatePage": "El usuario está visitando una página privada, la sincronización se reanudará en breve."
+    },
+    "videoTabs": {
+        "all": "Todos",
+        "videos": "Videos",
+        "playlists": "Listas de reproducción",
+        "channels": "Canales",
+        "shorts": "Shorts",
+        "streams": "En vivos"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Administrar suscripciones"
+    },
+    "playlist": {
+        "createPlaylist": "Crear lista de reproducción",
+        "public": "Público",
+        "unlisted": "Sin listar",
+        "private": "Privado",
+        "playVideos": "Reproducir videos",
+        "shuffleVideos": "Reproducir videos en aleatorio",
+        "loopPlaylist": "Repetir lista de reproducción"
+    },
+    "thumbnail": {
+        "live": "EN VIVO",
+        "failedToLoadImage": "Falló al cargar la imagen"
+    },
+    "pages": {
+        "home": "Inicio",
+        "trending": "Tendencia",
+        "subscriptions": "Suscripciones",
+        "history": "Historial",
+        "playlists": "Listas de reproducción"
+    },
+    "subscribers": "suscriptores",
+    "unsubscribe": "Anular suscripción",
+    "loginRequired": "Se requiere iniciar sesión",
+    "player": {
+        "audioOnly": "Solo audio",
+        "theatreMode": "Modo teatro",
+        "pauseTimer": "Pausar temporizador",
+        "pauseVideoIn": "Pausar video en",
+        "share": {
+            "title": "Compartir",
+            "materialiousLink": "Copiar enlace de Materialious",
+            "invidiousRedirect": "Copiar enlace de redirección de Invidious",
+            "youtubeLink": "Copiar enlace de Youtube"
+        },
+        "download": "Descargar",
+        "downloadSteps": {
+            "merging": "Combinar video y audio",
+            "video": "Descargando video",
+            "audio": "Descargando audio",
+            "ffmpeg": "Descargando la librería y componentes de ffmpeg",
+            "classWorker": "Descargando ffmpeg class worker",
+            "core": "Descargando el ffmpeg core",
+            "wasm": "Descargando ffmpeg wasm",
+            "worker": "Descargando ffmpeg worker"
+        },
+        "noPlaylists": "Sin listas de reproducción",
+        "unableToLoadComments": "No se pudo cargar los comentarios",
+        "addToPlaylist": "Agregar a lista de reproducción",
+        "youtubeJsFallBack": "Se está utilizando la opción de video local.",
+        "defaultLanguage": "Idioma predeterminado"
+    },
+    "layout": {
+        "interface": "Interfaz",
+        "star": "¡Danos una Star en Github!",
+        "syncParty": "Sincronizar sala",
+        "syncPartyWarning": "Ten en cuenta que tu IP será visible para los usuarios que invites.",
+        "startSyncParty": "Comenzar a sincronizar la sala",
+        "endSyncParty": "Terminar la sincronización de sala",
+        "notifications": "Notificaciones",
+        "noNewNotifications": "Sin notificaciones nuevas",
+        "settings": "Configuraciones",
+        "login": "Iniciar sesión",
+        "logout": "Salir",
+        "customize": "Personalizar",
+        "lowBandwidthMode": "Modo ahorro de datos",
+        "displayThumbnailAvatars": "Carga de miniaturas (Lento)",
+        "searchHistory": "Historial de búsqueda",
+        "theme": {
+            "theme": "Tema",
+            "darkMode": "Modo oscuro",
+            "lightMode": "Modo claro",
+            "AmoledTheme": "Tema Amoled",
+            "color": "Color"
+        },
+        "searchSuggestions": "Sugerencias de búsqueda",
+        "previewVideoOnHover": "Vista previa del video al pasar por encima",
+        "expandDescription": "Ampliar descripción por defecto",
+        "expandComments": "Desplegar comentarios por defecto",
+        "dataPreferences": {
+            "content": "¿Desea importar/exportar suscripciones, cambiar la contraseña o eliminar una cuenta? Haga clic aquí y desplácese hasta el final de la página.",
+            "dataPreferences": "Preferencia de datos"
+        },
+        "player": {
+            "title": "Reproductor",
+            "autoPlay": "Reproducción automática",
+            "alwaysLoopVideo": "Siempre repetir video",
+            "savePlaybackPosition": "Guardar la posición de reproductor",
+            "listenByDefault": "Escuchar por defecto",
+            "theatreModeByDefault": "Modo teatro por defecto",
+            "autoPlayNextByDefault": "Reproducción automática por defecto",
+            "miniPlayer": "Minirreproductor",
+            "proxyVideos": "Videos proxy",
+            "backgroundPlay": "Reproducir audio en segundo plano",
+            "dash": "Modo escritorio",
+            "silenceSkipper": "Omitir silencio (Experimental)",
+            "youtubeJsFallback": "Procesar video localmente",
+            "youtubeJsAlways": "Utilizar siempre el procesamiento de vídeo local",
+            "lockOrientation": "Bloquear orientación de pantalla"
+        },
+        "bookmarklet": "Favoritos",
+        "instanceUrl": "URL de la instancia",
+        "sponsors": {
+            "sponsor": "Patrocinador",
+            "disableToast": "Desactivar avisos",
+            "disableTimeline": "Desactivar segmentos en la barra de progreso",
+            "Catagories": "Categorías",
+            "unpaidSelfPromotion": "Propaganda no pagada / Propaganda propia",
+            "interactionReminder": "Recordatorio de interacción (Suscribirse)",
+            "intermissionIntroAnimation": "Pausa / Animación de introducción",
+            "credits": "Elementos finales / Créditos",
+            "preViewRecapHook": "Avance/Repetición/Enganche",
+            "tangentJokes": "Contenido de relleno/Chistes"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL de la instancia de la miniatura",
+            "titleOnly": "Solo títulos"
+        }
+    },
+    "subscribe": "Suscríbete"
 }

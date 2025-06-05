@@ -606,7 +606,7 @@
 						</nav>
 					</summary>
 					<div class="space"></div>
-					<div>
+					<div class="chapter-list">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
 								<li
@@ -778,6 +778,11 @@
 </dialog>
 
 <style>
+	.chapter-list {
+		max-height: 300px;
+		overflow-x: scroll;
+	}
+
 	.video-actions {
 		display: flex;
 		align-items: center;

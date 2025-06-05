@@ -22,6 +22,7 @@
 	import type { PlayerEvents } from '$lib/player.js';
 	import {
 		authStore,
+		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
@@ -71,12 +72,16 @@
 
 	let playerCurrentTime: number = $state(0);
 
+	function expandSummery(id: string) {
+		const element = document.getElementById(id);
+		if (element) {
+			element.click();
+		}
+	}
+
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
-			const commentSectionElement = document.getElementById('comment-section');
-			if (commentSectionElement) {
-				commentSectionElement.click();
-			}
+			expandSummery('comment-section');
 		}
 	});
 
@@ -221,10 +226,11 @@
 
 	onMount(async () => {
 		if ($interfaceAutoExpandDesc) {
-			const descriptionElement = document.getElementById('description');
-			if (descriptionElement) {
-				descriptionElement.click();
-			}
+			expandSummery('description');
+		}
+
+		if ($interfaceAutoExpandChapters) {
+			expandSummery('chapter-section');
 		}
 
 		if ($syncPartyConnectionsStore) {
@@ -403,9 +409,6 @@
 
 		ui('#pause-timer');
 	}
-
-	let downloadStage: string | undefined;
-	let downloadProgress: number = 0;
 </script>
 
 <svelte:head>
@@ -421,18 +424,6 @@
 				<Player bind:playerElement bind:segments {data} isSyncing={$syncPartyPeerStore !== null} />
 			{/key}
 		</div>
-
-		{#if downloadStage}
-			<article>
-				<h6>
-					{downloadStage}
-					{#if downloadProgress > 0}
-						({Math.round(downloadProgress)}%)
-					{/if}
-				</h6>
-				<progress class="max" value={downloadProgress} max="100"></progress>
-			</article>
-		{/if}
 
 		<h5>{letterCase(data.video.title)}</h5>
 
@@ -580,7 +571,8 @@
 				<summary id="description" class="bold none">
 					<nav>
 						<div class="max">
-							{numberWithCommas(data.video.viewCount)} views • {data.video.publishedText}
+							{numberWithCommas(data.video.viewCount)}
+							{$_('views')} • {data.video.publishedText}
 						</div>
 						<i>expand_more</i>
 					</nav>
@@ -590,24 +582,6 @@
 					<div style="white-space: pre-line; overflow-wrap: break-word;">
 						{@html data.content.description}
 					</div>
-					{#if data.content}
-						{#if data.content.timestamps.length > 0}
-							<h6 style="margin-bottom: .3em;">Chapters</h6>
-							{#each data.content.timestamps as timestamp}
-								<button
-									onclick={() => {
-										if (playerElement) playerElement.currentTime = timestamp.time;
-									}}
-									class="timestamps"
-									>{timestamp.timePretty}
-									{#if !timestamp.title.startsWith('-')}
-										-
-									{/if}
-									{timestamp.title}</button
-								>
-							{/each}
-						{/if}
-					{/if}
 				</div>
 
 				<nav class="scroll">
@@ -619,6 +593,43 @@
 				</nav>
 			</details>
 		</article>
+
+		{#if data.content.timestamps.length > 0}
+			<article>
+				<details>
+					<summary id="chapter-section" class="bold none">
+						<nav>
+							<div class="max">
+								<p>{$_('player.chapters')}</p>
+							</div>
+							<i>expand_more</i>
+						</nav>
+					</summary>
+					<div class="space"></div>
+					<div class="chapter-list">
+						<ul class="list">
+							{#each data.content.timestamps as timestamp}
+								<li
+									onclick={() => {
+										if (playerElement) playerElement.currentTime = timestamp.time;
+									}}
+								>
+									<img
+										class="round large"
+										src={getBestThumbnail(data.video.videoThumbnails) as string}
+										alt="Thumbnail for current video"
+									/>
+									<div class="max" style="white-space: pre-line; overflow-wrap: break-word;">
+										<p>{timestamp.title}</p>
+										<span class="chip fill no-margin">{timestamp.timePretty}</span>
+									</div>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				</details>
+			</article>
+		{/if}
 
 		{#if comments && comments.comments.length > 0}
 			<article>
@@ -767,22 +778,9 @@
 </dialog>
 
 <style>
-	:root {
-		--plyr-color-main: var(--primary);
-	}
-
-	.timestamps {
-		margin-left: 0;
-		margin-bottom: 0.4em;
-		display: block;
-		padding: 0;
-		text-align: left;
-		background-color: transparent;
-		color: var(--on-secondary-container);
-	}
-
-	.timestamps:hover {
-		padding: 0 0.5em;
+	.chapter-list {
+		max-height: 300px;
+		overflow-x: scroll;
 	}
 
 	.video-actions {

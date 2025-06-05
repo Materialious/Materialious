@@ -71,6 +71,10 @@ export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', tr
 export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
 export const interfaceAutoExpandComments: Writable<boolean> = persisted('autoExpandComments', true);
 export const interfaceAutoExpandDesc: Writable<boolean> = persisted('autoExpandDesc', false);
+export const interfaceAutoExpandChapters: Writable<boolean> = persisted(
+	'autoExpandChapters',
+	false
+);
 export const interfaceAmoledTheme = persisted('amoledTheme', false);
 export const interfaceLowBandwidthMode = persisted('lowBandwidthMode', false);
 export const interfaceDisplayThumbnailAvatars = persisted('disableThumbnailAvatars', false);

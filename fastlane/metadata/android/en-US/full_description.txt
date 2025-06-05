@@ -3,24 +3,23 @@ It lets you browse and watch videos, manage playlists and use channels.
 
 <b>Features:</b>
 <ul>
-<li><a href='https://github.com/Materialious/api-extended'>Invidious API extended integration!</a></li>
-<li>Sync your watch progress between Invidious sessions</li>
-<li>Watch sync parties!</li>
-<li>Preview video on hover.</li>
-<li>Sponsorblock built-in.</li>
-<li>Return YouTube dislikes built-in.</li>
-<li>DeArrow built-in (With local processing fallback).</li>
-<li>Video progress tracking & resuming.</li>
-<li>No ads.</li>
-<li>No tracking.</li>
-<li>Light and dark themes.</li>
-<li>Custom colour themes.</li>
-<li>Integrates with Invidious subscriptions, watch history & more.</li>
-<li>Live stream support.</li>
-<li>Dash support.</li>
-<li>Chapters.</li>
-<li>Audio only mode.</li>
-<li>Playlists.</li>
-<li>PWA support.</li>
-<li>YT path redirects (So your redirect plugins should still work!)</li>
+  <li>Invidious companion support</li>
+  <li>Invidious API extended integration</li>
+  <li>YouTube.js fallback if Invidious fails loading videos for Desktop & Android</li>
+  <li>Support for disabling certificate validation for homelab users</li>
+  <li>Sync your watch progress between Invidious sessions</li>
+  <li>Watch sync parties</li>
+  <li>Sponsorblock built-in</li>
+  <li>Return YouTube dislikes built-in</li>
+  <li>DeArrow built-in (With local processing fallback)</li>
+  <li>No ads</li>
+  <li>No tracking</li>
+  <li>Light/Dark themes</li>
+  <li>Custom colour themes</li>
+  <li>Integrates with Invidious subscriptions, watch history & more</li>
+  <li>Live stream support</li>
+  <li>Dash support</li>
+  <li>Chapters</li>
+  <li>Audio only mode</li>
+  <li>Playlists</li>
 </ul>

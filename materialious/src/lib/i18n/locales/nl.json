@@ -1,160 +1,160 @@
 {
-	"enabled": "Ingeschakeld",
-	"copyUrl": "URL kopiëren",
-	"loadMore": "Meer laden",
-	"views": "uitzichten",
-	"invidiousBlockWarning": "Invidious wordt momenteel geblokkeerd door Google. Als video's niet worden geladen voor deze instantie, gebruik dan deze instantie op Materialious op {android} of {desktop} om dit te omzeilen met lokale video terugval.",
-	"videos": "video's",
-	"cancel": "Annuleren",
-	"create": "Creëren",
-	"title": "Titel",
-	"searchPlaceholder": "Zoeken...",
-	"delete": "Verwijderen",
-	"donate": "Doneren",
-	"deleteAllHistory": "Alle geschiedenis verwijderen",
-	"skipping": "Overslaan",
-	"replies": "antwoorden",
-	"region": "Regio",
-	"noResult": "Geen resultaten",
-	"language": "Taal",
-	"channels": "kanalen",
-	"transcript": "Transcriptie",
-	"noCaptionData": "Ondertitels hebben geen gegevens.",
-	"selectLang": "Selecteer taal",
-	"letterCase": "Letterkast voor titels",
-	"hideReplies": "Antwoorden verbergen",
-	"hideVideo": "Video verbergen",
-	"syncParty": {
-		"userJoined": "De gebruiker heeft zich aangesloten bij jouw kijkgroep.",
-		"userLeft": "De gebruiker heeft je kijkgroep verlaten.",
-		"userOnPrivatePage": "De gebruiker wie bekijkt momenteel een privépagina, de synchronisatie wordt binnenkort hervat."
-	},
-	"videoTabs": {
-		"all": "Alle",
-		"videos": "Video's",
-		"playlists": "Afspeellijsten",
-		"channels": "Kanalen",
-		"shorts": "Shorts",
-		"streams": "Stromen"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Beheer abonnementen"
-	},
-	"playlist": {
-		"createPlaylist": "Maak een afspeellijst",
-		"public": "Openbaar",
-		"unlisted": "Onvermelde",
-		"private": "Privé",
-		"playVideos": "Video's afspelen",
-		"shuffleVideos": "Video's in willekeurige volgorde afspelen",
-		"loopPlaylist": "Herhaal afspeellijst"
-	},
-	"thumbnail": {
-		"live": "LIVE",
-		"failedToLoadImage": "Afbeelding laden mislukt"
-	},
-	"pages": {
-		"home": "Startpagina",
-		"trending": "Populair",
-		"subscriptions": "Abonnementen",
-		"history": "Geschiedenis",
-		"playlists": "Afspeellijsten"
-	},
-	"subscribers": "abonnees",
-	"unsubscribe": "Uitschrijven",
-	"loginRequired": "Inloggen vereist",
-	"player": {
-		"audioOnly": "Alleen audio",
-		"theatreMode": "Theatermodus",
-		"pauseTimer": "Pauzeer timer",
-		"pauseVideoIn": "Pauzeer video in ",
-		"share": {
-			"title": "Deel",
-			"materialiousLink": "Kopieer Materialious-link",
-			"invidiousRedirect": "Kopieer Invidious-omleidingslink",
-			"youtubeLink": "Kopieer Youtube-link"
-		},
-		"download": "Download",
-		"downloadSteps": {
-			"merging": "Video en audio samenvoegen",
-			"video": "Video downloaden",
-			"audio": "Audio downloaden",
-			"ffmpeg": "Downloaden van ffmpeg-bibliotheek en componenten",
-			"classWorker": "Downloaden van ffmpeg-klassewerker",
-			"core": "Downloaden van ffmpeg-kern",
-			"wasm": "Downloaden van ffmpeg wasm",
-			"worker": "Downloaden van ffmpeg-werker"
-		},
-		"noPlaylists": "Geen afspeellijsten",
-		"unableToLoadComments": "Kan opmerkingen niet laden",
-		"addToPlaylist": "Toevoegen aan afspeellijst",
-		"youtubeJsFallBack": "Lokale video terugval wordt gebruikt"
-	},
-	"layout": {
-		"interface": "Koppelvlak",
-		"star": "Geef ons een ster op Github!",
-		"syncParty": "Synchroniseren van partij",
-		"syncPartyWarning": "Houd er rekening mee dat uw IP-adres zichtbaar is voor gebruikers die u uitnodigt.",
-		"startSyncParty": "Start synchroniseren van partij",
-		"endSyncParty": "Einde synchroniseren van partij",
-		"notifications": "Meldingen",
-		"noNewNotifications": "Geen nieuwe meldingen hier",
-		"settings": "Instellingen",
-		"login": "Aanmelden",
-		"logout": "Afmelden",
-		"customize": "Aanpassen",
-		"lowBandwidthMode": "Lage bandbreedtemodus",
-		"theme": {
-			"theme": "Thema",
-			"darkMode": "Donkere modus",
-			"lightMode": "Lichtmodus",
-			"AmoledTheme": "Amoled-thema",
-			"color": "Kleur"
-		},
-		"searchSuggestions": "Zoek suggesties",
-		"previewVideoOnHover": "Voorbeeldvideo bij hover",
-		"expandDescription": "Beschrijving standaard uitvouwen",
-		"expandComments": "Standaard opmerkingen uitvouwen",
-		"dataPreferences": {
-			"content": "Wilt u abonnementen importeren/exporteren, wachtwoord wijzigen of account verwijderen? Klik hier en scroll naar de onderkant van de pagina.",
-			"dataPreferences": "Gegevensvoorkeuren"
-		},
-		"player": {
-			"title": "Speler",
-			"autoPlay": "Video automatisch afspelen",
-			"alwaysLoopVideo": "Video altijd herhalen",
-			"savePlaybackPosition": "Afspeelpositie opslaan",
-			"listenByDefault": "Standaard luisteren",
-			"theatreModeByDefault": "Theatermodus standaard",
-			"autoPlayNextByDefault": "Automatisch afspelen als volgende standaard",
-			"miniPlayer": "Mini-speler",
-			"proxyVideos": "Proxy-video's",
-			"backgroundPlay": "Audio op de achtergrond afspelen",
-			"dash": "Streepje-modus",
-			"silenceSkipper": "Stilte-overslager (Experimenteel)",
-			"youtubeJsFallback": "Lokale videoverwerking fallback",
-			"youtubeJsAlways": "Gebruik altijd lokale videoverwerking",
-			"lockOrientation": "Oriëntatie vergrendeld op beeldverhouding"
-		},
-		"bookmarklet": "Bladwijzer",
-		"instanceUrl": "Instantie-URL",
-		"sponsors": {
-			"sponsor": "Sponsor",
-			"disableToast": "Toast uitschakelen",
-			"disableTimeline": "Segmenten op tijdlijn uitschakelen",
-			"Catagories": "Categorieën",
-			"unpaidSelfPromotion": "Onbetaald/Zelfpromotie",
-			"interactionReminder": "Interactieherinnering (Abonneren)",
-			"intermissionIntroAnimation": "Pauze/Intro-animatie",
-			"credits": "Eindkaarten/credits",
-			"preViewRecapHook": "Voorbeschouwing/Samenvatting/Haak",
-			"tangentJokes": "Vulling Tangens/Grappen"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "URL van miniatuurinstantie",
-			"titleOnly": "Alleen titel"
-		}
-	},
-	"subscribe": "Abonneren"
+    "enabled": "Ingeschakeld",
+    "copyUrl": "URL kopiëren",
+    "loadMore": "Meer laden",
+    "views": "uitzichten",
+    "invidiousBlockWarning": "Invidious wordt momenteel geblokkeerd door Google. Als video's niet worden geladen voor deze instantie, gebruik dan deze instantie op Materialious op {android} of {desktop} om dit te omzeilen met lokale video terugval.",
+    "videos": "video's",
+    "cancel": "Annuleren",
+    "create": "Creëren",
+    "title": "Titel",
+    "searchPlaceholder": "Zoeken...",
+    "delete": "Verwijderen",
+    "donate": "Doneren",
+    "deleteAllHistory": "Alle geschiedenis verwijderen",
+    "skipping": "Overslaan",
+    "replies": "antwoorden",
+    "region": "Regio",
+    "noResult": "Geen resultaten",
+    "language": "Taal",
+    "channels": "kanalen",
+    "transcript": "Transcriptie",
+    "noCaptionData": "Ondertitels hebben geen gegevens.",
+    "selectLang": "Selecteer taal",
+    "letterCase": "Letterkast voor titels",
+    "hideReplies": "Antwoorden verbergen",
+    "hideVideo": "Video verbergen",
+    "syncParty": {
+        "userJoined": "De gebruiker heeft zich aangesloten bij jouw kijkgroep.",
+        "userLeft": "De gebruiker heeft je kijkgroep verlaten.",
+        "userOnPrivatePage": "De gebruiker wie bekijkt momenteel een privépagina, de synchronisatie wordt binnenkort hervat."
+    },
+    "videoTabs": {
+        "all": "Alle",
+        "videos": "Video's",
+        "playlists": "Afspeellijsten",
+        "channels": "Kanalen",
+        "shorts": "Shorts",
+        "streams": "Stromen"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Beheer abonnementen"
+    },
+    "playlist": {
+        "createPlaylist": "Maak een afspeellijst",
+        "public": "Openbaar",
+        "unlisted": "Onvermelde",
+        "private": "Privé",
+        "playVideos": "Video's afspelen",
+        "shuffleVideos": "Video's in willekeurige volgorde afspelen",
+        "loopPlaylist": "Herhaal afspeellijst"
+    },
+    "thumbnail": {
+        "live": "LIVE",
+        "failedToLoadImage": "Afbeelding laden mislukt"
+    },
+    "pages": {
+        "home": "Startpagina",
+        "trending": "Populair",
+        "subscriptions": "Abonnementen",
+        "history": "Geschiedenis",
+        "playlists": "Afspeellijsten"
+    },
+    "subscribers": "abonnees",
+    "unsubscribe": "Uitschrijven",
+    "loginRequired": "Inloggen vereist",
+    "player": {
+        "audioOnly": "Alleen audio",
+        "theatreMode": "Theatermodus",
+        "pauseTimer": "Pauzeer timer",
+        "pauseVideoIn": "Pauzeer video in ",
+        "share": {
+            "title": "Deel",
+            "materialiousLink": "Kopieer Materialious-link",
+            "invidiousRedirect": "Kopieer Invidious-omleidingslink",
+            "youtubeLink": "Kopieer Youtube-link"
+        },
+        "download": "Download",
+        "downloadSteps": {
+            "merging": "Video en audio samenvoegen",
+            "video": "Video downloaden",
+            "audio": "Audio downloaden",
+            "ffmpeg": "Downloaden van ffmpeg-bibliotheek en componenten",
+            "classWorker": "Downloaden van ffmpeg-klassewerker",
+            "core": "Downloaden van ffmpeg-kern",
+            "wasm": "Downloaden van ffmpeg wasm",
+            "worker": "Downloaden van ffmpeg-werker"
+        },
+        "noPlaylists": "Geen afspeellijsten",
+        "unableToLoadComments": "Kan opmerkingen niet laden",
+        "addToPlaylist": "Toevoegen aan afspeellijst",
+        "youtubeJsFallBack": "Lokale video terugval wordt gebruikt"
+    },
+    "layout": {
+        "interface": "Koppelvlak",
+        "star": "Geef ons een ster op Github!",
+        "syncParty": "Synchroniseren van partij",
+        "syncPartyWarning": "Houd er rekening mee dat uw IP-adres zichtbaar is voor gebruikers die u uitnodigt.",
+        "startSyncParty": "Start synchroniseren van partij",
+        "endSyncParty": "Einde synchroniseren van partij",
+        "notifications": "Meldingen",
+        "noNewNotifications": "Geen nieuwe meldingen hier",
+        "settings": "Instellingen",
+        "login": "Aanmelden",
+        "logout": "Afmelden",
+        "customize": "Aanpassen",
+        "lowBandwidthMode": "Lage bandbreedtemodus",
+        "theme": {
+            "theme": "Thema",
+            "darkMode": "Donkere modus",
+            "lightMode": "Lichtmodus",
+            "AmoledTheme": "Amoled-thema",
+            "color": "Kleur"
+        },
+        "searchSuggestions": "Zoek suggesties",
+        "previewVideoOnHover": "Voorbeeldvideo bij hover",
+        "expandDescription": "Beschrijving standaard uitvouwen",
+        "expandComments": "Standaard opmerkingen uitvouwen",
+        "dataPreferences": {
+            "content": "Wilt u abonnementen importeren/exporteren, wachtwoord wijzigen of account verwijderen? Klik hier en scroll naar de onderkant van de pagina.",
+            "dataPreferences": "Gegevensvoorkeuren"
+        },
+        "player": {
+            "title": "Speler",
+            "autoPlay": "Video automatisch afspelen",
+            "alwaysLoopVideo": "Video altijd herhalen",
+            "savePlaybackPosition": "Afspeelpositie opslaan",
+            "listenByDefault": "Standaard luisteren",
+            "theatreModeByDefault": "Theatermodus standaard",
+            "autoPlayNextByDefault": "Automatisch afspelen als volgende standaard",
+            "miniPlayer": "Mini-speler",
+            "proxyVideos": "Proxy-video's",
+            "backgroundPlay": "Audio op de achtergrond afspelen",
+            "dash": "Streepje-modus",
+            "silenceSkipper": "Stilte-overslager (Experimenteel)",
+            "youtubeJsFallback": "Lokale videoverwerking fallback",
+            "youtubeJsAlways": "Gebruik altijd lokale videoverwerking",
+            "lockOrientation": "Oriëntatie vergrendeld op beeldverhouding"
+        },
+        "bookmarklet": "Bladwijzer",
+        "instanceUrl": "Instantie-URL",
+        "sponsors": {
+            "sponsor": "Sponsor",
+            "disableToast": "Toast uitschakelen",
+            "disableTimeline": "Segmenten op tijdlijn uitschakelen",
+            "Catagories": "Categorieën",
+            "unpaidSelfPromotion": "Onbetaald/Zelfpromotie",
+            "interactionReminder": "Interactieherinnering (Abonneren)",
+            "intermissionIntroAnimation": "Pauze/Intro-animatie",
+            "credits": "Eindkaarten/credits",
+            "preViewRecapHook": "Voorbeschouwing/Samenvatting/Haak",
+            "tangentJokes": "Vulling Tangens/Grappen"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "URL van miniatuurinstantie",
+            "titleOnly": "Alleen titel"
+        }
+    },
+    "subscribe": "Abonneren"
 }

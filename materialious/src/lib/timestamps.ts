@@ -1,9 +1,11 @@
 import { decodeHtmlCharCodes } from './misc';
 import { convertToSeconds } from './numbers';
 
+type Timestamps = { title: string; time: number; timePretty: string; endTime: number }[];
+
 export interface PhasedDescription {
 	description: string;
-	timestamps: { title: string; time: number; timePretty: string }[];
+	timestamps: Timestamps;
 }
 
 export function extractActualLink(url: string): string {
@@ -37,7 +39,7 @@ export function phaseDescription(
 	content: string,
 	fallbackPatch?: 'youtubejs' | 'piped'
 ): PhasedDescription {
-	const timestamps: { title: string; time: number; timePretty: string }[] = [];
+	const timestamps: Timestamps = [];
 	const lines = content.split('\n');
 
 	// Regular expressions for different timestamp formats
@@ -80,10 +82,19 @@ export function phaseDescription(
 						.replace(/\n/g, '')
 						.trim()
 				),
-				timePretty: timestamp
+				timePretty: timestamp,
+				endTime: -1
 			});
 		} else {
 			filteredLines.push(line);
+		}
+	});
+
+	timestamps.forEach((ts, idx) => {
+		if (idx < timestamps.length - 1) {
+			ts.endTime = timestamps[idx + 1].time;
+		} else {
+			ts.endTime = -1;
 		}
 	});
 

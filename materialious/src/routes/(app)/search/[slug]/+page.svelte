@@ -93,6 +93,7 @@
 						<article
 							class="no-padding"
 							style="height: 100%;"
+							role="presentation"
 							onclick={() => feedLastItemId.set(extractUniqueId(item))}
 							id={extractUniqueId(item)}
 						>

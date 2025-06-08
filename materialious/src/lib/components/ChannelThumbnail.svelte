@@ -36,6 +36,7 @@
 					<progress class="circle"></progress>
 				{:else}
 					<img
+						loading="lazy"
 						class="circle"
 						style="width: 90px;height: 90px;"
 						src={channelPfp.src}

@@ -163,7 +163,7 @@
 				{#if !thumbnail}
 					<div class="secondary-container" style="width: 100%;height: {placeholderHeight}px;"></div>
 				{:else}
-					<img class="responsive" src={thumbnail.src} alt="Thumbnail for video" />
+					<img class="responsive" loading="lazy" src={thumbnail.src} alt="Thumbnail for video" />
 				{/if}
 			{/if}
 			{#if progress}

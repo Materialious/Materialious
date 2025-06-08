@@ -37,6 +37,7 @@
 					class="no-padding"
 					style="height: 100%;"
 					id={video.videoId}
+					role="presentation"
 					onclick={() => feedLastItemId.set(video.videoId)}
 				>
 					<Thumbnail {video} {playlistId} />

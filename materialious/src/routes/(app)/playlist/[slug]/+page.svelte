@@ -14,12 +14,13 @@
 
 	let videos: PlaylistPageVideo[] | undefined = $state();
 	if (data.playlist.videos.length > 0) {
-		videos = data.playlist.videos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-			return a.index < b.index ? -1 : 1;
-		});
-		videos = videos.filter((playlistVideo) => {
-			return playlistVideo.lengthSeconds > 0;
-		});
+		videos = data.playlist.videos
+			.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
+				return a.index < b.index ? -1 : 1;
+			})
+			.filter((playlistVideo) => {
+				return playlistVideo.lengthSeconds > 0;
+			});
 
 		onMount(async () => {
 			for (let page = 1; page++; ) {
@@ -87,26 +88,27 @@
 		<span>{$_('player.share.title')}</span>
 		<menu class="no-wrap mobile">
 			{#if !Capacitor.isNativePlatform()}
-				<button
+				<li
 					class="row"
+					role="presentation"
 					onclick={async () => {
 						await Clipboard.write({ string: location.href });
-					}}>{$_('player.share.materialiousLink')}</button
-				>
-			{/if}
-			<!--Silly hack so svelte doesnt error-->
-			{#if true}
-				<button
-					class="row"
-					onclick={async () => {
-						await Clipboard.write({
-							string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
-						});
 					}}
 				>
-					{$_('player.share.youtubeLink')}
-				</button>
+					{$_('player.share.materialiousLink')}
+				</li>
 			{/if}
+			<li
+				class="row"
+				role="presentation"
+				onclick={async () => {
+					await Clipboard.write({
+						string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
+					});
+				}}
+			>
+				{$_('player.share.youtubeLink')}
+			</li>
 		</menu>
 	</button>
 </article>

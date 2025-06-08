@@ -56,7 +56,7 @@
 	{#if !$interfaceLowBandwidthMode}
 		<div class="comment-header">
 			{#if userPfp}
-				<img class="circle small" src={userPfp} alt="comment profile" />
+				<img loading="lazy" class="circle small" src={userPfp} alt="comment profile" />
 			{:else}
 				<progress class="circle"></progress>
 			{/if}

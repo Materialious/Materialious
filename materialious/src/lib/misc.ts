@@ -63,6 +63,7 @@ export async function insecureRequestImageHandler(source: string): Promise<HTMLI
 		const imgResp = await fetch(source);
 		if (!imgResp.ok) {
 			img.src = '';
+			return img;
 		}
 
 		img.src = URL.createObjectURL(await imgResp.blob());

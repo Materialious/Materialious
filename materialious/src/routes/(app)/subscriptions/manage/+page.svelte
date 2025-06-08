@@ -9,7 +9,7 @@
 
 	let search: string = $state('');
 
-	const fuse = new Fuse(subscriptions, {
+	const fuse = new Fuse(data.subscriptions, {
 		keys: ['author']
 	});
 

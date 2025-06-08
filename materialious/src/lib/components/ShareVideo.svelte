@@ -13,8 +13,9 @@
 	let { video }: Props = $props();
 </script>
 
-<button
+<li
 	class="row"
+	role="presentation"
 	onclick={async () => {
 		if (Capacitor.isNativePlatform()) {
 			await Clipboard.write({ string: `${get(instanceStore)}/watch/${video.videoId}` });
@@ -23,18 +24,21 @@
 		}
 	}}
 >
-	<div class="min">{$_('player.share.materialiousLink')}</div></button
->
-<button
+	<div class="min">{$_('player.share.materialiousLink')}</div>
+</li>
+<li
 	class="row"
+	role="presentation"
 	onclick={async () =>
 		await Clipboard.write({ string: `https://redirect.invidious.io/watch?v=${video.videoId}` })}
 >
-	<div class="min">{$_('player.share.invidiousRedirect')}</div></button
-><button
+	<div class="min">{$_('player.share.invidiousRedirect')}</div>
+</li>
+<li
 	class="row"
+	role="presentation"
 	onclick={async () =>
 		await Clipboard.write({ string: `https://www.youtube.com/watch?v=${video.videoId}` })}
 >
-	<div class="min">{$_('player.share.youtubeLink')}</div></button
->
+	<div class="min">{$_('player.share.youtubeLink')}</div>
+</li>

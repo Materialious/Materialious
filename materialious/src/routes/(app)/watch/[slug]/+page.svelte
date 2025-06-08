@@ -434,6 +434,7 @@
 						<nav style="gap: 0.5em;">
 							{#if !$interfaceLowBandwidthMode}
 								<img
+									loading="lazy"
 									class="circle large"
 									src={proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))}
 									alt="Channel profile"
@@ -532,7 +533,8 @@
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
 							<menu class="no-wrap mobile">
 								{#each personalPlaylists as personalPlaylist}
-									<button
+									<li
+										role="presentation"
 										class="row"
 										onclick={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
 									>
@@ -546,7 +548,7 @@
 												<i>add</i>
 											{/if}
 										</nav>
-									</button>
+									</li>
 								{/each}
 							</menu>
 						</button>
@@ -610,18 +612,24 @@
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
 								<li
+									role="presentation"
 									onclick={() => {
 										if (playerElement) playerElement.currentTime = timestamp.time;
 									}}
 								>
 									<img
 										class="round large"
+										loading="lazy"
 										src={getBestThumbnail(data.video.videoThumbnails) as string}
 										alt="Thumbnail for current video"
 									/>
 									<div class="max" style="white-space: pre-line; overflow-wrap: break-word;">
-										<p>{timestamp.title}</p>
-										<span class="chip fill no-margin">{timestamp.timePretty}</span>
+										<p style="no-margin no-padding">{timestamp.title}</p>
+										<span
+											class:primary={playerCurrentTime >= timestamp.time &&
+												(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
+											class="chip no-margin">{timestamp.timePretty}</span
+										>
 									</div>
 								</li>
 							{/each}

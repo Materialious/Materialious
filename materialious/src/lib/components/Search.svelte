@@ -115,7 +115,9 @@
 		{#if showSearchBox}
 			<menu class="min suggestions-container rounded">
 				<div class="field large prefix suffix no-margin fixed">
-					<i class="front" onclick={() => dispatch('searchCancelled')}>arrow_back</i>
+					<i class="front" role="presentation" onclick={() => dispatch('searchCancelled')}
+						>arrow_back</i
+					>
 					<input
 						placeholder={$_('searchPlaceholder')}
 						type="text"
@@ -131,7 +133,7 @@
 							}
 						}}
 					/>
-					<i class="front" onclick={resetSearch}>close</i>
+					<i class="front" role="presentation" onclick={resetSearch}>close</i>
 				</div>
 				{#if searchSuggestions}
 					{#each suggestionsForSearch as suggestion, index}

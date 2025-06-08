@@ -58,6 +58,7 @@
 			<progress class="circle"></progress>
 		{:else if img && img.src !== ''}
 			<img
+				loading="lazy"
 				class="responsive"
 				style="max-width: 100%;height: 100%;"
 				src={img.src}

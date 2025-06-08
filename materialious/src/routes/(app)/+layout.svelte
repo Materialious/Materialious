@@ -204,7 +204,12 @@
 		</nav>
 	{/if}
 
-	<nav onclick={() => goto($interfaceDefaultPage)} style="cursor: pointer;" class="m l">
+	<nav
+		role="presentation"
+		onclick={() => goto($interfaceDefaultPage)}
+		style="cursor: pointer;"
+		class="m l"
+	>
 		<Logo />
 		<h6 class="l">Materialious</h6>
 	</nav>

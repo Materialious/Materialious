@@ -135,6 +135,7 @@
 					<div
 						class="transcript-line"
 						id={`transcript-line-${cue.startTime}`}
+						role="presentation"
 						onclick={() => (playerElement.currentTime = cue.startTime)}
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
 					>

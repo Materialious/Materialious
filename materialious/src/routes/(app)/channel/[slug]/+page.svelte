@@ -90,6 +90,7 @@
 <div class="padding">
 	{#if data.channel.authorBanners.length > 0 && !$interfaceLowBandwidthMode}
 		<img
+			loading="lazy"
 			src={proxyGoogleImage(data.channel.authorBanners[0].url)}
 			width="100%"
 			alt="Channel banner"
@@ -99,6 +100,7 @@
 		{#if !$interfaceLowBandwidthMode}
 			{#if channelPfp}
 				<img
+					loading="lazy"
 					style="margin-right: 1em;"
 					class="circle extra m l"
 					src={channelPfp}
@@ -135,24 +137,28 @@
 					<span>{$_('player.share.title')}</span>
 					<menu class="no-wrap mobile">
 						{#if !Capacitor.isNativePlatform()}
-							<button
+							<li
 								class="row"
+								role="presentation"
 								onclick={async () => {
 									await Clipboard.write({ string: location.href });
-								}}>{$_('player.share.materialiousLink')}</button
+								}}
 							>
+								{$_('player.share.materialiousLink')}
+							</li>
 						{/if}
-						<!--Ugly hack to get pass svelte error-->
-						{#if true}
-							<button
-								class="row"
-								onclick={async () => {
-									await Clipboard.write({
-										string: `https://www.youtube.com/channel/${data.channel.authorId}`
-									});
-								}}>{$_('player.share.youtubeLink')}</button
-							>
-						{/if}
+
+						<li
+							class="row"
+							role="presentation"
+							onclick={async () => {
+								await Clipboard.write({
+									string: `https://www.youtube.com/channel/${data.channel.authorId}`
+								});
+							}}
+						>
+							{$_('player.share.youtubeLink')}
+						</li>
 					</menu>
 				</button>
 			</div>

@@ -20,13 +20,17 @@ export async function load({ params, url }) {
 
 	if (!search) {
 		try {
-			searchCacheStore.set({ [searchStoreId]: await getSearch(params.slug, { type: type }) });
+			searchCacheStore.set({
+				...get(searchCacheStore),
+				[searchStoreId]: await getSearch(params.slug, { type: type })
+			});
 		} catch (errorMessage: any) {
 			error(500, errorMessage);
 		}
 	} else {
 		getSearch(params.slug, { type: type }).then((newSearch) => {
 			searchCacheStore.set({
+				...get(searchCacheStore),
 				[searchStoreId]: excludeDuplicateFeeds(search, newSearch) as (
 					| Channel
 					| Video

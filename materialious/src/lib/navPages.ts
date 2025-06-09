@@ -1,8 +1,10 @@
 import { _ } from '$lib/i18n';
 import { get } from 'svelte/store';
 
+export type Pages = { icon: string; href: string; name: string; requiresAuth: boolean }[];
+
 // Must be a func do to how i18n is loaded
-export function getPages(): { icon: string; href: string; name: string; requiresAuth: boolean }[] {
+export function getPages(): Pages {
 	return [
 		{
 			icon: 'home',

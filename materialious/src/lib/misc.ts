@@ -80,6 +80,8 @@ export type feedItems = feedItem[];
 export function extractUniqueId(item: feedItem): string {
 	if ('videoId' in item) {
 		return item.videoId;
+	} else if ('playlistId' in item) {
+		return item.playlistId;
 	} else if ('authorId' in item) {
 		return item.authorId;
 	} else {

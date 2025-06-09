@@ -10,7 +10,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
-	import { getPages } from '../../navPages';
+	import { getPages, type Pages } from '../../navPages';
 	import {
 		authStore,
 		darkModeStore,
@@ -108,6 +108,11 @@
 		} else if (Capacitor.getPlatform() === 'electron') {
 			await window.electronAPI.setAllowInsecureSSL(isAllowed);
 		}
+	});
+
+	let pages: Pages = $state([]);
+	authStore.subscribe(() => {
+		pages = getPages();
 	});
 </script>
 
@@ -314,7 +319,7 @@
 		bind:value={defaultPage}
 		onchange={() => interfaceDefaultPage.set(defaultPage)}
 	>
-		{#each getPages() as page}
+		{#each pages as page}
 			{#if !page.requiresAuth || get(authStore)}
 				<option selected={$interfaceDefaultPage === page.href} value={page.href}>{page.name}</option
 				>

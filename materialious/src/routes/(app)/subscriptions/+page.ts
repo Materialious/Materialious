@@ -18,11 +18,12 @@ export async function load() {
 
 		videos = [...feeds.notifications, ...feeds.videos];
 
-		feedCacheStore.set({ subscription: videos });
+		feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
 	} else {
 		await getFeed(100, 1).then((feeds) => {
 			const newVideos = [...feeds.notifications, ...feeds.videos, ...videos];
 			feedCacheStore.set({
+				...get(feedCacheStore),
 				subscription: excludeDuplicateFeeds(videos, newVideos) as (
 					| VideoBase
 					| Video

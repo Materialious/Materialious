@@ -22,6 +22,8 @@
 			document
 				.getElementById($feedLastItemId)
 				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
+
+			feedLastItemId.set(undefined);
 		}
 	});
 
@@ -94,7 +96,7 @@
 							class="no-padding"
 							style="height: 100%;"
 							role="presentation"
-							onclick={() => feedLastItemId.set(extractUniqueId(item))}
+							onclick={async () => feedLastItemId.set(await extractUniqueId(item))}
 							id={extractUniqueId(item)}
 						>
 							{#if item.type === 'video'}

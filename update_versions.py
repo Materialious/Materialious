@@ -3,19 +3,15 @@ import os
 import re
 from datetime import datetime
 
-LATEST_VERSION = "1.9.4"
+LATEST_VERSION = "1.9.5"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
-WORKING_DIR = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), "materialious"
-)
+WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
 
 ROOT_PACKAGE = os.path.join(WORKING_DIR, "package.json")
 ELECTRON_PACKAGE = os.path.join(WORKING_DIR, "electron", "package.json")
 ANDROID_PACKAGE = os.path.join(WORKING_DIR, "android", "app", "build.gradle")
-METAINFO_FILE = os.path.join(
-    WORKING_DIR, "electron", "materialious.metainfo.xml"
-)
+METAINFO_FILE = os.path.join(WORKING_DIR, "electron", "materialious.metainfo.xml")
 
 
 def package_json_update_ver(location: str) -> None:
@@ -38,9 +34,7 @@ def update_android_version() -> None:
 
     if version_code_match and version_name_match:
         version_code = int(version_code_match.group(1)) + 1
-        contents = re.sub(
-            r"versionCode\s+\d+", f"versionCode {version_code}", contents
-        )
+        contents = re.sub(r"versionCode\s+\d+", f"versionCode {version_code}", contents)
         contents = re.sub(
             r'versionName\s+"[^"]+"',
             f'versionName "{LATEST_VERSION}"',
@@ -66,9 +60,7 @@ def update_metainfo_release() -> None:
     </release>"""
 
     # Insert the new release after the opening <releases> tag
-    updated_contents = re.sub(
-        r"(<releases>\s*)", rf"\1{new_release}\n", contents
-    )
+    updated_contents = re.sub(r"(<releases>\s*)", rf"\1{new_release}\n", contents)
 
     with open(METAINFO_FILE, "w") as f_:
         f_.write(updated_contents)

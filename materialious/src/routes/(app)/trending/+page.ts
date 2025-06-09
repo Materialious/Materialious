@@ -13,8 +13,10 @@ export async function load() {
 			error(500, errorMessage);
 		}
 
-		feedCacheStore.set({ trending });
+		feedCacheStore.set({ ...get(feedCacheStore), trending });
 	} else {
-		getTrending().then((newTrending) => feedCacheStore.set({ trending: newTrending }));
+		getTrending().then((newTrending) =>
+			feedCacheStore.set({ ...get(feedCacheStore), trending: newTrending })
+		);
 	}
 }

@@ -18,9 +18,11 @@ export async function load() {
 			}
 		}
 
-		feedCacheStore.set({ popular });
+		feedCacheStore.set({ ...get(feedCacheStore), popular });
 	} else {
-		getPopular().then((newPopular) => feedCacheStore.set({ popular: newPopular }));
+		getPopular().then((newPopular) =>
+			feedCacheStore.set({ ...get(feedCacheStore), popular: newPopular })
+		);
 	}
 
 	return {

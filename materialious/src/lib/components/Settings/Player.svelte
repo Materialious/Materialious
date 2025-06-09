@@ -10,13 +10,16 @@
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerDefaultLanguage,
+		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerStatisticsByDefault,
 		playerTheatreModeByDefaultStore,
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
 	} from '../../store';
+	import { playbackRates } from '$lib/const';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 
@@ -34,6 +37,11 @@
 	function onQualityChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
 		playerDefaultQualityStore.set(value);
+	}
+
+	function onSpeedChange(event: Event) {
+		const value = (event.target as HTMLSelectElement).value;
+		playerDefaultPlaybackSpeed.set(Number(value));
 	}
 
 	function onLocalVideoFallbackChange() {
@@ -87,6 +95,21 @@
 		<option value="2160">2160p (4K UHD)</option>
 	</select>
 	<label for="quality">{$_('player.preferredQuality')}</label>
+	<i>arrow_drop_down</i>
+</div>
+
+<div class="field label suffix border">
+	<select
+		name="quality"
+		id="quality"
+		bind:value={$playerDefaultPlaybackSpeed}
+		onchange={onSpeedChange}
+	>
+		{#each playbackRates as speed}
+			<option value={speed}>x{speed}</option>
+		{/each}
+	</select>
+	<label for="quality">{$_('layout.player.defaultPlaybackSpeed')}</label>
 	<i>arrow_drop_down</i>
 </div>
 
@@ -212,6 +235,22 @@
 				type="checkbox"
 				bind:checked={$playerAutoplayNextByDefaultStore}
 				onclick={() => playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
+			/>
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<div>{$_('layout.player.playerStatistics')}</div>
+		</div>
+		<label class="switch">
+			<input
+				type="checkbox"
+				bind:checked={$playerStatisticsByDefault}
+				onclick={() => playerStatisticsByDefault.set(!playerStatisticsByDefault)}
 			/>
 			<span></span>
 		</label>

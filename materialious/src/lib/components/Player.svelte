@@ -27,9 +27,11 @@
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
+		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
@@ -41,6 +43,7 @@
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { injectSABR } from '$lib/sabr';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
+	import { playbackRates } from '$lib/const';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -317,9 +320,20 @@
 			ui('#snackbar-alert');
 		}
 
-	        restoreQualityPreference();
+		restoreQualityPreference();
 		restoreDefaultLanguage();
 
+		if ($playerDefaultPlaybackSpeed && playerElement) {
+			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
+		}
+
+		if ($playerStatisticsByDefault) {
+			// Appears to be no native way in shaka to toggle statistics on and off
+			const shakaStatisticsButton = document.querySelector('.shaka-statistics-button') as
+				| HTMLButtonElement
+				| undefined;
+			shakaStatisticsButton?.click();
+		}
 	}
 
 	async function reloadVideo() {
@@ -394,7 +408,7 @@
 				'language',
 				'statistics'
 			],
-			playbackRates: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3],
+			playbackRates: playbackRates,
 			enableTooltips: false,
 			seekBarColors: {
 				played: (await getDynamicTheme())['--primary']

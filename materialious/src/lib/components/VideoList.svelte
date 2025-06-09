@@ -21,10 +21,13 @@
 	}
 
 	onMount(() => {
-		if ($feedLastItemId)
+		if ($feedLastItemId) {
 			document
 				.getElementById($feedLastItemId)
 				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
+
+			feedLastItemId.set(undefined);
+		}
 	});
 </script>
 

@@ -32,14 +32,16 @@ import {
 	synciousInstanceStore,
 	synciousStore,
 	themeColorStore,
-	interfaceAutoExpandChapters
+	interfaceAutoExpandChapters,
+	playerDefaultPlaybackSpeed,
+	playerStatisticsByDefault
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 
 const persistedStores: {
 	name: string;
 	store: Writable<any>;
-	type: 'string' | 'boolean' | 'array';
+	type: 'string' | 'boolean' | 'array' | 'number';
 }[] = [
 	{
 		name: 'returnYTDislikesInstance',
@@ -205,6 +207,16 @@ const persistedStores: {
 		name: 'autoExpandChapters',
 		store: interfaceAutoExpandChapters,
 		type: 'boolean'
+	},
+	{
+		name: 'defaultPlaybackSpeed',
+		store: playerDefaultPlaybackSpeed,
+		type: 'number'
+	},
+	{
+		name: 'playerStatistics',
+		store: playerStatisticsByDefault,
+		type: 'boolean'
 	}
 ];
 
@@ -221,6 +233,8 @@ function setStores(toSet: Record<string, any>) {
 
 			if (store.type === 'array') {
 				value = paramValue.split(',');
+			} else if (store.type === 'number') {
+				value = Number(paramValue);
 			} else if (store.type === 'boolean') {
 				value = typeof paramValue === 'string' ? paramValue === 'true' : paramValue;
 			} else {

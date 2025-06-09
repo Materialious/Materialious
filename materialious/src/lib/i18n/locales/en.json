@@ -150,7 +150,9 @@
 			"localVideoFallback": "Local video fallback",
 			"youtubeJsFallback": "Local video processing fallback",
 			"youtubeJsAlways": "Always use",
-			"lockOrientation": "Orientation locked to aspect ratio"
+			"lockOrientation": "Orientation locked to aspect ratio",
+			"defaultPlaybackSpeed": "Default playback speed",
+			"playerStatistics": "Show player statistics by default"
 		},
 		"bookmarklet": "Bookmarklet",
 		"instanceUrl": "Instance URL",

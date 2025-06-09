@@ -56,7 +56,11 @@
   </content_rating>
   <releases>
     
-    <release version="1.9.4" date="2025-6-08">
+    
+    <release version="1.9.5" date="2025-6-09">
+      <url>https://github.com/Materialious/Materialious/releases/tag/1.9.5</url>
+    </release>
+<release version="1.9.4" date="2025-6-08">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.9.4</url>
     </release>
 <release version="1.9.3" date="2025-6-05">

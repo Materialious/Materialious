@@ -323,7 +323,6 @@
 		restoreDefaultLanguage();
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {
-			console.log('$playerDefaultPlaybackSpeed', $playerDefaultPlaybackSpeed);
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
 		}
 	}

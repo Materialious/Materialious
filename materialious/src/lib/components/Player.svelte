@@ -31,6 +31,7 @@
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
@@ -324,6 +325,14 @@
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
+		}
+
+		if ($playerStatisticsByDefault) {
+			// Appears to be no native way in shaka to toggle statistics on and off
+			const shakaStatisticsButton = document.querySelector('.shaka-statistics-button') as
+				| HTMLButtonElement
+				| undefined;
+			shakaStatisticsButton?.click();
 		}
 	}
 

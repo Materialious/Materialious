@@ -207,7 +207,7 @@
 }
 
 .shaka-overflow-button-label span:not(.shaka-current-selection-span) {
-	font-weight: bold !important;
+	font-weight: 200 !important;
 }
 
 .youtube-theme .shaka-overflow-menu span + span {

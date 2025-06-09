@@ -14,6 +14,7 @@
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerStatisticsByDefault,
 		playerTheatreModeByDefaultStore,
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
@@ -234,6 +235,22 @@
 				type="checkbox"
 				bind:checked={$playerAutoplayNextByDefaultStore}
 				onclick={() => playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
+			/>
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<div>{$_('layout.player.playerStatistics')}</div>
+		</div>
+		<label class="switch">
+			<input
+				type="checkbox"
+				bind:checked={$playerStatisticsByDefault}
+				onclick={() => playerStatisticsByDefault.set(!playerStatisticsByDefault)}
 			/>
 			<span></span>
 		</label>

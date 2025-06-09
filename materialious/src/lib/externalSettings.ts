@@ -33,7 +33,8 @@ import {
 	synciousStore,
 	themeColorStore,
 	interfaceAutoExpandChapters,
-	playerDefaultPlaybackSpeed
+	playerDefaultPlaybackSpeed,
+	playerStatisticsByDefault
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 
@@ -211,6 +212,11 @@ const persistedStores: {
 		name: 'defaultPlaybackSpeed',
 		store: playerDefaultPlaybackSpeed,
 		type: 'number'
+	},
+	{
+		name: 'playerStatistics',
+		store: playerStatisticsByDefault,
+		type: 'boolean'
 	}
 ];
 

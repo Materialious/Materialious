@@ -129,7 +129,7 @@ export function injectSABR(
 			type === shaka.net.NetworkingEngine.RequestType.SEGMENT &&
 			url.pathname.includes('videoplayback')
 		) {
-			if (!video.liveNow) {
+			if (!video.liveNow && !video.ytjs?.video.basic_info.is_post_live_dvr) {
 				const currentFormat = formatList.find(
 					(format) =>
 						fromFormat(format) === (new URL(request.uris[0]).searchParams.get('___key') || '')
@@ -283,7 +283,17 @@ export function injectSABR(
 				request.headers['X-Streaming-Context'] = btoa(JSON.stringify(sabrStreamingContext));
 				delete headers.Range;
 			} else {
-				url.pathname += `/ump/1/srfvp/1/pot/${get(poTokenCacheStore)}`;
+				if (!video.liveNow && !video.ytjs?.video.basic_info.is_post_live_dvr) {
+					url.searchParams.set('ump', '1');
+					url.searchParams.set('srfvp', '1');
+					if (headers.Range) {
+						url.searchParams.set('range', headers.Range?.split('=')[1]);
+						delete headers.Range;
+					}
+				} else {
+					url.pathname += '/ump/1';
+					url.pathname += '/srfvp/1';
+				}
 
 				request.headers['X-Streaming-Context'] = btoa(
 					JSON.stringify({

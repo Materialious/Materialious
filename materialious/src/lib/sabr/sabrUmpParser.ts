@@ -112,33 +112,31 @@ export class SabrUmpParser {
 	}
 
 	private handlePart(part: Part): shaka.extern.Response | undefined {
-		switch (part.type) {
-			case PART.FORMAT_INITIALIZATION_METADATA:
-				this.handleFormatInitMetadata(part);
-				break;
-			case PART.NEXT_REQUEST_POLICY:
-				this.handleNextRequestPolicy(part);
-				break;
-			case PART.MEDIA_HEADER:
-				try {
+		try {
+			switch (part.type) {
+				case PART.FORMAT_INITIALIZATION_METADATA:
+					this.handleFormatInitMetadata(part);
+					break;
+				case PART.NEXT_REQUEST_POLICY:
+					this.handleNextRequestPolicy(part);
+					break;
+				case PART.MEDIA_HEADER:
 					this.handleMediaHeader(part);
-				} catch (error) {
-					console.error(error);
-				}
-				break;
-			case PART.MEDIA:
-				this.handleMedia(part);
-				break;
-			case PART.MEDIA_END:
-				return this.handleMediaEnd(part);
-			case PART.SABR_ERROR:
-				return this.handleSabrError(part);
-			case PART.STREAM_PROTECTION_STATUS:
-				return this.handleStreamProtectionStatus(part);
-			case PART.SABR_REDIRECT:
-				return this.handleSabrRedirect(part);
-			default:
-		}
+					break;
+				case PART.MEDIA:
+					this.handleMedia(part);
+					break;
+				case PART.MEDIA_END:
+					return this.handleMediaEnd(part);
+				case PART.SABR_ERROR:
+					return this.handleSabrError(part);
+				case PART.STREAM_PROTECTION_STATUS:
+					return this.handleStreamProtectionStatus(part);
+				case PART.SABR_REDIRECT:
+					return this.handleSabrRedirect(part);
+				default:
+			}
+		} catch {}
 	}
 
 	private handleFormatInitMetadata(part: Part) {

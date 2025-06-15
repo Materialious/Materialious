@@ -400,7 +400,7 @@
 				Capacitor.getPlatform() === 'android' ? '' : 'volume',
 				'spacer',
 				'time_and_duration',
-				data.video.liveNow ? '' : 'end_time',
+				data.video.liveNow || data.video.lengthSeconds < 240 ? '' : 'end_time',
 				'captions',
 				'overflow_menu',
 				'fullscreen'

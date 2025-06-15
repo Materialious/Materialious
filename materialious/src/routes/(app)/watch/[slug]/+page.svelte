@@ -72,6 +72,8 @@
 
 	let playerCurrentTime: number = $state(0);
 
+	let currentChapterStartTime: number = $state(0);
+
 	function expandSummery(id: string) {
 		const element = document.getElementById(id);
 		if (element) {
@@ -243,6 +245,15 @@
 			playerElement.addEventListener('timeupdate', () => {
 				if (!playerElement) return;
 				playerCurrentTime = playerElement.currentTime;
+
+				if (data.content.timestamps) {
+					for (const timestamp of data.content.timestamps) {
+						if (timestamp.time >= playerCurrentTime && timestamp.endTime <= playerCurrentTime) {
+							currentChapterStartTime = timestamp.time;
+							break;
+						}
+					}
+				}
 			});
 
 			playerElement.addEventListener('ended', async () => {
@@ -408,6 +419,15 @@
 		}, pauseTimerSeconds * 1000);
 
 		ui('#pause-timer');
+	}
+
+	function goToChapter() {
+		const chaptersScrollable = document.getElementById('chapters');
+		const currentTimestamp = document.getElementById(`timestamp-${currentChapterStartTime}`);
+
+		if (!chaptersScrollable || !currentTimestamp) return;
+
+		chaptersScrollable.scrollTop = currentTimestamp.offsetTop - chaptersScrollable.offsetTop - 550;
 	}
 </script>
 
@@ -599,7 +619,7 @@
 		{#if data.content.timestamps.length > 0}
 			<article>
 				<details>
-					<summary id="chapter-section" class="bold none">
+					<summary id="chapter-section" class="bold none" onclick={goToChapter}>
 						<nav>
 							<div class="max">
 								<p>{$_('player.chapters')}</p>
@@ -608,11 +628,12 @@
 						</nav>
 					</summary>
 					<div class="space"></div>
-					<div class="chapter-list">
+					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
 								<li
 									role="presentation"
+									id={`timestamp-${timestamp.time}`}
 									onclick={() => {
 										if (playerElement) playerElement.currentTime = timestamp.time;
 									}}
@@ -788,7 +809,8 @@
 <style>
 	.chapter-list {
 		max-height: 300px;
-		overflow-x: scroll;
+		overflow-y: scroll;
+		overflow-x: hidden;
 	}
 
 	.video-actions {

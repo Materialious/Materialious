@@ -70,6 +70,10 @@
 				videoId = url.pathname.split('/')[1];
 			}
 
+			if (videoId === 'shorts') {
+				videoId = url.pathname.split('/')[2];
+			}
+
 			if (!videoId) {
 				return;
 			}

@@ -655,6 +655,11 @@
 		id="player"
 		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
 	></video>
+	{#if isEmbed}
+		<div class="chip blur" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
+			{data.video.title}
+		</div>
+	{/if}
 </div>
 
 {#if showVideoRetry}

@@ -44,6 +44,7 @@
 	import { injectSABR } from '$lib/sabr';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { playbackRates } from '$lib/const';
+	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -387,13 +388,19 @@
 			playerElement
 		);
 
+		shaka.ui.Controls.registerElement('end_time', {
+			create: (parent: HTMLElement, controls: shaka.ui.Controls) => {
+				return new EndTimeElement(parent, controls);
+			}
+		});
+
 		shakaUi.configure({
 			controlPanelElements: [
 				'play_pause',
 				Capacitor.getPlatform() === 'android' ? '' : 'volume',
 				'spacer',
-				'chapter',
 				'time_and_duration',
+				data.video.liveNow || data.video.lengthSeconds < 240 ? '' : 'end_time',
 				'captions',
 				'overflow_menu',
 				'fullscreen'
@@ -401,7 +408,6 @@
 			overflowMenuButtons: [
 				'cast',
 				'airplay',
-				'captions',
 				'quality',
 				'playback_rate',
 				'loop',
@@ -655,6 +661,11 @@
 		id="player"
 		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
 	></video>
+	{#if isEmbed}
+		<div class="chip blur" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
+			{data.video.title}
+		</div>
+	{/if}
 </div>
 
 {#if showVideoRetry}

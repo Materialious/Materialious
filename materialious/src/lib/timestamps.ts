@@ -1,7 +1,7 @@
 import { decodeHtmlCharCodes } from './misc';
 import { convertToSeconds } from './numbers';
 
-type Timestamps = { title: string; time: number; timePretty: string; endTime: number }[];
+export type Timestamps = { title: string; time: number; timePretty: string; endTime: number }[];
 
 export interface PhasedDescription {
 	description: string;

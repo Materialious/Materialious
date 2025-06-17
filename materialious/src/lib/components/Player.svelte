@@ -541,6 +541,40 @@
 			}
 		});
 
+		const shakaControls = shakaUi.getControls();
+		if (data.content.timestamps && shakaControls) {
+			const seekBar = shakaControls
+				.getControlsContainer()
+				.querySelector('.shaka-seek-bar-container');
+
+			data.content.timestamps.forEach((chapter, index) => {
+				const nextChapter = data.content.timestamps[index + 1];
+
+				const marker = document.createElement('div');
+				marker.classList.add('chapter-marker');
+
+				const startPercent = (chapter.time / data.video.lengthSeconds) * 100;
+				let widthPercent: number;
+
+				if (nextChapter) {
+					widthPercent = ((nextChapter.time - chapter.time) / data.video.lengthSeconds) * 100;
+				} else {
+					widthPercent = 100 - startPercent;
+				}
+
+				marker.style.left = `${startPercent}%`;
+				marker.style.width = `${widthPercent}%`;
+
+				const tooltip = document.createElement('div');
+				tooltip.classList.add('tooltip');
+				tooltip.textContent = chapter.title;
+
+				marker.appendChild(tooltip);
+
+				if (seekBar) seekBar.appendChild(marker);
+			});
+		}
+
 		try {
 			await loadVideo();
 		} catch (error: unknown) {

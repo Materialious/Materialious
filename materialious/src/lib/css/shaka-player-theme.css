@@ -292,6 +292,10 @@
 		display: none;
 	}
 
+	.player-theme .chapter-marker {
+		height: 8px;
+	}
+
 	.player-theme .shaka-overflow-menu,
 	.player-theme .shaka-settings-menu {
 		width: 100% !important;

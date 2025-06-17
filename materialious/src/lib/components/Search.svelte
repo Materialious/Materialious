@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
@@ -37,7 +35,9 @@
 		}, 250);
 	}
 
-	function handleSubmit() {
+	function handleSubmit(event: Event | undefined = undefined) {
+		if (event) event.preventDefault();
+
 		if (search.trim() === '') return;
 
 		selectedSuggestionIndex = -1;
@@ -98,7 +98,15 @@
 	});
 </script>
 
-<form onsubmit={preventDefault(handleSubmit)}>
+<form
+	onsubmit={handleSubmit}
+	onclick={async () => {
+		showSearchBox = true;
+		await tick();
+		document.getElementById('search')?.focus();
+	}}
+	role="presentation"
+>
 	<div class="field prefix fill no-margin search rounded">
 		<i class="front">search</i>
 		<input
@@ -106,11 +114,6 @@
 			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
 			class="rounded"
-			onclick={async () => {
-				showSearchBox = true;
-				await tick();
-				document.getElementById('search')?.focus();
-			}}
 		/>
 		{#if showSearchBox}
 			<menu class="min suggestions-container rounded">

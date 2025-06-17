@@ -651,7 +651,7 @@
 
 <div
 	id="shaka-container"
-	class="youtube-theme"
+	class="player-theme"
 	data-shaka-player-container
 	class:hide={showVideoRetry}
 >
@@ -695,19 +695,25 @@
 {/if}
 
 <style>
-	.youtube-theme {
+	.player-theme {
 		max-height: 80vh;
 		max-width: calc(80vh * 16 / 9);
 		overflow: hidden;
 		position: relative;
 		flex: 1;
 		background-color: black;
+		aspect-ratio: 16 / 9;
 	}
 
 	video {
-		width: 100%;
-		height: 100%;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		max-height: 100%;
+		max-width: 100%;
 		object-fit: contain;
+		background-color: black;
 	}
 
 	.hide {

@@ -420,15 +420,6 @@
 
 		ui('#pause-timer');
 	}
-
-	function goToChapter() {
-		const chaptersScrollable = document.getElementById('chapters');
-		const currentTimestamp = document.getElementById(`timestamp-${currentChapterStartTime}`);
-
-		if (!chaptersScrollable || !currentTimestamp) return;
-
-		chaptersScrollable.scrollTop = currentTimestamp.offsetTop - chaptersScrollable.offsetTop - 550;
-	}
 </script>
 
 <svelte:head>
@@ -556,7 +547,10 @@
 									<li
 										role="presentation"
 										class="row"
-										onclick={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
+										onclick={async () => {
+											await toggleVideoToPlaylist(personalPlaylist.playlistId);
+											(document.activeElement as HTMLElement)?.blur();
+										}}
 									>
 										<nav>
 											<span class="max">{personalPlaylist.title}</span>
@@ -619,7 +613,7 @@
 		{#if data.content.timestamps.length > 0}
 			<article>
 				<details>
-					<summary id="chapter-section" class="bold none" onclick={goToChapter}>
+					<summary id="chapter-section" class="bold none">
 						<nav>
 							<div class="max">
 								<p>{$_('player.chapters')}</p>
@@ -633,7 +627,6 @@
 							{#each data.content.timestamps as timestamp}
 								<li
 									role="presentation"
-									id={`timestamp-${timestamp.time}`}
 									onclick={() => {
 										if (playerElement) playerElement.currentTime = timestamp.time;
 									}}

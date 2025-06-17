@@ -93,6 +93,7 @@
 					role="presentation"
 					onclick={async () => {
 						await Clipboard.write({ string: location.href });
+						(document.activeElement as HTMLElement)?.blur();
 					}}
 				>
 					{$_('player.share.materialiousLink')}
@@ -105,6 +106,7 @@
 					await Clipboard.write({
 						string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
 					});
+					(document.activeElement as HTMLElement)?.blur();
 				}}
 			>
 				{$_('player.share.youtubeLink')}

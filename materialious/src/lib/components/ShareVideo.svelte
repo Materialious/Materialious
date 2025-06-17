@@ -22,6 +22,7 @@
 		} else {
 			await Clipboard.write({ string: `${location.origin}/watch/${video.videoId}` });
 		}
+		(document.activeElement as HTMLElement)?.blur();
 	}}
 >
 	<div class="min">{$_('player.share.materialiousLink')}</div>
@@ -29,16 +30,20 @@
 <li
 	class="row"
 	role="presentation"
-	onclick={async () =>
-		await Clipboard.write({ string: `https://redirect.invidious.io/watch?v=${video.videoId}` })}
+	onclick={async () => {
+		await Clipboard.write({ string: `https://redirect.invidious.io/watch?v=${video.videoId}` });
+		(document.activeElement as HTMLElement)?.blur();
+	}}
 >
 	<div class="min">{$_('player.share.invidiousRedirect')}</div>
 </li>
 <li
 	class="row"
 	role="presentation"
-	onclick={async () =>
-		await Clipboard.write({ string: `https://www.youtube.com/watch?v=${video.videoId}` })}
+	onclick={async () => {
+		await Clipboard.write({ string: `https://www.youtube.com/watch?v=${video.videoId}` });
+		(document.activeElement as HTMLElement)?.blur();
+	}}
 >
 	<div class="min">{$_('player.share.youtubeLink')}</div>
 </li>

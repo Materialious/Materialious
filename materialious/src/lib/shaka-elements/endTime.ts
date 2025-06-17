@@ -9,7 +9,7 @@ export class EndTimeElement extends shaka.ui.Element {
 
 		this.video = (this.player as shaka.Player).getMediaElement() as HTMLMediaElement;
 		this.button = document.createElement('button');
-		this.button.classList.add('shaka-current-time');
+		this.button.classList.add('shaka-current-time', 'shaka-end-time');
 		this.button.disabled = true;
 		(this.parent as HTMLElement).appendChild(this.button);
 

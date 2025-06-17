@@ -66,8 +66,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		parse: false
 	});
 	const rawNextResponse = await watchEndpoint.call(youtube.actions, {
-		override_endpoint: '/next',
-		...extraArgs
+		override_endpoint: '/next'
 	});
 	const video = new YT.VideoInfo(
 		[rawPlayerResponse, rawNextResponse],
@@ -99,7 +98,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
 				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
 		} else {
-			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash(undefined, undefined))}`;
+			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash(undefined))}`;
 		}
 	}
 

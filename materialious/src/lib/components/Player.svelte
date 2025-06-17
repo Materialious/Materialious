@@ -16,13 +16,14 @@
 	import 'shaka-player/dist/controls.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
+		darkModeStore,
 		instanceStore,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
@@ -38,7 +39,8 @@
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
-		synciousStore
+		synciousStore,
+		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { injectSABR } from '$lib/sabr';
@@ -73,6 +75,55 @@
 	let shakaUi: shaka.ui.Overlay;
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
+
+	async function updateSeekBarTheme() {
+		await tick();
+		shakaUi.configure({
+			seekBarColors: {
+				played: (await getDynamicTheme())['--primary']
+			}
+		});
+		setChapterMarkers();
+	}
+
+	themeColorStore.subscribe(updateSeekBarTheme);
+	darkModeStore.subscribe(updateSeekBarTheme);
+
+	function setChapterMarkers() {
+		const shakaControls = shakaUi.getControls();
+		if (data.content.timestamps && shakaControls) {
+			const seekBar = shakaControls
+				.getControlsContainer()
+				.querySelector('.shaka-seek-bar-container');
+
+			data.content.timestamps.forEach((chapter, index) => {
+				const nextChapter = data.content.timestamps[index + 1];
+
+				const marker = document.createElement('div');
+				marker.classList.add('chapter-marker');
+
+				const startPercent = (chapter.time / data.video.lengthSeconds) * 100;
+				let widthPercent: number;
+
+				if (nextChapter) {
+					widthPercent = ((nextChapter.time - chapter.time) / data.video.lengthSeconds) * 100;
+				} else {
+					widthPercent = 100 - startPercent;
+				}
+
+				marker.style.left = `${startPercent}%`;
+				marker.style.width = `${widthPercent}%`;
+
+				const tooltip = document.createElement('div');
+				tooltip.classList.add('tooltip');
+				tooltip.textContent = chapter.title;
+
+				marker.appendChild(tooltip);
+
+				if (seekBar) seekBar.appendChild(marker);
+			});
+		}
+	}
 
 	function restoreDefaultLanguage() {
 		if ($playerDefaultLanguage) {
@@ -541,6 +592,8 @@
 			}
 		});
 
+		setChapterMarkers();
+
 		try {
 			await loadVideo();
 		} catch (error: unknown) {
@@ -651,7 +704,7 @@
 
 <div
 	id="shaka-container"
-	class="youtube-theme"
+	class="player-theme"
 	data-shaka-player-container
 	class:hide={showVideoRetry}
 >
@@ -695,19 +748,25 @@
 {/if}
 
 <style>
-	.youtube-theme {
+	.player-theme {
 		max-height: 80vh;
 		max-width: calc(80vh * 16 / 9);
 		overflow: hidden;
 		position: relative;
 		flex: 1;
 		background-color: black;
+		aspect-ratio: 16 / 9;
 	}
 
 	video {
-		width: 100%;
-		height: 100%;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		max-height: 100%;
+		max-width: 100%;
 		object-fit: contain;
+		background-color: black;
 	}
 
 	.hide {

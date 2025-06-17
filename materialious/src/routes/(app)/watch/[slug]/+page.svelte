@@ -547,7 +547,10 @@
 									<li
 										role="presentation"
 										class="row"
-										onclick={async () => await toggleVideoToPlaylist(personalPlaylist.playlistId)}
+										onclick={async () => {
+											await toggleVideoToPlaylist(personalPlaylist.playlistId);
+											(document.activeElement as HTMLElement)?.blur();
+										}}
 									>
 										<nav>
 											<span class="max">{personalPlaylist.title}</span>

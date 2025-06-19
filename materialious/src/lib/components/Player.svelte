@@ -192,7 +192,7 @@
 		if (
 			Capacitor.getPlatform() === 'android' &&
 			data.video.adaptiveFormats.length > 0 &&
-			!(await androidTv.isAndroidTv()).value
+			!isAndroidTv
 		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')

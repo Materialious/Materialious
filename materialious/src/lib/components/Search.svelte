@@ -109,7 +109,6 @@
 		await tick();
 		document.getElementById('search')?.focus();
 	}}
-	tabindex="0"
 	role="presentation"
 >
 	<div
@@ -119,6 +118,7 @@
 	>
 		<i class="front" tabindex="-1">search</i>
 		<input
+			tabindex="0"
 			id="search-box"
 			placeholder={$_('searchPlaceholder')}
 			bind:value={search}
@@ -131,6 +131,7 @@
 						>arrow_back</i
 					>
 					<input
+						tabindex="0"
 						placeholder={$_('searchPlaceholder')}
 						type="text"
 						id="search"

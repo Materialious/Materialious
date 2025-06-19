@@ -159,7 +159,7 @@
 	role="button"
 	onclick={async () => {
 		if ((await androidTv.isAndroidTv()).value) {
-			goto(watchUrl.toString());
+			goto(`${location.origin}/embed/${video.videoId}`);
 		}
 	}}
 >

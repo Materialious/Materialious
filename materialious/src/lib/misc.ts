@@ -5,6 +5,7 @@ import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import { instanceStore, interfaceAllowInsecureRequests } from './store';
 import type { Channel, HashTag, Playlist, PlaylistPageVideo, Video, VideoBase } from './api/model';
+import { Capacitor } from '@capacitor/core';
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;

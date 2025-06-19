@@ -42,7 +42,7 @@
 	</nav>
 
 	<div>
-		<nav class="tabbed small">
+		<nav class="tabbed small" tabindex="0" role="region">
 			<a class:active={activeTab === 'interface'} onclick={() => (activeTab = 'interface')}>
 				<i>grid_view</i>
 				<span>{$_('layout.interface')}</span>

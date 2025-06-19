@@ -11,11 +11,14 @@
 }
 
 main.root {
-	padding-left: 7em !important;
-	padding-top: 5em !important;
+	padding-top: 6em !important;
 	padding-bottom: 5em !important;
 	max-height: 100vh;
 	overflow-y: auto;
+}
+
+main.root-not-tv {
+	padding-left: 7em !important;
 }
 
 .row {

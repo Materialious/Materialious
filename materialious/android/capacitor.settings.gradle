@@ -20,5 +20,8 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 include ':hugotomazi-capacitor-navigation-bar'
 project(':hugotomazi-capacitor-navigation-bar').projectDir = new File('../node_modules/@hugotomazi/capacitor-navigation-bar/android')
 
+include ':capacitor-android-tv-plugin'
+project(':capacitor-android-tv-plugin').projectDir = new File('../node_modules/capacitor-android-tv-plugin/android')
+
 include ':capacitor-nodejs'
 project(':capacitor-nodejs').projectDir = new File('../node_modules/capacitor-nodejs/android')

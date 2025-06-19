@@ -47,6 +47,7 @@
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { playbackRates } from '$lib/const';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
+	import { AndroidTv } from 'capacitor-android-tv-plugin';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -67,7 +68,6 @@
 	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
-	let userWantsFullscreen = false;
 	let playerElementResizeObserver: ResizeObserver | undefined;
 	let showVideoRetry = $state(false);
 
@@ -188,7 +188,11 @@
 	}
 
 	async function androidHandleRotate() {
-		if (Capacitor.getPlatform() === 'android' && data.video.adaptiveFormats.length > 0) {
+		if (
+			Capacitor.getPlatform() === 'android' &&
+			data.video.adaptiveFormats.length > 0 &&
+			!(await AndroidTv.isAndroidTv())
+		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')
 			);
@@ -479,7 +483,6 @@
 
 		// Required to stop buttons from being still selected when fullscreening
 		document.addEventListener('fullscreenchange', async () => {
-			userWantsFullscreen = document.fullscreenElement !== null;
 			const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
 			buttons.forEach((button) => {
 				// Reset the button's focus and active states
@@ -513,7 +516,7 @@
 				playerElement.pause();
 			}
 
-			if (!document.fullscreenElement && userWantsFullscreen) {
+			if (!document.fullscreenElement) {
 				shakaUi.getControls()?.toggleFullScreen();
 			}
 			return false;
@@ -523,7 +526,7 @@
 			if (!playerElement) return;
 			playerElement.currentTime = playerElement.currentTime + 10;
 
-			if (!document.fullscreenElement && userWantsFullscreen) {
+			if (!document.fullscreenElement) {
 				shakaUi.getControls()?.toggleFullScreen();
 			}
 			return false;
@@ -534,7 +537,7 @@
 
 			playerElement.currentTime = playerElement.currentTime - 10;
 
-			if (!document.fullscreenElement && userWantsFullscreen) {
+			if (!document.fullscreenElement) {
 				shakaUi.getControls()?.toggleFullScreen();
 			}
 			return false;
@@ -557,7 +560,7 @@
 				}
 			}
 
-			if (!document.fullscreenElement && userWantsFullscreen) {
+			if (!document.fullscreenElement) {
 				shakaUi.getControls()?.toggleFullScreen();
 			}
 			return false;
@@ -577,9 +580,11 @@
 
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
 
-			if (!document.fullscreenElement && userWantsFullscreen) {
+			if (!document.fullscreenElement) {
 				shakaUi.getControls()?.toggleFullScreen();
 			}
+
+			return false;
 		});
 
 		Mousetrap.bind('shift+right', () => {
@@ -587,12 +592,27 @@
 
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 
-			if (!document.fullscreenElement && userWantsFullscreen) {
+			if (!document.fullscreenElement) {
 				shakaUi.getControls()?.toggleFullScreen();
 			}
+
+			return false;
 		});
 
 		setChapterMarkers();
+
+		if (await AndroidTv.isAndroidTv()) {
+			shakaUi.getControls()?.toggleFullScreen();
+
+			Mousetrap.bind('enter', () => {
+				if (playerElement?.paused) {
+					playerElement?.play();
+				} else {
+					playerElement?.pause();
+				}
+				return false;
+			});
+		}
 
 		try {
 			await loadVideo();

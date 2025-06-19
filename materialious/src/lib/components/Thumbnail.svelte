@@ -158,7 +158,7 @@
 	tabindex="0"
 	role="button"
 	onclick={async () => {
-		if (await androidTv.isAndroidTv()) {
+		if ((await androidTv.isAndroidTv()).value) {
 			goto(watchUrl.toString());
 		}
 	}}

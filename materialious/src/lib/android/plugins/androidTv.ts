@@ -2,12 +2,12 @@ import { registerPlugin } from '@capacitor/core';
 import { WebPlugin } from '@capacitor/core';
 
 interface AndroidTV {
-	isAndroidTv: () => Promise<boolean>;
+	isAndroidTv: () => Promise<{ value: boolean }>;
 }
 
 export class AndroidTvWeb extends WebPlugin implements AndroidTV {
-	async isAndroidTv(): Promise<boolean> {
-		return false;
+	async isAndroidTv(): Promise<{ value: boolean }> {
+		return { value: false };
 	}
 }
 

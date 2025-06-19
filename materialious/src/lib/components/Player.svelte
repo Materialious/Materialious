@@ -191,7 +191,7 @@
 		if (
 			Capacitor.getPlatform() === 'android' &&
 			data.video.adaptiveFormats.length > 0 &&
-			!(await androidTv.isAndroidTv())
+			!(await androidTv.isAndroidTv()).value
 		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')
@@ -515,20 +515,12 @@
 			} else {
 				playerElement.pause();
 			}
-
-			if (!document.fullscreenElement) {
-				shakaUi.getControls()?.toggleFullScreen();
-			}
 			return false;
 		});
 
 		Mousetrap.bind('right', () => {
 			if (!playerElement) return;
 			playerElement.currentTime = playerElement.currentTime + 10;
-
-			if (!document.fullscreenElement) {
-				shakaUi.getControls()?.toggleFullScreen();
-			}
 			return false;
 		});
 
@@ -536,10 +528,6 @@
 			if (!playerElement) return;
 
 			playerElement.currentTime = playerElement.currentTime - 10;
-
-			if (!document.fullscreenElement) {
-				shakaUi.getControls()?.toggleFullScreen();
-			}
 			return false;
 		});
 
@@ -559,10 +547,6 @@
 					player.setTextTrackVisibility(true);
 				}
 			}
-
-			if (!document.fullscreenElement) {
-				shakaUi.getControls()?.toggleFullScreen();
-			}
 			return false;
 		});
 
@@ -579,11 +563,6 @@
 			if (!playerElement) return;
 
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
-
-			if (!document.fullscreenElement) {
-				shakaUi.getControls()?.toggleFullScreen();
-			}
-
 			return false;
 		});
 
@@ -591,17 +570,12 @@
 			if (!playerElement) return;
 
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
-
-			if (!document.fullscreenElement) {
-				shakaUi.getControls()?.toggleFullScreen();
-			}
-
 			return false;
 		});
 
 		setChapterMarkers();
 
-		if (await androidTv.isAndroidTv()) {
+		if ((await androidTv.isAndroidTv()).value) {
 			shakaUi.getControls()?.toggleFullScreen();
 
 			Mousetrap.bind('enter', () => {

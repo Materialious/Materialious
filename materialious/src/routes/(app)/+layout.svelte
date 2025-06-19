@@ -351,7 +351,7 @@
 	{/if}
 </dialog>
 
-<main class="responsive max root" tabindex="0" role="region" class:main.root-not-tv={!isAndroidTv}>
+<main class="responsive max root" tabindex="0" role="region" class:root-not-tv={!isAndroidTv}>
 	{#if isAndroidTv}
 		<div class="tabs">
 			{#each getPages() as navPage}

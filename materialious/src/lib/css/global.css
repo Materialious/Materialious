@@ -17,7 +17,7 @@ main.root {
 	overflow-y: auto;
 }
 
-main.root-not-tv {
+.root-not-tv {
 	padding-left: 7em !important;
 }
 

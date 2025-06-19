@@ -20,6 +20,7 @@
 		instanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
+		isAndroidTvStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -31,7 +32,7 @@
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
-	import { _ } from '$lib/i18n';
+	import { _, initI18n } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import androidTv from '$lib/android/plugins/androidTv';
@@ -40,8 +41,6 @@
 	let { children } = $props();
 
 	let mobileSearchShow = $state(false);
-
-	let isAndroidTv = $state(false);
 
 	let isLoggedIn = $state(false);
 	authStore.subscribe((value) => {
@@ -97,7 +96,7 @@
 	});
 
 	async function login() {
-		if (!isAndroidTv) {
+		if (!$isAndroidTvStore) {
 			const path = new URL(`${get(instanceStore)}/authorize_token`);
 			const searchParams = new URLSearchParams({
 				scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
@@ -122,6 +121,9 @@
 	let rawPassword: string = $state('');
 	async function usernamePasswordLogin(event: Event) {
 		event.preventDefault();
+
+		if (!$isAndroidTvStore) return;
+
 		loginError = false;
 
 		const body = new FormData();
@@ -171,9 +173,9 @@
 	onMount(async () => {
 		ui();
 
-		isAndroidTv = (await androidTv.isAndroidTv()).value;
+		$isAndroidTvStore = (await androidTv.isAndroidTv()).value;
 
-		if (isAndroidTv) {
+		if ($isAndroidTvStore) {
 			const topContent = document.getElementById('top-content') as HTMLElement;
 			Mousetrap.bind('down', () => {
 				if (topContent.contains(document.activeElement)) {
@@ -231,9 +233,18 @@
 
 <svelte:head>
 	{@html webManifestLink}
+
+	{#if $isAndroidTvStore}
+		<style>
+			:focus {
+				outline: 4px solid var(--primary);
+				box-shadow: none !important;
+			}
+		</style>
+	{/if}
 </svelte:head>
 
-{#if !isAndroidTv}
+{#if !$isAndroidTvStore}
 	<nav class="left m l small">
 		<header></header>
 		{#each getPages() as navPage}
@@ -368,9 +379,9 @@
 	class="responsive max root"
 	tabindex="0"
 	role="region"
-	class:root-not-tv={!isAndroidTv}
+	class:root-not-tv={!$isAndroidTvStore}
 >
-	{#if isAndroidTv}
+	{#if $isAndroidTvStore}
 		<div class="tabs">
 			{#each getPages() as navPage}
 				{#if !navPage.requiresAuth || isLoggedIn}

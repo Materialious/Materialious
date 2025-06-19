@@ -576,7 +576,9 @@
 		setChapterMarkers();
 
 		if ((await androidTv.isAndroidTv()).value) {
-			shakaUi.getControls()?.toggleFullScreen();
+			if (!document.fullscreenElement) {
+				shakaUi.getControls()?.toggleFullScreen();
+			}
 
 			Mousetrap.bind('enter', () => {
 				if (playerElement?.paused) {

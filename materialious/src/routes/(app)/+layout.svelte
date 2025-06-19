@@ -35,6 +35,7 @@
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import androidTv from '$lib/android/plugins/androidTv';
+	import Mousetrap from 'mousetrap';
 
 	let { children } = $props();
 
@@ -172,6 +173,16 @@
 
 		isAndroidTv = (await androidTv.isAndroidTv()).value;
 
+		if (isAndroidTv) {
+			const mainContent = document.getElementById('main-content') as HTMLElement;
+			Mousetrap.bind('down', () => {
+				if (!mainContent.contains(document.activeElement)) {
+					mainContent.focus();
+					return false;
+				}
+			});
+		}
+
 		document.addEventListener('click', linkClickOverwrite);
 
 		loadSettingsFromEnv();
@@ -265,6 +276,7 @@
 		onclick={() => goto($interfaceDefaultPage)}
 		style="cursor: pointer;"
 		class="m l"
+		tabindex="-1"
 	>
 		<Logo />
 		<h6 class="l">Materialious</h6>
@@ -351,7 +363,13 @@
 	{/if}
 </dialog>
 
-<main class="responsive max root" tabindex="0" role="region" class:root-not-tv={!isAndroidTv}>
+<main
+	id="main-content"
+	class="responsive max root"
+	tabindex="0"
+	role="region"
+	class:root-not-tv={!isAndroidTv}
+>
 	{#if isAndroidTv}
 		<div class="tabs">
 			{#each getPages() as navPage}

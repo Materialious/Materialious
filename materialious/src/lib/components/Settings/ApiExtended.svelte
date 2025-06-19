@@ -16,8 +16,8 @@
 >
 	<nav>
 		<div class="field label border max">
-			<input bind:value={synciousInstance} name="syncious-instance" type="text" />
-			<label for="syncious-instance">{$_('layout.instanceUrl')}</label>
+			<input tabindex="0" bind:value={synciousInstance} name="syncious-instance" type="text" />
+			<label tabindex="-1" for="syncious-instance">{$_('layout.instanceUrl')}</label>
 		</div>
 		<button class="square round">
 			<i>done</i>
@@ -29,7 +29,7 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch">
+	<label class="switch" tabindex="0" role="switch">
 		<input
 			bind:checked={$synciousStore}
 			onclick={() => synciousStore.set(!$synciousStore)}

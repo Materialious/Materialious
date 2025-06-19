@@ -15,7 +15,6 @@ dependencies {
     implementation project(':capacitor-screen-orientation')
     implementation project(':capacitor-status-bar')
     implementation project(':hugotomazi-capacitor-navigation-bar')
-    implementation project(':capacitor-android-tv-plugin')
     implementation project(':capacitor-nodejs')
 
 }

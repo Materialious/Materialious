@@ -47,7 +47,7 @@
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { playbackRates } from '$lib/const';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
-	import { AndroidTv } from 'capacitor-android-tv-plugin';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -191,7 +191,7 @@
 		if (
 			Capacitor.getPlatform() === 'android' &&
 			data.video.adaptiveFormats.length > 0 &&
-			!(await AndroidTv.isAndroidTv())
+			!(await androidTv.isAndroidTv())
 		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')
@@ -601,7 +601,7 @@
 
 		setChapterMarkers();
 
-		if (await AndroidTv.isAndroidTv()) {
+		if (await androidTv.isAndroidTv()) {
 			shakaUi.getControls()?.toggleFullScreen();
 
 			Mousetrap.bind('enter', () => {

@@ -52,7 +52,6 @@
 		"@hugotomazi/capacitor-navigation-bar": "^4.0.1",
 		"beercss": "^3.8.0",
 		"bgutils-js": "^3.2.0",
-		"capacitor-android-tv-plugin": "^0.0.2",
 		"capacitor-nodejs": "https://github.com/hampoelz/capacitor-nodejs/releases/download/v1.0.0-beta.8/capacitor-nodejs.tgz",
 		"fuse.js": "^7.0.0",
 		"googlevideo": "^3.0.0",

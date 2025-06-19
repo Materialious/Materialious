@@ -9,6 +9,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(ColorTheme.class);
+        registerPlugin(AndroidTv.class);
         super.onCreate(savedInstanceState);
     }
 

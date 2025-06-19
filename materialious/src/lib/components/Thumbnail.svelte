@@ -20,7 +20,7 @@
 		synciousStore
 	} from '../store';
 	import { goto } from '$app/navigation';
-	import { AndroidTv } from 'capacitor-android-tv-plugin';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -158,7 +158,7 @@
 	tabindex="0"
 	role="button"
 	onclick={async () => {
-		if (await AndroidTv.isAndroidTv()) {
+		if (await androidTv.isAndroidTv()) {
 			goto(watchUrl.toString());
 		}
 	}}

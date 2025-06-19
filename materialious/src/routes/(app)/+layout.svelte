@@ -34,8 +34,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { AndroidTv } from 'capacitor-android-tv-plugin';
-	import Mousetrap from 'mousetrap';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	let { children } = $props();
 
@@ -171,7 +170,7 @@
 	onMount(async () => {
 		ui();
 
-		isAndroidTv = await AndroidTv.isAndroidTv();
+		isAndroidTv = await androidTv.isAndroidTv();
 
 		document.addEventListener('click', linkClickOverwrite);
 

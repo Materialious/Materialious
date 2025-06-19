@@ -9,7 +9,7 @@
 		interfaceSearchSuggestionsStore,
 		searchHistoryStore
 	} from '../store';
-	import { AndroidTv } from 'capacitor-android-tv-plugin';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	const dispatch = createEventDispatcher();
 
@@ -92,7 +92,7 @@
 	}
 
 	onMount(async () => {
-		isAndroidTv = await AndroidTv.isAndroidTv();
+		isAndroidTv = await androidTv.isAndroidTv();
 		Mousetrap.bind(['ctrl+k', 'command+k'], () => {
 			document.getElementById('search-box')?.focus();
 			showSearchBox = !showSearchBox;

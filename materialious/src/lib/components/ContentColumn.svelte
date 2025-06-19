@@ -1,6 +1,6 @@
 <script lang="ts">
+	import androidTv from '$lib/android/plugins/androidTv';
 	import { onMount } from 'svelte';
-	import { AndroidTv } from 'capacitor-android-tv-plugin';
 
 	let { children } = $props();
 
@@ -9,7 +9,7 @@
 	let mediumCol = $state('6');
 
 	async function checkWidth() {
-		if (await AndroidTv.isAndroidTv()) {
+		if (await androidTv.isAndroidTv()) {
 			mediumCol = '3';
 		} else if (innerWidth <= 1750) {
 			largeCol = '4';

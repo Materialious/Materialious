@@ -92,7 +92,7 @@
 	}
 
 	onMount(async () => {
-		isAndroidTv = await androidTv.isAndroidTv();
+		isAndroidTv = (await androidTv.isAndroidTv()).value;
 		Mousetrap.bind(['ctrl+k', 'command+k'], () => {
 			document.getElementById('search-box')?.focus();
 			showSearchBox = !showSearchBox;

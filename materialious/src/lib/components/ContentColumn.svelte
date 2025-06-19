@@ -9,7 +9,7 @@
 	let mediumCol = $state('6');
 
 	async function checkWidth() {
-		if (await androidTv.isAndroidTv()) {
+		if ((await androidTv.isAndroidTv()).value) {
 			mediumCol = '3';
 		} else if (innerWidth <= 1750) {
 			largeCol = '4';

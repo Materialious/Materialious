@@ -170,7 +170,7 @@
 	onMount(async () => {
 		ui();
 
-		isAndroidTv = await androidTv.isAndroidTv();
+		isAndroidTv = (await androidTv.isAndroidTv()).value;
 
 		document.addEventListener('click', linkClickOverwrite);
 

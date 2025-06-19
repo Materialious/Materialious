@@ -63,6 +63,7 @@
 <div class="margin"></div>
 <div class="field label suffix border">
 	<select
+		tabindex="0"
 		name="case"
 		bind:value={defaultLanguage}
 		onchange={() => playerDefaultLanguage.set(defaultLanguage)}
@@ -73,12 +74,13 @@
 			>
 		{/each}
 	</select>
-	<label for="case">{$_('player.defaultLanguage')}</label>
+	<label tabindex="-1" for="case">{$_('player.defaultLanguage')}</label>
 	<i>arrow_drop_down</i>
 </div>
 
 <div class="field label suffix border">
 	<select
+		tabindex="0"
 		name="quality"
 		id="quality"
 		bind:value={$playerDefaultQualityStore}
@@ -94,12 +96,13 @@
 		<option value="1440">1440p (2K)</option>
 		<option value="2160">2160p (4K UHD)</option>
 	</select>
-	<label for="quality">{$_('player.preferredQuality')}</label>
+	<label tabindex="-1" for="quality">{$_('player.preferredQuality')}</label>
 	<i>arrow_drop_down</i>
 </div>
 
 <div class="field label suffix border">
 	<select
+		tabindex="0"
 		name="quality"
 		id="quality"
 		bind:value={$playerDefaultPlaybackSpeed}
@@ -109,18 +112,23 @@
 			<option value={speed}>x{speed}</option>
 		{/each}
 	</select>
-	<label for="quality">{$_('layout.player.defaultPlaybackSpeed')}</label>
+	<label tabindex="-1" for="quality">{$_('layout.player.defaultPlaybackSpeed')}</label>
 	<i>arrow_drop_down</i>
 </div>
 
 {#if Capacitor.isNativePlatform()}
 	<div class="field suffix border label">
-		<select name="ytfallback" bind:value={localVideoFallback} onchange={onLocalVideoFallbackChange}>
+		<select
+			tabindex="0"
+			name="ytfallback"
+			bind:value={localVideoFallback}
+			onchange={onLocalVideoFallbackChange}
+		>
 			<option value="enabled">{$_('enabled')}</option>
 			<option value="always">{$_('layout.player.youtubeJsAlways')}</option>
 			<option value="disabled">{$_('disabled')}</option>
 		</select>
-		<label for="ytfallback">{$_('layout.player.localVideoFallback')}</label>
+		<label tabindex="-1" for="ytfallback">{$_('layout.player.localVideoFallback')}</label>
 		<i>arrow_drop_down</i>
 	</div>
 {/if}
@@ -130,7 +138,7 @@
 		<div class="max">
 			<div>{$_('layout.player.autoPlay')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerAutoPlayStore}
@@ -146,7 +154,7 @@
 		<div class="max">
 			<div>{$_('layout.player.alwaysLoopVideo')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerAlwaysLoopStore}
@@ -163,7 +171,7 @@
 			<div class="max">
 				<div>{$_('layout.player.lockOrientation')}</div>
 			</div>
-			<label class="switch">
+			<label class="switch" tabindex="0" role="switch">
 				<input
 					type="checkbox"
 					bind:checked={$playerAndroidLockOrientation}
@@ -181,7 +189,7 @@
 			<div class="max">
 				<div>{$_('layout.player.proxyVideos')}</div>
 			</div>
-			<label class="switch">
+			<label class="switch" tabindex="0" role="switch">
 				<input
 					type="checkbox"
 					bind:checked={$playerProxyVideosStore}
@@ -198,7 +206,7 @@
 		<div class="max">
 			<div>{$_('layout.player.savePlaybackPosition')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerSavePlaybackPositionStore}
@@ -214,7 +222,7 @@
 		<div class="max">
 			<div>{$_('layout.player.theatreModeByDefault')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerTheatreModeByDefaultStore}
@@ -230,7 +238,7 @@
 		<div class="max">
 			<div>{$_('layout.player.autoPlayNextByDefault')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerAutoplayNextByDefaultStore}
@@ -246,7 +254,7 @@
 		<div class="max">
 			<div>{$_('layout.player.playerStatistics')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerStatisticsByDefault}

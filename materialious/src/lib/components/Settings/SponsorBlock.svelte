@@ -43,8 +43,13 @@
 >
 	<nav>
 		<div class="field label border max">
-			<input bind:value={sponsorBlockInstance} name="sponsorblock-instance" type="text" />
-			<label for="sponsorblock-instance">{$_('layout.instanceUrl')}</label>
+			<input
+				tabindex="0"
+				bind:value={sponsorBlockInstance}
+				name="sponsorblock-instance"
+				type="text"
+			/>
+			<label tabindex="-1" for="sponsorblock-instance">{$_('layout.instanceUrl')}</label>
 		</div>
 		<button class="square round">
 			<i>done</i>
@@ -56,7 +61,7 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch">
+	<label class="switch" tabindex="0" role="switch">
 		<input
 			bind:checked={$sponsorBlockStore}
 			onclick={() => sponsorBlockStore.set(!$sponsorBlockStore)}
@@ -70,7 +75,7 @@
 	<div class="max">
 		<p>{$_('layout.sponsors.disableToast')}</p>
 	</div>
-	<label class="switch">
+	<label class="switch" tabindex="0" role="switch">
 		<input
 			bind:checked={$sponsorBlockDisplayToastStore}
 			onclick={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
@@ -104,7 +109,7 @@
 			<div class="max">
 				<p>{sponsor.name}</p>
 			</div>
-			<label class="switch">
+			<label class="switch" tabindex="0" role="switch">
 				<input
 					type="checkbox"
 					checked={sponsorCategoriesList.includes(sponsor.category)}

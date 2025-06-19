@@ -120,8 +120,8 @@
 	<form onsubmit={setInstance}>
 		<nav>
 			<div class="field label border max" class:invalid={invalidInstance}>
-				<input bind:value={invidiousInstance} name="invidious-instance" type="text" />
-				<label for="invidious-instance">{$_('layout.instanceUrl')}</label>
+				<input tabindex="0" bind:value={invidiousInstance} name="invidious-instance" type="text" />
+				<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
 				{#if invalidInstance}
 					<span class="error">{$_('invalidInstance')}</span>
 				{/if}
@@ -177,7 +177,7 @@
 			<div class="max">
 				<div>{$_('layout.theme.AmoledTheme')}</div>
 			</div>
-			<label class="switch">
+			<label class="switch" tabindex="0" role="switch">
 				<input
 					type="checkbox"
 					bind:checked={$interfaceAmoledTheme}
@@ -194,7 +194,7 @@
 		<div class="max">
 			<div>{$_('layout.searchHistory')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceSearchHistoryEnabled}
@@ -213,7 +213,7 @@
 		<div class="max">
 			<div>{$_('layout.lowBandwidthMode')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceLowBandwidthMode}
@@ -229,7 +229,7 @@
 		<div class="max">
 			<div>{$_('layout.searchSuggestions')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceSearchSuggestionsStore}
@@ -245,7 +245,7 @@
 		<div class="max">
 			<div>{$_('layout.expandDescription')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandDesc}
@@ -261,7 +261,7 @@
 		<div class="max">
 			<div>{$_('layout.expandChapters')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandChapters}
@@ -277,7 +277,7 @@
 		<div class="max">
 			<div>{$_('layout.expandComments')}</div>
 		</div>
-		<label class="switch">
+		<label class="switch" tabindex="0" role="switch">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandComments}
@@ -289,19 +289,29 @@
 </div>
 
 <div class="field label suffix border">
-	<select name="region" bind:value={region} onchange={() => interfaceRegionStore.set(region)}>
+	<select
+		tabindex="0"
+		name="region"
+		bind:value={region}
+		onchange={() => interfaceRegionStore.set(region)}
+	>
 		{#each iso31661 as region}
 			<option selected={$interfaceRegionStore === region.alpha2} value={region.alpha2}
 				>{region.alpha2} - {region.name}</option
 			>
 		{/each}
 	</select>
-	<label for="region">{$_('region')}</label>
+	<label tabindex="-1" for="region">{$_('region')}</label>
 	<i>arrow_drop_down</i>
 </div>
 
 <div class="field label suffix border">
-	<select name="case" bind:value={forceCase} onchange={() => interfaceForceCase.set(forceCase)}>
+	<select
+		tabindex="0"
+		name="case"
+		bind:value={forceCase}
+		onchange={() => interfaceForceCase.set(forceCase)}
+	>
 		<option selected={$interfaceForceCase === null} value={null}>Default</option>
 		{#each titleCases as caseType}
 			<option selected={$interfaceForceCase === caseType} value={caseType}
@@ -309,13 +319,14 @@
 			>
 		{/each}
 	</select>
-	<label for="case">{$_('letterCase')}</label>
+	<label tabindex="-1" for="case">{$_('letterCase')}</label>
 	<i>arrow_drop_down</i>
 </div>
 
 <div class="field label suffix border">
 	<select
 		name="defaultPage"
+		tabindex="0"
 		bind:value={defaultPage}
 		onchange={() => interfaceDefaultPage.set(defaultPage)}
 	>
@@ -326,7 +337,7 @@
 			{/if}
 		{/each}
 	</select>
-	<label for="defaultPage">{$_('defaultPage')}</label>
+	<label tabindex="-1" for="defaultPage">{$_('defaultPage')}</label>
 	<i>arrow_drop_down</i>
 </div>
 

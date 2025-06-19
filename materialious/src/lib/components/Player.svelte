@@ -70,6 +70,7 @@
 	let watchProgressTimeout: NodeJS.Timeout;
 	let playerElementResizeObserver: ResizeObserver | undefined;
 	let showVideoRetry = $state(false);
+	let isAndroidTv = $state(false);
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
@@ -191,7 +192,7 @@
 		if (
 			Capacitor.getPlatform() === 'android' &&
 			data.video.adaptiveFormats.length > 0 &&
-			!(await androidTv.isAndroidTv()).value
+			!isAndroidTv
 		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')
@@ -404,6 +405,8 @@
 			return;
 		}
 
+		isAndroidTv = (await androidTv.isAndroidTv()).value;
+
 		HttpFetchPlugin.cacheManager.clearCache();
 
 		player = new shaka.Player();
@@ -575,9 +578,7 @@
 
 		setChapterMarkers();
 
-		if ((await androidTv.isAndroidTv()).value) {
-			shakaUi.getControls()?.toggleFullScreen();
-
+		if (isAndroidTv) {
 			Mousetrap.bind('enter', () => {
 				if (playerElement?.paused) {
 					playerElement?.play();
@@ -666,6 +667,8 @@
 			}
 		}
 
+		Mousetrap.unbind(['enter', 'left', 'right']);
+
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);
 		}
@@ -699,6 +702,8 @@
 <div
 	id="shaka-container"
 	class="player-theme"
+	class:contain-video={!isAndroidTv}
+	class:tv-contain-video={isAndroidTv}
 	data-shaka-player-container
 	class:hide={showVideoRetry}
 >
@@ -709,7 +714,7 @@
 		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
 	></video>
 	{#if isEmbed}
-		<div class="chip blur" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
+		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
 			{data.video.title}
 		</div>
 	{/if}
@@ -742,9 +747,21 @@
 {/if}
 
 <style>
-	.player-theme {
+	.contain-video {
 		max-height: 80vh;
 		max-width: calc(80vh * 16 / 9);
+		overflow: hidden;
+		position: relative;
+		flex: 1;
+		background-color: black;
+		aspect-ratio: 16 / 9;
+	}
+
+	.tv-contain-video {
+		height: 100vh;
+		width: calc(100vh * 16 / 9);
+		max-width: 100vw;
+		max-height: 100vh;
 		overflow: hidden;
 		position: relative;
 		flex: 1;

@@ -4,17 +4,15 @@
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
-	import { playlistSettingsStore } from '$lib/store';
+	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import androidTv from '$lib/android/plugins/androidTv.js';
 
 	let { data } = $props();
 
 	let videos: PlaylistPageVideo[] | undefined = $state();
-	let isAndroidTv: boolean = $state(false);
 
 	if (data.playlist.videos.length > 0) {
 		videos = data.playlist.videos
@@ -26,7 +24,6 @@
 			});
 
 		onMount(async () => {
-			isAndroidTv = (await androidTv.isAndroidTv()).value;
 			for (let page = 1; page++; ) {
 				const newVideos = (await getPlaylist(data.playlist.playlistId, page)).videos;
 				if (newVideos.length === 0) {
@@ -51,7 +48,7 @@
 	{#if videos}
 		<nav>
 			<a
-				href={!isAndroidTv
+				href={!$isAndroidTvStore
 					? `/watch/${videos[0].videoId}?playlist=${data.playlist.playlistId}`
 					: `/embed/${videos[0].videoId}?playlist=${data.playlist.playlistId}`}
 				class="button circle extra no-margin"
@@ -63,7 +60,7 @@
 			</a>
 
 			<a
-				href={!isAndroidTv
+				href={!$isAndroidTvStore
 					? `/watch/${unsafeRandomItem(videos).videoId}?playlist=${data.playlist.playlistId}`
 					: `/embed/${unsafeRandomItem(videos).videoId}?playlist=${data.playlist.playlistId}`}
 				onclick={() =>

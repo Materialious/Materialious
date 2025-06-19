@@ -130,3 +130,5 @@ export const searchCacheStore: Writable<{
 	[searchTypeAndQuery: string]: (Channel | Video | Playlist | HashTag)[];
 }> = writable({});
 export const feedLastItemId: Writable<string | undefined> = writable(undefined);
+
+export const isAndroidTvStore: Writable<boolean> = writable(false);

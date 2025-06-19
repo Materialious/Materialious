@@ -8,6 +8,7 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
+	import { isAndroidTvStore } from '$lib/store';
 
 	let activeTab:
 		| 'interface'
@@ -42,7 +43,7 @@
 	</nav>
 
 	<div>
-		<nav class="tabbed small" tabindex="0" role="region">
+		<nav tabindex="0" class="tabbed small" style="outline: none" role="region">
 			<a class:active={activeTab === 'interface'} onclick={() => (activeTab = 'interface')}>
 				<i>grid_view</i>
 				<span>{$_('layout.interface')}</span>
@@ -51,7 +52,7 @@
 				<i>smart_display</i>
 				<span>{$_('layout.player.title')}</span>
 			</a>
-			<a class:active={activeTab === 'ryd'} onclick={() => (activeTab = 'ryd')}>
+			<a tabindex="0" class:active={activeTab === 'ryd'} onclick={() => (activeTab = 'ryd')}>
 				<i>thumb_down</i>
 				<span>RYD</span>
 			</a>
@@ -67,22 +68,28 @@
 				<i>keyboard_double_arrow_down</i>
 				<span>{$_('layout.deArrow.title')}</span>
 			</a>
-			<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
-				<i>save</i>
-				<span>{$_('layout.dataPreferences.dataPreferences')}</span>
-			</a>
-			<a href="https://github.com/sponsors/WardPearce" target="_blank" referrerpolicy="no-referrer">
-				<i>favorite</i>
-				<span>{$_('donate')}</span>
-			</a>
-			<a
-				href="https://github.com/Materialious/Materialious"
-				target="_blank"
-				referrerpolicy="no-referrer"
-			>
-				<i>code</i>
-				<span>GitHub</span>
-			</a>
+			{#if !$isAndroidTvStore}
+				<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
+					<i>save</i>
+					<span>{$_('layout.dataPreferences.dataPreferences')}</span>
+				</a>
+				<a
+					href="https://github.com/sponsors/WardPearce"
+					target="_blank"
+					referrerpolicy="no-referrer"
+				>
+					<i>favorite</i>
+					<span>{$_('donate')}</span>
+				</a>
+				<a
+					href="https://github.com/Materialious/Materialious"
+					target="_blank"
+					referrerpolicy="no-referrer"
+				>
+					<i>code</i>
+					<span>GitHub</span>
+				</a>
+			{/if}
 		</nav>
 		<div class="page padding" class:active={activeTab === 'interface'}>
 			<Interface />

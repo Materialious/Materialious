@@ -13,6 +13,7 @@
 		authStore,
 		deArrowEnabledStore,
 		interfaceLowBandwidthMode,
+		isAndroidTvStore,
 		playerSavePlaybackPositionStore,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore,
@@ -20,7 +21,6 @@
 		synciousStore
 	} from '../store';
 	import { goto } from '$app/navigation';
-	import androidTv from '$lib/android/plugins/androidTv';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -137,6 +137,10 @@
 	}
 
 	function calcThumbnailPlaceholderHeight() {
+		if ($isAndroidTvStore) {
+			placeholderHeight = innerWidth / 3;
+			return;
+		}
 		if (!sideways) {
 			if (innerWidth < 1000) {
 				if (innerWidth < 600) {
@@ -158,7 +162,7 @@
 	tabindex="0"
 	role="button"
 	onclick={async () => {
-		if ((await androidTv.isAndroidTv()).value) {
+		if ($isAndroidTvStore) {
 			goto(`${location.origin}/embed/${video.videoId}`);
 		}
 	}}

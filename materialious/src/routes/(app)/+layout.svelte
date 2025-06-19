@@ -174,10 +174,10 @@
 		isAndroidTv = (await androidTv.isAndroidTv()).value;
 
 		if (isAndroidTv) {
-			const mainContent = document.getElementById('main-content') as HTMLElement;
+			const topContent = document.getElementById('top-content') as HTMLElement;
 			Mousetrap.bind('down', () => {
-				if (!mainContent.contains(document.activeElement)) {
-					mainContent.focus();
+				if (topContent.contains(document.activeElement)) {
+					document.getElementById('main-content')?.focus();
 					return false;
 				}
 			});
@@ -250,7 +250,7 @@
 	</nav>
 {/if}
 
-<nav class="top">
+<nav class="top" id="top-content">
 	{#if !mobileSearchShow}
 		<button
 			onclick={() => (mobileSearchShow = !mobileSearchShow)}

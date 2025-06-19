@@ -281,8 +281,8 @@
 	position: absolute;
 	background: linear-gradient(
 		to right,
-		rgba(255, 255, 255, 0.3) 0%,
-		rgba(255, 255, 255, 0.3) calc(100% - 5px),
+		var(--primary-container) 0%,
+		var(--primary-container) calc(100% - 10px),
 		transparent 100%
 	);
 }

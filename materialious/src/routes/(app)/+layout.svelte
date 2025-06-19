@@ -20,7 +20,6 @@
 		instanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
-		showWarningStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -35,10 +34,13 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	let { children } = $props();
 
 	let mobileSearchShow = $state(false);
+
+	let isAndroidTv = $state(false);
 
 	let isLoggedIn = $state(false);
 	authStore.subscribe((value) => {
@@ -94,19 +96,65 @@
 	});
 
 	async function login() {
-		const path = new URL(`${get(instanceStore)}/authorize_token`);
-		const searchParams = new URLSearchParams({
-			scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
-		});
-		if (Capacitor.getPlatform() === 'android') {
-			searchParams.set('callback_url', 'materialious-auth://');
-			path.search = searchParams.toString();
-			await Browser.open({ url: path.toString() });
+		if (!isAndroidTv) {
+			const path = new URL(`${get(instanceStore)}/authorize_token`);
+			const searchParams = new URLSearchParams({
+				scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
+			});
+			if (Capacitor.getPlatform() === 'android') {
+				searchParams.set('callback_url', 'materialious-auth://');
+				path.search = searchParams.toString();
+				await Browser.open({ url: path.toString() });
+			} else {
+				searchParams.set('callback_url', `${location.origin}/auth`);
+				path.search = searchParams.toString();
+				document.location.href = path.toString();
+			}
 		} else {
-			searchParams.set('callback_url', `${location.origin}/auth`);
-			path.search = searchParams.toString();
-			document.location.href = path.toString();
+			await ui('#tv-login');
+			document.getElementById('username')?.focus();
 		}
+	}
+
+	let loginError: boolean = $state(false);
+	let rawUsername: string = $state('');
+	let rawPassword: string = $state('');
+	async function usernamePasswordLogin(event: Event) {
+		event.preventDefault();
+		loginError = false;
+
+		const body = new FormData();
+		body.append('email', rawUsername);
+		body.append('password', rawPassword);
+		body.append('action', 'signin');
+
+		const response = await fetch(`${$instanceStore}/login?type=invidious`, {
+			method: 'POST',
+			body: body,
+			headers: {
+				__redirect: 'manual',
+				__custom_return: 'json-headers'
+			}
+		});
+
+		if (response.ok) {
+			const headers = await response.json();
+			if ('set-cookie' in headers) {
+				const sid = (headers['set-cookie'][0].split(';') as string[]).find((cookie) =>
+					cookie.startsWith('SID=')
+				);
+
+				if (sid) {
+					console.log(sid);
+					authStore.set({ username: rawUsername, token: sid });
+					await ui('#tv-login');
+					goto('/', { replaceState: true });
+					return;
+				}
+			}
+		}
+
+		loginError = true;
 	}
 
 	function logout() {
@@ -121,6 +169,8 @@
 
 	onMount(async () => {
 		ui();
+
+		isAndroidTv = await androidTv.isAndroidTv();
 
 		document.addEventListener('click', linkClickOverwrite);
 
@@ -172,20 +222,22 @@
 	{@html webManifestLink}
 </svelte:head>
 
-<nav class="left m l small">
-	<header></header>
-	{#each getPages() as navPage}
-		{#if !navPage.requiresAuth || isLoggedIn}
-			<a
-				href={navPage.href}
-				class:active={$page.url.href.endsWith(navPage.href)}
-				data-sveltekit-preload-data="off"
-				><i>{navPage.icon}</i>
-				<div>{navPage.name}</div>
-			</a>
-		{/if}
-	{/each}
-</nav>
+{#if !isAndroidTv}
+	<nav class="left m l small">
+		<header></header>
+		{#each getPages() as navPage}
+			{#if !navPage.requiresAuth || isLoggedIn}
+				<a
+					href={navPage.href}
+					class:active={$page.url.href.endsWith(navPage.href)}
+					data-sveltekit-preload-data="off"
+					><i>{navPage.icon}</i>
+					<div>{navPage.name}</div>
+				</a>
+			{/if}
+		{/each}
+	</nav>
+{/if}
 
 <nav class="top">
 	{#if !mobileSearchShow}
@@ -299,28 +351,23 @@
 	{/if}
 </dialog>
 
-<main class="responsive max root">
-	{#if Capacitor.getPlatform() === 'web' && $showWarningStore}
-		<dialog class="active small" style="height: fit-content;">
-			<h5>Warning</h5>
-			<div>
-				<p>
-					{@html $_('invidiousBlockWarning', {
-						values: {
-							android:
-								'<a href="https://github.com/Materialious/Materialious?tab=readme-ov-file#android" target="_blank" class="link" rel="noopener noreferrer">Android</a>',
-							desktop:
-								'<a href="https://github.com/Materialious/Materialious?tab=readme-ov-file#desktop-windowsmacoslinux" target="_blank" class="link" rel="noopener noreferrer">Desktop</a>'
-						}
-					})}
-				</p>
-			</div>
-			<nav class="right-align no-space">
-				<button class="transparent link" onclick={() => showWarningStore.set(false)}
-					>Don't show again</button
-				>
-			</nav>
-		</dialog>
+<main class="responsive max root" tabindex="0" role="region" class:root-not-tv={!isAndroidTv}>
+	{#if isAndroidTv}
+		<div class="tabs">
+			{#each getPages() as navPage}
+				{#if !navPage.requiresAuth || isLoggedIn}
+					<a
+						href={navPage.href}
+						class:active={$page.url.href.endsWith(navPage.href)}
+						class="active"
+						data-sveltekit-preload-data="off"
+					>
+						<i>{navPage.icon}</i>
+						<span>{navPage.name}</span>
+					</a>
+				{/if}
+			{/each}
+		</div>
 	{/if}
 	{#if $navigating}
 		<PageLoading />
@@ -330,6 +377,33 @@
 
 	<SyncParty />
 </main>
+
+<dialog class="modal" id="tv-login">
+	<h5>{$_('loginRequired')}</h5>
+	<div>{$_('invidiousLogin')}</div>
+
+	<form onsubmit={usernamePasswordLogin}>
+		<div class="field label border" class:invalid={loginError}>
+			<input id="username" bind:value={rawUsername} name="username" type="text" />
+			<label for="username">Username</label>
+		</div>
+		<div class="field label border" class:invalid={loginError}>
+			<input bind:value={rawPassword} name="password" type="password" />
+			<label for="password">Password</label>
+		</div>
+
+		<nav class="right-align no-space">
+			<button
+				class="transparent link"
+				type="button"
+				onclick={async () => {
+					await ui('#tv-login');
+				}}>{$_('cancel')}</button
+			>
+			<button class="transparent link" type="submit">{$_('login')}</button>
+		</nav>
+	</form>
+</dialog>
 
 <style>
 	nav.left a {

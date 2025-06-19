@@ -59,8 +59,13 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 	return response;
 }
 
-export function buildAuthHeaders(): { headers: { Authorization: string } } {
-	return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
+export function buildAuthHeaders(): { headers: Record<string, string> } {
+	const authToken = get(authStore)?.token ?? '';
+	if (authToken.startsWith('SID=')) {
+		return { headers: { __sid_auth: authToken } };
+	} else {
+		return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
+	}
 }
 
 export async function getTrending(fetchOptions?: RequestInit): Promise<Video[]> {

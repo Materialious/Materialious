@@ -1,5 +1,6 @@
 import { goto } from '$app/navigation';
 import { Capacitor } from '@capacitor/core';
+import { NodeJS } from 'capacitor-nodejs';
 
 const originalFetch = window.fetch;
 const corsProxyUrl: string = 'http://localhost:3000/';
@@ -52,5 +53,7 @@ if (Capacitor.getPlatform() === 'android') {
 		return originalXhrOpen.apply(this, args);
 	};
 
-	setTimeout(() => goto('/', { replaceState: true }), 100);
+	NodeJS.whenReady().then(() => {
+		goto('/', { replaceState: true });
+	});
 }

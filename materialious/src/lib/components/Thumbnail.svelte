@@ -19,6 +19,8 @@
 		synciousInstanceStore,
 		synciousStore
 	} from '../store';
+	import { goto } from '$app/navigation';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -151,9 +153,19 @@
 	}
 </script>
 
-<div class:sideways-root={sideways}>
-	<div onfocus={() => {}} id="thumbnail-container" role="region">
+<div
+	class:sideways-root={sideways}
+	tabindex="0"
+	role="button"
+	onclick={async () => {
+		if (await androidTv.isAndroidTv()) {
+			goto(watchUrl.toString());
+		}
+	}}
+>
+	<div id="thumbnail-container">
 		<a
+			tabindex="-1"
 			class="wave thumbnail"
 			href={watchUrl.toString()}
 			data-sveltekit-preload-data="off"
@@ -199,6 +211,7 @@
 	<div class="thumbnail-details video-title">
 		<div class="video-title">
 			<a
+				tabindex="-1"
 				style="padding-left: 1px;"
 				class="video-title"
 				data-sveltekit-preload-data="off"
@@ -208,7 +221,9 @@
 			</a>
 
 			<div>
-				<a class:author={!sideways} href={`/channel/${video.authorId}`}>{video.author}</a>
+				<a tabindex="-1" class:author={!sideways} href={`/channel/${video.authorId}`}
+					>{video.author}</a
+				>
 				{#if !('publishedText' in video) && 'viewCountText' in video}
 					<span style="margin-top: 1em;">
 						• {video.viewCountText}

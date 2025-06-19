@@ -26,7 +26,10 @@ const CORS_HEADERS = [
 	'X-Goog-FieldMask',
 	'Range',
 	'Referer',
-	'Cookie'
+	'Cookie',
+	'__redirect',
+	'__custom_return',
+	'__sid_auth'
 ].join(', ');
 
 const CORS_ORIGIN = 'https://www.youtube.com';
@@ -47,6 +50,11 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 		return clientRes.end('Too many redirects');
 	}
 
+	const redirectAllowed = clientReq.headers.__redirect !== 'manual';
+	delete clientReq.headers.__redirect;
+	const returnHeadersAsJson = clientReq.headers.__custom_return === 'json-headers';
+	delete clientReq.headers.__custom_return;
+
 	const isHttps = parsedUrl.protocol === 'https:';
 	const httpClient = isHttps ? https : http;
 
@@ -62,6 +70,11 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 		rejectUnauthorized: rejectUnauthorized
 	};
 
+	if (clientReq.headers.__sid_auth) {
+		proxyOptions.headers.cookie = clientReq.headers.__sid_auth;
+		delete proxyOptions.headers.__sid_auth;
+	}
+
 	// Remove headers that may cause issues or be auto-managed
 	for (const key of [
 		'referer',
@@ -75,11 +88,35 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 	}
 
 	const proxyReq = httpClient.request(parsedUrl, proxyOptions, (proxyRes) => {
-		// Handle redirects
-		if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {
+		// Handle redirects normally if redirectAllowed
+		if (
+			proxyRes.statusCode >= 300 &&
+			proxyRes.statusCode < 400 &&
+			proxyRes.headers.location &&
+			redirectAllowed
+		) {
 			proxyRes.resume(); // discard response data
 			const newUrl = new URL(proxyRes.headers.location, parsedUrl);
 			return proxyRequest(clientReq, clientRes, newUrl, bodyChunks, redirectCount + 1);
+		}
+
+		if (returnHeadersAsJson) {
+			const headersDict = {};
+			for (const [key, value] of Object.entries(proxyRes.headers)) {
+				headersDict[key] = value;
+			}
+
+			const body = JSON.stringify(headersDict);
+
+			clientRes.writeHead(200, {
+				'Content-Type': 'application/json',
+				'Access-Control-Allow-Origin': CORS_ORIGIN,
+				'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+				'Access-Control-Allow-Headers': CORS_HEADERS,
+				'Access-Control-Allow-Credentials': 'true',
+				'Content-Length': Buffer.byteLength(body)
+			});
+			return clientRes.end(body);
 		}
 
 		clientRes.writeHead(proxyRes.statusCode, {

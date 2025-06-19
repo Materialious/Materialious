@@ -9,6 +9,7 @@
 		interfaceSearchSuggestionsStore,
 		searchHistoryStore
 	} from '../store';
+	import androidTv from '$lib/android/plugins/androidTv';
 
 	const dispatch = createEventDispatcher();
 
@@ -20,6 +21,8 @@
 	let selectedSuggestionIndex: number = $state(-1);
 
 	let showSearchBox = $state(false);
+
+	let isAndroidTv = $state(false);
 
 	let debounceTimer: NodeJS.Timeout;
 	function debouncedSearch(event: any) {
@@ -88,7 +91,8 @@
 		showSearchBox = false;
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		isAndroidTv = await androidTv.isAndroidTv();
 		Mousetrap.bind(['ctrl+k', 'command+k'], () => {
 			document.getElementById('search-box')?.focus();
 			showSearchBox = !showSearchBox;
@@ -105,10 +109,15 @@
 		await tick();
 		document.getElementById('search')?.focus();
 	}}
+	tabindex="0"
 	role="presentation"
 >
-	<div class="field prefix fill no-margin search rounded">
-		<i class="front">search</i>
+	<div
+		class="field prefix fill no-margin rounded"
+		class:search={!isAndroidTv}
+		class:search-tv={isAndroidTv}
+	>
+		<i class="front" tabindex="-1">search</i>
 		<input
 			id="search-box"
 			placeholder={$_('searchPlaceholder')}
@@ -175,6 +184,11 @@
 	.search {
 		width: 500px;
 	}
+
+	.search-tv {
+		width: 600px;
+	}
+
 	.selected {
 		background-color: var(--surface-variant);
 	}

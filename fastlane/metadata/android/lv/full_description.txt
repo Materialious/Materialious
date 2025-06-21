@@ -3,24 +3,23 @@ Klients ļauj pārlūkot un skatīties YouTube video, pārvaldīt atskaņošanas
 
 <b>Funkcionalitāte:</b>
 <ul>
-<li><a href='https://github.com/Materialious/api-extended'>Invidious API paplašinātā integrācija!</a></li>
-<li>Sinhronizē skatīšanās progresu starp Invidious sesijām</li>
-<li>Piedalīties sinhronizētās skatīšanās ballītēs!</li>
-<li>Priekšskatīt video, novietojot kursoru.</li>
-<li>Iebūvēta sponsoru un reklāmdevēju izlaišana (Sponsorblock).</li>
-<li>Iebūvēts nepatīk balsojums (Return YouTube dislikes).</li>
-<li>Iebūvēts DeArrow (ar iespēju ārkārtas gadījumos pārslēgties uz vietējo apstrādi).</li>
-<li>Video atskaņošanas pozīcijas saglabāšana un skatīšanās atsākšana no saglabātās pozīcijas.</li>
-<li>Nav kaitinošu reklāmu.</li>
-<li>Neizseko jūsu aktivitātes.</li>
-<li>Iespēja iestatīt gaišo vai tumšo motīvu.</li>
-<li>Pielāgoti krāsu motīvi.</li>
-<li>Strādā ar Invidious abonementiem, skatīšanās vēsturi un pārējām funkcijām.</li>
-<li>Iespēja skatīt tiešraides.</li>
-<li>Ir Dash atbalsts.</li>
-<li>Nodaļas.</li>
-<li>Kausīties tikai audio.</li>
-<li>Atskaņošanas saraksti.</li>
-<li>Ir PWA atbalsts.</li>
-<li>YT ceļa novirzīšanas (tātad jūsu novirzīšanas spraudņiem joprojām vajadzētu darboties!)</li>
+  <li>Invidious pavadoņu (biedru) atbalsts</li>
+  <li>Invidious API paplašinātā integrācija</li>
+  <li>YouTube.js rezerves risinājums ārkārtas gadījumos, kad Invidious nevar ielādēt video datorā vai Android ierīcē</li>
+  <li>Iespēja atslēgt TLS sertifikātu pārbaudi uz personīgi izvietotajiem (pašmitinātajiem) serveriem</li>
+  <li>Sinhronizē skatīšanās progresu starp Invidious sesijām</li>
+  <li>Piedalīties sinhronizētās skatīšanās ballītēs</li>
+  <li>Iebūvēta sponsoru un reklāmdevēju izlaišana (Sponsorblock)</li>
+  <li>Iebūvēts nepatīk balsojums (Return YouTube dislikes)</li>
+  <li>Iebūvēts DeArrow (ar iespēju ārkārtas gadījumos pārslēgties uz vietējo apstrādi un ieguvi)</li>
+  <li>Nav kaitinošu reklāmu</li>
+  <li>Neizseko jūsu aktivitātes</li>
+  <li>Iespēja iestatīt gaišo vai tumšo motīvu</li>
+  <li>Pielāgoti krāsu motīvi</li>
+  <li>Strādā ar Invidious abonementiem, skatīšanās vēsturi un pārējām funkcijām</li>
+  <li>Iespēja skatīt tiešraides</li>
+  <li>Ir DASH atbalsts</li>
+  <li>Nodaļas</li>
+  <li>Iespēja klausīties tikai audio</li>
+  <li>Atskaņošanas saraksti</li>
 </ul>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getPlaylist } from '$lib/api/index';
 	import type { PlaylistPageVideo } from '$lib/api/model';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { unsafeRandomItem } from '$lib/misc';

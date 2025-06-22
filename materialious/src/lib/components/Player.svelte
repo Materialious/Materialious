@@ -25,6 +25,7 @@
 		authStore,
 		darkModeStore,
 		instanceStore,
+		isAndroidTvStore,
 		playerAndroidLockOrientation,
 		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
@@ -50,7 +51,6 @@
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { playbackRates } from '$lib/const';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
-	import androidTv from '$lib/android/plugins/androidTv';
 	import { loadEntirePlaylist } from '$lib/playlist';
 	import { goto } from '$app/navigation';
 	import { unsafeRandomItem } from '$lib/misc';
@@ -72,12 +72,10 @@
 	}: Props = $props();
 
 	let snackBarAlert = $state('');
-	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
 	let playerElementResizeObserver: ResizeObserver | undefined;
 	let showVideoRetry = $state(false);
-	let isAndroidTv = $state(false);
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
@@ -200,7 +198,7 @@
 		if (
 			Capacitor.getPlatform() === 'android' &&
 			data.video.adaptiveFormats.length > 0 &&
-			!isAndroidTv
+			!$isAndroidTvStore
 		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')
@@ -413,8 +411,6 @@
 			return;
 		}
 
-		isAndroidTv = (await androidTv.isAndroidTv()).value;
-
 		HttpFetchPlugin.cacheManager.clearCache();
 
 		player = new shaka.Player();
@@ -586,7 +582,7 @@
 
 		setChapterMarkers();
 
-		if (isAndroidTv) {
+		if ($isAndroidTvStore) {
 			Mousetrap.bind('enter', () => {
 				if (playerElement?.paused) {
 					playerElement?.play();
@@ -660,9 +656,6 @@
 	});
 
 	async function loadPlayerPos() {
-		if (playerPosSet) return;
-		playerPosSet = true;
-
 		if (loadTimeFromUrl($page)) return;
 
 		let toSetTime = 0;
@@ -686,11 +679,11 @@
 	}
 
 	function savePlayerPos() {
-		if (data.video.hlsUrl) return;
+		if (data.video.liveNow) return;
 
 		const synciousEnabled = $synciousStore && $synciousInstanceStore && $authStore;
 
-		if ($playerSavePlaybackPositionStore && player && playerElement && playerElement.currentTime) {
+		if ($playerSavePlaybackPositionStore && playerElement) {
 			if (
 				playerElement.currentTime < playerElement.duration - 10 &&
 				playerElement.currentTime > 10
@@ -715,7 +708,7 @@
 	}
 
 	onDestroy(async () => {
-		if (Capacitor.getPlatform() === 'android') {
+		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
 				await StatusBar.show();
@@ -725,7 +718,7 @@
 			}
 		}
 
-		Mousetrap.unbind(['enter', 'left', 'right']);
+		Mousetrap.unbind(['enter', 'left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);
@@ -735,7 +728,6 @@
 			savePlayerPos();
 		} catch (error) {}
 
-		playerPosSet = false;
 		HttpFetchPlugin.cacheManager.clearCache();
 
 		if (playerElementResizeObserver) {
@@ -760,8 +752,8 @@
 <div
 	id="shaka-container"
 	class="player-theme"
-	class:contain-video={!isAndroidTv}
-	class:tv-contain-video={isAndroidTv}
+	class:contain-video={!$isAndroidTvStore}
+	class:tv-contain-video={$isAndroidTvStore}
 	data-shaka-player-container
 	class:hide={showVideoRetry}
 >

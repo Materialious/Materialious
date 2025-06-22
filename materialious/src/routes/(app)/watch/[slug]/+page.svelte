@@ -1,15 +1,13 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import {
 		addPlaylistVideo,
 		deleteUnsubscribe,
 		getComments,
 		getPersonalPlaylists,
-		getPlaylist,
 		postSubscribe,
 		removePlaylistVideo
 	} from '$lib/api/index';
-	import type { Comments, PlaylistPage, PlaylistPageVideo } from '$lib/api/model';
+	import type { Comments, PlaylistPage } from '$lib/api/model';
 	import Comment from '$lib/components/Comment.svelte';
 	import Player from '$lib/components/Player.svelte';
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
@@ -17,7 +15,7 @@
 	import Transcript from '$lib/components/Transcript.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { truncate, unsafeRandomItem } from '$lib/misc';
+	import { truncate } from '$lib/misc';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
 	import type { PlayerEvents } from '$lib/player.js';
 	import {
@@ -26,8 +24,8 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceLowBandwidthMode,
-		playerAutoplayNextByDefaultStore,
 		playerTheatreModeByDefaultStore,
+		playlistCacheStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore
@@ -38,6 +36,7 @@
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
+	import { loadEntirePlaylist } from '$lib/playlist.js';
 
 	let { data = $bindable() } = $props();
 
@@ -56,9 +55,6 @@
 	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
 
-	let playlistVideos: PlaylistPageVideo[] = $state([]);
-	let playlist: PlaylistPage | null = $state(null);
-
 	let loopPlaylist: boolean = $state(false);
 	let shufflePlaylist: boolean = $state(false);
 
@@ -71,8 +67,6 @@
 	let showTranscript = $state(false);
 
 	let playerCurrentTime: number = $state(0);
-
-	let currentChapterStartTime: number = $state(0);
 
 	function expandSummery(id: string) {
 		const element = document.getElementById(id);
@@ -135,7 +129,7 @@
 					event.playlistId !== data.playlistId
 				) {
 					data.playlistId = event.playlistId;
-					await loadPlaylist(event.playlistId);
+					await loadEntirePlaylist(event.playlistId);
 					goToCurrentPlaylistItem();
 				}
 			});
@@ -227,6 +221,10 @@
 	});
 
 	onMount(async () => {
+		if (data.playlistId) {
+			await goToCurrentPlaylistItem();
+		}
+
 		if ($interfaceAutoExpandDesc) {
 			expandSummery('description');
 		}
@@ -245,70 +243,8 @@
 			playerElement.addEventListener('timeupdate', () => {
 				if (!playerElement) return;
 				playerCurrentTime = playerElement.currentTime;
-
-				if (data.content.timestamps) {
-					for (const timestamp of data.content.timestamps) {
-						if (timestamp.time >= playerCurrentTime && timestamp.endTime <= playerCurrentTime) {
-							currentChapterStartTime = timestamp.time;
-							break;
-						}
-					}
-				}
-			});
-
-			playerElement.addEventListener('ended', async () => {
-				if (playlistVideos.length === 0) {
-					if ($playerAutoplayNextByDefaultStore) {
-						goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
-					}
-					return;
-				}
-
-				await goToCurrentPlaylistItem();
-
-				const playlistVideoIds = playlistVideos.map((value) => {
-					return value.videoId;
-				});
-
-				let goToVideo: PlaylistPageVideo | undefined;
-
-				if (shufflePlaylist) {
-					goToVideo = unsafeRandomItem(playlistVideos);
-				} else {
-					const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
-					const newIndex = currentVideoIndex + 1;
-					if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
-						goToVideo = playlistVideos[newIndex];
-					} else if (loopPlaylist) {
-						// Loop playlist on end
-						goToVideo = playlistVideos[0];
-					}
-				}
-
-				if (typeof goToVideo !== 'undefined') {
-					if ($syncPartyConnectionsStore) {
-						$syncPartyConnectionsStore.forEach((conn) => {
-							if (typeof goToVideo === 'undefined') return;
-
-							conn.send({
-								events: [
-									{ type: 'change-video', videoId: goToVideo.videoId },
-									{ type: 'playlist', playlistId: data.playlistId }
-								]
-							} as PlayerEvents);
-						});
-					}
-
-					goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
-				}
 			});
 		}
-
-		if (!data.playlistId) return;
-
-		await loadPlaylist(data.playlistId);
-
-		await goToCurrentPlaylistItem();
 	});
 
 	onDestroy(() => {
@@ -319,28 +255,6 @@
 			clearTimeout(pauseTimeout);
 		}
 	});
-
-	async function loadPlaylist(playlistId: string) {
-		for (let page = 1; page < Infinity; page++) {
-			const newPlaylist = await getPlaylist(playlistId, page);
-			if (page === 1) {
-				playlist = newPlaylist;
-			}
-			const newVideos = newPlaylist.videos;
-			if (newVideos.length === 0) {
-				break;
-			}
-			playlistVideos = [...playlistVideos, ...newVideos].sort(
-				(a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-					return a.index < b.index ? -1 : 1;
-				}
-			);
-
-			playlistVideos = playlistVideos.filter((playlistVideo) => {
-				return playlistVideo.lengthSeconds > 0;
-			});
-		}
-	}
 
 	async function goToCurrentPlaylistItem() {
 		await tick();
@@ -682,28 +596,30 @@
 			{#if showTranscript && playerElement}
 				<Transcript video={data.video} bind:playerElement />
 			{/if}
-			{#if playlist}
+			{#if data.playlistId && data.playlistId in $playlistCacheStore}
 				<article
-					style="height: 85vh; position: relative;"
+					style="height: 85vh; position: relative;scrollbar-width: none;"
 					id="playlist"
 					class="scroll no-padding surface-container-high"
 				>
 					<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
-						<h6>{playlist.title}</h6>
+						<h6>{$playlistCacheStore[data.playlistId].info.title}</h6>
 						<p>
-							{cleanNumber(playlist.viewCount)}
-							{$_('views')} • {playlist.videoCount}
+							{cleanNumber($playlistCacheStore[data.playlistId].info.viewCount)}
+							{$_('views')} • {$playlistCacheStore[data.playlistId].info.videoCount}
 							{$_('videos')}
 						</p>
-						<p><a href={`/channel/${playlist.authorId}`}>{playlist.author}</a></p>
+						<p>
+							<a href={`/channel/${$playlistCacheStore[data.playlistId].info.authorId}`}
+								>{$playlistCacheStore[data.playlistId].info.author}</a
+							>
+						</p>
 						<nav>
 							<button
 								onclick={() => {
-									if (!playlist) return;
-
 									loopPlaylist = !loopPlaylist;
 									playlistSettingsStore.set({
-										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
+										[data.playlistId as string]: { loop: loopPlaylist, shuffle: shufflePlaylist }
 									});
 								}}
 								class="circle"
@@ -716,11 +632,9 @@
 							</button>
 							<button
 								onclick={() => {
-									if (!playlist) return;
-
 									shufflePlaylist = !shufflePlaylist;
 									playlistSettingsStore.set({
-										[playlist.playlistId]: { loop: loopPlaylist, shuffle: shufflePlaylist }
+										[data.playlistId as string]: { loop: loopPlaylist, shuffle: shufflePlaylist }
 									});
 								}}
 								class="circle"
@@ -739,7 +653,7 @@
 
 					<div class="space"></div>
 
-					{#each playlistVideos as playlistVideo}
+					{#each $playlistCacheStore[data.playlistId].videos as playlistVideo}
 						<article
 							class="no-padding primary-border"
 							style="margin: .7em;"

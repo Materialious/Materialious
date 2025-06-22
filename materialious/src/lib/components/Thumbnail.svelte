@@ -152,7 +152,7 @@
 				placeholderHeight = innerWidth / 12;
 			}
 		} else {
-			placeholderHeight = 115;
+			placeholderHeight = 100;
 		}
 	}
 </script>

@@ -20,12 +20,13 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
-	import type { VideoPlay } from '../api/model';
+	import type { PlaylistPageVideo, VideoPlay } from '../api/model';
 	import {
 		authStore,
 		darkModeStore,
 		instanceStore,
 		playerAndroidLockOrientation,
+		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
@@ -34,12 +35,14 @@
 		playerSavePlaybackPositionStore,
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
+		playlistSettingsStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore,
+		syncPartyConnectionsStore,
 		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
@@ -48,6 +51,10 @@
 	import { playbackRates } from '$lib/const';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 	import androidTv from '$lib/android/plugins/androidTv';
+	import { loadEntirePlaylist } from '$lib/playlist';
+	import { goto } from '$app/navigation';
+	import { unsafeRandomItem } from '$lib/misc';
+	import type { PlayerEvents } from '$lib/player';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -78,6 +85,7 @@
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	async function updateSeekBarTheme() {
+		if (!shakaUi) return;
 		await tick();
 		shakaUi.configure({
 			seekBarColors: {
@@ -589,6 +597,56 @@
 			});
 		}
 
+		playerElement.addEventListener('ended', async () => {
+			if (!data.playlistId) {
+				if ($playerAutoplayNextByDefaultStore) {
+					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+				}
+
+				return;
+			}
+
+			const playlist = await loadEntirePlaylist(data.playlistId);
+			const playlistVideoIds = playlist.videos.map((value) => {
+				return value.videoId;
+			});
+
+			let goToVideo: PlaylistPageVideo | undefined;
+
+			const shufflePlaylist = $playlistSettingsStore[data.playlistId]?.shuffle ?? false;
+			const loopPlaylist = $playlistSettingsStore[data.playlistId]?.loop ?? false;
+
+			if (shufflePlaylist) {
+				goToVideo = unsafeRandomItem(playlist.videos);
+			} else {
+				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+				const newIndex = currentVideoIndex + 1;
+				if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
+					goToVideo = playlist.videos[newIndex];
+				} else if (loopPlaylist) {
+					// Loop playlist on end
+					goToVideo = playlist.videos[0];
+				}
+			}
+
+			if (typeof goToVideo !== 'undefined') {
+				if ($syncPartyConnectionsStore) {
+					$syncPartyConnectionsStore.forEach((conn) => {
+						if (typeof goToVideo === 'undefined') return;
+
+						conn.send({
+							events: [
+								{ type: 'change-video', videoId: goToVideo.videoId },
+								{ type: 'playlist', playlistId: data.playlistId }
+							]
+						} as PlayerEvents);
+					});
+				}
+
+				goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
+			}
+		});
+
 		try {
 			await loadVideo();
 		} catch (error: unknown) {
@@ -767,6 +825,11 @@
 		flex: 1;
 		background-color: black;
 		aspect-ratio: 16 / 9;
+	}
+
+	video[poster] {
+		height: 100%;
+		width: 100%;
 	}
 
 	video {

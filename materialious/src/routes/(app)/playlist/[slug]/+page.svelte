@@ -9,6 +9,7 @@
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
+	import { loadEntirePlaylist } from '$lib/playlist.js';
 
 	let { data } = $props();
 
@@ -24,20 +25,7 @@
 			});
 
 		onMount(async () => {
-			for (let page = 1; page++; ) {
-				const newVideos = (await getPlaylist(data.playlist.playlistId, page)).videos;
-				if (newVideos.length === 0) {
-					break;
-				}
-				videos = [...(videos as PlaylistPageVideo[]), ...newVideos].sort(
-					(a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-						return a.index < b.index ? -1 : 1;
-					}
-				);
-				videos = videos.filter((playlistVideo) => {
-					return playlistVideo.lengthSeconds > 0;
-				});
-			}
+			videos = (await loadEntirePlaylist(data.playlist.playlistId)).videos;
 		});
 	}
 </script>

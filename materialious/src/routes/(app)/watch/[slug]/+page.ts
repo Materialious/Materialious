@@ -6,6 +6,7 @@ import {
 	getVideo,
 	postHistory
 } from '$lib/api/index';
+import { loadEntirePlaylist } from '$lib/playlist';
 import {
 	authStore,
 	playerProxyVideosStore,
@@ -19,7 +20,7 @@ import { get } from 'svelte/store';
 export async function load({ params, url }) {
 	let video;
 	try {
-		video = await getVideo(params.slug, get(playerProxyVideosStore), { priority: "high" });
+		video = await getVideo(params.slug, get(playerProxyVideosStore), { priority: 'high' });
 	} catch (errorMessage: any) {
 		error(500, errorMessage);
 	}
@@ -36,7 +37,7 @@ export async function load({ params, url }) {
 	try {
 		comments = video.liveNow
 			? null
-			: getComments(params.slug, { sort_by: 'top', source: 'youtube' }, { priority: "low" });
+			: getComments(params.slug, { sort_by: 'top', source: 'youtube' }, { priority: 'low' });
 	} catch {
 		comments = null;
 	}
@@ -45,20 +46,26 @@ export async function load({ params, url }) {
 	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
 	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
 		try {
-			returnYTDislikes = get(returnYtDislikesStore) ? getDislikes(params.slug, { priority: "low" }) : null;
-		} catch { }
+			returnYTDislikes = get(returnYtDislikesStore)
+				? getDislikes(params.slug, { priority: 'low' })
+				: null;
+		} catch {}
 	}
 
+	const playlistId = url.searchParams.get('playlist');
+	if (playlistId) {
+		await loadEntirePlaylist(playlistId);
+	}
 
 	return {
 		video: video,
 		content: phaseDescription(video.videoId, video.descriptionHtml, video.fallbackPatch),
-		playlistId: url.searchParams.get('playlist'),
+		playlistId: playlistId,
 		streamed: {
 			personalPlaylists: personalPlaylists,
 			returnYTDislikes: returnYTDislikes,
 			comments: comments,
-			subscribed: amSubscribed(video.authorId),
+			subscribed: amSubscribed(video.authorId)
 		}
 	};
 }

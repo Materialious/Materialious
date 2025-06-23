@@ -173,6 +173,19 @@
 	onMount(async () => {
 		ui();
 
+		let themeHex = get(themeColorStore);
+		if (themeHex) {
+			await ui('theme', themeHex);
+		} else if (Capacitor.getPlatform() === 'android') {
+			if (!themeHex) {
+				try {
+					const colorPalette = await colorTheme.getColorPalette();
+					themeHex = convertToHexColorCode(colorPalette.primary);
+					await ui('theme', themeHex);
+				} catch {}
+			}
+		}
+
 		$isAndroidTvStore = (await androidTv.isAndroidTv()).value;
 
 		if ($isAndroidTvStore) {
@@ -191,19 +204,6 @@
 		// Should always be loaded after env settings
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
-
-		let themeHex = get(themeColorStore);
-		if (themeHex) {
-			await ui('theme', themeHex);
-		} else if (Capacitor.getPlatform() === 'android') {
-			if (!themeHex) {
-				try {
-					const colorPalette = await colorTheme.getColorPalette();
-					themeHex = convertToHexColorCode(colorPalette.primary);
-					await ui('theme', themeHex);
-				} catch {}
-			}
-		}
 
 		await setStatusBarColor();
 

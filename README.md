@@ -204,8 +204,11 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 ## Mobile
 <img src="./previews/mobile-preview.png" style="height: 500px"/>
 
-## Android TV
-![Preview of subscriptions page on Android TV](./previews/android-tv.png)
+## Android TV Home
+![Preview of subscriptions page on Android TV](./previews/android-tv-home.png)
+
+## Android TV Player
+![Preview of player on Android TV](./previews/android-tv-player.png)
 
 ## Player
 ![Preview of player](./previews/player-preview.png)

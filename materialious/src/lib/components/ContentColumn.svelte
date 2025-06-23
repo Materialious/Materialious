@@ -10,7 +10,7 @@
 
 	async function checkWidth() {
 		if ($isAndroidTvStore) {
-			mediumCol = '3';
+			mediumCol = '4';
 		} else if (innerWidth <= 1750) {
 			largeCol = '4';
 		} else {

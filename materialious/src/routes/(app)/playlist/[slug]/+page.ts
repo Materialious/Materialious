@@ -1,11 +1,11 @@
-import { getPlaylist } from '$lib/api/index';
+import { loadEntirePlaylist } from '$lib/playlist.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
 	let playlist;
 
 	try {
-		playlist = await getPlaylist(params.slug);
+		playlist = await loadEntirePlaylist(params.slug);
 	} catch (errorMessage: any) {
 		error(500, errorMessage);
 	}

@@ -493,7 +493,7 @@
 
 		updateSeekBarTheme();
 
-		player.addEventListener('error', async (event) => {
+		player.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
 		});
@@ -759,7 +759,7 @@
 		controls={false}
 		autoplay={$playerAutoPlayStore}
 		id="player"
-		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
+		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
 	{#if isEmbed}
 		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">

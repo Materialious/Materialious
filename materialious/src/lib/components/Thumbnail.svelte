@@ -139,7 +139,7 @@
 
 	function calcThumbnailPlaceholderHeight() {
 		if ($isAndroidTvStore) {
-			placeholderHeight = innerWidth / 3;
+			placeholderHeight = 400;
 			return;
 		}
 		if (!sideways) {
@@ -164,7 +164,7 @@
 	role="button"
 	onclick={async () => {
 		if ($isAndroidTvStore) {
-			goto(`${location.origin}/embed/${video.videoId}`);
+			goto(`${location.origin}/tv/${video.videoId}`);
 		}
 	}}
 >

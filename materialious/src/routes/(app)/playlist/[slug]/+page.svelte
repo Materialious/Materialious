@@ -1,43 +1,24 @@
 <script lang="ts">
-	import type { PlaylistPageVideo } from '$lib/api/model';
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
 	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
-	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import { loadEntirePlaylist } from '$lib/playlist.js';
 
 	let { data } = $props();
-
-	let videos: PlaylistPageVideo[] | undefined = $state();
-
-	if (data.playlist.videos.length > 0) {
-		videos = data.playlist.videos
-			.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-				return a.index < b.index ? -1 : 1;
-			})
-			.filter((playlistVideo) => {
-				return playlistVideo.lengthSeconds > 0;
-			});
-
-		onMount(async () => {
-			videos = (await loadEntirePlaylist(data.playlist.playlistId)).videos;
-		});
-	}
 </script>
 
 <div class="space"></div>
 
 <article>
-	{#if videos}
+	{#if data.playlist.videos}
 		<nav>
 			<a
 				href={!$isAndroidTvStore
-					? `/watch/${videos[0].videoId}?playlist=${data.playlist.playlistId}`
-					: `/embed/${videos[0].videoId}?playlist=${data.playlist.playlistId}`}
+					? `/watch/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`
+					: `/tv/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`}
 				class="button circle extra no-margin"
 			>
 				<i>play_arrow</i>
@@ -48,10 +29,12 @@
 
 			<a
 				href={!$isAndroidTvStore
-					? `/watch/${unsafeRandomItem(videos).videoId}?playlist=${data.playlist.playlistId}`
-					: `/embed/${unsafeRandomItem(videos).videoId}?playlist=${data.playlist.playlistId}`}
+					? `/watch/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`
+					: `/tv/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`}
 				onclick={() =>
-					playlistSettingsStore.set({ [data.playlist.playlistId]: { shuffle: true, loop: false } })}
+					playlistSettingsStore.set({
+						[data.playlist.info.playlistId]: { shuffle: true, loop: false }
+					})}
 				class="button circle extra no-margin border"
 			>
 				<i>shuffle</i>
@@ -61,16 +44,16 @@
 			</a>
 		</nav>
 	{/if}
-	<h3>{data.playlist.title}</h3>
+	<h3>{data.playlist.info.title}</h3>
 	<p>
-		{cleanNumber(data.playlist.viewCount)}
-		{$_('views')} • {data.playlist.videoCount}
+		{cleanNumber(data.playlist.info.viewCount)}
+		{$_('views')} • {data.playlist.info.videoCount}
 		{$_('videos')}
 	</p>
 	<div class="divider" style="margin-bottom: 1em;"></div>
 
 	<article style="max-height: 200px;" class="scroll no-padding no-elevate no-round">
-		<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.description}</p>
+		<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.info.description}</p>
 	</article>
 
 	<div class="space"></div>
@@ -96,7 +79,7 @@
 				role="presentation"
 				onclick={async () => {
 					await Clipboard.write({
-						string: `https://www.youtube.com/playlist?list=${data.playlist.playlistId}`
+						string: `https://www.youtube.com/playlist?list=${data.playlist.info.playlistId}`
 					});
 					(document.activeElement as HTMLElement)?.blur();
 				}}
@@ -107,6 +90,10 @@
 	</button>
 </article>
 
-{#if videos}
-	<VideoList {videos} playlistAuthor={data.playlist.author} playlistId={data.playlist.playlistId} />
+{#if data.playlist.videos}
+	<VideoList
+		videos={data.playlist.videos}
+		playlistAuthor={data.playlist.info.author}
+		playlistId={data.playlist.info.playlistId}
+	/>
 {/if}

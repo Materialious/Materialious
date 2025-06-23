@@ -15,7 +15,8 @@ const resources: Record<string, () => Promise<Record<string, any>>> = {
 	de: () => import('./locales/de.json'),
 	es: () => import('./locales/es.json'),
 	sh: () => import('./locales/sh.json'),
-	'pt-BR': () => import('./locales/pt-BR.json')
+	'pt-BR': () => import('./locales/pt-BR.json'),
+	lv: () => import('./locales/lv.json')
 };
 
 function getUserLocale(): string {

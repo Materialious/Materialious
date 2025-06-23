@@ -585,7 +585,7 @@
 		playerElement.addEventListener('ended', async () => {
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
-					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
+					goto(`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`);
 				}
 
 				return;
@@ -628,7 +628,9 @@
 					});
 				}
 
-				goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
+				goto(
+					`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`
+				);
 			}
 		});
 

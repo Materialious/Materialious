@@ -127,25 +127,27 @@
 				{/each}
 			</div>
 		{/if}
-		<h5 style="margin-bottom: 0;">{$_('recommendedVideos')}</h5>
-		<div class="grid">
-			{#each data.video.recommendedVideos as recommendedVideo}
-				<ContentColumn>
-					<article
-						onclick={() => {
-							showInfo = false;
-						}}
-						role="presentation"
-						style="height: 100%;"
-						class="no-padding"
-					>
-						{#key recommendedVideo.videoId}
-							<Thumbnail video={recommendedVideo} sideways={false} />
-						{/key}
-					</article>
-				</ContentColumn>
-			{/each}
-		</div>
+		{#if data.video.recommendedVideos.length > 0}
+			<h5 style="margin-bottom: 0;">{$_('recommendedVideos')}</h5>
+			<div class="grid">
+				{#each data.video.recommendedVideos as recommendedVideo}
+					<ContentColumn>
+						<article
+							onclick={() => {
+								showInfo = false;
+							}}
+							role="presentation"
+							style="height: 100%;"
+							class="no-padding"
+						>
+							{#key recommendedVideo.videoId}
+								<Thumbnail video={recommendedVideo} sideways={false} />
+							{/key}
+						</article>
+					</ContentColumn>
+				{/each}
+			</div>
+		{/if}
 	</article>
 {/if}
 

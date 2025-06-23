@@ -1,10 +1,11 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
+import androidTv from '$lib/android/plugins/androidTv';
 import { getResolveUrl } from '$lib/api';
 import '$lib/i18n'; // Import to initialize. Important :)
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages.js';
-import { authStore, interfaceDefaultPage } from '$lib/store.js';
+import { authStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store.js';
 import { get } from 'svelte/store';
 
 export const ssr = false;
@@ -13,6 +14,8 @@ export async function load({ url }) {
 	if (browser) {
 		await initI18n();
 	}
+
+	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
 
 	if (url.pathname.startsWith('/@')) {
 		const username = url.pathname.split('/')[1];

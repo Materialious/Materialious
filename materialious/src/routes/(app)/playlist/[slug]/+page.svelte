@@ -58,36 +58,38 @@
 
 	<div class="space"></div>
 
-	<button class="border no-margin">
-		<i>share</i>
-		<span>{$_('player.share.title')}</span>
-		<menu class="no-wrap mobile">
-			{#if !Capacitor.isNativePlatform()}
+	{#if !$isAndroidTvStore}
+		<button class="border no-margin">
+			<i>share</i>
+			<span>{$_('player.share.title')}</span>
+			<menu class="no-wrap mobile">
+				{#if !Capacitor.isNativePlatform()}
+					<li
+						class="row"
+						role="presentation"
+						onclick={async () => {
+							await Clipboard.write({ string: location.href });
+							(document.activeElement as HTMLElement)?.blur();
+						}}
+					>
+						{$_('player.share.materialiousLink')}
+					</li>
+				{/if}
 				<li
 					class="row"
 					role="presentation"
 					onclick={async () => {
-						await Clipboard.write({ string: location.href });
+						await Clipboard.write({
+							string: `https://www.youtube.com/playlist?list=${data.playlist.info.playlistId}`
+						});
 						(document.activeElement as HTMLElement)?.blur();
 					}}
 				>
-					{$_('player.share.materialiousLink')}
+					{$_('player.share.youtubeLink')}
 				</li>
-			{/if}
-			<li
-				class="row"
-				role="presentation"
-				onclick={async () => {
-					await Clipboard.write({
-						string: `https://www.youtube.com/playlist?list=${data.playlist.info.playlistId}`
-					});
-					(document.activeElement as HTMLElement)?.blur();
-				}}
-			>
-				{$_('player.share.youtubeLink')}
-			</li>
-		</menu>
-	</button>
+			</menu>
+		</button>
+	{/if}
 </article>
 
 {#if data.playlist.videos}

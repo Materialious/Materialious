@@ -32,10 +32,9 @@
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
-	import { _, initI18n } from '$lib/i18n';
+	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import androidTv from '$lib/android/plugins/androidTv';
 	import Mousetrap from 'mousetrap';
 
 	let { children } = $props();
@@ -185,8 +184,6 @@
 				} catch {}
 			}
 		}
-
-		$isAndroidTvStore = (await androidTv.isAndroidTv()).value;
 
 		if ($isAndroidTvStore) {
 			const topContent = document.getElementById('top-content') as HTMLElement;

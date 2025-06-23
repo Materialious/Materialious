@@ -7,7 +7,7 @@
 	import VideoList from '$lib/components/VideoList.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
-	import { authStore, interfaceLowBandwidthMode } from '$lib/store';
+	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
@@ -131,39 +131,41 @@
 				</button>
 			</div>
 
-			<div class="s12 m12 l5">
-				<button class="border">
-					<i>share</i>
-					<span>{$_('player.share.title')}</span>
-					<menu class="no-wrap mobile">
-						{#if !Capacitor.isNativePlatform()}
+			{#if !$isAndroidTvStore}
+				<div class="s12 m12 l5">
+					<button class="border">
+						<i>share</i>
+						<span>{$_('player.share.title')}</span>
+						<menu class="no-wrap mobile">
+							{#if !Capacitor.isNativePlatform()}
+								<li
+									class="row"
+									role="presentation"
+									onclick={async () => {
+										await Clipboard.write({ string: location.href });
+										(document.activeElement as HTMLElement)?.blur();
+									}}
+								>
+									{$_('player.share.materialiousLink')}
+								</li>
+							{/if}
+
 							<li
 								class="row"
 								role="presentation"
 								onclick={async () => {
-									await Clipboard.write({ string: location.href });
+									await Clipboard.write({
+										string: `https://www.youtube.com/channel/${data.channel.authorId}`
+									});
 									(document.activeElement as HTMLElement)?.blur();
 								}}
 							>
-								{$_('player.share.materialiousLink')}
+								{$_('player.share.youtubeLink')}
 							</li>
-						{/if}
-
-						<li
-							class="row"
-							role="presentation"
-							onclick={async () => {
-								await Clipboard.write({
-									string: `https://www.youtube.com/channel/${data.channel.authorId}`
-								});
-								(document.activeElement as HTMLElement)?.blur();
-							}}
-						>
-							{$_('player.share.youtubeLink')}
-						</li>
-					</menu>
-				</button>
-			</div>
+						</menu>
+					</button>
+				</div>
+			{/if}
 		</div>
 	</div>
 

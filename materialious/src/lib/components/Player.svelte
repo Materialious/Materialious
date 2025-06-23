@@ -20,12 +20,14 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
-	import type { VideoPlay } from '../api/model';
+	import type { PlaylistPageVideo, VideoPlay } from '../api/model';
 	import {
 		authStore,
 		darkModeStore,
 		instanceStore,
+		isAndroidTvStore,
 		playerAndroidLockOrientation,
+		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
@@ -34,12 +36,14 @@
 		playerSavePlaybackPositionStore,
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
+		playlistSettingsStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore,
+		syncPartyConnectionsStore,
 		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
@@ -47,7 +51,10 @@
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { playbackRates } from '$lib/const';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
-	import androidTv from '$lib/android/plugins/androidTv';
+	import { loadEntirePlaylist } from '$lib/playlist';
+	import { goto } from '$app/navigation';
+	import { unsafeRandomItem } from '$lib/misc';
+	import type { PlayerEvents } from '$lib/player';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -65,12 +72,10 @@
 	}: Props = $props();
 
 	let snackBarAlert = $state('');
-	let playerPosSet = false;
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
 	let playerElementResizeObserver: ResizeObserver | undefined;
 	let showVideoRetry = $state(false);
-	let isAndroidTv = $state(false);
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
@@ -78,13 +83,25 @@
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	async function updateSeekBarTheme() {
+		if (!shakaUi) return;
 		await tick();
 		shakaUi.configure({
 			seekBarColors: {
 				played: (await getDynamicTheme())['--primary']
 			}
 		});
+
 		setChapterMarkers();
+
+		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
+		if (overflowMenuButton) {
+			overflowMenuButton.innerHTML = 'settings';
+		}
+
+		const backToOverflowButton = document.querySelector('.shaka-back-to-overflow-button');
+		if (backToOverflowButton) {
+			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
+		}
 	}
 
 	themeColorStore.subscribe(updateSeekBarTheme);
@@ -192,7 +209,7 @@
 		if (
 			Capacitor.getPlatform() === 'android' &&
 			data.video.adaptiveFormats.length > 0 &&
-			!isAndroidTv
+			!$isAndroidTvStore
 		) {
 			const videoFormats = data.video.adaptiveFormats.filter((format) =>
 				format.type.startsWith('video/')
@@ -405,8 +422,6 @@
 			return;
 		}
 
-		isAndroidTv = (await androidTv.isAndroidTv()).value;
-
 		HttpFetchPlugin.cacheManager.clearCache();
 
 		player = new shaka.Player();
@@ -473,13 +488,12 @@
 				'statistics'
 			],
 			playbackRates: playbackRates,
-			enableTooltips: false,
-			seekBarColors: {
-				played: (await getDynamicTheme())['--primary']
-			}
+			enableTooltips: false
 		});
 
-		player.addEventListener('error', async (event) => {
+		updateSeekBarTheme();
+
+		player.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
 		});
@@ -500,16 +514,6 @@
 
 		await androidHandleRotate();
 
-		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
-		if (overflowMenuButton) {
-			overflowMenuButton.innerHTML = 'settings';
-		}
-
-		const backToOverflowButton = document.querySelector('.shaka-back-to-overflow-button');
-		if (backToOverflowButton) {
-			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
-		}
-
 		Mousetrap.bind('space', () => {
 			if (!playerElement) return;
 
@@ -521,18 +525,20 @@
 			return false;
 		});
 
-		Mousetrap.bind('right', () => {
-			if (!playerElement) return;
-			playerElement.currentTime = playerElement.currentTime + 10;
-			return false;
-		});
+		if (!$isAndroidTvStore) {
+			Mousetrap.bind('right', () => {
+				if (!playerElement) return;
+				playerElement.currentTime = playerElement.currentTime + 10;
+				return false;
+			});
 
-		Mousetrap.bind('left', () => {
-			if (!playerElement) return;
+			Mousetrap.bind('left', () => {
+				if (!playerElement) return;
 
-			playerElement.currentTime = playerElement.currentTime - 10;
-			return false;
-		});
+				playerElement.currentTime = playerElement.currentTime - 10;
+				return false;
+			});
+		}
 
 		Mousetrap.bind('c', () => {
 			const isVisible = player.isTextTrackVisible();
@@ -576,18 +582,55 @@
 			return false;
 		});
 
-		setChapterMarkers();
-
-		if (isAndroidTv) {
-			Mousetrap.bind('enter', () => {
-				if (playerElement?.paused) {
-					playerElement?.play();
-				} else {
-					playerElement?.pause();
+		playerElement.addEventListener('ended', async () => {
+			if (!data.playlistId) {
+				if ($playerAutoplayNextByDefaultStore) {
+					goto(`/watch/${data.video.recommendedVideos[0].videoId}`);
 				}
-				return false;
+
+				return;
+			}
+
+			const playlist = await loadEntirePlaylist(data.playlistId);
+			const playlistVideoIds = playlist.videos.map((value) => {
+				return value.videoId;
 			});
-		}
+
+			let goToVideo: PlaylistPageVideo | undefined;
+
+			const shufflePlaylist = $playlistSettingsStore[data.playlistId]?.shuffle ?? false;
+			const loopPlaylist = $playlistSettingsStore[data.playlistId]?.loop ?? false;
+
+			if (shufflePlaylist) {
+				goToVideo = unsafeRandomItem(playlist.videos);
+			} else {
+				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
+				const newIndex = currentVideoIndex + 1;
+				if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
+					goToVideo = playlist.videos[newIndex];
+				} else if (loopPlaylist) {
+					// Loop playlist on end
+					goToVideo = playlist.videos[0];
+				}
+			}
+
+			if (typeof goToVideo !== 'undefined') {
+				if ($syncPartyConnectionsStore) {
+					$syncPartyConnectionsStore.forEach((conn) => {
+						if (typeof goToVideo === 'undefined') return;
+
+						conn.send({
+							events: [
+								{ type: 'change-video', videoId: goToVideo.videoId },
+								{ type: 'playlist', playlistId: data.playlistId }
+							]
+						} as PlayerEvents);
+					});
+				}
+
+				goto(`/watch/${goToVideo.videoId}?playlist=${data.playlistId}`);
+			}
+		});
 
 		try {
 			await loadVideo();
@@ -602,9 +645,6 @@
 	});
 
 	async function loadPlayerPos() {
-		if (playerPosSet) return;
-		playerPosSet = true;
-
 		if (loadTimeFromUrl($page)) return;
 
 		let toSetTime = 0;
@@ -628,11 +668,11 @@
 	}
 
 	function savePlayerPos() {
-		if (data.video.hlsUrl) return;
+		if (data.video.liveNow) return;
 
 		const synciousEnabled = $synciousStore && $synciousInstanceStore && $authStore;
 
-		if ($playerSavePlaybackPositionStore && player && playerElement && playerElement.currentTime) {
+		if ($playerSavePlaybackPositionStore && playerElement) {
 			if (
 				playerElement.currentTime < playerElement.duration - 10 &&
 				playerElement.currentTime > 10
@@ -657,7 +697,7 @@
 	}
 
 	onDestroy(async () => {
-		if (Capacitor.getPlatform() === 'android') {
+		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
 			if (originalOrigination) {
 				await StatusBar.setOverlaysWebView({ overlay: false });
 				await StatusBar.show();
@@ -667,7 +707,7 @@
 			}
 		}
 
-		Mousetrap.unbind(['enter', 'left', 'right']);
+		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);
@@ -677,7 +717,6 @@
 			savePlayerPos();
 		} catch (error) {}
 
-		playerPosSet = false;
 		HttpFetchPlugin.cacheManager.clearCache();
 
 		if (playerElementResizeObserver) {
@@ -702,8 +741,8 @@
 <div
 	id="shaka-container"
 	class="player-theme"
-	class:contain-video={!isAndroidTv}
-	class:tv-contain-video={isAndroidTv}
+	class:contain-video={!$isAndroidTvStore}
+	class:tv-contain-video={$isAndroidTvStore}
 	data-shaka-player-container
 	class:hide={showVideoRetry}
 >
@@ -711,9 +750,9 @@
 		controls={false}
 		autoplay={$playerAutoPlayStore}
 		id="player"
-		poster={getBestThumbnail(data.video.videoThumbnails, 1251, 781)}
+		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed}
+	{#if isEmbed && !isAndroidTvStore}
 		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
 			{data.video.title}
 		</div>
@@ -767,6 +806,11 @@
 		flex: 1;
 		background-color: black;
 		aspect-ratio: 16 / 9;
+	}
+
+	video[poster] {
+		height: 100%;
+		width: 100%;
 	}
 
 	video {

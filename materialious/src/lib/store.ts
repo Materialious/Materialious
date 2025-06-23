@@ -4,7 +4,15 @@ import type { DataConnection } from 'peerjs';
 import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
 import type { TitleCase } from './letterCasing';
-import type { Channel, HashTag, Playlist, PlaylistPageVideo, Video, VideoBase } from './api/model';
+import type {
+	Channel,
+	HashTag,
+	Playlist,
+	PlaylistPage,
+	PlaylistPageVideo,
+	Video,
+	VideoBase
+} from './api/model';
 import { ensureNoTrailingSlash } from './misc';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
@@ -130,5 +138,8 @@ export const searchCacheStore: Writable<{
 	[searchTypeAndQuery: string]: (Channel | Video | Playlist | HashTag)[];
 }> = writable({});
 export const feedLastItemId: Writable<string | undefined> = writable(undefined);
+export const playlistCacheStore: Writable<{
+	[playlistId: string]: { videos: PlaylistPageVideo[]; info: PlaylistPage };
+}> = writable({});
 
 export const isAndroidTvStore: Writable<boolean> = writable(false);

@@ -81,7 +81,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	let dashUri: string | undefined;
 
 	if (video.streaming_data) {
-		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.map((format) => {
+		video.streaming_data.adaptive_formats.forEach((format) => {
 			const formatKey = fromFormat(format) || '';
 			format.url = `https://sabr?___key=${formatKey}`;
 			format.signature_cipher = undefined;

@@ -5,7 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { getDeArrow, getThumbnail, getVideoProgress } from '../api';
+	import { getDeArrow, getThumbnail } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
 	import { insecureRequestImageHandler, truncate } from '../misc';
 	import type { PlayerEvents } from '../player';
@@ -21,6 +21,7 @@
 		synciousStore
 	} from '../store';
 	import { goto } from '$app/navigation';
+	import { queueSyncious } from '$lib/api/apiExtended';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -32,7 +33,9 @@
 
 	let placeholderHeight: number = $state(0);
 
-	let watchUrl = new URL(`${location.origin}/watch/${video.videoId}`);
+	let watchUrl = new URL(
+		`${location.origin}/${$isAndroidTvStore ? 'tv' : 'watch'}/${video.videoId}`
+	);
 
 	if (playlistId !== '') {
 		watchUrl.searchParams.set('playlist', playlistId);
@@ -109,7 +112,7 @@
 
 		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 			try {
-				progress = (await getVideoProgress(video.videoId, { priority: 'low' }))[0].time.toString();
+				progress = (await queueSyncious(video.videoId))?.time?.toString() ?? undefined;
 			} catch {}
 		}
 	});
@@ -138,7 +141,7 @@
 
 	function calcThumbnailPlaceholderHeight() {
 		if ($isAndroidTvStore) {
-			placeholderHeight = innerWidth / 3;
+			placeholderHeight = 100;
 			return;
 		}
 		if (!sideways) {
@@ -152,7 +155,7 @@
 				placeholderHeight = innerWidth / 12;
 			}
 		} else {
-			placeholderHeight = 115;
+			placeholderHeight = 100;
 		}
 	}
 </script>
@@ -162,9 +165,7 @@
 	tabindex="0"
 	role="button"
 	onclick={async () => {
-		if ($isAndroidTvStore) {
-			goto(`${location.origin}/embed/${video.videoId}`);
-		}
+		goto(watchUrl);
 	}}
 >
 	<div id="thumbnail-container">

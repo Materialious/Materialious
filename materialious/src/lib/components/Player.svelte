@@ -707,7 +707,7 @@
 			}
 		}
 
-		Mousetrap.unbind(['enter', 'left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
+		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);

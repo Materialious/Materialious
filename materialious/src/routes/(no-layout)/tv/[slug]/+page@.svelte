@@ -67,23 +67,27 @@
 		});
 
 		Mousetrap.bind('enter', () => {
-			if (showInfo) return true;
-
-			if (playerElement?.paused) {
-				playerElement?.play();
-			} else {
-				playerElement?.pause();
+			if (!showInfo) {
+				if (playerElement?.paused) {
+					playerElement?.play();
+				} else {
+					playerElement?.pause();
+				}
+				return false;
 			}
-			return false;
+
+			return true;
 		});
 	});
 
 	onDestroy(() => {
-		Mousetrap.unbind(['up', 'down', 'left', 'right']);
+		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter']);
 	});
 </script>
 
-<Player bind:playerElement isEmbed={true} {data} />
+{#key data.video.videoId}
+	<Player bind:playerElement isEmbed={true} {data} />
+{/key}
 
 {#if showInfo}
 	<article id="shown-info">
@@ -104,6 +108,10 @@
 						<article
 							class="no-padding primary-border"
 							style="height: 100%;"
+							onclick={() => {
+								showInfo = false;
+							}}
+							role="presentation"
 							id={playlistVideo.videoId}
 							class:border={playlistVideo.videoId === data.video.videoId}
 						>
@@ -123,7 +131,14 @@
 		<div class="grid">
 			{#each data.video.recommendedVideos as recommendedVideo}
 				<ContentColumn>
-					<article style="height: 100%;" class="no-padding">
+					<article
+						onclick={() => {
+							showInfo = false;
+						}}
+						role="presentation"
+						style="height: 100%;"
+						class="no-padding"
+					>
 						{#key recommendedVideo.videoId}
 							<Thumbnail video={recommendedVideo} sideways={false} />
 						{/key}
@@ -140,7 +155,7 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		height: 40%;
+		height: 50%;
 		z-index: 101;
 		overflow-y: scroll;
 	}

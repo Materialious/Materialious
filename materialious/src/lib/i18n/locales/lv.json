@@ -18,7 +18,10 @@
         "audioOnly": "Tikai audio",
         "unableToLoadComments": "Nevar ielādēt komentārus",
         "addToPlaylist": "Pievienot atskaņošanas sarakstam",
-        "defaultLanguage": "Noklusējuma valoda"
+        "defaultLanguage": "Noklusējuma valoda",
+        "noPlaylists": "Nav atskaņošanas sarakstu",
+        "chapters": "Nodaļas",
+        "theatreMode": "Teātra režīms (Platekrāns)"
     },
     "videos": "video",
     "layout": {
@@ -29,18 +32,30 @@
         "customize": "Pielāgot",
         "searchHistory": "Meklēšanas vēsture",
         "theme": {
-            "theme": "Motīvs"
+            "theme": "Motīvs",
+            "color": "Krāsa"
         },
         "player": {
-            "savePlaybackPosition": "Saglabāt atskaņošanas pozīciju"
+            "savePlaybackPosition": "Saglabāt atskaņošanas pozīciju",
+            "title": "Atskaņotājs",
+            "autoPlay": "Automātiski atskaņot video",
+            "youtubeJsAlways": "Vienmēr izmantot"
         },
         "deArrow": {
             "titleOnly": "Tikai virsrakstu",
             "title": "DeArrow"
         },
         "sponsors": {
-            "Catagories": "Kategorijas"
-        }
+            "Catagories": "Kategorijas",
+            "unpaidSelfPromotion": "Neapmaksāts/pašreklāma",
+            "sponsor": "Sponsors",
+            "disableToast": "Atspējot uznirstošos logus"
+        },
+        "bookmarklet": "Grāmatzīmes sīklietotne",
+        "dataPreferences": {
+            "dataPreferences": "Datu iestatījumi"
+        },
+        "searchSuggestions": "Meklēšanas ieteikumi"
     },
     "channels": "kanāli",
     "copyUrl": "Kopēt URL saiti",
@@ -60,7 +75,8 @@
         "playlists": "Atskaņošanas saraksti",
         "channels": "Kanāli",
         "shorts": "Īsie video",
-        "all": "Viss"
+        "all": "Viss",
+        "streams": "Plūsmas (Pārraides)"
     },
     "playlist": {
         "createPlaylist": "Izveidot atskaņošanas sarakstu",
@@ -86,5 +102,8 @@
         "manageSubscriptions": "Pārvaldīt abonementus"
     },
     "region": "Reģions",
-    "subscribe": "Abonēt"
+    "subscribe": "Abonēt",
+    "disabled": "Atspējots",
+    "invidiousBlockWarning": "Google pašlaik bloķē Invidious. Ja video nelādējas šajā serverī (instancē), lūdzu, izmantojiet šo serveri (instanci) Materialious uz {android} vai {desktop}, lai apietu šo problēmu ar vietējo video ieguves rezerves variantu.",
+    "skipping": "Izlaiž"
 }

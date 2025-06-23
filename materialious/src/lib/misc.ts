@@ -106,3 +106,10 @@ export function excludeDuplicateFeeds(currentItems: feedItems, newItems: feedIte
 
 	return [...nonDuplicatedNewItems, ...currentItems];
 }
+
+export function expandSummery(id: string) {
+	const element = document.getElementById(id);
+	if (element) {
+		element.click();
+	}
+}

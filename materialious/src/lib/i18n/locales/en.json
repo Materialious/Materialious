@@ -5,6 +5,8 @@
 	"loadMore": "Load more",
 	"views": "views",
 	"login": "Login",
+	"recommendedVideos": "Recommended Videos",
+	"playlistVideos": "Playlist Videos",
 	"invidiousLogin": "Please log in with your Invidious account",
 	"invalidInstance": "Please verify the URL. If it's correct, the instance may be down or may not support third-party clients.",
 	"invidiousBlockWarning": "Invidious is currently being blocked by Google. If videos aren't loading for this instance, please use this instance on Materialious on {android} or {desktop} to get around this with local video fallback.",

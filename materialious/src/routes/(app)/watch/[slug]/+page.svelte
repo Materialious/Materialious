@@ -1,10 +1,8 @@
 <script lang="ts">
 	import {
 		addPlaylistVideo,
-		deleteUnsubscribe,
 		getComments,
 		getPersonalPlaylists,
-		postSubscribe,
 		removePlaylistVideo
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
@@ -13,17 +11,14 @@
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import Transcript from '$lib/components/Transcript.svelte';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { truncate } from '$lib/misc';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
 	import type { PlayerEvents } from '$lib/player.js';
 	import {
 		authStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
-		interfaceAutoExpandDesc,
-		interfaceLowBandwidthMode,
 		playerTheatreModeByDefaultStore,
 		playlistCacheStore,
 		playlistSettingsStore,
@@ -37,6 +32,10 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { loadEntirePlaylist } from '$lib/playlist.js';
+	import Author from '$lib/components/Watch/Author.svelte';
+	import Description from '$lib/components/Watch/Description.svelte';
+	import { expandSummery } from '$lib/misc.js';
+	import LikesDislikes from '$lib/components/Watch/LikesDislikes.svelte';
 
 	let { data = $bindable() } = $props();
 
@@ -48,9 +47,7 @@
 	});
 
 	let subscribed: boolean = $state(false);
-	data.streamed.subscribed.then((streamedIsSubbed) => {
-		subscribed = streamedIsSubbed;
-	});
+	data.streamed.subscribed.then((isSubbed) => (subscribed = isSubbed));
 
 	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
@@ -67,13 +64,6 @@
 	let showTranscript = $state(false);
 
 	let playerCurrentTime: number = $state(0);
-
-	function expandSummery(id: string) {
-		const element = document.getElementById(id);
-		if (element) {
-			element.click();
-		}
-	}
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
@@ -225,10 +215,6 @@
 			await goToCurrentPlaylistItem();
 		}
 
-		if ($interfaceAutoExpandDesc) {
-			expandSummery('description');
-		}
-
 		if ($interfaceAutoExpandChapters) {
 			expandSummery('chapter-section');
 		}
@@ -307,16 +293,6 @@
 		comments.comments = [...comments.comments, ...loadedComments.comments];
 	}
 
-	async function toggleSubscribed() {
-		if (subscribed) {
-			await deleteUnsubscribe(data.video.authorId);
-		} else {
-			await postSubscribe(data.video.authorId);
-		}
-
-		subscribed = !subscribed;
-	}
-
 	function toggleTheatreMode() {
 		theatreMode = !theatreMode;
 	}
@@ -354,65 +330,10 @@
 
 		<div class="grid no-padding">
 			<div class="s12 m12 l5">
-				<nav>
-					<a href={`/channel/${data.video.authorId}`}>
-						<nav style="gap: 0.5em;">
-							{#if !$interfaceLowBandwidthMode}
-								<img
-									loading="lazy"
-									class="circle large"
-									src={proxyGoogleImage(getBestThumbnail(data.video.authorThumbnails))}
-									alt="Channel profile"
-								/>
-							{/if}
-							<div>
-								<p style="margin: 0;" class="bold">{truncate(data.video.author, 16)}</p>
-								<p style="margin: 0;">{data.video.subCountText}</p>
-							</div>
-						</nav>
-					</a>
-					{#if $authStore}
-						<button
-							onclick={toggleSubscribed}
-							class:inverse-surface={!subscribed}
-							class:border={subscribed}
-						>
-							{#if !subscribed}
-								{$_('subscribe')}
-							{:else}
-								{$_('unsubscribe')}
-							{/if}
-						</button>
-					{:else}
-						<button class="inverse-surface" disabled>
-							{$_('subscribe')}
-							<div class="tooltip">
-								{$_('loginRequired')}
-							</div>
-						</button>
-					{/if}
-				</nav>
+				<Author video={data.video} bind:subscribed />
 			</div>
 			<div class="s12 m12 l7 video-actions">
-				{#await data.streamed.returnYTDislikes then returnYTDislikes}
-					{#if returnYTDislikes}
-						<nav class="no-space">
-							<button style="cursor: default;" class="border left-round">
-								<i class="small">thumb_up</i>
-								<span>{cleanNumber(returnYTDislikes.likes)}</span>
-							</button>
-							<button style="cursor: default;margin-right: 0.5em;" class="border right-round">
-								<i class="small">thumb_down_alt</i>
-								<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
-							</button>
-						</nav>
-					{:else}
-						<button style="cursor: default;margin-right: 0.5em;" class="border">
-							<i class="small">thumb_up</i>
-							<span>{cleanNumber(data.video.likeCount)}</span>
-						</button>
-					{/if}
-				{/await}
+				<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
 
 				<div>
 					<button onclick={toggleTheatreMode} class="m l" class:border={!theatreMode}>
@@ -497,31 +418,7 @@
 		</div>
 
 		<article>
-			<details>
-				<summary id="description" class="bold none">
-					<nav>
-						<div class="max">
-							{numberWithCommas(data.video.viewCount)}
-							{$_('views')} • {data.video.publishedText}
-						</div>
-						<i>expand_more</i>
-					</nav>
-				</summary>
-				<div class="space"></div>
-				<div class="medium scroll">
-					<div style="white-space: pre-line; overflow-wrap: break-word;">
-						{@html data.content.description}
-					</div>
-				</div>
-
-				<nav class="scroll">
-					{#if data.video.keywords}
-						{#each data.video.keywords as keyword}
-							<a href={`/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
-						{/each}
-					{/if}
-				</nav>
-			</details>
+			<Description video={data.video} description={data.content.description} />
 		</article>
 
 		{#if data.content.timestamps.length > 0}

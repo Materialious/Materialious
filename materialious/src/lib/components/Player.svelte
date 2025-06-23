@@ -525,18 +525,20 @@
 			return false;
 		});
 
-		Mousetrap.bind('right', () => {
-			if (!playerElement) return;
-			playerElement.currentTime = playerElement.currentTime + 10;
-			return false;
-		});
+		if (!$isAndroidTvStore) {
+			Mousetrap.bind('right', () => {
+				if (!playerElement) return;
+				playerElement.currentTime = playerElement.currentTime + 10;
+				return false;
+			});
 
-		Mousetrap.bind('left', () => {
-			if (!playerElement) return;
+			Mousetrap.bind('left', () => {
+				if (!playerElement) return;
 
-			playerElement.currentTime = playerElement.currentTime - 10;
-			return false;
-		});
+				playerElement.currentTime = playerElement.currentTime - 10;
+				return false;
+			});
+		}
 
 		Mousetrap.bind('c', () => {
 			const isVisible = player.isTextTrackVisible();
@@ -579,17 +581,6 @@
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			return false;
 		});
-
-		if ($isAndroidTvStore) {
-			Mousetrap.bind('enter', () => {
-				if (playerElement?.paused) {
-					playerElement?.play();
-				} else {
-					playerElement?.pause();
-				}
-				return false;
-			});
-		}
 
 		playerElement.addEventListener('ended', async () => {
 			if (!data.playlistId) {
@@ -761,7 +752,7 @@
 		id="player"
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed}
+	{#if isEmbed && !isAndroidTvStore}
 		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
 			{data.video.title}
 		</div>

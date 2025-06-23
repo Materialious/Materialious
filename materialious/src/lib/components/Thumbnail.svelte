@@ -33,7 +33,9 @@
 
 	let placeholderHeight: number = $state(0);
 
-	let watchUrl = new URL(`${location.origin}/watch/${video.videoId}`);
+	let watchUrl = new URL(
+		`${location.origin}/${$isAndroidTvStore ? 'tv' : 'watch'}/${video.videoId}`
+	);
 
 	if (playlistId !== '') {
 		watchUrl.searchParams.set('playlist', playlistId);
@@ -139,7 +141,7 @@
 
 	function calcThumbnailPlaceholderHeight() {
 		if ($isAndroidTvStore) {
-			placeholderHeight = 400;
+			placeholderHeight = 100;
 			return;
 		}
 		if (!sideways) {
@@ -163,9 +165,7 @@
 	tabindex="0"
 	role="button"
 	onclick={async () => {
-		if ($isAndroidTvStore) {
-			goto(`${location.origin}/tv/${video.videoId}`);
-		}
+		goto(watchUrl);
 	}}
 >
 	<div id="thumbnail-container">

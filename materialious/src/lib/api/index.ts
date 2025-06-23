@@ -64,7 +64,7 @@ export function buildAuthHeaders(): { headers: Record<string, string> } {
 	if (authToken.startsWith('SID=')) {
 		return { headers: { __sid_auth: authToken } };
 	} else {
-		return { headers: { Authorization: `Bearer ${get(authStore)?.token}` } };
+		return { headers: { Authorization: `Bearer ${authToken}` } };
 	}
 }
 

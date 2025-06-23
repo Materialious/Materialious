@@ -90,7 +90,18 @@
 				played: (await getDynamicTheme())['--primary']
 			}
 		});
+
 		setChapterMarkers();
+
+		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
+		if (overflowMenuButton) {
+			overflowMenuButton.innerHTML = 'settings';
+		}
+
+		const backToOverflowButton = document.querySelector('.shaka-back-to-overflow-button');
+		if (backToOverflowButton) {
+			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
+		}
 	}
 
 	themeColorStore.subscribe(updateSeekBarTheme);
@@ -477,11 +488,10 @@
 				'statistics'
 			],
 			playbackRates: playbackRates,
-			enableTooltips: false,
-			seekBarColors: {
-				played: (await getDynamicTheme())['--primary']
-			}
+			enableTooltips: false
 		});
+
+		updateSeekBarTheme();
 
 		player.addEventListener('error', async (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
@@ -503,16 +513,6 @@
 		playerElement.addEventListener('volumechange', saveVolumePreference);
 
 		await androidHandleRotate();
-
-		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
-		if (overflowMenuButton) {
-			overflowMenuButton.innerHTML = 'settings';
-		}
-
-		const backToOverflowButton = document.querySelector('.shaka-back-to-overflow-button');
-		if (backToOverflowButton) {
-			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
-		}
 
 		Mousetrap.bind('space', () => {
 			if (!playerElement) return;
@@ -579,8 +579,6 @@
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			return false;
 		});
-
-		setChapterMarkers();
 
 		if ($isAndroidTvStore) {
 			Mousetrap.bind('enter', () => {

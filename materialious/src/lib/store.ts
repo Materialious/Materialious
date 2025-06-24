@@ -143,3 +143,4 @@ export const playlistCacheStore: Writable<{
 }> = writable({});
 
 export const isAndroidTvStore: Writable<boolean> = writable(false);
+export const isTvRouteLoading: Writable<boolean> = writable(false);

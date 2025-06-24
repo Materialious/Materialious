@@ -1,4 +1,3 @@
-// src/lib/requestQueue.ts
 import { writable, type Writable } from 'svelte/store';
 import type { SynciousProgressModel } from './model';
 import { getVideoProgress } from '.';

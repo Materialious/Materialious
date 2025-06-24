@@ -61,14 +61,14 @@
 		isSyncing?: boolean;
 		isEmbed?: boolean;
 		segments?: Segment[];
-		playerElement: HTMLMediaElement | undefined;
+		playerElement?: HTMLMediaElement | undefined;
 	}
 
 	let {
 		data,
 		isEmbed = false,
 		segments = $bindable([]),
-		playerElement = $bindable()
+		playerElement = $bindable(undefined)
 	}: Props = $props();
 
 	let snackBarAlert = $state('');

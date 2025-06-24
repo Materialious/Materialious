@@ -15,11 +15,19 @@
 
 	let playerElement: HTMLMediaElement | undefined = $state();
 	let showInfo = $state(false);
+	let playerCurrentTime: number = $state(0);
 
 	let subscribed: boolean = $state(false);
 	data.streamed.subscribed.then((isSubbed) => (subscribed = isSubbed));
 
 	onMount(() => {
+		if (playerElement) {
+			playerElement.addEventListener('timeupdate', () => {
+				if (!playerElement) return;
+				playerCurrentTime = playerElement.currentTime;
+			});
+		}
+
 		Mousetrap.bind('down', () => {
 			if (showInfo) return true;
 
@@ -98,6 +106,30 @@
 		<article class="border">
 			<Description video={data.video} description={data.content.description} />
 		</article>
+
+		{#if data.content.timestamps.length > 0}
+			<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
+			<div class="grid">
+				{#each data.content.timestamps as timestamp}
+					<article
+						role="presentation"
+						style="cursor: pointer;"
+						onclick={() => {
+							if (playerElement) playerElement.currentTime = timestamp.time;
+						}}
+					>
+						<div style="white-space: pre-line; overflow-wrap: break-word;text-align: center;">
+							<p style="no-margin no-padding">{timestamp.title}</p>
+							<span
+								class:primary={playerCurrentTime >= timestamp.time &&
+									(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
+								class="chip no-margin">{timestamp.timePretty}</span
+							>
+						</div>
+					</article>
+				{/each}
+			</div>
+		{/if}
 
 		{#if data.playlistId && data.playlistId in $playlistCacheStore}
 			<h5 style="margin-bottom: 0;">{$_('playlistVideos')}</h5>

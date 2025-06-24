@@ -378,6 +378,9 @@
 				}
 			}
 
+			if (watchProgressTimeout) {
+				clearInterval(watchProgressTimeout);
+			}
 			// Auto save watch progress every minute.
 			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
 			setupSponsorSkip();
@@ -588,6 +591,10 @@
 			return false;
 		});
 
+		playerElement.addEventListener('pause', async () => {
+			savePlayerPos();
+		});
+
 		playerElement.addEventListener('ended', async () => {
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
@@ -719,15 +726,15 @@
 			}
 		}
 
+		try {
+			savePlayerPos();
+		} catch (error) {}
+
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);
 		}
-
-		try {
-			savePlayerPos();
-		} catch (error) {}
 
 		HttpFetchPlugin.cacheManager.clearCache();
 

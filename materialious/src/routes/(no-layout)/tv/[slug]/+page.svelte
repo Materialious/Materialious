@@ -114,7 +114,7 @@
 					<ContentColumn>
 						<article
 							role="presentation"
-							style="cursor: pointer;"
+							style="cursor: pointer;height: 100%;"
 							onclick={() => {
 								if (playerElement) playerElement.currentTime = timestamp.time;
 							}}

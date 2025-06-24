@@ -184,7 +184,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		formatStreams: [],
 		recommendedVideos: recommendedVideos,
 		authorThumbnails: authorThumbnails,
-		captions: captions,
+		captions: [],
 		authorId: video.basic_info.channel_id || '',
 		authorUrl: `/channel/${video.basic_info.channel_id}`,
 		authorVerified: false,

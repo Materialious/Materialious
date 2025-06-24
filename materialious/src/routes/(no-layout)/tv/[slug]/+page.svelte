@@ -117,6 +117,7 @@
 							style="cursor: pointer;height: 100%;"
 							onclick={() => {
 								if (playerElement) playerElement.currentTime = timestamp.time;
+								showInfo = false;
 							}}
 						>
 							<div style="white-space: pre-line; overflow-wrap: break-word;text-align: center;">

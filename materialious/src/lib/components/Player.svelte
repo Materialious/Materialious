@@ -585,7 +585,10 @@
 		playerElement.addEventListener('ended', async () => {
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
-					goto(`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`);
+					goto(
+						`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`,
+						{ replaceState: $isAndroidTvStore }
+					);
 				}
 
 				return;
@@ -629,7 +632,8 @@
 				}
 
 				goto(
-					`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`
+					`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`,
+					{ replaceState: $isAndroidTvStore }
 				);
 			}
 		});

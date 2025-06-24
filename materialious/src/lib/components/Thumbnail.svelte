@@ -22,6 +22,7 @@
 	} from '../store';
 	import { goto } from '$app/navigation';
 	import { queueSyncious } from '$lib/api/apiExtended';
+	import { page } from '$app/state';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -165,7 +166,7 @@
 	tabindex="0"
 	role="button"
 	onclick={async () => {
-		goto(watchUrl);
+		goto(watchUrl, { replaceState: $isAndroidTvStore && page.url.pathname.startsWith('/tv') });
 	}}
 >
 	<div id="thumbnail-container">

@@ -111,22 +111,25 @@
 			<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
 			<div class="grid">
 				{#each data.content.timestamps as timestamp}
-					<article
-						role="presentation"
-						style="cursor: pointer;"
-						onclick={() => {
-							if (playerElement) playerElement.currentTime = timestamp.time;
-						}}
-					>
-						<div style="white-space: pre-line; overflow-wrap: break-word;text-align: center;">
-							<p style="no-margin no-padding">{timestamp.title}</p>
-							<span
-								class:primary={playerCurrentTime >= timestamp.time &&
-									(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
-								class="chip no-margin">{timestamp.timePretty}</span
-							>
-						</div>
-					</article>
+					<ContentColumn>
+						<article
+							role="presentation"
+							style="cursor: pointer;height: 100%;"
+							onclick={() => {
+								if (playerElement) playerElement.currentTime = timestamp.time;
+								showInfo = false;
+							}}
+						>
+							<div style="white-space: pre-line; overflow-wrap: break-word;text-align: center;">
+								<p style="no-margin no-padding">{timestamp.title}</p>
+								<span
+									class:primary={playerCurrentTime >= timestamp.time &&
+										(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
+									class="chip no-margin">{timestamp.timePretty}</span
+								>
+							</div>
+						</article>
+					</ContentColumn>
 				{/each}
 			</div>
 		{/if}

@@ -29,6 +29,7 @@
 		playerAndroidLockOrientation,
 		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
+		playerCCByDefault,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
@@ -313,6 +314,24 @@
 		return false;
 	}
 
+	function toggleSubtitles() {
+		const isVisible = player.isTextTrackVisible();
+		if (isVisible) {
+			player.setTextTrackVisibility(false);
+		} else {
+			const defaultLanguage = get(playerDefaultLanguage);
+			const langCode = ISO6391.getCode(defaultLanguage);
+
+			const tracks = player.getTextTracks();
+			const subtitleTrack = tracks.find((track) => track.language === langCode);
+
+			if (subtitleTrack) {
+				player.selectTextTrack(subtitleTrack);
+				player.setTextTrackVisibility(true);
+			}
+		}
+	}
+
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
 	async function loadVideo() {
@@ -359,6 +378,9 @@
 				}
 			}
 
+			if (watchProgressTimeout) {
+				clearInterval(watchProgressTimeout);
+			}
 			// Auto save watch progress every minute.
 			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
 			setupSponsorSkip();
@@ -378,9 +400,7 @@
 				dashUrl += '?local=true';
 			}
 
-			await player.load(dashUrl);
-
-			await loadPlayerPos();
+			await player.load(dashUrl, await getLastPlayPos());
 		} else {
 			if (data.video.fallbackPatch === 'youtubejs') {
 				await player.load(data.video.dashUrl);
@@ -396,6 +416,9 @@
 
 		restoreQualityPreference();
 		restoreDefaultLanguage();
+		if ($playerCCByDefault) {
+			toggleSubtitles();
+		}
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
@@ -541,21 +564,7 @@
 		}
 
 		Mousetrap.bind('c', () => {
-			const isVisible = player.isTextTrackVisible();
-			if (isVisible) {
-				player.setTextTrackVisibility(false);
-			} else {
-				const defaultLanguage = get(playerDefaultLanguage);
-				const langCode = ISO6391.getCode(defaultLanguage);
-
-				const tracks = player.getTextTracks();
-				const subtitleTrack = tracks.find((track) => track.language === langCode);
-
-				if (subtitleTrack) {
-					player.selectTextTrack(subtitleTrack);
-					player.setTextTrackVisibility(true);
-				}
-			}
+			toggleSubtitles();
 			return false;
 		});
 
@@ -580,6 +589,10 @@
 
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			return false;
+		});
+
+		playerElement.addEventListener('pause', async () => {
+			savePlayerPos();
 		});
 
 		playerElement.addEventListener('ended', async () => {
@@ -650,8 +663,8 @@
 		}
 	});
 
-	async function loadPlayerPos() {
-		if (loadTimeFromUrl($page)) return;
+	async function getLastPlayPos(): Promise<number> {
+		if (loadTimeFromUrl($page)) return 0;
 
 		let toSetTime = 0;
 
@@ -670,7 +683,7 @@
 			}
 		}
 
-		if (toSetTime > 0 && playerElement) playerElement.currentTime = toSetTime;
+		return toSetTime;
 	}
 
 	function savePlayerPos() {
@@ -713,15 +726,15 @@
 			}
 		}
 
+		try {
+			savePlayerPos();
+		} catch (error) {}
+
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
 		if (watchProgressTimeout) {
 			clearTimeout(watchProgressTimeout);
 		}
-
-		try {
-			savePlayerPos();
-		} catch (error) {}
 
 		HttpFetchPlugin.cacheManager.clearCache();
 

@@ -5,8 +5,8 @@ on:
         branches: [main]
         paths-ignore:
             - "**/*.md"
-            - "fastline/**"
-            - "materialious/src/i18n/locales/**"
+            - "./fastline/**"
+            - "./materialious/src/lib/i18n/locales/**"
 
     workflow_dispatch:
 

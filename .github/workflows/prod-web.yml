@@ -6,8 +6,8 @@ on:
             - main
         paths-ignore:
             - "**/*.md"
-            - "fastline/**"
-            - "materialious/src/i18n/locales/**"
+            - "./fastline/**"
+            - "./materialious/src/lib/i18n/locales/**"
 
 jobs:
     web-build:

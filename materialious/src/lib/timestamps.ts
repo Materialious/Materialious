@@ -41,64 +41,74 @@ export function phaseDescription(
 ): PhasedDescription {
 	const timestamps: Timestamps = [];
 	const lines = content.split('\n');
-
-	// Regular expressions for different timestamp formats
-	const urlRegex = /<a href="([^"]+)"/;
-	const timestampRegexInvidious =
-		/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">(\d+:\d+(?::\d+)?)<\/a>\s*(.+)/;
-	const timestampRegexYtJs = new RegExp(
-		`href="https://www\\.youtube\\.com/watch\\?v=${videoId}(?:&t=(\\d+)s)?"[^>]*>\\s*<span[^>]*>\\s*([^<]+)\\s*</span>\\s*</a>\\s*<span[^>]*>\\s*([^<]+)\\s*</span>`,
-		'i'
-	);
-
 	const filteredLines: string[] = [];
+
+	const parser = new DOMParser();
+
 	lines.forEach((line) => {
-		const urlMatch = urlRegex.exec(line);
-		// Use appropriate regex based on the `usingYoutubeJs` flag
-		const timestampMatch = (
-			fallbackPatch === 'youtubejs' ? timestampRegexYtJs : timestampRegexInvidious
-		).exec(fallbackPatch === 'youtubejs' ? line + '</span>' : line);
+		const doc = parser.parseFromString(line, 'text/html');
+		const link = doc.querySelector('a');
 
-		if (urlMatch !== null && timestampMatch === null) {
-			// If line contains a URL but not a timestamp, modify the URL
-			const modifiedLine = processYoutubeLink(line).replace(
-				/<a href="([^"]+)"/,
-				'<a href="$1" target="_blank" rel="noopener noreferrer" class="link"'
-			);
-			filteredLines.push(modifiedLine);
-		} else if (timestampMatch !== null) {
-			// If line contains a timestamp, extract details and push into timestamps array
-			const time = (fallbackPatch === 'youtubejs' ? timestampMatch[1] : timestampMatch[2]) || '0';
-			const timestamp = fallbackPatch === 'youtubejs' ? timestampMatch[2] : timestampMatch[3];
-			const title =
-				fallbackPatch === 'youtubejs' ? timestampMatch[3] || '' : timestampMatch[4] || '';
+		if (link) {
+			const href = link.getAttribute('href') || '';
 
-			timestamps.push({
-				time: convertToSeconds(time),
-				// Remove any HTML in the timestamp title.
-				title: decodeHtmlCharCodes(
-					title
-						.replace(/<[^>]+>/g, '')
-						.replace(/\n/g, '')
-						.trim()
-				),
-				timePretty: timestamp,
-				endTime: -1
-			});
+			// Handle youtubejs timestamps
+			if (
+				fallbackPatch === 'youtubejs' &&
+				href.includes(`https://www.youtube.com/watch?v=${videoId}`)
+			) {
+				const url = new URL(href);
+				const timeParam = url.searchParams.get('t') || '0';
+
+				const timePretty = link.textContent?.trim() || '';
+				const spans = doc.querySelectorAll('span');
+				const title = spans.length > 1 ? spans[1].textContent?.trim() || '' : '';
+
+				timestamps.push({
+					time: convertToSeconds(timeParam.replace('s', '')),
+					title: decodeHtmlCharCodes(title),
+					timePretty,
+					endTime: -1
+				});
+			}
+			// Handle invidious-like timestamps
+			else if (
+				fallbackPatch !== 'youtubejs' &&
+				link.hasAttribute('data-onclick') &&
+				link.getAttribute('data-onclick') === 'jump_to_time'
+			) {
+				const timePretty = link.textContent?.trim() || '';
+				const time = link.getAttribute('data-jump-time') || '0';
+
+				// Get remaining text after the link for title
+				const title = link.nextSibling?.textContent?.trim() || '';
+
+				timestamps.push({
+					time: convertToSeconds(time),
+					title: decodeHtmlCharCodes(title),
+					timePretty,
+					endTime: -1
+				});
+			}
+			// Normal link, modify to not use youtube redirect
+			else {
+				const modifiedLine = processYoutubeLink(line).replace(
+					/<a href="([^"]+)"/,
+					'<a href="$1" target="_blank" rel="noopener noreferrer" class="link"'
+				);
+				filteredLines.push(modifiedLine);
+			}
 		} else {
 			filteredLines.push(line);
 		}
 	});
 
+	// Set endTime for each timestamp
 	timestamps.forEach((ts, idx) => {
-		if (idx < timestamps.length - 1) {
-			ts.endTime = timestamps[idx + 1].time;
-		} else {
-			ts.endTime = -1;
-		}
+		ts.endTime = idx < timestamps.length - 1 ? timestamps[idx + 1].time : -1;
 	});
 
 	const filteredContent = filteredLines.join('\n');
 
-	return { description: filteredContent, timestamps: timestamps };
+	return { description: filteredContent, timestamps };
 }

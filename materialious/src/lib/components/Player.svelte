@@ -29,6 +29,7 @@
 		playerAndroidLockOrientation,
 		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
+		playerCCByDefault,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
@@ -313,6 +314,24 @@
 		return false;
 	}
 
+	function toggleSubtitles() {
+		const isVisible = player.isTextTrackVisible();
+		if (isVisible) {
+			player.setTextTrackVisibility(false);
+		} else {
+			const defaultLanguage = get(playerDefaultLanguage);
+			const langCode = ISO6391.getCode(defaultLanguage);
+
+			const tracks = player.getTextTracks();
+			const subtitleTrack = tracks.find((track) => track.language === langCode);
+
+			if (subtitleTrack) {
+				player.selectTextTrack(subtitleTrack);
+				player.setTextTrackVisibility(true);
+			}
+		}
+	}
+
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
 	async function loadVideo() {
@@ -394,6 +413,9 @@
 
 		restoreQualityPreference();
 		restoreDefaultLanguage();
+		if ($playerCCByDefault) {
+			toggleSubtitles();
+		}
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
@@ -539,21 +561,7 @@
 		}
 
 		Mousetrap.bind('c', () => {
-			const isVisible = player.isTextTrackVisible();
-			if (isVisible) {
-				player.setTextTrackVisibility(false);
-			} else {
-				const defaultLanguage = get(playerDefaultLanguage);
-				const langCode = ISO6391.getCode(defaultLanguage);
-
-				const tracks = player.getTextTracks();
-				const subtitleTrack = tracks.find((track) => track.language === langCode);
-
-				if (subtitleTrack) {
-					player.selectTextTrack(subtitleTrack);
-					player.setTextTrackVisibility(true);
-				}
-			}
+			toggleSubtitles();
 			return false;
 		});
 

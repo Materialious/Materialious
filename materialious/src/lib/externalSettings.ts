@@ -34,7 +34,8 @@ import {
 	themeColorStore,
 	interfaceAutoExpandChapters,
 	playerDefaultPlaybackSpeed,
-	playerStatisticsByDefault
+	playerStatisticsByDefault,
+	playerCCByDefault
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 
@@ -217,6 +218,11 @@ const persistedStores: {
 		name: 'playerStatistics',
 		store: playerStatisticsByDefault,
 		type: 'boolean'
+	},
+	{
+		name: 'CCByDefault',
+		store: playerCCByDefault,
+		type: 'boolean'
 	}
 ];
 
@@ -227,7 +233,7 @@ function setStores(toSet: Record<string, any>) {
 			userOverwritten = localStorage.getItem(store.name) !== null;
 		} catch {}
 
-		let paramValue = toSet[store.name];
+		const paramValue = toSet[store.name];
 		if (typeof paramValue !== 'undefined' && !userOverwritten) {
 			let value: any;
 

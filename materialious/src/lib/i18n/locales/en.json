@@ -144,6 +144,7 @@
 			"alwaysLoopVideo": "Always loop video",
 			"savePlaybackPosition": "Save playback position",
 			"listenByDefault": "Listen by default",
+			"ccByDefault": "Subtitles on by default",
 			"theatreModeByDefault": "Theatre mode by default",
 			"autoPlayNextByDefault": "Autoplay next by default",
 			"miniPlayer": "Mini player",

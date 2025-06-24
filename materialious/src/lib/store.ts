@@ -53,7 +53,8 @@ export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault
 export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
 export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);
 export const playerAndroidLockOrientation = persisted('androidLockOrientation', true);
-export const playerDefaultLanguage = persisted('defaultLanguage', '');
+export const playerDefaultLanguage = persisted('defaultLanguage', 'english');
+export const playerCCByDefault = persisted('CCByDefault', false);
 export const playerDefaultPlaybackSpeed: Writable<number> = persisted('defaultPlaybackSpeed', 1);
 export const playerStatisticsByDefault = persisted('playerStatistics', false);
 

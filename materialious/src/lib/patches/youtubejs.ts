@@ -98,7 +98,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
 				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
 		} else {
-			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash(undefined))}`;
+			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash({ captions_format: 'vtt' }))}`;
 		}
 	}
 
@@ -130,16 +130,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			lengthSeconds: recommended?.duration?.seconds || 0,
 			author: recommended?.author?.name || '',
 			authorId: recommended?.author?.id || ''
-		});
-	});
-
-	const captions: Captions[] = [];
-	video.captions?.caption_tracks?.forEach((caption) => {
-		captions.push({
-			label: caption.name?.toString() || '',
-			language_code: caption.language_code,
-			// Add correct format to url.
-			url: caption.base_url + '&fmt=vtt'
 		});
 	});
 

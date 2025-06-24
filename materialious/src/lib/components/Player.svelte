@@ -378,9 +378,7 @@
 				dashUrl += '?local=true';
 			}
 
-			await player.load(dashUrl);
-
-			await loadPlayerPos();
+			await player.load(dashUrl, await getLastPlayPos());
 		} else {
 			if (data.video.fallbackPatch === 'youtubejs') {
 				await player.load(data.video.dashUrl);
@@ -650,8 +648,8 @@
 		}
 	});
 
-	async function loadPlayerPos() {
-		if (loadTimeFromUrl($page)) return;
+	async function getLastPlayPos(): Promise<number> {
+		if (loadTimeFromUrl($page)) return 0;
 
 		let toSetTime = 0;
 
@@ -670,7 +668,7 @@
 			}
 		}
 
-		if (toSetTime > 0 && playerElement) playerElement.currentTime = toSetTime;
+		return toSetTime;
 	}
 
 	function savePlayerPos() {

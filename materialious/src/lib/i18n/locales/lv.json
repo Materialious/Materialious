@@ -13,7 +13,10 @@
             "video": "Lejupielādē video",
             "ffmpeg": "Lejupielādē ffmpeg bibliotēku un komponentes",
             "audio": "Lejupielādē audio",
-            "merging": "Apvieno video un audio"
+            "merging": "Apvieno video un audio",
+            "core": "Lejupielādē FFmpeg core",
+            "wasm": "Lejupielādē FFmpeg wasm",
+            "worker": "Lejupielādē FFmpeg worker"
         },
         "audioOnly": "Tikai audio",
         "unableToLoadComments": "Nevar ielādēt komentārus",
@@ -21,7 +24,13 @@
         "defaultLanguage": "Noklusējuma valoda",
         "noPlaylists": "Nav atskaņošanas sarakstu",
         "chapters": "Nodaļas",
-        "theatreMode": "Teātra režīms (Platekrāns)"
+        "theatreMode": "Teātra režīms (Platekrāns)",
+        "youtubeJsFallBack": "Tiek izmantots vietējais video ieguves rezerves variants",
+        "enableYoutubejsTemp": "Šoreiz izmantot vietējo video ieguves rezerves variantu",
+        "retryText": "Neizdevās ielādēt video. Kā vēlaties turpināt?",
+        "youtubeJsLoading": "Neizdevās ielādēt video, mēģina atkārtoti ielādēt ar vietējo video ieguves rezerves variantu.",
+        "enableYoutubejsPerm": "Vienmēr izmantot vietējo video ieguves rezerves variantu",
+        "preferredQuality": "Vēlamā kvalitāte"
     },
     "videos": "video",
     "layout": {
@@ -39,7 +48,9 @@
             "savePlaybackPosition": "Saglabāt atskaņošanas pozīciju",
             "title": "Atskaņotājs",
             "autoPlay": "Automātiski atskaņot video",
-            "youtubeJsAlways": "Vienmēr izmantot"
+            "youtubeJsAlways": "Vienmēr izmantot",
+            "localVideoFallback": "Vietējais video ieguves rezerves variants",
+            "youtubeJsFallback": "Vietējais video apstrādes rezerves variants"
         },
         "deArrow": {
             "titleOnly": "Tikai virsrakstu",
@@ -55,7 +66,12 @@
         "dataPreferences": {
             "dataPreferences": "Datu iestatījumi"
         },
-        "searchSuggestions": "Meklēšanas ieteikumi"
+        "searchSuggestions": "Meklēšanas ieteikumi",
+        "instanceUrl": "Servera (Instances) URL",
+        "syncPartyWarning": "Lūdzu, ņemiet vērā, ka Jūsu IP adrese būs pieejama lietotājiem, kurus jūs uzaicināt.",
+        "syncParty": "Kopīga skatīšanās ballīte",
+        "startSyncParty": "Sākt kopīgu skatīšanās ballīti",
+        "endSyncParty": "Beigt kopīgu skatīšanās ballīti"
     },
     "channels": "kanāli",
     "copyUrl": "Kopēt URL saiti",
@@ -83,13 +99,15 @@
         "public": "Publisks",
         "private": "Privāts",
         "playVideos": "Atskaņot video",
-        "shuffleVideos": "Atskaņot video jauktā secībā"
+        "shuffleVideos": "Atskaņot video jauktā secībā",
+        "loopPlaylist": "Atskaņot (malt) uz riņķi atskaņošanas sarakstu"
     },
     "pages": {
         "subscriptions": "Abonementi",
         "history": "Vēsture",
         "playlists": "Atskaņošanas saraksti",
-        "trending": "Pašlaik populāri"
+        "trending": "Pašlaik populāri",
+        "home": "Sākumlapa"
     },
     "subscribers": "abonenti",
     "title": "Virsraksts",
@@ -105,5 +123,16 @@
     "subscribe": "Abonēt",
     "disabled": "Atspējots",
     "invidiousBlockWarning": "Google pašlaik bloķē Invidious. Ja video nelādējas šajā serverī (instancē), lūdzu, izmantojiet šo serveri (instanci) Materialious uz {android} vai {desktop}, lai apietu šo problēmu ar vietējo video ieguves rezerves variantu.",
-    "skipping": "Izlaiž"
+    "skipping": "Izlaiž",
+    "playlistVideos": "Atskaņošanas saraksta video",
+    "invalidInstance": "Lūdzu, pārbaudiet URL saiti. Ja tā ir pareiza, tad iespējams serveris (instance) šobrīd nav pieejams vai neatbalsta trešo pušu klientus.",
+    "noCaptionData": "Subtitri nesatur nekādus datus.",
+    "syncParty": {
+        "userOnPrivatePage": "Lietotājs pašlaik skata privātu lapu, sinhronizācija drīz tiks atsākta.",
+        "userJoined": "Lietotājs pievienojās jūsu skatīšanās ballītei.",
+        "userLeft": "Lietotājs pameta jūsu skatīšanās ballīti."
+    },
+    "invidiousLogin": "Lūdzu, autorizējieties ar savu Invidious kontu",
+    "noResult": "Bez rezultātiem",
+    "letterCase": "Virsrakstu burtu reģistrs"
 }

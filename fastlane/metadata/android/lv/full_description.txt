@@ -8,7 +8,7 @@ Klients ļauj pārlūkot un skatīties YouTube video, pārvaldīt atskaņošanas
   <li>YouTube.js rezerves risinājums ārkārtas gadījumos, kad Invidious nevar ielādēt video datorā vai Android ierīcē</li>
   <li>Iespēja atslēgt TLS sertifikātu pārbaudi uz personīgi izvietotajiem (pašmitinātajiem) serveriem</li>
   <li>Sinhronizē skatīšanās progresu starp Invidious sesijām</li>
-  <li>Piedalīties sinhronizētās skatīšanās ballītēs</li>
+  <li>Piedalīties kopīgās skatīšanās ballītēs</li>
   <li>Iebūvēta sponsoru un reklāmdevēju izlaišana (Sponsorblock)</li>
   <li>Iebūvēts nepatīk balsojums (Return YouTube dislikes)</li>
   <li>Iebūvēts DeArrow (ar iespēju ārkārtas gadījumos pārslēgties uz vietējo apstrādi un ieguvi)</li>

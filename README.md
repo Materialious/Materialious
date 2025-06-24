@@ -234,13 +234,13 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 
 # Special thanks to
 - [SecularSteve](https://github.com/SecularSteve) for creating Materialious' logo.
-- [Invidious](https://github.com/iv-org)
-- [Clipious](https://github.com/lamarios/clipious) for inspiration & a good source for learning more about undocumented Invidious routes.
+- [Invidious](https://github.com/iv-org).
+- [Clipious](https://github.com/lamarios/clipious) for inspiration & references to undocumented Invidious routes.
 - [Beer CSS](https://github.com/beercss/beercss) (Especially the [YouTube template](https://github.com/beercss/beercss/tree/main/src/youtube) what was used as the base for Materialious.)
-- Every dependency in [package.json](/materialious/package.json).
 - [LuanRT](https://github.com/LuanRT) for YouTube.js & SABR implementation.
 - [FreeTube](https://github.com/FreeTubeApp/FreeTube) for their subtitle fix.
 - [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.
+- Every dependency in [package.json](/materialious/package.json).
 
 # Developers
 - [How Materialious is built](./docs/BUILDING.md)

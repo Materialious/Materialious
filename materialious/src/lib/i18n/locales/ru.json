@@ -8,7 +8,7 @@
     "cancel": "Отмена",
     "create": "Создать",
     "title": "Заголовок",
-    "searchPlaceholder": "Искать...",
+    "searchPlaceholder": "Искать",
     "delete": "Удалить",
     "donate": "Пожертвовать",
     "deleteAllHistory": "Удалить всю историю",
@@ -34,7 +34,7 @@
         "videos": "Видео",
         "playlists": "Списки воспроизведения",
         "channels": "Каналы",
-        "shorts": "Моменты",
+        "shorts": "Shorts",
         "streams": "Трансляции"
     },
     "subscriptions": {
@@ -107,22 +107,22 @@
         "notifications": "Уведомления",
         "noNewNotifications": "Нет новых уведомлений",
         "settings": "Настройки",
-        "login": "Зайти в учетную запись",
-        "logout": "Выйти из учетной записи",
+        "login": "Зайти в учётную запись",
+        "logout": "Выйти из учётной записи",
         "customize": "Настроить под себя",
         "theme": {
             "theme": "Тема",
             "darkMode": "Тёмный режим",
             "lightMode": "Светлый режим",
             "color": "Цвет",
-            "AmoledTheme": "Полностью чёрная тема"
+            "AmoledTheme": "Amoled-тема"
         },
         "searchSuggestions": "Поисковые подсказки",
         "previewVideoOnHover": "Предпросмотр видео при наведении",
         "expandDescription": "Развернуть описание по умолчанию",
         "expandComments": "Развернуть комментарий по умолчанию",
         "dataPreferences": {
-            "content": "Ищете импорт/экспорт подписок, смену пароля или как удалить учётную запись? Нажмите сюда и прокрутите станицу вниз.",
+            "content": "Хотите импортировать/экспортировать подписки, изменить пароль или удалить аккаунт? Нажмите сюда и прокрутите страницу вниз.",
             "dataPreferences": "Настройки данных"
         },
         "player": {
@@ -143,20 +143,21 @@
             "lockOrientation": "Ориентация закреплена относительно соотношения сторон",
             "localVideoFallback": "Резервное локальное видео",
             "playerStatistics": "Показать статистику плеера по умолчанию",
-            "defaultPlaybackSpeed": "Скорость воспроизведения по умолчанию"
+            "defaultPlaybackSpeed": "Скорость воспроизведения по умолчанию",
+            "ccByDefault": "Субтитры включены по умолчанию"
         },
         "bookmarklet": "Закладка",
         "instanceUrl": "URL-адрес сервера",
         "sponsors": {
             "sponsor": "Спонсор",
             "Catagories": "Категории",
-            "unpaidSelfPromotion": "Безвозмездная или самореклама",
-            "interactionReminder": "Призыв к подписке и взаимодействии",
-            "intermissionIntroAnimation": "Разделительная заставка или анимация",
-            "credits": "Титры, авторы, конечная заставка",
-            "preViewRecapHook": "Краткое содержание, предпросмотр, пересказ, завязка",
-            "tangentJokes": "Отвлечённые темы, шутки",
-            "disableToast": "Отключить всплывашки",
+            "unpaidSelfPromotion": "Самореклама/рекомендация",
+            "interactionReminder": "Напоминание о взаимодействии (Подписка)",
+            "intermissionIntroAnimation": "Анимация концовки/вступления",
+            "credits": "Конечные заставки/титры",
+            "preViewRecapHook": "Предпросмотр/краткое содержание/отсылка",
+            "tangentJokes": "Отвлечённые темы/шутки",
+            "disableToast": "Отключить всплывающие уведомления",
             "disableTimeline": "Отключить сегменты на временной линии"
         },
         "deArrow": {
@@ -164,7 +165,7 @@
             "thumbnailInstanceUrl": "URL-адрес сервера обложек",
             "titleOnly": "Только название"
         },
-        "lowBandwidthMode": "Режим низкой пропустительности сети",
+        "lowBandwidthMode": "Режим низкой пропускной способности сети",
         "displayThumbnailAvatars": "Миниатюрные аватары (Медленно)",
         "searchHistory": "История поиска",
         "allowInsecureRequests": "Разрешить небезопасные запросы",
@@ -176,5 +177,7 @@
     "defaultPage": "Страница по умолчанию",
     "disabled": "Выключено",
     "login": "Имя пользователя",
-    "invidiousLogin": "Пожалуйста, войдите со своей учётной записью Invidious"
+    "invidiousLogin": "Пожалуйста, войдите со своей учётной записью Invidious",
+    "playlistVideos": "Видео из плейлиста",
+    "recommendedVideos": "Рекомендуемые видео"
 }

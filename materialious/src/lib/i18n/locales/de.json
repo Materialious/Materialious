@@ -8,7 +8,7 @@
     "cancel": "Abbrechen",
     "create": "Erstellen",
     "title": "Titel",
-    "searchPlaceholder": "Suchen...",
+    "searchPlaceholder": "Suchen",
     "delete": "Löschen",
     "donate": "Spenden",
     "deleteAllHistory": "Gesamten Verlauf löschen",
@@ -88,7 +88,14 @@
         "noPlaylists": "Keine Wiedergabelisten",
         "unableToLoadComments": "Laden der Kommentare fehlgeschlagen",
         "addToPlaylist": "Zur Wiedergabeliste hinzufügen",
-        "youtubeJsFallBack": "Lokales Videozurückfall wird verwendet"
+        "youtubeJsFallBack": "Lokales Video-Fallback wird verwendet",
+        "enableYoutubejsPerm": "Lokales Video-Fallback immer erlauben",
+        "defaultLanguage": "Standardsprache",
+        "preferredQuality": "Bevorzugte Qualität",
+        "enableYoutubejsTemp": "Nutze einmalig lokales Video-Fallback",
+        "chapters": "Kapitel",
+        "retryText": "Das Video konnte nicht geladen werden, wie möchtest du weiterfahren?",
+        "youtubeJsLoading": "Das Video konnte nicht geladen werden, es wird mit lokalem Video-Fallback erneut versucht."
     },
     "layout": {
         "interface": "Schnittstelle",
@@ -133,8 +140,12 @@
             "dash": "Bindestrichmodus",
             "silenceSkipper": "Schweigenüberspringer (Experimentell)",
             "youtubeJsFallback": "Fallback für lokale Videoverarbeitung",
-            "youtubeJsAlways": "Verwenden Sie immer die lokale Videoverarbeitung",
-            "lockOrientation": "Ausrichtung an Seitenverhältnis gebunden"
+            "youtubeJsAlways": "Immer nutzen",
+            "lockOrientation": "Ausrichtung an Seitenverhältnis gebunden",
+            "defaultPlaybackSpeed": "Standardmässige Wiedergabegeschwindigkeit",
+            "ccByDefault": "Untertitel standardmässig an",
+            "localVideoFallback": "Lokales Video-Fallback",
+            "playerStatistics": "Player-Statistiken standardmässig anzeigen"
         },
         "bookmarklet": "Lesezeichen",
         "instanceUrl": "URL der Instanz",
@@ -154,7 +165,19 @@
             "title": "DeArrow",
             "thumbnailInstanceUrl": "URL der Miniaturansicht",
             "titleOnly": "Nur Titel"
-        }
+        },
+        "allowInsecureRequests": "Unsichere Anfragen zulassen",
+        "searchHistory": "Suchverlauf",
+        "companionUrl": "Companion URL",
+        "expandChapters": "Kapitel standardmässig ausklappen",
+        "displayThumbnailAvatars": "Vorschaubild-Avatare (Langsam)"
     },
-    "subscribe": "Abonnieren"
+    "subscribe": "Abonnieren",
+    "recommendedVideos": "Vorgeschlagene Videos",
+    "playlistVideos": "Wiedergabelisten Videos",
+    "defaultPage": "Standardseite",
+    "disabled": "Deaktiviert",
+    "invidiousLogin": "Bitte melde dich mit deinem Invidious-Konto an",
+    "invalidInstance": "Bitte prüfe die URL. Wenn sie korrekt ist, ist die Instanz möglicherweise außer Betrieb oder unterstützt keine Clients von Drittanbietern.",
+    "login": "Anmeldung"
 }

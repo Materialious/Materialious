@@ -3,7 +3,7 @@
     "copyUrl": "URL kopieren",
     "loadMore": "Mehr laden",
     "views": "Ansichten",
-    "invidiousBlockWarning": "Invidious wird derzeit von Google blockiert. Wenn Videos für diese Instanz nicht geladen werden, verwenden Sie diese Instanz bitte auf Materialious auf {android} oder {desktop}, um dies mit lokalem Videozurückfall zu umgehen.",
+    "invidiousBlockWarning": "Invidious wird derzeit von Google blockiert. Wenn Videos für diese Instanz nicht geladen werden, verwende diese Instanz bitte auf Materialious auf {android} oder {desktop}, um dies mit lokalem Video-Fallback zu umgehen.",
     "videos": "Videos",
     "cancel": "Abbrechen",
     "create": "Erstellen",
@@ -19,15 +19,15 @@
     "language": "Sprache",
     "channels": "Kanäle",
     "transcript": "Transkript",
-    "noCaptionData": "Untertitel enthalten keine daten.",
+    "noCaptionData": "Untertitel enthalten keine Daten.",
     "selectLang": "Sprache auswählen",
     "letterCase": "Groß-/Kleinschreibung für Titel",
     "hideReplies": "Antworten verstecken",
     "hideVideo": "Video verstecken",
     "syncParty": {
-        "userJoined": "Ein Benutzer ist Ihrer Anzeiggruppe beigetreten.",
-        "userLeft": "Ein Benutzer hat ihre Anzeiggruppe verlassen.",
-        "userOnPrivatePage": "Der Benutzer sieht gerade eine private Seite, die Synchronisierung wird in Kürze fortgesetzt."
+        "userJoined": "Ein Benutzer ist deiner Wiedergabegruppe beigetreten.",
+        "userLeft": "Ein Benutzer hat deine Wiedergabegruppe verlassen.",
+        "userOnPrivatePage": "Der Benutzer sieht sich gerade eine private Seite an, die Synchronisierung wird in Kürze fortgesetzt."
     },
     "videoTabs": {
         "all": "Alle",
@@ -35,7 +35,7 @@
         "playlists": "Wiedergabeliste",
         "channels": "Kanäle",
         "shorts": "Shorts",
-        "streams": "Ströme"
+        "streams": "Streams"
     },
     "subscriptions": {
         "manageSubscriptions": "Abonnements verwalten"
@@ -70,14 +70,14 @@
         "pauseVideoIn": "Video pausieren in ",
         "share": {
             "title": "Teilen",
-            "materialiousLink": "Materialious link kopieren",
-            "invidiousRedirect": "Invidious Weiterleitungslink kopieren",
-            "youtubeLink": "YouTube Link kopieren"
+            "materialiousLink": "Materialious-Link kopieren",
+            "invidiousRedirect": "Invidious-Weiterleitungslink kopieren",
+            "youtubeLink": "YouTube-Link kopieren"
         },
         "download": "Herunterladen",
         "downloadSteps": {
             "merging": "Video und Audio zusammenführen",
-            "video": "Herunterladen der Video",
+            "video": "Herunterladen des Videos",
             "audio": "Herunterladen der Audio",
             "ffmpeg": "Herunterladen der ffmpeg-Bibliothek und -Komponenten",
             "classWorker": "Herunterladen des ffmpeg-Klassenarbeiters",
@@ -88,7 +88,7 @@
         "noPlaylists": "Keine Wiedergabelisten",
         "unableToLoadComments": "Laden der Kommentare fehlgeschlagen",
         "addToPlaylist": "Zur Wiedergabeliste hinzufügen",
-        "youtubeJsFallBack": "Lokales Video-Fallback wird verwendet",
+        "youtubeJsFallBack": "Lokaler Video-Fallback wird verwendet",
         "enableYoutubejsPerm": "Lokales Video-Fallback immer erlauben",
         "defaultLanguage": "Standardsprache",
         "preferredQuality": "Bevorzugte Qualität",
@@ -98,19 +98,19 @@
         "youtubeJsLoading": "Das Video konnte nicht geladen werden, es wird mit lokalem Video-Fallback erneut versucht."
     },
     "layout": {
-        "interface": "Schnittstelle",
+        "interface": "Benutzeroberfläche",
         "star": "Sternchen auf GitHub vergeben!",
-        "syncParty": "Synchronisierung der Partei",
-        "syncPartyWarning": "Bitte beachten Sie, dass Ihre IP für die von Ihnen eingeladenen Benutzer sichtbar ist.",
-        "startSyncParty": "Synchronisierung der Partei starten",
-        "endSyncParty": "Synchronisierung der Partei beenden",
+        "syncParty": "Synchronisationsgruppe",
+        "syncPartyWarning": "Bitte beachte, dass deine IP für die von dir eingeladenen Benutzer sichtbar ist.",
+        "startSyncParty": "Synchronisationsgruppe starten",
+        "endSyncParty": "Synchronisationsgruppe stoppen",
         "notifications": "Benachrichtigungen",
         "noNewNotifications": "Keine neuen Benachrichtigungen",
         "settings": "Einstellungen",
         "login": "Anmelden",
         "logout": "Abmelden",
         "customize": "Anpassen",
-        "lowBandwidthMode": "Modus der geringer Bandbreite",
+        "lowBandwidthMode": "Modus für geringe Bandbreite",
         "theme": {
             "theme": "Thema",
             "darkMode": "Dunkler Modus",
@@ -123,29 +123,29 @@
         "expandDescription": "Beschreibung standardmäßig erweitern",
         "expandComments": "Kommentare standardmäßig erweitern",
         "dataPreferences": {
-            "content": "Sie möchten Abonnements importieren/exportieren, Ihr Passwort ändern oder Ihr Konto löschen? Klicken Sie hier und scrollen Sie bis zum Ende der Seite.",
+            "content": "Du möchtest Abonnements importieren/exportieren, dein Passwort ändern oder dein Konto löschen? Klicke hier und scrolle bis zum Ende der Seite.",
             "dataPreferences": "Dateneinstellungen"
         },
         "player": {
-            "title": "Spieler",
+            "title": "Player",
             "autoPlay": "Video automatisch abspielen",
             "alwaysLoopVideo": "Video immer in Schleife abspielen",
             "savePlaybackPosition": "Wiedergabeposition speichern",
             "listenByDefault": "Standardmäßig zuhören",
             "theatreModeByDefault": "Standardmäßiger Theatermodus",
             "autoPlayNextByDefault": "Standardmäßige Wiedergabe des nächsten Videos",
-            "miniPlayer": "Minispieler",
-            "proxyVideos": "Proxy-Videos",
+            "miniPlayer": "Mini-Player",
+            "proxyVideos": "Videos durch Proxy leiten",
             "backgroundPlay": "Ton im Hintergrund abspielen",
-            "dash": "Bindestrichmodus",
+            "dash": "Dash",
             "silenceSkipper": "Schweigenüberspringer (Experimentell)",
             "youtubeJsFallback": "Fallback für lokale Videoverarbeitung",
             "youtubeJsAlways": "Immer nutzen",
             "lockOrientation": "Ausrichtung an Seitenverhältnis gebunden",
-            "defaultPlaybackSpeed": "Standardmässige Wiedergabegeschwindigkeit",
-            "ccByDefault": "Untertitel standardmässig an",
-            "localVideoFallback": "Lokales Video-Fallback",
-            "playerStatistics": "Player-Statistiken standardmässig anzeigen"
+            "defaultPlaybackSpeed": "Standardmäßige Wiedergabegeschwindigkeit",
+            "ccByDefault": "Untertitel standardmäßig an",
+            "localVideoFallback": "Lokaler Video-Fallback",
+            "playerStatistics": "Player-Statistiken standardmäßig anzeigen"
         },
         "bookmarklet": "Lesezeichen",
         "instanceUrl": "URL der Instanz",
@@ -154,22 +154,22 @@
             "disableToast": "Toast deaktivieren",
             "disableTimeline": "Segmente auf der Zeitleiste deaktivieren",
             "Catagories": "Kategorien",
-            "unpaidSelfPromotion": "Unbezahlte/Selbstständige Förderung",
-            "interactionReminder": "Interaktionserinnerung (Abonnieren)",
+            "unpaidSelfPromotion": "Unbezahlte Werbung/Eigenwerbung",
+            "interactionReminder": "Interaktionsaufforderung (Abonnieren)",
             "intermissionIntroAnimation": "Unterbrechung/Einstiegsanimation",
-            "credits": "Endkarten/Gutschriften",
-            "preViewRecapHook": "Vorschau/Rückblick/Haken",
-            "tangentJokes": "Füller Tangent/Witze"
+            "credits": "Abspann",
+            "preViewRecapHook": "Vorschau/Rückblick/Hook",
+            "tangentJokes": "Füllende Abweichler/Witze"
         },
         "deArrow": {
             "title": "DeArrow",
-            "thumbnailInstanceUrl": "URL der Miniaturansicht",
+            "thumbnailInstanceUrl": "URL der Vorschaubilder-Instanz",
             "titleOnly": "Nur Titel"
         },
         "allowInsecureRequests": "Unsichere Anfragen zulassen",
         "searchHistory": "Suchverlauf",
         "companionUrl": "Companion URL",
-        "expandChapters": "Kapitel standardmässig ausklappen",
+        "expandChapters": "Kapitel standardmäßig ausklappen",
         "displayThumbnailAvatars": "Vorschaubild-Avatare (Langsam)"
     },
     "subscribe": "Abonnieren",

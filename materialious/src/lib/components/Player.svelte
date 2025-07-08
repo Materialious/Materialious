@@ -232,7 +232,7 @@
 					await setStatusBarColor();
 				}
 
-				if (!get(playerAndroidLockOrientation)) return;
+				if (!$playerAndroidLockOrientation) return;
 
 				if (isFullScreen && videoFormats[0].resolution) {
 					const widthHeight = videoFormats[0].resolution.split('x');

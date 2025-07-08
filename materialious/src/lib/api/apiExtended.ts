@@ -1,8 +1,5 @@
-import { writable, type Writable } from 'svelte/store';
 import type { SynciousProgressModel } from './model';
 import { getVideoProgress } from '.';
-
-const synciousCacheStore: Writable<SynciousProgressModel[] | null> = writable(null);
 
 const videoIds: string[] = [];
 const pendingResolves = new Map<string, (result: SynciousProgressModel | undefined) => void>();
@@ -34,8 +31,6 @@ async function processBatches(): Promise<void> {
 			}
 		}
 	}
-
-	synciousCacheStore.set(results);
 }
 
 export function queueSyncious(videoId: string): Promise<SynciousProgressModel | undefined> {
@@ -54,5 +49,3 @@ export function queueSyncious(videoId: string): Promise<SynciousProgressModel | 
 
 	return promise;
 }
-
-export { synciousCacheStore };

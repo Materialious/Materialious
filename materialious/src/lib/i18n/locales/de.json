@@ -2,7 +2,7 @@
     "enabled": "Aktiviert",
     "copyUrl": "URL kopieren",
     "loadMore": "Mehr laden",
-    "views": "Ansichten",
+    "views": "Aufrufe",
     "invidiousBlockWarning": "Invidious wird derzeit von Google blockiert. Wenn Videos für diese Instanz nicht geladen werden, verwende diese Instanz bitte auf Materialious auf {android} oder {desktop}, um dies mit lokalem Video-Fallback zu umgehen.",
     "videos": "Videos",
     "cancel": "Abbrechen",
@@ -34,7 +34,7 @@
     "videoTabs": {
         "all": "Alle",
         "videos": "Videos",
-        "playlists": "Wiedergabeliste",
+        "playlists": "Wiedergabelisten",
         "channels": "Kanäle",
         "shorts": "Shorts",
         "streams": "Streams"
@@ -63,7 +63,7 @@
         "playlists": "Wiedergabelisten"
     },
     "subscribers": "Abonnenten",
-    "unsubscribe": "Deabonnieren",
+    "unsubscribe": "Abo beenden",
     "loginRequired": "Anmeldung erforderlich",
     "player": {
         "audioOnly": "Nur Ton",

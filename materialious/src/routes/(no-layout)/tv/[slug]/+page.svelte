@@ -10,6 +10,7 @@
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { playlistCacheStore } from '$lib/store.js';
+	import { fade } from 'svelte/transition';
 
 	let { data } = $props();
 
@@ -98,7 +99,7 @@
 {/key}
 
 {#if showInfo}
-	<article id="shown-info">
+	<article id="shown-info" transition:fade>
 		<h5>{letterCase(data.video.title)}</h5>
 		<Author bind:subscribed video={data.video} />
 		<div class="space"></div>

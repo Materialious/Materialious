@@ -232,7 +232,7 @@
 					await setStatusBarColor();
 				}
 
-				if (!get(playerAndroidLockOrientation)) return;
+				if (!$playerAndroidLockOrientation) return;
 
 				if (isFullScreen && videoFormats[0].resolution) {
 					const widthHeight = videoFormats[0].resolution.split('x');
@@ -664,23 +664,21 @@
 	});
 
 	async function getLastPlayPos(): Promise<number> {
-		if (loadTimeFromUrl($page)) return 0;
+		if (loadTimeFromUrl($page) || !$playerSavePlaybackPositionStore) return 0;
 
 		let toSetTime = 0;
+
+		try {
+			const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
+			if (playerPos && Number(playerPos) > toSetTime) {
+				toSetTime = Number(playerPos);
+			}
+		} catch {}
 
 		if ($synciousStore && $synciousInstanceStore && $authStore) {
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
 			} catch {}
-		} else {
-			if ($playerSavePlaybackPositionStore) {
-				try {
-					const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-					if (playerPos && Number(playerPos) > toSetTime) {
-						toSetTime = Number(playerPos);
-					}
-				} catch {}
-			}
 		}
 
 		return toSetTime;

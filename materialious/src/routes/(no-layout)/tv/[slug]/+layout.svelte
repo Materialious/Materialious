@@ -6,6 +6,15 @@
 	let { children } = $props();
 </script>
 
+<svelte:head>
+	<style>
+		:focus {
+			outline: 4px solid var(--primary);
+			box-shadow: none !important;
+		}
+	</style>
+</svelte:head>
+
 {#if $isTvRouteLoading || $navigating}
 	<PageLoading />
 {:else}

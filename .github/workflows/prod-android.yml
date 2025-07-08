@@ -6,7 +6,7 @@ on:
         paths-ignore:
             - "**/*.md"
             - "./fastline/**"
-            - "./materialious/src/lib/i18n/locales/**"
+            - "./materialious/src/lib/i18n/**"
 
     workflow_dispatch:
 

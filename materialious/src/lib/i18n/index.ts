@@ -23,8 +23,16 @@ const resources: Record<string, () => Promise<Record<string, any>>> = {
 
 function getUserLocale(): string {
 	if (typeof navigator !== 'undefined') {
-		const lang = navigator.language;
-		return resources[lang] ? lang : defaultLocale;
+		for (const lang of navigator.languages) {
+			if (resources[lang]) {
+				return lang;
+			}
+			// In case of a regional code (e.g. 'de-CH'), fallback to the more general lang
+			const baseLang = lang.split('-')[0]
+			if (resources[baseLang]) {
+				return baseLang
+			}
+		}
 	}
 	return defaultLocale;
 }

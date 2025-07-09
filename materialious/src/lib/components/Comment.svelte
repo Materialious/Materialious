@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import CommentSelf from './Comment.svelte';
 	import { insecureRequestImageHandler } from '$lib/misc';
+	import { _ } from '$lib/i18n';
 
 	interface Props {
 		comment: Comment;
@@ -17,7 +18,7 @@
 
 	let replies: Comments | undefined = $state(undefined);
 
-	const replyText: string = comment.replies?.replyCount > 1 ? 'replies' : 'reply';
+	const replyText: string = comment.replies?.replyCount > 1 ? $_('replies') : $_('reply');
 
 	async function loadReplies(continuation: string) {
 		try {

@@ -469,7 +469,7 @@
 				<details>
 					<summary id="comment-section" class="none bold">
 						<nav>
-							<div class="max">{numberWithCommas(comments.commentCount)} comments</div>
+							<div class="max">{numberWithCommas(comments.commentCount)} {$_('comments')}</div>
 							<i>expand_more</i>
 						</nav>
 					</summary>

@@ -179,5 +179,7 @@
         "customize": "カスタマイズ"
     },
     "subscribe": "登録",
-    "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。"
+    "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
+    "reply": "返信",
+    "comments": "コメント"
 }

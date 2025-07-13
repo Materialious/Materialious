@@ -98,10 +98,10 @@
         "addToPlaylist": "再生リストに追加",
         "defaultLanguage": "既定の言語",
         "retryText": "動画の読み込みに失敗。どう続けますか？",
-        "enableYoutubejsTemp": "一度だけ動画への代替接続で直接接続",
-        "enableYoutubejsPerm": "常に動画への代替接続で直接接続",
-        "youtubeJsFallBack": "動画への代替接続で直接接続を使用",
-        "youtubeJsLoading": "動画の読み込みに失敗。動画への代替接続で直接接続を試みます。"
+        "enableYoutubejsTemp": "一度だけ動画への直接接続に切り替え",
+        "enableYoutubejsPerm": "常に動画への接続エラーで直接接続を許可",
+        "youtubeJsFallBack": "動画接続エラー 直接接続に切替",
+        "youtubeJsLoading": "動画の読み込みに失敗。動画への直接接続に切り替えます。"
     },
     "layout": {
         "interface": "外観",
@@ -132,7 +132,7 @@
         "expandComments": "最初からコメント展開",
         "allowInsecureRequests": "安全でないリクエストの許可",
         "dataPreferences": {
-            "content": "登録チャンネルのインポート/エクスポート、パスワード変更、アカウント削除ですか？ここをクリックし、ページの一番下までスクロール。",
+            "content": "登録チャンネルのインポートやエクスポート、パスワード変更、アカウント削除ですか？ここをクリックし、ページの一番下までスクロールしてください。",
             "dataPreferences": "データ設定"
         },
         "player": {
@@ -142,19 +142,19 @@
             "savePlaybackPosition": "再生位置を記憶",
             "ccByDefault": "最初から字幕表示",
             "theatreModeByDefault": "最初からシアターモード",
-            "autoPlayNextByDefault": "最初から自動で次の動画",
+            "autoPlayNextByDefault": "最初から「次の動画を自動再生」を有効化",
             "miniPlayer": "ミニプレイヤー",
             "proxyVideos": "動画のプロキシ",
             "backgroundPlay": "バックグラウンドで音声を再生",
             "dash": "DASH",
             "listenByDefault": "最初から音声モード",
             "silenceSkipper": "無音部分を飛ばす (実験的)",
-            "localVideoFallback": "動画への代替接続で直接接続",
+            "localVideoFallback": "動画の接続エラーで直接接続に切替",
             "youtubeJsFallback": "失敗時に動画の代替処理を使用",
             "youtubeJsAlways": "常に使用",
             "lockOrientation": "アスペクト比と向きを固定",
             "defaultPlaybackSpeed": "既定の再生速度",
-            "playerStatistics": "最初かプレイヤー統計情報を表示"
+            "playerStatistics": "最初からプレイヤー統計情報を表示"
         },
         "bookmarklet": "ブックマーク",
         "instanceUrl": "インスタンスのURL",
@@ -175,9 +175,11 @@
             "thumbnailInstanceUrl": "サムネイル用のインスタンスのURL",
             "titleOnly": "題名のみ"
         },
-        "noNewNotifications": "新規の通知なし",
+        "noNewNotifications": "新着通知なし",
         "customize": "カスタマイズ"
     },
     "subscribe": "登録",
-    "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。"
+    "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
+    "reply": "返信",
+    "comments": "コメント"
 }

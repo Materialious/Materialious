@@ -19,6 +19,7 @@ declare global {
 				visitorData: string
 			) => Promise<string>;
 			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promoise<boolean>;
+			doUpdateCheck: (disableAutoUpdate: boolean) => Promise<void>;
 		};
 	}
 }

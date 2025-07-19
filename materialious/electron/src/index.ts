@@ -58,8 +58,6 @@ let allowInsecureSSL = false;
 	setupContentSecurityPolicy(myCapacitorApp.getCustomURLScheme());
 	// Initialize our app, build windows, and load content.
 	await myCapacitorApp.init();
-	// Check for updates if we are in a packaged app.
-	autoUpdater.checkForUpdatesAndNotify();
 })();
 
 app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
@@ -167,3 +165,9 @@ ipcMain.handle('setAllowInsecureSSL', async (_, allow) => {
 
 	return allowInsecureSSL;
 });
+
+ipcMain.handle('doUpdateCheck', (_, disableAutoUpdate) => {
+	// Check for updates if we are in a packaged app.
+	autoUpdater.autoInstallOnAppQuit = !disableAutoUpdate
+	autoUpdater.checkForUpdatesAndNotify();
+})

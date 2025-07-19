@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
 		ipcRenderer.invoke('generatePoToken', bgChallenge, requestKey, visitorData),
 	setAllowInsecureSSL: async (allow: boolean) => {
 		return await ipcRenderer.invoke('setAllowInsecureSSL', allow);
-	}
+	},
+	doUpdateCheck: (disableAutoUpdate) => ipcRenderer.invoke('doUpdateCheck', disableAutoUpdate)
 });

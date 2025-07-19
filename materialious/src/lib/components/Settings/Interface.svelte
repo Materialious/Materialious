@@ -21,6 +21,7 @@
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
 		interfaceDefaultPage,
+		interfaceDisableAutoUpdate,
 		interfaceForceCase,
 		interfaceLowBandwidthMode,
 		interfaceRegionStore,
@@ -287,6 +288,24 @@
 		</label>
 	</nav>
 </div>
+
+{#if Capacitor.getPlatform() == 'electron'}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.disableAutoUpdate')}</div>
+			</div>
+			<label class="switch" tabindex="0" role="switch">
+				<input
+					type="checkbox"
+					bind:checked={$interfaceDisableAutoUpdate}
+					onclick={() => interfaceDisableAutoUpdate.set(!$interfaceDisableAutoUpdate)}
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+{/if}
 
 <div class="field label suffix border">
 	<select

@@ -590,6 +590,22 @@
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			return false;
 		});
+		
+		Mousetrap.bind(',', () => {
+			if (!playerElement) return
+			
+			const currentTrack = player.getVariantTracks().find(track => track.active)
+			const frameTime = 1/(currentTrack?.frameRate || 30)
+			playerElement.currentTime -= frameTime
+		})
+
+		Mousetrap.bind('.', () => {
+			if (!playerElement) return
+			
+			const currentTrack = player.getVariantTracks().find(track => track.active)
+			const frameTime = 1/(currentTrack?.frameRate || 30)
+			playerElement.currentTime += frameTime
+		})
 
 		playerElement.addEventListener('pause', async () => {
 			savePlayerPos();

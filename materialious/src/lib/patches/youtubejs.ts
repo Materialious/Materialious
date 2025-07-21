@@ -1,7 +1,6 @@
 import { androidPoTokenMinter } from '$lib/android/youtube/minter';
 import type {
 	AdaptiveFormats,
-	Captions,
 	Image,
 	StoryBoard,
 	Thumbnail,
@@ -78,6 +77,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		throw new Error('Unable to pull video info from youtube.js');
 	}
 
+	console.log(video);
+
 	let dashUri: string | undefined;
 
 	if (video.streaming_data) {
@@ -98,7 +99,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
 				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
 		} else {
-			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash({ captions_format: 'vtt' }))}`;
+			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash({ manifest_options: { captions_format: 'vtt' } }))}`;
 		}
 	}
 
@@ -116,20 +117,30 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	const recommendedVideos: VideoBase[] = [];
 	video.watch_next_feed?.forEach((recommended: Record<string, any>) => {
-		if (!recommended.title) {
+		if (
+			!recommended.metadata.title.text ||
+			recommended.content_type !== 'VIDEO' ||
+			!recommended.metadata.metadata.metadata_rows ||
+			recommended.metadata.metadata.metadata_rows.length < 2
+		) {
 			return;
 		}
 
 		recommendedVideos.push({
-			videoThumbnails: (recommended?.thumbnails as Thumbnail[]) || [],
-			videoId: recommended?.id || '',
-			title: recommended?.title?.toString() || '',
-			viewCountText: recommended.view_count
-				? numberWithCommas(Number(recommended?.view_count.toString().replace(/\D/g, ''))) || ''
+			videoThumbnails: (recommended?.content_image?.image as Thumbnail[]) || [],
+			videoId: recommended?.content_id || '',
+			title: recommended.metadata.title?.text || '',
+			viewCountText: recommended.metadata.metadata.metadata_rows[1]?.metadata_parts[0]
+				? recommended.metadata.metadata.metadata_rows[1]?.metadata_parts[0]?.text.text?.replace(
+						'views',
+						''
+					)
 				: '',
 			lengthSeconds: recommended?.duration?.seconds || 0,
-			author: recommended?.author?.name || '',
-			authorId: recommended?.author?.id || ''
+			author: recommended.metadata.metadata.metadata_rows[0]?.metadata_parts[0]?.text.text || '',
+			authorId:
+				recommended.metadata?.image?.renderer_context?.command_context?.on_tap.payload?.browseId ||
+				''
 		});
 	});
 
@@ -202,7 +213,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		videoThumbnails: video.basic_info.thumbnail as Thumbnail[],
 		author: video.basic_info.author || 'Unknown',
 		lengthSeconds: video.basic_info.duration || 0,
-		subCountText: '',
+		subCountText: video.secondary_info.owner?.subscriber_count.text || '',
 		keywords: video.basic_info.keywords || [],
 		allowedRegions: [],
 		ytjs: {

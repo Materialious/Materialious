@@ -136,7 +136,7 @@
 		"expandChapters": "Expand chapters by default",
 		"expandComments": "Expand comments by default",
 		"allowInsecureRequests": "Allow insecure requests",
-		"disableAutoUpdate": "Disable automatic update installation",
+		"disableAutoUpdate": "Disable automatic updates",
 		"dataPreferences": {
 			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page.",
 			"dataPreferences": "Data preferences"

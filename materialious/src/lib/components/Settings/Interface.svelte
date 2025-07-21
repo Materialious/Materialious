@@ -111,6 +111,12 @@
 		}
 	});
 
+	if (Capacitor.getPlatform() === 'electron') {
+		interfaceDisableAutoUpdate.subscribe((isDisabled) => {
+			window.electronAPI.doUpdateCheck(isDisabled);
+		});
+	}
+
 	let pages: Pages = $state([]);
 	authStore.subscribe(() => {
 		pages = getPages();

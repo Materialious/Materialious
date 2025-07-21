@@ -20,7 +20,6 @@
 		instanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
-		interfaceDisableAutoUpdate,
 		isAndroidTvStore,
 		syncPartyPeerStore,
 		themeColorStore
@@ -211,8 +210,6 @@
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));
 		}
-
-		window.electronAPI.doUpdateCheck($interfaceDisableAutoUpdate)
 	});
 
 	function linkClickOverwrite(event: MouseEvent) {

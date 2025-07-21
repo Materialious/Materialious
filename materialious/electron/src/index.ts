@@ -4,7 +4,7 @@ import {
 	setupElectronDeepLinking
 } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, ipcMain, MenuItem, session, webContents } from 'electron';
+import { app, ipcMain, MenuItem, session } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';

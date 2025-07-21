@@ -7,6 +7,7 @@ export const locale: Writable<string> = writable(defaultLocale);
 export const _: Writable<(key: string, options?: any) => string> = writable(() => '');
 
 const resources: Record<string, () => Promise<Record<string, any>>> = {
+	ar: () => import('./locales/ar.json'),
 	en: () => import('./locales/en.json'),
 	ru: () => import('./locales/ru.json'),
 	'zh-CN': () => import('./locales/zh-CN.json'),
@@ -14,6 +15,7 @@ const resources: Record<string, () => Promise<Record<string, any>>> = {
 	nl: () => import('./locales/nl.json'),
 	de: () => import('./locales/de.json'),
 	es: () => import('./locales/es.json'),
+	gsw: () => import('./locales/gsw.json'),
 	sh: () => import('./locales/sh.json'),
 	'pt-BR': () => import('./locales/pt-BR.json'),
 	lv: () => import('./locales/lv.json'),

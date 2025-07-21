@@ -2,7 +2,7 @@
     "enabled": "Aktiviert",
     "copyUrl": "URL kopieren",
     "loadMore": "Mehr laden",
-    "views": "Ansichten",
+    "views": "Aufrufe",
     "invidiousBlockWarning": "Invidious wird derzeit von Google blockiert. Wenn Videos für diese Instanz nicht geladen werden, verwende diese Instanz bitte auf Materialious auf {android} oder {desktop}, um dies mit lokalem Video-Fallback zu umgehen.",
     "videos": "Videos",
     "cancel": "Abbrechen",
@@ -34,7 +34,7 @@
     "videoTabs": {
         "all": "Alle",
         "videos": "Videos",
-        "playlists": "Wiedergabeliste",
+        "playlists": "Wiedergabelisten",
         "channels": "Kanäle",
         "shorts": "Shorts",
         "streams": "Streams"
@@ -63,7 +63,7 @@
         "playlists": "Wiedergabelisten"
     },
     "subscribers": "Abonnenten",
-    "unsubscribe": "Deabonnieren",
+    "unsubscribe": "Abo beenden",
     "loginRequired": "Anmeldung erforderlich",
     "player": {
         "audioOnly": "Nur Ton",
@@ -80,7 +80,7 @@
         "downloadSteps": {
             "merging": "Video und Audio zusammenführen",
             "video": "Herunterladen des Videos",
-            "audio": "Herunterladen der Audio",
+            "audio": "Herunterladen des Tons",
             "ffmpeg": "Herunterladen der ffmpeg-Bibliothek und -Komponenten",
             "classWorker": "Herunterladen des ffmpeg-Klassenarbeiters",
             "core": "Herunterladen der ffmpeg-Kern",
@@ -91,10 +91,10 @@
         "unableToLoadComments": "Laden der Kommentare fehlgeschlagen",
         "addToPlaylist": "Zur Wiedergabeliste hinzufügen",
         "youtubeJsFallBack": "Lokaler Video-Fallback wird verwendet",
-        "enableYoutubejsPerm": "Lokales Video-Fallback immer erlauben",
+        "enableYoutubejsPerm": "Lokalen Video-Fallback immer erlauben",
         "defaultLanguage": "Standardsprache",
         "preferredQuality": "Bevorzugte Qualität",
-        "enableYoutubejsTemp": "Nutze einmalig lokales Video-Fallback",
+        "enableYoutubejsTemp": "Nutze einmalig den lokalen Video-Fallback",
         "chapters": "Kapitel",
         "retryText": "Das Video konnte nicht geladen werden, wie möchtest du weiterfahren?",
         "youtubeJsLoading": "Das Video konnte nicht geladen werden, es wird mit lokalem Video-Fallback erneut versucht."
@@ -114,7 +114,7 @@
         "customize": "Anpassen",
         "lowBandwidthMode": "Modus für geringe Bandbreite",
         "theme": {
-            "theme": "Thema",
+            "theme": "Erscheinungsbild",
             "darkMode": "Dunkler Modus",
             "lightMode": "Heller Modus",
             "AmoledTheme": "Amoled-Thema",
@@ -124,6 +124,7 @@
         "previewVideoOnHover": "Video-Vorschau beim Hovern",
         "expandDescription": "Beschreibung standardmäßig erweitern",
         "expandComments": "Kommentare standardmäßig erweitern",
+        "disableAutoUpdate": "Automatische Installation von Updates deaktivieren",
         "dataPreferences": {
             "content": "Du möchtest Abonnements importieren/exportieren, dein Passwort ändern oder dein Konto löschen? Klicke hier und scrolle bis zum Ende der Seite.",
             "dataPreferences": "Dateneinstellungen"

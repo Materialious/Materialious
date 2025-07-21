@@ -55,24 +55,10 @@
     <content_attribute id="social-contacts">intense</content_attribute>
   </content_rating>
   <releases>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <release version="1.9.20" date="2025-7-09">
+    <release version="1.9.21" date="2025-7-21">
+      <url>https://github.com/Materialious/Materialious/releases/tag/1.9.21</url>
+    </release>
+<release version="1.9.20" date="2025-7-09">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.9.20</url>
     </release>
 <release version="1.9.19" date="2025-7-08">
@@ -125,7 +111,7 @@
     </release>
 <release version="1.9.3" date="2025-6-05">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.9.3</url>
-    </release>    
+    </release>
     <release version="1.9.2" date="2025-6-05">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.9.2</url>
     </release>

@@ -166,8 +166,16 @@ ipcMain.handle('setAllowInsecureSSL', async (_, allow) => {
 	return allowInsecureSSL;
 });
 
-ipcMain.handle('doUpdateCheck', (_, disableAutoUpdate) => {
+ipcMain.handle('doUpdateCheck', async (_, disableAutoUpdate) => {
 	// Check for updates if we are in a packaged app.
-	autoUpdater.autoInstallOnAppQuit = !disableAutoUpdate
-	autoUpdater.checkForUpdatesAndNotify();
-})
+	autoUpdater.autoInstallOnAppQuit = !disableAutoUpdate;
+
+	if (disableAutoUpdate) {
+		await autoUpdater.checkForUpdatesAndNotify({
+			title: 'Update Available',
+			body: 'A new version is available.'
+		});
+	} else {
+		await autoUpdater.checkForUpdatesAndNotify();
+	}
+});

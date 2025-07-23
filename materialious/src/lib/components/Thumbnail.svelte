@@ -270,6 +270,7 @@
 	.video-title {
 		word-wrap: break-word;
 		overflow: hidden;
+		border-radius: 0px;
 	}
 
 	.thumbnail-details {

@@ -16,13 +16,9 @@ import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } 
 // Graceful handling of unhandled errors.
 unhandled();
 
-// Define our menu templates (these are optional)
+// Define our menu template (this is optional)
 const trayMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 	new MenuItem({ label: 'Quit App', role: 'quit' })
-];
-const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
-	{ role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu' },
-	{ role: 'viewMenu' }
 ];
 
 // Get Config options from capacitor.config
@@ -33,7 +29,6 @@ const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig(
 const myCapacitorApp = new ElectronCapacitorApp(
 	capacitorFileConfig,
 	trayMenuTemplate,
-	appMenuBarMenuTemplate
 );
 
 // If deeplinking is enabled then we will set it up here.

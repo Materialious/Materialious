@@ -7,7 +7,6 @@ import type {
 	VideoBase,
 	VideoPlay
 } from '$lib/api/model';
-import { numberWithCommas } from '$lib/numbers';
 import { fromFormat } from '$lib/sabr/formatKeyUtils';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
@@ -77,8 +76,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		throw new Error('Unable to pull video info from youtube.js');
 	}
 
-	console.log(video);
-
 	let dashUri: string | undefined;
 
 	if (video.streaming_data) {
@@ -102,8 +99,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash({ manifest_options: { captions_format: 'vtt' } }))}`;
 		}
 	}
-
-	if (!dashUri) throw Error('Unable to find suitable dash manifest');
 
 	const descString = video.secondary_info.description?.toString() || '';
 
@@ -206,9 +201,10 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		premiereTimestamp: 0,
 		hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
 		liveNow: video.basic_info.is_live || false,
-		premium: false,
+		// @ts-expect-error Type does have offer_id
+		premium: video?.playability_status?.error_screen?.offer_id === 'sponsors_only_video',
 		storyboards: storyboard,
-		isUpcoming: false,
+		isUpcoming: video?.playability_status?.status !== 'OK',
 		videoId: videoId,
 		videoThumbnails: video.basic_info.thumbnail as Thumbnail[],
 		author: video.basic_info.author || 'Unknown',

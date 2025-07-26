@@ -100,7 +100,7 @@ export interface VideoPlay extends Video {
 	genre: string;
 	genreUrl: string;
 	hlsUrl?: string;
-	dashUrl: string;
+	dashUrl?: string;
 	adaptiveFormats: AdaptiveFormats[];
 	formatStreams: FormatStreams[];
 	recommendedVideos: VideoBase[];

@@ -1,6 +1,8 @@
 {
 	"enabled": "Enabled",
 	"disabled": "Disabled",
+	"premium": "Premium YouTube content can't be watched on Materialious.",
+	"isUpcoming": "Video is not in a watchable state yet.",
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",
 	"views": "views",

@@ -8,7 +8,7 @@
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { StatusBar, Style } from '@capacitor/status-bar';
 	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
-	import { type Page } from '@sveltejs/kit';
+	import { error, type Page } from '@sveltejs/kit';
 	import { HttpFetchPlugin } from '$lib/sabr/shakaHttpPlugin';
 	import ui from 'beercss';
 	import ISO6391 from 'iso-639-1';
@@ -385,7 +385,7 @@
 			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
 			setupSponsorSkip();
 
-			let dashUrl: string = '';
+			let dashUrl: string;
 
 			// Due to CORs issues with redirects, hosted instances of Materialious
 			// dirctly provide the companion instance
@@ -393,6 +393,10 @@
 			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && Capacitor.getPlatform() === 'web') {
 				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
 			} else {
+				if (!data.video.dashUrl) {
+					error(500, 'No dash manifest found');
+					return;
+				}
 				dashUrl = data.video.dashUrl;
 			}
 
@@ -403,6 +407,10 @@
 			await player.load(dashUrl, await getLastPlayPos());
 		} else {
 			if (data.video.fallbackPatch === 'youtubejs') {
+				if (!data.video.dashUrl) {
+					error(500, 'No dash manifest found');
+					return;
+				}
 				await player.load(data.video.dashUrl);
 			} else {
 				await player.load(data.video.hlsUrl + '?local=true');
@@ -590,22 +598,22 @@
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			return false;
 		});
-		
+
 		Mousetrap.bind(',', () => {
-			if (!playerElement) return
-			
-			const currentTrack = player.getVariantTracks().find(track => track.active)
-			const frameTime = 1/(currentTrack?.frameRate || 30)
-			playerElement.currentTime -= frameTime
-		})
+			if (!playerElement) return;
+
+			const currentTrack = player.getVariantTracks().find((track) => track.active);
+			const frameTime = 1 / (currentTrack?.frameRate || 30);
+			playerElement.currentTime -= frameTime;
+		});
 
 		Mousetrap.bind('.', () => {
-			if (!playerElement) return
-			
-			const currentTrack = player.getVariantTracks().find(track => track.active)
-			const frameTime = 1/(currentTrack?.frameRate || 30)
-			playerElement.currentTime += frameTime
-		})
+			if (!playerElement) return;
+
+			const currentTrack = player.getVariantTracks().find((track) => track.active);
+			const frameTime = 1 / (currentTrack?.frameRate || 30);
+			playerElement.currentTime += frameTime;
+		});
 
 		playerElement.addEventListener('pause', async () => {
 			savePlayerPos();

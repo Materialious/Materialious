@@ -16,6 +16,7 @@ import {
 import { phaseDescription } from '$lib/timestamps';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
+import { _ } from './i18n';
 
 export async function getWatchDetails(videoId: string, url: URL) {
 	let video;
@@ -23,6 +24,14 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		video = await getVideo(videoId, get(playerProxyVideosStore), { priority: 'high' });
 	} catch (errorMessage: any) {
 		error(500, errorMessage);
+	}
+
+	if (video.premium) {
+		error(400, get(_)('premium'));
+	}
+
+	if (video.isUpcoming) {
+		error(400, get(_)('isUpcoming'));
 	}
 
 	let personalPlaylists;

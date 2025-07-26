@@ -124,7 +124,7 @@
         "previewVideoOnHover": "Video-Vorschau beim Hovern",
         "expandDescription": "Beschreibung standardmäßig erweitern",
         "expandComments": "Kommentare standardmäßig erweitern",
-        "disableAutoUpdate": "Automatische Installation von Updates deaktivieren",
+        "disableAutoUpdate": "Automatische Updates deaktivieren",
         "dataPreferences": {
             "content": "Du möchtest Abonnements importieren/exportieren, dein Passwort ändern oder dein Konto löschen? Klicke hier und scrolle bis zum Ende der Seite.",
             "dataPreferences": "Dateneinstellungen"

@@ -67,7 +67,7 @@ export const returnYTDislikesInstanceStore: Writable<string | null | undefined> 
 	)
 );
 
-export const synciousStore = persisted('syncious', true);
+export const synciousStore = persisted('syncious', false);
 export const synciousInstanceStore: Writable<string | null | undefined> = persisted(
 	'synciousInstance',
 	platformDependentDefault(
@@ -92,7 +92,7 @@ export const interfaceDisplayThumbnailAvatars = persisted('disableThumbnailAvata
 export const interfaceDefaultPage = persisted('defaultPage', '/');
 export const interfaceSearchHistoryEnabled = persisted('searchHistoryEnabled', false);
 export const interfaceAllowInsecureRequests = persisted('allowInsecureRequests', false);
-export const interfaceDisableAutoUpdate = persisted('disableAutoUpdate', false)
+export const interfaceDisableAutoUpdate = persisted('disableAutoUpdate', false);
 
 export const sponsorBlockStore = persisted('sponsorBlock', true);
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(

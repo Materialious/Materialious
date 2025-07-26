@@ -172,6 +172,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		});
 	}
 
+	console.log(video);
+
 	return {
 		type: 'video',
 		title: video.primary_info.title?.toString() || '',
@@ -201,7 +203,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		premiereTimestamp: 0,
 		hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
 		liveNow: video.basic_info.is_live || false,
-		premium: video?.playability_status?.status === 'UNPLAYABLE',
+		// @ts-expect-error Type does have offer_id
+		premium: video?.playability_status?.error_screen?.offer_id === 'sponsors_only_video',
 		storyboards: storyboard,
 		isUpcoming: video?.playability_status?.status !== 'OK',
 		videoId: videoId,

@@ -3,8 +3,7 @@ import {
 	getCapacitorElectronConfig,
 	setupElectronDeepLinking
 } from '@capacitor-community/electron';
-import type { MenuItemConstructorOptions } from 'electron';
-import { app, ipcMain, MenuItem, session } from 'electron';
+import { app, ipcMain, session } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
@@ -16,20 +15,12 @@ import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } 
 // Graceful handling of unhandled errors.
 unhandled();
 
-// Define our menu template (this is optional)
-const trayMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
-	new MenuItem({ label: 'Quit App', role: 'quit' })
-];
-
 // Get Config options from capacitor.config
 const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
 
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
-const myCapacitorApp = new ElectronCapacitorApp(
-	capacitorFileConfig,
-	trayMenuTemplate,
-);
+const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
 
 // If deeplinking is enabled then we will set it up here.
 if (capacitorFileConfig.electron?.deepLinkingEnabled) {

@@ -172,8 +172,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		});
 	}
 
-	console.log(video);
-
 	return {
 		type: 'video',
 		title: video.primary_info.title?.toString() || '',

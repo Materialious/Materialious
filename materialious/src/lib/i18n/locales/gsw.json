@@ -85,7 +85,8 @@
         },
         "syncPartyWarning": "Bitte denk dra, dass dini IP für die vo dir iigladne Benutzer sichtbar isch.",
         "displayThumbnailAvatars": "Vorschaubild-Avatar (Langsam)",
-        "expandDescription": "Beschriibig standardmässig erwiitere"
+        "expandDescription": "Beschriibig standardmässig erwiitere",
+        "disableAutoUpdate": "Automatischi Updates deaktiviere"
     },
     "videos": "Videos",
     "cancel": "Abbreche",

@@ -191,22 +191,6 @@ export class ElectronCapacitorApp {
 			this.MainWindow.webContents.toggleDevTools();
 		});
 
-		let zoomFactor = 1.0;
-		globalShortcut.register('Control+Plus', () => {
-			zoomFactor += 0.1;
-			this.MainWindow.webContents.setZoomFactor(zoomFactor);
-		});
-
-		globalShortcut.register('Control+Minus', () => {
-			zoomFactor = Math.max(0.2, zoomFactor - 0.1);
-			this.MainWindow.webContents.setZoomFactor(zoomFactor);
-		});
-
-		globalShortcut.register('Control+0', () => {
-			zoomFactor = 1.0;
-			this.MainWindow.webContents.setZoomFactor(zoomFactor);
-		});
-
 		// Security
 		this.MainWindow.webContents.setWindowOpenHandler((details) => {
 			shell.openExternal(details.url);

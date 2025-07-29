@@ -182,5 +182,7 @@
     "subscribe": "Abonniere",
     "invidiousLogin": "Bitte meld dich mit dim Invidious-Konto aa",
     "invalidInstance": "Bitte prüef d URL. Wenn si korrekt isch, isch d Instanz möglicherwiis usser Betriib oder unterstützt kei Clients vo Drittaabüüter.",
-    "loginRequired": "Aameldig erforderlich"
+    "loginRequired": "Aameldig erforderlich",
+    "isUpcoming": "Video isch nonig imene aaluegbare Zuestand.",
+    "premium": "YouTube-Premium-Inhält chönd uf Materialious nonig aagluegt werde."
 }

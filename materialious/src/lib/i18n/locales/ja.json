@@ -132,7 +132,7 @@
         "expandComments": "最初からコメント展開",
         "allowInsecureRequests": "安全でないリクエストの許可",
         "dataPreferences": {
-            "content": "登録チャンネルのインポートやエクスポート、パスワード変更、アカウント削除ですか？ここをクリックし、ページの一番下までスクロールしてください。",
+            "content": "登録チャンネルのインポートやエクスポート、パスワード変更、アカウント削除ですか？ここをクリックし、開いたページの一番下までスクロールしてください。",
             "dataPreferences": "データ設定"
         },
         "player": {
@@ -176,10 +176,13 @@
             "titleOnly": "題名のみ"
         },
         "noNewNotifications": "新着通知なし",
-        "customize": "カスタマイズ"
+        "customize": "カスタマイズ",
+        "disableAutoUpdate": "自動更新しない"
     },
     "subscribe": "登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
     "reply": "返信",
-    "comments": "コメント"
+    "comments": "コメント",
+    "premium": "プレミアムなYouTubeコンテンツはMaterialiousでは視聴できません。",
+    "isUpcoming": "動画はまだ視聴可能ではありません。"
 }

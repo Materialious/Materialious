@@ -42,6 +42,7 @@ function getUserLocale(): string {
 export async function initI18n(selectedLocale: string = getUserLocale()): Promise<void> {
 	const langToLoad = resources[selectedLocale] ? selectedLocale : defaultLocale;
 	const translations = await resources[langToLoad]();
+	const fallbackTranslations = await resources[defaultLocale]();
 
 	const options: InitOptions = {
 		lng: langToLoad,
@@ -49,6 +50,9 @@ export async function initI18n(selectedLocale: string = getUserLocale()): Promis
 		resources: {
 			[langToLoad]: {
 				translation: translations.default || translations
+			},
+			[defaultLocale]: {
+				translation: fallbackTranslations.default || fallbackTranslations
 			}
 		}
 	};

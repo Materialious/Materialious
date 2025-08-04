@@ -182,5 +182,7 @@
     "disabled": "Deaktiviert",
     "invidiousLogin": "Bitte melde dich mit deinem Invidious-Konto an",
     "invalidInstance": "Bitte prüfe die URL. Wenn sie korrekt ist, ist die Instanz möglicherweise außer Betrieb oder unterstützt keine Clients von Drittanbietern.",
-    "login": "Anmeldung"
+    "login": "Anmeldung",
+    "premium": "YouTube-Premium-Inhalte können auf Materialious nicht angeschaut werden.",
+    "isUpcoming": "Video ist noch nicht in einem anschaubaren Zustand."
 }

@@ -57,7 +57,11 @@
   <releases>
     
     
-    <release version="1.9.23" date="2025-7-28">
+    
+    <release version="1.10.0" date="2025-8-04">
+      <url>https://github.com/Materialious/Materialious/releases/tag/1.10.0</url>
+    </release>
+<release version="1.9.23" date="2025-7-28">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.9.23</url>
     </release>
 <release version="1.9.22" date="2025-7-26">

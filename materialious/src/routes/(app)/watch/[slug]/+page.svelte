@@ -370,7 +370,7 @@
 							{$_('player.share.title')}
 						</div>
 						<menu class="no-wrap mobile">
-							<ShareVideo video={data.video} />
+							<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
 						</menu></button
 					>
 					{#if personalPlaylists}

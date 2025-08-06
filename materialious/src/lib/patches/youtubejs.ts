@@ -113,7 +113,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	const recommendedVideos: VideoBase[] = [];
 	video.watch_next_feed?.forEach((recommended: Record<string, any>) => {
 		if (
-			!recommended.metadata.title.text ||
+			!recommended.metadata?.title?.text ||
 			recommended.content_type !== 'VIDEO' ||
 			!recommended.metadata.metadata.metadata_rows ||
 			recommended.metadata.metadata.metadata_rows.length < 2
@@ -124,7 +124,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image?.image as Thumbnail[]) || [],
 			videoId: recommended?.content_id || '',
-			title: recommended.metadata.title?.text || '',
+			title: recommended.metadata?.title?.text || '',
 			viewCountText: recommended.metadata.metadata.metadata_rows[1]?.metadata_parts[0]
 				? recommended.metadata.metadata.metadata_rows[1]?.metadata_parts[0]?.text.text?.replace(
 						'views',
@@ -174,7 +174,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	return {
 		type: 'video',
-		title: video.primary_info.title?.toString() || '',
+		title: video.primary_info?.title?.toString() || '',
 		viewCount: Number(video.basic_info.view_count || 0),
 		viewCountText: video.basic_info.view_count?.toString() || '0',
 		likeCount: video.basic_info.like_count || 0,

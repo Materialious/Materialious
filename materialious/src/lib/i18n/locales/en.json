@@ -85,7 +85,8 @@
 			"title": "Share",
 			"materialiousLink": "Copy Materialious link",
 			"invidiousRedirect": "Copy Invidious redirect link",
-			"youtubeLink": "Copy Youtube link"
+			"youtubeLink": "Copy Youtube link",
+			"includeTimestamp": "Timestamped"
 		},
 		"download": "Download",
 		"downloadSteps": {

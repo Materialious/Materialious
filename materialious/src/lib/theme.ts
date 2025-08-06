@@ -28,6 +28,7 @@ export async function setStatusBarColor() {
 		await StatusBar.setBackgroundColor({
 			color: surfaceColor
 		});
+		await StatusBar.setOverlaysWebView({overlay: false})
 
 		await NavigationBar.setColor({
 			color: surfaceColor,

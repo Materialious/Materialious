@@ -8,20 +8,37 @@
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
+		currentTime?: number;
 	}
 
-	let { video }: Props = $props();
+	let { video, currentTime = $bindable() }: Props = $props();
+	let includeTimestamp: boolean = $state(false);
 </script>
 
+{#if currentTime !== undefined}
+	<li class="row">
+		<label class="switch">
+			<input type="checkbox" bind:checked={includeTimestamp} />
+			<span></span>
+		</label>
+		<div class="min">{$_('player.share.includeTimestamp')}</div>
+	</li>
+	<div class="divider"></div>
+{/if}
 <li
 	class="row"
 	role="presentation"
 	onclick={async () => {
+		let url = '';
 		if (Capacitor.isNativePlatform()) {
-			await Clipboard.write({ string: `${get(instanceStore)}/watch/${video.videoId}` });
+			url = `${get(instanceStore)}/watch/${video.videoId}`;
 		} else {
-			await Clipboard.write({ string: `${location.origin}/watch/${video.videoId}` });
+			url = `${location.origin}/watch/${video.videoId}`;
 		}
+		if (includeTimestamp && currentTime !== undefined) {
+			url += `?time=${Math.floor(currentTime)}`;
+		}
+		await Clipboard.write({ string: url });
 		(document.activeElement as HTMLElement)?.blur();
 	}}
 >
@@ -31,7 +48,11 @@
 	class="row"
 	role="presentation"
 	onclick={async () => {
-		await Clipboard.write({ string: `https://redirect.invidious.io/watch?v=${video.videoId}` });
+		let url = `https://redirect.invidious.io/watch?v=${video.videoId}`;
+		if (includeTimestamp && currentTime !== undefined) {
+			url += `&t=${Math.floor(currentTime)}`;
+		}
+		await Clipboard.write({ string: url });
 		(document.activeElement as HTMLElement)?.blur();
 	}}
 >
@@ -41,7 +62,11 @@
 	class="row"
 	role="presentation"
 	onclick={async () => {
-		await Clipboard.write({ string: `https://www.youtube.com/watch?v=${video.videoId}` });
+		let url = `https://www.youtube.com/watch?v=${video.videoId}`;
+		if (includeTimestamp && currentTime !== undefined) {
+			url += `&t=${Math.floor(currentTime)}`;
+		}
+		await Clipboard.write({ string: url });
 		(document.activeElement as HTMLElement)?.blur();
 	}}
 >

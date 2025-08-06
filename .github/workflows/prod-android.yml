@@ -58,14 +58,14 @@ jobs:
 
             - name: Sign App
               id: sign_app
-              uses: ilharp/sign-android-release@v1.0.4
+              uses: ilharp/sign-android-release@v2
               with:
                   releaseDir: ./materialious/android/app/build/outputs/
                   signingKey: ${{ secrets.ANDROID_SIGNING_KEY }}
                   keyAlias: ${{ secrets.ANDROID_KEY_ALIAS }}
                   keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
                   keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
-                  buildToolsVersion: 35.0.0
+                  buildToolsVersion: 36.0.0
 
             - name: Make release dir
               run: mkdir app/release

@@ -223,7 +223,7 @@
 				data-sveltekit-preload-data="off"
 				href={watchUrl.toString()}
 			>
-				<span class="bold">{letterCase(truncate(video.title.trimEnd(), 80))}</span>
+				<span class="bold">{letterCase(truncate(video.title.trimEnd(), sideways ? 40 : 80))}</span>
 			</a>
 
 			<div>
@@ -265,6 +265,24 @@
 
 	.sideways-root .thumbnail {
 		width: 200px;
+		flex-shrink: 0;
+	}
+
+	.sideways-root .thumbnail-details {
+		flex: 1;
+		min-width: 0;
+		padding-right: 0.5em;
+	}
+
+	.sideways-root .video-title {
+		overflow: hidden;
+	}
+
+	.sideways-root .video-title span {
+		display: block;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.video-title {
@@ -285,6 +303,10 @@
 		.sideways-root .thumbnail {
 			width: 100%;
 			max-height: 100%;
+		}
+
+		.sideways-root .thumbnail-details {
+			display: none;
 		}
 	}
 </style>

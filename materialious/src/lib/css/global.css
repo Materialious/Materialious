@@ -39,21 +39,14 @@ button.row:hover {
 	width: 100%;
 }
 
-@media screen and (max-width: 650px) {
-	dialog.right {
+@media screen and (max-width: 1000px) {
+	menu.mobile {
+		z-index: 9999 !important;
+		position: fixed !important;
+		top: 20% !important;
 		width: 100% !important;
-		border-radius: 0 !important;
 	}
-}
 
-@media screen and (max-width: 650px) {
-	main.root {
-		padding-left: 0.1em !important;
-		padding-right: 0.1em !important;
-	}
-}
-
-@media screen and (max-width: 650px) {
 	main.root {
 		scrollbar-width: none !important;
 	}
@@ -61,13 +54,19 @@ button.row:hover {
 	main.root::-webkit-scrollbar {
 		display: none !important;
 	}
-}
 
-@media screen and (max-width: 1000px) {
-	menu.mobile {
-		z-index: 9999 !important;
-		position: fixed !important;
-		top: 20% !important;
+	main.root {
+		padding-left: 0.1em !important;
+		padding-right: 0.1em !important;
+	}
+
+	dialog.right {
 		width: 100% !important;
+		border-radius: 0 !important;
+		padding-top: 2em;
+	}
+
+	nav.top {
+		height: 110px;
 	}
 }

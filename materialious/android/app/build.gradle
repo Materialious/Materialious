@@ -7,8 +7,8 @@ android {
         applicationId "us.materialio.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 142
-        versionName "1.10.1"
+        versionCode 143
+        versionName "1.10.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

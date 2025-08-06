@@ -7,7 +7,7 @@ import { get } from 'svelte/store';
 import { darkModeStore, interfaceAmoledTheme } from './store';
 
 export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
-	const givenSettings = (await ui('theme'));
+	const givenSettings = await ui('theme');
 
 	// @ts-ignore
 	const themes: string = givenSettings[mode ? mode : (ui('mode') as string)];
@@ -23,12 +23,13 @@ export async function setStatusBarColor() {
 	if (Capacitor.getPlatform() === 'android') {
 		await tick();
 
-		const surfaceColor = get(interfaceAmoledTheme) ? '#000000' : (await getDynamicTheme())['--surface-container'];
+		const surfaceColor = get(interfaceAmoledTheme)
+			? '#000000'
+			: (await getDynamicTheme())['--surface-container'];
 
 		await StatusBar.setBackgroundColor({
 			color: surfaceColor
 		});
-		await StatusBar.setOverlaysWebView({overlay: false})
 
 		await NavigationBar.setColor({
 			color: surfaceColor,
@@ -42,9 +43,10 @@ export async function setStatusBarColor() {
 		} else {
 			await StatusBar.setStyle({ style: Style.Light });
 		}
+
+		await StatusBar.setOverlaysWebView({ overlay: false });
 	}
 }
-
 
 export function setAmoledTheme() {
 	const isAmoled = get(interfaceAmoledTheme);

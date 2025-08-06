@@ -345,9 +345,7 @@
 				class:active={$page.url.href.endsWith(navPage.href)}
 				data-sveltekit-preload-data="off"
 				><i>{navPage.icon}</i>
-				{#if $page.url.href.endsWith(navPage.href)}
-					<span style="font-size: .8em;">{navPage.name}</span>
-				{/if}
+				<span style="font-size: .8em;">{navPage.name}</span>
 			</a>
 		{/if}
 	{/each}

@@ -240,18 +240,11 @@
 					if (widthHeight.length !== 2) return;
 
 					if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-						await StatusBar.setOverlaysWebView({ overlay: true });
-						await StatusBar.hide();
-						await NavigationBar.hide();
 						await ScreenOrientation.lock({ orientation: 'landscape' });
 					} else {
 						await ScreenOrientation.lock({ orientation: 'portrait' });
 					}
 				} else {
-					await StatusBar.setOverlaysWebView({ overlay: false });
-					await StatusBar.show();
-					await NavigationBar.show();
-
 					await ScreenOrientation.lock({
 						orientation: (originalOrigination as ScreenOrientationResult).type
 					});
@@ -740,7 +733,6 @@
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
 			if (originalOrigination) {
-				await StatusBar.setOverlaysWebView({ overlay: false });
 				await StatusBar.show();
 				await ScreenOrientation.lock({
 					orientation: originalOrigination.type

@@ -4,10 +4,9 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
 	import { type PhasedDescription } from '$lib/timestamps';
+	import { SafeArea } from '@capacitor-community/safe-area';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
-	import { StatusBar, Style } from '@capacitor/status-bar';
-	import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 	import { error, type Page } from '@sveltejs/kit';
 	import { HttpFetchPlugin } from '$lib/sabr/shakaHttpPlugin';
 	import ui from 'beercss';
@@ -223,11 +222,15 @@
 
 				if (isFullScreen) {
 					// Ensure bar color is black while in fullscreen
-					await StatusBar.setBackgroundColor({ color: '#000000' });
-					await NavigationBar.setColor({
-						color: '#000000'
+					await SafeArea.enable({
+						config: {
+							customColorsForSystemBars: true,
+							statusBarColor: '#00000000',
+							statusBarContent: 'light',
+							navigationBarColor: '#00000000',
+							navigationBarContent: 'light'
+						}
 					});
-					await StatusBar.setStyle({ style: Style.Dark });
 				} else {
 					await setStatusBarColor();
 				}

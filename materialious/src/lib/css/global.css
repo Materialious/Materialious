@@ -10,11 +10,29 @@
 	margin: 1em 0;
 }
 
+nav.top {
+	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
+	height: 100px;
+	padding-bottom: 1em;
+}
+
+nav.bottom {
+	padding-bottom: var(--safe-area-inset-bottom) !important;
+}
+
 main.root {
-	padding-top: 6em !important;
+	padding-top: 7em !important;
 	padding-bottom: 5em !important;
 	max-height: 100vh;
 	overflow-y: auto;
+}
+
+nav.left {
+	padding-top: 2em;
+}
+
+dialog {
+	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 }
 
 .root-not-tv {

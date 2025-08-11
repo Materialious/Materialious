@@ -1,0 +1,25 @@
+A Materialious egy kliens az <a href='https://github.com/iv-org'>Invidious</a> számára, amely anyagszerű tervezést (material design) használ.
+Lehetővé teszi a videók böngészését és megtekintését, a lejátszási listák kezelését és a csatornák használatát.
+
+<b>Funkciók:</b>
+<ul>
+  <li>Invidious társalkalmazás támogatása</li>
+  <li>Invidious API kiterjesztett integrációja</li>
+  <li>YouTube.js visszaállítás, ha az Invidious nem tudja betölteni a videókat számítógépen és Androidon</li>
+  <li>Támogatja a tanúsítvány-ellenőrzés letiltását homelab felhasználók számára</li>
+  <li>Szinkronizálhatja a megtekintési előrehaladást az Invidious munkamenetek között</li>
+  <li>Szinkronizált csoportok</li>
+  <li>Beépített Sponsorblock</li>
+  <li>Beépített YouTube dislike visszaállítás</li>
+  <li>Beépített DeArrow (helyi feldolgozási visszaállítással)</li>
+  <li>Nincsenek hirdetések</li>
+  <li>Nincs nyomkövetés</li>
+  <li>Világos/ Sötét témák</li>
+  <li>Egyedi színválasztási témák</li>
+  <li>Integrálódik az Invidious feliratkozásokkal, megtekintési előzményekkel és egyebekkel</li>
+  <li>Élő közvetítések támogatása</li>
+  <li>Dash támogatása</li>
+  <li>Fejezetek</li>
+  <li>Csak hang mód</li>
+  <li>Lejátszási listák</li>
+</ul>

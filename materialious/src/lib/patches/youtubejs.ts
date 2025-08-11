@@ -121,6 +121,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			return;
 		}
 
+		console.log(recommended);
+
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image?.image as Thumbnail[]) || [],
 			videoId: recommended?.content_id || '',

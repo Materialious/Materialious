@@ -20,7 +20,8 @@ const resources: Record<string, () => Promise<Record<string, any>>> = {
 	'pt-BR': () => import('./locales/pt-BR.json'),
 	lv: () => import('./locales/lv.json'),
 	ja: () => import('./locales/ja.json'),
-	mi: () => import('./locales/mi.json')
+	mi: () => import('./locales/mi.json'),
+	'hu-HU': () => import('./locales/hu.json')
 };
 
 function getUserLocale(): string {
@@ -30,9 +31,9 @@ function getUserLocale(): string {
 				return lang;
 			}
 			// In case of a regional code (e.g. 'de-CH'), fallback to the more general lang
-			const baseLang = lang.split('-')[0]
+			const baseLang = lang.split('-')[0];
 			if (resources[baseLang]) {
-				return baseLang
+				return baseLang;
 			}
 		}
 	}

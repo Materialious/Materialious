@@ -1,9 +1,8 @@
 import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
 import ui from 'beercss';
 import { tick } from 'svelte';
 import { get } from 'svelte/store';
+import { SafeArea } from '@capacitor-community/safe-area';
 import { darkModeStore, interfaceAmoledTheme } from './store';
 
 export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
@@ -27,24 +26,17 @@ export async function setStatusBarColor() {
 			? '#000000'
 			: (await getDynamicTheme())['--surface-container'];
 
-		await StatusBar.setBackgroundColor({
-			color: surfaceColor
+		const contentColor = !get(darkModeStore) ? 'dark' : 'light';
+
+		await SafeArea.enable({
+			config: {
+				customColorsForSystemBars: true,
+				statusBarColor: surfaceColor,
+				statusBarContent: contentColor,
+				navigationBarColor: surfaceColor,
+				navigationBarContent: contentColor
+			}
 		});
-
-		await NavigationBar.setColor({
-			color: surfaceColor,
-			darkButtons: !get(darkModeStore)
-		});
-
-		await NavigationBar.show();
-
-		if (get(darkModeStore)) {
-			await StatusBar.setStyle({ style: Style.Dark });
-		} else {
-			await StatusBar.setStyle({ style: Style.Light });
-		}
-
-		await StatusBar.setOverlaysWebView({ overlay: false });
 	}
 }
 

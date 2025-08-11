@@ -148,7 +148,7 @@
 				<div class="max">
 					<div>{$_('layout.allowInsecureRequests')}</div>
 				</div>
-				<label class="switch">
+				<label class="switch" tabindex="0">
 					<input
 						type="checkbox"
 						bind:checked={$interfaceAllowInsecureRequests}

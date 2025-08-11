@@ -15,3 +15,4 @@ vite.config.ts.timestamp-*
 resources/android/**/*
 android/release.jks*
 .electron-cache
+**/.settings/**

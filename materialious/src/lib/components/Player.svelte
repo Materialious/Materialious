@@ -736,7 +736,6 @@
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
 			if (originalOrigination) {
-				await StatusBar.show();
 				await ScreenOrientation.lock({
 					orientation: originalOrigination.type
 				});

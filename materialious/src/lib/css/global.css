@@ -63,10 +63,5 @@ button.row:hover {
 	dialog.right {
 		width: 100% !important;
 		border-radius: 0 !important;
-		padding-top: 2em;
-	}
-
-	nav.top {
-		height: 110px;
 	}
 }

@@ -223,19 +223,19 @@
 				data-sveltekit-preload-data="off"
 				href={watchUrl.toString()}
 			>
-				<span class="bold">{letterCase(truncate(video.title.trimEnd(), sideways ? 40 : 80))}</span>
+				<span class="bold">{letterCase(video.title.trimEnd())}</span>
 			</a>
 
 			<div>
 				<a tabindex="-1" class:author={!sideways} href={`/channel/${video.authorId}`}
-					>{video.author}</a
-				>
-				{#if !('publishedText' in video) && 'viewCountText' in video}
-					<span style="margin-top: 1em;">
-						• {video.viewCountText}
-						{$_('views')}
-					</span>
-				{/if}
+					>{video.author}
+					{#if !('publishedText' in video) && 'viewCountText' in video}
+						<span>
+							&nbsp;• {video.viewCountText}
+							{$_('views')}
+						</span>
+					{/if}
+				</a>
 
 				{#if 'publishedText' in video}
 					<div class="max">

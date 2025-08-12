@@ -74,7 +74,8 @@
             "title": "Teilen",
             "materialiousLink": "Materialious-Link kopieren",
             "invidiousRedirect": "Invidious-Weiterleitungslink kopieren",
-            "youtubeLink": "YouTube-Link kopieren"
+            "youtubeLink": "YouTube-Link kopieren",
+            "includeTimestamp": "Mit Zeitstempel"
         },
         "download": "Herunterladen",
         "downloadSteps": {

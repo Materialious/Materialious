@@ -55,6 +55,7 @@
 	import { goto } from '$app/navigation';
 	import { unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
+	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -400,7 +401,12 @@
 				dashUrl += '?local=true';
 			}
 
-			await player.load(dashUrl, await getLastPlayPos());
+			if (Capacitor.getPlatform() === 'android' && $playerProxyVideosStore) {
+				const manifest = await dashManifestDomainInclusion(dashUrl);
+				await player.load(manifest, await getLastPlayPos());
+			} else {
+				await player.load(dashUrl, await getLastPlayPos());
+			}
 		} else {
 			if (data.video.fallbackPatch === 'youtubejs') {
 				if (!data.video.dashUrl) {

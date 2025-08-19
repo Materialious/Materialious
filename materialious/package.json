@@ -62,7 +62,7 @@
 		"material-dynamic-colors": "^1.1.1",
 		"media-captions": "^1.0.4",
 		"mousetrap": "^1.6.5",
-		"peerjs": "^1.5.4",
+		"peerjs": "^1.5.5",
 		"shaka-player": "^4.11.7",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",

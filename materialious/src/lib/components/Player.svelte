@@ -49,7 +49,7 @@
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { injectSABR } from '$lib/sabr';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
-	import { playbackRates } from '$lib/const';
+	import { playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 	import { loadEntirePlaylist } from '$lib/playlist';
 	import { goto } from '$app/navigation';

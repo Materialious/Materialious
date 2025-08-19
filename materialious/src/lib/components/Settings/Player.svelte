@@ -20,7 +20,7 @@
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
 	} from '../../store';
-	import { playbackRates } from '$lib/const';
+	import { playbackRates } from '$lib/player';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 

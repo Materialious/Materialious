@@ -156,7 +156,8 @@
             "title": "Teile",
             "materialiousLink": "Materialious-Link kopiere",
             "youtubeLink": "YouTube-Link kopiere",
-            "invidiousRedirect": "Invidious-Wiiterleitigslink kopiere"
+            "invidiousRedirect": "Invidious-Wiiterleitigslink kopiere",
+            "includeTimestamp": "Mit Ziitstempel"
         },
         "download": "Abelade",
         "downloadSteps": {

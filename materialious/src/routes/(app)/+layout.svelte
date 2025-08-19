@@ -239,6 +239,12 @@
 				box-shadow: none !important;
 			}
 		</style>
+	{:else if Capacitor.getPlatform() === 'android'}
+		<style>
+			nav.top {
+				height: 120px;
+			}
+		</style>
 	{/if}
 </svelte:head>
 

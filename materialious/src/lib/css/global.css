@@ -12,7 +12,6 @@
 
 nav.top {
 	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
-	height: 100px;
 	padding-bottom: 1em;
 }
 

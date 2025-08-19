@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.10.3",
+	"version": "1.10.4",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -32,7 +32,7 @@
 		"eslint-plugin-svelte": "^3.11.0",
 		"patch-package": "^8.0.0",
 		"prettier": "^3.3.3",
-		"prettier-plugin-svelte": "^3.2.7",
+		"prettier-plugin-svelte": "^3.4.0",
 		"svelte": "^5.19.7",
 		"svelte-check": "^4.0.0",
 		"tslib": "^2.7.0",
@@ -62,7 +62,7 @@
 		"material-dynamic-colors": "^1.1.1",
 		"media-captions": "^1.0.4",
 		"mousetrap": "^1.6.5",
-		"peerjs": "^1.5.4",
+		"peerjs": "^1.5.5",
 		"shaka-player": "^4.11.7",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",

@@ -49,12 +49,13 @@
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { injectSABR } from '$lib/sabr';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
-	import { playbackRates } from '$lib/const';
+	import { playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 	import { loadEntirePlaylist } from '$lib/playlist';
 	import { goto } from '$app/navigation';
 	import { unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
+	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -400,7 +401,16 @@
 				dashUrl += '?local=true';
 			}
 
-			await player.load(dashUrl, await getLastPlayPos());
+			if (
+				Capacitor.getPlatform() === 'android' &&
+				$playerProxyVideosStore &&
+				!data.video.fallbackPatch
+			) {
+				const manifest = await dashManifestDomainInclusion(dashUrl);
+				await player.load(manifest, await getLastPlayPos());
+			} else {
+				await player.load(dashUrl, await getLastPlayPos());
+			}
 		} else {
 			if (data.video.fallbackPatch === 'youtubejs') {
 				if (!data.video.dashUrl) {

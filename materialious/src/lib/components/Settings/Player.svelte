@@ -20,7 +20,7 @@
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
 	} from '../../store';
-	import { playbackRates } from '$lib/const';
+	import { playbackRates } from '$lib/player';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 
@@ -49,9 +49,11 @@
 		switch (localVideoFallback) {
 			case 'enabled':
 				playerYouTubeJsFallback.set(true);
+				playerYouTubeJsAlways.set(false);
 				break;
 			case 'disabled':
 				playerYouTubeJsFallback.set(false);
+				playerYouTubeJsAlways.set(false);
 				break;
 			case 'always':
 				playerYouTubeJsAlways.set(true);

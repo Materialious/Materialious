@@ -1,22 +1,37 @@
 export async function dashManifestDomainInclusion(manifestUrl: string): Promise<string> {
 	/* If on android, must manually format dash manifest to include URL. */
 
-	const response = await fetch(manifestUrl, {
+	// Must fetch the headers of the request
+	// using our custom android proxy logic
+	const respIvg = await fetch(manifestUrl, {
 		method: 'GET',
-		redirect: 'follow'
+		headers: {
+			__custom_return: 'json-headers',
+			__redirect: 'manual'
+		}
 	});
 
-	if (!response.ok) {
-		throw Error('Unable to fetch manifest');
+	if (!respIvg.ok) {
+		throw Error('Unable to make request to Invidious');
 	}
 
-	const finalUrl = response.url;
-	const manifestText = await response.text();
+	const ivgHeaders = await respIvg.json();
+	// If location isn't present, then use base manifest URL.
+	const companionUrl = 'location' in ivgHeaders ? ivgHeaders['location'] : manifestUrl;
+
+	const respCompanion = await fetch(companionUrl, {
+		method: 'GET'
+	});
+
+	if (!respCompanion.ok) {
+		throw Error('Unable to make request to Companion');
+	}
+
+	const manifestText = await respCompanion.text();
 
 	const parser = new DOMParser();
 	const xmlDoc = parser.parseFromString(manifestText, 'application/xml');
 
-	// Find all BaseURL elements
 	const baseUrlElements = xmlDoc.getElementsByTagName('BaseURL');
 
 	for (let i = 0; i < baseUrlElements.length; i++) {
@@ -24,8 +39,8 @@ export async function dashManifestDomainInclusion(manifestUrl: string): Promise<
 		const baseUrlValue = baseUrlElement.textContent;
 
 		if (baseUrlValue && (baseUrlValue.startsWith('/') || !baseUrlValue.includes('://'))) {
-			const finalUrlObj = new URL(finalUrl);
-			const baseDomain = `${finalUrlObj.protocol}//${finalUrlObj.host}`;
+			const companionUrlObj = new URL(companionUrl);
+			const baseDomain = `${companionUrlObj.protocol}//${companionUrlObj.host}`;
 			const resolvedUrl = new URL(baseUrlValue, baseDomain).href;
 			baseUrlElement.textContent = resolvedUrl;
 		}
@@ -33,8 +48,6 @@ export async function dashManifestDomainInclusion(manifestUrl: string): Promise<
 
 	const serializer = new XMLSerializer();
 	const updatedManifest = serializer.serializeToString(xmlDoc);
-
-	console.log(updatedManifest);
 
 	return `data:application/dash+xml;base64,${btoa(updatedManifest)}`;
 }

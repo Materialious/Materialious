@@ -401,7 +401,11 @@
 				dashUrl += '?local=true';
 			}
 
-			if (Capacitor.getPlatform() === 'android' && $playerProxyVideosStore) {
+			if (
+				Capacitor.getPlatform() === 'android' &&
+				$playerProxyVideosStore &&
+				!data.video.fallbackPatch
+			) {
 				const manifest = await dashManifestDomainInclusion(dashUrl);
 				await player.load(manifest, await getLastPlayPos());
 			} else {

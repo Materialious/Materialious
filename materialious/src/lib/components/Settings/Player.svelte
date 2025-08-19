@@ -49,9 +49,11 @@
 		switch (localVideoFallback) {
 			case 'enabled':
 				playerYouTubeJsFallback.set(true);
+				playerYouTubeJsAlways.set(false);
 				break;
 			case 'disabled':
 				playerYouTubeJsFallback.set(false);
+				playerYouTubeJsAlways.set(false);
 				break;
 			case 'always':
 				playerYouTubeJsAlways.set(true);

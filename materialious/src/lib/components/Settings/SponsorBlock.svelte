@@ -61,11 +61,12 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch" tabindex="0" role="switch">
+	<label class="switch" tabindex="0">
 		<input
 			bind:checked={$sponsorBlockStore}
 			onclick={() => sponsorBlockStore.set(!$sponsorBlockStore)}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>
@@ -75,11 +76,12 @@
 	<div class="max">
 		<p>{$_('layout.sponsors.disableToast')}</p>
 	</div>
-	<label class="switch" tabindex="0" role="switch">
+	<label class="switch" tabindex="0">
 		<input
 			bind:checked={$sponsorBlockDisplayToastStore}
 			onclick={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>
@@ -109,11 +111,12 @@
 			<div class="max">
 				<p>{sponsor.name}</p>
 			</div>
-			<label class="switch" tabindex="0" role="switch">
+			<label class="switch" tabindex="0">
 				<input
 					type="checkbox"
 					checked={sponsorCategoriesList.includes(sponsor.category)}
 					onclick={() => toggleSponsor(sponsor.category)}
+					role="switch"
 				/>
 				<span></span>
 			</label>

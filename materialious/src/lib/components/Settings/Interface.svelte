@@ -153,6 +153,7 @@
 						type="checkbox"
 						bind:checked={$interfaceAllowInsecureRequests}
 						onclick={allowInsecureRequests}
+						role="switch"
 					/>
 					<span></span>
 				</label>
@@ -184,11 +185,12 @@
 			<div class="max">
 				<div>{$_('layout.theme.AmoledTheme')}</div>
 			</div>
-			<label class="switch" tabindex="0" role="switch">
+			<label class="switch" tabindex="0">
 				<input
 					type="checkbox"
 					bind:checked={$interfaceAmoledTheme}
 					onclick={() => interfaceAmoledTheme.set(!$interfaceAmoledTheme)}
+					role="switch"
 				/>
 				<span></span>
 			</label>
@@ -201,7 +203,7 @@
 		<div class="max">
 			<div>{$_('layout.searchHistory')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceSearchHistoryEnabled}
@@ -209,6 +211,7 @@
 					interfaceSearchHistoryEnabled.set(!$interfaceSearchHistoryEnabled);
 					searchHistoryStore.set([]);
 				}}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -220,11 +223,12 @@
 		<div class="max">
 			<div>{$_('layout.lowBandwidthMode')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceLowBandwidthMode}
 				onclick={() => interfaceLowBandwidthMode.set(!$interfaceLowBandwidthMode)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -236,11 +240,12 @@
 		<div class="max">
 			<div>{$_('layout.searchSuggestions')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceSearchSuggestionsStore}
 				onclick={() => interfaceSearchSuggestionsStore.set(!$interfaceSearchSuggestionsStore)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -252,11 +257,12 @@
 		<div class="max">
 			<div>{$_('layout.expandDescription')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandDesc}
 				onclick={() => interfaceAutoExpandDesc.set(!$interfaceAutoExpandDesc)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -268,11 +274,12 @@
 		<div class="max">
 			<div>{$_('layout.expandChapters')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandChapters}
 				onclick={() => interfaceAutoExpandChapters.set(!$interfaceAutoExpandChapters)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -284,11 +291,12 @@
 		<div class="max">
 			<div>{$_('layout.expandComments')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$interfaceAutoExpandComments}
 				onclick={() => interfaceAutoExpandComments.set(!$interfaceAutoExpandComments)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -301,11 +309,12 @@
 			<div class="max">
 				<div>{$_('layout.disableAutoUpdate')}</div>
 			</div>
-			<label class="switch" tabindex="0" role="switch">
+			<label class="switch" tabindex="0">
 				<input
 					type="checkbox"
 					bind:checked={$interfaceDisableAutoUpdate}
 					onclick={() => interfaceDisableAutoUpdate.set(!$interfaceDisableAutoUpdate)}
+					role="switch"
 				/>
 				<span></span>
 			</label>

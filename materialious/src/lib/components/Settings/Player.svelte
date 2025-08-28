@@ -141,11 +141,12 @@
 		<div class="max">
 			<div>{$_('layout.player.ccByDefault')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerCCByDefault}
 				onclick={() => playerCCByDefault.set(!$playerCCByDefault)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -157,11 +158,12 @@
 		<div class="max">
 			<div>{$_('layout.player.autoPlay')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerAutoPlayStore}
 				onclick={() => playerAutoPlayStore.set(!$playerAutoPlayStore)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -173,11 +175,12 @@
 		<div class="max">
 			<div>{$_('layout.player.alwaysLoopVideo')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerAlwaysLoopStore}
 				onclick={() => playerAlwaysLoopStore.set(!$playerAlwaysLoopStore)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -190,11 +193,12 @@
 			<div class="max">
 				<div>{$_('layout.player.lockOrientation')}</div>
 			</div>
-			<label class="switch" tabindex="0" role="switch">
+			<label class="switch" tabindex="0">
 				<input
 					type="checkbox"
 					bind:checked={$playerAndroidLockOrientation}
 					onclick={() => playerAndroidLockOrientation.set(!$playerAndroidLockOrientation)}
+					role="switch"
 				/>
 				<span></span>
 			</label>
@@ -208,11 +212,12 @@
 			<div class="max">
 				<div>{$_('layout.player.proxyVideos')}</div>
 			</div>
-			<label class="switch" tabindex="0" role="switch">
+			<label class="switch" tabindex="0">
 				<input
 					type="checkbox"
 					bind:checked={$playerProxyVideosStore}
 					onclick={() => playerProxyVideosStore.set(!$playerProxyVideosStore)}
+					role="switch"
 				/>
 				<span></span>
 			</label>
@@ -225,11 +230,12 @@
 		<div class="max">
 			<div>{$_('layout.player.savePlaybackPosition')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerSavePlaybackPositionStore}
 				onclick={() => playerSavePlaybackPositionStore.set(!$playerSavePlaybackPositionStore)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -241,11 +247,12 @@
 		<div class="max">
 			<div>{$_('layout.player.theatreModeByDefault')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerTheatreModeByDefaultStore}
 				onclick={() => playerTheatreModeByDefaultStore.set(!$playerTheatreModeByDefaultStore)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -257,11 +264,12 @@
 		<div class="max">
 			<div>{$_('layout.player.autoPlayNextByDefault')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerAutoplayNextByDefaultStore}
 				onclick={() => playerAutoplayNextByDefaultStore.set(!$playerAutoplayNextByDefaultStore)}
+				role="switch"
 			/>
 			<span></span>
 		</label>
@@ -273,11 +281,12 @@
 		<div class="max">
 			<div>{$_('layout.player.playerStatistics')}</div>
 		</div>
-		<label class="switch" tabindex="0" role="switch">
+		<label class="switch" tabindex="0">
 			<input
 				type="checkbox"
 				bind:checked={$playerStatisticsByDefault}
 				onclick={() => playerStatisticsByDefault.set(!playerStatisticsByDefault)}
+				role="switch"
 			/>
 			<span></span>
 		</label>

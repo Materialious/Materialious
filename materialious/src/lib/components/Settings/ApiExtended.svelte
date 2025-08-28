@@ -29,11 +29,12 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch" tabindex="0" role="switch">
+	<label class="switch" tabindex="0">
 		<input
 			bind:checked={$synciousStore}
 			onclick={() => synciousStore.set(!$synciousStore)}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>

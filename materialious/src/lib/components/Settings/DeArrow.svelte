@@ -43,11 +43,12 @@
 	<div class="max">
 		<p>{$_('layout.deArrow.titleOnly')}</p>
 	</div>
-	<label class="switch" tabindex="0" role="switch">
+	<label class="switch" tabindex="0">
 		<input
 			bind:checked={$deArrowTitlesOnly}
 			onclick={() => deArrowTitlesOnly.set(!$deArrowTitlesOnly)}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>
@@ -57,11 +58,12 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch" tabindex="0" role="switch">
+	<label class="switch" tabindex="0">
 		<input
 			bind:checked={$deArrowEnabledStore}
 			onclick={() => deArrowEnabledStore.set(!$deArrowEnabledStore)}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>

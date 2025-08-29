@@ -1,146 +1,161 @@
 {
-	"enabled": "Aktif et",
-	"copyUrl": "URLi kopyala",
-	"loadMore": "Daha fazlasını yükle",
-	"views": "görüntülenme",
-	"videos": "videolar",
-	"cancel": "İptal",
-	"create": "Oluştur",
-	"title": "Başlık",
-	"searchPlaceholder": "Ara...",
-	"delete": "Sil",
-	"deleteAllHistory": "Tüm geçmişi sil",
-	"skipping": "Atla",
-	"replies": "cevaplar",
-	"region": "Bölge",
-	"noResult": "Sonuç yok",
-	"language": "Dil",
-	"transcript": "Transkript",
-	"noCaptionData": "Altyazılarda herhangi bir veri yoktur.",
-	"selectLang": "Dil seçin",
-	"letterCase": "Başlıklar için harf durumu",
-	"hideReplies": "Cevapları gizle",
-	"hideVideo": "Videoyu gizle",
-	"syncParty": {
-		"userJoined": "Kullanıcı izleme partinize katıldı.",
-		"userLeft": "Kullanıcı izleme partinizden ayrıldı.",
-		"userOnPrivatePage": "Kullanıcı şu an gizli bir sayfa görüntülüyor, senkronizasyon birazdan devam edecek."
-	},
-	"videoTabs": {
-		"all": "Tümü",
-		"videos": "Videolar",
-		"playlists": "Oynatma listeleri",
-		"channels": "Kanallar",
-		"shorts": "Shorts",
-		"streams": "Canlı Yayınlar"
-	},
-	"subscriptions": {
-		"manageSubscriptions": "Abonelikleri Yönet"
-	},
-	"playlist": {
-		"createPlaylist": "Oynatma listesi oluştur",
-		"public": "Herkese açık",
-		"unlisted": "Liste dışı",
-		"private": "Gizli",
-		"playVideos": "Videoları oynat",
-		"shuffleVideos": "Videoları karışık oynat",
-		"loopPlaylist": "Çalma listesini tekrarla"
-	},
-	"thumbnail": {
-		"live": "CANLI",
-		"failedToLoadImage": "Resim yüklenemedi"
-	},
-	"pages": {
-		"home": "Ana Sayfa",
-		"trending": "Trendler",
-		"subscriptions": "Abonelikler",
-		"history": "Geçmiş",
-		"playlists": "Oynatma Listeleri"
-	},
-	"subscribers": "aboneler",
-	"unsubscribe": "Abonelikten çık",
-	"loginRequired": "Oturum açmak gereklidir",
-	"player": {
-		"audioOnly": "Sadece ses",
-		"theatreMode": "Tiyatro modu",
-		"share": {
-			"title": "Paylaş",
-			"materialiousLink": "Bağlantıyı Materialious a kopyala",
-			"invidiousRedirect": "Invidious yönlendirme bağlantısını kopyala",
-			"youtubeLink": "Youtube bağlantısını kopyala"
-		},
-		"download": "İndir",
-		"downloadSteps": {
-			"merging": "Birlikte video ve ses birleştiriliyor",
-			"video": "Video indiriliyor",
-			"audio": "Ses indiriliyor",
-			"ffmpeg": "FFmpeg kütüphaneleri ve parçaları indiriliyor",
-			"classWorker": "FFmpeg sınıf işcisi indiriliyor",
-			"core": "FFmpeg çekirdeği indiriliyor",
-			"wasm": "FFmpeg wasm indiriliyor",
-			"worker": "FFmpeg işcisi indiriliyor"
-		},
-		"noPlaylists": "Oynatma listesi yok",
-		"unableToLoadComments": "Yorumlar yüklenemiyor",
-		"addToPlaylist": "Oynatma listesine ekle"
-	},
-	"layout": {
-		"interface": "Arayüz",
-		"star": "Github'da bize yıldız verin!",
-		"syncParty": "Senkronizasyon partisi",
-		"syncPartyWarning": "Lütfen IP nizin davet ettiğiniz kullanıcılara görüneceğini unutmayın.",
-		"startSyncParty": "Senkronizasyon partisi başlat",
-		"endSyncParty": "Senkronizasyon partisini sonlandır",
-		"notifications": "Bildirimler",
-		"noNewNotifications": "Burada yeni bildirim yok",
-		"settings": "Ayarlar",
-		"login": "Giriş Yap",
-		"logout": "Çıkış Yap",
-		"customize": "Özelleştir",
-		"theme": {
-			"theme": "Tema",
-			"darkMode": "Koyu mod",
-			"lightMode": "Açık Mod",
-			"color": "Renk"
-		},
-		"searchSuggestions": "Önerileri ara",
-		"previewVideoOnHover": "Fareyle üzerine gelindiğinde videoyu ön izleyin",
-		"expandDescription": "Açıklamayı varsayılan olarak genişlet",
-		"expandComments": "Yorumları varsayılan olarak genişlet",
-		"dataPreferences": {
-			"content": "Abonelikleri içe/dışa aktarmayı, şifreyi değiştirmeyi veya hesabı silmeyi mi istiyorsunuz? Buraya tıklayın ve sayfanın en altına gidin.",
-			"dataPreferences": "Veri tercihleri"
-		},
-		"player": {
-			"title": "Oynatıcı",
-			"autoPlay": "Otomatik oynatılan video",
-			"alwaysLoopVideo": "Videoyu her zaman tekrara al",
-			"savePlaybackPosition": "Oynatma konumunu kaydet",
-			"listenByDefault": "Varsayılan olarak dinle",
-			"theatreModeByDefault": "Varsayılan olarak tiyatro modu",
-			"autoPlayNextByDefault": "Sonrakini varsayılan olarak otomatik oynat",
-			"miniPlayer": "Mini oynatıcı",
-			"proxyVideos": "Vekil Sunucu videolar",
-			"backgroundPlay": "Arka planda ses çal",
-			"silenceSkipper": "Sessizlik atlayıcı (Deneysel)"
-		},
-		"bookmarklet": "Yer işareti",
-		"instanceUrl": "Instance URL",
-		"sponsors": {
-			"sponsor": "Sponsor",
-			"Catagories": "Kategoriler",
-			"unpaidSelfPromotion": "Ücretsiz/Kişisel Promosyon",
-			"interactionReminder": "Etkileşim Hatırlatıcısı (Abone Ol)",
-			"intermissionIntroAnimation": "Ara/Giriş Animasyonu",
-			"credits": "Bitiş Kartları/Krediler",
-			"preViewRecapHook": "Önizleme/Özet/Kanca",
-			"tangentJokes": "Dolgu Tanjantı/Şakalar"
-		},
-		"deArrow": {
-			"title": "DeArrow",
-			"thumbnailInstanceUrl": "Küçük resim görünüm URL'si",
-			"titleOnly": "Sadece başlık"
-		}
-	},
-	"subscribe": "Abone Ol"
+    "enabled": "Etkin",
+    "copyUrl": "URL' yi kopyala",
+    "loadMore": "Daha fazlasını yükle",
+    "views": "görüntülenme",
+    "videos": "videolar",
+    "cancel": "İptal",
+    "create": "Oluştur",
+    "title": "Başlık",
+    "searchPlaceholder": "Ara...",
+    "delete": "Sil",
+    "deleteAllHistory": "Tüm geçmişi sil",
+    "skipping": "Atla",
+    "replies": "cevaplar",
+    "region": "Bölge",
+    "noResult": "Sonuç yok",
+    "language": "Dil",
+    "transcript": "Transkript",
+    "noCaptionData": "Altyazılarda herhangi bir veri yoktur.",
+    "selectLang": "Dil seçin",
+    "letterCase": "Başlıklar için harf durumu",
+    "hideReplies": "Cevapları gizle",
+    "hideVideo": "Videoyu gizle",
+    "syncParty": {
+        "userJoined": "Kullanıcı izleme partinize katıldı.",
+        "userLeft": "Kullanıcı izleme partinizden ayrıldı.",
+        "userOnPrivatePage": "Kullanıcı şu an gizli bir sayfa görüntülüyor, senkronizasyon birazdan devam edecek."
+    },
+    "videoTabs": {
+        "all": "Tümü",
+        "videos": "Videolar",
+        "playlists": "Oynatma listeleri",
+        "channels": "Kanallar",
+        "shorts": "Shorts",
+        "streams": "Canlı Yayınlar"
+    },
+    "subscriptions": {
+        "manageSubscriptions": "Abonelikleri Yönet"
+    },
+    "playlist": {
+        "createPlaylist": "Oynatma listesi oluştur",
+        "public": "Herkese açık",
+        "unlisted": "Liste dışı",
+        "private": "Gizli",
+        "playVideos": "Videoları oynat",
+        "shuffleVideos": "Videoları karışık oynat",
+        "loopPlaylist": "Çalma listesini tekrarla"
+    },
+    "thumbnail": {
+        "live": "CANLI",
+        "failedToLoadImage": "Resim yüklenemedi"
+    },
+    "pages": {
+        "home": "Ana Sayfa",
+        "trending": "Trendler",
+        "subscriptions": "Abonelikler",
+        "history": "Geçmiş",
+        "playlists": "Oynatma Listeleri"
+    },
+    "subscribers": "aboneler",
+    "unsubscribe": "Abonelikten çık",
+    "loginRequired": "Oturum açmak gereklidir",
+    "player": {
+        "audioOnly": "Sadece ses",
+        "theatreMode": "Tiyatro modu",
+        "share": {
+            "title": "Paylaş",
+            "materialiousLink": "Bağlantıyı Materialious a kopyala",
+            "invidiousRedirect": "Invidious yönlendirme bağlantısını kopyala",
+            "youtubeLink": "Youtube bağlantısını kopyala"
+        },
+        "download": "İndir",
+        "downloadSteps": {
+            "merging": "Birlikte video ve ses birleştiriliyor",
+            "video": "Video indiriliyor",
+            "audio": "Ses indiriliyor",
+            "ffmpeg": "FFmpeg kütüphaneleri ve parçaları indiriliyor",
+            "classWorker": "FFmpeg sınıf işcisi indiriliyor",
+            "core": "FFmpeg çekirdeği indiriliyor",
+            "wasm": "FFmpeg wasm indiriliyor",
+            "worker": "FFmpeg işcisi indiriliyor"
+        },
+        "noPlaylists": "Oynatma listesi yok",
+        "unableToLoadComments": "Yorumlar yüklenemiyor",
+        "addToPlaylist": "Oynatma listesine ekle"
+    },
+    "layout": {
+        "interface": "Arayüz",
+        "star": "Github'da bize yıldız verin!",
+        "syncParty": "Senkronizasyon partisi",
+        "syncPartyWarning": "Lütfen IP nizin davet ettiğiniz kullanıcılara görüneceğini unutmayın.",
+        "startSyncParty": "Senkronizasyon partisi başlat",
+        "endSyncParty": "Senkronizasyon partisini sonlandır",
+        "notifications": "Bildirimler",
+        "noNewNotifications": "Burada yeni bildirim yok",
+        "settings": "Ayarlar",
+        "login": "Giriş Yap",
+        "logout": "Çıkış Yap",
+        "customize": "Özelleştir",
+        "theme": {
+            "theme": "Tema",
+            "darkMode": "Koyu mod",
+            "lightMode": "Açık Mod",
+            "color": "Renk"
+        },
+        "searchSuggestions": "Önerileri ara",
+        "previewVideoOnHover": "Fareyle üzerine gelindiğinde videoyu ön izleyin",
+        "expandDescription": "Açıklamayı varsayılan olarak genişlet",
+        "expandComments": "Yorumları varsayılan olarak genişlet",
+        "dataPreferences": {
+            "content": "Abonelikleri içe/dışa aktarmayı, şifreyi değiştirmeyi veya hesabı silmeyi mi istiyorsunuz? Buraya tıklayın ve sayfanın en altına gidin.",
+            "dataPreferences": "Veri tercihleri"
+        },
+        "player": {
+            "title": "Oynatıcı",
+            "autoPlay": "Otomatik oynatılan video",
+            "alwaysLoopVideo": "Videoyu her zaman tekrara al",
+            "savePlaybackPosition": "Oynatma konumunu kaydet",
+            "listenByDefault": "Varsayılan olarak dinle",
+            "theatreModeByDefault": "Varsayılan olarak tiyatro modu",
+            "autoPlayNextByDefault": "Sonrakini varsayılan olarak otomatik oynat",
+            "miniPlayer": "Mini oynatıcı",
+            "proxyVideos": "Vekil Sunucu videolar",
+            "backgroundPlay": "Arka planda ses çal",
+            "silenceSkipper": "Sessizlik atlayıcı (Deneysel)"
+        },
+        "bookmarklet": "Yer işareti",
+        "instanceUrl": "Instance URL",
+        "sponsors": {
+            "sponsor": "Sponsor",
+            "Catagories": "Kategoriler",
+            "unpaidSelfPromotion": "Ücretsiz/Kişisel Promosyon",
+            "interactionReminder": "Etkileşim Hatırlatıcısı (Abone Ol)",
+            "intermissionIntroAnimation": "Ara/Giriş Animasyonu",
+            "credits": "Bitiş Kartları/Krediler",
+            "preViewRecapHook": "Önizleme/Özet/Kanca",
+            "tangentJokes": "Dolgu Tanjantı/Şakalar"
+        },
+        "deArrow": {
+            "title": "DeArrow",
+            "thumbnailInstanceUrl": "Küçük resim görünüm URL'si",
+            "titleOnly": "Sadece başlık"
+        },
+        "allowInsecureRequests": "Güvenli olmayan isteklere izin ver"
+    },
+    "subscribe": "Abone Ol",
+    "premium": "Premium YouTube içeriği Materialious ile izlenemez.",
+    "isUpcoming": "Video henüz izlenebilir durumda değil.",
+    "recommendedVideos": "Önerilen Videolar",
+    "playlistVideos": "Çalma Listeleri",
+    "channels": "kanallar",
+    "defaultPage": "Varsayılan sayfa",
+    "invalidInstance": "Lütfen URL' yi kontrol edin. Eğer doğruysa, sunucu kapalı olabilir veya üçüncü taraf istemcileri desteklemiyor olabilir.",
+    "disabled": "Devre dışı",
+    "invidiousBlockWarning": "Invidious şu anda Google tarafından engellenmiş durumda. Eğer bu sunucu çalışmıyorsa, bunu aşmak için lütfen Materialous {android} ve {masaüstü} sunucusunu kullanın.",
+    "donate": "Bağış",
+    "comments": "yorumlar",
+    "reply": "cevapla",
+    "login": "Giriş",
+    "invidiousLogin": "Lütfen Invidious hesabınız ile giriş yapınız"
 }

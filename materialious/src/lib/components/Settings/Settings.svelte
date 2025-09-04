@@ -10,14 +10,17 @@
 	import SponsorBlock from './SponsorBlock.svelte';
 	import { isAndroidTvStore } from '$lib/store';
 
-	let activeTab:
-		| 'interface'
-		| 'player'
-		| 'data'
-		| 'ryd'
-		| 'api extended'
-		| 'sponsorblock'
-		| 'dearrow' = $state('interface');
+	let activeTab = $state('interface');
+	const isActive = (id: string) => activeTab === id;
+	
+	const tabs = [
+		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
+		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
+		{ id: 'ryd', label: 'RYD', icon: 'thumb_down', component: Ryd },
+		{ id: 'api extended', label: 'API Extended', icon: 'sync', component: ApiExtended },
+		{ id: 'sponsorblock', label: 'Sponsorblock', icon: 'block', component: SponsorBlock },
+		{ id: 'dearrow', label: $_('layout.deArrow.title'), icon: 'keyboard_double_arrow_down', component: DeArrow },
+	]
 
 	let dialogType = $state('');
 
@@ -29,10 +32,41 @@
 		}
 	}
 
+	function onKeydown(e: KeyboardEvent, idx: number) {
+		const keys = ["ArrowRight", "ArrowLeft", "Home", "End"] as const;
+		if (!keys.includes(e.key as typeof keys[number])) return;
+
+		e.preventDefault();
+
+		let next = idx;
+		switch (e.key) {
+			case "ArrowRight":
+				next = (idx + 1) % tabs.length;
+				break;
+			case "ArrowLeft":
+				next = (idx - 1 + tabs.length) % tabs.length;
+				break;
+			case "Home":
+				next = 0;
+				break;
+			case "End":
+				next = tabs.length - 1;
+				break;
+		}
+
+		activeTab = tabs[next].id;
+
+		const els = document.querySelectorAll<HTMLElement>('[role="tab"]');
+		els[next]?.focus();
+	}
+
 	onMount(() => {
 		checkWidth();
 
 		addEventListener('resize', () => checkWidth());
+		if ($isAndroidTvStore) {
+			document.getElementById(`tab-${activeTab}`)?.focus();
+		}
 	});
 </script>
 
@@ -43,33 +77,32 @@
 	</nav>
 
 	<div>
-		<nav tabindex="0" class="tabbed small" style="outline: none" role="region">
-			<a class:active={activeTab === 'interface'} onclick={() => (activeTab = 'interface')}>
-				<i>grid_view</i>
-				<span>{$_('layout.interface')}</span>
-			</a>
-			<a class:active={activeTab === 'player'} onclick={() => (activeTab = 'player')}>
-				<i>smart_display</i>
-				<span>{$_('layout.player.title')}</span>
-			</a>
-			<a tabindex="0" class:active={activeTab === 'ryd'} onclick={() => (activeTab = 'ryd')}>
-				<i>thumb_down</i>
-				<span>RYD</span>
-			</a>
-			<a class:active={activeTab === 'api extended'} onclick={() => (activeTab = 'api extended')}>
-				<i>sync</i>
-				<span>API Extended</span>
-			</a>
-			<a class:active={activeTab === 'sponsorblock'} onclick={() => (activeTab = 'sponsorblock')}>
-				<i>block</i>
-				<span>Sponsorblock</span>
-			</a>
-			<a class:active={activeTab === 'dearrow'} onclick={() => (activeTab = 'dearrow')}>
-				<i>keyboard_double_arrow_down</i>
-				<span>{$_('layout.deArrow.title')}</span>
-			</a>
+		<nav class="tabbed small" style="outline: none" role="tablist" tabindex="0">
+			{#each tabs as tab, i}
+				<a
+					role="tab"
+					class:active={isActive(tab.id)}
+					aria-selected={isActive(tab.id)}
+					id={`tab-${tab.id}`}
+					aria-controls={`panel-${tab.id}`}
+					tabindex={isActive(tab.id) ? 0 : -1}
+					onclick={() => (activeTab = tab.id)}
+					onkeydown={(e) => onKeydown(e, i)}
+				>
+					<i>{tab.icon}</i>
+					<span>{tab.label}</span>
+				</a>
+			{/each}
 			{#if !$isAndroidTvStore}
-				<a class:active={activeTab === 'data'} onclick={() => (activeTab = 'data')}>
+				<a
+					role="tab"
+					class:active={isActive('data')}
+					aria-selected={isActive('data')}
+					id="tab-data"
+					aria-controls="panel-data"
+					tabindex="0"
+					onclick={() => (activeTab = 'data')}
+				>
 					<i>save</i>
 					<span>{$_('layout.dataPreferences.dataPreferences')}</span>
 				</a>
@@ -91,26 +124,31 @@
 				</a>
 			{/if}
 		</nav>
-		<div class="page padding" class:active={activeTab === 'interface'}>
-			<Interface />
-		</div>
-		<div class="page padding" class:active={activeTab === 'player'}>
-			<Player />
-		</div>
-		<div class="page padding" class:active={activeTab === 'data'}>
+		{#each tabs as t, _}
+			<div
+				class="page padding"
+				id={`panel-${t.id}`}
+				role="tabpanel"
+				aria-labelledby={`tab-${t.id}`}
+				hidden={!isActive(t.id)}
+				inert={!$isAndroidTvStore && !isActive(t.id)}
+				aria-hidden={!isActive(t.id)}
+				class:active={isActive(t.id)}
+			>
+				<t.component />
+			</div>
+		{/each}
+		<div
+			class="page padding"
+			id="panel-data"
+			role="tabpanel"
+			aria-labelledby="tab-data"
+			hidden={!isActive('data')}
+			inert={!$isAndroidTvStore && !isActive('data')}
+			aria-hidden={!isActive('data')}
+			class:active={isActive('data')}
+		>
 			<DataPreferences />
-		</div>
-		<div class="page padding" class:active={activeTab === 'ryd'}>
-			<Ryd />
-		</div>
-		<div class="page padding" class:active={activeTab === 'api extended'}>
-			<ApiExtended />
-		</div>
-		<div class="page padding" class:active={activeTab === 'sponsorblock'}>
-			<SponsorBlock />
-		</div>
-		<div class="page padding" class:active={activeTab === 'dearrow'}>
-			<DeArrow />
 		</div>
 	</div>
 </dialog>

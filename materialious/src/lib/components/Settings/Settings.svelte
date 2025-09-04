@@ -12,15 +12,20 @@
 
 	let activeTab = $state('interface');
 	const isActive = (id: string) => activeTab === id;
-	
+
 	const tabs = [
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
 		{ id: 'ryd', label: 'RYD', icon: 'thumb_down', component: Ryd },
 		{ id: 'api extended', label: 'API Extended', icon: 'sync', component: ApiExtended },
 		{ id: 'sponsorblock', label: 'Sponsorblock', icon: 'block', component: SponsorBlock },
-		{ id: 'dearrow', label: $_('layout.deArrow.title'), icon: 'keyboard_double_arrow_down', component: DeArrow },
-	]
+		{
+			id: 'dearrow',
+			label: $_('layout.deArrow.title'),
+			icon: 'keyboard_double_arrow_down',
+			component: DeArrow
+		}
+	];
 
 	let dialogType = $state('');
 
@@ -32,24 +37,24 @@
 		}
 	}
 
-	function onKeydown(e: KeyboardEvent, idx: number) {
-		const keys = ["ArrowRight", "ArrowLeft", "Home", "End"] as const;
-		if (!keys.includes(e.key as typeof keys[number])) return;
+	function onKeydown(event: KeyboardEvent, idx: number) {
+		const keys = ['ArrowRight', 'ArrowLeft', 'Home', 'End'] as const;
+		if (!keys.includes(event.key as (typeof keys)[number])) return;
 
-		e.preventDefault();
+		event.preventDefault();
 
 		let next = idx;
-		switch (e.key) {
-			case "ArrowRight":
+		switch (event.key) {
+			case 'ArrowRight':
 				next = (idx + 1) % tabs.length;
 				break;
-			case "ArrowLeft":
+			case 'ArrowLeft':
 				next = (idx - 1 + tabs.length) % tabs.length;
 				break;
-			case "Home":
+			case 'Home':
 				next = 0;
 				break;
-			case "End":
+			case 'End':
 				next = tabs.length - 1;
 				break;
 		}
@@ -87,7 +92,7 @@
 					aria-controls={`panel-${tab.id}`}
 					tabindex={isActive(tab.id) ? 0 : -1}
 					onclick={() => (activeTab = tab.id)}
-					onkeydown={(e) => onKeydown(e, i)}
+					onkeydown={(event) => onKeydown(event, i)}
 				>
 					<i>{tab.icon}</i>
 					<span>{tab.label}</span>
@@ -124,18 +129,18 @@
 				</a>
 			{/if}
 		</nav>
-		{#each tabs as t, _}
+		{#each tabs as tab, _}
 			<div
 				class="page padding"
-				id={`panel-${t.id}`}
+				id={`panel-${tab.id}`}
 				role="tabpanel"
-				aria-labelledby={`tab-${t.id}`}
-				hidden={!isActive(t.id)}
-				inert={!$isAndroidTvStore && !isActive(t.id)}
-				aria-hidden={!isActive(t.id)}
-				class:active={isActive(t.id)}
+				aria-labelledby={`tab-${tab.id}`}
+				hidden={!isActive(tab.id)}
+				inert={!$isAndroidTvStore && !isActive(tab.id)}
+				aria-hidden={!isActive(tab.id)}
+				class:active={isActive(tab.id)}
 			>
-				<t.component />
+				<tab.component />
 			</div>
 		{/each}
 		<div

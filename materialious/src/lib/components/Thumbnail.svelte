@@ -65,7 +65,7 @@
 	function disableSideways() {
 		if (!startedSideways) return;
 
-		if (window.innerWidth <= 1500) {
+		if (window.innerWidth <= 1800) {
 			sideways = false;
 		} else sideways = true;
 	}
@@ -229,13 +229,14 @@
 			<div>
 				<a tabindex="-1" class:author={!sideways} href={`/channel/${video.authorId}`}
 					>{video.author}
-					{#if !('publishedText' in video) && 'viewCountText' in video}
-						<span>
-							&nbsp;• {video.viewCountText}
-							{$_('views')}
-						</span>
-					{/if}
 				</a>
+
+				{#if !('publishedText' in video) && 'viewCountText' in video}
+					<span>
+						{video.viewCountText}
+						{$_('views')}
+					</span>
+				{/if}
 
 				{#if 'publishedText' in video}
 					<div class="max">
@@ -280,9 +281,10 @@
 
 	.sideways-root .video-title span {
 		display: block;
-		white-space: nowrap;
+		white-space: normal;
 		overflow: hidden;
-		text-overflow: ellipsis;
+		word-wrap: break-word;
+		line-height: 1.2;
 	}
 
 	.video-title {

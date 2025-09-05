@@ -551,6 +551,63 @@
 
 		await androidHandleRotate();
 
+		if ('mediaSession' in navigator) {
+			const metadataArtwork: MediaImage[] = [];
+			data.video.videoThumbnails.forEach((thumbnail) => {
+				metadataArtwork.push({
+					type: 'image/jpeg',
+					sizes: `${thumbnail.width}x${thumbnail.height}`,
+					src: thumbnail.url
+				});
+			});
+
+			console.log(metadataArtwork);
+
+			navigator.mediaSession.metadata = new MediaMetadata({
+				title: data.video.title,
+				artist: data.video.author,
+				artwork: metadataArtwork
+			});
+
+			navigator.mediaSession.setActionHandler('play', () => playerElement?.play());
+
+			navigator.mediaSession.setActionHandler('pause', () => playerElement?.pause());
+
+			navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+				if (!playerElement) return;
+
+				playerElement.currentTime = Math.max(
+					playerElement.currentTime - (details.seekOffset || 10),
+					0
+				);
+			});
+
+			navigator.mediaSession.setActionHandler('seekforward', (details) => {
+				if (!playerElement) return;
+
+				playerElement.currentTime = Math.min(
+					playerElement.currentTime + (details.seekOffset || 10),
+					playerElement.duration
+				);
+			});
+
+			navigator.mediaSession.setActionHandler('seekto', (details) => {
+				if (!playerElement) return;
+
+				if (details.fastSeek && 'fastSeek' in playerElement) {
+					playerElement.fastSeek(details.seekTime ?? 0);
+				} else {
+					playerElement.currentTime = details.seekTime ?? 0;
+				}
+			});
+
+			navigator.mediaSession.setActionHandler('stop', () => {
+				if (!playerElement) return;
+				playerElement.pause();
+				playerElement.currentTime = 0;
+			});
+		}
+
 		Mousetrap.bind('space', () => {
 			if (!playerElement) return;
 

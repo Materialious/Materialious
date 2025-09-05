@@ -7,7 +7,7 @@
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { insecureRequestImageHandler, truncate } from '../misc';
+	import { insecureRequestImageHandler } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,

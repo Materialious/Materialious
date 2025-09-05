@@ -208,53 +208,54 @@
 
 	async function androidHandleRotate() {
 		if (
-			Capacitor.getPlatform() === 'android' &&
-			data.video.adaptiveFormats.length > 0 &&
-			!$isAndroidTvStore
-		) {
-			const videoFormats = data.video.adaptiveFormats.filter((format) =>
-				format.type.startsWith('video/')
-			);
+			Capacitor.getPlatform() !== 'android' ||
+			data.video.adaptiveFormats.length === 0 ||
+			$isAndroidTvStore
+		)
+			return;
 
-			originalOrigination = await ScreenOrientation.orientation();
+		const videoFormats = data.video.adaptiveFormats.filter((format) =>
+			format.type.startsWith('video/')
+		);
 
-			document.addEventListener('fullscreenchange', async () => {
-				const isFullScreen = !!document.fullscreenElement;
+		originalOrigination = await ScreenOrientation.orientation();
 
-				if (isFullScreen) {
-					// Ensure bar color is black while in fullscreen
-					await SafeArea.enable({
-						config: {
-							customColorsForSystemBars: true,
-							statusBarColor: '#00000000',
-							statusBarContent: 'light',
-							navigationBarColor: '#00000000',
-							navigationBarContent: 'light'
-						}
-					});
-				} else {
-					await setStatusBarColor();
-				}
+		document.addEventListener('fullscreenchange', async () => {
+			const isFullScreen = !!document.fullscreenElement;
 
-				if (!$playerAndroidLockOrientation) return;
-
-				if (isFullScreen && videoFormats[0].resolution) {
-					const widthHeight = videoFormats[0].resolution.split('x');
-
-					if (widthHeight.length !== 2) return;
-
-					if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-						await ScreenOrientation.lock({ orientation: 'landscape' });
-					} else {
-						await ScreenOrientation.lock({ orientation: 'portrait' });
+			if (isFullScreen) {
+				// Ensure bar color is black while in fullscreen
+				await SafeArea.enable({
+					config: {
+						customColorsForSystemBars: true,
+						statusBarColor: '#00000000',
+						statusBarContent: 'light',
+						navigationBarColor: '#00000000',
+						navigationBarContent: 'light'
 					}
+				});
+			} else {
+				await setStatusBarColor();
+			}
+
+			if (!$playerAndroidLockOrientation) return;
+
+			if (isFullScreen && videoFormats[0].resolution) {
+				const widthHeight = videoFormats[0].resolution.split('x');
+
+				if (widthHeight.length !== 2) return;
+
+				if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+					await ScreenOrientation.lock({ orientation: 'landscape' });
 				} else {
-					await ScreenOrientation.lock({
-						orientation: (originalOrigination as ScreenOrientationResult).type
-					});
+					await ScreenOrientation.lock({ orientation: 'portrait' });
 				}
-			});
-		}
+			} else {
+				await ScreenOrientation.lock({
+					orientation: (originalOrigination as ScreenOrientationResult).type
+				});
+			}
+		});
 	}
 
 	async function setupSponsorSkip() {

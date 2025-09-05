@@ -30,13 +30,13 @@ export async function load({ params, url }) {
 	} else {
 		getSearch(params.slug, { type: type }).then((newSearch) => {
 			searchCacheStore.set({
-				...get(searchCacheStore),
 				[searchStoreId]: excludeDuplicateFeeds(search, newSearch) as (
 					| Channel
 					| Video
 					| Playlist
 					| HashTag
-				)[]
+				)[],
+				...get(searchCacheStore)
 			});
 		});
 	}

@@ -8,7 +8,6 @@ export async function loadEntirePlaylist(
 ): Promise<{ videos: PlaylistPageVideo[]; info: PlaylistPage }> {
 	const cachedPlaylists = get(playlistCacheStore);
 	if (playlistId in cachedPlaylists) {
-		console.log('Using cache');
 		return cachedPlaylists[playlistId];
 	}
 

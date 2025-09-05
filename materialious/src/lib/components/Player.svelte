@@ -561,8 +561,6 @@
 				});
 			});
 
-			console.log(metadataArtwork);
-
 			navigator.mediaSession.metadata = new MediaMetadata({
 				title: data.video.title,
 				artist: data.video.author,

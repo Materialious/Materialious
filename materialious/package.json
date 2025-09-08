@@ -67,6 +67,6 @@
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
-		"youtubei.js": "^15.0.0"
+		"youtubei.js": "^15.0.1"
 	}
 }

@@ -63,7 +63,7 @@
 		"media-captions": "^1.0.4",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.5",
-		"shaka-player": "^4.11.7",
+		"shaka-player": "^4.16.1",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",

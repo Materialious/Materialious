@@ -145,7 +145,13 @@
 	}
 
 	function restoreDefaultLanguage() {
-		if ($playerDefaultLanguage) {
+		if (!$playerDefaultLanguage || $playerDefaultLanguage === "original") {
+			const languageAndRole = player.getAudioLanguagesAndRoles().find(({ role }) => role === "main");
+			if (languageAndRole !== undefined) {
+				player.selectAudioLanguage(languageAndRole.language);
+				return;
+			}
+		} else if ($playerDefaultLanguage) {
 			const audioLanguages = player.getAudioLanguages();
 			const langCode = ISO6391.getCode($playerDefaultLanguage);
 

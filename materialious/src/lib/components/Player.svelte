@@ -462,6 +462,8 @@
 			playerElement
 		);
 
+		await player.attach(playerElement);
+
 		shaka.ui.Controls.registerElement('end_time', {
 			create: (parent: HTMLElement, controls: shaka.ui.Controls) => {
 				return new EndTimeElement(parent, controls);
@@ -494,13 +496,13 @@
 
 		updateSeekBarTheme();
 
-		player.addEventListener('error', (event) => {
+		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
 		});
 
 		// Required to stop buttons from being still selected when fullscreening
-		document.addEventListener('fullscreenchange', async () => {
+		document?.addEventListener('fullscreenchange', async () => {
 			const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
 			buttons.forEach((button) => {
 				// Reset the button's focus and active states
@@ -509,9 +511,7 @@
 			});
 		});
 
-		await player.attach(playerElement);
-
-		playerElement.addEventListener('volumechange', saveVolumePreference);
+		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
 		await androidHandleRotate();
 
@@ -640,11 +640,11 @@
 			playerElement.currentTime += frameTime;
 		});
 
-		playerElement.addEventListener('pause', async () => {
+		playerElement?.addEventListener('pause', async () => {
 			savePlayerPos();
 		});
 
-		playerElement.addEventListener('ended', async () => {
+		playerElement?.addEventListener('ended', async () => {
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
 					goto(

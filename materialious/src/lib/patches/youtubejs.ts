@@ -39,12 +39,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			? androidPoTokenMinter
 			: window.electronAPI.generatePoToken;
 
-	poTokenCacheStore.set(BG.PoToken.generateColdStartToken(visitorData));
-
-	platformMinter(challengeResponse.bg_challenge, requestKey, visitorData).then((poToken) =>
-		poTokenCacheStore.set(poToken)
-	);
-
 	const extraArgs: Record<string, any> = {
 		playbackContext: {
 			contentPlaybackContext: {
@@ -76,6 +70,18 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	if (!video.primary_info || !video.secondary_info) {
 		throw new Error('Unable to pull video info from youtube.js');
+	}
+
+	if (video.basic_info.is_live) {
+		poTokenCacheStore.set(
+			await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
+		);
+	} else {
+		poTokenCacheStore.set(BG.PoToken.generateColdStartToken(visitorData));
+
+		platformMinter(challengeResponse.bg_challenge, requestKey, visitorData).then((poToken) =>
+			poTokenCacheStore.set(poToken)
+		);
 	}
 
 	let dashUri: string | undefined;

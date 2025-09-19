@@ -428,7 +428,6 @@
 
 		player = new shaka.Player();
 
-		// YouTube's defaults
 		player.configure({
 			abr: {
 				enabled: true,
@@ -438,18 +437,18 @@
 				}
 			},
 			streaming: {
+				failureCallback: (error: shaka.util.Error) => {
+					console.error('Streaming failure:', error);
+					player.retryStreaming(5);
+				},
 				bufferingGoal: 120,
 				rebufferingGoal: 0.01,
 				bufferBehind: 300,
 				retryParameters: {
-					maxAttempts: 30,
-					baseDelay: 1500,
-					backoffFactor: 2.5,
-					fuzzFactor: 0.7,
-					timeout: 120000
-				},
-				stallThreshold: 2,
-				stallSkip: 0.5
+					maxAttempts: 8,
+					fuzzFactor: 0.5,
+					timeout: 30 * 1000
+				}
 			}
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;

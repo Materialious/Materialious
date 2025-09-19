@@ -10,7 +10,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"postinstall": "patch-package"
+		"patch:shaka": "node ./scripts/patchShaka.mjs",
+		"postinstall": "npm run patch:shaka"
 	},
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",
@@ -63,7 +64,7 @@
 		"media-captions": "^1.0.4",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.5",
-		"shaka-player": "^4.11.7",
+		"shaka-player": "^4.16.2",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",

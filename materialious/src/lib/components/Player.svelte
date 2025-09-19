@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import '$lib/css/shaka-player-theme.css';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
 	import { type PhasedDescription } from '$lib/timestamps';
@@ -13,6 +12,7 @@
 	import ISO6391 from 'iso-639-1';
 	import Mousetrap from 'mousetrap';
 	import 'shaka-player/dist/controls.css';
+	import '$lib/css/shaka-player-theme.css';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
@@ -91,62 +91,16 @@
 				played: (await getDynamicTheme())['--primary']
 			}
 		});
-
-		setChapterMarkers();
-
-		const overflowMenuButton = document.querySelector('.shaka-overflow-menu-button');
-		if (overflowMenuButton) {
-			overflowMenuButton.innerHTML = 'settings';
-		}
-
-		const backToOverflowButton = document.querySelector('.shaka-back-to-overflow-button');
-		if (backToOverflowButton) {
-			backToOverflowButton.innerHTML = 'arrow_back_ios_new';
-		}
 	}
 
 	themeColorStore.subscribe(updateSeekBarTheme);
 	darkModeStore.subscribe(updateSeekBarTheme);
 
-	function setChapterMarkers() {
-		const shakaControls = shakaUi.getControls();
-		if (data.content.timestamps && shakaControls) {
-			const seekBar = shakaControls
-				.getControlsContainer()
-				.querySelector('.shaka-seek-bar-container');
-
-			data.content.timestamps.forEach((chapter, index) => {
-				const nextChapter = data.content.timestamps[index + 1];
-
-				const marker = document.createElement('div');
-				marker.classList.add('chapter-marker');
-
-				const startPercent = (chapter.time / data.video.lengthSeconds) * 100;
-				let widthPercent: number;
-
-				if (nextChapter) {
-					widthPercent = ((nextChapter.time - chapter.time) / data.video.lengthSeconds) * 100;
-				} else {
-					widthPercent = 100 - startPercent;
-				}
-
-				marker.style.left = `${startPercent}%`;
-				marker.style.width = `${widthPercent}%`;
-
-				const tooltip = document.createElement('div');
-				tooltip.classList.add('tooltip');
-				tooltip.textContent = chapter.title;
-
-				marker.appendChild(tooltip);
-
-				if (seekBar) seekBar.appendChild(marker);
-			});
-		}
-	}
-
 	function restoreDefaultLanguage() {
-		if (!$playerDefaultLanguage || $playerDefaultLanguage === "original") {
-			const languageAndRole = player.getAudioLanguagesAndRoles().find(({ role }) => role === "main");
+		if (!$playerDefaultLanguage || $playerDefaultLanguage === 'original') {
+			const languageAndRole = player
+				.getAudioLanguagesAndRoles()
+				.find(({ role }) => role === 'main');
 			if (languageAndRole !== undefined) {
 				player.selectAudioLanguage(languageAndRole.language);
 				return;
@@ -343,45 +297,11 @@
 		// Will inject requirements for SABR if SABR is required.
 		playerElementResizeObserver = injectSABR(player, playerElement as HTMLMediaElement, data.video);
 
+		try {
+			document.getElementsByClassName('shaka-ad-info')[0].remove();
+		} catch {}
+
 		if (!data.video.liveNow) {
-			if (data.video.captions) {
-				data.video.captions.forEach(async (caption) => {
-					player.addTextTrackAsync(
-						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
-						caption.language_code,
-						'captions',
-						undefined,
-						undefined,
-						caption.label
-					);
-				});
-			}
-
-			if (data.content.timestamps) {
-				let chapterWebVTT = 'WEBVTT\n\n';
-
-				let timestampIndex = 0;
-				data.content.timestamps.forEach((timestamp) => {
-					let endTime: string;
-					if (timestampIndex === data.content.timestamps.length - 1) {
-						endTime = videoLength(data.video.lengthSeconds);
-					} else {
-						endTime = data.content.timestamps[timestampIndex + 1].timePretty;
-					}
-
-					chapterWebVTT += `${padTime(timestamp.timePretty)} --> ${padTime(endTime)}\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
-
-					timestampIndex += 1;
-				});
-
-				if (timestampIndex > 0) {
-					player.addChaptersTrack(
-						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
-						get(playerDefaultLanguage)
-					);
-				}
-			}
-
 			if (watchProgressTimeout) {
 				clearInterval(watchProgressTimeout);
 			}
@@ -417,6 +337,44 @@
 				await player.load(manifest, await getLastPlayPos());
 			} else {
 				await player.load(dashUrl, await getLastPlayPos());
+			}
+
+			if (data.video.captions) {
+				data.video.captions.forEach(async (caption) => {
+					player.addTextTrackAsync(
+						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
+						caption.language_code,
+						'captions',
+						undefined,
+						undefined,
+						caption.label
+					);
+				});
+			}
+
+			if (data.content.timestamps) {
+				let chapterWebVTT = 'WEBVTT\n\n';
+
+				let timestampIndex = 0;
+				data.content.timestamps.forEach((timestamp) => {
+					let endTime: string;
+					if (timestampIndex === data.content.timestamps.length - 1) {
+						endTime = videoLength(data.video.lengthSeconds);
+					} else {
+						endTime = data.content.timestamps[timestampIndex + 1].timePretty;
+					}
+
+					chapterWebVTT += `${padTime(timestamp.timePretty)}.000 --> ${padTime(endTime)}.000\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
+
+					timestampIndex += 1;
+				});
+
+				if (timestampIndex > 0) {
+					player.addChaptersTrack(
+						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
+						get(playerDefaultLanguage)
+					);
+				}
 			}
 		} else {
 			if (data.video.fallbackPatch === 'youtubejs') {

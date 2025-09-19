@@ -10,7 +10,7 @@ import type {
 import { fromFormat } from '$lib/sabr/formatKeyUtils';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
-import { USER_AGENT } from 'bgutils-js';
+import BG, { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
 import { Innertube, UniversalCache, Utils, YT, YTNodes } from 'youtubei.js';
 
@@ -39,8 +39,10 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			? androidPoTokenMinter
 			: window.electronAPI.generatePoToken;
 
-	poTokenCacheStore.set(
-		await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
+	poTokenCacheStore.set(BG.PoToken.generateColdStartToken(visitorData));
+
+	platformMinter(challengeResponse.bg_challenge, requestKey, visitorData).then((poToken) =>
+		poTokenCacheStore.set(poToken)
 	);
 
 	const extraArgs: Record<string, any> = {

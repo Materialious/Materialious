@@ -71,6 +71,7 @@
 		bind:value={defaultLanguage}
 		onchange={() => playerDefaultLanguage.set(defaultLanguage)}
 	>
+		<option selected={$playerDefaultLanguage === "original"} value="original">Original</option>
 		{#each languageNames as language}
 			<option selected={$playerDefaultLanguage === language} value={language}
 				>{titleCase(language)}</option

@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.10.6",
+	"version": "1.10.7",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -10,7 +10,8 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"postinstall": "patch-package"
+		"patch:shaka": "node ./scripts/patchShaka.mjs",
+		"postinstall": "npm run patch:shaka"
 	},
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",
@@ -28,7 +29,7 @@
 		"@typescript-eslint/parser": "^7.18.0",
 		"@vite-pwa/sveltekit": "^0.6.6",
 		"eslint": "^8.56.0",
-		"eslint-config-prettier": "^9.1.0",
+		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.11.0",
 		"patch-package": "^8.0.0",
 		"prettier": "^3.3.3",
@@ -37,14 +38,14 @@
 		"svelte-check": "^4.0.0",
 		"tslib": "^2.7.0",
 		"typescript": "^5.6.3",
-		"vite": "^6.3.4"
+		"vite": "^6.3.6"
 	},
 	"type": "module",
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.1",
 		"@capacitor-community/safe-area": "^7.0.0-alpha.1",
 		"@capacitor/android": "^7.0.0",
-		"@capacitor/app": "^7.0.0",
+		"@capacitor/app": "^7.1.0",
 		"@capacitor/browser": "^7.0.0",
 		"@capacitor/clipboard": "^7.0.0",
 		"@capacitor/core": "^7.0.0",
@@ -63,10 +64,10 @@
 		"media-captions": "^1.0.4",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.5",
-		"shaka-player": "^4.11.7",
+		"shaka-player": "^4.16.2",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
-		"youtubei.js": "^15.0.0"
+		"youtubei.js": "^15.1.1"
 	}
 }

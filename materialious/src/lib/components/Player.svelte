@@ -428,7 +428,6 @@
 
 		player = new shaka.Player();
 
-		// YouTube's defaults
 		player.configure({
 			abr: {
 				enabled: true,
@@ -438,18 +437,18 @@
 				}
 			},
 			streaming: {
+				failureCallback: (error: shaka.util.Error) => {
+					console.error('Streaming failure:', error);
+					player.retryStreaming(5);
+				},
 				bufferingGoal: 120,
 				rebufferingGoal: 0.01,
 				bufferBehind: 300,
 				retryParameters: {
-					maxAttempts: 30,
-					baseDelay: 1500,
-					backoffFactor: 2.5,
-					fuzzFactor: 0.7,
-					timeout: 120000
-				},
-				stallThreshold: 2,
-				stallSkip: 0.5
+					maxAttempts: 8,
+					fuzzFactor: 0.5,
+					timeout: 30 * 1000
+				}
 			}
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
@@ -462,6 +461,8 @@
 			document.getElementById('shaka-container') as HTMLElement,
 			playerElement
 		);
+
+		await player.attach(playerElement);
 
 		shaka.ui.Controls.registerElement('end_time', {
 			create: (parent: HTMLElement, controls: shaka.ui.Controls) => {
@@ -495,13 +496,13 @@
 
 		updateSeekBarTheme();
 
-		player.addEventListener('error', (event) => {
+		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
 		});
 
 		// Required to stop buttons from being still selected when fullscreening
-		document.addEventListener('fullscreenchange', async () => {
+		document?.addEventListener('fullscreenchange', async () => {
 			const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
 			buttons.forEach((button) => {
 				// Reset the button's focus and active states
@@ -510,9 +511,7 @@
 			});
 		});
 
-		await player.attach(playerElement);
-
-		playerElement.addEventListener('volumechange', saveVolumePreference);
+		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
 		await androidHandleRotate();
 
@@ -641,11 +640,11 @@
 			playerElement.currentTime += frameTime;
 		});
 
-		playerElement.addEventListener('pause', async () => {
+		playerElement?.addEventListener('pause', async () => {
 			savePlayerPos();
 		});
 
-		playerElement.addEventListener('ended', async () => {
+		playerElement?.addEventListener('ended', async () => {
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
 					goto(

@@ -31,7 +31,7 @@ jobs:
                   VERSION=$(jq -r .version ./materialious/package.json)
                   echo "version=$VERSION" >> "$GITHUB_OUTPUT"
             - name: Build and push
-              uses: docker/build-push-action@v5
+              uses: docker/build-push-action@v6
               with:
                   context: ./materialious
                   platforms: linux/amd64,linux/arm64,linux/arm/v7

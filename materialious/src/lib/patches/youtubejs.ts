@@ -10,7 +10,7 @@ import type {
 import { fromFormat } from '$lib/sabr/formatKeyUtils';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
-import { USER_AGENT } from 'bgutils-js';
+import BG, { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
 import { Innertube, UniversalCache, Utils, YT, YTNodes } from 'youtubei.js';
 
@@ -38,10 +38,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		Capacitor.getPlatform() === 'android'
 			? androidPoTokenMinter
 			: window.electronAPI.generatePoToken;
-
-	poTokenCacheStore.set(
-		await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
-	);
 
 	const extraArgs: Record<string, any> = {
 		playbackContext: {
@@ -74,6 +70,18 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	if (!video.primary_info || !video.secondary_info) {
 		throw new Error('Unable to pull video info from youtube.js');
+	}
+
+	if (video.basic_info.is_live) {
+		poTokenCacheStore.set(
+			await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
+		);
+	} else {
+		poTokenCacheStore.set(BG.PoToken.generateColdStartToken(visitorData));
+
+		platformMinter(challengeResponse.bg_challenge, requestKey, visitorData).then((poToken) =>
+			poTokenCacheStore.set(poToken)
+		);
 	}
 
 	let dashUri: string | undefined;

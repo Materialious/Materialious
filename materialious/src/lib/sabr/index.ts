@@ -97,9 +97,9 @@ export function injectSABR(
 			)
 		);
 
-	playerElement.addEventListener('seeked', () => (lastSeekMs = Date.now()));
+	playerElement?.addEventListener('seeked', () => (lastSeekMs = Date.now()));
 
-	player.addEventListener('variantchanged', (event) => {
+	player?.addEventListener('variantchanged', (event) => {
 		// Technically, all variant changes here are manual, given we don't handle ABR updates from the server.
 		if (event.type !== 'variant') {
 			lastManualFormatSelectionMs = Date.now();

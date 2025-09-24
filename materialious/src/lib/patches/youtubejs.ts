@@ -24,7 +24,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		cache: new UniversalCache(false),
 		location: get(interfaceRegionStore),
 		user_agent: USER_AGENT,
-		enable_session_cache: false
+		enable_session_cache: false,
+		player_id: '0004de42'
 	});
 
 	const visitorData = youtube.session.context.client.visitorData ?? '';

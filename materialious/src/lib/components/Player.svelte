@@ -7,7 +7,6 @@
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { error, type Page } from '@sveltejs/kit';
-	import { HttpFetchPlugin } from '$lib/sabr/shakaHttpPlugin';
 	import ui from 'beercss';
 	import ISO6391 from 'iso-639-1';
 	import Mousetrap from 'mousetrap';
@@ -37,6 +36,7 @@
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
 		playlistSettingsStore,
+		poTokenCacheStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -47,7 +47,6 @@
 		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
-	import { injectSABR } from '$lib/sabr';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
@@ -56,6 +55,8 @@
 	import { unsafeRandomItem } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
+	import { injectSabr } from '$lib/sabr';
+	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -75,11 +76,11 @@
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressTimeout: NodeJS.Timeout;
-	let playerElementResizeObserver: ResizeObserver | undefined;
 	let showVideoRetry = $state(false);
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
+	let sabrAdapter: SabrStreamingAdapter | null;
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -158,9 +159,8 @@
 		}
 
 		if (selectedTrack) {
-			player.selectVariantTrack(selectedTrack, true);
-			HttpFetchPlugin.cacheManager.clearCache();
 			player.configure({ abr: { enabled: false } });
+			player.selectVariantTrack(selectedTrack, true);
 		} else {
 			player.configure({ abr: { enabled: true } });
 		}
@@ -294,8 +294,8 @@
 
 	async function loadVideo() {
 		showVideoRetry = false;
-		// Will inject requirements for SABR if SABR is required.
-		playerElementResizeObserver = injectSABR(player, playerElement as HTMLMediaElement, data.video);
+
+		sabrAdapter = injectSabr(data.video, player);
 
 		try {
 			document.getElementsByClassName('shaka-ad-info')[0].remove();
@@ -395,6 +395,7 @@
 
 		restoreQualityPreference();
 		restoreDefaultLanguage();
+
 		if ($playerCCByDefault) {
 			toggleSubtitles();
 		}
@@ -424,17 +425,11 @@
 			return;
 		}
 
-		HttpFetchPlugin.cacheManager.clearCache();
-
 		player = new shaka.Player();
 
 		player.configure({
 			abr: {
-				enabled: true,
-				restrictions: {
-					maxWidth: 1920,
-					maxHeight: 1080
-				}
+				enabled: true
 			},
 			streaming: {
 				failureCallback: (error: shaka.util.Error) => {
@@ -442,7 +437,7 @@
 					player.retryStreaming(5);
 				},
 				bufferingGoal: 120,
-				rebufferingGoal: 0.01,
+				rebufferingGoal: 2,
 				bufferBehind: 300,
 				retryParameters: {
 					maxAttempts: 8,
@@ -456,11 +451,9 @@
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
 
-		shakaUi = new shaka.ui.Overlay(
-			player,
-			document.getElementById('shaka-container') as HTMLElement,
-			playerElement
-		);
+		const playerContainer = document.getElementById('shaka-container') as HTMLElement;
+
+		shakaUi = new shaka.ui.Overlay(player, playerContainer, playerElement);
 
 		await player.attach(playerElement);
 
@@ -471,6 +464,7 @@
 		});
 
 		shakaUi.configure({
+			addBigPlayButton: Capacitor.getPlatform() === 'android',
 			controlPanelElements: [
 				'play_pause',
 				Capacitor.getPlatform() === 'android' ? '' : 'volume',
@@ -595,6 +589,17 @@
 				return false;
 			});
 		}
+
+		const volumeContainer = playerContainer.getElementsByClassName('shaka-volume-bar-container');
+		volumeContainer[0]?.addEventListener('mousewheel', (event) => {
+			event.preventDefault();
+			const delta = Math.sign((event as any).deltaY);
+			const newVolume = Math.max(
+				0,
+				Math.min(1, (playerElement as HTMLMediaElement).volume - delta * 0.05)
+			);
+			(playerElement as HTMLMediaElement).volume = newVolume;
+		});
 
 		Mousetrap.bind('c', () => {
 			toggleSubtitles();
@@ -781,18 +786,12 @@
 			clearTimeout(watchProgressTimeout);
 		}
 
-		HttpFetchPlugin.cacheManager.clearCache();
-
-		if (playerElementResizeObserver) {
-			playerElementResizeObserver.disconnect();
-		}
-
-		if (playerElement) {
-			playerElement.src = '';
-			playerElement.load();
+		if (sabrAdapter) {
+			sabrAdapter.dispose();
 		}
 
 		if (player) {
+			player.unload();
 			player.destroy();
 		}
 

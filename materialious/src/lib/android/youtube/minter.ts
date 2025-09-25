@@ -1,24 +1,45 @@
 import { BG, buildURL, GOOG_API_KEY, type WebPoSignalOutput } from 'bgutils-js';
-import type { IBotguardChallenge } from 'youtubei.js';
 
 export async function androidPoTokenMinter(
-	bgChallenge: IBotguardChallenge,
 	requestKey: string,
 	visitorData: string
 ): Promise<string> {
-	const interpreterUrl =
-		bgChallenge.interpreter_url.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
-	const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
-	const interpreterJavascript = await bgScriptResponse.text();
+	const challengeResponse = await fetch(buildURL('Create', true), {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json+protobuf',
+			'x-goog-api-key': GOOG_API_KEY,
+			'x-user-agent': 'grpc-web-javascript/0.1'
+		},
+		body: JSON.stringify([requestKey])
+	});
 
-	if (interpreterJavascript) {
-		new Function(interpreterJavascript)();
-	} else throw new Error('Could not load VM');
+	const challengeResponseData = await challengeResponse.json();
+	const bgChallenge = BG.Challenge.parseChallengeData(challengeResponseData);
+
+	if (!bgChallenge) throw new Error('Unable to parse challenge data');
+
+	const interpreterJavascript =
+		bgChallenge.interpreterJavascript.privateDoNotAccessOrElseSafeScriptWrappedValue;
+
+	if (!interpreterJavascript) {
+		throw new Error(
+			`Could not get integrity token. Interpreter Hash: ${bgChallenge.interpreterHash}`
+		);
+	}
+
+	if (!document.getElementById(bgChallenge.interpreterHash)) {
+		const script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.id = bgChallenge.interpreterHash;
+		script.textContent = interpreterJavascript;
+		document.head.appendChild(script);
+	}
 
 	const botguardClient = await BG.BotGuardClient.create({
-		program: bgChallenge.program,
-		globalName: bgChallenge.global_name,
-		globalObj: globalThis
+		globalObj: globalThis,
+		globalName: bgChallenge.globalName,
+		program: bgChallenge.program
 	});
 
 	const webPoSignalOutput: WebPoSignalOutput = [];
@@ -29,22 +50,23 @@ export async function androidPoTokenMinter(
 		headers: {
 			'content-type': 'application/json+protobuf',
 			'x-goog-api-key': GOOG_API_KEY,
-			'x-user-agent': 'grpc-web-javascript/0.1'
+			'x-user-agent': 'grpc-web-javacript/0.1'
 		},
 		body: JSON.stringify([requestKey, botguardResponse])
 	});
 
 	const integrityTokenResponseData = await integrityTokenResponse.json();
+	const integrityToken = integrityTokenResponseData[0] as string | undefined;
 
-	if (typeof integrityTokenResponseData[0] !== 'string')
-		throw new Error('Could not get integrity token');
-
-	const integrityToken = integrityTokenResponseData[0];
+	if (!integrityToken) {
+		throw new Error(
+			`Could not get integrity token. Interpreter Hash: ${bgChallenge.interpreterHash}`
+		);
+	}
 
 	const integrityTokenBasedMinter = await BG.WebPoMinter.create(
 		{ integrityToken },
 		webPoSignalOutput
 	);
-
 	return await integrityTokenBasedMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
 }

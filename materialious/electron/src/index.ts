@@ -74,75 +74,91 @@ app.on('activate', async function () {
 });
 
 // Place all ipc or other electron api calls and custom functionality under this line
-ipcMain.handle(
-	'generatePoToken',
-	async (_, bgChallenge: any, requestKey: string, visitorData: string) => {
-		const youtubeUrl = 'https://www.youtube.com/';
+ipcMain.handle('generatePoToken', async (_, requestKey: string, visitorData: string) => {
+	const youtubeUrl = 'https://www.youtube.com/';
 
-		const dom = new JSDOM(
-			'<!DOCTYPE html><html lang="en"><head><title></title></head><body></body></html>',
-			{
-				url: youtubeUrl,
-				referrer: youtubeUrl,
-				origin: youtubeUrl,
-				USER_AGENT
-			}
-		);
-
-		Object.assign(globalThis, {
-			window: dom.window,
-			document: dom.window.document,
-			location: dom.window.location,
-			origin: dom.window.origin
-		});
-
-		if (!Reflect.has(globalThis, 'navigator')) {
-			Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator });
+	const dom = new JSDOM(
+		'<!DOCTYPE html><html lang="en"><head><title>YouTube</title></head><body></body></html>',
+		{
+			url: youtubeUrl,
+			referrer: youtubeUrl,
+			origin: youtubeUrl,
+			USER_AGENT
 		}
+	);
 
-		const interpreterUrl =
-			bgChallenge.interpreter_url.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
-		const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
-		const interpreterJavascript = await bgScriptResponse.text();
+	Object.assign(globalThis, {
+		window: dom.window,
+		document: dom.window.document,
+		location: dom.window.location,
+		origin: dom.window.origin
+	});
 
-		if (interpreterJavascript) {
-			new Function(interpreterJavascript)();
-		} else throw new Error('Could not load VM');
-
-		const botguardClient = await BG.BotGuardClient.create({
-			program: bgChallenge.program,
-			globalName: bgChallenge.global_name,
-			globalObj: globalThis
-		});
-
-		const webPoSignalOutput: WebPoSignalOutput = [];
-		const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
-
-		const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json+protobuf',
-				'x-goog-api-key': GOOG_API_KEY,
-				'x-user-agent': 'grpc-web-javascript/0.1'
-			},
-			body: JSON.stringify([requestKey, botguardResponse])
-		});
-
-		const integrityTokenResponseData = await integrityTokenResponse.json();
-
-		if (typeof integrityTokenResponseData[0] !== 'string')
-			throw new Error('Could not get integrity token');
-
-		const integrityToken = integrityTokenResponseData[0];
-
-		const integrityTokenBasedMinter = await BG.WebPoMinter.create(
-			{ integrityToken },
-			webPoSignalOutput
-		);
-
-		return await integrityTokenBasedMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
+	if (!Reflect.has(globalThis, 'navigator')) {
+		Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator });
 	}
-);
+
+	const challengeResponse = await fetch(buildURL('Create', true), {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json+protobuf',
+			'x-goog-api-key': GOOG_API_KEY,
+			'x-user-agent': 'grpc-web-javascript/0.1'
+		},
+		body: JSON.stringify([requestKey])
+	});
+
+	const challengeResponseData = await challengeResponse.json();
+	const bgChallenge = BG.Challenge.parseChallengeData(challengeResponseData);
+
+	if (!bgChallenge) throw new Error('Unable to parse challenge data');
+
+	const interpreterJavascript =
+		bgChallenge.interpreterJavascript.privateDoNotAccessOrElseSafeScriptWrappedValue;
+
+	if (!interpreterJavascript) {
+		throw new Error(
+			`Could not get integrity token. Interpreter Hash: ${bgChallenge.interpreterHash}`
+		);
+	}
+	if (interpreterJavascript) {
+		new Function(interpreterJavascript)();
+	} else throw new Error('Could not load VM');
+
+	const botguardClient = await BG.BotGuardClient.create({
+		program: bgChallenge.program,
+		globalName: bgChallenge.globalName,
+		globalObj: globalThis
+	});
+
+	const webPoSignalOutput: WebPoSignalOutput = [];
+	const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
+
+	const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json+protobuf',
+			'x-goog-api-key': GOOG_API_KEY,
+			'x-user-agent': 'grpc-web-javacript/0.1'
+		},
+		body: JSON.stringify([requestKey, botguardResponse])
+	});
+
+	const integrityTokenResponseData = await integrityTokenResponse.json();
+	const integrityToken = integrityTokenResponseData[0] as string | undefined;
+
+	if (!integrityToken) {
+		throw new Error(
+			`Could not get integrity token. Interpreter Hash: ${bgChallenge.interpreterHash}`
+		);
+	}
+
+	const integrityTokenBasedMinter = await BG.WebPoMinter.create(
+		{ integrityToken },
+		webPoSignalOutput
+	);
+	return await integrityTokenBasedMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
+});
 
 ipcMain.handle('setAllowInsecureSSL', async (_, allow) => {
 	allowInsecureSSL = allow;

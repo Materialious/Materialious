@@ -56,6 +56,7 @@
 	import type { PlayerEvents } from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
+	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -79,6 +80,7 @@
 
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
+	let sabrAdapter: SabrStreamingAdapter | null;
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -293,7 +295,7 @@
 	async function loadVideo() {
 		showVideoRetry = false;
 
-		injectSabr(data.video, player);
+		sabrAdapter = injectSabr(data.video, player);
 
 		try {
 			document.getElementsByClassName('shaka-ad-info')[0].remove();
@@ -788,12 +790,12 @@
 			clearTimeout(watchProgressTimeout);
 		}
 
-		if (playerElement) {
-			playerElement.src = '';
-			playerElement.load();
+		if (sabrAdapter) {
+			sabrAdapter.dispose();
 		}
 
 		if (player) {
+			player.unload();
 			player.destroy();
 		}
 

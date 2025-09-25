@@ -8,8 +8,8 @@ import { get } from 'svelte/store';
 import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
 
-export function injectSabr(video: VideoPlay, player: shaka.Player) {
-	if (!video.ytjs || !Capacitor.isNativePlatform()) return;
+export function injectSabr(video: VideoPlay, player: shaka.Player): SabrStreamingAdapter | null {
+	if (!video.ytjs || !Capacitor.isNativePlatform()) return null;
 
 	const sabrAdapter = new SabrStreamingAdapter({
 		playerAdapter: new ShakaPlayerAdapter(),
@@ -91,4 +91,6 @@ export function injectSabr(video: VideoPlay, player: shaka.Player) {
 	}
 
 	sabrAdapter.attach(player);
+
+	return sabrAdapter;
 }

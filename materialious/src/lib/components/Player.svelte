@@ -439,7 +439,7 @@
 					player.retryStreaming(5);
 				},
 				bufferingGoal: 120,
-				rebufferingGoal: 0.01,
+				rebufferingGoal: 2,
 				bufferBehind: 300,
 				retryParameters: {
 					maxAttempts: 8,
@@ -466,6 +466,7 @@
 		});
 
 		shakaUi.configure({
+			addBigPlayButton: Capacitor.getPlatform() === 'android',
 			controlPanelElements: [
 				'play_pause',
 				Capacitor.getPlatform() === 'android' ? '' : 'volume',

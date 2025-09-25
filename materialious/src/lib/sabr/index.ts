@@ -66,8 +66,6 @@ export function injectSabr(video: VideoPlay, player: shaka.Player) {
 		);
 	});
 
-	sabrAdapter.attach(player);
-
 	const isLive = video.ytjs.video.basic_info.is_live;
 	const isPostLiveDVR =
 		!!video.ytjs.video.basic_info.is_post_live_dvr ||
@@ -91,4 +89,6 @@ export function injectSabr(video: VideoPlay, player: shaka.Player) {
 			video.ytjs.video.streaming_data.adaptive_formats.map(buildSabrFormat)
 		);
 	}
+
+	sabrAdapter.attach(player);
 }

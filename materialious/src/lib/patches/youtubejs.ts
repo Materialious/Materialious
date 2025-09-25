@@ -20,10 +20,9 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	const youtube = await Innertube.create({
 		fetch: fetch,
-		cache: new UniversalCache(false),
+		cache: new UniversalCache(true),
 		location: get(interfaceRegionStore),
 		user_agent: USER_AGENT,
-		enable_session_cache: false,
 		player_id: '0004de42'
 	});
 

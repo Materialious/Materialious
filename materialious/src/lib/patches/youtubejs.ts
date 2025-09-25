@@ -7,7 +7,6 @@ import type {
 	VideoBase,
 	VideoPlay
 } from '$lib/api/model';
-import { fromFormat } from '$lib/sabr/formatKeyUtils';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import BG, { USER_AGENT } from 'bgutils-js';
@@ -40,25 +39,20 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			? androidPoTokenMinter
 			: window.electronAPI.generatePoToken;
 
-	const extraArgs: Record<string, any> = {
-		playbackContext: {
-			contentPlaybackContext: {
-				vis: 0,
-				splay: false,
-				lactMilliseconds: '-1',
-				signatureTimestamp: youtube.session.player?.sts
-			}
-		},
-		contentCheckOk: true,
-		racyCheckOk: true
-	};
-
-	const clientPlaybackNonce = Utils.generateRandomString(12);
+	const clientPlaybackNonce = Utils.generateRandomString(16);
 
 	const watchEndpoint = new YTNodes.NavigationEndpoint({ watchEndpoint: { videoId } });
 	const rawPlayerResponse = await watchEndpoint.call(youtube.actions, {
-		...extraArgs,
-		parse: false
+		contentCheckOk: true,
+		racyCheckOk: true,
+		playbackContext: {
+			adPlaybackContext: {
+				pyv: true
+			},
+			contentPlaybackContext: {
+				signatureTimestamp: youtube.session.player?.sts
+			}
+		}
 	});
 	const rawNextResponse = await watchEndpoint.call(youtube.actions, {
 		override_endpoint: '/next'
@@ -87,25 +81,30 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	let dashUri: string | undefined;
 
-	if (video.streaming_data) {
-		video.streaming_data.adaptive_formats.forEach((format) => {
-			const formatKey = fromFormat(format) || '';
-			format.url = `https://sabr?___key=${formatKey}`;
-			format.signature_cipher = undefined;
-			format.decipher = () => format.url || '';
-			return format;
-		});
+	const isPostLiveDVR =
+		!!video.basic_info.is_post_live_dvr ||
+		(video.basic_info.is_live_content &&
+			!!(video.streaming_data?.dash_manifest_url || video.streaming_data?.hls_manifest_url));
 
+	if (video.streaming_data) {
 		if (video.basic_info.is_live) {
 			dashUri = video.streaming_data.dash_manifest_url
 				? `${video.streaming_data.dash_manifest_url}/mpd_version/7`
 				: video.streaming_data.hls_manifest_url;
-		} else if (video.streaming_data.dash_manifest_url && video.basic_info.is_post_live_dvr) {
+		} else if (isPostLiveDVR) {
 			dashUri = video.streaming_data.hls_manifest_url
 				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
 				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
 		} else {
-			dashUri = `data:application/dash+xml;base64,${btoa(await video.toDash({ manifest_options: { captions_format: 'vtt' } }))}`;
+			dashUri = `data:application/dash+xml;base64,${btoa(
+				await video.toDash({
+					manifest_options: {
+						is_sabr: true,
+						captions_format: 'vtt',
+						include_thumbnails: false
+					}
+				})
+			)}`;
 		}
 	}
 

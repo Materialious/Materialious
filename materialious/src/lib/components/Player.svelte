@@ -593,7 +593,7 @@
 		}
 
 		const volumeContainer = playerContainer.getElementsByClassName('shaka-volume-bar-container');
-		volumeContainer[0].addEventListener('mousewheel', (event) => {
+		volumeContainer[0]?.addEventListener('mousewheel', (event) => {
 			event.preventDefault();
 			const delta = Math.sign((event as any).deltaY);
 			const newVolume = Math.max(

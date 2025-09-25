@@ -159,8 +159,8 @@
 		}
 
 		if (selectedTrack) {
-			player.selectVariantTrack(selectedTrack, true);
 			player.configure({ abr: { enabled: false } });
+			player.selectVariantTrack(selectedTrack, true);
 		} else {
 			player.configure({ abr: { enabled: true } });
 		}
@@ -429,11 +429,7 @@
 
 		player.configure({
 			abr: {
-				enabled: true,
-				restrictions: {
-					maxWidth: 1920,
-					maxHeight: 1080
-				}
+				enabled: true
 			},
 			streaming: {
 				failureCallback: (error: shaka.util.Error) => {

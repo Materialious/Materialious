@@ -20,7 +20,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	const youtube = await Innertube.create({
 		fetch: fetch,
-		cache: new UniversalCache(true),
+		cache: new UniversalCache(false),
 		location: get(interfaceRegionStore),
 		user_agent: USER_AGENT,
 		player_id: '0004de42'
@@ -29,9 +29,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	const visitorData = youtube.session.context.client.visitorData ?? '';
 
 	const requestKey = 'O43z0dpjhgX20SCx4KAo';
-	const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
-
-	if (!challengeResponse.bg_challenge) throw new Error('Could not get challenge');
 
 	const platformMinter =
 		Capacitor.getPlatform() === 'android'
@@ -67,15 +64,11 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	}
 
 	if (video.basic_info.is_live) {
-		poTokenCacheStore.set(
-			await platformMinter(challengeResponse.bg_challenge, requestKey, visitorData)
-		);
+		poTokenCacheStore.set(await platformMinter(requestKey, visitorData));
 	} else {
 		poTokenCacheStore.set(BG.PoToken.generateColdStartToken(visitorData));
 
-		platformMinter(challengeResponse.bg_challenge, requestKey, visitorData).then((poToken) =>
-			poTokenCacheStore.set(poToken)
-		);
+		platformMinter(requestKey, visitorData).then((poToken) => poTokenCacheStore.set(poToken));
 	}
 
 	let dashUri: string | undefined;

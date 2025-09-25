@@ -1,11 +1,11 @@
 .player-theme {
-	font-family: var(--font);
-	color: var(--on-surface);
+	font-family: var(--font) !important;
+	color: var(--on-surface) !important;
 }
 
 .player-theme .shaka-video-container * {
-	font-family: var(--font);
-	color: var(--on-surface);
+	font-family: var(--font) !important;
+	color: var(--on-surface) !important;
 }
 
 @media screen and (max-width: 650px) {

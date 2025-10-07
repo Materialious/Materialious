@@ -65,6 +65,14 @@
 		await setStatusBarColor();
 	});
 
+	App.addListener('backButton', async (data) => {
+		if (data.canGoBack) {
+			window.history.back();
+		} else {
+			await App.exitApp();
+		}
+	});
+
 	App.addListener('appUrlOpen', (data) => {
 		const url = new URL(data.url);
 
@@ -202,7 +210,17 @@
 			});
 		}
 
-		document.addEventListener('click', linkClickOverwrite);
+		if (Capacitor.getPlatform() === 'android') {
+			document.addEventListener('click', (event: MouseEvent) => {
+				// Handles opening links in browser for android.
+				const link = (event.target as HTMLElement).closest('a');
+
+				if (link && link.href && link.href.startsWith('http') && link.target === '_blank') {
+					event.preventDefault();
+					Browser.open({ url: link.href });
+				}
+			});
+		}
 
 		loadSettingsFromEnv();
 		// Should always be loaded after env settings
@@ -218,19 +236,6 @@
 			loadNotifications().catch(() => authStore.set(null));
 		}
 	});
-
-	function linkClickOverwrite(event: MouseEvent) {
-		// Handles opening links in browser for android.
-
-		if (Capacitor.getPlatform() !== 'android') return;
-
-		const link = (event.target as HTMLElement).closest('a');
-
-		if (link && link.href && link.href.startsWith('http') && link.target === '_blank') {
-			event.preventDefault();
-			Browser.open({ url: link.href });
-		}
-	}
 
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
 </script>

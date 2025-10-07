@@ -14,6 +14,7 @@ export interface Thumbnail {
 }
 
 export interface VideoBase {
+	type: 'video' | 'shortVideo' | 'stream';
 	videoId: string;
 	title: string;
 	videoThumbnails: Thumbnail[];
@@ -30,7 +31,6 @@ export interface ResolvedUrl {
 }
 
 export interface Video extends VideoBase {
-	type: 'video';
 	title: string;
 	authorUrl: string;
 	authorVerified: boolean;
@@ -178,6 +178,7 @@ export interface Channel {
 }
 
 export interface PlaylistVideo {
+	type: 'playlist';
 	title: string;
 	videoId: string;
 	lengthSeconds: number;
@@ -196,7 +197,8 @@ export interface Playlist {
 	videos: PlaylistVideo[];
 }
 
-export interface PlaylistPageVideo extends PlaylistVideo {
+export interface PlaylistPageVideo extends Omit<PlaylistVideo, 'type'> {
+	type: 'video';
 	author: string;
 	index: number;
 	indexId: string;
@@ -214,7 +216,7 @@ export interface ChannelContentPlaylists {
 	continuation: string;
 }
 
-export interface PlaylistPage extends Playlist {
+export interface PlaylistPage extends Omit<Playlist, 'videos'> {
 	description: string;
 	descriptionHtml: string;
 	viewCount: number;
@@ -245,9 +247,7 @@ export interface HashTag {
 	videoCount: number;
 }
 
-export interface Notification extends VideoBase {
-	type: 'video' | 'shortVideo' | 'stream';
-}
+export interface Notification extends VideoBase {}
 
 export interface Feed {
 	notifications: Notification[];

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getFeed } from '$lib/api/index';
 	import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model.js';
-	import VideoList from '$lib/components/VideoList.svelte';
 	import { feedCacheStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import ItemsList from '$lib/components/ItemsList.svelte';
 
 	let currentPage = 1;
 	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state($feedCacheStore.subscription);
@@ -30,6 +30,6 @@
 	</a>
 </nav>
 
-<VideoList videos={videos ?? []} />
+<ItemsList items={videos ?? []} />
 
 <InfiniteLoading on:infinite={loadMore} />

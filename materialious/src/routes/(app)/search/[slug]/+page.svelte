@@ -11,6 +11,7 @@
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import ItemsList from '$lib/components/ItemsList.svelte';
 
 	let { data } = $props();
 
@@ -86,34 +87,7 @@
 </div>
 
 {#if $searchCacheStore[data.searchStoreId]}
-	<div class="page right active">
-		<div class="space"></div>
-		<div class="grid">
-			{#each $searchCacheStore[data.searchStoreId] as item}
-				<ContentColumn>
-					{#key item}
-						<article
-							class="no-padding"
-							style="height: 100%;"
-							role="presentation"
-							onclick={async () => feedLastItemId.set(await extractUniqueId(item))}
-							id={extractUniqueId(item)}
-						>
-							{#if item.type === 'video'}
-								<Thumbnail video={item} />
-							{:else if item.type === 'channel'}
-								<ChannelThumbnail channel={item} />
-							{:else if item.type === 'playlist'}
-								<PlaylistThumbnail playlist={item} />
-							{:else if item.type === 'hashtag'}
-								<HashtagThumbnail hashtag={item} />
-							{/if}
-						</article>
-					{/key}
-				</ContentColumn>
-			{/each}
-		</div>
-	</div>
+	<ItemsList items={$searchCacheStore[data.searchStoreId]} />
 {:else}
 	<PageLoading />
 {/if}

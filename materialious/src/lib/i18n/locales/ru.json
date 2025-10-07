@@ -72,7 +72,8 @@
             "title": "Поделиться",
             "materialiousLink": "Скопировать ссылку на Materialious",
             "invidiousRedirect": "Скопировать ссылку на сервер Invidious",
-            "youtubeLink": "Скопировать ссылку на Youtube"
+            "youtubeLink": "Скопировать ссылку на Youtube",
+            "includeTimestamp": "С отметкой времени"
         },
         "download": "Скачать",
         "downloadSteps": {
@@ -170,7 +171,8 @@
         "searchHistory": "История поиска",
         "allowInsecureRequests": "Разрешить небезопасные запросы",
         "companionUrl": "URL-адрес компаньона",
-        "expandChapters": "Раскрывать главы по умолчанию"
+        "expandChapters": "Раскрывать главы по умолчанию",
+        "disableAutoUpdate": "Отключить автоматические обновления"
     },
     "subscribe": "Подписаться",
     "invalidInstance": "Проверьте URL-адрес. Если он правильный, то возможно сервер сейчас недоступен или не поддерживает сторонние клиенты.",
@@ -179,5 +181,9 @@
     "login": "Имя пользователя",
     "invidiousLogin": "Пожалуйста, войдите со своей учётной записью Invidious",
     "playlistVideos": "Видео из плейлиста",
-    "recommendedVideos": "Рекомендуемые видео"
+    "recommendedVideos": "Рекомендуемые видео",
+    "premium": "Премиум-контент YouTube нельзя просматривать в Materialious.",
+    "isUpcoming": "Видео ещё не готово к просмотру.",
+    "comments": "комментарии",
+    "reply": "ответить"
 }

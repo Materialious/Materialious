@@ -135,7 +135,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			author: recommended.metadata.metadata.metadata_rows[0]?.metadata_parts[0]?.text.text || '',
 			authorId:
 				recommended.metadata?.image?.renderer_context?.command_context?.on_tap.payload?.browseId ||
-				''
+				'',
+			type: 'video'
 		});
 	});
 

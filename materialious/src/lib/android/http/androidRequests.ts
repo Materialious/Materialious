@@ -1,6 +1,8 @@
 import { goto } from '$app/navigation';
+import { isAndroidTvStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { NodeJS } from 'capacitor-nodejs';
+import { get } from 'svelte/store';
 
 const originalFetch = window.fetch;
 const corsProxyUrl: string = 'http://localhost:3000/';
@@ -55,5 +57,14 @@ if (Capacitor.getPlatform() === 'android') {
 
 	NodeJS.whenReady().then(() => {
 		goto('/', { replaceState: true });
+	});
+
+	// Required for Android TV to load correctly.
+	let hasReloaded = false;
+	isAndroidTvStore.subscribe((isAndroidTv) => {
+		if (hasReloaded || !isAndroidTv) return;
+		hasReloaded = true;
+
+		setTimeout(() => goto('/', { replaceState: true }), 2000);
 	});
 }

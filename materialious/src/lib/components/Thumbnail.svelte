@@ -7,7 +7,7 @@
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { insecureRequestImageHandler } from '../misc';
+	import { createVideoUrl, insecureRequestImageHandler } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,
@@ -34,13 +34,7 @@
 
 	let placeholderHeight: number = $state(0);
 
-	let watchUrl = new URL(
-		`${location.origin}/${$isAndroidTvStore ? 'tv' : 'watch'}/${video.videoId}`
-	);
-
-	if (playlistId !== '') {
-		watchUrl.searchParams.set('playlist', playlistId);
-	}
+	let watchUrl = createVideoUrl(video.videoId, playlistId);
 
 	syncPartyPeerStore.subscribe((peer) => {
 		if (peer) {
@@ -161,14 +155,7 @@
 	}
 </script>
 
-<div
-	class:sideways-root={sideways}
-	tabindex="0"
-	role="button"
-	onclick={async () => {
-		goto(watchUrl, { replaceState: $isAndroidTvStore && page.url.pathname.startsWith('/tv') });
-	}}
->
+<div class:sideways-root={sideways} tabindex="0" role="button">
 	<div id="thumbnail-container">
 		<a
 			tabindex="-1"
@@ -232,10 +219,9 @@
 				</a>
 
 				{#if !('publishedText' in video) && 'viewCountText' in video}
-					<span>
-						{video.viewCountText}
-						{$_('views')}
-					</span>
+					•
+					{video.viewCountText}
+					{$_('views')}
 				{/if}
 
 				{#if 'publishedText' in video}

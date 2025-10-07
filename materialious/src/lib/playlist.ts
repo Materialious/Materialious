@@ -27,6 +27,7 @@ export async function loadEntirePlaylist(
 		}
 
 		newVideos = newVideos.filter((playlistVideo) => {
+			playlistVideo.type = 'video';
 			return playlistVideo.lengthSeconds > 0 && !ignoreVideos.includes(playlistVideo.videoId);
 		});
 

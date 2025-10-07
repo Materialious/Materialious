@@ -216,7 +216,7 @@ export interface ChannelContentPlaylists {
 	continuation: string;
 }
 
-export interface PlaylistPage extends Playlist {
+export interface PlaylistPage extends Omit<Playlist, 'videos'> {
 	description: string;
 	descriptionHtml: string;
 	viewCount: number;

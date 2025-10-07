@@ -65,6 +65,6 @@ if (Capacitor.getPlatform() === 'android') {
 		if (hasReloaded || !isAndroidTv) return;
 		hasReloaded = true;
 
-		setTimeout(() => goto('/', { replaceState: true }), 1000);
+		setTimeout(() => goto('/', { replaceState: true }), 2000);
 	});
 }

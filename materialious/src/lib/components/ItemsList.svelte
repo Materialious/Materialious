@@ -19,6 +19,7 @@
 	import ChannelThumbnail from './ChannelThumbnail.svelte';
 	import PlaylistThumbnail from './PlaylistThumbnail.svelte';
 	import HashtagThumbnail from './HashtagThumbnail.svelte';
+
 	interface Props {
 		items?:
 			| (VideoBase | Video | PlaylistPageVideo | Channel | Playlist | HashTag)[]

@@ -18,10 +18,13 @@
 	import {
 		authStore,
 		darkModeStore,
+		feedCacheStore,
 		instanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
+		playlistCacheStore,
+		searchCacheStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -162,6 +165,9 @@
 
 	function logout() {
 		authStore.set(null);
+		feedCacheStore.set({});
+		searchCacheStore.set({});
+		playlistCacheStore.set({});
 		goto('/');
 	}
 

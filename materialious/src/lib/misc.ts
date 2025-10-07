@@ -4,7 +4,15 @@ import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import { instanceStore, interfaceAllowInsecureRequests, isAndroidTvStore } from './store';
-import type { Channel, HashTag, Playlist, PlaylistPageVideo, Video, VideoBase } from './api/model';
+import type {
+	Channel,
+	HashTag,
+	Playlist,
+	PlaylistPage,
+	PlaylistPageVideo,
+	Video,
+	VideoBase
+} from './api/model';
 
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
@@ -74,7 +82,15 @@ export async function insecureRequestImageHandler(source: string): Promise<HTMLI
 	return img;
 }
 
-export type feedItem = VideoBase | Video | PlaylistPageVideo | Channel | Video | Playlist | HashTag;
+export type feedItem =
+	| VideoBase
+	| Video
+	| PlaylistPageVideo
+	| Channel
+	| Video
+	| Playlist
+	| HashTag
+	| PlaylistPage;
 export type feedItems = feedItem[];
 
 export function extractUniqueId(item: feedItem): string {

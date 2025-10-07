@@ -155,14 +155,7 @@
 	}
 </script>
 
-<div
-	class:sideways-root={sideways}
-	tabindex="0"
-	role="button"
-	onclick={async () => {
-		goto(watchUrl, { replaceState: $isAndroidTvStore && page.url.pathname.startsWith('/tv') });
-	}}
->
+<div class:sideways-root={sideways} tabindex="0" role="button">
 	<div id="thumbnail-container">
 		<a
 			tabindex="-1"

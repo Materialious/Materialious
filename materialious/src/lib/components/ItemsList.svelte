@@ -2,21 +2,32 @@
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { _ } from '$lib/i18n';
 	import { removePlaylistVideo } from '../api';
-	import type { PlaylistPageVideo, Video, VideoBase } from '../api/model';
+	import type {
+		Channel,
+		HashTag,
+		Playlist,
+		PlaylistPage,
+		PlaylistPageVideo,
+		Video,
+		VideoBase
+	} from '../api/model';
 	import { authStore, feedLastItemId, isAndroidTvStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import Mousetrap from 'mousetrap';
-	import { goto } from '$app/navigation';
-	import { createVideoUrl } from '$lib/misc';
-
+	import { extractUniqueId } from '$lib/misc';
+	import ChannelThumbnail from './ChannelThumbnail.svelte';
+	import PlaylistThumbnail from './PlaylistThumbnail.svelte';
+	import HashtagThumbnail from './HashtagThumbnail.svelte';
 	interface Props {
-		videos?: (VideoBase | Video | PlaylistPageVideo)[];
+		items?:
+			| (VideoBase | Video | PlaylistPageVideo | Channel | Playlist | HashTag)[]
+			| PlaylistPage[];
 		playlistId?: string;
 		playlistAuthor?: string;
 	}
 
-	let { videos = [], playlistId = '', playlistAuthor = '' }: Props = $props();
+	let { items = [], playlistId = '', playlistAuthor = '' }: Props = $props();
 
 	let gridElement = $state<HTMLElement>();
 	let focusableItems = $state<HTMLElement[]>([]);
@@ -33,15 +44,15 @@
 	function calculateColumns() {
 		if (!gridElement || !$isAndroidTvStore) return;
 
-		const items = gridElement.querySelectorAll('article[role="presentation"]');
-		if (items.length === 0) return;
+		const gridItems = gridElement.querySelectorAll('article[role="presentation"]');
+		if (gridItems.length === 0) return;
 
 		// Count items in first row by checking top position
-		const firstItemTop = items[0].getBoundingClientRect().top;
+		const firstItemTop = gridItems[0].getBoundingClientRect().top;
 		let cols = 1;
 
-		for (let i = 1; i < items.length; i++) {
-			const itemTop = items[i].getBoundingClientRect().top;
+		for (let i = 1; i < gridItems.length; i++) {
+			const itemTop = gridItems[i].getBoundingClientRect().top;
 			if (Math.abs(itemTop - firstItemTop) < 10) {
 				cols++;
 			} else {
@@ -71,12 +82,12 @@
 	function updateTabIndex(focusIndex: number) {
 		if (!$isAndroidTvStore || focusableItems.length === 0) return;
 
-		focusableItems.forEach((item, index) => {
-			item.tabIndex = index === focusIndex ? 0 : -1;
+		focusableItems.forEach((focusableItem, index) => {
+			focusableItem.tabIndex = index === focusIndex ? 0 : -1;
 		});
 	}
 
-	// Check if focus is within the VideoList component
+	// Check if focus is within the ItemsList component
 	function checkComponentFocus() {
 		if (!gridElement) return;
 
@@ -157,6 +168,7 @@
 					let focusedItemIndex = -1;
 					if ($feedLastItemId) {
 						focusedItemIndex = focusableItems.findIndex((item) => item.id === $feedLastItemId);
+						feedLastItemId.set(undefined);
 					}
 					const focusIndex =
 						focusedItemIndex === -1
@@ -191,9 +203,9 @@
 		}
 	});
 
-	// Update navigation when videos change
+	// Update navigation when items change
 	$effect(() => {
-		if ($isAndroidTvStore && videos.length > 0 && gridElement) {
+		if ($isAndroidTvStore && items.length > 0 && gridElement) {
 			setTimeout(() => {
 				setupAndroidTVNavigation();
 			}, 100);
@@ -204,18 +216,26 @@
 <div class="page right active" class:android-container={$isAndroidTvStore}>
 	<div class="space"></div>
 	<div class="grid" bind:this={gridElement}>
-		{#each videos as video, index}
+		{#each items as item, index}
 			<ContentColumn>
 				<article
 					class="no-padding android-tv-item"
 					class:android-tv-focused={$isAndroidTvStore}
 					style="height: 100%;"
-					id={video.videoId}
+					id={extractUniqueId(item)}
 					role="presentation"
 					onclick={() => {
-						feedLastItemId.set(video.videoId);
+						feedLastItemId.set(extractUniqueId(item));
+
+						// Required to pass click through to thumbnail component on Android TV
 						if ($isAndroidTvStore) {
-							goto(createVideoUrl(video.videoId, playlistId));
+							const articleElement = document.getElementById(extractUniqueId(item));
+							if (articleElement) {
+								const clickable = articleElement.querySelector('a, button');
+								if (clickable instanceof HTMLElement) {
+									clickable.click();
+								}
+							}
 						}
 					}}
 					onfocus={() => {
@@ -224,17 +244,25 @@
 						}
 					}}
 				>
-					<Thumbnail {video} {playlistId} />
-					{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in video}
-						<div class="right-align" style="margin: 1em .5em;">
-							<button
-								onclick={async () => removePlaylistItem(video.indexId)}
-								class="tertiary circle small"
-							>
-								<i>delete</i>
-								<div class="tooltip">{$_('delete')}</div>
-							</button>
-						</div>
+					{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream'}
+						<Thumbnail video={item} {playlistId} />
+						{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in item}
+							<div class="right-align" style="margin: 1em .5em;">
+								<button
+									onclick={async () => removePlaylistItem(item.indexId)}
+									class="tertiary circle small"
+								>
+									<i>delete</i>
+									<div class="tooltip">{$_('delete')}</div>
+								</button>
+							</div>
+						{/if}
+					{:else if item.type === 'channel'}
+						<ChannelThumbnail channel={item} />
+					{:else if item.type === 'playlist'}
+						<PlaylistThumbnail playlist={item} />
+					{:else if item.type === 'hashtag'}
+						<HashtagThumbnail hashtag={item} />
 					{/if}
 				</article>
 			</ContentColumn>

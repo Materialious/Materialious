@@ -4,12 +4,12 @@
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import type { Playlist } from '../api/model';
+	import type { Playlist, PlaylistPage } from '../api/model';
 	import { insecureRequestImageHandler, truncate } from '../misc';
 	import { interfaceLowBandwidthMode } from '../store';
 
 	interface Props {
-		playlist: Playlist;
+		playlist: Playlist | PlaylistPage;
 		disabled?: boolean;
 	}
 

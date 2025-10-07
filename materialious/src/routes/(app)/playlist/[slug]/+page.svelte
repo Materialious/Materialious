@@ -1,11 +1,11 @@
 <script lang="ts">
-	import VideoList from '$lib/components/VideoList.svelte';
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
 	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
+	import ItemsList from '$lib/components/ItemsList.svelte';
 
 	let { data } = $props();
 </script>
@@ -93,8 +93,8 @@
 </article>
 
 {#if data.playlist.videos}
-	<VideoList
-		videos={data.playlist.videos}
+	<ItemsList
+		items={data.playlist.videos}
 		playlistAuthor={data.playlist.info.author}
 		playlistId={data.playlist.info.playlistId}
 	/>

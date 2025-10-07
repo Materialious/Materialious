@@ -4,7 +4,6 @@
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
-	import VideoList from '$lib/components/VideoList.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
 	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
@@ -14,6 +13,7 @@
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import { get } from 'svelte/store';
+	import ItemsList from '$lib/components/ItemsList.svelte';
 
 	let { data } = $props();
 
@@ -203,20 +203,9 @@
 
 {#if displayContent}
 	{#if 'videos' in displayContent}
-		<VideoList videos={displayContent.videos} />
+		<ItemsList items={displayContent.videos} />
 	{:else}
-		<div class="page right active">
-			<div class="space"></div>
-			<div class="grid">
-				{#each displayContent.playlists as playlist}
-					<ContentColumn>
-						<article class="no-padding" style="height: 100%;">
-							<PlaylistThumbnail {playlist} />
-						</article>
-					</ContentColumn>
-				{/each}
-			</div>
-		</div>
+		<ItemsList items={displayContent.playlists} />
 	{/if}
 
 	<InfiniteLoading on:infinite={loadMore} />

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import VideoList from '$lib/components/VideoList.svelte';
-	import { feedCacheStore } from '$lib/store.js';
+	import ItemsList from '$lib/components/ItemsList.svelte';
+	import { feedCacheStore } from '$lib/store';
 
 	let { data } = $props();
 </script>
@@ -12,5 +12,5 @@
 		<p>Popular page has been disabled</p>
 	</nav>
 {:else}
-	<VideoList videos={$feedCacheStore.popular ?? []} />
+	<ItemsList items={$feedCacheStore.popular ?? []} />
 {/if}

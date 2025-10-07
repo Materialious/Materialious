@@ -3,9 +3,12 @@
 	import { _ } from '$lib/i18n';
 	import { removePlaylistVideo } from '../api';
 	import type { PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { authStore, feedLastItemId } from '../store';
+	import { authStore, feedLastItemId, isAndroidTvStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import Mousetrap from 'mousetrap';
+	import { goto } from '$app/navigation';
+	import { createVideoUrl } from '$lib/misc';
 
 	interface Props {
 		videos?: (VideoBase | Video | PlaylistPageVideo)[];
@@ -15,33 +18,211 @@
 
 	let { videos = [], playlistId = '', playlistAuthor = '' }: Props = $props();
 
+	let gridElement = $state<HTMLElement>();
+	let focusableItems = $state<HTMLElement[]>([]);
+	let currentFocusIndex = $state(0);
+	let lastFocusIndex = $state(0); // Remember position when leaving grid
+	let columns = $state(4); // Default columns for Android TV
+	let isComponentActive = $state(false); // Track if focus is within this component
+
 	async function removePlaylistItem(indexId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
 	}
 
+	function calculateColumns() {
+		if (!gridElement || !$isAndroidTvStore) return;
+
+		const items = gridElement.querySelectorAll('article[role="presentation"]');
+		if (items.length === 0) return;
+
+		// Count items in first row by checking top position
+		const firstItemTop = items[0].getBoundingClientRect().top;
+		let cols = 1;
+
+		for (let i = 1; i < items.length; i++) {
+			const itemTop = items[i].getBoundingClientRect().top;
+			if (Math.abs(itemTop - firstItemTop) < 10) {
+				cols++;
+			} else {
+				break;
+			}
+		}
+
+		columns = Math.max(1, cols);
+	}
+
+	function setupAndroidTVNavigation() {
+		if (!$isAndroidTvStore || !gridElement) return;
+
+		focusableItems = Array.from(
+			gridElement.querySelectorAll('article[role="presentation"]')
+		) as HTMLElement[];
+
+		calculateColumns();
+
+		// Make items focusable and set current focus to stored position
+		const initialFocusIndex = Math.min(lastFocusIndex, focusableItems.length - 1);
+		currentFocusIndex = initialFocusIndex;
+		updateTabIndex(initialFocusIndex);
+	}
+
+	// Update tabindex when focus changes to maintain proper focus order
+	function updateTabIndex(focusIndex: number) {
+		if (!$isAndroidTvStore || focusableItems.length === 0) return;
+
+		focusableItems.forEach((item, index) => {
+			item.tabIndex = index === focusIndex ? 0 : -1;
+		});
+	}
+
+	// Check if focus is within the VideoList component
+	function checkComponentFocus() {
+		if (!gridElement) return;
+
+		const activeElement = document.activeElement;
+		const isWithinComponent = gridElement.contains(activeElement);
+		isComponentActive = isWithinComponent;
+
+		// If focus left the component, store the position
+		if (!isWithinComponent && focusableItems.length > 0) {
+			lastFocusIndex = currentFocusIndex;
+			updateTabIndex(currentFocusIndex);
+		}
+	}
+
+	function handleNavigation(direction: 'up' | 'down' | 'left' | 'right', event: Event) {
+		if (!$isAndroidTvStore || focusableItems.length === 0 || !isComponentActive) return true;
+
+		let newIndex = currentFocusIndex;
+
+		switch (direction) {
+			case 'left':
+				newIndex = Math.max(0, currentFocusIndex - 1);
+				break;
+			case 'right':
+				newIndex = Math.min(focusableItems.length - 1, currentFocusIndex + 1);
+				break;
+			case 'up':
+				// Check if we're in the first row and trying to go up
+				if (currentFocusIndex < columns) {
+					// Store current position before leaving and ensure it stays focusable
+					lastFocusIndex = currentFocusIndex;
+					updateTabIndex(currentFocusIndex);
+					// Allow the event to bubble up to parent navigation
+					return true;
+				}
+				newIndex = Math.max(0, currentFocusIndex - columns);
+				break;
+			case 'down':
+				newIndex = Math.min(focusableItems.length - 1, currentFocusIndex + columns);
+				break;
+		}
+
+		if (newIndex !== currentFocusIndex) {
+			event.preventDefault();
+			// Update focus
+			updateTabIndex(newIndex);
+			focusableItems[newIndex].focus();
+
+			// Snap to view with instant behavior
+			focusableItems[newIndex].scrollIntoView({
+				behavior: 'auto',
+				block: 'center',
+				inline: 'center'
+			});
+
+			currentFocusIndex = newIndex;
+			return false;
+		}
+
+		return true;
+	}
+
 	onMount(() => {
-		if ($feedLastItemId) {
+		if ($feedLastItemId && !$isAndroidTvStore) {
 			document
 				.getElementById($feedLastItemId)
 				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
 
 			feedLastItemId.set(undefined);
 		}
+
+		if ($isAndroidTvStore) {
+			// Setup Android TV navigation
+			setTimeout(() => {
+				setupAndroidTVNavigation();
+				// Focus the correct item initially (first time or restored position)
+				if (focusableItems.length > 0) {
+					let focusedItemIndex = -1;
+					if ($feedLastItemId) {
+						focusedItemIndex = focusableItems.findIndex((item) => item.id === $feedLastItemId);
+					}
+					const focusIndex =
+						focusedItemIndex === -1
+							? Math.min(lastFocusIndex, focusableItems.length - 1)
+							: focusedItemIndex;
+					focusableItems[focusIndex]?.focus();
+					currentFocusIndex = focusIndex;
+				}
+			}, 200);
+
+			// Bind navigation keys
+			Mousetrap.bind('up', (e) => handleNavigation('up', e));
+			Mousetrap.bind('down', (e) => handleNavigation('down', e), 'keydown');
+			Mousetrap.bind('left', (e) => handleNavigation('left', e));
+			Mousetrap.bind('right', (e) => handleNavigation('right', e));
+
+			// Watch for window resize to recalculate columns
+			window.addEventListener('resize', calculateColumns);
+
+			// Watch for focus changes to detect when we're active
+			document.addEventListener('focusin', checkComponentFocus);
+			document.addEventListener('focusout', checkComponentFocus);
+		}
+	});
+
+	onDestroy(() => {
+		if ($isAndroidTvStore) {
+			Mousetrap.unbind(['up', 'down', 'left', 'right']);
+			window.removeEventListener('resize', calculateColumns);
+			document.removeEventListener('focusin', checkComponentFocus);
+			document.removeEventListener('focusout', checkComponentFocus);
+		}
+	});
+
+	// Update navigation when videos change
+	$effect(() => {
+		if ($isAndroidTvStore && videos.length > 0 && gridElement) {
+			setTimeout(() => {
+				setupAndroidTVNavigation();
+			}, 100);
+		}
 	});
 </script>
 
-<div class="page right active">
+<div class="page right active" class:android-container={$isAndroidTvStore}>
 	<div class="space"></div>
-	<div class="grid">
-		{#each videos as video}
+	<div class="grid" bind:this={gridElement}>
+		{#each videos as video, index}
 			<ContentColumn>
 				<article
-					class="no-padding"
+					class="no-padding android-tv-item"
+					class:android-tv-focused={$isAndroidTvStore}
 					style="height: 100%;"
 					id={video.videoId}
 					role="presentation"
-					onclick={() => feedLastItemId.set(video.videoId)}
+					onclick={() => {
+						feedLastItemId.set(video.videoId);
+						if ($isAndroidTvStore) {
+							goto(createVideoUrl(video.videoId, playlistId));
+						}
+					}}
+					onfocus={() => {
+						if ($isAndroidTvStore) {
+							currentFocusIndex = index;
+						}
+					}}
 				>
 					<Thumbnail {video} {playlistId} />
 					{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in video}
@@ -60,3 +241,23 @@
 		{/each}
 	</div>
 </div>
+
+<style>
+	.android-container {
+		padding: 0 1em;
+	}
+
+	.android-tv-item {
+		transition:
+			transform 0.15s ease,
+			box-shadow 0.15s ease;
+	}
+
+	.android-tv-item:focus {
+		transform: scale(1.05);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+		z-index: 10;
+		position: relative;
+		outline: 4px solid var(--primary);
+	}
+</style>

@@ -7,7 +7,7 @@
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { insecureRequestImageHandler } from '../misc';
+	import { createVideoUrl, insecureRequestImageHandler } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,
@@ -34,13 +34,7 @@
 
 	let placeholderHeight: number = $state(0);
 
-	let watchUrl = new URL(
-		`${location.origin}/${$isAndroidTvStore ? 'tv' : 'watch'}/${video.videoId}`
-	);
-
-	if (playlistId !== '') {
-		watchUrl.searchParams.set('playlist', playlistId);
-	}
+	let watchUrl = createVideoUrl(video.videoId, playlistId);
 
 	syncPartyPeerStore.subscribe((peer) => {
 		if (peer) {

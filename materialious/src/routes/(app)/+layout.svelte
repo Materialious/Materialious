@@ -202,22 +202,26 @@
 
 		if ($isAndroidTvStore) {
 			const topContent = document.getElementById('top-content') as HTMLElement;
-			Mousetrap.bind('down', () => {
-				if (topContent.contains(document.activeElement)) {
-					document.getElementById('main-content')?.focus();
-					return false;
-				}
-			});
+			Mousetrap.bind(
+				'down',
+				() => {
+					if (topContent.contains(document.activeElement)) {
+						document.getElementById('main-content')?.focus();
+						return true;
+					}
+				},
+				'keyup'
+			);
 		}
 
 		if (Capacitor.getPlatform() === 'android') {
-			document.addEventListener('click', (event: MouseEvent) => {
+			document.addEventListener('click', async (event: MouseEvent) => {
 				// Handles opening links in browser for android.
 				const link = (event.target as HTMLElement).closest('a');
 
 				if (link && link.href && link.href.startsWith('http') && link.target === '_blank') {
 					event.preventDefault();
-					Browser.open({ url: link.href });
+					await Browser.open({ url: link.href });
 				}
 			});
 		}

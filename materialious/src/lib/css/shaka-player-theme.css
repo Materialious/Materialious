@@ -8,6 +8,24 @@
 	color: var(--on-surface) !important;
 }
 
+.player-theme .shaka-overflow-menu,
+.player-theme .shaka-settings-menu {
+	border-radius: 0.25rem;
+	background: var(--surface-container-low);
+	animation: none !important;
+	transition: none !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+	z-index: 99999999 !important;
+	pointer-events: auto !important;
+	pointer-events: auto !important;
+}
+
+.shaka-overflow-menu button,
+.shaka-settings-menu button {
+	color: var(--text) !important;
+}
+
 @media screen and (max-width: 650px) {
 	.player-theme .shaka-end-time {
 		display: none;

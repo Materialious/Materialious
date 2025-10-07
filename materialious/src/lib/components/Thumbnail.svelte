@@ -232,10 +232,9 @@
 				</a>
 
 				{#if !('publishedText' in video) && 'viewCountText' in video}
-					<span>
-						{video.viewCountText}
-						{$_('views')}
-					</span>
+					•
+					{video.viewCountText}
+					{$_('views')}
 				{/if}
 
 				{#if 'publishedText' in video}

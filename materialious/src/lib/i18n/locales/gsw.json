@@ -86,7 +86,8 @@
         "syncPartyWarning": "Bitte denk dra, dass dini IP für die vo dir iigladne Benutzer sichtbar isch.",
         "displayThumbnailAvatars": "Vorschaubild-Avatar (Langsam)",
         "expandDescription": "Beschriibig standardmässig erwiitere",
-        "disableAutoUpdate": "Automatischi Updates deaktiviere"
+        "disableAutoUpdate": "Automatischi Updates deaktiviere",
+        "about": "Über"
     },
     "videos": "Videos",
     "cancel": "Abbreche",
@@ -185,5 +186,7 @@
     "invalidInstance": "Bitte prüef d URL. Wenn si korrekt isch, isch d Instanz möglicherwiis usser Betriib oder unterstützt kei Clients vo Drittaabüüter.",
     "loginRequired": "Aameldig erforderlich",
     "isUpcoming": "Video isch nonig imene aaluegbare Zuestand.",
-    "premium": "YouTube-Premium-Inhält chönd uf Materialious nonig aagluegt werde."
+    "premium": "YouTube-Premium-Inhält chönd uf Materialious nonig aagluegt werde.",
+    "version": "Version",
+    "contributors": "Mitwirkendi"
 }

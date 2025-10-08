@@ -100,11 +100,9 @@ I've commented out places what aren't relevant but might be in the future.-->
   <tr>
     <td>Android TV</td>
     <td>
-      <br>
       <a href="https://github.com/rumboalla/apkupdater">
           For Android TV use APKUpdater.
       </a>
-      </br>
     </td>
   </tr>
   <tr>

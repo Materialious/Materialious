@@ -11,6 +11,7 @@
 	import { _ } from '$lib/i18n';
 	import { playlistCacheStore } from '$lib/store.js';
 	import { fade } from 'svelte/transition';
+	import ItemsList from '$lib/components/ItemsList.svelte';
 
 	let { data } = $props();
 
@@ -29,64 +30,84 @@
 			});
 		}
 
-		Mousetrap.bind('down', () => {
-			if (showInfo) return true;
+		Mousetrap.bind(
+			'down',
+			() => {
+				if (showInfo) return true;
 
-			showInfo = true;
-			tick().then(() => {
-				document.getElementById('shown-info')?.focus();
-			});
-
-			return false;
-		});
-
-		Mousetrap.bind('up', () => {
-			const infoElement = document.getElementById('shown-info');
-
-			if (showInfo && infoElement) {
-				if (infoElement.scrollTop === 0) {
-					showInfo = false;
-					return false;
-				}
-				return true;
-			}
-
-			if (!showInfo) {
 				showInfo = true;
 				tick().then(() => {
 					document.getElementById('shown-info')?.focus();
 				});
+
 				return false;
-			}
+			},
+			'keyup'
+		);
 
-			return true;
-		});
+		Mousetrap.bind(
+			'up',
+			() => {
+				const infoElement = document.getElementById('shown-info');
 
-		Mousetrap.bind('right', () => {
-			if (!playerElement || showInfo) return true;
-			playerElement.currentTime = playerElement.currentTime + 10;
-			return false;
-		});
-
-		Mousetrap.bind('left', () => {
-			if (!playerElement || showInfo) return true;
-
-			playerElement.currentTime = playerElement.currentTime - 10;
-			return false;
-		});
-
-		Mousetrap.bind('enter', () => {
-			if (!showInfo) {
-				if (playerElement?.paused) {
-					playerElement?.play();
-				} else {
-					playerElement?.pause();
+				if (showInfo && infoElement) {
+					if (infoElement.scrollTop === 0) {
+						showInfo = false;
+						return false;
+					}
+					return true;
 				}
-				return false;
-			}
 
-			return true;
-		});
+				if (!showInfo) {
+					showInfo = true;
+					tick().then(() => {
+						document.getElementById('shown-info')?.focus();
+					});
+					return false;
+				}
+
+				return true;
+			},
+			'keyup'
+		);
+
+		Mousetrap.bind(
+			'right',
+			() => {
+				if (!playerElement || showInfo) return true;
+				playerElement.currentTime = playerElement.currentTime + 10;
+				return false;
+			},
+			'keyup'
+		);
+
+		Mousetrap.bind(
+			'left',
+			() => {
+				if (!playerElement || showInfo) return true;
+
+				playerElement.currentTime = playerElement.currentTime - 10;
+				return false;
+			},
+			'keyup'
+		);
+
+		Mousetrap.bind(
+			'enter',
+			() => {
+				if (!showInfo) {
+					if (playerElement?.paused) {
+						playerElement?.play();
+					} else {
+						playerElement?.pause();
+					}
+					return false;
+				}
+
+				return true;
+			},
+			'keyup'
+		);
 	});
 
 	onDestroy(() => {
@@ -137,52 +158,11 @@
 
 		{#if data.playlistId && data.playlistId in $playlistCacheStore}
 			<h5 style="margin-bottom: 0;">{$_('playlistVideos')}</h5>
-
-			<div class="grid">
-				{#each $playlistCacheStore[data.playlistId].videos as playlistVideo}
-					<ContentColumn>
-						<article
-							class="no-padding primary-border"
-							style="height: 100%;"
-							onclick={() => {
-								showInfo = false;
-							}}
-							role="presentation"
-							id={playlistVideo.videoId}
-							class:border={playlistVideo.videoId === data.video.videoId}
-						>
-							{#key playlistVideo.videoId}
-								<Thumbnail
-									video={playlistVideo}
-									sideways={true}
-									playlistId={data.playlistId || undefined}
-								/>
-							{/key}
-						</article>
-					</ContentColumn>
-				{/each}
-			</div>
+			<ItemsList classes="" items={$playlistCacheStore[data.playlistId].videos} />
 		{/if}
 		{#if data.video.recommendedVideos.length > 0}
 			<h5 style="margin-bottom: 0;">{$_('recommendedVideos')}</h5>
-			<div class="grid">
-				{#each data.video.recommendedVideos as recommendedVideo}
-					<ContentColumn>
-						<article
-							onclick={() => {
-								showInfo = false;
-							}}
-							role="presentation"
-							style="height: 100%;"
-							class="no-padding"
-						>
-							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} sideways={false} />
-							{/key}
-						</article>
-					</ContentColumn>
-				{/each}
-			</div>
+			<ItemsList classes="" items={data.video.recommendedVideos} />
 		{/if}
 	</article>
 {/if}

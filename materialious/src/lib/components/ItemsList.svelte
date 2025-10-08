@@ -13,7 +13,7 @@
 	} from '../api/model';
 	import { authStore, feedLastItemId, isAndroidTvStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, tick } from 'svelte';
 	import Mousetrap from 'mousetrap';
 	import { extractUniqueId } from '$lib/misc';
 	import ChannelThumbnail from './ChannelThumbnail.svelte';
@@ -26,12 +26,18 @@
 			| PlaylistPage[];
 		playlistId?: string;
 		playlistAuthor?: string;
+		classes?: string;
 	}
 
-	let { items = [], playlistId = '', playlistAuthor = '' }: Props = $props();
+	let {
+		items = [],
+		playlistId = '',
+		playlistAuthor = '',
+		classes = 'page right active'
+	}: Props = $props();
 
-	let gridElement = $state<HTMLElement>();
-	let focusableItems = $state<HTMLElement[]>([]);
+	let gridElement: HTMLElement;
+	let focusableItems: HTMLElement[] = [];
 	let currentFocusIndex = $state(0);
 	let lastFocusIndex = $state(0); // Remember position when leaving grid
 	let columns = $state(4); // Default columns for Android TV
@@ -65,6 +71,7 @@
 	}
 
 	function setupAndroidTVNavigation() {
+		console.log('gridElement', gridElement);
 		if (!$isAndroidTvStore || !gridElement) return;
 
 		focusableItems = Array.from(
@@ -151,7 +158,7 @@
 		return true;
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		if ($feedLastItemId && !$isAndroidTvStore) {
 			document
 				.getElementById($feedLastItemId)
@@ -161,30 +168,28 @@
 		}
 
 		if ($isAndroidTvStore) {
+			await tick();
 			// Setup Android TV navigation
-			setTimeout(() => {
-				setupAndroidTVNavigation();
-				// Focus the correct item initially (first time or restored position)
-				if (focusableItems.length > 0) {
-					let focusedItemIndex = -1;
-					if ($feedLastItemId) {
-						focusedItemIndex = focusableItems.findIndex((item) => item.id === $feedLastItemId);
-						feedLastItemId.set(undefined);
+			setupAndroidTVNavigation();
+
+			// Focus the correct item initially (first time or restored position)
+			if (focusableItems.length > 0) {
+				if ($feedLastItemId) {
+					const focusedItemIndex = focusableItems.findIndex((item) => item.id === $feedLastItemId);
+					feedLastItemId.set(undefined);
+
+					if (focusedItemIndex !== -1) {
+						focusableItems[focusedItemIndex]?.focus();
+						currentFocusIndex = focusedItemIndex;
 					}
-					const focusIndex =
-						focusedItemIndex === -1
-							? Math.min(lastFocusIndex, focusableItems.length - 1)
-							: focusedItemIndex;
-					focusableItems[focusIndex]?.focus();
-					currentFocusIndex = focusIndex;
 				}
-			}, 200);
+			}
 
 			// Bind navigation keys
-			Mousetrap.bind('up', (e) => handleNavigation('up', e));
+			Mousetrap.bind('up', (e) => handleNavigation('up', e), 'keydown');
 			Mousetrap.bind('down', (e) => handleNavigation('down', e), 'keydown');
-			Mousetrap.bind('left', (e) => handleNavigation('left', e));
-			Mousetrap.bind('right', (e) => handleNavigation('right', e));
+			Mousetrap.bind('left', (e) => handleNavigation('left', e), 'keydown');
+			Mousetrap.bind('right', (e) => handleNavigation('right', e), 'keydown');
 
 			// Watch for window resize to recalculate columns
 			window.addEventListener('resize', calculateColumns);
@@ -207,14 +212,12 @@
 	// Update navigation when items change
 	$effect(() => {
 		if ($isAndroidTvStore && items.length > 0 && gridElement) {
-			setTimeout(() => {
-				setupAndroidTVNavigation();
-			}, 100);
+			tick().then(() => setupAndroidTVNavigation());
 		}
 	});
 </script>
 
-<div class="page right active" class:android-container={$isAndroidTvStore}>
+<div class={classes} class:android-container={$isAndroidTvStore}>
 	<div class="space"></div>
 	<div class="grid" bind:this={gridElement}>
 		{#each items as item, index}

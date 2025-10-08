@@ -16,12 +16,6 @@
 	});
 </script>
 
-<p>
-	Materialious is a modern material design frontend for Invidious, focused on a clean,
-	privacy-friendly YouTube experience. It supports local video fallback when Invidious fails and is
-	available on Web, Desktop, Android, and Android TV.
-</p>
-
 <div class="grid">
 	<div class="s12 m4 l4">
 		<a href="https://github.com/sponsors/WardPearce" target="_blank" referrerpolicy="no-referrer">

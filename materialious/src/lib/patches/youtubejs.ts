@@ -26,8 +26,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		player_id: '0004de42'
 	});
 
-	const visitorData = youtube.session.context.client.visitorData ?? '';
-
 	const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
 	const platformMinter =
@@ -64,11 +62,11 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	}
 
 	if (video.basic_info.is_live) {
-		poTokenCacheStore.set(await platformMinter(requestKey, visitorData));
+		poTokenCacheStore.set(await platformMinter(requestKey, videoId));
 	} else {
-		poTokenCacheStore.set(BG.PoToken.generateColdStartToken(visitorData));
+		poTokenCacheStore.set(BG.PoToken.generateColdStartToken(videoId));
 
-		platformMinter(requestKey, visitorData).then((poToken) => poTokenCacheStore.set(poToken));
+		platformMinter(requestKey, videoId).then((poToken) => poTokenCacheStore.set(poToken));
 	}
 
 	let dashUri: string | undefined;

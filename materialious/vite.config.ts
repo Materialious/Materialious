@@ -1,6 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vite';
+import pkg from './package.json';
 
 export default defineConfig({
 	plugins: [
@@ -36,5 +37,8 @@ export default defineConfig({
 	],
 	ssr: {
 		noExternal: ['beercss']
+	},
+	define: {
+		'import.meta.env.APP_VERSION': JSON.stringify(pkg.version)
 	}
 });

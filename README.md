@@ -98,18 +98,16 @@ I've commented out places what aren't relevant but might be in the future.-->
     </td>
   </tr>
   <tr>
-  <!-- <tr>
-    <td>iOS</td>
+    <td>Android TV</td>
     <td>
-      <a href="https://github.com/">
-        <img width="220" alt="Download iOS IPA" src="https://github.com/user-attachments/assets/3e50d93d-fb39-435c-be6b-337745f7c423">
+      <br>
+      <a href="https://github.com/rumboalla/apkupdater">
+          For Android TV use APKUpdater.
       </a>
-      <br/>
-      <blockquote style="color:red">
-        *iPA file only. Requires sideloading with <a href="https://altstore.io/">AltStore</a> or similar tools.
-      </blockquote>
+      </br>
     </td>
-  </tr> -->
+  </tr>
+  <tr>
   <tr>
     <td>Flatpak</td>
     <td>
@@ -136,13 +134,6 @@ I've commented out places what aren't relevant but might be in the future.-->
       <p>Then run: <code>sudo apt install ./Materialious-linux-amd64.deb</code></p>
     </td>
   </tr>
-  <!-- <tr>
-    <td>Arch/Manjaro</td>
-    <td>
-      <p>With pamac: <code>sudo pamac install spotube-bin</code></p>
-      <p>With yay: <code>yay -Sy spotube-bin</code></p>
-    </td>
-  </tr> -->
   <tr>
     <td>Fedora/OpenSuse</td>
     <td>
@@ -161,34 +152,6 @@ I've commented out places what aren't relevant but might be in the future.-->
       </a>
     </td>
   </tr>
-  <!-- <tr>
-    <td>Macos - <a href="https://brew.sh">Homebrew</a></td>
-    <td>
-<pre lang="bash">
-brew tap krtirtho/apps
-brew install --cask spotube
-</pre>
-    </td>
-  </tr>
-  <tr>
-    <td>Windows - <a href="https://chocolatey.org">Chocolatey</a></td>
-    <td>
-      <p><code>choco install spotube</code></p>
-    </td>
-  </tr>
-  <tr>
-    <td>Windows - <a href="https://scoop.sh">Scoop</a></td>
-    <td>
-      <p><code>scoop bucket add extras</code></p>
-      <p><code>scoop install spotube</code></p>
-    </td>
-  </tr>
-  <tr>
-    <td>Windows - <a href="https://github.com/microsoft/winget-cli">WinGet</a></td>
-    <td>
-      <p><code>winget install --id KRTirtho.Spotube</code></p>
-    </td>
-  </tr> -->
 </table>
 
 # Translations

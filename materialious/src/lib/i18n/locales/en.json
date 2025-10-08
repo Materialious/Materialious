@@ -25,7 +25,9 @@
 	"reply": "reply",
 	"replies": "replies",
 	"region": "Region",
+	"contributors": "Contributors",
 	"noResult": "No results",
+	"version": "Version",
 	"language": "Language",
 	"channels": "channels",
 	"transcript": "Transcript",
@@ -113,6 +115,7 @@
 		"interface": "Interface",
 		"star": "Star us on Github!",
 		"syncParty": "Sync party",
+		"about": "About",
 		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
 		"startSyncParty": "Start sync party",
 		"endSyncParty": "End sync party",
@@ -140,10 +143,6 @@
 		"expandComments": "Expand comments by default",
 		"allowInsecureRequests": "Allow insecure requests",
 		"disableAutoUpdate": "Disable automatic updates",
-		"dataPreferences": {
-			"content": "Looking to import/export subscriptions, change password or delete account? Click here and scroll to the bottom of the page.",
-			"dataPreferences": "Data preferences"
-		},
 		"player": {
 			"title": "Player",
 			"autoPlay": "Autoplay video",

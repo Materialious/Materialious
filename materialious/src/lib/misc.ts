@@ -140,3 +140,7 @@ export function createVideoUrl(videoId: string, playlistId: string): URL {
 
 	return watchUrl;
 }
+
+export function timeout(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -174,7 +174,8 @@
         "searchHistory": "Suchverlauf",
         "companionUrl": "Companion URL",
         "expandChapters": "Kapitel standardmäßig ausklappen",
-        "displayThumbnailAvatars": "Vorschaubild-Avatare (Langsam)"
+        "displayThumbnailAvatars": "Vorschaubild-Avatare (Langsam)",
+        "about": "Über"
     },
     "subscribe": "Abonnieren",
     "recommendedVideos": "Vorgeschlagene Videos",
@@ -185,5 +186,7 @@
     "invalidInstance": "Bitte prüfe die URL. Wenn sie korrekt ist, ist die Instanz möglicherweise außer Betrieb oder unterstützt keine Clients von Drittanbietern.",
     "login": "Anmeldung",
     "premium": "YouTube-Premium-Inhalte können auf Materialious nicht angeschaut werden.",
-    "isUpcoming": "Video ist noch nicht in einem anschaubaren Zustand."
+    "isUpcoming": "Video ist noch nicht in einem anschaubaren Zustand.",
+    "version": "Version",
+    "contributors": "Mitwirkende"
 }

@@ -107,7 +107,8 @@
             "titleOnly": "Csak cím"
         },
         "logout": "Kijelentkezés",
-        "companionUrl": "Kiegészítő webcím"
+        "companionUrl": "Kiegészítő webcím",
+        "about": "Névjegy"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",
@@ -185,5 +186,7 @@
     "letterCase": "Címek nagybetűs írásmódja",
     "unsubscribe": "Leiratkozás",
     "subscribe": "Feliratkozás",
-    "invidiousBlockWarning": "Az Invidious jelenleg le van tiltva a Google által. Ha ebben az esetben a videók nem töltődnek be, akkor használja ezt a példányt a Materialious-on {android} vagy {desktop} platformon, hogy helyi videó visszatéréssel megkerülje ezt a problémát."
+    "invidiousBlockWarning": "Az Invidious jelenleg le van tiltva a Google által. Ha ebben az esetben a videók nem töltődnek be, akkor használja ezt a példányt a Materialious-on {android} vagy {desktop} platformon, hogy helyi videó visszatéréssel megkerülje ezt a problémát.",
+    "version": "Verzió",
+    "contributors": "Közreműködők"
 }

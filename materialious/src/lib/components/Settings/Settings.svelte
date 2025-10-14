@@ -91,18 +91,17 @@
 
 	<div>
 		<nav class="wrap s">
-			<button class="large max small-round secondary">
+			<button class="large small-round secondary max" data-ui="#tab-menu">
 				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
 				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
-				<menu class="wrap max">
+				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
 					{#each tabs as tab, _}
 						<li
-							role="presentation"
-							class:active={isActive(tab.id)}
+							data-ui="#tab-menu"
 							onclick={() => {
 								activeTab = tab.id;
-								(document.activeElement as HTMLElement)?.blur();
 							}}
+							role="presentation"
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>

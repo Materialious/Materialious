@@ -44,7 +44,6 @@ dialog {
 
 @media screen and (max-width: 1000px) {
 	menu.mobile {
-		z-index: 9999 !important;
 		position: fixed !important;
 		top: 20% !important;
 		width: 100% !important;

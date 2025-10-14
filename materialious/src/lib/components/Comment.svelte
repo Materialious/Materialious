@@ -12,9 +12,10 @@
 	interface Props {
 		comment: Comment;
 		videoId: string;
+		isSubComp?: boolean;
 	}
 
-	let { comment, videoId }: Props = $props();
+	let { comment, videoId, isSubComp = false }: Props = $props();
 
 	let replies: Comments | undefined = $state(undefined);
 
@@ -53,7 +54,7 @@
 	});
 </script>
 
-<div class="comment">
+<article class="comment" class:border={!isSubComp}>
 	{#if !$interfaceLowBandwidthMode}
 		<div class="comment-header">
 			{#if userPfp}
@@ -95,17 +96,16 @@
 	{#if replies}
 		<div style="margin-left: 5em;">
 			{#each replies.comments as reply}
-				<CommentSelf comment={reply} {videoId} />
+				<CommentSelf comment={reply} {videoId} isSubComp={true} />
 			{/each}
 		</div>
 	{/if}
-</div>
+</article>
 
 <style>
 	.comment {
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 1em;
 		white-space: pre-line;
 	}
 

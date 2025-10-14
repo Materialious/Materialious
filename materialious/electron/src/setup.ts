@@ -104,8 +104,8 @@ export class ElectronCapacitorApp {
 			join(app.getAppPath(), 'assets', process.platform === 'win32' ? 'appIcon.ico' : 'appIcon.png')
 		);
 		this.mainWindowState = windowStateKeeper({
-			defaultWidth: 1000,
-			defaultHeight: 800
+			defaultWidth: 1920,
+			defaultHeight: 1080
 		});
 		// Setup preload script path and construct our main window.
 		const preloadPath = join(app.getAppPath(), 'build', 'src', 'preload.js');

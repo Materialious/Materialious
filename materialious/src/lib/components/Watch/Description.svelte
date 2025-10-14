@@ -22,7 +22,6 @@
 				{numberWithCommas(video.viewCount)}
 				{$_('views')} • {video.publishedText}
 			</div>
-			<i>expand_more</i>
 		</nav>
 	</summary>
 	<div class="space"></div>
@@ -30,13 +29,15 @@
 		<div style="white-space: pre-line; overflow-wrap: break-word;">
 			{@html description}
 		</div>
-	</div>
 
-	<nav class="scroll">
-		{#if video.keywords}
-			{#each video.keywords as keyword}
-				<a href={`/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
-			{/each}
-		{/if}
-	</nav>
+		<article class="border">
+			<nav class="scroll">
+				{#if video.keywords}
+					{#each video.keywords as keyword}
+						<a href={`/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
+					{/each}
+				{/if}
+			</nav>
+		</article>
+	</div>
 </details>

@@ -18,12 +18,14 @@
 	visibility: visible !important;
 	z-index: 99999999 !important;
 	pointer-events: auto !important;
-	pointer-events: auto !important;
+	max-height: 400px !important;
 }
 
 .shaka-overflow-menu button,
 .shaka-settings-menu button {
 	color: var(--text) !important;
+	border: none !important;
+	outline: none !important;
 }
 
 @media screen and (max-width: 650px) {
@@ -44,7 +46,6 @@
 		left: 50% !important;
 		height: 50vh !important;
 		transform: translate(-50%, -50%) !important;
-		pointer-events: all !important;
 		pointer-events: auto !important;
 		opacity: 1 !important;
 		visibility: visible !important;

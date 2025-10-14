@@ -303,7 +303,7 @@
 			clearTimeout(pauseTimeout);
 		}
 		pauseTimeout = setTimeout(() => {
-			// player.pause();
+			playerElement?.pause();
 			pauseTimerSeconds = 0;
 			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
@@ -313,10 +313,8 @@
 </script>
 
 <svelte:head>
-	<title>{data.video.title} | Materialious</title>
+	<title>{data.video.title}</title>
 </svelte:head>
-
-<div class="space"></div>
 
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
@@ -343,15 +341,14 @@
 					{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
 						<button
 							onclick={() => {
-								if (pauseTimeout) {
-									clearTimeout(pauseTimeout);
+								if (pauseTimerSeconds < 1) {
+									pauseTimerSeconds = 300;
 								}
-								pauseTimerSeconds = 0;
 								ui('#pause-timer');
 							}}
 							class:border={pauseTimerSeconds < 1}
 						>
-							<i>schedule</i>
+							<i>snooze</i>
 							<div class="tooltip">{$_('player.pauseTimer')}</div>
 						</button>
 					{/if}
@@ -417,22 +414,20 @@
 			</div>
 		</div>
 
-		<article>
+		<article class="border">
 			<Description video={data.video} description={data.content.description} />
 		</article>
 
 		{#if data.content.timestamps.length > 0}
-			<article>
+			<article class="border">
 				<details>
 					<summary id="chapter-section" class="bold none">
 						<nav>
 							<div class="max">
 								<p>{$_('player.chapters')}</p>
 							</div>
-							<i>expand_more</i>
 						</nav>
 					</summary>
-					<div class="space"></div>
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
@@ -465,12 +460,11 @@
 		{/if}
 
 		{#if comments && comments.comments.length > 0}
-			<article>
+			<article class="border">
 				<details>
 					<summary id="comment-section" class="none bold">
 						<nav>
 							<div class="max">{numberWithCommas(comments.commentCount)} {$_('comments')}</div>
-							<i>expand_more</i>
 						</nav>
 					</summary>
 
@@ -497,9 +491,9 @@
 				<article
 					style="height: 85vh; position: relative;scrollbar-width: none;"
 					id="playlist"
-					class="scroll no-padding surface-container-high"
+					class="scroll no-padding surface-container border"
 				>
-					<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
+					<article class="no-elevate border" style="position: sticky; top: 0; z-index: 3;">
 						<h6>{$playlistCacheStore[data.playlistId].info.title}</h6>
 						<p>
 							{cleanNumber($playlistCacheStore[data.playlistId].info.viewCount)}
@@ -552,10 +546,10 @@
 
 					{#each $playlistCacheStore[data.playlistId].videos as playlistVideo}
 						<article
-							class="no-padding primary-border"
+							class="no-padding border"
 							style="margin: .7em;"
 							id={playlistVideo.videoId}
-							class:border={playlistVideo.videoId === data.video.videoId}
+							class:primary-border={playlistVideo.videoId === data.video.videoId}
 						>
 							{#key playlistVideo.videoId}
 								<Thumbnail
@@ -569,7 +563,7 @@
 				</article>
 			{:else if data.video.recommendedVideos}
 				{#each data.video.recommendedVideos as recommendedVideo}
-					<article class="no-padding">
+					<article class="no-padding border">
 						{#key recommendedVideo.videoId}
 							<Thumbnail video={recommendedVideo} sideways={true} />
 						{/key}
@@ -580,34 +574,39 @@
 	{/if}
 </div>
 
-<dialog class="modal" id="pause-timer">
-	<div class="field middle-align">
-		<label class="slider">
-			<input
-				type="range"
-				bind:value={pauseTimerSeconds}
-				min="0"
-				step="60"
-				max={data.video.lengthSeconds - playerCurrentTime - 60}
-			/>
-			<span></span>
-		</label>
-		{#if pauseTimerSeconds > 0}
-			<span class="helper">{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</span>
-		{/if}
+<dialog
+	id="pause-timer"
+	onclose={(event: Event) => {
+		if (pauseTimerSeconds > 0) setPauseTimer();
+		(event.target as HTMLDialogElement).close();
+	}}
+>
+	<div>
+		<h6>{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</h6>
+
+		<nav class="group">
+			<button onclick={() => (pauseTimerSeconds += 300)} class="left-round">+5 mins</button>
+			<button onclick={() => (pauseTimerSeconds += 1800)} class="no-round">+30 mins</button>
+			<button onclick={() => (pauseTimerSeconds += 3600)} class="no-round">+1 hr</button>
+			<button onclick={() => (pauseTimerSeconds += 7200)} class="right-round">+2 hrs</button>
+		</nav>
+
+		<div class="space"></div>
+
+		<nav class="wrap">
+			<button
+				onclick={() => {
+					pauseTimerSeconds = 0;
+					clearTimeout(pauseTimeout);
+					ui('#pause-timer');
+				}}
+				class="secondary max"
+			>
+				<i>delete</i>
+				<span>Clear</span>
+			</button>
+		</nav>
 	</div>
-	<nav class="right-align no-space">
-		<button
-			class="transparent link"
-			onclick={() => {
-				ui('#pause-timer');
-				pauseTimerSeconds = 0;
-			}}>Cancel</button
-		>
-		<button disabled={pauseTimerSeconds < 1} class="transparent link" onclick={setPauseTimer}
-			>Confirm</button
-		>
-	</nav>
 </dialog>
 
 <style>

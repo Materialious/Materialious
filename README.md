@@ -174,9 +174,6 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 ## Player
 ![Preview of player](./previews/player-preview.png)
 
-## Transcript
-![Preview of player transcript](./previews/transcript-preview.png)
-
 ## Settings
 ![Preview of settings](./previews/setting-preview.png)
 

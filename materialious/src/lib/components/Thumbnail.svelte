@@ -245,7 +245,7 @@
 	}
 
 	.sideways-root {
-		height: 110px;
+		height: 112px;
 		display: flex;
 		align-items: flex-start;
 	}

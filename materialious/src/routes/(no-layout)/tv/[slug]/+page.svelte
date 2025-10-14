@@ -123,7 +123,6 @@
 	<article id="shown-info" transition:fade>
 		<h5>{letterCase(data.video.title)}</h5>
 		<Author bind:subscribed video={data.video} />
-		<div class="space"></div>
 		<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
 		<article class="border">
 			<Description video={data.video} description={data.content.description} />
@@ -176,5 +175,7 @@
 		height: 50%;
 		z-index: 101;
 		overflow-y: scroll;
+		border-bottom-left-radius: 0px;
+		border-bottom-right-radius: 0px;
 	}
 </style>

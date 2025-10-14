@@ -53,7 +53,7 @@
 	}
 </script>
 
-<div style="margin-top: 1em;">
+<div style="margin-bottom: 1em;">
 	<div class="tabs left-align min scroll">
 		<a class:active={currentType === 'all'} href="#all" onclick={async () => changeType('all')}>
 			<i>home</i>

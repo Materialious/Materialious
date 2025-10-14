@@ -22,7 +22,6 @@
 				{numberWithCommas(video.viewCount)}
 				{$_('views')} • {video.publishedText}
 			</div>
-			<i>expand_more</i>
 		</nav>
 	</summary>
 	<div class="space"></div>

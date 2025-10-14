@@ -2,6 +2,12 @@ article {
 	box-shadow: none !important;
 }
 
+a,
+button,
+.button {
+	border-radius: 0.5rem !important;
+}
+
 .thumbnail-corner {
 	padding: 0.1em 0.4em;
 }

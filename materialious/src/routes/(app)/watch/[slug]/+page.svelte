@@ -426,10 +426,8 @@
 							<div class="max">
 								<p>{$_('player.chapters')}</p>
 							</div>
-							<i>expand_more</i>
 						</nav>
 					</summary>
-					<div class="space"></div>
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
@@ -467,7 +465,6 @@
 					<summary id="comment-section" class="none bold">
 						<nav>
 							<div class="max">{numberWithCommas(comments.commentCount)} {$_('comments')}</div>
-							<i>expand_more</i>
 						</nav>
 					</summary>
 

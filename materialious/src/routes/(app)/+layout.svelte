@@ -302,10 +302,10 @@
 
 		{#if Capacitor.getPlatform() === 'electron'}
 			<nav class="no-space">
-				<button onclick={() => window.history.back()} class="border left-round">
+				<button onclick={() => window.history.back()} class="border">
 					<i>arrow_back</i>
 				</button>
-				<button onclick={() => window.history.forward()} class="border right-round">
+				<button onclick={() => window.history.forward()} class="border">
 					<i>arrow_forward</i>
 				</button>
 			</nav>

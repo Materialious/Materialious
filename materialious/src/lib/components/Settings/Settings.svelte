@@ -33,6 +33,8 @@
 		}
 	];
 
+	const tabIds = tabs.map((tab) => tab.id);
+
 	let dialogType = $state('');
 
 	function checkWidth() {
@@ -82,13 +84,35 @@
 </script>
 
 <dialog id="dialog-settings" class={dialogType + ' surface-container'}>
-	<nav style="margin-bottom: 1em;">
+	<nav class="s" style="margin-bottom: 1em;">
 		<h4 class="max">{$_('layout.settings')}</h4>
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
 	</nav>
 
 	<div>
-		<nav class="tabbed small" style="outline: none" role="tablist" tabindex="0">
+		<nav class="wrap s">
+			<button class="large max small-round secondary">
+				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
+				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
+				<menu class="wrap max">
+					{#each tabs as tab, _}
+						<li
+							role="presentation"
+							class:active={isActive(tab.id)}
+							onclick={() => {
+								activeTab = tab.id;
+								(document.activeElement as HTMLElement)?.blur();
+							}}
+						>
+							<i>{tab.icon}</i>
+							<span>{tab.label}</span>
+						</li>
+					{/each}
+				</menu>
+			</button>
+		</nav>
+
+		<nav class="tabbed small m l" style="outline: none" role="tablist" tabindex="0">
 			{#each tabs as tab, index}
 				<a
 					role="tab"
@@ -128,6 +152,8 @@
 				</a>
 			{/if}
 		</nav>
+		<div class="space"></div>
+		<div class="divider"></div>
 		{#each tabs as tab, _}
 			<div
 				class="page padding"
@@ -146,35 +172,7 @@
 </dialog>
 
 <style>
-	dialog {
-		width: 1320px;
-	}
-
 	.tabbed > a {
 		flex: none;
-	}
-
-	@media screen and (max-width: 1320px) {
-		.tabbed {
-			display: flex !important;
-			gap: 0 !important;
-			flex: 0 !important;
-			align-items: start !important;
-			padding: 1em 0 !important;
-			overflow-x: scroll !important;
-			background-color: transparent;
-			border-bottom: solid 1px var(--outline-variant);
-		}
-
-		.tabbed > a {
-			font-size: 1.5rem !important;
-			padding: 0.5em 0.3em !important;
-			border-radius: 3em !important;
-		}
-
-		.tabbed.small {
-			block-size: 100% !important;
-			border-radius: 0 !important;
-		}
 	}
 </style>

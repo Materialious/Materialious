@@ -303,7 +303,7 @@
 			clearTimeout(pauseTimeout);
 		}
 		pauseTimeout = setTimeout(() => {
-			// player.pause();
+			playerElement.pause();
 			pauseTimerSeconds = 0;
 			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
@@ -313,10 +313,8 @@
 </script>
 
 <svelte:head>
-	<title>{data.video.title} | Materialious</title>
+	<title>{data.video.title}</title>
 </svelte:head>
-
-<div class="space"></div>
 
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
@@ -417,12 +415,12 @@
 			</div>
 		</div>
 
-		<article>
+		<article class="border">
 			<Description video={data.video} description={data.content.description} />
 		</article>
 
 		{#if data.content.timestamps.length > 0}
-			<article>
+			<article class="border">
 				<details>
 					<summary id="chapter-section" class="bold none">
 						<nav>
@@ -465,7 +463,7 @@
 		{/if}
 
 		{#if comments && comments.comments.length > 0}
-			<article>
+			<article class="border">
 				<details>
 					<summary id="comment-section" class="none bold">
 						<nav>
@@ -569,7 +567,7 @@
 				</article>
 			{:else if data.video.recommendedVideos}
 				{#each data.video.recommendedVideos as recommendedVideo}
-					<article class="no-padding">
+					<article class="no-padding border">
 						{#key recommendedVideo.videoId}
 							<Thumbnail video={recommendedVideo} sideways={true} />
 						{/key}

@@ -223,7 +223,7 @@
 		{#each items as item, index}
 			<ContentColumn>
 				<article
-					class="no-padding android-tv-item"
+					class="no-padding android-tv-item border"
 					class:android-tv-focused={$isAndroidTvStore}
 					style="height: 100%;"
 					id={extractUniqueId(item)}

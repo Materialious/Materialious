@@ -125,7 +125,7 @@
 		<Author bind:subscribed video={data.video} />
 		<div class="space"></div>
 		<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
-		<article class="border">
+		<article>
 			<Description video={data.video} description={data.content.description} />
 		</article>
 

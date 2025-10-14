@@ -34,9 +34,9 @@
 
 <svg
 	version="1.1"
-	id="svg1"
 	class={classes}
 	height="100%"
+	width="70px"
 	xml:space="preserve"
 	xmlns="http://www.w3.org/2000/svg"
 	viewBox="50.17 104.37 109.67 88.27"

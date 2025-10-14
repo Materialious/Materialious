@@ -1,3 +1,7 @@
+article {
+	box-shadow: none !important;
+}
+
 .thumbnail-corner {
 	padding: 0.1em 0.4em;
 }
@@ -20,40 +24,16 @@ nav.bottom {
 }
 
 main.root {
-	padding-top: 7em !important;
-	padding-bottom: 5em !important;
 	max-height: 100vh;
 	overflow-y: auto;
-}
-
-nav.left {
-	padding-top: 2em;
 }
 
 dialog {
 	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 }
 
-.root-not-tv {
-	padding-left: 7em !important;
-}
-
 .row {
 	padding: 1em !important;
-}
-
-button.row {
-	background-color: transparent !important;
-	border: none !important;
-	color: var(--on-surface) !important;
-	width: 100%;
-	margin: 0 !important;
-}
-
-button.row:hover {
-	box-shadow: none !important;
-	background-color: transparent !important;
-	width: 100%;
 }
 
 @media screen and (max-width: 1000px) {

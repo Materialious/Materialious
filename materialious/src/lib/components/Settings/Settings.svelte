@@ -81,7 +81,7 @@
 	});
 </script>
 
-<dialog id="dialog-settings" class={dialogType}>
+<dialog id="dialog-settings" class={dialogType + ' surface-container'}>
 	<nav style="margin-bottom: 1em;">
 		<h4 class="max">{$_('layout.settings')}</h4>
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>

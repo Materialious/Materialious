@@ -269,166 +269,154 @@
 	{/if}
 </svelte:head>
 
-{#if !$isAndroidTvStore}
-	<nav class="left m l small">
-		<header></header>
+<div>
+	{#if !$isAndroidTvStore}
+		<nav class="left m l surface-container">
+			<header
+				role="presentation"
+				onclick={() => goto($interfaceDefaultPage)}
+				style="cursor: pointer;"
+				tabindex="-1"
+			>
+				<Logo />
+			</header>
+			{#each getPages() as navPage}
+				{#if !navPage.requiresAuth || isLoggedIn}
+					<a href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+						><i>{navPage.icon}</i>
+						<div>{navPage.name}</div>
+					</a>
+				{/if}
+			{/each}
+		</nav>
+	{/if}
+	<nav class="top" id="top-content">
+		{#if !mobileSearchShow}
+			<button
+				onclick={() => (mobileSearchShow = !mobileSearchShow)}
+				class="transparent s circle large"
+			>
+				<i>search</i>
+			</button>
+		{/if}
+
+		{#if Capacitor.getPlatform() === 'electron'}
+			<nav class="no-space">
+				<button onclick={() => window.history.back()} class="border left-round">
+					<i>arrow_back</i>
+				</button>
+				<button onclick={() => window.history.forward()} class="border right-round">
+					<i>arrow_forward</i>
+				</button>
+			</nav>
+		{/if}
+
+		<div class="max m l"></div>
+
+		<div class="m l">
+			<Search />
+		</div>
+
+		{#if !mobileSearchShow}
+			<div class="max"></div>
+		{/if}
+
+		{#if mobileSearchShow}
+			<div style="width: 100%;">
+				<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+			</div>
+		{:else}
+			{#if !Capacitor.isNativePlatform()}
+				<button data-ui="#sync-party" class="circle large transparent">
+					<i class:primary-text={$syncPartyPeerStore}>group</i>
+					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
+				</button>
+			{/if}
+			{#if isLoggedIn}
+				<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
+					><i>notifications</i>
+					<div class="tooltip bottom">{$_('layout.notifications')}</div>
+				</button>
+			{/if}
+			<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
+				<i>settings</i>
+				<div class="tooltip bottom">{$_('layout.settings')}</div>
+			</button>
+
+			{#if !isLoggedIn}
+				<button onclick={login} class="circle large transparent">
+					<i>login</i>
+					<div class="tooltip bottom">{$_('layout.login')}</div>
+				</button>
+			{:else}
+				<button onclick={logout} class="circle large transparent">
+					<i>logout</i>
+					<div class="tooltip bottom">{$_('layout.logout')}</div>
+				</button>
+			{/if}
+		{/if}
+	</nav>
+
+	<nav class="bottom s">
 		{#each getPages() as navPage}
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a
+					class="round"
 					href={navPage.href}
 					class:active={$page.url.href.endsWith(navPage.href)}
 					data-sveltekit-preload-data="off"
 					><i>{navPage.icon}</i>
-					<div>{navPage.name}</div>
+					<span style="font-size: .8em;">{navPage.name}</span>
 				</a>
 			{/if}
 		{/each}
 	</nav>
-{/if}
 
-<nav class="top" id="top-content">
-	{#if !mobileSearchShow}
-		<button
-			onclick={() => (mobileSearchShow = !mobileSearchShow)}
-			class="transparent s circle large"
-		>
-			<i>search</i>
-		</button>
-	{/if}
+	<Settings />
 
-	{#if Capacitor.getPlatform() === 'electron'}
-		<nav class="no-space">
-			<button onclick={() => window.history.back()} class="border left-round">
-				<i>arrow_back</i>
-			</button>
-			<button onclick={() => window.history.forward()} class="border right-round">
-				<i>arrow_forward</i>
-			</button>
+	<dialog class="right" id="dialog-notifications">
+		<nav>
+			<h5 class="max">{$_('layout.notifications')}</h5>
+			<button class="circle transparent" data-ui="#dialog-notifications"><i>close</i></button>
 		</nav>
-	{/if}
-
-	<nav
-		role="presentation"
-		onclick={() => goto($interfaceDefaultPage)}
-		style="cursor: pointer;"
-		class="m l"
-		tabindex="-1"
-	>
-		<Logo />
-		<h6 class="l">Materialious</h6>
-	</nav>
-
-	<div class="max m l"></div>
-
-	<div class="m l">
-		<Search />
-	</div>
-
-	{#if !mobileSearchShow}
-		<div class="max"></div>
-	{/if}
-
-	{#if mobileSearchShow}
-		<div style="width: 100%;">
-			<Search on:searchCancelled={() => (mobileSearchShow = false)} />
-		</div>
-	{:else}
-		{#if !Capacitor.isNativePlatform()}
-			<button data-ui="#sync-party" class="circle large transparent">
-				<i class:primary-text={$syncPartyPeerStore}>group</i>
-				<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-			</button>
-		{/if}
-		{#if isLoggedIn}
-			<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
-				><i>notifications</i>
-				<div class="tooltip bottom">{$_('layout.notifications')}</div>
-			</button>
-		{/if}
-		<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
-			<i>settings</i>
-			<div class="tooltip bottom">{$_('layout.settings')}</div>
-		</button>
-
-		{#if !isLoggedIn}
-			<button onclick={login} class="circle large transparent">
-				<i>login</i>
-				<div class="tooltip bottom">{$_('layout.login')}</div>
-			</button>
+		{#if notifications.length === 0}
+			<p>{$_('layout.noNewNotifications')}</p>
 		{:else}
-			<button onclick={logout} class="circle large transparent">
-				<i>logout</i>
-				<div class="tooltip bottom">{$_('layout.logout')}</div>
-			</button>
-		{/if}
-	{/if}
-</nav>
-
-<nav class="bottom s">
-	{#each getPages() as navPage}
-		{#if !navPage.requiresAuth || isLoggedIn}
-			<a
-				class="round"
-				href={navPage.href}
-				class:active={$page.url.href.endsWith(navPage.href)}
-				data-sveltekit-preload-data="off"
-				><i>{navPage.icon}</i>
-				<span style="font-size: .8em;">{navPage.name}</span>
-			</a>
-		{/if}
-	{/each}
-</nav>
-
-<Settings />
-
-<dialog class="right" id="dialog-notifications">
-	<nav>
-		<h5 class="max">{$_('layout.notifications')}</h5>
-		<button class="circle transparent" data-ui="#dialog-notifications"><i>close</i></button>
-	</nav>
-	{#if notifications.length === 0}
-		<p>{$_('layout.noNewNotifications')}</p>
-	{:else}
-		{#each notifications as notification}
-			<article class="no-padding">
-				<Thumbnail video={notification}></Thumbnail>
-			</article>
-		{/each}
-	{/if}
-</dialog>
-
-<main
-	id="main-content"
-	class="responsive max root"
-	tabindex="0"
-	role="region"
-	class:root-not-tv={!$isAndroidTvStore}
->
-	{#if $isAndroidTvStore}
-		<div class="tabs">
-			{#each getPages() as navPage}
-				{#if !navPage.requiresAuth || isLoggedIn}
-					<a
-						href={navPage.href}
-						class:active={$page.url.href.endsWith(navPage.href)}
-						class="active"
-						data-sveltekit-preload-data="off"
-					>
-						<i>{navPage.icon}</i>
-						<span>{navPage.name}</span>
-					</a>
-				{/if}
+			{#each notifications as notification}
+				<article class="no-padding border">
+					<Thumbnail video={notification}></Thumbnail>
+				</article>
 			{/each}
-		</div>
-	{/if}
-	{#if $navigating}
-		<PageLoading />
-	{:else}
-		{@render children?.()}
-	{/if}
+		{/if}
+	</dialog>
 
-	<SyncParty />
-</main>
+	<main id="main-content" class="responsive max root" tabindex="0" role="region">
+		{#if $isAndroidTvStore}
+			<div class="tabs">
+				{#each getPages() as navPage}
+					{#if !navPage.requiresAuth || isLoggedIn}
+						<a
+							href={navPage.href}
+							class:active={$page.url.href.endsWith(navPage.href)}
+							class="active"
+							data-sveltekit-preload-data="off"
+						>
+							<i>{navPage.icon}</i>
+							<span>{navPage.name}</span>
+						</a>
+					{/if}
+				{/each}
+			</div>
+		{/if}
+		{#if $navigating}
+			<PageLoading />
+		{:else}
+			{@render children?.()}
+		{/if}
+
+		<SyncParty />
+	</main>
+</div>
 
 <dialog class="modal" id="tv-login">
 	<h5>{$_('loginRequired')}</h5>
@@ -456,9 +444,3 @@
 		</nav>
 	</form>
 </dialog>
-
-<style>
-	nav.left a {
-		font-size: 0.8em;
-	}
-</style>

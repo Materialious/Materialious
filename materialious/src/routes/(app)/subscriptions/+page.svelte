@@ -22,14 +22,6 @@
 	}
 </script>
 
-<div class="space"></div>
-<nav class="right-align">
-	<a class="button" href="/subscriptions/manage">
-		<i>subscriptions</i>
-		<span>{$_('subscriptions.manageSubscriptions')}</span>
-	</a>
-</nav>
-
 <ItemsList items={videos ?? []} />
 
 <InfiniteLoading on:infinite={loadMore} />

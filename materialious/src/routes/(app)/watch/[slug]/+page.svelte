@@ -491,9 +491,9 @@
 				<article
 					style="height: 85vh; position: relative;scrollbar-width: none;"
 					id="playlist"
-					class="scroll no-padding surface-container-high"
+					class="scroll no-padding surface-container border"
 				>
-					<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
+					<article class="no-elevate border" style="position: sticky; top: 0; z-index: 3;">
 						<h6>{$playlistCacheStore[data.playlistId].info.title}</h6>
 						<p>
 							{cleanNumber($playlistCacheStore[data.playlistId].info.viewCount)}
@@ -546,10 +546,10 @@
 
 					{#each $playlistCacheStore[data.playlistId].videos as playlistVideo}
 						<article
-							class="no-padding primary-border"
+							class="no-padding border"
 							style="margin: .7em;"
 							id={playlistVideo.videoId}
-							class:border={playlistVideo.videoId === data.video.videoId}
+							class:primary-border={playlistVideo.videoId === data.video.videoId}
 						>
 							{#key playlistVideo.videoId}
 								<Thumbnail

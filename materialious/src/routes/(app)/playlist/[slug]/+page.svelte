@@ -10,9 +10,7 @@
 	let { data } = $props();
 </script>
 
-<div class="space"></div>
-
-<article>
+<article class="border padding">
 	{#if data.playlist.videos}
 		<nav>
 			<a

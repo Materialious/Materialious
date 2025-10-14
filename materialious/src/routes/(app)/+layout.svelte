@@ -253,14 +253,7 @@
 <svelte:head>
 	{@html webManifestLink}
 
-	{#if $isAndroidTvStore}
-		<style>
-			:focus {
-				outline: 4px solid var(--primary);
-				box-shadow: none !important;
-			}
-		</style>
-	{:else if Capacitor.getPlatform() === 'android'}
+	{#if Capacitor.getPlatform() === 'android' && !$isAndroidTvStore}
 		<style>
 			nav.top {
 				height: 120px;
@@ -270,27 +263,26 @@
 </svelte:head>
 
 <div>
-	{#if !$isAndroidTvStore}
-		<nav class="left m l surface-container">
-			<header
-				role="presentation"
-				onclick={() => goto($interfaceDefaultPage)}
-				style="cursor: pointer;"
-				tabindex="-1"
-			>
-				<Logo />
-			</header>
-			{#each getPages() as navPage}
-				{#if !navPage.requiresAuth || isLoggedIn}
-					<a href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
-						><i>{navPage.icon}</i>
-						<div>{navPage.name}</div>
-					</a>
-				{/if}
-			{/each}
-		</nav>
-	{/if}
-	<nav class="top" id="top-content">
+	<nav class="left m l surface-container" class:tv-nav={$isAndroidTvStore}>
+		<header
+			role="presentation"
+			onclick={() => goto($interfaceDefaultPage)}
+			style="cursor: pointer;"
+			tabindex="-1"
+			class="small-padding"
+		>
+			<Logo />
+		</header>
+		{#each getPages() as navPage}
+			{#if !navPage.requiresAuth || isLoggedIn}
+				<a href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+					><i>{navPage.icon}</i>
+					<div>{navPage.name}</div>
+				</a>
+			{/if}
+		{/each}
+	</nav>
+	<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
 		{#if !mobileSearchShow}
 			<button
 				onclick={() => (mobileSearchShow = !mobileSearchShow)}
@@ -391,23 +383,6 @@
 	</dialog>
 
 	<main id="main-content" class="responsive max root" tabindex="0" role="region">
-		{#if $isAndroidTvStore}
-			<div class="tabs">
-				{#each getPages() as navPage}
-					{#if !navPage.requiresAuth || isLoggedIn}
-						<a
-							href={navPage.href}
-							class:active={$page.url.href.endsWith(navPage.href)}
-							class="active"
-							data-sveltekit-preload-data="off"
-						>
-							<i>{navPage.icon}</i>
-							<span>{navPage.name}</span>
-						</a>
-					{/if}
-				{/each}
-			</div>
-		{/if}
 		{#if $navigating}
 			<PageLoading />
 		{:else}
@@ -444,3 +419,10 @@
 		</nav>
 	</form>
 </dialog>
+
+<style>
+	.tv-nav {
+		min-inline-size: 0.5rem;
+		padding: 0;
+	}
+</style>

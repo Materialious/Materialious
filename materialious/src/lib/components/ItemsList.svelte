@@ -71,7 +71,6 @@
 	}
 
 	function setupAndroidTVNavigation() {
-		console.log('gridElement', gridElement);
 		if (!$isAndroidTvStore || !gridElement) return;
 
 		focusableItems = Array.from(
@@ -117,6 +116,11 @@
 
 		switch (direction) {
 			case 'left':
+				if (currentFocusIndex % columns === 0) {
+					lastFocusIndex = currentFocusIndex;
+					updateTabIndex(currentFocusIndex);
+					return true;
+				}
 				newIndex = Math.max(0, currentFocusIndex - 1);
 				break;
 			case 'right':
@@ -128,7 +132,6 @@
 					// Store current position before leaving and ensure it stays focusable
 					lastFocusIndex = currentFocusIndex;
 					updateTabIndex(currentFocusIndex);
-					// Allow the event to bubble up to parent navigation
 					return true;
 				}
 				newIndex = Math.max(0, currentFocusIndex - columns);
@@ -218,7 +221,6 @@
 </script>
 
 <div class={classes} class:android-container={$isAndroidTvStore}>
-	<div class="space"></div>
 	<div class="grid" bind:this={gridElement}>
 		{#each items as item, index}
 			<ContentColumn>

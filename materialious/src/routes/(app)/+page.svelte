@@ -6,8 +6,6 @@
 </script>
 
 {#if data.popularDisabled}
-	<div class="space"></div>
-
 	<nav class="center-align">
 		<p>Popular page has been disabled</p>
 	</nav>

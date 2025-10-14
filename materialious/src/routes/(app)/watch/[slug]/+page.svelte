@@ -303,7 +303,7 @@
 			clearTimeout(pauseTimeout);
 		}
 		pauseTimeout = setTimeout(() => {
-			playerElement.pause();
+			playerElement?.pause();
 			pauseTimerSeconds = 0;
 			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
@@ -341,15 +341,14 @@
 					{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
 						<button
 							onclick={() => {
-								if (pauseTimeout) {
-									clearTimeout(pauseTimeout);
+								if (pauseTimerSeconds < 1) {
+									pauseTimerSeconds = 300;
 								}
-								pauseTimerSeconds = 0;
 								ui('#pause-timer');
 							}}
 							class:border={pauseTimerSeconds < 1}
 						>
-							<i>schedule</i>
+							<i>snooze</i>
 							<div class="tooltip">{$_('player.pauseTimer')}</div>
 						</button>
 					{/if}
@@ -578,34 +577,39 @@
 	{/if}
 </div>
 
-<dialog class="modal" id="pause-timer">
-	<div class="field middle-align">
-		<label class="slider">
-			<input
-				type="range"
-				bind:value={pauseTimerSeconds}
-				min="0"
-				step="60"
-				max={data.video.lengthSeconds - playerCurrentTime - 60}
-			/>
-			<span></span>
-		</label>
-		{#if pauseTimerSeconds > 0}
-			<span class="helper">{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</span>
-		{/if}
+<dialog
+	id="pause-timer"
+	onclose={(event: Event) => {
+		if (pauseTimerSeconds > 0) setPauseTimer();
+		(event.target as HTMLDialogElement).close();
+	}}
+>
+	<div>
+		<h6>{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</h6>
+
+		<nav class="group">
+			<button onclick={() => (pauseTimerSeconds += 300)} class="left-round">+5 mins</button>
+			<button onclick={() => (pauseTimerSeconds += 1800)} class="no-round">+30 mins</button>
+			<button onclick={() => (pauseTimerSeconds += 3600)} class="no-round">+1 hr</button>
+			<button onclick={() => (pauseTimerSeconds += 7200)} class="right-round">+2 hrs</button>
+		</nav>
+
+		<div class="space"></div>
+
+		<nav class="wrap">
+			<button
+				onclick={() => {
+					pauseTimerSeconds = 0;
+					clearTimeout(pauseTimeout);
+					ui('#pause-timer');
+				}}
+				class="secondary max"
+			>
+				<i>delete</i>
+				<span>Clear</span>
+			</button>
+		</nav>
 	</div>
-	<nav class="right-align no-space">
-		<button
-			class="transparent link"
-			onclick={() => {
-				ui('#pause-timer');
-				pauseTimerSeconds = 0;
-			}}>Cancel</button
-		>
-		<button disabled={pauseTimerSeconds < 1} class="transparent link" onclick={setPauseTimer}
-			>Confirm</button
-		>
-	</nav>
 </dialog>
 
 <style>

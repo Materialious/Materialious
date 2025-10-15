@@ -530,7 +530,7 @@
 				const stringBody = new TextDecoder().decode(response.data);
 				// position:0% for LTR text and position:100% for RTL text
 				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
-
+				// @ts-expect-error Type is acceptable, is shaka player
 				response.data = new TextEncoder().encode(cleaned).buffer;
 			}
 		});

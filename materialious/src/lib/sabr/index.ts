@@ -47,7 +47,7 @@ export async function injectSabr(
 					pyv: true
 				},
 				contentPlaybackContext: {
-					signatureTimestamp: video.ytjs.innertube.session.player?.sts
+					signatureTimestamp: video.ytjs.innertube.session.player?.signature_timestamp
 				},
 				reloadPlaybackContext: reloadContext
 			}

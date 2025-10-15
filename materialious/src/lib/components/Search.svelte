@@ -147,30 +147,32 @@
 				</div>
 				{#if searchSuggestions}
 					{#each suggestionsForSearch as suggestion, index}
-						<a
-							onclick={() => {
-								search = suggestion;
-								handleSubmit();
-							}}
-							class="row"
-							class:selected={index === selectedSuggestionIndex}
-							href={`/search/${encodeURIComponent(suggestion)}`}
-						>
-							<div>{suggestion}</div>
-						</a>
+						<li>
+							<a
+								onclick={() => {
+									search = suggestion;
+									handleSubmit();
+								}}
+								class:selected={index === selectedSuggestionIndex}
+								href={`/search/${encodeURIComponent(suggestion)}`}
+							>
+								<div>{suggestion}</div>
+							</a>
+						</li>
 					{/each}
 				{/if}
 				{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
 					{#each $searchHistoryStore as history}
-						<a
-							class="row"
-							onclick={() => {
-								search = history;
-							}}
-							href={`/search/${encodeURIComponent(history)}`}
-						>
-							<div>{history}</div>
-						</a>
+						<li>
+							<a
+								onclick={() => {
+									search = history;
+								}}
+								href={`/search/${encodeURIComponent(history)}`}
+							>
+								<div>{history}</div>
+							</a>
+						</li>
 					{/each}
 				{/if}
 			</menu>

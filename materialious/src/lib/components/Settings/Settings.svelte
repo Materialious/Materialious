@@ -94,12 +94,14 @@
 			<button class="large small-round secondary max" data-ui="#tab-menu">
 				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
 				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
-				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
+				<menu style="width: 100%;">
 					{#each tabs as tab, _}
 						<li
-							data-ui="#tab-menu"
 							onclick={() => {
 								activeTab = tab.id;
+
+								const hiddenElement = document.createElement('div');
+								hiddenElement.click();
 							}}
 							role="presentation"
 						>

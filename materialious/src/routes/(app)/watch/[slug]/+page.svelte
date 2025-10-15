@@ -631,11 +631,17 @@
 			align-items: flex-start;
 			flex-direction: column;
 		}
-	}
 
-	@media screen and (max-width: 1000px) {
 		.video-actions > div {
 			margin-top: 1em;
+		}
+
+		nav.group {
+			flex-direction: column;
+		}
+
+		nav.group button {
+			border-radius: 0.5rem !important;
 		}
 	}
 

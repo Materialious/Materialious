@@ -42,11 +42,23 @@
   <screenshots>
     <screenshot type="default">
       <caption>Popular videos</caption>
-      <image>https://raw.githubusercontent.com/Materialious/Materialious/7abde6b429d49196d3964ee0a3361712a1a4b4c2/previews/home-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/home-preview.png</image>
     </screenshot>
     <screenshot>
       <caption>Watching a video</caption>
-      <image>https://raw.githubusercontent.com/Materialious/Materialious/7abde6b429d49196d3964ee0a3361712a1a4b4c2/previews/player-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/player-preview.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Modifying settings</caption>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/setting-preview.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Browsing a channel</caption>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/channel-preview.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Browsing a playlist</caption>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/playlist-preview.png</image>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1">
@@ -55,25 +67,10 @@
     <content_attribute id="social-contacts">intense</content_attribute>
   </content_rating>
   <releases>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <release version="1.10.15" date="2025-10-15">
+<release version="1.10.16" date="2025-10-15">
+    <url>https://github.com/Materialious/Materialious/releases/tag/1.10.16</url>
+</release>
+<release version="1.10.15" date="2025-10-15">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.10.15</url>
     </release>
 <release version="1.10.14" date="2025-10-08">

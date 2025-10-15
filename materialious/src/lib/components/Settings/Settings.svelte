@@ -97,11 +97,11 @@
 				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
 					{#each tabs as tab, _}
 						<li
-							data-ui="#tab-menu"
 							onclick={() => {
 								activeTab = tab.id;
 							}}
 							role="presentation"
+							data-ui="#tab-menu"
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>

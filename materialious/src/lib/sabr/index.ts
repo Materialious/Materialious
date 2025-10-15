@@ -8,7 +8,10 @@ import { get } from 'svelte/store';
 import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
 
-export function injectSabr(video: VideoPlay, player: shaka.Player): SabrStreamingAdapter | null {
+export async function injectSabr(
+	video: VideoPlay,
+	player: shaka.Player
+): Promise<SabrStreamingAdapter | null> {
 	if (!video.ytjs || !Capacitor.isNativePlatform()) return null;
 
 	const sabrAdapter = new SabrStreamingAdapter({
@@ -56,7 +59,7 @@ export function injectSabr(video: VideoPlay, player: shaka.Player): SabrStreamin
 			video.ytjs.video.cpn
 		);
 		sabrAdapter.setStreamingURL(
-			video.ytjs.innertube.session.player!.decipher(
+			await video.ytjs.innertube.session.player!.decipher(
 				parsedInfo.streaming_data?.server_abr_streaming_url
 			)
 		);
@@ -77,7 +80,7 @@ export function injectSabr(video: VideoPlay, player: shaka.Player): SabrStreamin
 
 	if (video.ytjs.video.streaming_data && !isPostLiveDVR && !isLive) {
 		sabrAdapter.setStreamingURL(
-			video.ytjs.innertube.session.player!.decipher(
+			await video.ytjs.innertube.session.player!.decipher(
 				video.ytjs.video.streaming_data?.server_abr_streaming_url
 			)
 		);

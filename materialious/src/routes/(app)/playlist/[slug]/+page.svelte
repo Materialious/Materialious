@@ -90,6 +90,8 @@
 	{/if}
 </article>
 
+<div class="space"></div>
+
 {#if data.playlist.videos}
 	<ItemsList
 		items={data.playlist.videos}

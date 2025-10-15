@@ -276,8 +276,21 @@
 		if (isVisible) {
 			player.setTextTrackVisibility(false);
 		} else {
-			const defaultLanguage = get(playerDefaultLanguage);
-			const langCode = ISO6391.getCode(defaultLanguage);
+			let langCode: string;
+			if ($playerDefaultLanguage === 'original') {
+				const languageAndRole = player
+					.getAudioLanguagesAndRoles()
+					.find(({ role }) => role === 'main');
+
+				if (!languageAndRole) {
+					return;
+				}
+
+				langCode = languageAndRole.language;
+			} else {
+				const defaultLanguage = get(playerDefaultLanguage);
+				langCode = ISO6391.getCode(defaultLanguage);
+			}
 
 			const tracks = player.getTextTracks();
 

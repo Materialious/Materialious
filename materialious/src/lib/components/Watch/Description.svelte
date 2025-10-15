@@ -30,14 +30,14 @@
 			{@html description}
 		</div>
 
-		<article class="border">
-			<nav class="scroll">
-				{#if video.keywords}
+		{#if video.keywords}
+			<article class="border">
+				<nav class="scroll">
 					{#each video.keywords as keyword}
 						<a href={`/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
 					{/each}
-				{/if}
-			</nav>
-		</article>
+				</nav>
+			</article>
+		{/if}
 	</div>
 </details>

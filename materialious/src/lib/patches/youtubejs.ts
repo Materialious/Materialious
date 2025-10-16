@@ -1,6 +1,7 @@
 import { androidPoTokenMinter } from '$lib/android/youtube/minter';
 import type {
 	AdaptiveFormats,
+	Captions,
 	Image,
 	StoryBoard,
 	Thumbnail,
@@ -11,7 +12,27 @@ import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import BG, { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
-import { Innertube, UniversalCache, Utils, YT, YTNodes } from 'youtubei.js';
+import type { Types } from 'youtubei.js';
+import { Innertube, UniversalCache, Utils, YT, YTNodes, Platform } from 'youtubei.js';
+
+Platform.shim.eval = async (
+	data: Types.BuildScriptResult,
+	env: Record<string, Types.VMPrimative>
+) => {
+	const properties = [];
+
+	if (env.n) {
+		properties.push(`n: exportedVars.nFunction("${env.n}")`);
+	}
+
+	if (env.sig) {
+		properties.push(`sig: exportedVars.sigFunction("${env.sig}")`);
+	}
+
+	const code = `${data.output}\nreturn { ${properties.join(', ')} }`;
+
+	return new Function(code)();
+};
 
 export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	if (!Capacitor.isNativePlatform()) {
@@ -22,8 +43,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		fetch: fetch,
 		cache: new UniversalCache(false),
 		location: get(interfaceRegionStore),
-		user_agent: USER_AGENT,
-		player_id: '0004de42'
+		user_agent: USER_AGENT
 	});
 
 	const requestKey = 'O43z0dpjhgX20SCx4KAo';
@@ -44,7 +64,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				pyv: true
 			},
 			contentPlaybackContext: {
-				signatureTimestamp: youtube.session.player?.sts
+				signatureTimestamp: youtube.session.player?.signature_timestamp
 			}
 		}
 	});
@@ -61,13 +81,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		throw new Error('Unable to pull video info from youtube.js');
 	}
 
-	if (video.basic_info.is_live) {
-		poTokenCacheStore.set(await platformMinter(requestKey, videoId));
-	} else {
-		poTokenCacheStore.set(BG.PoToken.generateColdStartToken(videoId));
-
-		platformMinter(requestKey, videoId).then((poToken) => poTokenCacheStore.set(poToken));
-	}
+	poTokenCacheStore.set(await platformMinter(requestKey, videoId));
 
 	let dashUri: string | undefined;
 
@@ -90,7 +104,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				await video.toDash({
 					manifest_options: {
 						is_sabr: true,
-						captions_format: 'vtt',
 						include_thumbnails: false
 					}
 				})
@@ -107,6 +120,27 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	} else {
 		authorThumbnails = [];
 	}
+
+	const captions: Captions[] = [];
+	video.captions?.caption_tracks?.forEach((caption) => {
+		const url = new URL(caption.base_url);
+
+		url.searchParams.set('potc', '1');
+		url.searchParams.set('pot', get(poTokenCacheStore) ?? '');
+		url.searchParams.set('c', youtube.session.context.client.clientName);
+		url.searchParams.set('fmt', 'vtt');
+
+		// Remove &xosf=1 as it adds `position:63% line:0%` to the subtitle lines
+		// placing them in the top right corner
+		url.searchParams.delete('xosf');
+
+		captions.push({
+			label: caption.name?.toString() || '',
+			language_code: caption.language_code,
+			// Add correct format to url.
+			url: url.toString()
+		});
+	});
 
 	const recommendedVideos: VideoBase[] = [];
 	video.watch_next_feed?.forEach((recommended: Record<string, any>) => {
@@ -189,7 +223,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		formatStreams: [],
 		recommendedVideos: recommendedVideos,
 		authorThumbnails: authorThumbnails,
-		captions: [],
+		captions: captions,
 		authorId: video.basic_info.channel_id || '',
 		authorUrl: `/channel/${video.basic_info.channel_id}`,
 		authorVerified: false,

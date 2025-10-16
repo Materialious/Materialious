@@ -1,3 +1,7 @@
+.shaka-text-container > div {
+	align-items: center !important;
+}
+
 .player-theme {
 	font-family: var(--font) !important;
 	color: var(--on-surface) !important;
@@ -18,7 +22,7 @@
 	visibility: visible !important;
 	z-index: 99999999 !important;
 	pointer-events: auto !important;
-	max-height: 400px !important;
+	max-height: 400px;
 }
 
 .shaka-overflow-menu button,
@@ -95,5 +99,17 @@
 		pointer-events: auto !important;
 		opacity: 1 !important;
 		visibility: visible !important;
+	}
+}
+
+@media only screen and (width <=400px) {
+	:deep(.shaka-text-container) {
+		font-size: 16px !important;
+	}
+
+	.player-theme .shaka-overflow-menu,
+	.player-theme .shaka-settings-menu {
+		max-height: 80%;
+		overflow-y: scroll;
 	}
 }

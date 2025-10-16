@@ -36,7 +36,6 @@
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
 		playlistSettingsStore,
-		poTokenCacheStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -277,10 +276,24 @@
 		if (isVisible) {
 			player.setTextTrackVisibility(false);
 		} else {
-			const defaultLanguage = get(playerDefaultLanguage);
-			const langCode = ISO6391.getCode(defaultLanguage);
+			let langCode: string;
+			if ($playerDefaultLanguage === 'original') {
+				const languageAndRole = player
+					.getAudioLanguagesAndRoles()
+					.find(({ role }) => role === 'main');
+
+				if (!languageAndRole) {
+					return;
+				}
+
+				langCode = languageAndRole.language;
+			} else {
+				const defaultLanguage = get(playerDefaultLanguage);
+				langCode = ISO6391.getCode(defaultLanguage);
+			}
 
 			const tracks = player.getTextTracks();
+
 			const subtitleTrack = tracks.find((track) => track.language === langCode);
 
 			if (subtitleTrack) {
@@ -295,7 +308,7 @@
 	async function loadVideo() {
 		showVideoRetry = false;
 
-		sabrAdapter = injectSabr(data.video, player);
+		sabrAdapter = await injectSabr(data.video, player);
 
 		try {
 			document.getElementsByClassName('shaka-ad-info')[0].remove();
@@ -340,8 +353,8 @@
 			}
 
 			if (data.video.captions) {
-				data.video.captions.forEach(async (caption) => {
-					player.addTextTrackAsync(
+				for (const caption of data.video.captions) {
+					await player.addTextTrackAsync(
 						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
 						caption.language_code,
 						'captions',
@@ -349,7 +362,7 @@
 						undefined,
 						caption.label
 					);
-				});
+				}
 			}
 
 			if (data.content.timestamps) {
@@ -493,6 +506,33 @@
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
+		});
+
+		player.getNetworkingEngine()?.registerResponseFilter((type, response, _) => {
+			if (
+				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
+				!response.uri.includes('/api/timedtext')
+			) {
+				return;
+			}
+
+			const url = new URL(response.uri);
+
+			// Fix positioning for auto-generated subtitles
+			// Credit to Freetube!
+			if (
+				url.hostname.endsWith('.youtube.com') &&
+				url.pathname === '/api/timedtext' &&
+				url.searchParams.get('caps') === 'asr' &&
+				url.searchParams.get('kind') === 'asr' &&
+				url.searchParams.get('fmt') === 'vtt'
+			) {
+				const stringBody = new TextDecoder().decode(response.data);
+				// position:0% for LTR text and position:100% for RTL text
+				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
+				// @ts-expect-error Type is acceptable, is shaka player
+				response.data = new TextEncoder().encode(cleaned).buffer;
+			}
 		});
 
 		// Required to stop buttons from being still selected when fullscreening

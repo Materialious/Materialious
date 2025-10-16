@@ -92,7 +92,7 @@
 	}
 </script>
 
-<article class="scroll no-padding" style="height: 75vh;" id="transcript">
+<article class="scroll border" style="height: 75vh;" id="transcript">
 	<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
 		<h6>{$_('transcript')}</h6>
 		<div class="field label suffix border">

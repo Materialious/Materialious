@@ -6,7 +6,8 @@
             "materialiousLink": "Kopēt Materialious saiti",
             "invidiousRedirect": "Kopēt Invidious servera (instances) saiti",
             "title": "Dalīties",
-            "youtubeLink": "Kopēt YouTube saiti"
+            "youtubeLink": "Kopēt YouTube saiti",
+            "includeTimestamp": "Iekļaut atskaņošanas laiku"
         },
         "download": "Lejupielādēt",
         "downloadSteps": {
@@ -71,7 +72,11 @@
         "syncPartyWarning": "Lūdzu, ņemiet vērā, ka Jūsu IP adrese būs pieejama lietotājiem, kurus jūs uzaicināt.",
         "syncParty": "Kopīga skatīšanās ballīte",
         "startSyncParty": "Sākt kopīgu skatīšanās ballīti",
-        "endSyncParty": "Beigt kopīgu skatīšanās ballīti"
+        "endSyncParty": "Beigt kopīgu skatīšanās ballīti",
+        "about": "Par lietotni",
+        "expandDescription": "Izvērst aprakstu",
+        "expandChapters": "Izvērst nodaļas",
+        "expandComments": "Izvērst komentārus"
     },
     "channels": "kanāli",
     "copyUrl": "Kopēt URL saiti",
@@ -134,5 +139,6 @@
     },
     "invidiousLogin": "Lūdzu, autorizējieties ar savu Invidious kontu",
     "noResult": "Bez rezultātiem",
-    "letterCase": "Virsrakstu burtu reģistrs"
+    "letterCase": "Virsrakstu burtu reģistrs",
+    "version": "Versija"
 }

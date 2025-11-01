@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { deleteUnsubscribe, postSubscribe } from '$lib/api';
 	import type { VideoPlay } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
@@ -21,7 +22,7 @@
 </script>
 
 <nav>
-	<a href={`/channel/${video.authorId}`}>
+	<a href={`${base}/channel/${video.authorId}`}>
 		<nav style="gap: 0.5em;">
 			{#if !$interfaceLowBandwidthMode}
 				<img

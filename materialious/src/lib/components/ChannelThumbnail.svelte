@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
 	import { onMount } from 'svelte';
@@ -28,7 +29,7 @@
 	});
 </script>
 
-<a href={`/channel/${channel.authorId}`} class="wave" style="min-width: 100%;min-height: 100%;">
+<a href={`${base}/channel/${channel.authorId}`} class="wave" style="min-width: 100%;min-height: 100%;">
 	<div class="padding">
 		{#if !$interfaceLowBandwidthMode}
 			<div class="center-align">

@@ -1,4 +1,5 @@
 import { pushState } from '$app/navigation';
+import { base } from '$app/paths';
 import { page } from '$app/stores';
 import he from 'he';
 import type Peer from 'peerjs';
@@ -25,7 +26,15 @@ export function decodeHtmlCharCodes(str: string): string {
 
 export function proxyVideoUrl(source: string): string {
 	const rawSrc = new URL(source);
-	rawSrc.host = get(instanceStore).replace('http://', '').replace('https://', '');
+	const instURLStr = get(instanceStore);
+	const instURL = new URL(instURLStr);
+	rawSrc.host = instURL.host;
+	rawSrc.protocol = instURL.protocol;
+	let pathPrefix = instURL.pathname;
+	if (pathPrefix.endsWith("/")) {
+		pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1);
+	}
+	rawSrc.pathname = pathPrefix + rawSrc.pathname;
 
 	return rawSrc.toString();
 }
@@ -131,7 +140,7 @@ export function expandSummery(id: string) {
 
 export function createVideoUrl(videoId: string, playlistId: string): URL {
 	const watchUrl = new URL(
-		`${location.origin}/${get(isAndroidTvStore) ? 'tv' : 'watch'}/${videoId}`
+		`${location.origin}${base}/${get(isAndroidTvStore) ? 'tv' : 'watch'}/${videoId}`
 	);
 
 	if (playlistId !== '') {

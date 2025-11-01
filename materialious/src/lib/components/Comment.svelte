@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { getComments } from '$lib/api';
 	import { type Comment, type Comments } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
@@ -34,7 +35,7 @@
 	function commentTimestamps(html: string): string {
 		const regex =
 			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">([^<]+)<\/a>\s*(.+)/g;
-		const replacement = `<a href="/watch/${videoId}?time=$2" data-sveltekit-preload-data="off" class="link">$3 $4</a>`;
+		const replacement = `<a href="${base}/watch/${videoId}?time=$2" data-sveltekit-preload-data="off" class="link">$3 $4</a>`;
 
 		const processedHtml = html.replace(regex, replacement);
 
@@ -63,7 +64,7 @@
 				<progress class="circle"></progress>
 			{/if}
 			<div class="comment-info">
-				<a href={`/channel/${comment.authorId}`} class="author">
+				<a href={`${base}/channel/${comment.authorId}`} class="author">
 					<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>
 						{comment.author}
 					</span>

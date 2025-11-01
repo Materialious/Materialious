@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
@@ -355,7 +356,7 @@
 			if (data.video.captions) {
 				for (const caption of data.video.captions) {
 					await player.addTextTrackAsync(
-						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
+						caption.url.startsWith('http') ? caption.url : `${new URL(get(instanceStore)).origin}${caption.url}`,
 						caption.language_code,
 						'captions',
 						undefined,
@@ -693,7 +694,7 @@
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
 					goto(
-						`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`,
+						`${base}/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`,
 						{ replaceState: $isAndroidTvStore }
 					);
 				}
@@ -739,7 +740,7 @@
 				}
 
 				goto(
-					`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`,
+					`${base}/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`,
 					{ replaceState: $isAndroidTvStore }
 				);
 			}

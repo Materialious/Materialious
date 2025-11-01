@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { instanceStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
@@ -33,7 +34,7 @@
 		if (Capacitor.isNativePlatform()) {
 			url = `${get(instanceStore)}/watch/${video.videoId}`;
 		} else {
-			url = `${location.origin}/watch/${video.videoId}`;
+			url = `${location.origin}${base}/watch/${video.videoId}`;
 		}
 		if (includeTimestamp && currentTime !== undefined) {
 			url += `?time=${Math.floor(currentTime)}`;

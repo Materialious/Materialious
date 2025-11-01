@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
 	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
@@ -15,8 +16,8 @@
 		<nav>
 			<a
 				href={!$isAndroidTvStore
-					? `/watch/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`
-					: `/tv/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`}
+					? `${base}/watch/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`
+					: `${base}/tv/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`}
 				class="button circle extra no-margin"
 			>
 				<i>play_arrow</i>
@@ -27,8 +28,8 @@
 
 			<a
 				href={!$isAndroidTvStore
-					? `/watch/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`
-					: `/tv/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`}
+					? `${base}/watch/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`
+					: `${base}/tv/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`}
 				onclick={() =>
 					playlistSettingsStore.set({
 						[data.playlist.info.playlistId]: { shuffle: true, loop: false }

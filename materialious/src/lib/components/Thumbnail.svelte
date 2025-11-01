@@ -226,7 +226,9 @@
 
 				{#if 'publishedText' in video}
 					<div class="max">
-						{cleanNumber(video.viewCount)} • {video.publishedText}
+						{('viewCount' in video) ? cleanNumber(video.viewCount) : (video.viewCountText || "")}
+						•
+						{video.publishedText}
 					</div>
 				{/if}
 			</div>

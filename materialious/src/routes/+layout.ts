@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
 import androidTv from '$lib/android/plugins/androidTv';
 import { getResolveUrl } from '$lib/api';
 import '$lib/i18n'; // Import to initialize. Important :)
@@ -18,13 +18,14 @@ export async function load({ url }) {
 
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
 
-	if (url.pathname.startsWith(base+'/@')) {
-		const username = url.pathname.substring(base.length).split('/')[1];
+	const resolvedRoot = resolve('/');
+	if (url.pathname.startsWith(resolvedRoot+'@')) {
+		const username = url.pathname.substring(resolvedRoot.length).split('/')[0];
 
 		try {
 			const resolvedUrl = await getResolveUrl(`www.youtube.com/${username}`);
 			if (resolvedUrl.pageType === 'WEB_PAGE_TYPE_CHANNEL') {
-				goto(`${base}/channel/${resolvedUrl.ucid}`);
+				goto(resolve(`/channel/${resolvedUrl.ucid}`));
 			}
 		} catch {}
 	}
@@ -35,12 +36,12 @@ export async function load({ url }) {
 		defaultPage &&
 		defaultPage !== '/' &&
 		defaultPage.startsWith('/') &&
-		url.pathname === base+'/' &&
+		url.pathname === resolvedRoot &&
 		window.history.length < 3
 	) {
 		getPages().forEach((page) => {
 			if (page.href === defaultPage && (!page.requiresAuth || get(authStore))) {
-				goto(base+defaultPage);
+				goto(resolve(defaultPage));
 			}
 		});
 	}

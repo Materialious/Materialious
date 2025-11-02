@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
@@ -215,7 +215,7 @@
 			</a>
 
 			<div>
-				<a tabindex="-1" class:author={!sideways} href={`${base}/channel/${video.authorId}`}
+				<a tabindex="-1" class:author={!sideways} href={resolve(`/channel/${video.authorId}`)}
 					>{video.author}
 				</a>
 

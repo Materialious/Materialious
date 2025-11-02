@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
@@ -43,7 +43,7 @@
 		if (search.trim() === '') return;
 
 		selectedSuggestionIndex = -1;
-		goto(`${base}/search/${encodeURIComponent(search)}`);
+		goto(resolve(`/search/${encodeURIComponent(search)}`));
 
 		suggestionsForSearch = [];
 		showSearchBox = false;
@@ -155,7 +155,7 @@
 									handleSubmit();
 								}}
 								class:selected={index === selectedSuggestionIndex}
-								href={`${base}/search/${encodeURIComponent(suggestion)}`}
+								href={resolve(`/search/${encodeURIComponent(suggestion)}`)}
 							>
 								<div>{suggestion}</div>
 							</a>
@@ -169,7 +169,7 @@
 								onclick={() => {
 									search = history;
 								}}
-								href={`${base}/search/${encodeURIComponent(history)}`}
+								href={resolve(`/search/${encodeURIComponent(history)}`)}
 							>
 								<div>{history}</div>
 							</a>

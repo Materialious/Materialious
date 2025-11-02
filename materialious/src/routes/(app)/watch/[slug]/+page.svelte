@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import {
 		addPlaylistVideo,
 		getComments,
@@ -502,7 +502,7 @@
 							{$_('videos')}
 						</p>
 						<p>
-							<a href={`${base}/channel/${$playlistCacheStore[data.playlistId].info.authorId}`}
+							<a href={resolve(`/channel/${$playlistCacheStore[data.playlistId].info.authorId}`)}
 								>{$playlistCacheStore[data.playlistId].info.author}</a
 							>
 						</p>

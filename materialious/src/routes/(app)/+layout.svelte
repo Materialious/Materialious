@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/stores';
@@ -92,7 +92,7 @@
 				return;
 			}
 
-			goto(`${base}/watch/${videoId}`);
+			goto(resolve(`/watch/${videoId}`));
 		} else {
 			// Auth response handling for Mobile
 			const username = url.searchParams.get('username');
@@ -118,7 +118,7 @@
 				path.search = searchParams.toString();
 				await Browser.open({ url: path.toString() });
 			} else {
-				searchParams.set('callback_url', `${location.origin}${base}/auth`);
+				searchParams.set('callback_url', `${location.origin}`+resolve('/auth'));
 				path.search = searchParams.toString();
 				document.location.href = path.toString();
 			}
@@ -163,7 +163,7 @@
 					console.log(sid);
 					authStore.set({ username: rawUsername, token: sid });
 					await ui('#tv-login');
-					goto(base+'/', { replaceState: true });
+					goto(resolve('/'), { replaceState: true });
 					return;
 				}
 			}
@@ -177,7 +177,7 @@
 		feedCacheStore.set({});
 		searchCacheStore.set({});
 		playlistCacheStore.set({});
-		goto(base+'/');
+		goto(resolve('/'));
 	}
 
 	async function loadNotifications() {
@@ -267,7 +267,7 @@
 	<nav class="left m l surface-container" class:tv-nav={$isAndroidTvStore}>
 		<header
 			role="presentation"
-			onclick={() => goto(base+$interfaceDefaultPage)}
+			onclick={() => goto(resolve($interfaceDefaultPage))}
 			style="cursor: pointer;"
 			tabindex="-1"
 			class="small-padding"
@@ -276,7 +276,7 @@
 		</header>
 		{#each getPages() as navPage}
 			{#if !navPage.requiresAuth || isLoggedIn}
-				<a href={base+navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+				<a href={resolve(navPage.href)} class:active={$page.url.href.endsWith(navPage.href)}
 					><i>{navPage.icon}</i>
 					<div>{navPage.name}</div>
 				</a>
@@ -355,7 +355,7 @@
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a
 					class="round"
-					href={base+navPage.href}
+					href={resolve(navPage.href)}
 					class:active={$page.url.href.endsWith(navPage.href)}
 					data-sveltekit-preload-data="off"
 					><i>{navPage.icon}</i>

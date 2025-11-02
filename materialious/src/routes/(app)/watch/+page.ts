@@ -1,5 +1,5 @@
 import { goto } from '$app/navigation';
-import { base } from '$app/paths';
+import { resolve } from '$app/paths';
 import { error } from '@sveltejs/kit';
 
 export async function load({ url }) {
@@ -8,7 +8,7 @@ export async function load({ url }) {
 	const timestamp = url.searchParams.get('t');
 
 	if (videoId) {
-		let goToUrl = new URL(`${location.origin}${base}/watch/${videoId}`);
+		let goToUrl = new URL(`${location.origin}`+resolve(`/watch/${videoId}`));
 
 		if (playlistId) {
 			goToUrl.searchParams.set('playlist', playlistId);

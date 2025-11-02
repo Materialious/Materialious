@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
@@ -694,7 +694,7 @@
 			if (!data.playlistId) {
 				if ($playerAutoplayNextByDefaultStore) {
 					goto(
-						`${base}/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`,
+						resolve(`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`),
 						{ replaceState: $isAndroidTvStore }
 					);
 				}
@@ -740,7 +740,7 @@
 				}
 
 				goto(
-					`${base}/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`,
+					resolve(`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`),
 					{ replaceState: $isAndroidTvStore }
 				);
 			}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import { numberWithCommas } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { VideoPlay } from '$lib/api/model';
@@ -35,7 +35,7 @@
 			<article class="border">
 				<nav class="scroll">
 					{#each video.keywords as keyword}
-						<a href={`${base}/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
+						<a href={resolve(`/search/${encodeURIComponent(keyword)}`)} class="chip">{keyword}</a>
 					{/each}
 				</nav>
 			</article>

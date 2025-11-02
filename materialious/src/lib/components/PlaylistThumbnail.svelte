@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { base } from '$app/paths';
+	import { getBestThumbnail } from '$lib/images';
+	import { resolve } from '$app/paths';
 	import { letterCase } from '$lib/letterCasing';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -48,7 +49,7 @@
 </script>
 
 <a
-	href={base+playlistLink}
+	href={resolve(playlistLink)}
 	class:link-disabled={disabled}
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
@@ -77,11 +78,11 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a class:link-disabled={disabled} href={base+playlistLink}
+			<a class:link-disabled={disabled} href={resolve(playlistLink)}
 				><div class="bold">{letterCase(truncate(playlist.title))}</div></a
 			>
 			<div>
-				<a class:link-disabled={playlist.authorId === null} href={`${base}/channel/${playlist.authorId}`}
+				<a class:link-disabled={playlist.authorId === null} href={resolve(`/channel/${playlist.authorId}`)}
 					>{playlist.author}</a
 				>
 			</div>

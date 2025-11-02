@@ -26,10 +26,10 @@ export function decodeHtmlCharCodes(str: string): string {
 
 export function proxyVideoUrl(source: string): string {
 	let videoUrl = new URL(source);
-	const instURL = new URL(get(instanceStore));
-	videoUrl.host = instURL.host;
-	videoUrl.protocol = instURL.protocol;
-	let pathPrefix = instURL.pathname;
+	const instUrl = new URL(get(instanceStore));
+	videoUrl.host = instUrl.host;
+	videoUrl.protocol = instUrl.protocol;
+	let pathPrefix = instUrl.pathname;
 	if (pathPrefix.endsWith("/")) {
 		pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1);
 	}

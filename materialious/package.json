@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.10.17",
+	"version": "1.10.18",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -68,6 +68,6 @@
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"svelte-persisted-store": "^0.12.0",
-		"youtubei.js": "^16.0.0"
+		"youtubei.js": "^16.0.1"
 	}
 }

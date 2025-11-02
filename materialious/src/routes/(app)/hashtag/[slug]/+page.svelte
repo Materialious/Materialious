@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getHashtag } from '$lib/api';
-	import type { Video } from '$lib/api/model.js';
+	import type { Video } from '$lib/api/model';
 	import ItemsList from '$lib/components/ItemsList.svelte';
 	import { onMount } from 'svelte';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';

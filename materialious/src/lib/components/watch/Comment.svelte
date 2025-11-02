@@ -95,11 +95,9 @@
 	{/if}
 
 	{#if replies}
-		<div style="margin-left: 5em;">
-			{#each replies.comments as reply}
-				<CommentSelf comment={reply} {videoId} isSubComp={true} />
-			{/each}
-		</div>
+		{#each replies.comments as reply}
+			<CommentSelf comment={reply} {videoId} isSubComp={true} />
+		{/each}
 	{/if}
 </article>
 

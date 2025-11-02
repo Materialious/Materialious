@@ -6,8 +6,8 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import { extractUniqueId } from '$lib/misc.js';
-	import { feedLastItemId, searchCacheStore } from '$lib/store.js';
+	import { extractUniqueId } from '$lib/misc';
+	import { feedLastItemId, searchCacheStore } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';

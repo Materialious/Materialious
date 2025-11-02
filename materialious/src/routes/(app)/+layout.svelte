@@ -10,7 +10,7 @@
 	import Logo from '$lib/components/Logo.svelte';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import Search from '$lib/components/Search.svelte';
-	import Settings from '$lib/components/Settings/Settings.svelte';
+	import Settings from '$lib/components/settings/Settings.svelte';
 	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import '$lib/css/global.css';

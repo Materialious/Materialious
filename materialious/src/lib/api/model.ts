@@ -36,7 +36,6 @@ export interface Video extends VideoBase {
 	authorVerified: boolean;
 	description: string;
 	descriptionHtml: string;
-	viewCount: number;
 	published: number;
 	publishedText: string;
 	premiereTimestamp: number;
@@ -91,6 +90,7 @@ export interface VideoPlay extends Video {
 	keywords: string[];
 	likeCount: number;
 	dislikeCount: number;
+	viewCount: number;
 	subCountText: string;
 	allowRatings: boolean;
 	rating: number;

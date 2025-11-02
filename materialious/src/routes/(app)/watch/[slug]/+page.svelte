@@ -7,7 +7,6 @@
 		removePlaylistVideo
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
-	import Comment from '$lib/components/Comment.svelte';
 	import Player from '$lib/components/Player.svelte';
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
@@ -15,7 +14,7 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
-	import type { PlayerEvents } from '$lib/player.js';
+	import type { PlayerEvents } from '$lib/player';
 	import {
 		authStore,
 		interfaceAutoExpandChapters,
@@ -32,11 +31,12 @@
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { loadEntirePlaylist } from '$lib/playlist.js';
-	import Author from '$lib/components/Watch/Author.svelte';
-	import Description from '$lib/components/Watch/Description.svelte';
-	import { expandSummery } from '$lib/misc.js';
-	import LikesDislikes from '$lib/components/Watch/LikesDislikes.svelte';
+	import { loadEntirePlaylist } from '$lib/playlist';
+	import Author from '$lib/components/watch/Author.svelte';
+	import Description from '$lib/components/watch/Description.svelte';
+	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
+	import Comment from '$lib/components/watch/Comment.svelte';
+	import { expandSummery } from '$lib/misc';
 
 	let { data = $bindable() } = $props();
 

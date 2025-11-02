@@ -25,18 +25,17 @@ export function decodeHtmlCharCodes(str: string): string {
 }
 
 export function proxyVideoUrl(source: string): string {
-	const rawSrc = new URL(source);
-	const instURLStr = get(instanceStore);
-	const instURL = new URL(instURLStr);
-	rawSrc.host = instURL.host;
-	rawSrc.protocol = instURL.protocol;
+	let videoUrl = new URL(source);
+	const instURL = new URL(get(instanceStore));
+	videoUrl.host = instURL.host;
+	videoUrl.protocol = instURL.protocol;
 	let pathPrefix = instURL.pathname;
 	if (pathPrefix.endsWith("/")) {
 		pathPrefix = pathPrefix.substring(0, pathPrefix.length - 1);
 	}
-	rawSrc.pathname = pathPrefix + rawSrc.pathname;
+	videoUrl.pathname = pathPrefix + videoUrl.pathname;
 
-	return rawSrc.toString();
+	return videoUrl.toString();
 }
 
 export function unsafeRandomItem(array: any[]): any {

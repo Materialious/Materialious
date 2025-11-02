@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { numberWithCommas } from '$lib/numbers';
+	import { cleanNumber } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { VideoPlay } from '$lib/api/model';
 	import { onMount } from 'svelte';
@@ -19,7 +19,7 @@
 	<summary id="description" class="bold none">
 		<nav>
 			<div class="max">
-				{numberWithCommas(video.viewCount)}
+				{cleanNumber(video.viewCount)}
 				{$_('views')} • {video.publishedText}
 			</div>
 		</nav>

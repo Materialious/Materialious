@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { cleanNumber, videoLength } from '$lib/numbers';
+	import { videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
@@ -226,7 +226,7 @@
 
 				{#if 'publishedText' in video}
 					<div class="max">
-						{cleanNumber(video.viewCount)} • {video.publishedText}
+						{video.viewCountText} • {video.publishedText}
 					</div>
 				{/if}
 			</div>

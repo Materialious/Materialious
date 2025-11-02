@@ -1,5 +1,5 @@
-import { isTvRouteLoading } from '$lib/store.js';
-import { getWatchDetails } from '$lib/watch.js';
+import { isTvRouteLoading } from '$lib/store';
+import { getWatchDetails } from '$lib/watch';
 
 export async function load({ params, url }) {
 	isTvRouteLoading.set(true);

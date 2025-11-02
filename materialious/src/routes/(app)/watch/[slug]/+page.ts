@@ -1,4 +1,4 @@
-import { getWatchDetails } from '$lib/watch.js';
+import { getWatchDetails } from '$lib/watch';
 
 export async function load({ params, url }) {
 	return getWatchDetails(params.slug, url);

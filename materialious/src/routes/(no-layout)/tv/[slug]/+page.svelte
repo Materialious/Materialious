@@ -1,15 +1,14 @@
 <script lang="ts">
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import Player from '$lib/components/Player.svelte';
-	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import Author from '$lib/components/Watch/Author.svelte';
-	import Description from '$lib/components/Watch/Description.svelte';
-	import LikesDislikes from '$lib/components/Watch/LikesDislikes.svelte';
-	import { letterCase } from '$lib/letterCasing.js';
+	import Author from '$lib/components/watch/Author.svelte';
+	import Description from '$lib/components/watch/Description.svelte';
+	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
+	import { letterCase } from '$lib/letterCasing';
 	import Mousetrap from 'mousetrap';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import { playlistCacheStore } from '$lib/store.js';
+	import { playlistCacheStore } from '$lib/store';
 	import { fade } from 'svelte/transition';
 	import ItemsList from '$lib/components/ItemsList.svelte';
 

@@ -1,4 +1,4 @@
-import { loadEntirePlaylist } from '$lib/playlist.js';
+import { loadEntirePlaylist } from '$lib/playlist';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {

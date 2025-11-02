@@ -4,8 +4,8 @@ import androidTv from '$lib/android/plugins/androidTv';
 import { getResolveUrl } from '$lib/api';
 import '$lib/i18n'; // Import to initialize. Important :)
 import { initI18n } from '$lib/i18n';
-import { getPages } from '$lib/navPages.js';
-import { authStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store.js';
+import { getPages } from '$lib/navPages';
+import { authStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store';
 import { get } from 'svelte/store';
 
 export const ssr = false;

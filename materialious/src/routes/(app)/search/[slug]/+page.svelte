@@ -1,12 +1,6 @@
 <script lang="ts">
-	import { getSearch } from '$lib/api';
-	import ChannelThumbnail from '$lib/components/ChannelThumbnail.svelte';
-	import ContentColumn from '$lib/components/ContentColumn.svelte';
-	import HashtagThumbnail from '$lib/components/HashtagThumbnail.svelte';
+	import { getSearch, type SearchOptions } from '$lib/api';
 	import PageLoading from '$lib/components/PageLoading.svelte';
-	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
-	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import { extractUniqueId } from '$lib/misc';
 	import { feedLastItemId, searchCacheStore } from '$lib/store';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -15,8 +9,59 @@
 
 	let { data } = $props();
 
-	let currentType: 'playlist' | 'all' | 'video' | 'channel' = $state('all');
 	let currentPage = 1;
+
+	let filtersOpen = $state(false);
+
+	let searchOptions: SearchOptions = $state({
+		type: 'all',
+		page: currentPage.toString(),
+		sort_by: 'relevance'
+	});
+
+	const filters: {
+		options: string[];
+		title: string;
+		key: 'type' | 'date' | 'duration' | 'sort_by' | 'features';
+	}[] = $state([
+		{
+			options: ['all', 'video', 'playlist', 'channel'],
+			title: $_('filters.type'),
+			key: 'type'
+		},
+		{
+			options: ['hour', 'today', 'week', 'month', 'year'],
+			title: $_('filters.uploadDate'),
+			key: 'date'
+		},
+		{
+			options: ['short', 'medium', 'long'],
+			title: $_('filters.duration'),
+			key: 'duration'
+		},
+		{
+			options: ['relevance', 'rating', 'upload_date', 'view_count'],
+			title: $_('filters.sortBy'),
+			key: 'sort_by'
+		},
+		{
+			options: [
+				'hd',
+				'subtitles',
+				'creative_commons',
+				'3d',
+				'live',
+				'purchased',
+				'4k',
+				'360',
+				'location',
+				'hdr',
+				'vr180'
+			],
+			title: $_('filters.features'),
+			key: 'features'
+		}
+	]);
 
 	onMount(() => {
 		if ($feedLastItemId) {
@@ -28,19 +73,18 @@
 		}
 	});
 
-	async function changeType(type: 'playlist' | 'all' | 'video' | 'channel') {
-		currentType = type;
-		currentPage = 1;
-		data.searchStoreId = type + data.slug;
-		searchCacheStore.set({ [data.searchStoreId]: await getSearch(data.slug, { type: type }) });
+	async function updateSearch() {
+		data.searchStoreId = JSON.stringify(searchOptions) + data.slug;
+		searchCacheStore.set({ [data.searchStoreId]: await getSearch(data.slug, searchOptions) });
 	}
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
-		const newSearch = await getSearch(data.slug, {
-			page: currentPage.toString(),
-			type: currentType
-		});
+		searchOptions = {
+			...searchOptions,
+			page: currentPage.toString()
+		};
+		const newSearch = await getSearch(data.slug, searchOptions);
 
 		if (newSearch.length === 0) {
 			event.detail.complete();
@@ -53,38 +97,58 @@
 	}
 </script>
 
-<div style="margin-bottom: 1em;">
-	<div class="tabs left-align min scroll">
-		<a class:active={currentType === 'all'} href="#all" onclick={async () => changeType('all')}>
-			<i>home</i>
-			<span>{$_('videoTabs.all')}</span>
-		</a>
-		<a
-			class:active={currentType === 'video'}
-			href="#videos"
-			onclick={async () => changeType('video')}
-		>
-			<i>movie</i>
-			<span>{$_('videoTabs.videos')}</span>
-		</a>
-		<a
-			class:active={currentType === 'playlist'}
-			href="#playlists"
-			onclick={async () => changeType('playlist')}
-		>
-			<i>playlist_add_check</i>
-			<span>{$_('videoTabs.playlists')}</span>
-		</a>
-		<a
-			class:active={currentType === 'channel'}
-			href="#channels"
-			onclick={async () => changeType('channel')}
-		>
-			<i>person</i>
-			<span>{$_('videoTabs.channels')}</span>
-		</a>
-	</div>
-</div>
+<details open={filtersOpen}>
+	<summary>
+		<nav>
+			<button
+				class="secondary"
+				onclick={() => {
+					filtersOpen = !filtersOpen;
+				}}
+			>
+				<i>filter_alt</i>
+				<span>{$_('filters.filters')}</span>
+			</button>
+		</nav>
+	</summary>
+	<article class="scroll medium">
+		<div class="grid">
+			{#each filters as filter}
+				<div class="s12 m2 l2">
+					<h6>{filter.title}</h6>
+					<ul class="list no-margin no-padding">
+						{#each filter.options as filterOption}
+							<li>
+								<button
+									class="small border"
+									style="text-transform: capitalize;"
+									disabled={filter.key !== 'type' &&
+										!['all', 'video', undefined].includes(searchOptions.type)}
+									class:active={filterOption === searchOptions[filter.key]}
+									onclick={async () => {
+										if (filterOption === searchOptions[filter.key]) {
+											delete searchOptions[filter.key];
+										} else {
+											searchOptions = {
+												...searchOptions,
+												[filter.key]: filterOption
+											};
+										}
+										await updateSearch();
+									}}
+								>
+									<span>{filterOption.replaceAll('_', ' ')}</span>
+								</button>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/each}
+		</div>
+	</article>
+</details>
+
+<div class="space"></div>
 
 {#if $searchCacheStore[data.searchStoreId]}
 	<ItemsList items={$searchCacheStore[data.searchStoreId]} />

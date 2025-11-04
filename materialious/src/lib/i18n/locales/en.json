@@ -15,6 +15,14 @@
 	"videos": "videos",
 	"cancel": "Cancel",
 	"create": "Create",
+	"filters": {
+		"filters": "Filters",
+		"type": "Type",
+		"uploadDate": "Upload date",
+		"duration": "Duration",
+		"sortBy": "Short By",
+		"features": "Features"
+	},
 	"title": "Title",
 	"searchPlaceholder": "Search",
 	"delete": "Delete",

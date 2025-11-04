@@ -263,7 +263,9 @@
 					}}
 				>
 					{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream'}
-						<Thumbnail video={item} {playlistId} />
+						{#key item.videoId}
+							<Thumbnail video={item} {playlistId} />
+						{/key}
 						{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in item}
 							<div class="right-align" style="margin: 1em .5em;">
 								<button

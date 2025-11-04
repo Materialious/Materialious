@@ -29,6 +29,10 @@ button,
 	margin: 1em 0;
 }
 
+.video-actions button {
+	margin: 0.3em;
+}
+
 nav.top {
 	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 	padding-bottom: 1em;

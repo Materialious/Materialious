@@ -14,6 +14,11 @@ import type {
 	VideoBase
 } from './api/model';
 
+export function isVideoID(videoId: string): boolean {
+	var regExp = /^[a-zA-Z0-9_-]{11}$/;
+	return regExp.test(videoId);
+}
+
 export function truncate(value: string, maxLength: number = 50): string {
 	return value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
 }

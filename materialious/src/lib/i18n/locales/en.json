@@ -1,6 +1,7 @@
 {
 	"enabled": "Enabled",
 	"disabled": "Disabled",
+	"popularPageDisabled": "Popular page has been disabled by Admins",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",

@@ -366,13 +366,13 @@
 		<h5>{letterCase(data.video.title)}</h5>
 
 		<div class="grid no-padding">
-			<div class="s12 m12 l5">
+			<div class="s12 m12 l5" style="height: 100%;display: flex;align-items: center;">
 				<Author video={data.video} bind:subscribed />
 			</div>
 			<div class="s12 m12 l7 video-actions">
-				<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
-
 				<div>
+					<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
+
 					<button onclick={toggleTheatreMode} class="m l" class:border={!theatreMode}>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
@@ -438,7 +438,7 @@
 							</menu>
 						</button>
 					{:else}
-						<button disabled class="border no-margin">
+						<button disabled class="border">
 							<i>add</i>
 							<div class="tooltip">
 								{#if $authStore}
@@ -467,6 +467,7 @@
 							</div>
 						</nav>
 					</summary>
+					<div class="space"></div>
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
@@ -676,26 +677,10 @@
 		justify-content: flex-end;
 	}
 
-	.video-actions button:not(.left-round):not(.right-round) {
-		margin: 0.3em;
-	}
-
 	@media screen and (max-width: 1000px) {
 		.video-actions {
 			align-items: flex-start;
 			flex-direction: column;
-		}
-
-		.video-actions > div {
-			margin-top: 1em;
-		}
-
-		nav.group {
-			flex-direction: column;
-		}
-
-		nav.group button {
-			border-radius: 0.5rem !important;
 		}
 	}
 

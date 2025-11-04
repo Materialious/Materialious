@@ -26,9 +26,11 @@
 
 		let imgSrc = '';
 
+		console.log(playlist);
+
 		if (playlist.videos.length > 0) {
 			imgSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
-		} else if (playlist.playlistThumbnail) {
+		} else if (playlist.playlistThumbnail.length > 0) {
 			imgSrc = playlist.playlistThumbnail;
 		} else {
 			imgSrc = '';

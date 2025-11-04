@@ -3,7 +3,7 @@ import os
 import re
 from datetime import datetime
 
-LATEST_VERSION = "1.11.0"
+LATEST_VERSION = "1.11.1"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")

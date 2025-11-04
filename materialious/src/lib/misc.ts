@@ -23,13 +23,6 @@ export function decodeHtmlCharCodes(str: string): string {
 	return decode(str);
 }
 
-export function proxyVideoUrl(source: string): string {
-	const rawSrc = new URL(source);
-	rawSrc.host = get(instanceStore).replace('http://', '').replace('https://', '');
-
-	return rawSrc.toString();
-}
-
 export function unsafeRandomItem(array: any[]): any {
 	return array[Math.floor(Math.random() * array.length)];
 }

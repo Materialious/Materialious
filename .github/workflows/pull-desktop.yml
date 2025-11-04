@@ -1,59 +1,50 @@
 name: Check desktop
 
 on:
-  pull_request:
-    branches: ["main"]
+    pull_request:
+        branches: ["main"]
 
-  workflow_dispatch:
+    workflow_dispatch:
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  desktop-check:
-    strategy:
-      matrix:
-        node-version: [latest]
-        runtime:
-          - linux-x64
-          - linux-arm64
-          - win-x64
-          - osx-x64
+    desktop-check:
+        strategy:
+            matrix:
+                node-version: [latest]
+                runtime:
+                    - osx-x64
 
-        include:
-          - runtime: linux-x64
-            os: ubuntu-latest
-          - runtime: linux-arm64
-            os: ubuntu-latest
-          - runtime: osx-x64
-            os: macOS-latest
-          - runtime: win-x64
-            os: windows-latest
+                include:
+                    - runtime: osx-x64
+                      os: macOS-latest
 
-    runs-on: ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
 
-      - name: Install modules
-        run: cd ./materialious && npm install
+            - name: Install modules
+              run: cd ./materialious && npm install
 
-      - name: Build package
-        run: cd ./materialious && npm run build
+            - name: Build package
+              run: cd ./materialious && npm run build
 
-      - name: Sync electron package
-        run: cd ./materialious && npx cap sync @capacitor-community/electron
+            - name: Sync electron package
+              run: cd ./materialious && npx cap sync @capacitor-community/electron
 
-      - name: Patch capacitor plugin
-        run: cd ./materialious/electron && python patch_capacitor_plugin.py
+            - name: Patch capacitor plugin
+              run: cd ./materialious/electron && python patch_capacitor_plugin.py
 
-      - name: Install electron modules
-        run: cd ./materialious/electron && npm install
+            - name: Install electron modules
+              run: cd ./materialious/electron && npm install
 
-      - name: Build desktop packages
-        run: cd ./materialious/electron && npm run electron:make-no-publish
+            - name: Build desktop packages
+              run: cd ./materialious/electron && npm run electron:make-no-publish

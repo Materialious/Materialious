@@ -49,7 +49,9 @@
         "private": "Privat",
         "playVideos": "Videos abspielen",
         "shuffleVideos": "Videos in zufälliger Reihenfolge abspielen",
-        "loopPlaylist": "Wiedergabeliste in Schleife abspielen"
+        "loopPlaylist": "Wiedergabeliste in Schleife abspielen",
+        "next": "Weiter",
+        "previous": "Vorheriges"
     },
     "thumbnail": {
         "live": "LIVE",
@@ -98,7 +100,8 @@
         "enableYoutubejsTemp": "Nutze einmalig den lokalen Video-Fallback",
         "chapters": "Kapitel",
         "retryText": "Das Video konnte nicht geladen werden, wie möchtest du weiterfahren?",
-        "youtubeJsLoading": "Das Video konnte nicht geladen werden, es wird mit lokalem Video-Fallback erneut versucht."
+        "youtubeJsLoading": "Das Video konnte nicht geladen werden, es wird mit lokalem Video-Fallback erneut versucht.",
+        "premiere": "Video wird verfügbar sein"
     },
     "layout": {
         "interface": "Benutzeroberfläche",
@@ -188,5 +191,14 @@
     "premium": "YouTube-Premium-Inhalte können auf Materialious nicht angeschaut werden.",
     "isUpcoming": "Video ist noch nicht in einem anschaubaren Zustand.",
     "version": "Version",
-    "contributors": "Mitwirkende"
+    "contributors": "Mitwirkende",
+    "popularPageDisabled": "Die Seite „Populär“ wurde von den Administratoren deaktiviert",
+    "filters": {
+        "filters": "Filter",
+        "type": "Typ",
+        "uploadDate": "Hochladedatum",
+        "duration": "Dauer",
+        "sortBy": "Sortieren nach",
+        "features": "Eigenschaften"
+    }
 }

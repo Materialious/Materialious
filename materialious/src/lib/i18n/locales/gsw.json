@@ -135,7 +135,9 @@
         "private": "Privat",
         "playVideos": "Videos abspiele",
         "loopPlaylist": "Widergabelischte inere Schleife abspiele",
-        "shuffleVideos": "Videos in zuefälliger Reihefolg abspiele"
+        "shuffleVideos": "Videos in zuefälliger Reihefolg abspiele",
+        "next": "Wiiter",
+        "previous": "Vorherigs"
     },
     "pages": {
         "home": "Startsiite",
@@ -179,7 +181,8 @@
         "retryText": "S Video het nöd chönne glade werde, wie willsch wiitermache?",
         "enableYoutubejsPerm": "Lokale Video-Fallback immer erlaube",
         "enableYoutubejsTemp": "Nutz eimalig de lokali Video-Fallback",
-        "youtubeJsFallBack": "Lokale Video-Fallback wird gnutzt"
+        "youtubeJsFallBack": "Lokale Video-Fallback wird gnutzt",
+        "premiere": "Video wird verfüegbar sii"
     },
     "subscribe": "Abonniere",
     "invidiousLogin": "Bitte meld dich mit dim Invidious-Konto aa",
@@ -188,5 +191,14 @@
     "isUpcoming": "Video isch nonig imene aaluegbare Zuestand.",
     "premium": "YouTube-Premium-Inhält chönd uf Materialious nonig aagluegt werde.",
     "version": "Version",
-    "contributors": "Mitwirkendi"
+    "contributors": "Mitwirkendi",
+    "popularPageDisabled": "D Siite «Populär» isch vo de Administratore deaktiviert worde",
+    "filters": {
+        "filters": "Filter",
+        "type": "Typ",
+        "uploadDate": "Hochladedatum",
+        "duration": "Duur",
+        "sortBy": "Sortiere nach",
+        "features": "Eigeschafte"
+    }
 }

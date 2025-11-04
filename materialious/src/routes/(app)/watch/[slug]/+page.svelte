@@ -13,11 +13,12 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
-	import type { PlayerEvents } from '$lib/player';
+	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player';
 	import {
 		authStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
+		playerPlaylistHistory,
 		playerTheatreModeByDefaultStore,
 		playlistCacheStore,
 		playlistSettingsStore,
@@ -219,6 +220,7 @@
 	onMount(async () => {
 		if (data.playlistId) {
 			await goToCurrentPlaylistItem();
+			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
 		}
 
 		if ($interfaceAutoExpandChapters) {
@@ -571,6 +573,21 @@
 								<i>shuffle</i>
 								<div class="tooltip bottom">
 									{$_('playlist.shuffleVideos')}
+								</div>
+							</button>
+							<button class="circle fill" onclick={() => goToPreviousVideo(data.playlistId)}>
+								<i>skip_previous</i>
+								<div class="tooltip bottom">
+									{$_('playlist.previous')}
+								</div>
+							</button>
+							<button
+								class="circle fill"
+								onclick={async () => await goToNextVideo(data.video, data.playlistId)}
+							>
+								<i>skip_next</i>
+								<div class="tooltip bottom">
+									{$_('playlist.next')}
 								</div>
 							</button>
 						</nav>

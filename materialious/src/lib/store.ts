@@ -58,6 +58,8 @@ export const playerCCByDefault = persisted('CCByDefault', false);
 export const playerDefaultPlaybackSpeed: Writable<number> = persisted('defaultPlaybackSpeed', 1);
 export const playerStatisticsByDefault = persisted('playerStatistics', false);
 
+export const playerPlaylistHistory: Writable<string[]> = writable([]);
+
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
 	'returnYTDislikesInstance',

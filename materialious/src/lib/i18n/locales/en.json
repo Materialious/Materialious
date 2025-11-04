@@ -68,7 +68,9 @@
 		"private": "Private",
 		"playVideos": "Play videos",
 		"shuffleVideos": "Play videos shuffled",
-		"loopPlaylist": "Loop playlist"
+		"loopPlaylist": "Loop playlist",
+		"next": "Next",
+		"previous": "Previous"
 	},
 	"thumbnail": {
 		"live": "LIVE",

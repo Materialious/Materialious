@@ -106,6 +106,15 @@ http:
 ### Invidious Companion support
 The `VITE_DEFAULT_COMPANION_INSTANCE` environment variable allows you to specify a custom [Invidious Companion](https://github.com/iv-org/invidious-companion) instance.
 
+`public_url` **MUST** be set in Invidious under **invidious_companion** for companion to work with Materialious.
+
+e.g.
+```yml
+invidious_companion:
+  - private_url: "http://companion:8282/companion"
+    public_url:  "http://companion.example.com/companion"
+```
+
 To use this with Materialious, your Invidious Companion instance must be accessible with proper CORS headers. Fortunately, you can reuse the same reverse proxy configuration (with CORS modifications) that you applied to your Invidious instance—just apply it to your companion domain as well.
 
 For example, if you're using Caddy, you can configure your companion domain like this:

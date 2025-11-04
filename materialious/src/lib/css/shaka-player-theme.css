@@ -7,6 +7,11 @@
 	color: var(--on-surface) !important;
 }
 
+.shaka-current-time {
+	color: #fff !important;
+	opacity: 1 !important;
+}
+
 .player-theme .shaka-video-container * {
 	font-family: var(--font) !important;
 	color: var(--on-surface) !important;

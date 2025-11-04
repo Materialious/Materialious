@@ -327,12 +327,11 @@
 			// Due to CORs issues with redirects, hosted instances of Materialious
 			// dirctly provide the companion instance
 			// while clients can just use the reirect provided by Invidious' API
-			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && Capacitor.getPlatform() === 'web') {
+			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
 				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
 			} else {
 				if (!data.video.dashUrl) {
 					error(500, 'No dash manifest found');
-					return;
 				}
 				dashUrl = data.video.dashUrl;
 			}
@@ -353,9 +352,19 @@
 			}
 
 			if (data.video.captions) {
+				console.log(data.video.captions);
 				for (const caption of data.video.captions) {
+					let captionUrl: string;
+					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
+						captionUrl = caption.url.startsWith('http')
+							? caption.url
+							: `${get(instanceStore)}${caption.url}`;
+					} else {
+						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}${caption.url}`;
+					}
+
 					await player.addTextTrackAsync(
-						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
+						captionUrl,
 						caption.language_code,
 						'captions',
 						undefined,
@@ -706,10 +715,15 @@
 		try {
 			await loadVideo();
 		} catch (error: unknown) {
-			if (!Capacitor.isNativePlatform() || data.video.fallbackPatch === 'youtubejs') return;
-			showVideoRetry = true;
+			if (
+				!Capacitor.isNativePlatform() ||
+				data.video.fallbackPatch === 'youtubejs' ||
+				(error as shaka.extern.Error).code !== 1001
+			)
+				return;
 
-			if ((error as shaka.extern.Error).code === 1001 && $playerYouTubeJsFallback) {
+			showVideoRetry = true;
+			if ($playerYouTubeJsFallback) {
 				await reloadVideo();
 			}
 		}

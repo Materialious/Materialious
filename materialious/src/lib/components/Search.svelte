@@ -10,6 +10,8 @@
 		isAndroidTvStore,
 		searchHistoryStore
 	} from '../store';
+	import { isVideoID } from '$lib/misc';
+	import { resolve } from '$app/paths';
 
 	const dispatch = createEventDispatcher();
 
@@ -37,22 +39,30 @@
 	}
 
 	function handleSubmit(event: Event | undefined = undefined) {
-		if (event) event.preventDefault();
+		event?.preventDefault();
 
-		if (search.trim() === '') return;
+		const searchTrimed = search.trim();
+
+		if (!searchTrimed) return;
+
+		if (isVideoID(searchTrimed)) {
+			// Go directly to video if Video ID provided
+			goto(resolve('/watch/[videoId]', { videoId: searchTrimed }));
+			return;
+		}
 
 		selectedSuggestionIndex = -1;
-		goto(`/search/${encodeURIComponent(search)}`);
+		goto(`/search/${encodeURIComponent(searchTrimed)}`);
 
 		suggestionsForSearch = [];
 		showSearchBox = false;
 
-		if ($interfaceSearchHistoryEnabled && !$searchHistoryStore.includes(search)) {
+		if ($interfaceSearchHistoryEnabled && !$searchHistoryStore.includes(searchTrimed)) {
 			let pastHistory = $searchHistoryStore;
 			if (pastHistory.length > 15) {
 				pastHistory.pop();
 			}
-			searchHistoryStore.set([search, ...pastHistory]);
+			searchHistoryStore.set([searchTrimed, ...pastHistory]);
 		}
 	}
 

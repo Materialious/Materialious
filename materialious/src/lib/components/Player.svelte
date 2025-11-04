@@ -47,7 +47,7 @@
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
-	import { playbackRates } from '$lib/player';
+	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 	import { loadEntirePlaylist } from '$lib/playlist';
 	import { goto } from '$app/navigation';
@@ -602,6 +602,16 @@
 				playerElement.pause();
 				playerElement.currentTime = 0;
 			});
+
+			if (data.playlistId) {
+				navigator.mediaSession.setActionHandler('previoustrack', () => {
+					goToPreviousVideo(data.playlistId);
+				});
+
+				navigator.mediaSession.setActionHandler('nexttrack', async () => {
+					await goToNextVideo(data.video, data.playlistId);
+				});
+			}
 		}
 
 		Mousetrap.bind('space', () => {
@@ -690,59 +700,7 @@
 		});
 
 		playerElement?.addEventListener('ended', async () => {
-			if (!data.playlistId) {
-				if ($playerAutoplayNextByDefaultStore) {
-					goto(
-						`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`,
-						{ replaceState: $isAndroidTvStore }
-					);
-				}
-
-				return;
-			}
-
-			const playlist = await loadEntirePlaylist(data.playlistId);
-			const playlistVideoIds = playlist.videos.map((value) => {
-				return value.videoId;
-			});
-
-			let goToVideo: PlaylistPageVideo | undefined;
-
-			const shufflePlaylist = $playlistSettingsStore[data.playlistId]?.shuffle ?? false;
-			const loopPlaylist = $playlistSettingsStore[data.playlistId]?.loop ?? false;
-
-			if (shufflePlaylist) {
-				goToVideo = unsafeRandomItem(playlist.videos);
-			} else {
-				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
-				const newIndex = currentVideoIndex + 1;
-				if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
-					goToVideo = playlist.videos[newIndex];
-				} else if (loopPlaylist) {
-					// Loop playlist on end
-					goToVideo = playlist.videos[0];
-				}
-			}
-
-			if (typeof goToVideo !== 'undefined') {
-				if ($syncPartyConnectionsStore) {
-					$syncPartyConnectionsStore.forEach((conn) => {
-						if (typeof goToVideo === 'undefined') return;
-
-						conn.send({
-							events: [
-								{ type: 'change-video', videoId: goToVideo.videoId },
-								{ type: 'playlist', playlistId: data.playlistId }
-							]
-						} as PlayerEvents);
-					});
-				}
-
-				goto(
-					`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`,
-					{ replaceState: $isAndroidTvStore }
-				);
-			}
+			await goToNextVideo(data.video, data.playlistId);
 		});
 
 		try {
@@ -863,7 +821,7 @@
 </div>
 
 {#if showVideoRetry}
-	<article class="fallback">
+	<article class="video-placeholder">
 		{#if $playerYouTubeJsFallback}
 			<p>{$_('player.youtubeJsLoading')}</p>
 			<progress class="circle large"></progress>
@@ -929,14 +887,5 @@
 
 	.hide {
 		display: none;
-	}
-
-	.fallback {
-		height: 30vh;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 	}
 </style>

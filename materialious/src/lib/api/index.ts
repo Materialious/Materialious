@@ -179,13 +179,18 @@ export async function getHashtag(tag: string, page: number = 0): Promise<{ resul
 	return await resp.json();
 }
 
+export interface SearchOptions {
+	sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
+	type?: 'video' | 'playlist' | 'channel' | 'all';
+	duration?: 'short' | 'medium' | 'long';
+	date?: 'hour' | 'today' | 'week' | 'month' | 'year';
+	features?: string;
+	page?: string;
+}
+
 export async function getSearch(
 	search: string,
-	options: {
-		sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
-		type?: 'video' | 'playlist' | 'channel' | 'all';
-		page?: string;
-	},
+	options: SearchOptions,
 	fetchOptions?: RequestInit
 ): Promise<(Channel | Video | Playlist | HashTag)[]> {
 	if (typeof options.sort_by === 'undefined') {
@@ -193,7 +198,7 @@ export async function getSearch(
 	}
 
 	if (typeof options.type === 'undefined') {
-		options.type = 'video';
+		options.type = 'all';
 	}
 
 	if (typeof options.page === 'undefined') {

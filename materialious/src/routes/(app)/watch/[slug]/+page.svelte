@@ -13,11 +13,12 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
-	import type { PlayerEvents } from '$lib/player';
+	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player';
 	import {
 		authStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
+		playerPlaylistHistory,
 		playerTheatreModeByDefaultStore,
 		playlistCacheStore,
 		playlistSettingsStore,
@@ -36,6 +37,9 @@
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery } from '$lib/misc';
+	import { humanFriendlyTimestamp } from '$lib/time.js';
+	import { getWatchDetails } from '$lib/watch.js';
+	import { page } from '$app/state';
 
 	let { data = $bindable() } = $props();
 
@@ -64,6 +68,9 @@
 	let showTranscript = $state(false);
 
 	let playerCurrentTime: number = $state(0);
+
+	let premiereTime = $state('');
+	let premiereUpdateInterval: NodeJS.Timeout;
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
@@ -213,6 +220,7 @@
 	onMount(async () => {
 		if (data.playlistId) {
 			await goToCurrentPlaylistItem();
+			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
 		}
 
 		if ($interfaceAutoExpandChapters) {
@@ -231,6 +239,19 @@
 				playerCurrentTime = playerElement.currentTime;
 			});
 		}
+
+		if (data.video.premiereTimestamp) {
+			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+			premiereUpdateInterval = setInterval(async () => {
+				data = await getWatchDetails(data.video.videoId, page.url);
+
+				if (data.video.premiereTimestamp) {
+					premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+				} else {
+					clearInterval(premiereUpdateInterval);
+				}
+			}, 60000);
+		}
 	});
 
 	onDestroy(() => {
@@ -239,6 +260,10 @@
 
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);
+		}
+
+		if (premiereUpdateInterval) {
+			clearInterval(premiereUpdateInterval);
 		}
 	});
 
@@ -319,9 +344,23 @@
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#key data.video.videoId}
-				<Player bind:playerElement bind:segments {data} isSyncing={$syncPartyPeerStore !== null} />
-			{/key}
+			{#if !data.video.premiereTimestamp}
+				{#key data.video.videoId}
+					<Player
+						bind:playerElement
+						bind:segments
+						{data}
+						isSyncing={$syncPartyPeerStore !== null}
+					/>
+				{/key}
+			{:else}
+				<article class="video-placeholder">
+					<p>{$_('player.premiere')}</p>
+					<h6 class="no-margin no-padding">
+						{premiereTime}
+					</h6>
+				</article>
+			{/if}
 		</div>
 
 		<h5>{letterCase(data.video.title)}</h5>
@@ -534,6 +573,21 @@
 								<i>shuffle</i>
 								<div class="tooltip bottom">
 									{$_('playlist.shuffleVideos')}
+								</div>
+							</button>
+							<button class="circle fill" onclick={() => goToPreviousVideo(data.playlistId)}>
+								<i>skip_previous</i>
+								<div class="tooltip bottom">
+									{$_('playlist.previous')}
+								</div>
+							</button>
+							<button
+								class="circle fill"
+								onclick={async () => await goToNextVideo(data.video, data.playlistId)}
+							>
+								<i>skip_next</i>
+								<div class="tooltip bottom">
+									{$_('playlist.next')}
 								</div>
 							</button>
 						</nav>

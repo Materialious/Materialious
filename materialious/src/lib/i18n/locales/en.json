@@ -1,8 +1,8 @@
 {
 	"enabled": "Enabled",
 	"disabled": "Disabled",
+	"popularPageDisabled": "Popular page has been disabled by Admins",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
-	"isUpcoming": "Video is not in a watchable state yet.",
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",
 	"views": "views",
@@ -15,6 +15,14 @@
 	"videos": "videos",
 	"cancel": "Cancel",
 	"create": "Create",
+	"filters": {
+		"filters": "Filters",
+		"type": "Type",
+		"uploadDate": "Upload date",
+		"duration": "Duration",
+		"sortBy": "Short By",
+		"features": "Features"
+	},
 	"title": "Title",
 	"searchPlaceholder": "Search",
 	"delete": "Delete",
@@ -60,7 +68,9 @@
 		"private": "Private",
 		"playVideos": "Play videos",
 		"shuffleVideos": "Play videos shuffled",
-		"loopPlaylist": "Loop playlist"
+		"loopPlaylist": "Loop playlist",
+		"next": "Next",
+		"previous": "Previous"
 	},
 	"thumbnail": {
 		"live": "LIVE",
@@ -82,6 +92,7 @@
 		"pauseTimer": "Pause timer",
 		"pauseVideoIn": "Pause video in ",
 		"preferredQuality": "Preferred quality",
+		"premiere": "Video will be available",
 		"chapters": "Chapters",
 		"share": {
 			"title": "Share",

@@ -30,10 +30,6 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		error(400, get(_)('premium'));
 	}
 
-	if (video.isUpcoming) {
-		error(400, get(_)('isUpcoming'));
-	}
-
 	let personalPlaylists;
 	if (get(authStore)) {
 		postHistory(video.videoId);

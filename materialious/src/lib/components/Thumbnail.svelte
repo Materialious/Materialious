@@ -20,9 +20,7 @@
 		synciousInstanceStore,
 		synciousStore
 	} from '../store';
-	import { goto } from '$app/navigation';
 	import { queueSyncious } from '$lib/api/apiExtended';
-	import { page } from '$app/state';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;

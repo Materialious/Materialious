@@ -51,6 +51,15 @@ dialog {
 	padding: 1em !important;
 }
 
+.video-placeholder {
+	height: 30vh;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;

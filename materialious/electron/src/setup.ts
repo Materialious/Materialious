@@ -5,6 +5,7 @@ import {
 	setupCapacitorElectronPlugins
 } from '@capacitor-community/electron';
 import { USER_AGENT } from 'bgutils-js';
+import path from 'node:path';
 import chokidar from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';
 import {
@@ -219,6 +220,34 @@ export class ElectronCapacitorApp {
 				CapElectronEventEmitter.emit('CAPELECTRON_DeeplinkListenerInitialized', '');
 			}, 400);
 		});
+
+		// remove so we can register each time as we run the app.
+		app.removeAsDefaultProtocolClient('materialious');
+
+		// If we are running a non-packaged version of the app && on windows
+		if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
+			// Set the path of electron.exe and your app.
+			// These two additional parameters are only available on windows.
+			app.setAsDefaultProtocolClient('materialious', process.execPath, [
+				path.resolve(process.argv[1])
+			]);
+		} else {
+			app.setAsDefaultProtocolClient('materialious');
+		}
+
+		const gotTheLock = app.requestSingleInstanceLock();
+
+		if (!gotTheLock) {
+			app.quit();
+		} else {
+			app.on('second-instance', (event, commandLine, workingDirectory) => {
+				// Someone tried to run a second instance, we should focus our window.
+				if (this.MainWindow) {
+					if (this.MainWindow.isMinimized()) this.MainWindow.restore();
+					this.MainWindow.focus();
+				}
+			});
+		}
 	}
 }
 

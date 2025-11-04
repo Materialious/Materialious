@@ -324,21 +324,38 @@
 
 			let dashUrl: string;
 
+			let usingCorsCompanionPatch =
+				import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && Capacitor.getPlatform() === 'web';
+			let usingCompanion = false;
+
 			// Due to CORs issues with redirects, hosted instances of Materialious
 			// dirctly provide the companion instance
 			// while clients can just use the reirect provided by Invidious' API
-			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && Capacitor.getPlatform() === 'web') {
+			if (usingCorsCompanionPatch) {
 				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
+				usingCompanion = true;
 			} else {
 				if (!data.video.dashUrl) {
 					error(500, 'No dash manifest found');
-					return;
 				}
 				dashUrl = data.video.dashUrl;
 			}
 
 			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || $playerProxyVideosStore)) {
 				dashUrl += '?local=true';
+			}
+
+			if (!usingCorsCompanionPatch) {
+				const dashUrlObject = new URL(dashUrl);
+				if (!dashUrlObject.pathname.includes('companion')) {
+					dashUrlObject.pathname = `/companion${dashUrlObject.pathname}`;
+
+					const companionTestResp = await fetch(dashUrlObject, { method: 'HEAD' });
+					if (companionTestResp.ok) {
+						dashUrl = dashUrlObject.toString();
+						usingCompanion = true;
+					}
+				}
 			}
 
 			if (
@@ -354,8 +371,17 @@
 
 			if (data.video.captions) {
 				for (const caption of data.video.captions) {
+					let captionUrl: string;
+					if (!usingCorsCompanionPatch) {
+						captionUrl = caption.url.startsWith('http')
+							? caption.url
+							: `${get(instanceStore)}${usingCompanion ? '/companion' : ''}${caption.url}`;
+					} else {
+						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/v1/captions/${data.video.videoId}`;
+					}
+
 					await player.addTextTrackAsync(
-						caption.url.startsWith('http') ? caption.url : `${get(instanceStore)}${caption.url}`,
+						captionUrl,
 						caption.language_code,
 						'captions',
 						undefined,

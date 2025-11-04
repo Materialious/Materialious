@@ -467,6 +467,7 @@
 							</div>
 						</nav>
 					</summary>
+					<div class="space"></div>
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}

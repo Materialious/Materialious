@@ -863,7 +863,7 @@
 </div>
 
 {#if showVideoRetry}
-	<article class="fallback">
+	<article class="video-placeholder">
 		{#if $playerYouTubeJsFallback}
 			<p>{$_('player.youtubeJsLoading')}</p>
 			<progress class="circle large"></progress>
@@ -929,14 +929,5 @@
 
 	.hide {
 		display: none;
-	}
-
-	.fallback {
-		height: 30vh;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 	}
 </style>

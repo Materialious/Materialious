@@ -36,6 +36,9 @@
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery } from '$lib/misc';
+	import { humanFriendlyTimestamp } from '$lib/time.js';
+	import { getWatchDetails } from '$lib/watch.js';
+	import { page } from '$app/state';
 
 	let { data = $bindable() } = $props();
 
@@ -64,6 +67,9 @@
 	let showTranscript = $state(false);
 
 	let playerCurrentTime: number = $state(0);
+
+	let premiereTime = $state('');
+	let premiereUpdateInterval: NodeJS.Timeout;
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
@@ -231,6 +237,19 @@
 				playerCurrentTime = playerElement.currentTime;
 			});
 		}
+
+		if (data.video.premiereTimestamp) {
+			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+			premiereUpdateInterval = setInterval(async () => {
+				data = await getWatchDetails(data.video.videoId, page.url);
+
+				if (data.video.premiereTimestamp) {
+					premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+				} else {
+					clearInterval(premiereUpdateInterval);
+				}
+			}, 60000);
+		}
 	});
 
 	onDestroy(() => {
@@ -239,6 +258,10 @@
 
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);
+		}
+
+		if (premiereUpdateInterval) {
+			clearInterval(premiereUpdateInterval);
 		}
 	});
 
@@ -319,9 +342,23 @@
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#key data.video.videoId}
-				<Player bind:playerElement bind:segments {data} isSyncing={$syncPartyPeerStore !== null} />
-			{/key}
+			{#if !data.video.premiereTimestamp}
+				{#key data.video.videoId}
+					<Player
+						bind:playerElement
+						bind:segments
+						{data}
+						isSyncing={$syncPartyPeerStore !== null}
+					/>
+				{/key}
+			{:else}
+				<article class="video-placeholder">
+					<p>{$_('player.premiere')}</p>
+					<h6 class="no-margin no-padding">
+						{premiereTime}
+					</h6>
+				</article>
+			{/if}
 		</div>
 
 		<h5>{letterCase(data.video.title)}</h5>

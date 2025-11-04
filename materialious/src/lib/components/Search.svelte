@@ -11,6 +11,7 @@
 		searchHistoryStore
 	} from '../store';
 	import { isVideoID } from '$lib/misc';
+	import { resolve } from '$app/paths';
 
 	const dispatch = createEventDispatcher();
 
@@ -38,15 +39,16 @@
 	}
 
 	function handleSubmit(event: Event | undefined = undefined) {
-		if (event) event.preventDefault();
+		event?.preventDefault();
 
 		const searchTrimed = search.trim();
 
-		if (searchTrimed) return;
+		if (!searchTrimed) return;
 
 		if (isVideoID(searchTrimed)) {
 			// Go directly to video if Video ID provided
-			goto(`/watch/${searchTrimed}`);
+			goto(resolve('/watch/[videoId]', { videoId: searchTrimed }));
+			return;
 		}
 
 		selectedSuggestionIndex = -1;

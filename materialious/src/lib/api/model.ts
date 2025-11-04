@@ -38,7 +38,7 @@ export interface Video extends VideoBase {
 	descriptionHtml: string;
 	published: number;
 	publishedText: string;
-	premiereTimestamp: number;
+	premiereTimestamp?: number;
 	liveNow: boolean;
 	premium: boolean;
 	isUpcoming: boolean;

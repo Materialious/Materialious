@@ -2,7 +2,6 @@
 	"enabled": "Enabled",
 	"disabled": "Disabled",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
-	"isUpcoming": "Video is not in a watchable state yet.",
 	"copyUrl": "Copy URL",
 	"loadMore": "Load more",
 	"views": "views",
@@ -82,6 +81,7 @@
 		"pauseTimer": "Pause timer",
 		"pauseVideoIn": "Pause video in ",
 		"preferredQuality": "Preferred quality",
+		"premiere": "Video will be available",
 		"chapters": "Chapters",
 		"share": {
 			"title": "Share",

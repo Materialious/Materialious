@@ -285,10 +285,11 @@
 		}
 
 		if (
-			playerElement?.paused ||
-			playerElement?.ended ||
-			playerElement?.currentTime === 0 ||
-			playerElement?.readyState <= 2 ||
+			!playerElement ||
+			playerElement.paused ||
+			playerElement.ended ||
+			playerElement.currentTime === 0 ||
+			playerElement.readyState <= 2 ||
 			!playerMiniplayerEnabled
 		) {
 			playerState.set(undefined);

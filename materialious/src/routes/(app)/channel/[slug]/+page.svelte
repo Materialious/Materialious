@@ -1,9 +1,14 @@
 <script lang="ts">
-	import { amSubscribed, deleteUnsubscribe, getChannelContent, postSubscribe } from '$lib/api';
+	import {
+		amSubscribed,
+		deleteUnsubscribe,
+		getChannelContent,
+		postSubscribe,
+		type channelContentTypes,
+		type channelSortBy
+	} from '$lib/api';
 	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/api/model';
-	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import PageLoading from '$lib/components/PageLoading.svelte';
-	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
 	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
@@ -19,7 +24,10 @@
 
 	let isSubscribed = $state(false);
 
-	let tab: 'videos' | 'playlists' | 'streams' | 'shorts' = $state('videos');
+	let tab: channelContentTypes = $state('videos');
+
+	let sortBy: channelSortBy = $state('newest');
+	const sortByOptions: channelSortBy[] = ['newest', 'oldest', 'popular'];
 
 	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined =
 		$state(undefined);
@@ -34,7 +42,8 @@
 
 		const newContent = await getChannelContent(data.channel.authorId, {
 			type: tab,
-			continuation: displayContent.continuation
+			continuation: displayContent.continuation,
+			sortBy: sortBy
 		});
 		if ('videos' in newContent && 'videos' in displayContent) {
 			if (displayContent.continuation === newContent.continuation) {
@@ -62,7 +71,10 @@
 
 	let channelPfp: string | undefined = $state();
 	onMount(async () => {
-		displayContent = await getChannelContent(data.channel.authorId, { type: 'videos' });
+		displayContent = await getChannelContent(data.channel.authorId, {
+			type: 'videos',
+			sortBy: sortBy
+		});
 
 		if (!get(interfaceLowBandwidthMode)) {
 			const channelPfpResp = await fetch(
@@ -200,6 +212,25 @@
 		{/if}
 	</div>
 </div>
+
+<nav class="group">
+	{#each sortByOptions as sortingOption}
+		<button
+			class="no-round"
+			onclick={async () => {
+				sortBy = sortingOption;
+
+				displayContent = await getChannelContent(data.channel.authorId, {
+					type: tab,
+					sortBy: sortBy
+				});
+			}}
+			class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
+		>
+	{/each}
+</nav>
+
+<div class="space"></div>
 
 {#if displayContent}
 	{#if 'videos' in displayContent}

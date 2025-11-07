@@ -70,10 +70,12 @@
 	let premiereTime = $state('');
 	let premiereUpdateInterval: NodeJS.Timeout;
 
-	playerState.set({
-		data: data,
-		isSyncing: $syncPartyPeerStore !== null
-	});
+	if (!data.video.premiereTimestamp) {
+		playerState.set({
+			data: data,
+			isSyncing: $syncPartyPeerStore !== null
+		});
+	}
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
@@ -262,6 +264,7 @@
 						premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
 					} else {
 						clearInterval(premiereUpdateInterval);
+						playerState.set({ ...$playerState, data: { ...data } });
 					}
 				}, 60000);
 			}

@@ -35,6 +35,7 @@
 - Dash support.
 - Chapters.
 - Audio only mode.
+- Mini player (PIP.)
 - Playlists.
 - PWA support.
 - YT path redirects (So your redirect plugins should still work!)

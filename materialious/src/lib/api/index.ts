@@ -170,6 +170,17 @@ export async function getChannelContent(
 	return await resp.json();
 }
 
+export async function searchChannelContent(
+	channelId: string,
+	search: string,
+	fetchOptions?: RequestInit
+) {
+	const path = buildPath(`channel/${channelId}/search`);
+	path.search = new URLSearchParams({ q: search }).toString();
+	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
+	return await resp.json();
+}
+
 export async function getSearchSuggestions(
 	search: string,
 	fetchOptions?: RequestInit

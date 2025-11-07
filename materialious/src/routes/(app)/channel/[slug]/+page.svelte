@@ -4,6 +4,7 @@
 		deleteUnsubscribe,
 		getChannelContent,
 		postSubscribe,
+		searchChannelContent,
 		type channelContentTypes,
 		type channelSortBy
 	} from '$lib/api';
@@ -29,8 +30,15 @@
 	let sortBy: channelSortBy = $state('newest');
 	const sortByOptions: channelSortBy[] = ['newest', 'oldest', 'popular'];
 
+	let showSearch: boolean = $state(false);
+	let channelSearch: string = $state('');
+
 	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined =
 		$state(undefined);
+
+	async function searchChannel() {
+		displayContent = await searchChannelContent(data.channel.authorId, channelSearch);
+	}
 
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
@@ -213,22 +221,43 @@
 	</div>
 </div>
 
-<nav class="group">
-	{#each sortByOptions as sortingOption}
-		<button
-			class="no-round"
-			onclick={async () => {
-				sortBy = sortingOption;
+<div class="grid">
+	<div class="s12 m6 l6">
+		<nav class="group">
+			{#each sortByOptions as sortingOption}
+				<button
+					class="no-round"
+					onclick={async () => {
+						sortBy = sortingOption;
 
-				displayContent = await getChannelContent(data.channel.authorId, {
-					type: tab,
-					sortBy: sortBy
-				});
-			}}
-			class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
-		>
-	{/each}
-</nav>
+						displayContent = await getChannelContent(data.channel.authorId, {
+							type: tab,
+							sortBy: sortBy
+						});
+					}}
+					class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
+				>
+			{/each}
+		</nav>
+	</div>
+	<div class="s12 m6 l6">
+		{#if showSearch}
+			<div class="max field suffix prefix small no-margin surface-variant">
+				<i class="front">search</i><input
+					bind:value={channelSearch}
+					oninput={searchChannel}
+					type="text"
+					placeholder={$_('searchPlaceholder')}
+				/>
+			</div>
+		{:else}
+			<nav class="right-align m l">
+				<button onclick={() => (showSearch = true)}><i>search</i></button>
+			</nav>
+			<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
+		{/if}
+	</div>
+</div>
 
 <div class="space"></div>
 

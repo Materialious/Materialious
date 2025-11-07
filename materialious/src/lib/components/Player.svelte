@@ -18,14 +18,13 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
-	import type { PlaylistPageVideo, VideoPlay } from '../api/model';
+	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
 		darkModeStore,
 		instanceStore,
 		isAndroidTvStore,
 		playerAndroidLockOrientation,
-		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
@@ -33,26 +32,21 @@
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerState,
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
-		playlistSettingsStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore,
-		syncPartyConnectionsStore,
 		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
-	import { loadEntirePlaylist } from '$lib/playlist';
-	import { goto } from '$app/navigation';
-	import { unsafeRandomItem } from '$lib/misc';
-	import type { PlayerEvents } from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
@@ -61,16 +55,12 @@
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 		isSyncing?: boolean;
 		isEmbed?: boolean;
-		segments?: Segment[];
 		playerElement?: HTMLMediaElement | undefined;
 	}
 
-	let {
-		data,
-		isEmbed = false,
-		segments = $bindable([]),
-		playerElement = $bindable(undefined)
-	}: Props = $props();
+	let { data, isEmbed = false, playerElement = $bindable(undefined) }: Props = $props();
+
+	let segments: Segment[] = [];
 
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
@@ -352,7 +342,6 @@
 			}
 
 			if (data.video.captions) {
-				console.log(data.video.captions);
 				for (const caption of data.video.captions) {
 					let captionUrl: string;
 					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
@@ -469,6 +458,24 @@
 			}
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
+
+		if ($playerState) {
+			playerState.set({ ...$playerState, playerElement: playerElement });
+		}
+
+		// Due to how our player is rendered in layout for stateful pip
+		// we calaculate player height to then allow children pages
+		// to wrap around it.
+		function updateVideoPlayerHeight() {
+			const container = document.getElementById('shaka-container') as HTMLElement;
+
+			if (container) {
+				const height = container.getBoundingClientRect().height;
+				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+			}
+		}
+		window.addEventListener('resize', updateVideoPlayerHeight);
+		updateVideoPlayerHeight();
 
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();

@@ -13,6 +13,7 @@
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
+		playerMiniplayerEnabled,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerStatisticsByDefault,
@@ -71,7 +72,7 @@
 		bind:value={defaultLanguage}
 		onchange={() => playerDefaultLanguage.set(defaultLanguage)}
 	>
-		<option selected={$playerDefaultLanguage === "original"} value="original">Original</option>
+		<option selected={$playerDefaultLanguage === 'original'} value="original">Original</option>
 		{#each languageNames as language}
 			<option selected={$playerDefaultLanguage === language} value={language}
 				>{titleCase(language)}</option
@@ -147,6 +148,23 @@
 				type="checkbox"
 				bind:checked={$playerCCByDefault}
 				onclick={() => playerCCByDefault.set(!$playerCCByDefault)}
+				role="switch"
+			/>
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<div>{$_('layout.player.miniPlayer')}</div>
+		</div>
+		<label class="switch" tabindex="0">
+			<input
+				type="checkbox"
+				bind:checked={$playerMiniplayerEnabled}
+				onclick={() => playerMiniplayerEnabled.set(!$playerMiniplayerEnabled)}
 				role="switch"
 			/>
 			<span></span>

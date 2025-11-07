@@ -20,7 +20,6 @@ jobs:
                 node-version: [latest]
                 runtime:
                     - linux-x64
-                    - win-x64
                     - osx-x64
 
                 include:
@@ -28,8 +27,6 @@ jobs:
                       os: ubuntu-latest
                     - runtime: osx-x64
                       os: macOS-latest
-                    - runtime: win-x64
-                      os: windows-latest
 
         runs-on: ${{ matrix.os }}
 

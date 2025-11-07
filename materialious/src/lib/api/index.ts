@@ -145,11 +145,15 @@ export async function getChannel(
 	return await resp.json();
 }
 
+export type channelSortBy = 'oldest' | 'newest' | 'popular';
+export type channelContentTypes = 'videos' | 'playlists' | 'streams' | 'shorts';
+
 export async function getChannelContent(
 	channelId: string,
 	parameters: {
-		type?: 'videos' | 'playlists' | 'streams' | 'shorts';
+		type?: channelContentTypes;
 		continuation?: string;
+		sortBy?: channelSortBy;
 	},
 	fetchOptions?: RequestInit
 ): Promise<ChannelContentVideos | ChannelContentPlaylists> {
@@ -160,7 +164,20 @@ export async function getChannelContent(
 	if (typeof parameters.continuation !== 'undefined')
 		url.searchParams.set('continuation', parameters.continuation);
 
+	if (typeof parameters.sortBy !== 'undefined') url.searchParams.set('sort_by', parameters.sortBy);
+
 	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
+	return await resp.json();
+}
+
+export async function searchChannelContent(
+	channelId: string,
+	search: string,
+	fetchOptions?: RequestInit
+) {
+	const path = buildPath(`channel/${channelId}/search`);
+	path.search = new URLSearchParams({ q: search }).toString();
+	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
 

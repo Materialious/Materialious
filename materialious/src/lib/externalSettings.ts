@@ -35,7 +35,8 @@ import {
 	interfaceAutoExpandChapters,
 	playerDefaultPlaybackSpeed,
 	playerStatisticsByDefault,
-	playerCCByDefault
+	playerCCByDefault,
+	playerMiniplayerEnabled
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 
@@ -222,6 +223,11 @@ const persistedStores: {
 	{
 		name: 'CCByDefault',
 		store: playerCCByDefault,
+		type: 'boolean'
+	},
+	{
+		name: 'miniplayerEnabled',
+		store: playerMiniplayerEnabled,
 		type: 'boolean'
 	}
 ];

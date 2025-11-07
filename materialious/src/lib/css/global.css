@@ -2,6 +2,10 @@
 	display: none;
 }
 
+:root {
+	--video-player-height: 0px;
+}
+
 @font-face {
 	font-family: Inter;
 	src: url('/static/inter.ttf');

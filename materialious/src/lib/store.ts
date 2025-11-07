@@ -59,6 +59,7 @@ export const playerDefaultLanguage = persisted('defaultLanguage', 'original');
 export const playerCCByDefault = persisted('CCByDefault', false);
 export const playerDefaultPlaybackSpeed: Writable<number> = persisted('defaultPlaybackSpeed', 1);
 export const playerStatisticsByDefault = persisted('playerStatistics', false);
+export const playerMiniplayerEnabled = persisted('miniplayerEnabled', true);
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
 export const playerState: Writable<

@@ -352,7 +352,6 @@
 			}
 
 			if (data.video.captions) {
-				console.log(data.video.captions);
 				for (const caption of data.video.captions) {
 					let captionUrl: string;
 					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {

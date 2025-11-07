@@ -20,6 +20,7 @@
 		playerPlaylistHistory,
 		playerState,
 		playerTheatreModeByDefaultStore,
+		playertheatreModeIsActive,
 		playlistCacheStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
@@ -58,7 +59,7 @@
 	let loopPlaylist: boolean = $state(false);
 	let shufflePlaylist: boolean = $state(false);
 
-	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
+	playertheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
 	let pauseTimerSeconds: number = $state(-1);
 
@@ -341,7 +342,7 @@
 	}
 
 	function toggleTheatreMode() {
-		theatreMode = !theatreMode;
+		playertheatreModeIsActive.set(!$playertheatreModeIsActive);
 	}
 
 	let pauseTimeout: NodeJS.Timeout | undefined = $state();
@@ -364,7 +365,7 @@
 </svelte:head>
 
 <div class="grid no-padding">
-	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
+	<div class={`s12 m12 l${$playertheatreModeIsActive ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#if data.video.premiereTimestamp}
 				<article class="video-placeholder">
@@ -386,7 +387,11 @@
 				<div>
 					<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
 
-					<button onclick={toggleTheatreMode} class="m l" class:border={!theatreMode}>
+					<button
+						onclick={toggleTheatreMode}
+						class="m l"
+						class:border={!$playertheatreModeIsActive}
+					>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
@@ -405,7 +410,10 @@
 						</button>
 					{/if}
 					<button
-						onclick={() => ((showTranscript = !showTranscript), (theatreMode = false))}
+						onclick={() => (
+							(showTranscript = !showTranscript),
+							playertheatreModeIsActive.set(false)
+						)}
 						class:border={!showTranscript}
 					>
 						<i>description</i>
@@ -535,7 +543,7 @@
 			</article>
 		{/if}
 	</div>
-	{#if !theatreMode}
+	{#if !$playertheatreModeIsActive}
 		<div class="s12 m12 l3 recommended">
 			{#if showTranscript && playerElement}
 				<Transcript video={data.video} bind:playerElement />
@@ -686,7 +694,6 @@
 
 	.recommended {
 		margin-top: calc(var(--video-player-height) * -1);
-		position: relative;
 	}
 
 	.video-actions {

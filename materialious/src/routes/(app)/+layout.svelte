@@ -25,6 +25,7 @@
 		interfaceDefaultPage,
 		isAndroidTvStore,
 		playerState,
+		playertheatreModeIsActive,
 		playlistCacheStore,
 		searchCacheStore,
 		syncPartyPeerStore,
@@ -400,7 +401,8 @@
 					class:pip={playerIsPip}
 					class:s12={!playerIsPip}
 					class:m12={!playerIsPip}
-					class:l9={!playerIsPip}
+					class:l12={$playertheatreModeIsActive && !playerIsPip}
+					class:l9={!$playertheatreModeIsActive && !playerIsPip}
 				>
 					{#if playerIsPip}
 						<nav>
@@ -411,9 +413,11 @@
 						</nav>
 						<div class="space"></div>
 					{/if}
-					{#key $playerState.data.video.videoId}
-						<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
-					{/key}
+					<div style="display: flex;justify-content: center;">
+						{#key $playerState.data.video.videoId}
+							<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
+						{/key}
+					</div>
 					{#if playerIsPip}
 						<nav>
 							<Author video={$playerState.data.video} hideSubscribe={true} />

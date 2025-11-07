@@ -69,6 +69,7 @@ export const playerState: Writable<
 	  }
 	| undefined
 > = writable(undefined);
+export const playertheatreModeIsActive = writable(false);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(

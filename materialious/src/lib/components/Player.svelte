@@ -18,7 +18,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
-	import type { PlaylistPageVideo, VideoPlay } from '../api/model';
+	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
 		darkModeStore,

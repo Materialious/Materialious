@@ -32,6 +32,7 @@
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerState,
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
@@ -457,6 +458,10 @@
 			}
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
+
+		if ($playerState) {
+			playerState.set({ ...$playerState, playerElement: playerElement });
+		}
 
 		// Due to how our player is rendered in layout for stateful pip
 		// we calaculate player height to then allow children pages

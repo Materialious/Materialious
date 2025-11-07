@@ -74,10 +74,6 @@
 		isSyncing: $syncPartyPeerStore !== null
 	});
 
-	playerState.subscribe((updatedPlayerState) => {
-		playerElement = updatedPlayerState?.playerElement;
-	});
-
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
 			expandSummery('comment-section');
@@ -223,41 +219,52 @@
 		playerSyncEvents(connections[connections.length - 1]);
 	});
 
-	onMount(async () => {
-		if (data.playlistId) {
-			await goToCurrentPlaylistItem();
-			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
-		}
+	onMount(() => {
+		// Required due to needing the playerElement
+		let loadedPlayer = false;
+		playerState.subscribe(async (updatedPlayerState) => {
+			if (!updatedPlayerState?.playerElement || loadedPlayer) {
+				return;
+			}
+			loadedPlayer = true;
 
-		if ($interfaceAutoExpandChapters) {
-			expandSummery('chapter-section');
-		}
+			playerElement = updatedPlayerState.playerElement;
 
-		if ($syncPartyConnectionsStore) {
-			$syncPartyConnectionsStore.forEach((conn) => {
-				playerSyncEvents(conn);
-			});
-		}
+			if (data.playlistId) {
+				await goToCurrentPlaylistItem();
+				playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
+			}
 
-		if (playerElement) {
-			playerElement.addEventListener('timeupdate', () => {
-				if (!playerElement) return;
-				playerCurrentTime = playerElement.currentTime;
-			});
-		}
+			if ($interfaceAutoExpandChapters) {
+				expandSummery('chapter-section');
+			}
 
-		if (data.video.premiereTimestamp) {
-			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
-			premiereUpdateInterval = setInterval(async () => {
-				data = await getWatchDetails(data.video.videoId, page.url);
+			if ($syncPartyConnectionsStore) {
+				$syncPartyConnectionsStore.forEach((conn) => {
+					playerSyncEvents(conn);
+				});
+			}
 
-				if (data.video.premiereTimestamp) {
-					premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
-				} else {
-					clearInterval(premiereUpdateInterval);
-				}
-			}, 60000);
-		}
+			if (playerElement) {
+				playerElement.addEventListener('timeupdate', () => {
+					if (!playerElement) return;
+					playerCurrentTime = playerElement.currentTime;
+				});
+			}
+
+			if (data.video.premiereTimestamp) {
+				premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+				premiereUpdateInterval = setInterval(async () => {
+					data = await getWatchDetails(data.video.videoId, page.url);
+
+					if (data.video.premiereTimestamp) {
+						premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+					} else {
+						clearInterval(premiereUpdateInterval);
+					}
+				}, 60000);
+			}
+		});
 	});
 
 	onDestroy(() => {
@@ -270,6 +277,15 @@
 
 		if (premiereUpdateInterval) {
 			clearInterval(premiereUpdateInterval);
+		}
+
+		if (
+			playerElement?.paused ||
+			playerElement?.ended ||
+			playerElement?.currentTime === 0 ||
+			playerElement?.readyState === 2
+		) {
+			playerState.set(undefined);
 		}
 	});
 

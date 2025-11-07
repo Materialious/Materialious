@@ -259,17 +259,6 @@
 	});
 
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
-
-	let playerElement: HTMLMediaElement | undefined = $state();
-	let playerElementCaught = false;
-
-	$effect(() => {
-		if ($playerState && playerElement && !playerElementCaught) {
-			playerElementCaught = true;
-
-			playerState.set({ ...$playerState, playerElement: playerElement });
-		}
-	});
 </script>
 
 <svelte:head>
@@ -423,7 +412,7 @@
 						<div class="space"></div>
 					{/if}
 					{#key $playerState.data.video.videoId}
-						<Player data={$playerState.data} isSyncing={$playerState.isSyncing} {playerElement} />
+						<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
 					{/key}
 					{#if playerIsPip}
 						<nav>

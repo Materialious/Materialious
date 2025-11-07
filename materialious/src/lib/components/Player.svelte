@@ -25,7 +25,6 @@
 		instanceStore,
 		isAndroidTvStore,
 		playerAndroidLockOrientation,
-		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
@@ -35,24 +34,18 @@
 		playerSavePlaybackPositionStore,
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
-		playlistSettingsStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore,
-		syncPartyConnectionsStore,
 		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
-	import { loadEntirePlaylist } from '$lib/playlist';
-	import { goto } from '$app/navigation';
-	import { unsafeRandomItem } from '$lib/misc';
-	import type { PlayerEvents } from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
@@ -61,16 +54,12 @@
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 		isSyncing?: boolean;
 		isEmbed?: boolean;
-		segments?: Segment[];
 		playerElement?: HTMLMediaElement | undefined;
 	}
 
-	let {
-		data,
-		isEmbed = false,
-		segments = $bindable([]),
-		playerElement = $bindable(undefined)
-	}: Props = $props();
+	let { data, isEmbed = false, playerElement = $bindable(undefined) }: Props = $props();
+
+	let segments: Segment[] = [];
 
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;

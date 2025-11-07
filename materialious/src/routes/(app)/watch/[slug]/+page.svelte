@@ -61,8 +61,6 @@
 
 	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
 
-	let segments: Segment[] = $state([]);
-
 	let pauseTimerSeconds: number = $state(-1);
 
 	let showTranscript = $state(false);
@@ -346,12 +344,7 @@
 		<div style="display: flex;justify-content: center;">
 			{#if !data.video.premiereTimestamp}
 				{#key data.video.videoId}
-					<Player
-						bind:playerElement
-						bind:segments
-						{data}
-						isSyncing={$syncPartyPeerStore !== null}
-					/>
+					<Player bind:playerElement {data} isSyncing={$syncPartyPeerStore !== null} />
 				{/key}
 			{:else}
 				<article class="video-placeholder">

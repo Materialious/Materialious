@@ -363,7 +363,7 @@
 	<title>{data.video.title}</title>
 </svelte:head>
 
-<div class="grid">
+<div class="grid no-padding">
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#if data.video.premiereTimestamp}
@@ -699,12 +699,6 @@
 		.video-actions {
 			align-items: flex-start;
 			flex-direction: column;
-		}
-	}
-
-	@media screen and (max-width: 1646px) {
-		.grid {
-			padding: 0;
 		}
 	}
 

@@ -482,4 +482,10 @@
 		color: var(--on-surface);
 		border-radius: 0.75rem;
 	}
+
+	@media only screen and (max-width: 993px) {
+		.pip {
+			width: 100%;
+		}
+	}
 </style>

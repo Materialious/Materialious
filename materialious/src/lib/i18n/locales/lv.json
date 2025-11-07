@@ -43,7 +43,10 @@
         "searchHistory": "Meklēšanas vēsture",
         "theme": {
             "theme": "Motīvs",
-            "color": "Krāsa"
+            "color": "Krāsa",
+            "darkMode": "Tumšais režīms",
+            "lightMode": "Gaišais režīms",
+            "AmoledTheme": "AMOLED motīvs"
         },
         "player": {
             "savePlaybackPosition": "Saglabāt atskaņošanas pozīciju",
@@ -51,7 +54,8 @@
             "autoPlay": "Automātiski atskaņot video",
             "youtubeJsAlways": "Vienmēr izmantot",
             "localVideoFallback": "Vietējais video ieguves rezerves variants",
-            "youtubeJsFallback": "Vietējais video apstrādes rezerves variants"
+            "youtubeJsFallback": "Vietējais video apstrādes rezerves variants",
+            "alwaysLoopVideo": "Vienmēr atskaņot (malt) uz riņķi video"
         },
         "deArrow": {
             "titleOnly": "Tikai virsrakstu",
@@ -76,7 +80,12 @@
         "about": "Par lietotni",
         "expandDescription": "Izvērst aprakstu",
         "expandChapters": "Izvērst nodaļas",
-        "expandComments": "Izvērst komentārus"
+        "expandComments": "Izvērst komentārus",
+        "logout": "Iziet no konta",
+        "noNewNotifications": "Nav jaunu paziņojumu",
+        "previewVideoOnHover": "Priekšskatīt video, kad kursors ir virs tā",
+        "allowInsecureRequests": "Atļaut nedrošus pieprasījumus",
+        "disableAutoUpdate": "Atspējot automātiskos atjauninājumus"
     },
     "channels": "kanāli",
     "copyUrl": "Kopēt URL saiti",
@@ -97,7 +106,7 @@
         "channels": "Kanāli",
         "shorts": "Īsie video",
         "all": "Viss",
-        "streams": "Plūsmas (Pārraides)"
+        "streams": "Tiešraides"
     },
     "playlist": {
         "createPlaylist": "Izveidot atskaņošanas sarakstu",
@@ -105,7 +114,9 @@
         "private": "Privāts",
         "playVideos": "Atskaņot video",
         "shuffleVideos": "Atskaņot video jauktā secībā",
-        "loopPlaylist": "Atskaņot (malt) uz riņķi atskaņošanas sarakstu"
+        "loopPlaylist": "Atskaņot (malt) uz riņķi atskaņošanas sarakstu",
+        "next": "Nākamais",
+        "previous": "Iepriekšējais"
     },
     "pages": {
         "subscriptions": "Abonementi",
@@ -140,5 +151,16 @@
     "invidiousLogin": "Lūdzu, autorizējieties ar savu Invidious kontu",
     "noResult": "Bez rezultātiem",
     "letterCase": "Virsrakstu burtu reģistrs",
-    "version": "Versija"
+    "version": "Versija",
+    "premium": "YouTube Premium saturu nevar skatīties Materialious.",
+    "recommendedVideos": "Ieteiktie video",
+    "filters": {
+        "filters": "Filtrēt pēc",
+        "type": "Tips",
+        "uploadDate": "Augšupielādes datums",
+        "duration": "Ilgums"
+    },
+    "comments": "komentāri",
+    "login": "Autorizēties",
+    "transcript": "Transkripcija"
 }

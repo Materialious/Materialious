@@ -162,14 +162,6 @@
 	}
 
 	onMount(async () => {
-		if ($feedLastItemId && !$isAndroidTvStore) {
-			document
-				.getElementById($feedLastItemId)
-				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
-
-			feedLastItemId.set(undefined);
-		}
-
 		if ($isAndroidTvStore) {
 			await tick();
 			// Setup Android TV navigation

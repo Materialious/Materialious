@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { getSearch, type SearchOptions } from '$lib/api';
 	import PageLoading from '$lib/components/PageLoading.svelte';
-	import { feedLastItemId, searchCacheStore } from '$lib/store';
-	import { onMount } from 'svelte';
+	import { searchCacheStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/ItemsList.svelte';
@@ -62,16 +61,6 @@
 			key: 'features'
 		}
 	]);
-
-	onMount(() => {
-		if ($feedLastItemId) {
-			document
-				.getElementById($feedLastItemId)
-				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
-
-			feedLastItemId.set(undefined);
-		}
-	});
 
 	async function updateSearch() {
 		data.searchStoreId = JSON.stringify(searchOptions) + data.slug;

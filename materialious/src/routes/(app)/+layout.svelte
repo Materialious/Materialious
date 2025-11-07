@@ -43,6 +43,8 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import Mousetrap from 'mousetrap';
 	import { truncate } from '$lib/misc';
+	import Author from '$lib/components/watch/Author.svelte';
+	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 
 	let { children } = $props();
 
@@ -417,6 +419,9 @@
 				{#key $playerState.data.video.videoId}
 					<Player data={$playerState.data} isSyncing={$playerState.isSyncing} {playerElement} />
 				{/key}
+				{#if playerIsPip}
+					<Author video={$playerState.data.video} hideSubscribe={true} />
+				{/if}
 			</div>
 		{/if}
 

@@ -45,7 +45,6 @@
 	import Mousetrap from 'mousetrap';
 	import { truncate } from '$lib/misc';
 	import Author from '$lib/components/watch/Author.svelte';
-	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 
 	let { children } = $props();
 
@@ -404,22 +403,33 @@
 					class:l12={$playertheatreModeIsActive && !playerIsPip}
 					class:l9={!$playertheatreModeIsActive && !playerIsPip}
 				>
+					<div class="pip-info">
+						{#if playerIsPip}
+							<nav>
+								<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
+								<button class="border m l" onclick={() => playerState.set(undefined)}>
+									<i>close</i>
+								</button>
+							</nav>
+							<div class="space"></div>
+						{/if}
+						<div class="player">
+							{#key $playerState.data.video.videoId}
+								<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
+							{/key}
+						</div>
+					</div>
 					{#if playerIsPip}
-						<nav>
-							<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
+						<nav class="s">
+							<a class="button border" href={`/watch/${$playerState.data.video.videoId}`}
+								><i>keyboard_arrow_right</i></a
+							>
 							<button class="border" onclick={() => playerState.set(undefined)}>
 								<i>close</i>
 							</button>
 						</nav>
-						<div class="space"></div>
-					{/if}
-					<div style="display: flex;justify-content: center;">
-						{#key $playerState.data.video.videoId}
-							<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
-						{/key}
-					</div>
-					{#if playerIsPip}
-						<nav>
+
+						<nav class="m l">
 							<Author video={$playerState.data.video} hideSubscribe={true} />
 							<div class="max"></div>
 							<a class="button border" href={`/watch/${$playerState.data.video.videoId}`}
@@ -487,9 +497,30 @@
 		border-radius: 0.75rem;
 	}
 
+	.player {
+		display: flex;
+		justify-content: center;
+	}
+
 	@media only screen and (max-width: 993px) {
 		.pip {
 			width: 100%;
+			bottom: 100px;
+		}
+
+		.pip > .pip-info > .player {
+			height: 80px;
+			width: 150px;
+		}
+
+		.pip > .pip-info > nav {
+			align-items: start;
+			padding-right: 0.5em;
+		}
+
+		.pip > .pip-info {
+			display: flex;
+			justify-content: space-between;
 		}
 	}
 </style>

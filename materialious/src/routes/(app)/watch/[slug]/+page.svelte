@@ -382,7 +382,7 @@
 			{/if}
 		</div>
 
-		<h5>{letterCase(data.video.title)}</h5>
+		<h5 class="no-margin">{letterCase(data.video.title)}</h5>
 
 		<div class="grid no-padding">
 			<div class="s12 m12 l5" style="height: 100%;display: flex;align-items: center;">

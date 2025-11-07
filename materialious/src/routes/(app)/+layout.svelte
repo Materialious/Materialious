@@ -12,6 +12,7 @@
 	import Settings from '$lib/components/settings/Settings.svelte';
 	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import Player from '$lib/components/Player.svelte';
 	import '$lib/css/global.css';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
@@ -23,6 +24,7 @@
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
+		playerState,
 		playlistCacheStore,
 		searchCacheStore,
 		syncPartyPeerStore,
@@ -40,6 +42,7 @@
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import Mousetrap from 'mousetrap';
+	import { truncate } from '$lib/misc';
 
 	let { children } = $props();
 
@@ -51,6 +54,12 @@
 	});
 
 	let notifications: Notification[] = $state([]);
+
+	let playerIsPip: boolean = $state(false);
+
+	page.subscribe((pageData) => {
+		playerIsPip = !pageData.url.pathname.includes('/watch');
+	});
 
 	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
@@ -248,6 +257,17 @@
 	});
 
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
+
+	let playerElement: HTMLMediaElement | undefined = $state();
+	let playerElementCaught = false;
+
+	$effect(() => {
+		if ($playerState && playerElement && !playerElementCaught) {
+			playerElementCaught = true;
+
+			playerState.set({ ...$playerState, playerElement: playerElement });
+		}
+	});
 </script>
 
 <svelte:head>
@@ -383,6 +403,23 @@
 	</dialog>
 
 	<main id="main-content" class="responsive max root" tabindex="0" role="region">
+		{#if $playerState}
+			<div class:pip={playerIsPip}>
+				{#if playerIsPip}
+					<nav>
+						<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
+						<button class="border" onclick={() => playerState.set(undefined)}>
+							<i>close</i>
+						</button>
+					</nav>
+					<div class="space"></div>
+				{/if}
+				{#key $playerState.data.video.videoId}
+					<Player data={$playerState.data} isSyncing={$playerState.isSyncing} {playerElement} />
+				{/key}
+			</div>
+		{/if}
+
 		{#if $navigating}
 			<PageLoading />
 		{:else}
@@ -424,5 +461,18 @@
 	.tv-nav {
 		min-inline-size: 0.5rem;
 		padding: 0;
+	}
+
+	.pip {
+		position: fixed;
+		bottom: 10px;
+		right: 0;
+		width: 400px;
+		z-index: 99999;
+		padding: 1em;
+		border: 0.0625rem solid var(--outline-variant);
+		background-color: var(--surface-container-low);
+		color: var(--on-surface);
+		border-radius: 0.75rem;
 	}
 </style>

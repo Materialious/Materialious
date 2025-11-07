@@ -6,7 +6,6 @@
 		removePlaylistVideo
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
-	import Player from '$lib/components/Player.svelte';
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import Transcript from '$lib/components/Transcript.svelte';
@@ -19,6 +18,7 @@
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		playerPlaylistHistory,
+		playerState,
 		playerTheatreModeByDefaultStore,
 		playlistCacheStore,
 		playlistSettingsStore,
@@ -27,7 +27,6 @@
 	} from '$lib/store';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
-	import { type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
@@ -69,6 +68,15 @@
 
 	let premiereTime = $state('');
 	let premiereUpdateInterval: NodeJS.Timeout;
+
+	playerState.set({
+		data: data,
+		isSyncing: $syncPartyPeerStore !== null
+	});
+
+	playerState.subscribe((updatedPlayerState) => {
+		playerElement = updatedPlayerState?.playerElement;
+	});
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
@@ -342,11 +350,7 @@
 <div class="grid">
 	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#if !data.video.premiereTimestamp}
-				{#key data.video.videoId}
-					<Player bind:playerElement {data} isSyncing={$syncPartyPeerStore !== null} />
-				{/key}
-			{:else}
+			{#if data.video.premiereTimestamp}
 				<article class="video-placeholder">
 					<p>{$_('player.premiere')}</p>
 					<h6 class="no-margin no-padding">

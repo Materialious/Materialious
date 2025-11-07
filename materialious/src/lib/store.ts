@@ -11,9 +11,11 @@ import type {
 	PlaylistPage,
 	PlaylistPageVideo,
 	Video,
-	VideoBase
+	VideoBase,
+	VideoPlay
 } from './api/model';
 import { ensureNoTrailingSlash } from './misc';
+import type { PhasedDescription } from './timestamps';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && givenValue !== null) {
@@ -58,6 +60,15 @@ export const playerCCByDefault = persisted('CCByDefault', false);
 export const playerDefaultPlaybackSpeed: Writable<number> = persisted('defaultPlaybackSpeed', 1);
 export const playerStatisticsByDefault = persisted('playerStatistics', false);
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
+
+export const playerState: Writable<
+	| {
+			data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+			isSyncing?: boolean;
+			playerElement?: HTMLMediaElement | undefined;
+	  }
+	| undefined
+> = writable(undefined);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(

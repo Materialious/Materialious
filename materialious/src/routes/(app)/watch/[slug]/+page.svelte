@@ -520,7 +520,7 @@
 		{/if}
 	</div>
 	{#if !theatreMode}
-		<div class="s12 m12 l3">
+		<div class="s12 m12 l3 recommended">
 			{#if showTranscript && playerElement}
 				<Transcript video={data.video} bind:playerElement />
 			{/if}
@@ -668,6 +668,11 @@
 		overflow-x: hidden;
 	}
 
+	.recommended {
+		margin-top: calc(var(--video-player-height) * -1);
+		position: relative;
+	}
+
 	.video-actions {
 		display: flex;
 		align-items: center;
@@ -684,6 +689,12 @@
 	@media screen and (max-width: 1646px) {
 		.grid {
 			padding: 0;
+		}
+	}
+
+	@media only screen and (max-width: 993px) {
+		.recommended {
+			margin-top: 0;
 		}
 	}
 </style>

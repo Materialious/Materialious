@@ -458,6 +458,20 @@
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
+		// Due to how our player is rendered in layout for stateful pip
+		// we calaculate player height to then allow children pages
+		// to wrap around it.
+		function updateVideoPlayerHeight() {
+			const container = document.getElementById('shaka-container') as HTMLElement;
+
+			if (container) {
+				const height = container.getBoundingClientRect().height;
+				document.documentElement.style.setProperty('--video-player-height', `${height}px`);
+			}
+		}
+		window.addEventListener('resize', updateVideoPlayerHeight);
+		updateVideoPlayerHeight();
+
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
 

@@ -10,6 +10,7 @@ import { loadEntirePlaylist } from '$lib/playlist';
 import {
 	authStore,
 	playerProxyVideosStore,
+	playerState,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
@@ -19,11 +20,18 @@ import { get } from 'svelte/store';
 import { _ } from './i18n';
 
 export async function getWatchDetails(videoId: string, url: URL) {
+	const playerStateRetrieved = get(playerState);
+
 	let video;
-	try {
-		video = await getVideo(videoId, get(playerProxyVideosStore), { priority: 'high' });
-	} catch (errorMessage: any) {
-		error(500, errorMessage);
+
+	if (playerStateRetrieved && playerStateRetrieved.data.video.videoId === videoId) {
+		video = playerStateRetrieved.data.video;
+	} else {
+		try {
+			video = await getVideo(videoId, get(playerProxyVideosStore), { priority: 'high' });
+		} catch (errorMessage: any) {
+			error(500, errorMessage);
+		}
 	}
 
 	if (video.premium) {

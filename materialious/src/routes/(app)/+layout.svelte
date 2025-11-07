@@ -406,22 +406,35 @@
 
 	<main id="main-content" class="responsive max root" tabindex="0" role="region">
 		{#if $playerState}
-			<div class:pip={playerIsPip}>
-				{#if playerIsPip}
-					<nav>
-						<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
-						<button class="border" onclick={() => playerState.set(undefined)}>
-							<i>close</i>
-						</button>
-					</nav>
-					<div class="space"></div>
-				{/if}
-				{#key $playerState.data.video.videoId}
-					<Player data={$playerState.data} isSyncing={$playerState.isSyncing} {playerElement} />
-				{/key}
-				{#if playerIsPip}
-					<Author video={$playerState.data.video} hideSubscribe={true} />
-				{/if}
+			<div class="grid">
+				<div
+					class:pip={playerIsPip}
+					class:s12={!playerIsPip}
+					class:m12={!playerIsPip}
+					class:l9={!playerIsPip}
+				>
+					{#if playerIsPip}
+						<nav>
+							<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
+							<button class="border" onclick={() => playerState.set(undefined)}>
+								<i>close</i>
+							</button>
+						</nav>
+						<div class="space"></div>
+					{/if}
+					{#key $playerState.data.video.videoId}
+						<Player data={$playerState.data} isSyncing={$playerState.isSyncing} {playerElement} />
+					{/key}
+					{#if playerIsPip}
+						<nav>
+							<Author video={$playerState.data.video} hideSubscribe={true} />
+							<div class="max"></div>
+							<a class="button border" href={`/watch/${$playerState.data.video.videoId}`}
+								><i>keyboard_arrow_right</i></a
+							>
+						</nav>
+					{/if}
+				</div>
 			</div>
 		{/if}
 

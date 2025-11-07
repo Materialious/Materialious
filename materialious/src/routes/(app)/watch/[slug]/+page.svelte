@@ -289,7 +289,7 @@
 			playerElement?.ended ||
 			playerElement?.currentTime === 0 ||
 			playerElement?.readyState === 2 ||
-			!$playerMiniplayerEnabled
+			!playerMiniplayerEnabled
 		) {
 			playerState.set(undefined);
 		}

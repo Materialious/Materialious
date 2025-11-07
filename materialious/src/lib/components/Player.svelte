@@ -471,7 +471,7 @@
 
 			if (container) {
 				const height = container.getBoundingClientRect().height;
-				document.documentElement.style.setProperty('--video-player-height', `${height}px`);
+				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
 			}
 		}
 		window.addEventListener('resize', updateVideoPlayerHeight);

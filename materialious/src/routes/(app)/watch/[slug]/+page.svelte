@@ -25,7 +25,8 @@
 		playlistCacheStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
-		syncPartyPeerStore
+		syncPartyPeerStore,
+		type PlayerState
 	} from '$lib/store';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
@@ -71,7 +72,7 @@
 	let premiereTime = $state('');
 	let premiereUpdateInterval: NodeJS.Timeout;
 
-	if (!data.video.premiereTimestamp) {
+	if (!data.video.premiereTimestamp && !$playerState) {
 		playerState.set({
 			data: data,
 			isSyncing: $syncPartyPeerStore !== null
@@ -223,53 +224,61 @@
 		playerSyncEvents(connections[connections.length - 1]);
 	});
 
-	onMount(() => {
+	async function load(state: PlayerState) {
+		playerElement = state.playerElement;
+
+		if (data.playlistId) {
+			await goToCurrentPlaylistItem();
+			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
+		}
+
+		if ($interfaceAutoExpandChapters) {
+			expandSummery('chapter-section');
+		}
+
+		if ($syncPartyConnectionsStore) {
+			$syncPartyConnectionsStore.forEach((conn) => {
+				playerSyncEvents(conn);
+			});
+		}
+
+		if (playerElement) {
+			playerElement.addEventListener('timeupdate', () => {
+				if (!playerElement) return;
+				playerCurrentTime = playerElement.currentTime;
+			});
+		}
+
+		if (data.video.premiereTimestamp) {
+			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+			premiereUpdateInterval = setInterval(async () => {
+				data = await getWatchDetails(data.video.videoId, page.url);
+
+				if (data.video.premiereTimestamp) {
+					premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+				} else {
+					clearInterval(premiereUpdateInterval);
+					playerState.set({ ...$playerState, data: { ...data } });
+				}
+			}, 60000);
+		}
+	}
+
+	onMount(async () => {
 		// Required due to needing the playerElement
-		let loadedPlayer = false;
-		playerState.subscribe(async (updatedPlayerState) => {
-			if (!updatedPlayerState?.playerElement || loadedPlayer) {
-				return;
-			}
-			loadedPlayer = true;
+		if ($playerState?.playerElement) {
+			await load($playerState);
+		} else {
+			let loadedPlayer = false;
+			playerState.subscribe(async (updatedPlayerState) => {
+				if (!updatedPlayerState?.playerElement || loadedPlayer) {
+					return;
+				}
+				loadedPlayer = true;
 
-			playerElement = updatedPlayerState.playerElement;
-
-			if (data.playlistId) {
-				await goToCurrentPlaylistItem();
-				playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
-			}
-
-			if ($interfaceAutoExpandChapters) {
-				expandSummery('chapter-section');
-			}
-
-			if ($syncPartyConnectionsStore) {
-				$syncPartyConnectionsStore.forEach((conn) => {
-					playerSyncEvents(conn);
-				});
-			}
-
-			if (playerElement) {
-				playerElement.addEventListener('timeupdate', () => {
-					if (!playerElement) return;
-					playerCurrentTime = playerElement.currentTime;
-				});
-			}
-
-			if (data.video.premiereTimestamp) {
-				premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
-				premiereUpdateInterval = setInterval(async () => {
-					data = await getWatchDetails(data.video.videoId, page.url);
-
-					if (data.video.premiereTimestamp) {
-						premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
-					} else {
-						clearInterval(premiereUpdateInterval);
-						playerState.set({ ...$playerState, data: { ...data } });
-					}
-				}, 60000);
-			}
-		});
+				await load(updatedPlayerState);
+			});
+		}
 	});
 
 	onDestroy(() => {

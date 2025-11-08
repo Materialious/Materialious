@@ -40,7 +40,9 @@
 		{#each playlists.playlists as playlist}
 			<ContentColumn>
 				<article class="no-padding" style="height: 100%;">
-					<PlaylistThumbnail disabled={playlist.videoCount === 0} {playlist} />
+					{#key playlist.playlistId}
+						<PlaylistThumbnail disabled={playlist.videoCount === 0} {playlist} />
+					{/key}
 
 					<nav class="right-align padding">
 						<button

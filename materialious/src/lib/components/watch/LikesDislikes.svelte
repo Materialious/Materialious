@@ -9,19 +9,17 @@
 </script>
 
 {#await returnYTDislikes then returnYTDislikes}
-	<nav class="no-space">
-		{#if returnYTDislikes}
-			<button style="cursor: default;margin-right: 0.5em;" class="border">
-				<i class="small">thumb_up</i>
-				<span>{cleanNumber(returnYTDislikes.likes)}</span>
-				<i class="small" style="margin-left: 0.5em;">thumb_down_alt</i>
-				<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
-			</button>
-		{:else}
-			<button style="cursor: default;margin-right: 0.5em;" class="border">
-				<i class="small">thumb_up</i>
-				<span>{cleanNumber(video.likeCount)}</span>
-			</button>
-		{/if}
-	</nav>
+	{#if returnYTDislikes}
+		<button style="cursor: default;margin-left: 0;" class="border">
+			<i class="small">thumb_up</i>
+			<span>{cleanNumber(returnYTDislikes.likes)}</span>
+			<i class="small" style="margin-left: 0.5em;">thumb_down_alt</i>
+			<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
+		</button>
+	{:else}
+		<button style="cursor: default;margin-left: 0;" class="border">
+			<i class="small">thumb_up</i>
+			<span>{cleanNumber(video.likeCount)}</span>
+		</button>
+	{/if}
 {/await}

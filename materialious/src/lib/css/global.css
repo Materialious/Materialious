@@ -2,6 +2,10 @@
 	display: none;
 }
 
+:root {
+	--video-player-height: 0px;
+}
+
 @font-face {
 	font-family: Inter;
 	src: url('/static/inter.ttf');
@@ -29,6 +33,10 @@ button,
 	margin: 1em 0;
 }
 
+.video-actions button {
+	margin: 0.3em;
+}
+
 nav.top {
 	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 	padding-bottom: 1em;
@@ -49,6 +57,15 @@ dialog {
 
 .row {
 	padding: 1em !important;
+}
+
+.video-placeholder {
+	height: 30vh;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 @media screen and (max-width: 1000px) {

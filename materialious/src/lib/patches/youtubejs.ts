@@ -153,8 +153,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 			return;
 		}
 
-		console.log(recommended);
-
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image?.image as Thumbnail[]) || [],
 			videoId: recommended?.content_id || '',
@@ -233,7 +231,9 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		descriptionHtml: video.secondary_info.description?.toHTML() || descString,
 		published: 0,
 		publishedText: video.primary_info.published?.toString() || '',
-		premiereTimestamp: 0,
+		premiereTimestamp: video.basic_info.is_upcoming
+			? Math.floor(video.basic_info.start_timestamp?.getTime() || 0 / 1000)
+			: undefined,
 		hlsUrl: video.streaming_data?.hls_manifest_url || undefined,
 		liveNow: video.basic_info.is_live || false,
 		// @ts-expect-error Type does have offer_id

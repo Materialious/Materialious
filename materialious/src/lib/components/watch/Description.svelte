@@ -31,7 +31,7 @@
 			{@html description}
 		</div>
 
-		{#if video.keywords}
+		{#if video.keywords && video.keywords.length > 0}
 			<article class="border">
 				<nav class="scroll">
 					{#each video.keywords as keyword}

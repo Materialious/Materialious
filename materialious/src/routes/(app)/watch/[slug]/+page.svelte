@@ -7,27 +7,30 @@
 		removePlaylistVideo
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
-	import Player from '$lib/components/Player.svelte';
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import Transcript from '$lib/components/Transcript.svelte';
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, humanizeSeconds, numberWithCommas } from '$lib/numbers';
-	import type { PlayerEvents } from '$lib/player';
+	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player';
 	import {
 		authStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
+		playerMiniplayerEnabled,
+		playerPlaylistHistory,
+		playerState,
 		playerTheatreModeByDefaultStore,
+		playertheatreModeIsActive,
 		playlistCacheStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
-		syncPartyPeerStore
+		syncPartyPeerStore,
+		type PlayerState
 	} from '$lib/store';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
-	import { type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
@@ -37,6 +40,9 @@
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery } from '$lib/misc';
+	import { humanFriendlyTimestamp } from '$lib/time.js';
+	import { getWatchDetails } from '$lib/watch.js';
+	import { page } from '$app/state';
 
 	let { data = $bindable() } = $props();
 
@@ -56,15 +62,26 @@
 	let loopPlaylist: boolean = $state(false);
 	let shufflePlaylist: boolean = $state(false);
 
-	let theatreMode = $state(get(playerTheatreModeByDefaultStore));
-
-	let segments: Segment[] = $state([]);
+	playertheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
 	let pauseTimerSeconds: number = $state(-1);
 
 	let showTranscript = $state(false);
 
 	let playerCurrentTime: number = $state(0);
+
+	let premiereTime = $state('');
+	let premiereUpdateInterval: NodeJS.Timeout;
+
+	if (
+		!data.video.premiereTimestamp &&
+		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
+	) {
+		playerState.set({
+			data: data,
+			isSyncing: $syncPartyPeerStore !== null
+		});
+	}
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
@@ -211,9 +228,12 @@
 		playerSyncEvents(connections[connections.length - 1]);
 	});
 
-	onMount(async () => {
+	async function load(state: PlayerState) {
+		playerElement = state.playerElement;
+
 		if (data.playlistId) {
 			await goToCurrentPlaylistItem();
+			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
 		}
 
 		if ($interfaceAutoExpandChapters) {
@@ -232,6 +252,37 @@
 				playerCurrentTime = playerElement.currentTime;
 			});
 		}
+
+		if (data.video.premiereTimestamp) {
+			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+			premiereUpdateInterval = setInterval(async () => {
+				data = await getWatchDetails(data.video.videoId, page.url);
+
+				if (data.video.premiereTimestamp) {
+					premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+				} else {
+					clearInterval(premiereUpdateInterval);
+					playerState.set({ ...$playerState, data: { ...data } });
+				}
+			}, 60000);
+		}
+	}
+
+	onMount(async () => {
+		// Required due to needing the playerElement
+		if ($playerState?.playerElement) {
+			await load($playerState);
+		} else {
+			let loadedPlayer = false;
+			playerState.subscribe(async (updatedPlayerState) => {
+				if (!updatedPlayerState?.playerElement || loadedPlayer) {
+					return;
+				}
+				loadedPlayer = true;
+
+				await load(updatedPlayerState);
+			});
+		}
 	});
 
 	onDestroy(() => {
@@ -240,6 +291,21 @@
 
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);
+		}
+
+		if (premiereUpdateInterval) {
+			clearInterval(premiereUpdateInterval);
+		}
+
+		if (
+			!playerElement ||
+			playerElement.paused ||
+			playerElement.ended ||
+			playerElement.currentTime === 0 ||
+			playerElement.readyState <= 2 ||
+			!playerMiniplayerEnabled
+		) {
+			playerState.set(undefined);
 		}
 	});
 
@@ -295,7 +361,7 @@
 	}
 
 	function toggleTheatreMode() {
-		theatreMode = !theatreMode;
+		playertheatreModeIsActive.set(!$playertheatreModeIsActive);
 	}
 
 	let pauseTimeout: NodeJS.Timeout | undefined = $state();
@@ -317,25 +383,34 @@
 	<title>{data.video.title}</title>
 </svelte:head>
 
-<div class="grid">
-	<div class={`s12 m12 l${theatreMode ? '12' : '9'}`}>
+<div class="grid no-padding">
+	<div class={`s12 m12 l${$playertheatreModeIsActive ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#key data.video.videoId}
-				<Player bind:playerElement bind:segments {data} isSyncing={$syncPartyPeerStore !== null} />
-			{/key}
+			{#if data.video.premiereTimestamp}
+				<article class="video-placeholder">
+					<p>{$_('player.premiere')}</p>
+					<h6 class="no-margin no-padding">
+						{premiereTime}
+					</h6>
+				</article>
+			{/if}
 		</div>
 
-		<h5>{letterCase(data.video.title)}</h5>
+		<h5 class="no-margin">{letterCase(data.video.title)}</h5>
 
 		<div class="grid no-padding">
-			<div class="s12 m12 l5">
+			<div class="s12 m12 l5" style="height: 100%;display: flex;align-items: center;">
 				<Author video={data.video} bind:subscribed />
 			</div>
 			<div class="s12 m12 l7 video-actions">
-				<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
-
 				<div>
-					<button onclick={toggleTheatreMode} class="m l" class:border={!theatreMode}>
+					<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
+
+					<button
+						onclick={toggleTheatreMode}
+						class="m l"
+						class:border={!$playertheatreModeIsActive}
+					>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
 					</button>
@@ -354,7 +429,10 @@
 						</button>
 					{/if}
 					<button
-						onclick={() => ((showTranscript = !showTranscript), (theatreMode = false))}
+						onclick={() => (
+							(showTranscript = !showTranscript),
+							playertheatreModeIsActive.set(false)
+						)}
 						class:border={!showTranscript}
 					>
 						<i>description</i>
@@ -400,7 +478,7 @@
 							</menu>
 						</button>
 					{:else}
-						<button disabled class="border no-margin">
+						<button disabled class="border">
 							<i>add</i>
 							<div class="tooltip">
 								{#if $authStore}
@@ -429,6 +507,7 @@
 							</div>
 						</nav>
 					</summary>
+					<div class="space"></div>
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp}
@@ -483,8 +562,8 @@
 			</article>
 		{/if}
 	</div>
-	{#if !theatreMode}
-		<div class="s12 m12 l3">
+	{#if !$playertheatreModeIsActive}
+		<div class="s12 m12 l3 recommended">
 			{#if showTranscript && playerElement}
 				<Transcript video={data.video} bind:playerElement />
 			{/if}
@@ -535,6 +614,21 @@
 								<i>shuffle</i>
 								<div class="tooltip bottom">
 									{$_('playlist.shuffleVideos')}
+								</div>
+							</button>
+							<button class="circle fill" onclick={() => goToPreviousVideo(data.playlistId)}>
+								<i>skip_previous</i>
+								<div class="tooltip bottom">
+									{$_('playlist.previous')}
+								</div>
+							</button>
+							<button
+								class="circle fill"
+								onclick={async () => await goToNextVideo(data.video, data.playlistId)}
+							>
+								<i>skip_next</i>
+								<div class="tooltip bottom">
+									{$_('playlist.next')}
 								</div>
 							</button>
 						</nav>
@@ -617,14 +711,14 @@
 		overflow-x: hidden;
 	}
 
+	.recommended {
+		margin-top: calc(var(--video-player-height) * -1);
+	}
+
 	.video-actions {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
-	}
-
-	.video-actions button:not(.left-round):not(.right-round) {
-		margin: 0.3em;
 	}
 
 	@media screen and (max-width: 1000px) {
@@ -632,23 +726,11 @@
 			align-items: flex-start;
 			flex-direction: column;
 		}
-
-		.video-actions > div {
-			margin-top: 1em;
-		}
-
-		nav.group {
-			flex-direction: column;
-		}
-
-		nav.group button {
-			border-radius: 0.5rem !important;
-		}
 	}
 
-	@media screen and (max-width: 1646px) {
-		.grid {
-			padding: 0;
+	@media only screen and (max-width: 993px) {
+		.recommended {
+			margin-top: 0;
 		}
 	}
 </style>

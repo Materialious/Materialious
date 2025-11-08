@@ -55,7 +55,7 @@ export function phaseDescription(
 			// Handle youtubejs timestamps
 			if (
 				fallbackPatch === 'youtubejs' &&
-				href.includes(`https://www.youtube.com/watch?v=${videoId}&t=`)
+				href.includes(`https://www.youtube.com/watch?v=${videoId}`)
 			) {
 				const url = new URL(href);
 				const timeParam = url.searchParams.get('t') || '0';

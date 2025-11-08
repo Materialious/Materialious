@@ -162,14 +162,6 @@
 	}
 
 	onMount(async () => {
-		if ($feedLastItemId && !$isAndroidTvStore) {
-			document
-				.getElementById($feedLastItemId)
-				?.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'nearest' });
-
-			feedLastItemId.set(undefined);
-		}
-
 		if ($isAndroidTvStore) {
 			await tick();
 			// Setup Android TV navigation
@@ -200,6 +192,16 @@
 			// Watch for focus changes to detect when we're active
 			document.addEventListener('focusin', checkComponentFocus);
 			document.addEventListener('focusout', checkComponentFocus);
+		} else if ($feedLastItemId) {
+			const element = document.getElementById($feedLastItemId);
+
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'instant',
+					block: 'start',
+					inline: 'nearest'
+				});
+			}
 		}
 	});
 
@@ -221,6 +223,18 @@
 </script>
 
 <div class={classes} class:android-container={$isAndroidTvStore}>
+	{#if items.length === 0}
+		<div class="space"></div>
+		<div class="center-align">
+			<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+				><path
+					style="fill: var(--secondary);"
+					d="M11 0h2v4h-2zM5.001.586L3.587 2L6.5 4.914L7.915 3.5zM1 13.734L5.42 6h13.16L23 13.734V22H1zM6.58 8l-2.857 5h5.178l.193.75a3.002 3.002 0 0 0 5.812 0l.193-.75h5.178L17.42 8zM18.999.586L16.085 3.5l1.414 1.414L20.413 2z"
+				/></svg
+			>
+			<h1>{$_('noResult')}</h1>
+		</div>
+	{/if}
 	<div class="grid" bind:this={gridElement}>
 		{#each items as item, index}
 			<ContentColumn>
@@ -251,7 +265,9 @@
 					}}
 				>
 					{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream'}
-						<Thumbnail video={item} {playlistId} />
+						{#key item.videoId}
+							<Thumbnail video={item} {playlistId} />
+						{/key}
 						{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in item}
 							<div class="right-align" style="margin: 1em .5em;">
 								<button

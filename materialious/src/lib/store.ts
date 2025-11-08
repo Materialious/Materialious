@@ -11,9 +11,11 @@ import type {
 	PlaylistPage,
 	PlaylistPageVideo,
 	Video,
-	VideoBase
+	VideoBase,
+	VideoPlay
 } from './api/model';
 import { ensureNoTrailingSlash } from './misc';
+import type { PhasedDescription } from './timestamps';
 
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && givenValue !== null) {
@@ -57,6 +59,17 @@ export const playerDefaultLanguage = persisted('defaultLanguage', 'original');
 export const playerCCByDefault = persisted('CCByDefault', false);
 export const playerDefaultPlaybackSpeed: Writable<number> = persisted('defaultPlaybackSpeed', 1);
 export const playerStatisticsByDefault = persisted('playerStatistics', false);
+export const playerMiniplayerEnabled = persisted('miniplayerEnabled', true);
+export const playerPlaylistHistory: Writable<string[]> = writable([]);
+
+export interface PlayerState {
+	data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+	isSyncing?: boolean;
+	playerElement?: HTMLMediaElement | undefined;
+}
+
+export const playerState: Writable<PlayerState | undefined> = writable(undefined);
+export const playertheatreModeIsActive = writable(false);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
@@ -145,4 +158,3 @@ export const playlistCacheStore: Writable<{
 }> = writable({});
 
 export const isAndroidTvStore: Writable<boolean> = writable(false);
-export const isTvRouteLoading: Writable<boolean> = writable(false);

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
@@ -19,14 +18,13 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
-	import type { PlaylistPageVideo, VideoPlay } from '../api/model';
+	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
 		darkModeStore,
 		instanceStore,
 		isAndroidTvStore,
 		playerAndroidLockOrientation,
-		playerAutoplayNextByDefaultStore,
 		playerAutoPlayStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
@@ -34,26 +32,21 @@
 		playerDefaultQualityStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
+		playerState,
 		playerStatisticsByDefault,
 		playerYouTubeJsFallback,
-		playlistSettingsStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore,
-		syncPartyConnectionsStore,
 		themeColorStore
 	} from '../store';
 	import { getDynamicTheme, setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
-	import { playbackRates } from '$lib/player';
+	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
 	import { EndTimeElement } from '$lib/shaka-elements/endTime';
-	import { loadEntirePlaylist } from '$lib/playlist';
-	import { goto } from '$app/navigation';
-	import { unsafeRandomItem } from '$lib/misc';
-	import type { PlayerEvents } from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
@@ -62,16 +55,12 @@
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 		isSyncing?: boolean;
 		isEmbed?: boolean;
-		segments?: Segment[];
 		playerElement?: HTMLMediaElement | undefined;
 	}
 
-	let {
-		data,
-		isEmbed = false,
-		segments = $bindable([]),
-		playerElement = $bindable(undefined)
-	}: Props = $props();
+	let { data, isEmbed = false, playerElement = $bindable(undefined) }: Props = $props();
+
+	let segments: Segment[] = [];
 
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
@@ -328,12 +317,11 @@
 			// Due to CORs issues with redirects, hosted instances of Materialious
 			// dirctly provide the companion instance
 			// while clients can just use the reirect provided by Invidious' API
-			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && Capacitor.getPlatform() === 'web') {
+			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
 				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
 			} else {
 				if (!data.video.dashUrl) {
 					error(500, 'No dash manifest found');
-					return;
 				}
 				dashUrl = data.video.dashUrl;
 			}
@@ -355,8 +343,17 @@
 
 			if (data.video.captions) {
 				for (const caption of data.video.captions) {
+					let captionUrl: string;
+					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
+						captionUrl = caption.url.startsWith('http')
+							? caption.url
+							: `${new URL(get(instanceStore)).origin}${caption.url}`;
+					} else {
+						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}${caption.url}`;
+					}
+
 					await player.addTextTrackAsync(
-						caption.url.startsWith('http') ? caption.url : `${new URL(get(instanceStore)).origin}${caption.url}`,
+						captionUrl,
 						caption.language_code,
 						'captions',
 						undefined,
@@ -462,6 +459,24 @@
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
+		if ($playerState) {
+			playerState.set({ ...$playerState, playerElement: playerElement });
+		}
+
+		// Due to how our player is rendered in layout for stateful pip
+		// we calaculate player height to then allow children pages
+		// to wrap around it.
+		function updateVideoPlayerHeight() {
+			const container = document.getElementById('shaka-container') as HTMLElement;
+
+			if (container) {
+				const height = container.getBoundingClientRect().height;
+				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+			}
+		}
+		window.addEventListener('resize', updateVideoPlayerHeight);
+		updateVideoPlayerHeight();
+
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
 
@@ -531,7 +546,6 @@
 				const stringBody = new TextDecoder().decode(response.data);
 				// position:0% for LTR text and position:100% for RTL text
 				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
-				// @ts-expect-error Type is acceptable, is shaka player
 				response.data = new TextEncoder().encode(cleaned).buffer;
 			}
 		});
@@ -603,6 +617,16 @@
 				playerElement.pause();
 				playerElement.currentTime = 0;
 			});
+
+			if (data.playlistId) {
+				navigator.mediaSession.setActionHandler('previoustrack', () => {
+					goToPreviousVideo(data.playlistId);
+				});
+
+				navigator.mediaSession.setActionHandler('nexttrack', async () => {
+					await goToNextVideo(data.video, data.playlistId);
+				});
+			}
 		}
 
 		Mousetrap.bind('space', () => {
@@ -691,68 +715,21 @@
 		});
 
 		playerElement?.addEventListener('ended', async () => {
-			if (!data.playlistId) {
-				if ($playerAutoplayNextByDefaultStore) {
-					goto(
-						resolve(`/${$isAndroidTvStore ? 'tv' : 'watch'}/${data.video.recommendedVideos[0].videoId}`),
-						{ replaceState: $isAndroidTvStore }
-					);
-				}
-
-				return;
-			}
-
-			const playlist = await loadEntirePlaylist(data.playlistId);
-			const playlistVideoIds = playlist.videos.map((value) => {
-				return value.videoId;
-			});
-
-			let goToVideo: PlaylistPageVideo | undefined;
-
-			const shufflePlaylist = $playlistSettingsStore[data.playlistId]?.shuffle ?? false;
-			const loopPlaylist = $playlistSettingsStore[data.playlistId]?.loop ?? false;
-
-			if (shufflePlaylist) {
-				goToVideo = unsafeRandomItem(playlist.videos);
-			} else {
-				const currentVideoIndex = playlistVideoIds.indexOf(data.video.videoId);
-				const newIndex = currentVideoIndex + 1;
-				if (currentVideoIndex !== -1 && newIndex < playlistVideoIds.length) {
-					goToVideo = playlist.videos[newIndex];
-				} else if (loopPlaylist) {
-					// Loop playlist on end
-					goToVideo = playlist.videos[0];
-				}
-			}
-
-			if (typeof goToVideo !== 'undefined') {
-				if ($syncPartyConnectionsStore) {
-					$syncPartyConnectionsStore.forEach((conn) => {
-						if (typeof goToVideo === 'undefined') return;
-
-						conn.send({
-							events: [
-								{ type: 'change-video', videoId: goToVideo.videoId },
-								{ type: 'playlist', playlistId: data.playlistId }
-							]
-						} as PlayerEvents);
-					});
-				}
-
-				goto(
-					resolve(`/${$isAndroidTvStore ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${data.playlistId}`),
-					{ replaceState: $isAndroidTvStore }
-				);
-			}
+			await goToNextVideo(data.video, data.playlistId);
 		});
 
 		try {
 			await loadVideo();
 		} catch (error: unknown) {
-			if (!Capacitor.isNativePlatform() || data.video.fallbackPatch === 'youtubejs') return;
-			showVideoRetry = true;
+			if (
+				!Capacitor.isNativePlatform() ||
+				data.video.fallbackPatch === 'youtubejs' ||
+				(error as shaka.extern.Error).code !== 1001
+			)
+				return;
 
-			if ((error as shaka.extern.Error).code === 1001 && $playerYouTubeJsFallback) {
+			showVideoRetry = true;
+			if ($playerYouTubeJsFallback) {
 				await reloadVideo();
 			}
 		}
@@ -864,7 +841,7 @@
 </div>
 
 {#if showVideoRetry}
-	<article class="fallback">
+	<article class="video-placeholder">
 		{#if $playerYouTubeJsFallback}
 			<p>{$_('player.youtubeJsLoading')}</p>
 			<progress class="circle large"></progress>
@@ -930,14 +907,5 @@
 
 	.hide {
 		display: none;
-	}
-
-	.fallback {
-		height: 30vh;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
 	}
 </style>

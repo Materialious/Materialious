@@ -7,8 +7,11 @@
 	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 
-	let { video, subscribed = $bindable(false) }: { video: VideoPlay; subscribed?: boolean } =
-		$props();
+	let {
+		video,
+		subscribed = $bindable(false),
+		hideSubscribe = false
+	}: { video: VideoPlay; subscribed?: boolean; hideSubscribe?: boolean } = $props();
 
 	async function toggleSubscribed() {
 		if (subscribed) {
@@ -40,24 +43,26 @@
 			</div>
 		</nav>
 	</a>
-	{#if $authStore}
-		<button
-			onclick={toggleSubscribed}
-			class:inverse-surface={!subscribed}
-			class:border={subscribed}
-		>
-			{#if !subscribed}
+	{#if !hideSubscribe}
+		{#if $authStore}
+			<button
+				onclick={toggleSubscribed}
+				class:inverse-surface={!subscribed}
+				class:border={subscribed}
+			>
+				{#if !subscribed}
+					{$_('subscribe')}
+				{:else}
+					{$_('unsubscribe')}
+				{/if}
+			</button>
+		{:else}
+			<button class="inverse-surface" disabled>
 				{$_('subscribe')}
-			{:else}
-				{$_('unsubscribe')}
-			{/if}
-		</button>
-	{:else}
-		<button class="inverse-surface" disabled>
-			{$_('subscribe')}
-			<div class="tooltip">
-				{$_('loginRequired')}
-			</div>
-		</button>
+				<div class="tooltip">
+					{$_('loginRequired')}
+				</div>
+			</button>
+		{/if}
 	{/if}
 </nav>

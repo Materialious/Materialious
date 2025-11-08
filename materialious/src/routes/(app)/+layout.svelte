@@ -13,6 +13,7 @@
 	import Settings from '$lib/components/settings/Settings.svelte';
 	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import Player from '$lib/components/Player.svelte';
 	import '$lib/css/global.css';
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
@@ -24,6 +25,8 @@
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
+		playerState,
+		playertheatreModeIsActive,
 		playlistCacheStore,
 		searchCacheStore,
 		syncPartyPeerStore,
@@ -41,6 +44,8 @@
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
 	import Mousetrap from 'mousetrap';
+	import { truncate } from '$lib/misc';
+	import Author from '$lib/components/watch/Author.svelte';
 
 	let { children } = $props();
 
@@ -52,6 +57,12 @@
 	});
 
 	let notifications: Notification[] = $state([]);
+
+	let playerIsPip: boolean = $state(false);
+
+	page.subscribe((pageData) => {
+		playerIsPip = !pageData.url.pathname.includes('/watch');
+	});
 
 	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
@@ -384,6 +395,53 @@
 	</dialog>
 
 	<main id="main-content" class="responsive max root" tabindex="0" role="region">
+		{#if $playerState}
+			<div class="grid">
+				<div
+					class:pip={playerIsPip}
+					class:s12={!playerIsPip}
+					class:m12={!playerIsPip}
+					class:l12={$playertheatreModeIsActive && !playerIsPip}
+					class:l9={!$playertheatreModeIsActive && !playerIsPip}
+				>
+					<div class="pip-info">
+						{#if playerIsPip}
+							<nav>
+								<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
+								<button class="border m l" onclick={() => playerState.set(undefined)}>
+									<i>close</i>
+								</button>
+							</nav>
+							<div class="space"></div>
+						{/if}
+						<div class="player">
+							{#key $playerState.data.video.videoId}
+								<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
+							{/key}
+						</div>
+					</div>
+					{#if playerIsPip}
+						<nav class="s">
+							<a class="button border" href={resolve(`/watch/${$playerState.data.video.videoId}`)}
+								><i>keyboard_arrow_right</i></a
+							>
+							<button class="border" onclick={() => playerState.set(undefined)}>
+								<i>close</i>
+							</button>
+						</nav>
+
+						<nav class="m l">
+							<Author video={$playerState.data.video} hideSubscribe={true} />
+							<div class="max"></div>
+							<a class="button border" href={resolve(`/watch/${$playerState.data.video.videoId}`)}
+								><i>keyboard_arrow_right</i></a
+							>
+						</nav>
+					{/if}
+				</div>
+			</div>
+		{/if}
+
 		{#if $navigating}
 			<PageLoading />
 		{:else}
@@ -425,5 +483,46 @@
 	.tv-nav {
 		min-inline-size: 0.5rem;
 		padding: 0;
+	}
+
+	.pip {
+		position: fixed;
+		bottom: 10px;
+		right: 30px;
+		width: 400px;
+		z-index: 99999;
+		padding: 1em;
+		border: 0.0625rem solid var(--outline-variant);
+		background-color: var(--surface-container-low);
+		color: var(--on-surface);
+		border-radius: 0.75rem;
+	}
+
+	.player {
+		display: flex;
+		justify-content: center;
+	}
+
+	@media only screen and (max-width: 993px) {
+		.pip {
+			width: 100%;
+			bottom: 100px;
+			right: 0px;
+		}
+
+		.pip > .pip-info > .player {
+			height: 80px;
+			width: 150px;
+		}
+
+		.pip > .pip-info > nav {
+			align-items: start;
+			padding-right: 0.5em;
+		}
+
+		.pip > .pip-info {
+			display: flex;
+			justify-content: space-between;
+		}
 	}
 </style>

@@ -145,11 +145,15 @@ export async function getChannel(
 	return await resp.json();
 }
 
+export type channelSortBy = 'oldest' | 'newest' | 'popular';
+export type channelContentTypes = 'videos' | 'playlists' | 'streams' | 'shorts';
+
 export async function getChannelContent(
 	channelId: string,
 	parameters: {
-		type?: 'videos' | 'playlists' | 'streams' | 'shorts';
+		type?: channelContentTypes;
 		continuation?: string;
+		sortBy?: channelSortBy;
 	},
 	fetchOptions?: RequestInit
 ): Promise<ChannelContentVideos | ChannelContentPlaylists> {
@@ -160,7 +164,20 @@ export async function getChannelContent(
 	if (typeof parameters.continuation !== 'undefined')
 		url.searchParams.set('continuation', parameters.continuation);
 
+	if (typeof parameters.sortBy !== 'undefined') url.searchParams.set('sort_by', parameters.sortBy);
+
 	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
+	return await resp.json();
+}
+
+export async function searchChannelContent(
+	channelId: string,
+	search: string,
+	fetchOptions?: RequestInit
+) {
+	const path = buildPath(`channel/${channelId}/search`);
+	path.search = new URLSearchParams({ q: search }).toString();
+	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
 
@@ -179,13 +196,18 @@ export async function getHashtag(tag: string, page: number = 0): Promise<{ resul
 	return await resp.json();
 }
 
+export interface SearchOptions {
+	sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
+	type?: 'video' | 'playlist' | 'channel' | 'all';
+	duration?: 'short' | 'medium' | 'long';
+	date?: 'hour' | 'today' | 'week' | 'month' | 'year';
+	features?: string;
+	page?: string;
+}
+
 export async function getSearch(
 	search: string,
-	options: {
-		sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
-		type?: 'video' | 'playlist' | 'channel' | 'all';
-		page?: string;
-	},
+	options: SearchOptions,
 	fetchOptions?: RequestInit
 ): Promise<(Channel | Video | Playlist | HashTag)[]> {
 	if (typeof options.sort_by === 'undefined') {
@@ -193,7 +215,7 @@ export async function getSearch(
 	}
 
 	if (typeof options.type === 'undefined') {
-		options.type = 'video';
+		options.type = 'all';
 	}
 
 	if (typeof options.page === 'undefined') {

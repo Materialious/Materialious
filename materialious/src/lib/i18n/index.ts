@@ -1,6 +1,8 @@
 import i18next, { type InitOptions } from 'i18next';
 import { writable, type Writable } from 'svelte/store';
 
+import dayjs from 'dayjs';
+
 const defaultLocale = 'en';
 
 export const locale: Writable<string> = writable(defaultLocale);
@@ -40,6 +42,13 @@ function getUserLocale(): string {
 	return defaultLocale;
 }
 
+async function loadDayjsLocale(localeName: string) {
+	try {
+		const { default: locale } = await import(`dayjs/locale/${localeName}`);
+		dayjs.locale(locale);
+	} catch {}
+}
+
 export async function initI18n(selectedLocale: string = getUserLocale()): Promise<void> {
 	const langToLoad = resources[selectedLocale] ? selectedLocale : defaultLocale;
 	const translations = await resources[langToLoad]();
@@ -63,8 +72,11 @@ export async function initI18n(selectedLocale: string = getUserLocale()): Promis
 	locale.set(langToLoad);
 	_.set(i18next.t.bind(i18next));
 
-	window.addEventListener('languagechange', () => {
+	await loadDayjsLocale(selectedLocale);
+
+	window.addEventListener('languagechange', async () => {
 		const newLang = getUserLocale();
 		initI18n(newLang);
+		await loadDayjsLocale(newLang);
 	});
 }

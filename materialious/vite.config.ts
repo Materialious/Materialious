@@ -4,8 +4,6 @@ import { defineConfig } from 'vite';
 import pkg from './package.json';
 
 export default defineConfig({
-	// Optional: Set base path for Materialious here and in svelte.config.js
-	//base: '/materialious',
 	plugins: [
 		SvelteKitPWA({
 			injectRegister: 'inline',

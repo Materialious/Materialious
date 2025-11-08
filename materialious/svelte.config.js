@@ -7,7 +7,7 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: {
-		// Optional: Set base path for Materialious here and in vite.config.ts
+		// Optional: Set base path for hosted Materialious here
 		//paths: {base: '/materialious'},
 
 		// adapter-auto only supports some environments, see https://kit.svelte.dev/docs/adapter-auto for a list.

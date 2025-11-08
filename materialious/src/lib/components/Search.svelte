@@ -12,7 +12,6 @@
 		searchHistoryStore
 	} from '../store';
 	import { isVideoID } from '$lib/misc';
-	import { resolve } from '$app/paths';
 
 	const dispatch = createEventDispatcher();
 

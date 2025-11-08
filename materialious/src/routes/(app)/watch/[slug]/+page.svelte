@@ -72,7 +72,10 @@
 	let premiereTime = $state('');
 	let premiereUpdateInterval: NodeJS.Timeout;
 
-	if (!data.video.premiereTimestamp && !$playerState) {
+	if (
+		!data.video.premiereTimestamp &&
+		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
+	) {
 		playerState.set({
 			data: data,
 			isSyncing: $syncPartyPeerStore !== null

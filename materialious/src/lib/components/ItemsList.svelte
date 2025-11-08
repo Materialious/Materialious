@@ -192,6 +192,16 @@
 			// Watch for focus changes to detect when we're active
 			document.addEventListener('focusin', checkComponentFocus);
 			document.addEventListener('focusout', checkComponentFocus);
+		} else if ($feedLastItemId) {
+			const element = document.getElementById($feedLastItemId);
+
+			if (element) {
+				element.scrollIntoView({
+					behavior: 'instant',
+					block: 'start',
+					inline: 'nearest'
+				});
+			}
 		}
 	});
 

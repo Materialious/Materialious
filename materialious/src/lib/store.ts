@@ -62,14 +62,13 @@ export const playerStatisticsByDefault = persisted('playerStatistics', false);
 export const playerMiniplayerEnabled = persisted('miniplayerEnabled', true);
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
-export const playerState: Writable<
-	| {
-			data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-			isSyncing?: boolean;
-			playerElement?: HTMLMediaElement | undefined;
-	  }
-	| undefined
-> = writable(undefined);
+export interface PlayerState {
+	data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+	isSyncing?: boolean;
+	playerElement?: HTMLMediaElement | undefined;
+}
+
+export const playerState: Writable<PlayerState | undefined> = writable(undefined);
 export const playertheatreModeIsActive = writable(false);
 
 export const returnYtDislikesStore = persisted('returnYtDislikes', false);

@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.11.4",
+	"version": "1.11.5",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -37,7 +37,7 @@
 		"svelte": "^5.43.2",
 		"svelte-check": "^4.3.3",
 		"tslib": "^2.7.0",
-		"typescript": "^5.6.3",
+		"typescript": "^5.9.3",
 		"vite": "^7.1.12"
 	},
 	"type": "module",

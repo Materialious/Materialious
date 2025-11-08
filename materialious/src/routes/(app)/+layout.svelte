@@ -487,7 +487,7 @@
 	.pip {
 		position: fixed;
 		bottom: 10px;
-		right: 0;
+		right: 30px;
 		width: 400px;
 		z-index: 99999;
 		padding: 1em;
@@ -506,6 +506,7 @@
 		.pip {
 			width: 100%;
 			bottom: 100px;
+			right: 0px;
 		}
 
 		.pip > .pip-info > .player {

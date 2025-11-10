@@ -147,7 +147,8 @@
         "enableYoutubejsTemp": "Helyi videó visszatérés használata egyszer",
         "enableYoutubejsPerm": "Mindig engedélyezze a helyi videó visszatérést",
         "retryText": "A videó betöltése siketelen, hogyan szeretné folytatni?",
-        "youtubeJsLoading": "A videó betöltése sikertelen, újraprobálkozás a helyi videó visszatéréssel."
+        "youtubeJsLoading": "A videó betöltése sikertelen, újraprobálkozás a helyi videó visszatéréssel.",
+        "premiere": "A videó elérhető lesz ekkor"
     },
     "title": "Cím",
     "subscriptions": {
@@ -163,7 +164,9 @@
         "private": "Privát",
         "playVideos": "Videók lejátszása",
         "loopPlaylist": "Lejátszási lista folyamatos lejátszása",
-        "shuffleVideos": "Videók lejátszása keverten"
+        "shuffleVideos": "Videók lejátszása keverten",
+        "next": "Következő",
+        "previous": "Előző"
     },
     "thumbnail": {
         "live": "ÉLŐ",
@@ -188,5 +191,17 @@
     "subscribe": "Feliratkozás",
     "invidiousBlockWarning": "Az Invidious jelenleg le van tiltva a Google által. Ha ebben az esetben a videók nem töltődnek be, akkor használja ezt a példányt a Materialious-on {android} vagy {desktop} platformon, hogy helyi videó visszatéréssel megkerülje ezt a problémát.",
     "version": "Verzió",
-    "contributors": "Közreműködők"
+    "contributors": "Közreműködők",
+    "popularPageDisabled": "A népszerű oldal letiltva az adminok által",
+    "filters": {
+        "filters": "Szűrők",
+        "type": "Típus",
+        "uploadDate": "Feltöltés dátuma",
+        "duration": "Időtartam",
+        "sortBy": "Rendezés",
+        "features": "Jellemzők"
+    },
+    "newest": "Legújabb",
+    "oldest": "Legrégebbi",
+    "popular": "Népszerű"
 }

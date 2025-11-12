@@ -75,7 +75,7 @@
 
 		let resp;
 		try {
-			resp = await fetch(`${instance}/api/v1/trending`);
+			resp = await fetch(`${instance}/api/v1/channels/UCH-_hzb2ILSCo9ftVSnrCIQ`);
 		} catch {
 			invalidInstance = true;
 		}

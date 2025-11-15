@@ -1,4 +1,5 @@
 import { pushState } from '$app/navigation';
+import { resolve } from '$app/paths';
 import { page } from '$app/stores';
 import he from 'he';
 import type Peer from 'peerjs';
@@ -128,9 +129,8 @@ export function expandSummery(id: string) {
 }
 
 export function createVideoUrl(videoId: string, playlistId: string): URL {
-	const watchUrl = new URL(
-		`${location.origin}/${get(isAndroidTvStore) ? 'tv' : 'watch'}/${videoId}`
-	);
+	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/${videoId}`);
+	const watchUrl = new URL(`${location.origin}${watchPath}`);
 
 	if (playlistId !== '') {
 		watchUrl.searchParams.set('playlist', playlistId);

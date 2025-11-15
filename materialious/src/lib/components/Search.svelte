@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
@@ -11,7 +12,6 @@
 		searchHistoryStore
 	} from '../store';
 	import { isVideoID } from '$lib/misc';
-	import { resolve } from '$app/paths';
 
 	const dispatch = createEventDispatcher();
 
@@ -52,7 +52,7 @@
 		}
 
 		selectedSuggestionIndex = -1;
-		goto(`/search/${encodeURIComponent(searchTrimed)}`);
+		goto(resolve(`/search/${encodeURIComponent(searchTrimed)}`));
 
 		suggestionsForSearch = [];
 		showSearchBox = false;
@@ -164,7 +164,7 @@
 									handleSubmit();
 								}}
 								class:selected={index === selectedSuggestionIndex}
-								href={`/search/${encodeURIComponent(suggestion)}`}
+								href={resolve(`/search/${encodeURIComponent(suggestion)}`)}
 							>
 								<div>{suggestion}</div>
 							</a>
@@ -178,7 +178,7 @@
 								onclick={() => {
 									search = history;
 								}}
-								href={`/search/${encodeURIComponent(history)}`}
+								href={resolve(`/search/${encodeURIComponent(history)}`)}
 							>
 								<div>{history}</div>
 							</a>

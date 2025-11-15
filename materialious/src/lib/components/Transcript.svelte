@@ -48,7 +48,7 @@
 
 		isLoading = true;
 		transcript = null;
-		const resp = await fetch(`${!video.fallbackPatch ? get(instanceStore) : ''}${url}`);
+		const resp = await fetch(`${!video.fallbackPatch ? new URL(get(instanceStore)).origin : ''}${url}`);
 		transcript = await parseText(await resp.text(), { strict: false });
 
 		// Group cues by Math.ceil(startTime)

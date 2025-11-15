@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { cleanNumber } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { VideoPlay } from '$lib/api/model';
@@ -34,7 +35,7 @@
 			<article class="border">
 				<nav class="scroll">
 					{#each video.keywords as keyword}
-						<a href={`/search/${encodeURIComponent(keyword)}`} class="chip">{keyword}</a>
+						<a href={resolve(`/search/${encodeURIComponent(keyword)}`)} class="chip">{keyword}</a>
 					{/each}
 				</nav>
 			</article>

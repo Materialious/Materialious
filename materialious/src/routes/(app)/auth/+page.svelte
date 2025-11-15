@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { authStore } from '$lib/store';
@@ -17,7 +18,7 @@
 			});
 		}
 
-		goto('/');
+		goto(resolve('/'));
 	});
 </script>
 

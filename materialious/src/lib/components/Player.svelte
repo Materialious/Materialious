@@ -347,7 +347,7 @@
 					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
 						captionUrl = caption.url.startsWith('http')
 							? caption.url
-							: `${get(instanceStore)}${caption.url}`;
+							: `${new URL(get(instanceStore)).origin}${caption.url}`;
 					} else {
 						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}${caption.url}`;
 					}

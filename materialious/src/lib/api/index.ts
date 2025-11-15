@@ -68,11 +68,6 @@ export function buildAuthHeaders(): { headers: Record<string, string> } {
 	}
 }
 
-export async function getTrending(fetchOptions?: RequestInit): Promise<Video[]> {
-	const resp = await fetchErrorHandle(await fetch(setRegion(buildPath('trending')), fetchOptions));
-	return await resp.json();
-}
-
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	const resp = await fetchErrorHandle(await fetch(buildPath('popular'), fetchOptions));
 	return await resp.json();

@@ -12,8 +12,8 @@
     "delete": "Удалить",
     "donate": "Пожертвовать",
     "deleteAllHistory": "Удалить всю историю",
-    "skipping": "Пропускаю",
-    "replies": "ответ(а/ов)",
+    "skipping": "Пропуск",
+    "replies": "ответа(ов)",
     "region": "Регион",
     "noResult": "Без результатов",
     "language": "Язык",
@@ -32,7 +32,7 @@
     "videoTabs": {
         "all": "Всё",
         "videos": "Видео",
-        "playlists": "Списки воспроизведения",
+        "playlists": "Плейлисты",
         "channels": "Каналы",
         "shorts": "Shorts",
         "streams": "Трансляции"
@@ -41,13 +41,15 @@
         "manageSubscriptions": "Управление подписками"
     },
     "playlist": {
-        "createPlaylist": "Создать список воспроизведения",
+        "createPlaylist": "Создать плейлист",
         "public": "Общедоступно",
         "unlisted": "Недоступно",
         "private": "Ограниченно",
         "playVideos": "Воспроизвести видео",
         "shuffleVideos": "Воспроизвести видео в случайном порядке",
-        "loopPlaylist": "Повторять список воспроизведения"
+        "loopPlaylist": "Зациклить плейлист",
+        "next": "Следующее",
+        "previous": "Предыдущее"
     },
     "thumbnail": {
         "live": "В ЭФИРЕ",
@@ -64,7 +66,7 @@
     "unsubscribe": "Отписаться",
     "loginRequired": "Нужно войти в учётную запись",
     "player": {
-        "audioOnly": "Только звук",
+        "audioOnly": "Только аудио",
         "theatreMode": "Широкий экран",
         "pauseTimer": "Таймер паузы",
         "pauseVideoIn": "Приостановить видео на ",
@@ -86,7 +88,7 @@
             "wasm": "Скачивание ffmpeg wasm",
             "worker": "Скачивание ffmpeg worker"
         },
-        "noPlaylists": "Нет списков воспроизведения",
+        "noPlaylists": "Нет плейлистов",
         "unableToLoadComments": "Невозможно загрузить комментарии",
         "addToPlaylist": "Добавить в плейлист",
         "defaultLanguage": "Язык по умолчанию",
@@ -96,7 +98,8 @@
         "youtubeJsLoading": "Не удалось скачать видео, попытка перезагрузки с локальным резервным видео.",
         "chapters": "Главы",
         "enableYoutubejsPerm": "Всегда использовать резервное локальное видео",
-        "preferredQuality": "Желаемое качество"
+        "preferredQuality": "Желаемое качество",
+        "premiere": "Видео будет доступно"
     },
     "layout": {
         "interface": "Интерфейс",
@@ -129,10 +132,10 @@
         "player": {
             "title": "Плеер",
             "autoPlay": "Авто-воспроизведение видео",
-            "alwaysLoopVideo": "Зацикливать видео",
+            "alwaysLoopVideo": "Всегда зацикливать видео",
             "savePlaybackPosition": "Сохранять позицию",
             "listenByDefault": "Слушать по умолчанию",
-            "theatreModeByDefault": "Широкий формат по умолчанию",
+            "theatreModeByDefault": "Широкий экран по умолчанию",
             "autoPlayNextByDefault": "Авто-воспроизведение по умолчанию",
             "miniPlayer": "Мини-плеер",
             "proxyVideos": "Прокси видео",
@@ -153,7 +156,7 @@
             "sponsor": "Спонсор",
             "Catagories": "Категории",
             "unpaidSelfPromotion": "Самореклама/рекомендация",
-            "interactionReminder": "Напоминание о взаимодействии (Подписка)",
+            "interactionReminder": "Напоминание о взаимодействии (Подписаться)",
             "intermissionIntroAnimation": "Анимация концовки/вступления",
             "credits": "Конечные заставки/титры",
             "preViewRecapHook": "Предпросмотр/краткое содержание/отсылка",
@@ -186,6 +189,19 @@
     "premium": "Премиум-контент YouTube нельзя просматривать в Materialious.",
     "isUpcoming": "Видео ещё не готово к просмотру.",
     "comments": "комментарии",
-    "reply": "ответить",
-    "version": "Версия"
+    "reply": "ответ",
+    "version": "Версия",
+    "popularPageDisabled": "Страница «Популярные» отключена администраторами",
+    "filters": {
+        "filters": "Фильтры",
+        "type": "Тип",
+        "uploadDate": "Дата загрузки",
+        "duration": "Длительность",
+        "sortBy": "Сортировать по",
+        "features": "Функции"
+    },
+    "contributors": "Участники",
+    "newest": "Сначала новые",
+    "oldest": "Сначала старые",
+    "popular": "Популярные"
 }

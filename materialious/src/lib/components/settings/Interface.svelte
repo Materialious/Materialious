@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
 	import { letterCase, titleCases } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
@@ -89,7 +90,7 @@
 
 		instanceStore.set(instance);
 		authStore.set(null);
-		goto('/', { replaceState: true });
+		goto(resolve('/'), { replaceState: true });
 		ui('#dialog-settings');
 	}
 

@@ -90,7 +90,7 @@
 
 		instanceStore.set(instance);
 		authStore.set(null);
-		goto(resolve('/'), { replaceState: true });
+		goto(resolve('/', {}), { replaceState: true });
 		ui('#dialog-settings');
 	}
 

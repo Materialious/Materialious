@@ -21,7 +21,7 @@
 
 			events.events.forEach((event) => {
 				if (event.type === 'change-video' && event.videoId) {
-					currentUrl.pathname = resolve(`/watch/${event.videoId}`);
+					currentUrl.pathname = resolve(`/watch/[videoId]`, { videoId: event.videoId });
 					goto(currentUrl);
 				} else if (event.type === 'goto' && event.path && event.path !== $page.url.pathname) {
 					if (blockedPages.includes(event.path.replace('/', ''))) {
@@ -73,7 +73,7 @@
 	}
 
 	page.subscribe((newPage) => {
-		if (!newPage.url.pathname.startsWith(resolve('/watch')) && $syncPartyPeerStore) {
+		if (!newPage.url.pathname.startsWith(resolve('/watch', {})) && $syncPartyPeerStore) {
 			$syncPartyConnectionsStore?.forEach((conn) => {
 				conn.send({
 					events: [
@@ -125,7 +125,7 @@
 				<input
 					name="sync-share"
 					readonly
-					value={`${location.origin}`+resolve(`/?sync=${$syncPartyPeerStore.id}`)}
+					value={`${location.origin}${resolve(`/?sync=${$syncPartyPeerStore?.id}`, {})}`}
 					type="text"
 				/>
 				<label class="active" for="sync-share">Share URL</label>
@@ -133,7 +133,7 @@
 			<button
 				onclick={async () => {
 					await Clipboard.write({
-						string: `${location.origin}`+resolve(`/?sync=${$syncPartyPeerStore?.id}`)
+						string: `${location.origin}${resolve(`/?sync=${$syncPartyPeerStore?.id}`, {})}`
 					});
 				}}
 				class="square round"

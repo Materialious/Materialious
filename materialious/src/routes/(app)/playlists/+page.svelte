@@ -37,7 +37,7 @@
 <div class="page right active">
 	<div class="space"></div>
 	<div class="grid">
-		{#each playlists.playlists as playlist}
+		{#each playlists.playlists as playlist (playlist.playlistId)}
 			<ContentColumn>
 				<article class="no-padding" style="height: 100%;">
 					{#key playlist.playlistId}

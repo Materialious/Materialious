@@ -454,7 +454,7 @@
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
 							<menu class="no-wrap mobile">
-								{#each personalPlaylists as personalPlaylist}
+								{#each personalPlaylists as personalPlaylist (personalPlaylist.playlistId)}
 									<li
 										role="presentation"
 										class="row"
@@ -510,7 +510,7 @@
 					<div class="space"></div>
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
-							{#each data.content.timestamps as timestamp}
+							{#each data.content.timestamps as timestamp (timestamp)}
 								<li
 									role="presentation"
 									onclick={() => {
@@ -551,7 +551,7 @@
 					<div class="space"></div>
 
 					<div class="medium scroll">
-						{#each comments.comments as comment}
+						{#each comments.comments as comment (comment)}
 							<Comment {comment} videoId={data.video.videoId}></Comment>
 						{/each}
 						{#if comments.continuation}
@@ -581,8 +581,10 @@
 							{$_('videos')}
 						</p>
 						<p>
-							<a href={resolve(`/channel/${$playlistCacheStore[data.playlistId].info.authorId}`)}
-								>{$playlistCacheStore[data.playlistId].info.author}</a
+							<a
+								href={resolve(`/channel/[authorId]`, {
+									authorId: $playlistCacheStore[data.playlistId].info.authorId
+								})}>{$playlistCacheStore[data.playlistId].info.author}</a
 							>
 						</p>
 						<nav>
@@ -639,7 +641,7 @@
 
 					<div class="space"></div>
 
-					{#each $playlistCacheStore[data.playlistId].videos as playlistVideo}
+					{#each $playlistCacheStore[data.playlistId].videos as playlistVideo (playlistVideo.videoId)}
 						<article
 							class="no-padding border"
 							style="margin: .7em;"
@@ -657,7 +659,7 @@
 					{/each}
 				</article>
 			{:else if data.video.recommendedVideos}
-				{#each data.video.recommendedVideos as recommendedVideo}
+				{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
 					<article class="no-padding border">
 						{#key recommendedVideo.videoId}
 							<Thumbnail video={recommendedVideo} sideways={true} />

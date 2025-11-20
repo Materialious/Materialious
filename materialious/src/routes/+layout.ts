@@ -18,14 +18,14 @@ export async function load({ url }) {
 
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
 
-	const resolvedRoot = resolve('/');
-	if (url.pathname.startsWith(resolvedRoot+'@')) {
+	const resolvedRoot = resolve('/', {});
+	if (url.pathname.startsWith(resolvedRoot + '@')) {
 		const username = url.pathname.substring(resolvedRoot.length).split('/')[0];
 
 		try {
 			const resolvedUrl = await getResolveUrl(`www.youtube.com/${username}`);
 			if (resolvedUrl.pageType === 'WEB_PAGE_TYPE_CHANNEL') {
-				goto(resolve(`/channel/${resolvedUrl.ucid}`));
+				goto(resolve(`/channel/[authorId]`, { authorId: resolvedUrl.ucid }));
 			}
 		} catch {}
 	}
@@ -41,7 +41,7 @@ export async function load({ url }) {
 	) {
 		getPages().forEach((page) => {
 			if (page.href === defaultPage && (!page.requiresAuth || get(authStore))) {
-				goto(resolve(defaultPage));
+				goto(resolve(defaultPage, {}));
 			}
 		});
 	}

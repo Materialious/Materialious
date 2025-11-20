@@ -43,10 +43,10 @@
 	/>
 </div>
 
-{#each subscriptions as sub}
+{#each subscriptions as sub (sub.authorId)}
 	<article>
 		<nav>
-			<a href={resolve(`/channel/${sub.authorId}`)}
+			<a href={resolve(`/channel/[authorId]`, { authorId: sub.authorId })}
 				><h6>
 					{sub.author}
 				</h6></a

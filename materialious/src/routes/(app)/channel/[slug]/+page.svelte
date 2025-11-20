@@ -224,7 +224,7 @@
 <div class="grid">
 	<div class="s12 m6 l6">
 		<nav class="group">
-			{#each sortByOptions as sortingOption}
+			{#each sortByOptions as sortingOption (sortingOption)}
 				<button
 					class="no-round"
 					onclick={async () => {

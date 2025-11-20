@@ -34,7 +34,7 @@
 		if (Capacitor.isNativePlatform()) {
 			url = `${get(instanceStore)}/watch/${video.videoId}`;
 		} else {
-			url = `${location.origin}`+resolve(`/watch/${video.videoId}`);
+			url = `${location.origin}${resolve('/watch/[videoId]', { videoId: video.videoId })}`;
 		}
 		if (includeTimestamp && currentTime !== undefined) {
 			url += `?time=${Math.floor(currentTime)}`;

@@ -12,7 +12,7 @@
 	let { hashtag }: Props = $props();
 </script>
 
-<a href={resolve(hashtag.url)} class="wave" style="min-width: 100%;min-height: 100%;">
+<a href={resolve(hashtag.url, {})} class="wave" style="min-width: 100%;min-height: 100%;">
 	<div class="padding">
 		<h5 class="center-align">{truncate(hashtag.title, 14)}</h5>
 		<h6 style="margin-top: 0;" class="center-align grey-text medium-text">

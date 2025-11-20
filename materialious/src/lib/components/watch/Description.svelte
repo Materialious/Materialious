@@ -34,8 +34,11 @@
 		{#if video.keywords && video.keywords.length > 0}
 			<article class="border">
 				<nav class="scroll">
-					{#each video.keywords as keyword}
-						<a href={resolve(`/search/${encodeURIComponent(keyword)}`)} class="chip">{keyword}</a>
+					{#each video.keywords as keyword (keyword)}
+						<a
+							href={resolve(`/search/[search]`, { search: encodeURIComponent(keyword) })}
+							class="chip">{keyword}</a
+						>
 					{/each}
 				</nav>
 			</article>

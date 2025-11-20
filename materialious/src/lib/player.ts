@@ -44,9 +44,14 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 
 	if (!playlistId) {
 		if (get(playerAutoplayNextByDefaultStore)) {
-			goto(resolve(`/${isAndroidTv ? 'tv' : 'watch'}/${video.recommendedVideos[0].videoId}`), {
-				replaceState: isAndroidTv
-			});
+			goto(
+				resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]`, {
+					videoId: video.recommendedVideos[0].videoId
+				}),
+				{
+					replaceState: isAndroidTv
+				}
+			);
 		}
 		return;
 	}
@@ -86,8 +91,13 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 			} as PlayerEvents);
 		});
 
-		goto(resolve(`/${isAndroidTv ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${playlistId}`), {
-			replaceState: isAndroidTv
-		});
+		goto(
+			resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]?playlist=${playlistId}`, {
+				videoId: goToVideo.videoId
+			}),
+			{
+				replaceState: isAndroidTv
+			}
+		);
 	}
 }

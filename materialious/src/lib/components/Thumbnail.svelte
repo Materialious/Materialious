@@ -213,7 +213,10 @@
 			</a>
 
 			<div>
-				<a tabindex="-1" class:author={!sideways} href={resolve(`/channel/${video.authorId}`)}
+				<a
+					tabindex="-1"
+					class:author={!sideways}
+					href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
 					>{video.author}
 				</a>
 

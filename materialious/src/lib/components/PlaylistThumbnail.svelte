@@ -20,7 +20,7 @@
 
 	let img: HTMLImageElement | undefined = $state();
 
-	const playlistLink = `/playlist/${playlist.playlistId}`;
+	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
 
 	onMount(async () => {
 		if (get(interfaceLowBandwidthMode)) return;
@@ -48,7 +48,7 @@
 </script>
 
 <a
-	href={resolve(playlistLink)}
+	href={playlistLink}
 	class:link-disabled={disabled}
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
@@ -77,13 +77,17 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a class:link-disabled={disabled} href={resolve(playlistLink)}
+			<a class:link-disabled={disabled} href={playlistLink}
 				><div class="bold">{letterCase(truncate(playlist.title))}</div></a
 			>
 			<div>
-				<a class:link-disabled={playlist.authorId === null} href={resolve(`/channel/${playlist.authorId}`)}
-					>{playlist.author}</a
-				>
+				{#if playlist.authorId}
+					<a href={resolve('/channel/[authorId]', { authorId: playlist.authorId })}
+						>{playlist.author}</a
+					>
+				{:else}
+					<p>{playlist.author}</p>
+				{/if}
 			</div>
 		</div>
 	</nav>

@@ -129,7 +129,9 @@ export function expandSummery(id: string) {
 }
 
 export function createVideoUrl(videoId: string, playlistId: string): URL {
-	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/${videoId}`);
+	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
+		videoId: videoId
+	});
 	const watchUrl = new URL(`${location.origin}${watchPath}`);
 
 	if (playlistId !== '') {

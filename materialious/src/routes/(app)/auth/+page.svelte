@@ -18,7 +18,7 @@
 			});
 		}
 
-		goto(resolve('/'));
+		goto(resolve('/', {}));
 	});
 </script>
 

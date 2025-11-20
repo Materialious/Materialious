@@ -35,7 +35,7 @@
 	function commentTimestamps(html: string): string {
 		const regex =
 			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">([^<]+)<\/a>\s*(.+)/g;
-		const replacement = `<a href=${resolve(`/watch/${videoId}?time=$2`)} data-sveltekit-preload-data="off" class="link">$3 $4</a>`;
+		const replacement = `<a href=${resolve(`/watch/[videoId]?time=$2`, { videoId: videoId })} data-sveltekit-preload-data="off" class="link">$3 $4</a>`;
 
 		const processedHtml = html.replace(regex, replacement);
 
@@ -64,7 +64,7 @@
 				<progress class="circle"></progress>
 			{/if}
 			<div class="comment-info">
-				<a href={resolve(`/channel/${comment.authorId}`)} class="author">
+				<a href={resolve(`/channel/[authorId]`, { authorId: comment.authorId })} class="author">
 					<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>
 						{comment.author}
 					</span>

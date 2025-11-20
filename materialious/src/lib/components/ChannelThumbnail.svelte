@@ -29,7 +29,11 @@
 	});
 </script>
 
-<a href={resolve(`/channel/${channel.authorId}`)} class="wave" style="min-width: 100%;min-height: 100%;">
+<a
+	href={resolve(`/channel/[authorId]`, { authorId: channel.authorId })}
+	class="wave"
+	style="min-width: 100%;min-height: 100%;"
+>
 	<div class="padding">
 		{#if !$interfaceLowBandwidthMode}
 			<div class="center-align">

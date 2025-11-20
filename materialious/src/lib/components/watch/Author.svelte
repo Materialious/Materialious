@@ -25,7 +25,7 @@
 </script>
 
 <nav>
-	<a href={resolve(`/channel/${video.authorId}`)}>
+	<a href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}>
 		<nav style="gap: 0.5em;">
 			{#if !$interfaceLowBandwidthMode}
 				<img

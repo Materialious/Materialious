@@ -15,9 +15,14 @@
 	{#if data.playlist.videos}
 		<nav>
 			<a
-				href={!$isAndroidTvStore
-					? resolve(`/watch/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`)
-					: resolve(`/tv/${data.playlist.videos[0].videoId}?playlist=${data.playlist.info.playlistId}`)}
+				href={resolve(
+					$isAndroidTvStore
+						? `/tv/[playlistId]?playlist=${data.playlist.info.playlistId}`
+						: `/watch/[playlistId]?playlist=${data.playlist.info.playlistId}`,
+					{
+						playlistId: data.playlist.videos[0].videoId
+					}
+				)}
 				class="button circle extra no-margin"
 			>
 				<i>play_arrow</i>
@@ -27,9 +32,14 @@
 			</a>
 
 			<a
-				href={!$isAndroidTvStore
-					? resolve(`/watch/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`)
-					: resolve(`/tv/${unsafeRandomItem(data.playlist.videos).videoId}?playlist=${data.playlist.info.playlistId}`)}
+				href={resolve(
+					$isAndroidTvStore
+						? `/tv/[playlistId]?playlist=${data.playlist.info.playlistId}`
+						: `/watch/[playlistId]?playlist=${data.playlist.info.playlistId}`,
+					{
+						playlistId: unsafeRandomItem(data.playlist.videos).videoId
+					}
+				)}
 				onclick={() =>
 					playlistSettingsStore.set({
 						[data.playlist.info.playlistId]: { shuffle: true, loop: false }

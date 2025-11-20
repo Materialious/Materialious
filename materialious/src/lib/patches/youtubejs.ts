@@ -10,9 +10,9 @@ import type {
 } from '$lib/api/model';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
-import BG, { USER_AGENT } from 'bgutils-js';
+import { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
-import type { Types } from 'youtubei.js';
+import type { Types, Misc } from 'youtubei.js';
 import { Innertube, UniversalCache, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 
 Platform.shim.eval = async (
@@ -85,6 +85,29 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 
 	let dashUri: string | undefined;
 
+	// Unsupported format fix
+	// https://github.com/LuanRT/googlevideo/issues/42
+	if (video.streaming_data)
+		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.filter(
+			(format) => format.xtags !== 'CgcKAnZiEgEx'
+		);
+
+	const adaptiveFormats: AdaptiveFormats[] = [];
+	video.streaming_data?.adaptive_formats.forEach((format) => {
+		adaptiveFormats.push({
+			index: format.index_range?.start?.toString() || '',
+			bitrate: format.bitrate?.toString() || '',
+			init: format.init_range?.start?.toString() || '',
+			url: format.url || '',
+			itag: format.itag?.toString() || '',
+			type: format.mime_type,
+			clen: '',
+			lmt: '',
+			projectionType: 0,
+			resolution: format.width ? `${format.width}x${format.height}` : undefined
+		});
+	});
+
 	const isPostLiveDVR =
 		!!video.basic_info.is_post_live_dvr ||
 		(video.basic_info.is_live_content &&
@@ -100,14 +123,13 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				? video.streaming_data.hls_manifest_url // HLS is preferred for DVR streams.
 				: `${video.streaming_data.dash_manifest_url}/mpd_version/7`;
 		} else {
-			dashUri = `data:application/dash+xml;base64,${btoa(
-				await video.toDash({
-					manifest_options: {
-						is_sabr: true,
-						include_thumbnails: false
-					}
-				})
-			)}`;
+			const manifest = await video.toDash({
+				manifest_options: {
+					is_sabr: true,
+					include_thumbnails: false
+				}
+			});
+			dashUri = `data:application/dash+xml;base64,${btoa(manifest)}`;
 		}
 	}
 
@@ -169,22 +191,6 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 				recommended.metadata?.image?.renderer_context?.command_context?.on_tap.payload?.browseId ||
 				'',
 			type: 'video'
-		});
-	});
-
-	const adaptiveFormats: AdaptiveFormats[] = [];
-	video.streaming_data?.adaptive_formats.forEach((format) => {
-		adaptiveFormats.push({
-			index: format.index_range?.start?.toString() || '',
-			bitrate: format.bitrate?.toString() || '',
-			init: format.init_range?.start?.toString() || '',
-			url: format.url || '',
-			itag: format.itag?.toString() || '',
-			type: format.mime_type,
-			clen: '',
-			lmt: '',
-			projectionType: 0,
-			resolution: format.width ? `${format.width}x${format.height}` : undefined
 		});
 	});
 

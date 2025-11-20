@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
@@ -11,7 +12,6 @@
 		searchHistoryStore
 	} from '../store';
 	import { isVideoID } from '$lib/misc';
-	import { resolve } from '$app/paths';
 
 	const dispatch = createEventDispatcher();
 
@@ -52,7 +52,7 @@
 		}
 
 		selectedSuggestionIndex = -1;
-		goto(`/search/${encodeURIComponent(searchTrimed)}`);
+		goto(resolve(`/search/[search]`, { search: encodeURIComponent(searchTrimed) }));
 
 		suggestionsForSearch = [];
 		showSearchBox = false;
@@ -156,7 +156,7 @@
 					<i class="front" role="presentation" onclick={resetSearch}>close</i>
 				</div>
 				{#if searchSuggestions}
-					{#each suggestionsForSearch as suggestion, index}
+					{#each suggestionsForSearch as suggestion, index (index)}
 						<li>
 							<a
 								onclick={() => {
@@ -164,7 +164,7 @@
 									handleSubmit();
 								}}
 								class:selected={index === selectedSuggestionIndex}
-								href={`/search/${encodeURIComponent(suggestion)}`}
+								href={resolve(`/search/[search]`, { search: encodeURIComponent(suggestion) })}
 							>
 								<div>{suggestion}</div>
 							</a>
@@ -172,13 +172,13 @@
 					{/each}
 				{/if}
 				{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
-					{#each $searchHistoryStore as history}
+					{#each $searchHistoryStore as history (history)}
 						<li>
 							<a
 								onclick={() => {
 									search = history;
 								}}
-								href={`/search/${encodeURIComponent(history)}`}
+								href={resolve(`/search/[search]`, { search: encodeURIComponent(history) })}
 							>
 								<div>{history}</div>
 							</a>

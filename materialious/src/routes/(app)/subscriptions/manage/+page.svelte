@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { deleteUnsubscribe } from '$lib/api';
 	import Fuse from 'fuse.js';
 	import { _ } from '$lib/i18n';
@@ -42,10 +43,10 @@
 	/>
 </div>
 
-{#each subscriptions as sub}
+{#each subscriptions as sub (sub.authorId)}
 	<article>
 		<nav>
-			<a href={`/channel/${sub.authorId}`}
+			<a href={resolve(`/channel/[authorId]`, { authorId: sub.authorId })}
 				><h6>
 					{sub.author}
 				</h6></a

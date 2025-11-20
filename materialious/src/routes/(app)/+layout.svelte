@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/stores';
@@ -102,7 +103,7 @@
 				return;
 			}
 
-			goto(`/watch/${videoId}`);
+			goto(resolve(`/watch/[videoId]`, { videoId: videoId }));
 		} else {
 			// Auth response handling for Mobile
 			const username = url.searchParams.get('username');
@@ -128,7 +129,7 @@
 				path.search = searchParams.toString();
 				await Browser.open({ url: path.toString() });
 			} else {
-				searchParams.set('callback_url', `${location.origin}/auth`);
+				searchParams.set('callback_url', `${location.origin}${resolve('/auth', {})}`);
 				path.search = searchParams.toString();
 				document.location.href = path.toString();
 			}
@@ -173,7 +174,7 @@
 					console.log(sid);
 					authStore.set({ username: rawUsername, token: sid });
 					await ui('#tv-login');
-					goto('/', { replaceState: true });
+					goto(resolve('/', {}), { replaceState: true });
 					return;
 				}
 			}
@@ -187,7 +188,7 @@
 		feedCacheStore.set({});
 		searchCacheStore.set({});
 		playlistCacheStore.set({});
-		goto('/');
+		goto(resolve('/', {}));
 	}
 
 	async function loadNotifications() {
@@ -277,7 +278,7 @@
 	<nav class="left m l surface-container" class:tv-nav={$isAndroidTvStore}>
 		<header
 			role="presentation"
-			onclick={() => goto($interfaceDefaultPage)}
+			onclick={() => goto(resolve($interfaceDefaultPage, {}))}
 			style="cursor: pointer;"
 			tabindex="-1"
 			class="small-padding"
@@ -286,7 +287,7 @@
 		</header>
 		{#each getPages() as navPage}
 			{#if !navPage.requiresAuth || isLoggedIn}
-				<a href={navPage.href} class:active={$page.url.href.endsWith(navPage.href)}
+				<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
 					><i>{navPage.icon}</i>
 					<div>{navPage.name}</div>
 				</a>
@@ -365,7 +366,7 @@
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a
 					class="round"
-					href={navPage.href}
+					href={resolve(navPage.href, {})}
 					class:active={$page.url.href.endsWith(navPage.href)}
 					data-sveltekit-preload-data="off"
 					><i>{navPage.icon}</i>
@@ -421,7 +422,9 @@
 					</div>
 					{#if playerIsPip}
 						<nav class="s">
-							<a class="button border" href={`/watch/${$playerState.data.video.videoId}`}
+							<a
+								class="button border"
+								href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
 								><i>keyboard_arrow_right</i></a
 							>
 							<button class="border" onclick={() => playerState.set(undefined)}>
@@ -432,7 +435,9 @@
 						<nav class="m l">
 							<Author video={$playerState.data.video} hideSubscribe={true} />
 							<div class="max"></div>
-							<a class="button border" href={`/watch/${$playerState.data.video.videoId}`}
+							<a
+								class="button border"
+								href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
 								><i>keyboard_arrow_right</i></a
 							>
 						</nav>

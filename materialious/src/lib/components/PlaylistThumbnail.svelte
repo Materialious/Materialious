@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getBestThumbnail } from '$lib/images';
+	import { resolve } from '$app/paths';
 	import { letterCase } from '$lib/letterCasing';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -19,7 +20,7 @@
 
 	let img: HTMLImageElement | undefined = $state();
 
-	const playlistLink = `/playlist/${playlist.playlistId}`;
+	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
 
 	onMount(async () => {
 		if (get(interfaceLowBandwidthMode)) return;
@@ -80,9 +81,13 @@
 				><div class="bold">{letterCase(truncate(playlist.title))}</div></a
 			>
 			<div>
-				<a class:link-disabled={playlist.authorId === null} href={`/channel/${playlist.authorId}`}
-					>{playlist.author}</a
-				>
+				{#if playlist.authorId}
+					<a href={resolve('/channel/[authorId]', { authorId: playlist.authorId })}
+						>{playlist.author}</a
+					>
+				{:else}
+					<p>{playlist.author}</p>
+				{/if}
 			</div>
 		</div>
 	</nav>

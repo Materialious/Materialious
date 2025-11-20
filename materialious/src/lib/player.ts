@@ -8,9 +8,9 @@ import {
 	syncPartyConnectionsStore
 } from './store';
 import { goto } from '$app/navigation';
+import { resolve } from '$app/paths';
 import { loadEntirePlaylist } from './playlist';
 import { unsafeRandomItem } from './misc';
-import { resolve } from '$app/paths';
 
 export interface PlayerEvent {
 	type: 'pause' | 'seek' | 'change-video' | 'play' | 'playlist' | 'goto';
@@ -44,9 +44,14 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 
 	if (!playlistId) {
 		if (get(playerAutoplayNextByDefaultStore)) {
-			goto(`/${isAndroidTv ? 'tv' : 'watch'}/${video.recommendedVideos[0].videoId}`, {
-				replaceState: isAndroidTv
-			});
+			goto(
+				resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]`, {
+					videoId: video.recommendedVideos[0].videoId
+				}),
+				{
+					replaceState: isAndroidTv
+				}
+			);
 		}
 		return;
 	}
@@ -86,8 +91,13 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 			} as PlayerEvents);
 		});
 
-		goto(`/${isAndroidTv ? 'tv' : 'watch'}/${goToVideo.videoId}?playlist=${playlistId}`, {
-			replaceState: isAndroidTv
-		});
+		goto(
+			resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]?playlist=${playlistId}`, {
+				videoId: goToVideo.videoId
+			}),
+			{
+				replaceState: isAndroidTv
+			}
+		);
 	}
 }

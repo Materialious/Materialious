@@ -118,17 +118,19 @@
 	{/if}
 	<div class="description">
 		{#if !$interfaceLowBandwidthMode}
-			{#if channelPfp}
-				<img
-					loading="lazy"
-					style="margin-right: 1em;"
-					class="circle extra m l"
-					src={channelPfp}
-					alt="Channel profile"
-				/>
-			{:else}
-				<progress style="padding: 15px;" class="circle"></progress>
-			{/if}
+			<div class="m l">
+				{#if channelPfp}
+					<img
+						loading="lazy"
+						style="margin-right: 1em;"
+						class="circle extra"
+						src={channelPfp}
+						alt="Channel profile"
+					/>
+				{:else}
+					<progress style="padding: 15px;" class="circle"></progress>
+				{/if}
+			</div>
 		{/if}
 
 		<div>
@@ -191,75 +193,69 @@
 
 	<div class="tabs left-align scroll">
 		{#if data.channel.tabs.includes('videos')}
-			<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href={`#video`}>
+			<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href="#video">
 				<i>movie</i>
 				<span>{$_('videoTabs.videos')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('shorts')}
-			<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href={`#short`}>
+			<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href="#short">
 				<i>smartphone</i>
 				<span>{$_('videoTabs.shorts')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('streams')}
-			<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href={`#stream`}>
+			<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href="#stream">
 				<i>stream</i>
 				<span>{$_('videoTabs.streams')}</span>
 			</a>
 		{/if}
 		{#if data.channel.tabs.includes('playlists')}
-			<a
-				class:active={tab === 'playlists'}
-				onclick={() => changeTab('playlists')}
-				href={`#playlist`}
-			>
+			<a class:active={tab === 'playlists'} onclick={() => changeTab('playlists')} href="#playlist">
 				<i>playlist_add_check</i>
 				<span>{$_('videoTabs.playlists')}</span>
 			</a>
 		{/if}
 	</div>
-</div>
 
-<div class="grid">
-	<div class="s12 m6 l6">
-		<nav class="group">
-			{#each sortByOptions as sortingOption (sortingOption)}
-				<button
-					class="no-round"
-					onclick={async () => {
-						sortBy = sortingOption;
+	<div class="grid">
+		<div class="s12 m6 l6">
+			<nav class="group">
+				{#each sortByOptions as sortingOption (sortingOption)}
+					<button
+						class="no-round"
+						onclick={async () => {
+							sortBy = sortingOption;
 
-						displayContent = await getChannelContent(data.channel.authorId, {
-							type: tab,
-							sortBy: sortBy
-						});
-					}}
-					class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
-				>
-			{/each}
-		</nav>
-	</div>
-	<div class="s12 m6 l6">
-		{#if showSearch}
-			<div class="max field suffix prefix small no-margin surface-variant">
-				<i class="front">search</i><input
-					bind:value={channelSearch}
-					oninput={searchChannel}
-					type="text"
-					placeholder={$_('searchPlaceholder')}
-				/>
-			</div>
-		{:else}
-			<nav class="right-align m l">
-				<button onclick={() => (showSearch = true)}><i>search</i></button>
+							displayContent = await getChannelContent(data.channel.authorId, {
+								type: tab,
+								sortBy: sortBy
+							});
+						}}
+						class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
+					>
+				{/each}
 			</nav>
-			<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
-		{/if}
+		</div>
+		<div class="s12 m6 l6">
+			{#if showSearch}
+				<div class="max field suffix prefix small no-margin surface-variant">
+					<i class="front">search</i><input
+						bind:value={channelSearch}
+						oninput={searchChannel}
+						type="text"
+						placeholder={$_('searchPlaceholder')}
+					/>
+				</div>
+			{:else}
+				<nav class="right-align m l">
+					<button onclick={() => (showSearch = true)}><i>search</i></button>
+				</nav>
+				<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
+			{/if}
+		</div>
 	</div>
 </div>
-
-<div class="space"></div>
 
 {#if displayContent}
 	{#if 'videos' in displayContent}

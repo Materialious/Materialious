@@ -15,7 +15,10 @@ article {
 	box-shadow: none !important;
 }
 
-a,
+.primary-border {
+	border: 0.5px solid var(--primary);
+}
+
 button,
 .button {
 	border-radius: 0.5rem !important;

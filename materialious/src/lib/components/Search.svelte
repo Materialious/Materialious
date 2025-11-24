@@ -72,11 +72,20 @@
 			const direction = event.key === 'ArrowUp' ? -1 : 1;
 			const container = document.querySelector('.suggestions-container');
 			if (container) {
-				const children = Array.from(container.children);
-				const currentIndex = selectedSuggestionIndex !== -1 ? selectedSuggestionIndex : 0;
+				// Filter to ensure only list items are used.
+				const children = Array.from(container.children).filter((child) => {
+					return child.tagName === 'LI';
+				});
+				let currentIndex = selectedSuggestionIndex;
+
+				if (selectedSuggestionIndex !== -1) {
+					children[currentIndex].classList.remove('primary-border');
+				}
+
 				const newIndex = Math.min(Math.max(currentIndex + direction, 0), children.length - 1);
 				const selectedItem = children[newIndex];
 				if (selectedItem) {
+					selectedItem.classList.add('primary-border');
 					selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 					selectedSuggestionIndex = newIndex;
 				}
@@ -132,7 +141,7 @@
 			class="rounded"
 		/>
 		{#if showSearchBox}
-			<menu class="min suggestions-container rounded">
+			<menu class="min rounded suggestions-container">
 				<div class="field large prefix suffix no-margin fixed">
 					<i class="front" role="presentation" onclick={() => dispatch('searchCancelled')}
 						>arrow_back</i

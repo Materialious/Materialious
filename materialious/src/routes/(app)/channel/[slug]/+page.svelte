@@ -118,17 +118,19 @@
 	{/if}
 	<div class="description">
 		{#if !$interfaceLowBandwidthMode}
-			{#if channelPfp}
-				<img
-					loading="lazy"
-					style="margin-right: 1em;"
-					class="circle extra m l"
-					src={channelPfp}
-					alt="Channel profile"
-				/>
-			{:else}
-				<progress style="padding: 15px;" class="circle"></progress>
-			{/if}
+			<div class="m l">
+				{#if channelPfp}
+					<img
+						loading="lazy"
+						style="margin-right: 1em;"
+						class="circle extra"
+						src={channelPfp}
+						alt="Channel profile"
+					/>
+				{:else}
+					<progress style="padding: 15px;" class="circle"></progress>
+				{/if}
+			</div>
 		{/if}
 
 		<div>

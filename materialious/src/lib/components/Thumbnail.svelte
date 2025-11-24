@@ -159,7 +159,7 @@
 		<a
 			tabindex="-1"
 			class="wave thumbnail"
-			href={watchUrl.toString()}
+			href={resolve(watchUrl.toString(), {})}
 			data-sveltekit-preload-data="off"
 			onclick={syncChangeVideo}
 		>
@@ -207,18 +207,22 @@
 				style="padding-left: 1px;"
 				class="video-title"
 				data-sveltekit-preload-data="off"
-				href={watchUrl.toString()}
+				href={resolve(watchUrl.toString(), {})}
 			>
 				<span class="bold">{letterCase(video.title.trimEnd())}</span>
 			</a>
 
 			<div>
-				<a
-					tabindex="-1"
-					class:author={!sideways}
-					href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
-					>{video.author}
-				</a>
+				{#if video.authorId}
+					<a
+						tabindex="-1"
+						class:author={!sideways}
+						href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
+						>{video.author}
+					</a>
+				{:else}
+					<p>{video.author}</p>
+				{/if}
 
 				{#if !('publishedText' in video) && 'viewCountText' in video}
 					•

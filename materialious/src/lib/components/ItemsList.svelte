@@ -195,6 +195,8 @@
 		} else if ($feedLastItemId) {
 			const element = document.getElementById($feedLastItemId);
 
+			feedLastItemId.set(undefined);
+
 			if (element) {
 				element.scrollIntoView({
 					behavior: 'instant',
@@ -236,7 +238,7 @@
 		</div>
 	{/if}
 	<div class="grid" bind:this={gridElement}>
-		{#each items as item, index}
+		{#each items as item, index (index)}
 			<ContentColumn>
 				<article
 					class="no-padding android-tv-item border"
@@ -245,11 +247,12 @@
 					id={extractUniqueId(item)}
 					role="presentation"
 					onclick={() => {
-						feedLastItemId.set(extractUniqueId(item));
+						const uniqueItemId = extractUniqueId(item);
+						feedLastItemId.set(uniqueItemId);
 
 						// Required to pass click through to thumbnail component on Android TV
 						if ($isAndroidTvStore) {
-							const articleElement = document.getElementById(extractUniqueId(item));
+							const articleElement = document.getElementById(uniqueItemId);
 							if (articleElement) {
 								const clickable = articleElement.querySelector('a, button');
 								if (clickable instanceof HTMLElement) {

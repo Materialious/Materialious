@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { videoLength } from '$lib/numbers';
 	import Fuse from 'fuse.js';
-	import { VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
+	import { type VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { VideoPlay } from '../api/model';

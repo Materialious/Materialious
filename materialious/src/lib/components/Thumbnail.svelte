@@ -159,7 +159,7 @@
 		<a
 			tabindex="-1"
 			class="wave thumbnail"
-			href={resolve(watchUrl.toString(), {})}
+			href={watchUrl.toString()}
 			data-sveltekit-preload-data="off"
 			onclick={syncChangeVideo}
 		>
@@ -207,7 +207,7 @@
 				style="padding-left: 1px;"
 				class="video-title"
 				data-sveltekit-preload-data="off"
-				href={resolve(watchUrl.toString(), {})}
+				href={watchUrl.toString()}
 			>
 				<span class="bold">{letterCase(video.title.trimEnd())}</span>
 			</a>

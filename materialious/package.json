@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.11.7",
+	"version": "1.11.8",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",

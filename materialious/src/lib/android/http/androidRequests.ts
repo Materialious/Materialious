@@ -1,6 +1,5 @@
 import { timeout } from '$lib/misc';
 import { Capacitor } from '@capacitor/core';
-import { NodeJS } from 'capacitor-nodejs';
 
 const originalFetch = window.fetch;
 const corsProxyUrl: string = 'http://localhost:3000/';

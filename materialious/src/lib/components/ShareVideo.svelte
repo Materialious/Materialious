@@ -21,7 +21,7 @@
 		if (includeTimestamp) url += `?${param}=${Math.floor(currentTime ?? 0)}`;
 
 		if ((await Share.canShare()) && Capacitor.getPlatform() !== 'electron') {
-			await Share.share({ url: url });
+			await Share.share({ url: url, dialogTitle: video.title });
 		} else {
 			await Clipboard.write({ string: url });
 			ui('#share-success');

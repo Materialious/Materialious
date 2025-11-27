@@ -445,7 +445,6 @@
 						<div class="tooltip">
 							{$_('player.share.title')}
 						</div>
-						W
 						<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
 					</button>
 					{#if personalPlaylists}

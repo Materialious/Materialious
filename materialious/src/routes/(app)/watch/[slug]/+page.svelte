@@ -445,10 +445,9 @@
 						<div class="tooltip">
 							{$_('player.share.title')}
 						</div>
-						<menu class="no-wrap mobile">
-							<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
-						</menu></button
-					>
+						W
+						<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
+					</button>
 					{#if personalPlaylists}
 						<button class="border">
 							<i>add</i>

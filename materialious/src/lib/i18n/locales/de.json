@@ -200,5 +200,8 @@
         "duration": "Dauer",
         "sortBy": "Sortieren nach",
         "features": "Eigenschaften"
-    }
+    },
+    "newest": "Neuste",
+    "oldest": "Älteste",
+    "popular": "Populär"
 }

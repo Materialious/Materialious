@@ -200,5 +200,8 @@
         "duration": "Duur",
         "sortBy": "Sortiere nach",
         "features": "Eigeschafte"
-    }
+    },
+    "newest": "Neusti",
+    "oldest": "Ältisti",
+    "popular": "Populär"
 }

@@ -178,8 +178,6 @@
 
 		if (!$playerAndroidLockOrientation) return;
 
-		console.log(videoFormats[0]);
-
 		if (isFullScreen && videoFormats[0].resolution) {
 			const widthHeight = videoFormats[0].resolution.split('x');
 
@@ -791,7 +789,6 @@
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
 			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
-			await Motion.removeAllListeners();
 
 			if (originalOrigination) {
 				await ScreenOrientation.lock({

@@ -22,6 +22,7 @@ export interface VideoBase {
 	authorId: string;
 	lengthSeconds: number;
 	viewCountText: string;
+	viewCount?: number;
 }
 
 export interface ResolvedUrl {

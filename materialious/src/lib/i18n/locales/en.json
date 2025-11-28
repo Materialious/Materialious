@@ -102,7 +102,8 @@
 			"materialiousLink": "Copy Materialious link",
 			"invidiousRedirect": "Copy Invidious redirect link",
 			"youtubeLink": "Copy Youtube link",
-			"includeTimestamp": "Timestamped"
+			"includeTimestamp": "Timestamped",
+			"copiedSuccess": "Copied to clipboard"
 		},
 		"download": "Download",
 		"downloadSteps": {
@@ -157,6 +158,7 @@
 		"expandComments": "Expand comments by default",
 		"allowInsecureRequests": "Allow insecure requests",
 		"disableAutoUpdate": "Disable automatic updates",
+		"androidNativeShare": "Use native share",
 		"player": {
 			"title": "Player",
 			"autoPlay": "Autoplay video",

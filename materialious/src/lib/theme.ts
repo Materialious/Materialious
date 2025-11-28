@@ -10,34 +10,34 @@ export async function getDynamicTheme(mode?: string): Promise<Record<string, str
 
 	// @ts-ignore
 	const themes: string = givenSettings[mode ? mode : (ui('mode') as string)];
-	let themeVars: Record<string, string> = {};
+	const themeVars: Record<string, string> = {};
 	themes.split(';').forEach((keyVar) => {
-		let [key, value] = keyVar.split(':');
+		const [key, value] = keyVar.split(':');
 		themeVars[key] = value;
 	});
 	return themeVars;
 }
 
 export async function setStatusBarColor() {
-	if (Capacitor.getPlatform() === 'android') {
-		await tick();
+	if (Capacitor.getPlatform() !== 'android') return;
 
-		const surfaceColor = get(interfaceAmoledTheme)
-			? '#000000'
-			: (await getDynamicTheme())['--surface-container'];
+	await tick();
 
-		const contentColor = !get(darkModeStore) ? 'dark' : 'light';
+	const surfaceColor = get(interfaceAmoledTheme)
+		? '#000000'
+		: (await getDynamicTheme())['--surface-container'];
 
-		await SafeArea.enable({
-			config: {
-				customColorsForSystemBars: true,
-				statusBarColor: surfaceColor,
-				statusBarContent: contentColor,
-				navigationBarColor: surfaceColor,
-				navigationBarContent: contentColor
-			}
-		});
-	}
+	const contentColor = !get(darkModeStore) ? 'dark' : 'light';
+
+	await SafeArea.enable({
+		config: {
+			customColorsForSystemBars: true,
+			statusBarColor: surfaceColor,
+			statusBarContent: contentColor,
+			navigationBarColor: surfaceColor,
+			navigationBarContent: contentColor
+		}
+	});
 }
 
 export function setAmoledTheme() {

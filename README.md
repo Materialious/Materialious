@@ -25,7 +25,7 @@
 - Watch sync parties.
 - Sponsorblock built-in.
 - Return YouTube dislikes built-in.
-- DeArrow built-in (With local processing fallback).
+- [DeArrow](https://github.com/ajayyy/DeArrow) built-in (With local processing fallback).
 - No ads.
 - No tracking.
 - Light/Dark themes.

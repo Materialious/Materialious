@@ -53,7 +53,6 @@
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-		isSyncing?: boolean;
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 	}
@@ -155,6 +154,47 @@
 		}
 	}
 
+	async function onAndroidFullscreenChange() {
+		const videoFormats = data.video.adaptiveFormats.filter((format) =>
+			format.type.startsWith('video/')
+		);
+
+		const isFullScreen = !!document.fullscreenElement;
+
+		if (isFullScreen) {
+			// Ensure bar color is black while in fullscreen
+			await SafeArea.enable({
+				config: {
+					customColorsForSystemBars: true,
+					statusBarColor: '#00000000',
+					statusBarContent: 'light',
+					navigationBarColor: '#00000000',
+					navigationBarContent: 'light'
+				}
+			});
+		} else {
+			await setStatusBarColor();
+		}
+
+		if (!$playerAndroidLockOrientation) return;
+
+		if (isFullScreen && videoFormats[0].resolution) {
+			const widthHeight = videoFormats[0].resolution.split('x');
+
+			if (widthHeight.length !== 2) return;
+
+			if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+				await ScreenOrientation.lock({ orientation: 'landscape' });
+			} else {
+				await ScreenOrientation.lock({ orientation: 'portrait' });
+			}
+		} else {
+			await ScreenOrientation.lock({
+				orientation: (originalOrigination as ScreenOrientationResult).type
+			});
+		}
+	}
+
 	async function androidHandleRotate() {
 		if (
 			Capacitor.getPlatform() !== 'android' ||
@@ -163,48 +203,9 @@
 		)
 			return;
 
-		const videoFormats = data.video.adaptiveFormats.filter((format) =>
-			format.type.startsWith('video/')
-		);
-
 		originalOrigination = await ScreenOrientation.orientation();
 
-		document.addEventListener('fullscreenchange', async () => {
-			const isFullScreen = !!document.fullscreenElement;
-
-			if (isFullScreen) {
-				// Ensure bar color is black while in fullscreen
-				await SafeArea.enable({
-					config: {
-						customColorsForSystemBars: true,
-						statusBarColor: '#00000000',
-						statusBarContent: 'light',
-						navigationBarColor: '#00000000',
-						navigationBarContent: 'light'
-					}
-				});
-			} else {
-				await setStatusBarColor();
-			}
-
-			if (!$playerAndroidLockOrientation) return;
-
-			if (isFullScreen && videoFormats[0].resolution) {
-				const widthHeight = videoFormats[0].resolution.split('x');
-
-				if (widthHeight.length !== 2) return;
-
-				if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-					await ScreenOrientation.lock({ orientation: 'landscape' });
-				} else {
-					await ScreenOrientation.lock({ orientation: 'portrait' });
-				}
-			} else {
-				await ScreenOrientation.lock({
-					orientation: (originalOrigination as ScreenOrientationResult).type
-				});
-			}
-		});
+		document.addEventListener('fullscreenchange', onAndroidFullscreenChange);
 	}
 
 	async function setupSponsorSkip() {
@@ -787,6 +788,8 @@
 
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
+			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
+
 			if (originalOrigination) {
 				await ScreenOrientation.lock({
 					orientation: originalOrigination.type
@@ -833,7 +836,7 @@
 		id="player"
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !isAndroidTvStore}
+	{#if isEmbed && !$isAndroidTvStore}
 		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
 			{data.video.title}
 		</div>

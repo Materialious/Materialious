@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/stores';
-	import '$lib/android/http/androidRequests';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
@@ -416,7 +415,7 @@
 						{/if}
 						<div class="player">
 							{#key $playerState.data.video.videoId}
-								<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
+								<Player data={$playerState.data} />
 							{/key}
 						</div>
 					</div>

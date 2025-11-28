@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { instanceStore } from '$lib/store';
+	import { instanceStore, interfaceAndroidUseNativeShare } from '$lib/store';
+	import { Share } from '@capacitor/share';
+	import ui from 'beercss';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
@@ -14,62 +16,71 @@
 
 	let { video, currentTime = $bindable() }: Props = $props();
 	let includeTimestamp: boolean = $state(false);
+
+	async function shareUrl(url: string, param: string = 't') {
+		if (includeTimestamp) url += `?${param}=${Math.floor(currentTime ?? 0)}`;
+
+		if (
+			(await Share.canShare()) &&
+			Capacitor.getPlatform() !== 'electron' &&
+			$interfaceAndroidUseNativeShare
+		) {
+			await Share.share({ url: url, dialogTitle: video.title });
+		} else {
+			await Clipboard.write({ string: url });
+			ui('#share-success');
+		}
+	}
 </script>
 
-{#if currentTime !== undefined}
-	<li class="row">
-		<label class="switch">
-			<input type="checkbox" bind:checked={includeTimestamp} />
-			<span></span>
-		</label>
-		<div class="min">{$_('player.share.includeTimestamp')}</div>
+<menu class="no-wrap mobile" data-ui="#share-menu" id="share-menu">
+	{#if currentTime !== undefined}
+		<li class="row">
+			<label class="switch">
+				<input type="checkbox" bind:checked={includeTimestamp} />
+				<span></span>
+			</label>
+			<div class="min">{$_('player.share.includeTimestamp')}</div>
+		</li>
+		<div class="divider"></div>
+	{/if}
+	<li
+		data-ui="#share-menu"
+		class="row"
+		role="presentation"
+		onclick={async () => {
+			if (Capacitor.isNativePlatform()) {
+				shareUrl(`${get(instanceStore)}/watch/${video.videoId}`);
+			} else {
+				shareUrl(
+					`${location.origin}${resolve('/watch/[videoId]', { videoId: video.videoId })}`,
+					'time'
+				);
+			}
+		}}
+	>
+		<div class="min">{$_('player.share.materialiousLink')}</div>
 	</li>
-	<div class="divider"></div>
-{/if}
-<li
-	class="row"
-	role="presentation"
-	onclick={async () => {
-		let url = '';
-		if (Capacitor.isNativePlatform()) {
-			url = `${get(instanceStore)}/watch/${video.videoId}`;
-		} else {
-			url = `${location.origin}${resolve('/watch/[videoId]', { videoId: video.videoId })}`;
-		}
-		if (includeTimestamp && currentTime !== undefined) {
-			url += `?time=${Math.floor(currentTime)}`;
-		}
-		await Clipboard.write({ string: url });
-		(document.activeElement as HTMLElement)?.blur();
-	}}
->
-	<div class="min">{$_('player.share.materialiousLink')}</div>
-</li>
-<li
-	class="row"
-	role="presentation"
-	onclick={async () => {
-		let url = `https://redirect.invidious.io/watch?v=${video.videoId}`;
-		if (includeTimestamp && currentTime !== undefined) {
-			url += `&t=${Math.floor(currentTime)}`;
-		}
-		await Clipboard.write({ string: url });
-		(document.activeElement as HTMLElement)?.blur();
-	}}
->
-	<div class="min">{$_('player.share.invidiousRedirect')}</div>
-</li>
-<li
-	class="row"
-	role="presentation"
-	onclick={async () => {
-		let url = `https://www.youtube.com/watch?v=${video.videoId}`;
-		if (includeTimestamp && currentTime !== undefined) {
-			url += `&t=${Math.floor(currentTime)}`;
-		}
-		await Clipboard.write({ string: url });
-		(document.activeElement as HTMLElement)?.blur();
-	}}
->
-	<div class="min">{$_('player.share.youtubeLink')}</div>
-</li>
+	<li
+		data-ui="#share-menu"
+		class="row"
+		role="presentation"
+		onclick={async () => {
+			shareUrl(`https://redirect.invidious.io/watch?v=${video.videoId}`);
+		}}
+	>
+		<div class="min">{$_('player.share.invidiousRedirect')}</div>
+	</li>
+	<li
+		data-ui="#share-menu"
+		class="row"
+		role="presentation"
+		onclick={async () => {
+			shareUrl(`https://www.youtube.com/watch?v=${video.videoId}`);
+		}}
+	>
+		<div class="min">{$_('player.share.youtubeLink')}</div>
+	</li>
+</menu>
+
+<div class="snackbar" id="share-success">{$_('player.share.copiedSuccess')}</div>

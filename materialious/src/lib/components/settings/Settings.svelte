@@ -95,7 +95,7 @@
 				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
 				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
 				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
-					{#each tabs as tab, _}
+					{#each tabs as tab (tab)}
 						<li
 							onclick={() => {
 								activeTab = tab.id;
@@ -112,7 +112,7 @@
 		</nav>
 
 		<nav class="tabbed small m l" style="outline: none" role="tablist" tabindex="0">
-			{#each tabs as tab, index}
+			{#each tabs as tab, index (tab)}
 				<a
 					role="tab"
 					class:active={isActive(tab.id)}
@@ -153,7 +153,7 @@
 		</nav>
 		<div class="space"></div>
 		<div class="divider"></div>
-		{#each tabs as tab, _}
+		{#each tabs as tab (tab)}
 			<div
 				class="page padding"
 				id={`panel-${tab.id}`}

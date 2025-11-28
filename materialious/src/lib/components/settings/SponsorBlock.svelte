@@ -12,7 +12,9 @@
 	} from '../../store';
 
 	let sponsorCategoriesList: string[] = $state([]);
-	sponsorBlockCategoriesStore.subscribe((value) => (sponsorCategoriesList = value));
+	sponsorBlockCategoriesStore.subscribe((value) => {
+		sponsorCategoriesList = value;
+	});
 
 	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
 
@@ -105,7 +107,7 @@
 
 <p class="bold">{$_('layout.sponsors.Catagories')}</p>
 
-{#each sponsorCategories as sponsor}
+{#each sponsorCategories as sponsor (sponsor)}
 	<div class="field middle-align no-margin">
 		<nav class="no-padding">
 			<div class="max">

@@ -18,6 +18,7 @@
 		instanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
+		interfaceAndroidUseNativeShare,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		interfaceAutoExpandDesc,
@@ -304,6 +305,25 @@
 	</nav>
 </div>
 
+{#if Capacitor.getPlatform() == 'android'}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.androidNativeShare')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$interfaceAndroidUseNativeShare}
+					onclick={() => interfaceAndroidUseNativeShare.set(!$interfaceAndroidUseNativeShare)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+{/if}
+
 {#if Capacitor.getPlatform() == 'electron'}
 	<div class="field no-margin">
 		<nav class="no-padding">
@@ -330,7 +350,7 @@
 		bind:value={region}
 		onchange={() => interfaceRegionStore.set(region)}
 	>
-		{#each iso31661 as region}
+		{#each iso31661 as region (region)}
 			<option selected={$interfaceRegionStore === region.alpha2} value={region.alpha2}
 				>{region.alpha2} - {region.name}</option
 			>
@@ -348,7 +368,7 @@
 		onchange={() => interfaceForceCase.set(forceCase)}
 	>
 		<option selected={$interfaceForceCase === null} value={null}>Default</option>
-		{#each titleCases as caseType}
+		{#each titleCases as caseType (caseType)}
 			<option selected={$interfaceForceCase === caseType} value={caseType}
 				>{letterCase(`${caseType}`, caseType)}</option
 			>
@@ -365,7 +385,7 @@
 		bind:value={defaultPage}
 		onchange={() => interfaceDefaultPage.set(defaultPage)}
 	>
-		{#each pages as page}
+		{#each pages as page (page)}
 			{#if !page.requiresAuth || get(authStore)}
 				<option selected={$interfaceDefaultPage === page.href} value={page.href}>{page.name}</option
 				>

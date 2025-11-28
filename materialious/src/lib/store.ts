@@ -1,9 +1,16 @@
 import { Capacitor } from '@capacitor/core';
 import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
-import { persisted } from 'svelte-persisted-store';
 import { writable, type Writable } from 'svelte/store';
+import { Preferences } from '@capacitor/preferences';
+import {
+	persist,
+	createLocalStorage,
+	type StorageInterface,
+	type SelfUpdateStorageInterface
+} from '@macfja/svelte-persistent-store';
 import type { TitleCase } from './letterCasing';
+import { serialize, deserialize } from '@macfja/serializer';
 import type {
 	Channel,
 	HashTag,
@@ -17,6 +24,59 @@ import type {
 import { ensureNoTrailingSlash } from './misc';
 import type { PhasedDescription } from './timestamps';
 
+function createListenerFunctions(): {
+	callListeners: (eventKey: string, newValue: any) => void;
+	addListener: (key: string, listener: (newValue: any) => void) => void;
+	removeListener: (key: string, listener: (newValue: any) => void) => void;
+} {
+	const listeners: Array<{ key: string; listener: (newValue: any) => void }> = [];
+	return {
+		callListeners(eventKey: string, newValue: any) {
+			if (newValue === undefined) {
+				return;
+			}
+			listeners.filter(({ key }) => key === eventKey).forEach(({ listener }) => listener(newValue));
+		},
+		addListener(key: string, listener: (newValue: any) => void) {
+			listeners.push({ key, listener });
+		},
+		removeListener(key: string, listener: (newValue: any) => void) {
+			const index = listeners.indexOf({ key, listener });
+			if (index !== -1) {
+				listeners.splice(index, 1);
+			}
+		}
+	};
+}
+
+function createStorage(): StorageInterface<any> | SelfUpdateStorageInterface<any> {
+	if (Capacitor.getPlatform() === 'android') {
+		// https://github.com/MacFJA/svelte-persistent-store/blob/main/.docs/How-To/02-New-Async-Storage.md
+		const { removeListener, callListeners, addListener } = createListenerFunctions();
+		return {
+			getValue(key: string): any | null {
+				Preferences.get({ key: key }).then((value) => {
+					if (value.value !== null) {
+						callListeners(key, deserialize(value.value));
+					}
+				});
+
+				return null;
+			},
+			deleteValue(key: string) {
+				Preferences.remove({ key: key });
+			},
+			setValue(key: string, value: any) {
+				Preferences.set({ key: key, value: serialize(value) });
+			},
+			addListener,
+			removeListener
+		};
+	} else {
+		return createLocalStorage(true);
+	}
+}
+
 function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && givenValue !== null) {
 		return givenValue;
@@ -25,115 +85,227 @@ function platformDependentDefault(givenValue: any, defaultValue: any): any {
 	}
 }
 
-export const instanceStore: Writable<string> = persisted(
-	'invidiousInstance',
-	platformDependentDefault(
-		!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
-			? undefined
-			: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
-		'https://invidious.materialio.us'
-	)
+export const instanceStore: Writable<string> = persist(
+	writable(
+		platformDependentDefault(
+			!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
+				? undefined
+				: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
+			'https://invidious.materialio.us'
+		)
+	),
+	createStorage(),
+	'invidiousInstance'
 );
 
-export const authStore: Writable<null | { username: string; token: string }> = persisted(
-	'authToken',
-	null
+export const authStore: Writable<null | { username: string; token: string }> = persist(
+	writable(null),
+	createStorage(),
+	'authToken'
 );
 
-export const darkModeStore: Writable<null | boolean> = persisted('darkMode', null);
-export const themeColorStore: Writable<null | string> = persisted('themeColor', null);
+export const darkModeStore: Writable<null | boolean> = persist(
+	writable(null),
+	createStorage(),
+	'darkMode'
+);
+export const themeColorStore: Writable<null | string> = persist(
+	writable(null),
+	createStorage(),
+	'themeColor'
+);
 
-export const showWarningStore = persisted('showWarning', true);
+export const showWarningStore = persist(writable(true), createStorage(), 'showWarning');
 
-export const playerAutoPlayStore = persisted('autoPlay', true);
-export const playerAlwaysLoopStore = persisted('alwaysLoop', false);
-export const playerProxyVideosStore = persisted('proxyVideos', true);
-export const playerSavePlaybackPositionStore = persisted('savePlaybackPosition', true);
-export const playerTheatreModeByDefaultStore = persisted('theatreModeByDefault', false);
-export const playerDefaultQualityStore = persisted('defaultQuality', 'auto');
-export const playerAutoplayNextByDefaultStore = persisted('autoplayNextByDefault', false);
-export const playerYouTubeJsFallback = persisted('youTubeJsFallback', true);
-export const playerYouTubeJsAlways = persisted('youTubeJsAlways', false);
-export const playerAndroidLockOrientation = persisted('androidLockOrientation', true);
-export const playerDefaultLanguage = persisted('defaultLanguage', 'original');
-export const playerCCByDefault = persisted('CCByDefault', false);
-export const playerDefaultPlaybackSpeed: Writable<number> = persisted('defaultPlaybackSpeed', 1);
-export const playerStatisticsByDefault = persisted('playerStatistics', false);
-export const playerMiniplayerEnabled = persisted('miniplayerEnabled', true);
+export const playerAutoPlayStore = persist(writable(true), createStorage(), 'autoPlay');
+export const playerAlwaysLoopStore = persist(writable(false), createStorage(), 'alwaysLoop');
+export const playerProxyVideosStore = persist(writable(true), createStorage(), 'proxyVideos');
+export const playerSavePlaybackPositionStore = persist(
+	writable(true),
+	createStorage(),
+	'savePlaybackPosition'
+);
+export const playerTheatreModeByDefaultStore = persist(
+	writable(false),
+	createStorage(),
+	'theatreModeByDefault'
+);
+export const playerDefaultQualityStore = persist(
+	writable('auto'),
+	createStorage(),
+	'defaultQuality'
+);
+export const playerAutoplayNextByDefaultStore = persist(
+	writable(false),
+	createStorage(),
+	'autoplayNextByDefault'
+);
+export const playerYouTubeJsFallback = persist(
+	writable(true),
+	createStorage(),
+	'youTubeJsFallback'
+);
+export const playerYouTubeJsAlways = persist(writable(false), createStorage(), 'youTubeJsAlways');
+export const playerAndroidLockOrientation = persist(
+	writable(true),
+	createStorage(),
+	'androidLockOrientation'
+);
+export const playerDefaultLanguage = persist(
+	writable('original'),
+	createStorage(),
+	'defaultLanguage'
+);
+export const playerCCByDefault = persist(writable(false), createStorage(), 'CCByDefault');
+export const playerDefaultPlaybackSpeed: Writable<number> = persist(
+	writable(1),
+	createStorage(),
+	'defaultPlaybackSpeed'
+);
+export const playerStatisticsByDefault = persist(
+	writable(false),
+	createStorage(),
+	'playerStatistics'
+);
+export const playerMiniplayerEnabled = persist(
+	writable(true),
+	createStorage(),
+	'miniplayerEnabled'
+);
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
 export interface PlayerState {
 	data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-	isSyncing?: boolean;
 	playerElement?: HTMLMediaElement | undefined;
 }
 
 export const playerState: Writable<PlayerState | undefined> = writable(undefined);
 export const playertheatreModeIsActive = writable(false);
 
-export const returnYtDislikesStore = persisted('returnYtDislikes', false);
-export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persisted(
-	'returnYTDislikesInstance',
-	platformDependentDefault(
-		import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
-		'https://ryd-proxy.materialio.us'
-	)
+export const returnYtDislikesStore = persist(writable(false), createStorage(), 'returnYtDislikes');
+export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persist(
+	writable(
+		platformDependentDefault(
+			import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+			'https://ryd-proxy.materialio.us'
+		)
+	),
+	createStorage(),
+	'returnYTDislikesInstance'
 );
 
-export const synciousStore = persisted('syncious', false);
-export const synciousInstanceStore: Writable<string | null | undefined> = persisted(
-	'synciousInstance',
-	platformDependentDefault(
-		import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE ||
-			import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
-		'https://extended-api.materialio.us'
-	)
+export const synciousStore = persist(writable(false), createStorage(), 'syncious');
+export const synciousInstanceStore: Writable<string | null | undefined> = persist(
+	writable(
+		platformDependentDefault(
+			import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE ||
+				import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
+			'https://extended-api.materialio.us'
+		)
+	),
+	createStorage(),
+	'synciousInstance'
 );
 
-export const interfaceRegionStore: Writable<string> = persisted('interfaceRegion', 'US');
-export const interfaceSearchSuggestionsStore = persisted('searchSuggestions', true);
-export const interfaceForceCase: Writable<TitleCase> = persisted('forceCase', null);
-export const interfaceAutoExpandComments: Writable<boolean> = persisted('autoExpandComments', true);
-export const interfaceAutoExpandDesc: Writable<boolean> = persisted('autoExpandDesc', false);
-export const interfaceAutoExpandChapters: Writable<boolean> = persisted(
-	'autoExpandChapters',
-	false
+export const interfaceRegionStore: Writable<string> = persist(
+	writable('US'),
+	createStorage(),
+	'interfaceRegion'
 );
-export const interfaceAmoledTheme = persisted('amoledTheme', false);
-export const interfaceLowBandwidthMode = persisted('lowBandwidthMode', false);
-export const interfaceDisplayThumbnailAvatars = persisted('disableThumbnailAvatars', false);
-export const interfaceDefaultPage = persisted('defaultPage', '/');
-export const interfaceSearchHistoryEnabled = persisted('searchHistoryEnabled', false);
-export const interfaceAllowInsecureRequests = persisted('allowInsecureRequests', false);
-export const interfaceDisableAutoUpdate = persisted('disableAutoUpdate', false);
+export const interfaceSearchSuggestionsStore = persist(
+	writable(true),
+	createStorage(),
+	'searchSuggestions'
+);
+export const interfaceForceCase: Writable<TitleCase> = persist(
+	writable(null),
+	createStorage(),
+	'forceCase'
+);
+export const interfaceAutoExpandComments: Writable<boolean> = persist(
+	writable(true),
+	createStorage(),
+	'autoExpandComments'
+);
+export const interfaceAutoExpandDesc: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'autoExpandDesc'
+);
+export const interfaceAutoExpandChapters: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'autoExpandChapters'
+);
+export const interfaceAmoledTheme = persist(writable(false), createStorage(), 'amoledTheme');
+export const interfaceLowBandwidthMode = persist(
+	writable(false),
+	createStorage(),
+	'lowBandwidthMode'
+);
+export const interfaceDisplayThumbnailAvatars = persist(
+	writable(false),
+	createStorage(),
+	'disableThumbnailAvatars'
+);
+export const interfaceDefaultPage = persist(writable('/'), createStorage(), 'defaultPage');
+export const interfaceSearchHistoryEnabled = persist(
+	writable(false),
+	createStorage(),
+	'searchHistoryEnabled'
+);
+export const interfaceAllowInsecureRequests = persist(
+	writable(false),
+	createStorage(),
+	'allowInsecureRequests'
+);
+export const interfaceDisableAutoUpdate = persist(
+	writable(false),
+	createStorage(),
+	'disableAutoUpdate'
+);
+export const interfaceAndroidUseNativeShare = persist(
+	writable(true),
+	createStorage(),
+	'androidUseNativeShare'
+);
 
-export const sponsorBlockStore = persisted('sponsorBlock', true);
-export const sponsorBlockUrlStore: Writable<string | null | undefined> = persisted(
-	'sponsorBlockUrl',
-	import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE || 'https://sponsor.ajay.app'
+export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');
+export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist(
+	writable(import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE || 'https://sponsor.ajay.app'),
+	createStorage(),
+	'sponsorBlockUrl'
 );
-export const sponsorBlockCategoriesStore: Writable<string[]> = persisted(
-	'sponsorBlockCategories',
-	[]
-);
-export const sponsorBlockDisplayToastStore: Writable<boolean> = persisted(
-	'sponsorBlockDisplayToast',
-	false
-);
-export const sponsorBlockTimelineStore: Writable<boolean> = persisted(
-	'sponsorBlockTimeline',
-	false
+export const sponsorBlockCategoriesStore: Writable<string[]> = persist(
+	writable([]),
+	createStorage(),
+	'sponsorBlockCategories'
 );
 
-export const deArrowInstanceStore = persisted(
-	'deArrowInstance',
-	import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE || 'https://sponsor.ajay.app'
+export const sponsorBlockDisplayToastStore: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'sponsorBlockDisplayToast'
 );
-export const deArrowEnabledStore = persisted('deArrowEnabled', false);
-export const deArrowTitlesOnly = persisted('deArrowTitlesOnly', true);
-export const deArrowThumbnailInstanceStore = persisted(
-	'deArrowThumbnailInstance',
-	import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE || 'https://dearrow-thumb.ajay.app'
+export const sponsorBlockTimelineStore: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'sponsorBlockTimeline'
+);
+
+export const deArrowInstanceStore = persist(
+	writable(import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE || 'https://sponsor.ajay.app'),
+	createStorage(),
+	'deArrowInstance'
+);
+export const deArrowEnabledStore = persist(writable(false), createStorage(), 'deArrowEnabled');
+export const deArrowTitlesOnly = persist(writable(true), createStorage(), 'deArrowTitlesOnly');
+export const deArrowThumbnailInstanceStore = persist(
+	writable(
+		import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE || 'https://dearrow-thumb.ajay.app'
+	),
+	createStorage(),
+	'deArrowThumbnailInstance'
 );
 
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
@@ -144,7 +316,11 @@ export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; 
 
 export const poTokenCacheStore: Writable<string | undefined> = writable();
 
-export const searchHistoryStore: Writable<string[]> = persisted('searchHistory', []);
+export const searchHistoryStore: Writable<string[]> = persist(
+	writable([]),
+	createStorage(),
+	'searchHistory'
+);
 
 export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];

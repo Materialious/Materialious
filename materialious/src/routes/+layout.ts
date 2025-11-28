@@ -8,6 +8,7 @@ import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
 import { authStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store';
 import { get } from 'svelte/store';
+import '$lib/android/http/androidRequests';
 
 export const ssr = false;
 

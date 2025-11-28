@@ -790,6 +790,9 @@
 
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
+			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
+			await Motion.removeAllListeners();
+
 			if (originalOrigination) {
 				await ScreenOrientation.lock({
 					orientation: originalOrigination.type
@@ -800,8 +803,6 @@
 		try {
 			savePlayerPos();
 		} catch (error) {}
-
-		document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 

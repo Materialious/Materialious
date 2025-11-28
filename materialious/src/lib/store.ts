@@ -38,7 +38,7 @@ function createStorage(): StorageInterface<any> {
 			}
 		};
 	} else {
-		return createLocalStorage();
+		return createLocalStorage(true);
 	}
 }
 

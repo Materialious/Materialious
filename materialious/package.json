@@ -51,6 +51,7 @@
 		"@capacitor/preferences": "^7.0.2",
 		"@capacitor/screen-orientation": "^7.0.0",
 		"@capacitor/share": "^7.0.2",
+		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"beercss": "^3.12.13",
 		"bgutils-js": "^3.2.0",

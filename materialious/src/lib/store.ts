@@ -6,9 +6,11 @@ import { Preferences } from '@capacitor/preferences';
 import {
 	persist,
 	createLocalStorage,
-	type StorageInterface
+	type StorageInterface,
+	type SelfUpdateStorageInterface
 } from '@macfja/svelte-persistent-store';
 import type { TitleCase } from './letterCasing';
+import { serialize, deserialize } from '@macfja/serializer';
 import type {
 	Channel,
 	HashTag,
@@ -22,20 +24,53 @@ import type {
 import { ensureNoTrailingSlash } from './misc';
 import type { PhasedDescription } from './timestamps';
 
-function createStorage(): StorageInterface<any> {
+function createListenerFunctions(): {
+	callListeners: (eventKey: string, newValue: any) => void;
+	addListener: (key: string, listener: (newValue: any) => void) => void;
+	removeListener: (key: string, listener: (newValue: any) => void) => void;
+} {
+	const listeners: Array<{ key: string; listener: (newValue: any) => void }> = [];
+	return {
+		callListeners(eventKey: string, newValue: any) {
+			if (newValue === undefined) {
+				return;
+			}
+			listeners.filter(({ key }) => key === eventKey).forEach(({ listener }) => listener(newValue));
+		},
+		addListener(key: string, listener: (newValue: any) => void) {
+			listeners.push({ key, listener });
+		},
+		removeListener(key: string, listener: (newValue: any) => void) {
+			const index = listeners.indexOf({ key, listener });
+			if (index !== -1) {
+				listeners.splice(index, 1);
+			}
+		}
+	};
+}
+
+function createStorage(): StorageInterface<any> | SelfUpdateStorageInterface<any> {
 	if (Capacitor.getPlatform() === 'android') {
+		// https://github.com/MacFJA/svelte-persistent-store/blob/main/.docs/How-To/02-New-Async-Storage.md
+		const { removeListener, callListeners, addListener } = createListenerFunctions();
 		return {
 			getValue(key: string): any | null {
-				return Preferences.get({ key: key }).then((value) => {
-					return value.value ? JSON.parse(value.value) : value.value;
+				Preferences.get({ key: key }).then((value) => {
+					if (value.value !== null) {
+						callListeners(key, deserialize(value.value));
+					}
 				});
+
+				return null;
 			},
 			deleteValue(key: string) {
 				Preferences.remove({ key: key });
 			},
 			setValue(key: string, value: any) {
-				Preferences.set({ key: key, value: JSON.stringify(value) });
-			}
+				Preferences.set({ key: key, value: serialize(value) });
+			},
+			addListener,
+			removeListener
 		};
 	} else {
 		return createLocalStorage(true);
@@ -242,6 +277,7 @@ export const sponsorBlockCategoriesStore: Writable<string[]> = persist(
 	createStorage(),
 	'sponsorBlockCategories'
 );
+
 export const sponsorBlockDisplayToastStore: Writable<boolean> = persist(
 	writable(false),
 	createStorage(),

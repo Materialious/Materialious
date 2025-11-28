@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { videoLength } from '$lib/numbers';
+	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
@@ -226,13 +226,13 @@
 
 				{#if !('publishedText' in video) && 'viewCountText' in video}
 					•
-					{video.viewCountText}
+					{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
 					{$_('views')}
 				{/if}
 
 				{#if 'publishedText' in video}
 					<div class="max">
-						{video.viewCountText} • {video.publishedText}
+						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)} • {video.publishedText}
 					</div>
 				{/if}
 			</div>

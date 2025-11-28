@@ -78,8 +78,7 @@
 		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
 	) {
 		playerState.set({
-			data: data,
-			isSyncing: $syncPartyPeerStore !== null
+			data: data
 		});
 	}
 

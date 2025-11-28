@@ -176,7 +176,6 @@ export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
 export interface PlayerState {
 	data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-	isSyncing?: boolean;
 	playerElement?: HTMLMediaElement | undefined;
 }
 

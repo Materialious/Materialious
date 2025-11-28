@@ -415,7 +415,7 @@
 						{/if}
 						<div class="player">
 							{#key $playerState.data.video.videoId}
-								<Player data={$playerState.data} isSyncing={$playerState.isSyncing} />
+								<Player data={$playerState.data} />
 							{/key}
 						</div>
 					</div>

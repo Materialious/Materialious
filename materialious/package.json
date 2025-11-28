@@ -36,11 +36,8 @@
 		"svelte-check": "^4.3.3",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
-<<<<<<< HEAD
 		"typescript-eslint": "^8.47.0",
-
 		"vite": "^7.2.4"
->>>>>>> origin/dependabot/npm_and_yarn/materialious/vite-7.2.4
 	},
 	"type": "module",
 	"dependencies": {

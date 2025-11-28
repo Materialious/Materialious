@@ -53,7 +53,6 @@
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
-		isSyncing?: boolean;
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 	}
@@ -172,6 +171,8 @@
 		document.addEventListener('fullscreenchange', async () => {
 			const isFullScreen = !!document.fullscreenElement;
 
+			console.log('isFullScreen', isFullScreen);
+
 			if (isFullScreen) {
 				// Ensure bar color is black while in fullscreen
 				await SafeArea.enable({
@@ -189,17 +190,22 @@
 
 			if (!$playerAndroidLockOrientation) return;
 
+			console.log(videoFormats[0]);
+
 			if (isFullScreen && videoFormats[0].resolution) {
 				const widthHeight = videoFormats[0].resolution.split('x');
 
 				if (widthHeight.length !== 2) return;
 
 				if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+					console.log('needs to be landscape');
 					await ScreenOrientation.lock({ orientation: 'landscape' });
 				} else {
+					console.log('needs to be portrait');
 					await ScreenOrientation.lock({ orientation: 'portrait' });
 				}
 			} else {
+				console.log('reset to og');
 				await ScreenOrientation.lock({
 					orientation: (originalOrigination as ScreenOrientationResult).type
 				});

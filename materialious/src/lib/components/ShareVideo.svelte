@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { instanceStore } from '$lib/store';
+	import { instanceStore, interfaceAndroidUseNativeShare } from '$lib/store';
 	import { Share } from '@capacitor/share';
 	import ui from 'beercss';
 	import { Clipboard } from '@capacitor/clipboard';
@@ -20,7 +20,11 @@
 	async function shareUrl(url: string, param: string = 't') {
 		if (includeTimestamp) url += `?${param}=${Math.floor(currentTime ?? 0)}`;
 
-		if ((await Share.canShare()) && Capacitor.getPlatform() !== 'electron') {
+		if (
+			(await Share.canShare()) &&
+			Capacitor.getPlatform() !== 'electron' &&
+			$interfaceAndroidUseNativeShare
+		) {
 			await Share.share({ url: url, dialogTitle: video.title });
 		} else {
 			await Clipboard.write({ string: url });

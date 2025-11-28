@@ -154,6 +154,49 @@
 		}
 	}
 
+	async function onAndroidFullscreenChange() {
+		const videoFormats = data.video.adaptiveFormats.filter((format) =>
+			format.type.startsWith('video/')
+		);
+
+		const isFullScreen = !!document.fullscreenElement;
+
+		if (isFullScreen) {
+			// Ensure bar color is black while in fullscreen
+			await SafeArea.enable({
+				config: {
+					customColorsForSystemBars: true,
+					statusBarColor: '#00000000',
+					statusBarContent: 'light',
+					navigationBarColor: '#00000000',
+					navigationBarContent: 'light'
+				}
+			});
+		} else {
+			await setStatusBarColor();
+		}
+
+		if (!$playerAndroidLockOrientation) return;
+
+		console.log(videoFormats[0]);
+
+		if (isFullScreen && videoFormats[0].resolution) {
+			const widthHeight = videoFormats[0].resolution.split('x');
+
+			if (widthHeight.length !== 2) return;
+
+			if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+				await ScreenOrientation.lock({ orientation: 'landscape' });
+			} else {
+				await ScreenOrientation.lock({ orientation: 'portrait' });
+			}
+		} else {
+			await ScreenOrientation.lock({
+				orientation: (originalOrigination as ScreenOrientationResult).type
+			});
+		}
+	}
+
 	async function androidHandleRotate() {
 		if (
 			Capacitor.getPlatform() !== 'android' ||
@@ -162,55 +205,9 @@
 		)
 			return;
 
-		const videoFormats = data.video.adaptiveFormats.filter((format) =>
-			format.type.startsWith('video/')
-		);
-
 		originalOrigination = await ScreenOrientation.orientation();
 
-		document.addEventListener('fullscreenchange', async () => {
-			const isFullScreen = !!document.fullscreenElement;
-
-			console.log('isFullScreen', isFullScreen);
-
-			if (isFullScreen) {
-				// Ensure bar color is black while in fullscreen
-				await SafeArea.enable({
-					config: {
-						customColorsForSystemBars: true,
-						statusBarColor: '#00000000',
-						statusBarContent: 'light',
-						navigationBarColor: '#00000000',
-						navigationBarContent: 'light'
-					}
-				});
-			} else {
-				await setStatusBarColor();
-			}
-
-			if (!$playerAndroidLockOrientation) return;
-
-			console.log(videoFormats[0]);
-
-			if (isFullScreen && videoFormats[0].resolution) {
-				const widthHeight = videoFormats[0].resolution.split('x');
-
-				if (widthHeight.length !== 2) return;
-
-				if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-					console.log('needs to be landscape');
-					await ScreenOrientation.lock({ orientation: 'landscape' });
-				} else {
-					console.log('needs to be portrait');
-					await ScreenOrientation.lock({ orientation: 'portrait' });
-				}
-			} else {
-				console.log('reset to og');
-				await ScreenOrientation.lock({
-					orientation: (originalOrigination as ScreenOrientationResult).type
-				});
-			}
-		});
+		document.addEventListener('fullscreenchange', onAndroidFullscreenChange);
 	}
 
 	async function setupSponsorSkip() {
@@ -803,6 +800,8 @@
 		try {
 			savePlayerPos();
 		} catch (error) {}
+
+		document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 

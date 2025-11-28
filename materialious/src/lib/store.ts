@@ -265,6 +265,11 @@ export const interfaceDisableAutoUpdate = persist(
 	createStorage(),
 	'disableAutoUpdate'
 );
+export const interfaceAndroidUseNativeShare = persist(
+	writable(true),
+	createStorage(),
+	'androidUseNativeShare'
+);
 
 export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist(

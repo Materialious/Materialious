@@ -77,7 +77,8 @@
             "materialiousLink": "Materialious-Link kopieren",
             "invidiousRedirect": "Invidious-Weiterleitungslink kopieren",
             "youtubeLink": "YouTube-Link kopieren",
-            "includeTimestamp": "Mit Zeitstempel"
+            "includeTimestamp": "Mit Zeitstempel",
+            "copiedSuccess": "In Zwischenablage kopiert"
         },
         "download": "Herunterladen",
         "downloadSteps": {
@@ -178,7 +179,8 @@
         "companionUrl": "Companion URL",
         "expandChapters": "Kapitel standardmäßig ausklappen",
         "displayThumbnailAvatars": "Vorschaubild-Avatare (Langsam)",
-        "about": "Über"
+        "about": "Über",
+        "androidNativeShare": "Natives Teilen nutzen"
     },
     "subscribe": "Abonnieren",
     "recommendedVideos": "Vorgeschlagene Videos",

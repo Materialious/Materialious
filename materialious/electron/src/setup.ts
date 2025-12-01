@@ -5,23 +5,23 @@ import {
 	setupCapacitorElectronPlugins
 } from '@capacitor-community/electron';
 import { USER_AGENT } from 'bgutils-js';
-import path from 'node:path';
 import chokidar from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';
 import {
 	app,
 	BrowserWindow,
+	globalShortcut,
 	Menu,
 	MenuItem,
 	nativeImage,
 	session,
 	shell,
-	Tray,
-	globalShortcut
+	Tray
 } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
+import path from 'node:path';
 import { join } from 'path';
 
 // Define components for a watcher to detect when the webapp is changed so we can reload in Dev mode.
@@ -121,7 +121,7 @@ export class ElectronCapacitorApp {
 				nodeIntegration: true,
 				contextIsolation: true,
 				webSecurity: false,
-				// Use preload to inject the electron varriant overrides for capacitor plugins.
+				// Use preload to inject the electron variant overrides for capacitor plugins.
 				// preload: join(app.getAppPath(), "node_modules", "@capacitor-community", "electron", "dist", "runtime", "electron-rt.js"),
 				preload: preloadPath
 			}
@@ -132,7 +132,7 @@ export class ElectronCapacitorApp {
 			this.MainWindow.setBackgroundColor(this.CapacitorFileConfig.electron.backgroundColor);
 		}
 
-		// If we close the main window with the splashscreen enabled we need to destory the ref.
+		// If we close the main window with the splashscreen enabled we need to destroy the ref.
 		this.MainWindow.on('closed', () => {
 			if (
 				this.SplashScreen?.getSplashWindow() &&

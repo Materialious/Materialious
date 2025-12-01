@@ -315,9 +315,9 @@
 
 			let dashUrl: string;
 
-			// Due to CORs issues with redirects, hosted instances of Materialious
-			// dirctly provide the companion instance
-			// while clients can just use the reirect provided by Invidious' API
+			// Due to CORS issues with redirects, hosted instances of Materialious
+			// directly provide the companion instance
+			// while clients can just use the redirect provided by Invidious' API
 			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
 				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
 			} else {

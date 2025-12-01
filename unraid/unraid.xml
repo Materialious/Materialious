@@ -8,7 +8,7 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/Materialious/Materialious/issues</Support>
   <Project>https://github.com/Materialious/Materialious</Project>
-  <Overview>Materialious is a privacy respecting frontend for YouTube built ontop of Invidious.</Overview>
+  <Overview>Materialious is a privacy respecting frontend for YouTube built on top of Invidious.</Overview>
   <Category>Productivity: Tools:</Category>
   <WebUI>http://[IP]:[PORT:80]</WebUI>
   <Icon>https://i.imgur.com/aS2nnhv.png</Icon>

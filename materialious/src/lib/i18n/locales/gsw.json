@@ -87,7 +87,8 @@
         "displayThumbnailAvatars": "Vorschaubild-Avatar (Langsam)",
         "expandDescription": "Beschriibig standardmässig erwiitere",
         "disableAutoUpdate": "Automatischi Updates deaktiviere",
-        "about": "Über"
+        "about": "Über",
+        "androidNativeShare": "Nativs Teile bruche"
     },
     "videos": "Videos",
     "cancel": "Abbreche",
@@ -160,7 +161,8 @@
             "materialiousLink": "Materialious-Link kopiere",
             "youtubeLink": "YouTube-Link kopiere",
             "invidiousRedirect": "Invidious-Wiiterleitigslink kopiere",
-            "includeTimestamp": "Mit Ziitstempel"
+            "includeTimestamp": "Mit Ziitstempel",
+            "copiedSuccess": "I d Zwüscheablaag kopiert"
         },
         "download": "Abelade",
         "downloadSteps": {

@@ -44,8 +44,8 @@
         "theme": {
             "theme": "Motīvs",
             "color": "Krāsa",
-            "darkMode": "Tumšais režīms",
-            "lightMode": "Gaišais režīms",
+            "darkMode": "Tumšais motīvs",
+            "lightMode": "Gaišais motīvs",
             "AmoledTheme": "AMOLED motīvs"
         },
         "player": {
@@ -55,7 +55,10 @@
             "youtubeJsAlways": "Vienmēr izmantot",
             "localVideoFallback": "Vietējais video ieguves rezerves variants",
             "youtubeJsFallback": "Vietējais video apstrādes rezerves variants",
-            "alwaysLoopVideo": "Vienmēr atskaņot (malt) uz riņķi video"
+            "alwaysLoopVideo": "Vienmēr atskaņot (malt) uz riņķi video",
+            "miniPlayer": "Mini atskaņotājs",
+            "playerStatistics": "Rādīt atskaņotāja statistiku pēc noklusējuma",
+            "autoPlayNextByDefault": "Automātiski atskaņot nākamo video pēc noklusējuma"
         },
         "deArrow": {
             "titleOnly": "Tikai virsrakstu",

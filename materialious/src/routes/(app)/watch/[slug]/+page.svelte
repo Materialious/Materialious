@@ -26,7 +26,6 @@
 		playlistCacheStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
-		syncPartyPeerStore,
 		type PlayerState
 	} from '$lib/store';
 	import ui from 'beercss';

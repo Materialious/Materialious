@@ -57,7 +57,7 @@ export default ts.config(
 			'.DS_Store',
 			'node_modules',
 			'/build',
-			'/.svelte-kit',
+			'**/.svelte-kit/*',
 			'/package',
 			'.env',
 			'.env.*',
@@ -65,7 +65,14 @@ export default ts.config(
 			// Ignore files for PNPM, NPM and YARN
 			'pnpm-lock.yaml',
 			'package-lock.json',
-			'yarn.lock'
+			'yarn.lock',
+			// Ignore our nodejs android code
+			'**/nodejs-android/*',
+			// Ignore electron code from capacitorjs
+			'**/electron/*',
+			// Ignore build files
+			'**/build/*',
+			'**/android/app/src/main/assets/*'
 		]
 	}
 );

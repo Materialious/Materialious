@@ -29,7 +29,9 @@
 				sort_by: 'top',
 				source: 'youtube'
 			});
-		} catch {}
+		} catch {
+			// Continue regardless of error
+		}
 	}
 
 	function commentTimestamps(html: string): string {
@@ -71,7 +73,9 @@
 					<span class="secondary-text">{comment.publishedText}</span>
 				</a>
 				<p class="no-margin">
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 					{@html commentTimestamps(comment.contentHtml)}
+					<!-- Comment comes directly from YT so is already sanitized -->
 				</p>
 				<div class="comment-actions">
 					<p class="no-margin no-padding"><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
@@ -95,7 +99,7 @@
 	{/if}
 
 	{#if replies}
-		{#each replies.comments as reply}
+		{#each replies.comments as reply (reply)}
 			<CommentSelf comment={reply} {videoId} isSubComp={true} />
 		{/each}
 	{/if}

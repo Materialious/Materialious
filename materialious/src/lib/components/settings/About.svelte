@@ -48,7 +48,7 @@
 <h4>{$_('contributors')}</h4>
 
 <div class="grid">
-	{#each ghContributors as contributor}
+	{#each ghContributors as contributor (contributor)}
 		{#if contributor.type === 'User'}
 			<div class="s12 m4 l4">
 				<article>

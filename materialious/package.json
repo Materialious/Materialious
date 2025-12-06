@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.11.10",
+	"version": "1.12.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
@@ -32,12 +32,12 @@
 		"patch-package": "^8.0.1",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
-		"svelte": "^5.43.5",
+		"svelte": "^5.45.2",
 		"svelte-check": "^4.3.3",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.47.0",
-		"vite": "^7.2.4"
+		"vite": "^7.2.6"
 	},
 	"type": "module",
 	"dependencies": {
@@ -47,7 +47,7 @@
 		"@capacitor/app": "^7.1.0",
 		"@capacitor/browser": "^7.0.0",
 		"@capacitor/clipboard": "^7.0.0",
-		"@capacitor/core": "^7.4.3",
+		"@capacitor/core": "^7.4.4",
 		"@capacitor/preferences": "^7.0.2",
 		"@capacitor/screen-orientation": "^7.0.0",
 		"@capacitor/share": "^7.0.2",
@@ -60,7 +60,7 @@
 		"fuse.js": "^7.0.0",
 		"googlevideo": "^4.0.4",
 		"he": "^1.2.0",
-		"human-number": "^2.0.7",
+		"human-number": "^2.0.8",
 		"i18next": "^25.6.3",
 		"iso-3166": "^4.4.0",
 		"iso-639-1": "^3.1.5",
@@ -68,7 +68,7 @@
 		"media-captions": "^1.0.4",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.5",
-		"shaka-player": "^4.16.9",
+		"shaka-player": "^4.16.11",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"youtubei.js": "^16.0.1"

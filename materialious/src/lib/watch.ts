@@ -62,7 +62,9 @@ export async function getWatchDetails(videoId: string, url: URL) {
 			returnYTDislikes = get(returnYtDislikesStore)
 				? getDislikes(videoId, { priority: 'low' })
 				: null;
-		} catch {}
+		} catch {
+			// Continue regardless of error
+		}
 	}
 
 	const playlistId = url.searchParams.get('playlist');

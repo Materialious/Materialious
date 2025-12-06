@@ -178,7 +178,7 @@ services:
       # URL to your proxied Companion instance
       VITE_DEFAULT_COMPANION_INSTANCE: "https://companion.materialio.us"
 
-      # URL TO RYD
+      # URL TO RYD (Return YouTube Dislike / https://github.com/Anarios/return-youtube-dislike)
       # Leave blank to disable completely.
       VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
 

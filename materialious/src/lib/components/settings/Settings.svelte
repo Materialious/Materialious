@@ -128,6 +128,7 @@
 				</a>
 			{/each}
 			{#if !$isAndroidTvStore}
+				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a href={`${$instanceStore}/preferences`} target="_blank" referrerpolicy="no-referrer">
 					<i>
 						<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">

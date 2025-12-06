@@ -18,6 +18,7 @@ export async function load({ url }) {
 			goToUrl.searchParams.set('time', timestamp);
 		}
 
+		// eslint-disable-next-line svelte/no-navigation-without-resolve
 		goto(goToUrl);
 	} else {
 		error(404);

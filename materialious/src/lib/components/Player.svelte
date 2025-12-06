@@ -63,6 +63,7 @@
 
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
+	// eslint-disable-next-line no-undef
 	let watchProgressTimeout: NodeJS.Timeout;
 	let showVideoRetry = $state(false);
 
@@ -303,7 +304,9 @@
 
 		try {
 			document.getElementsByClassName('shaka-ad-info')[0].remove();
-		} catch {}
+		} catch {
+			// Continue regardless of error
+		}
 
 		if (!data.video.liveNow) {
 			if (watchProgressTimeout) {
@@ -525,7 +528,7 @@
 			console.error('Player error:', error);
 		});
 
-		player.getNetworkingEngine()?.registerResponseFilter((type, response, _) => {
+		player.getNetworkingEngine()?.registerResponseFilter((type, response) => {
 			if (
 				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
 				!response.uri.includes('/api/timedtext')
@@ -746,12 +749,16 @@
 			if (playerPos && Number(playerPos) > toSetTime) {
 				toSetTime = Number(playerPos);
 			}
-		} catch {}
+		} catch {
+			// Continue regardless of error
+		}
 
 		if ($synciousStore && $synciousInstanceStore && $authStore) {
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
-			} catch {}
+			} catch {
+				// Continue regardless of error
+			}
 		}
 
 		return toSetTime;
@@ -769,7 +776,9 @@
 			) {
 				try {
 					localStorage.setItem(`v_${data.video.videoId}`, playerElement.currentTime.toString());
-				} catch {}
+				} catch {
+					// Continue regardless of error
+				}
 
 				if (synciousEnabled) {
 					saveVideoProgress(data.video.videoId, playerElement.currentTime);
@@ -777,7 +786,9 @@
 			} else {
 				try {
 					localStorage.removeItem(`v_${data.video.videoId}`);
-				} catch {}
+				} catch {
+					// Continue regardless of error
+				}
 
 				if (synciousEnabled) {
 					deleteVideoProgress(data.video.videoId);
@@ -799,7 +810,9 @@
 
 		try {
 			savePlayerPos();
-		} catch (error) {}
+		} catch {
+			// Continue regardless of error
+		}
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 

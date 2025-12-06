@@ -28,7 +28,9 @@ export async function load({ url }) {
 			if (resolvedUrl.pageType === 'WEB_PAGE_TYPE_CHANNEL') {
 				goto(resolve(`/channel/[authorId]`, { authorId: resolvedUrl.ucid }));
 			}
-		} catch {}
+		} catch {
+			// continue regardless of error
+		}
 	}
 
 	const defaultPage = get(interfaceDefaultPage);

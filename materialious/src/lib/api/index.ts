@@ -52,7 +52,9 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 		try {
 			const json = await response.json();
 			message = 'errorBacktrace' in json ? json.errorBacktrace : json.error;
-		} catch {}
+		} catch {
+			// Continue regardless of error
+		}
 		throw Error(message);
 	}
 

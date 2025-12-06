@@ -1,5 +1,14 @@
 # Setup
-For security reasons regarding CORS, your hosted instance of Materialious must serve as the value for the `Access-Control-Allow-Origin` header on Invidious.
+
+### CORS
+To assure browsers they are allowed to access your Materialious instance
+despite their default [same-origin policy][wp-sop], the instance's webserver
+needs to send [cross-origin resource sharing (CORS)][wp-cors] headers in its
+response to the browser's `OPTIONS` request. The `Access-Control-Allow-Origin`
+header of that response must be set to the public origin URI of your instance.
+
+  [wp-sop]: https://en.wikipedia.org/wiki/Same-origin_policy
+  [wp-cors]: https://en.wikipedia.org/wiki/Cross-origin_resource_sharing
 
 Invidious doesn't provide a simple way to modify CORS, so this must be done with your reverse proxy.
 
@@ -169,7 +178,7 @@ services:
       # URL to your proxied Companion instance
       VITE_DEFAULT_COMPANION_INSTANCE: "https://companion.materialio.us"
 
-      # URL TO RYD
+      # URL TO RYD (Return YouTube Dislike / https://github.com/Anarios/return-youtube-dislike)
       # Leave blank to disable completely.
       VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
 

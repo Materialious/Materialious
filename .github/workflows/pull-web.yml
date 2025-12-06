@@ -1,24 +1,26 @@
 name: Check web
 
 on:
-  pull_request:
-    branches: ["main"]
+    pull_request:
+        branches: ["main"]
 
 jobs:
-  web-check:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./materialious
+    web-check:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./materialious
 
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: latest
-      - name: Install modules
-        run: npm install
-      - name: Check linting
-        run: npm run check
-      - name: Attempt to build codebase
-        run: npm run build
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: latest
+            - name: Install modules
+              run: npm install
+            - name: Run svelte checks
+              run: npm run check
+            - name: Check linting
+              run: npm run eslint
+            - name: Attempt to build codebase
+              run: npm run build

@@ -24,7 +24,7 @@
 - Sync your watch progress between Invidious sessions.
 - Watch sync parties.
 - Sponsorblock built-in.
-- Return YouTube dislikes built-in.
+- [Return YouTube Dislike](https://github.com/Anarios/return-youtube-dislike) (RYD) built-in.
 - [DeArrow](https://github.com/ajayyy/DeArrow) built-in (With local processing fallback).
 - No ads.
 - No tracking.

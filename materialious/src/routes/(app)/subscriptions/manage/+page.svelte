@@ -28,7 +28,9 @@
 			subscriptions = subscriptions.filter((item) => {
 				return item.authorId !== authorId;
 			});
-		} catch {}
+		} catch {
+			// Continue regradless of error
+		}
 	}
 </script>
 

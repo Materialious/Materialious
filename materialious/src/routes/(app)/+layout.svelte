@@ -119,7 +119,9 @@
 
 	async function login() {
 		if (!$isAndroidTvStore) {
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			const path = new URL(`${get(instanceStore)}/authorize_token`);
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			const searchParams = new URLSearchParams({
 				scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
 			});
@@ -207,7 +209,9 @@
 					const colorPalette = await colorTheme.getColorPalette();
 					themeHex = convertToHexColorCode(colorPalette.primary);
 					await ui('theme', themeHex);
-				} catch {}
+				} catch {
+					// Continue regardless of error
+				}
 			}
 		}
 
@@ -262,6 +266,7 @@
 </script>
 
 <svelte:head>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html webManifestLink}
 
 	{#if Capacitor.getPlatform() === 'android' && !$isAndroidTvStore}
@@ -284,7 +289,7 @@
 		>
 			<Logo />
 		</header>
-		{#each getPages() as navPage}
+		{#each getPages() as navPage (navPage)}
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
 					><i>{navPage.icon}</i>
@@ -361,7 +366,7 @@
 	</nav>
 
 	<nav class="bottom s">
-		{#each getPages() as navPage}
+		{#each getPages() as navPage (navPage)}
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a
 					class="round"
@@ -385,7 +390,7 @@
 		{#if notifications.length === 0}
 			<p>{$_('layout.noNewNotifications')}</p>
 		{:else}
-			{#each notifications as notification}
+			{#each notifications as notification (notification)}
 				<article class="no-padding border">
 					<Thumbnail video={notification}></Thumbnail>
 				</article>

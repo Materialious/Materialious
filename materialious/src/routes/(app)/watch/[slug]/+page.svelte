@@ -26,7 +26,6 @@
 		playlistCacheStore,
 		playlistSettingsStore,
 		syncPartyConnectionsStore,
-		syncPartyPeerStore,
 		type PlayerState
 	} from '$lib/store';
 	import ui from 'beercss';
@@ -71,6 +70,7 @@
 	let playerCurrentTime: number = $state(0);
 
 	let premiereTime = $state('');
+	// eslint-disable-next-line no-undef
 	let premiereUpdateInterval: NodeJS.Timeout;
 
 	if (
@@ -302,7 +302,7 @@
 			playerElement.ended ||
 			playerElement.currentTime === 0 ||
 			playerElement.readyState <= 2 ||
-			!playerMiniplayerEnabled
+			!$playerMiniplayerEnabled
 		) {
 			playerState.set(undefined);
 		}
@@ -363,6 +363,7 @@
 		playertheatreModeIsActive.set(!$playertheatreModeIsActive);
 	}
 
+	// eslint-disable-next-line no-undef
 	let pauseTimeout: NodeJS.Timeout | undefined = $state();
 	function setPauseTimer() {
 		if (pauseTimeout) {

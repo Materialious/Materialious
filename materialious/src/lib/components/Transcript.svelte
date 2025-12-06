@@ -48,10 +48,13 @@
 
 		isLoading = true;
 		transcript = null;
-		const resp = await fetch(`${!video.fallbackPatch ? new URL(get(instanceStore)).origin : ''}${url}`);
+		const resp = await fetch(
+			`${!video.fallbackPatch ? new URL(get(instanceStore)).origin : ''}${url}`
+		);
 		transcript = await parseText(await resp.text(), { strict: false });
 
 		// Group cues by Math.ceil(startTime)
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const startTimeMap = new Map<number, VTTCue[]>();
 		for (const cue of transcript.cues) {
 			const roundedTime = Math.ceil(cue.startTime);
@@ -98,7 +101,7 @@
 		<div class="field label suffix border">
 			<select bind:value={url} onchange={loadTranscript} name="captions">
 				<option selected={true} value={null}>{$_('selectLang')}</option>
-				{#each video.captions as caption}
+				{#each video.captions as caption (caption)}
 					<option value={caption.url}>{caption.label}</option>
 				{/each}
 			</select>
@@ -131,7 +134,7 @@
 	{:else if transcript}
 		{#if transcript.cues.length > 0}
 			{#if transcriptCues.length > 0}
-				{#each transcriptCues as cue}
+				{#each transcriptCues as cue (cue)}
 					<div
 						class="transcript-line"
 						id={`transcript-line-${cue.startTime}`}

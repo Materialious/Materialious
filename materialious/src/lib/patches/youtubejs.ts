@@ -12,7 +12,7 @@ import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
-import type { Types, Misc } from 'youtubei.js';
+import type { Types } from 'youtubei.js';
 import { Innertube, UniversalCache, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 
 Platform.shim.eval = async (

@@ -237,7 +237,9 @@ function setStores(toSet: Record<string, any>) {
 		let userOverwritten: boolean = false;
 		try {
 			userOverwritten = localStorage.getItem(store.name) !== null;
-		} catch {}
+		} catch {
+			// Continue regardless of error
+		}
 
 		const paramValue = toSet[store.name];
 		if (typeof paramValue !== 'undefined' && !userOverwritten) {
@@ -284,7 +286,7 @@ export function bookmarkletSaveToUrl(): string {
 	const url = new URL(location.origin);
 
 	persistedStores.forEach((store) => {
-		let value = get(store.store);
+		const value = get(store.store);
 		if (value !== null && value !== undefined) {
 			url.searchParams.set(store.name, value.toString());
 		}

@@ -46,7 +46,9 @@ async function loadDayjsLocale(localeName: string) {
 	try {
 		const { default: locale } = await import(`dayjs/locale/${localeName}`);
 		dayjs.locale(locale);
-	} catch {}
+	} catch {
+		// Continue regardless of error
+	}
 }
 
 export async function initI18n(selectedLocale: string = getUserLocale()): Promise<void> {

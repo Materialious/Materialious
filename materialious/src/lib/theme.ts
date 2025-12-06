@@ -8,7 +8,7 @@ import { darkModeStore, interfaceAmoledTheme } from './store';
 export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
 	const givenSettings = await ui('theme');
 
-	// @ts-ignore
+	// @ts-expect-error Works as expected
 	const themes: string = givenSettings[mode ? mode : (ui('mode') as string)];
 	const themeVars: Record<string, string> = {};
 	themes.split(';').forEach((keyVar) => {

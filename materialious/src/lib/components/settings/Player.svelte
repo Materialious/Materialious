@@ -73,7 +73,7 @@
 		onchange={() => playerDefaultLanguage.set(defaultLanguage)}
 	>
 		<option selected={$playerDefaultLanguage === 'original'} value="original">Original</option>
-		{#each languageNames as language}
+		{#each languageNames as language (language)}
 			<option selected={$playerDefaultLanguage === language} value={language}
 				>{titleCase(language)}</option
 			>
@@ -113,7 +113,7 @@
 		bind:value={$playerDefaultPlaybackSpeed}
 		onchange={onSpeedChange}
 	>
-		{#each playbackRates as speed}
+		{#each playbackRates as speed (speed)}
 			<option value={speed}>x{speed}</option>
 		{/each}
 	</select>
@@ -304,7 +304,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$playerStatisticsByDefault}
-				onclick={() => playerStatisticsByDefault.set(!playerStatisticsByDefault)}
+				onclick={() => playerStatisticsByDefault.set(!$playerStatisticsByDefault)}
 				role="switch"
 			/>
 			<span></span>

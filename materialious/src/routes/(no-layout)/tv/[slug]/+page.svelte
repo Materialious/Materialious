@@ -130,7 +130,7 @@
 		{#if data.content.timestamps.length > 0}
 			<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
 			<div class="grid">
-				{#each data.content.timestamps as timestamp}
+				{#each data.content.timestamps as timestamp (timestamp)}
 					<ContentColumn>
 						<article
 							role="presentation"

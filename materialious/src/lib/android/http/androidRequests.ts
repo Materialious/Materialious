@@ -47,7 +47,7 @@ if (Capacitor.getPlatform() === 'android') {
 		if (needsProxying(args[1])) {
 			args[1] = corsProxyUrl + args[1];
 		}
-		/* @ts-ignore */
+		// @ts-expect-error args have any type
 		return originalXhrOpen.apply(this, args);
 	};
 }

@@ -248,7 +248,7 @@ export interface HashTag {
 	videoCount: number;
 }
 
-export interface Notification extends VideoBase {}
+export type Notification = VideoBase;
 
 export interface Feed {
 	notifications: Notification[];

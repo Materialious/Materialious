@@ -108,7 +108,8 @@
         },
         "logout": "Kijelentkezés",
         "companionUrl": "Kiegészítő webcím",
-        "about": "Névjegy"
+        "about": "Névjegy",
+        "androidNativeShare": "Natív megosztás használata"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",
@@ -122,7 +123,8 @@
             "title": "Megosztás",
             "materialiousLink": "Materialious-hivatkozás megosztása",
             "youtubeLink": "Youtube-hivatkozás másolása",
-            "invidiousRedirect": "Invidious átirányítási hivatkozás másolása"
+            "invidiousRedirect": "Invidious átirányítási hivatkozás másolása",
+            "copiedSuccess": "Vágólapra másolva"
         },
         "audioOnly": "Csak hang",
         "theatreMode": "Szélesvásznú mód",

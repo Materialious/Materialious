@@ -1,10 +1,9 @@
 import { pushState } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { page } from '$app/stores';
 import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
-import { instanceStore, interfaceAllowInsecureRequests, isAndroidTvStore } from './store';
+import { interfaceAllowInsecureRequests, isAndroidTvStore } from './store';
 import type {
 	Channel,
 	HashTag,
@@ -14,9 +13,10 @@ import type {
 	Video,
 	VideoBase
 } from './api/model';
+import { page } from '$app/state';
 
 export function isVideoID(videoId: string): boolean {
-	var regExp = /^[a-zA-Z0-9_-]{11}$/;
+	const regExp = /^[a-zA-Z0-9_-]{11}$/;
 	return regExp.test(videoId);
 }
 
@@ -34,15 +34,15 @@ export function unsafeRandomItem(array: any[]): any {
 }
 
 export function setWindowQueryFlag(key: string, value: string) {
-	const currentPage = get(page);
-	currentPage.url.searchParams.set(key, value);
-	pushState(currentPage.url, currentPage.state);
+	page.url.searchParams.set(key, value);
+	// eslint-disable-next-line svelte/no-navigation-without-resolve
+	pushState(page.url, page.state);
 }
 
 export function removeWindowQueryFlag(key: string) {
-	const currentPage = get(page);
-	currentPage.url.searchParams.delete(key);
-	pushState(currentPage.url, currentPage.state);
+	page.url.searchParams.delete(key);
+	// eslint-disable-next-line svelte/no-navigation-without-resolve
+	pushState(page.url, page.state);
 }
 
 let PeerInstance: typeof Peer;

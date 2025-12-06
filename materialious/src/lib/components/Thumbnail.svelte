@@ -96,7 +96,9 @@
 						break;
 					}
 				}
-			} catch {}
+			} catch {
+				// Continue regardless of error
+			}
 		}
 
 		const img = await insecureRequestImageHandler(imageSrc);
@@ -107,7 +109,9 @@
 		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 			try {
 				progress = (await queueSyncious(video.videoId))?.time?.toString() ?? undefined;
-			} catch {}
+			} catch {
+				// Continue regardless of error
+			}
 		}
 	});
 
@@ -156,6 +160,7 @@
 
 <div class:sideways-root={sideways} tabindex="0" role="button">
 	<div id="thumbnail-container">
+		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
 			tabindex="-1"
 			class="wave thumbnail"

@@ -22,12 +22,14 @@
 			events.events.forEach((event) => {
 				if (event.type === 'change-video' && event.videoId) {
 					currentUrl.pathname = resolve(`/watch/[videoId]`, { videoId: event.videoId });
+					// eslint-disable-next-line svelte/no-navigation-without-resolve
 					goto(currentUrl);
 				} else if (event.type === 'goto' && event.path && event.path !== $page.url.pathname) {
 					if (blockedPages.includes(event.path.replace('/', ''))) {
 						ui('#sync-party-private-page');
 					} else {
 						currentUrl.pathname = event.path;
+						// eslint-disable-next-line svelte/no-navigation-without-resolve
 						goto(currentUrl);
 					}
 				}

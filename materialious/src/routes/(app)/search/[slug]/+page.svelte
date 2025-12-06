@@ -102,11 +102,11 @@
 	</summary>
 	<article class="scroll medium">
 		<div class="grid">
-			{#each filters as filter}
+			{#each filters as filter (filter)}
 				<div class="s12 m2 l2">
 					<h6>{filter.title}</h6>
 					<ul class="list no-margin no-padding">
-						{#each filter.options as filterOption}
+						{#each filter.options as filterOption (filterOption)}
 							<li>
 								<button
 									class="small border"

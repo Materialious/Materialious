@@ -28,7 +28,9 @@
 	<div class="space"></div>
 	<div class="medium scroll">
 		<div style="white-space: pre-line; overflow-wrap: break-word;">
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html description}
+			<!-- Description comes directly from YT so is already sanitized -->
 		</div>
 
 		{#if video.keywords && video.keywords.length > 0}

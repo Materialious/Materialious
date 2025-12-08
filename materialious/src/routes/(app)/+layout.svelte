@@ -197,21 +197,22 @@
 		notifications = feed.notifications;
 	}
 
+	themeColorStore.subscribe(async (hex) => {
+		if (!hex) return;
+		await ui('theme', hex);
+	});
+
 	onMount(async () => {
 		ui();
 
 		let themeHex = get(themeColorStore);
-		if (themeHex) {
-			await ui('theme', themeHex);
-		} else if (Capacitor.getPlatform() === 'android') {
-			if (!themeHex) {
-				try {
-					const colorPalette = await colorTheme.getColorPalette();
-					themeHex = convertToHexColorCode(colorPalette.primary);
-					await ui('theme', themeHex);
-				} catch {
-					// Continue regardless of error
-				}
+		if (Capacitor.getPlatform() === 'android' && !themeHex) {
+			try {
+				const colorPalette = await colorTheme.getColorPalette();
+				themeHex = convertToHexColorCode(colorPalette.primary);
+				await ui('theme', themeHex);
+			} catch {
+				// Continue regardless of error
 			}
 		}
 

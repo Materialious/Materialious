@@ -4,6 +4,8 @@
 	import { feedCacheStore } from '$lib/store';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/ItemsList.svelte';
+	import { resolve } from '$app/paths';
+	import { _ } from '$lib/i18n';
 
 	let currentPage = 1;
 	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state($feedCacheStore.subscription);
@@ -20,6 +22,13 @@
 		}
 	}
 </script>
+
+<nav class="right-align">
+	<a class="button outline" href={resolve('/subscriptions/manage', {})}>
+		{$_('subscriptions.manageSubscriptions')}
+	</a>
+</nav>
+<div class="space"></div>
 
 <ItemsList items={videos ?? []} />
 

@@ -23,6 +23,9 @@ export interface VideoBase {
 	lengthSeconds: number;
 	viewCountText: string;
 	viewCount?: number;
+	// Means it was given preference in rankings due to
+	// a users settings
+	promotedBy?: 'favourited';
 }
 
 export interface ResolvedUrl {
@@ -205,6 +208,9 @@ export interface PlaylistPageVideo extends Omit<PlaylistVideo, 'type'> {
 	indexId: string;
 	authorId: string;
 	viewCount: number;
+	// Means it was given preference in rankings due to
+	// a users settings
+	promotedBy?: 'favourited';
 }
 
 export interface ChannelContentVideos {

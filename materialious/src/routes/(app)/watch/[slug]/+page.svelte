@@ -251,7 +251,9 @@
 				playerCurrentTime = playerElement.currentTime;
 			});
 		}
+	}
 
+	onMount(async () => {
 		if (data.video.premiereTimestamp) {
 			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
 			premiereUpdateInterval = setInterval(async () => {
@@ -265,9 +267,7 @@
 				}
 			}, 60000);
 		}
-	}
 
-	onMount(async () => {
 		// Required due to needing the playerElement
 		if ($playerState?.playerElement) {
 			await load($playerState);

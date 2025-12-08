@@ -6,9 +6,9 @@ import { feedCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
-async function sortVideosByFavourites(
-	videos: (VideoBase | Video | PlaylistPageVideo)[]
-): Promise<(VideoBase | Video | PlaylistPageVideo)[]> {
+type supportedVideos = (VideoBase | Video | PlaylistPageVideo)[];
+
+async function sortVideosByFavourites(videos: supportedVideos): Promise<supportedVideos> {
 	if (!window.indexedDB) return videos;
 
 	const favouritedChannels = (await localDb.favouriteChannels.toArray()).map(
@@ -19,18 +19,19 @@ async function sortVideosByFavourites(
 		return videos;
 	}
 
-	const rearrangedVideos: (VideoBase | Video | PlaylistPageVideo)[] = [];
+	const regularVideos: supportedVideos = [];
+	const favouriteVideos: supportedVideos = [];
 
 	videos.forEach((video) => {
 		if (favouritedChannels.includes(video.authorId)) {
 			video.promotedBy = 'favourited';
-			rearrangedVideos.unshift(video);
+			favouriteVideos.push(video);
 		} else {
-			rearrangedVideos.push(video);
+			regularVideos.push(video);
 		}
 	});
 
-	return rearrangedVideos;
+	return [...favouriteVideos, ...regularVideos];
 }
 
 export async function load() {

@@ -163,7 +163,6 @@ Please ensure you have followed the previous steps before doing this!
 ### Docker Compose
 
 ```yaml
----
 services:
   materialious:
     image: wardpearce/materialious:latest

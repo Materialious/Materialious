@@ -272,8 +272,7 @@ export function loadSettingsFromEnv() {
 		const isInitialLoadStorage = localStorage.getItem('initialLoadState');
 		if (isInitialLoadStorage === null) {
 			isInitialLoad = true;
-		} else {
-			localStorage.setItem('initialLoadState', '1');
+			localStorage.setItem('initialLoadState', '0');
 		}
 	} catch {
 		// In an environment where localstorage isn't allowed, treat as initial load.

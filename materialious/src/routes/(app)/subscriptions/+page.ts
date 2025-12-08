@@ -1,9 +1,35 @@
 import { getFeed } from '$lib/api/index';
 import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
+import { localDb } from '$lib/dexie';
 import { excludeDuplicateFeeds } from '$lib/misc';
 import { feedCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
+
+async function sortVideosByFavourites(
+	videos: (VideoBase | Video | PlaylistPageVideo)[]
+): Promise<(VideoBase | Video | PlaylistPageVideo)[]> {
+	const favouritedChannels = (await localDb.favouriteChannels.toArray()).map(
+		(channel) => channel.channelId
+	);
+
+	if (favouritedChannels.length === 0) {
+		return videos;
+	}
+
+	const rearrangedVideos: (VideoBase | Video | PlaylistPageVideo)[] = [];
+
+	videos.forEach((video) => {
+		if (favouritedChannels.includes(video.authorId)) {
+			video.promotedBy = 'favourited';
+			rearrangedVideos.unshift(video);
+		} else {
+			rearrangedVideos.push(video);
+		}
+	});
+
+	return rearrangedVideos;
+}
 
 export async function load() {
 	let videos = get(feedCacheStore).subscription;
@@ -16,12 +42,16 @@ export async function load() {
 			error(500, errorMessage);
 		}
 
-		videos = [...feeds.notifications, ...feeds.videos];
+		videos = await sortVideosByFavourites([...feeds.notifications, ...feeds.videos]);
 
 		feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
 	} else {
-		await getFeed(100, 1).then((feeds) => {
-			const newVideos = [...feeds.notifications, ...feeds.videos, ...videos];
+		await getFeed(100, 1).then(async (feeds) => {
+			const newVideos = await sortVideosByFavourites([
+				...feeds.notifications,
+				...feeds.videos,
+				...videos
+			]);
 			feedCacheStore.set({
 				...get(feedCacheStore),
 				subscription: excludeDuplicateFeeds(videos, newVideos) as (

@@ -229,6 +229,10 @@
 					<p>{video.author}</p>
 				{/if}
 
+				{#if video.promotedBy === 'favourited'}
+					<i>star</i>
+				{/if}
+
 				{#if !('publishedText' in video) && 'viewCountText' in video}
 					•
 					{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}

@@ -6,12 +6,24 @@
 	import { truncate } from '$lib/misc';
 	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
+	import { localDb } from '$lib/dexie';
+	import { onMount } from 'svelte';
 
 	let {
 		video,
 		subscribed = $bindable(false),
 		hideSubscribe = false
 	}: { video: VideoPlay; subscribed?: boolean; hideSubscribe?: boolean } = $props();
+
+	let favoritedChannel = $state(false);
+
+	const favoriteChannelItem = localDb.favouriteChannels.filter((item) => {
+		return item.channelId === video.authorId;
+	});
+
+	onMount(async () => {
+		favoritedChannel = (await favoriteChannelItem.count()) > 0;
+	});
 
 	async function toggleSubscribed() {
 		if (subscribed) {
@@ -21,6 +33,16 @@
 		}
 
 		subscribed = !subscribed;
+	}
+
+	async function toggleFavourited() {
+		if (favoritedChannel) {
+			await favoriteChannelItem.delete();
+			favoritedChannel = false;
+		} else {
+			await localDb.favouriteChannels.add({ channelId: video.authorId, created: new Date() });
+			favoritedChannel = true;
+		}
 	}
 </script>
 
@@ -55,6 +77,16 @@
 				{:else}
 					{$_('unsubscribe')}
 				{/if}
+			</button>
+			<button
+				class:inverse-surface={!favoritedChannel}
+				class:border={favoritedChannel}
+				onclick={toggleFavourited}
+			>
+				<i>star</i>
+				<div class="tooltip">
+					{favoritedChannel ? $_('unfavouriteChannel') : $_('favouriteChannel')}
+				</div>
 			</button>
 		{:else}
 			<button class="inverse-surface" disabled>

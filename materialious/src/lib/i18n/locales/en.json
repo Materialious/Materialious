@@ -200,5 +200,7 @@
 			"titleOnly": "Title only"
 		}
 	},
-	"subscribe": "Subscribe"
+	"subscribe": "Subscribe",
+	"favouriteChannel": "Favourite channel",
+	"unfavouriteChannel": "Unfavourite channel"
 }

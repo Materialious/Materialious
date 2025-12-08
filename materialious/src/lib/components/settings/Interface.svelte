@@ -43,7 +43,6 @@
 	async function setColor(color: any) {
 		const target = color.target;
 		const hex = (target as { value: string }).value;
-		await ui('theme', hex);
 		setAmoledTheme();
 		themeColorStore.set(hex);
 	}

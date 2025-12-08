@@ -9,6 +9,8 @@ import { get } from 'svelte/store';
 async function sortVideosByFavourites(
 	videos: (VideoBase | Video | PlaylistPageVideo)[]
 ): Promise<(VideoBase | Video | PlaylistPageVideo)[]> {
+	if (!window.indexedDB) return videos;
+
 	const favouritedChannels = (await localDb.favouriteChannels.toArray()).map(
 		(channel) => channel.channelId
 	);

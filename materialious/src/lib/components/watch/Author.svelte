@@ -78,16 +78,18 @@
 					{$_('unsubscribe')}
 				{/if}
 			</button>
-			<button
-				class:inverse-surface={!favoritedChannel}
-				class:border={favoritedChannel}
-				onclick={toggleFavourited}
-			>
-				<i>star</i>
-				<div class="tooltip">
-					{favoritedChannel ? $_('unfavouriteChannel') : $_('favouriteChannel')}
-				</div>
-			</button>
+			{#if window.indexedDB}
+				<button
+					class:inverse-surface={!favoritedChannel}
+					class:border={favoritedChannel}
+					onclick={toggleFavourited}
+				>
+					<i>star</i>
+					<div class="tooltip">
+						{favoritedChannel ? $_('unfavouriteChannel') : $_('favouriteChannel')}
+					</div>
+				</button>
+			{/if}
 		{:else}
 			<button class="inverse-surface" disabled>
 				{$_('subscribe')}

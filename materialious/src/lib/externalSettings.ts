@@ -1,4 +1,4 @@
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import {
 	darkModeStore,
 	deArrowEnabledStore,
@@ -232,17 +232,10 @@ const persistedStores: {
 	}
 ];
 
-function setStores(toSet: Record<string, any>) {
+function setStores(toSet: Record<string, any>, overwriteExisting: boolean = false) {
 	persistedStores.forEach((store) => {
-		let userOverwritten: boolean = false;
-		try {
-			userOverwritten = localStorage.getItem(store.name) !== null;
-		} catch {
-			// Continue regardless of error
-		}
-
 		const paramValue = toSet[store.name];
-		if (typeof paramValue !== 'undefined' && !userOverwritten) {
+		if (typeof paramValue !== 'undefined' && overwriteExisting) {
 			let value: any;
 
 			if (store.type === 'array') {
@@ -274,9 +267,21 @@ export function loadSettingsFromEnv() {
 		defaultSettingsJson = defaultSettingsJson.slice(0, -1);
 	}
 
+	let isInitialLoad = false;
+	try {
+		const isInitialLoadStorage = localStorage.getItem('initialLoadState');
+		if (isInitialLoadStorage === null) {
+			isInitialLoad = true;
+			localStorage.setItem('initialLoadState', '0');
+		}
+	} catch {
+		// In an environment where localstorage isn't allowed, treat as initial load.
+		isInitialLoad = true;
+	}
+
 	try {
 		const defaultSettings = JSON.parse(defaultSettingsJson);
-		setStores(defaultSettings);
+		setStores(defaultSettings, isInitialLoad);
 	} catch (error) {
 		console.log(error);
 	}
@@ -296,13 +301,11 @@ export function bookmarkletSaveToUrl(): string {
 }
 
 export function bookmarkletLoadFromUrl() {
-	const currentPage = get(page);
-
 	const toSet: Record<string, string> = {};
 
-	currentPage.url.searchParams.forEach((value, key) => {
+	page.url.searchParams.forEach((value, key) => {
 		toSet[key] = value;
 	});
 
-	setStores(toSet);
+	setStores(toSet, true);
 }

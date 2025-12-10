@@ -84,13 +84,13 @@
 							onclick={async () => loadReplies(comment.replies.continuation)}
 							class="transparent replies"
 						>
-							<i class="white-text">expand_more</i>
-							<span class="white-text">{comment.replies.replyCount} {replyText}</span>
+							<i>expand_more</i>
+							<span>{comment.replies.replyCount} {replyText}</span>
 						</button>
 					{:else if replies}
 						<button onclick={() => (replies = undefined)} class="transparent replies">
-							<i class="white-text">expand_less</i>
-							<span class="white-text">Hide {replyText}</span>
+							<i>expand_less</i>
+							<span>Hide {replyText}</span>
 						</button>
 					{/if}
 				</div>

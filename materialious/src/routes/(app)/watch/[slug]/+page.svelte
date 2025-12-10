@@ -34,7 +34,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { loadEntirePlaylist } from '$lib/playlist';
-	import Author from '$lib/components/watch/Author.svelte';
+	import Author from '$lib/components/Author.svelte';
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
@@ -51,9 +51,6 @@
 	data.streamed.comments?.then((streamedComments) => {
 		comments = streamedComments;
 	});
-
-	let subscribed: boolean = $state(false);
-	data.streamed.subscribed.then((isSubbed) => (subscribed = isSubbed));
 
 	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
@@ -400,7 +397,7 @@
 
 		<div class="grid no-padding">
 			<div class="s12 m12 l5" style="height: 100%;display: flex;align-items: center;">
-				<Author video={data.video} bind:subscribed />
+				<Author channel={data.video} />
 			</div>
 			<div class="s12 m12 l7 video-actions">
 				<div>

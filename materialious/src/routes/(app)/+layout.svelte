@@ -44,7 +44,7 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import Mousetrap from 'mousetrap';
 	import { truncate } from '$lib/misc';
-	import Author from '$lib/components/watch/Author.svelte';
+	import Author from '$lib/components/Author.svelte';
 
 	let { children } = $props();
 
@@ -438,7 +438,7 @@
 						</nav>
 
 						<nav class="m l">
-							<Author video={$playerState.data.video} hideSubscribe={true} />
+							<Author channel={$playerState.data.video} hideSubscribe={true} />
 							<div class="max"></div>
 							<a
 								class="button border"

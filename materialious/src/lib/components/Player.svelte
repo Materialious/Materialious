@@ -308,6 +308,15 @@
 			// Continue regardless of error
 		}
 
+		player.addEventListener('loaded', () => {
+			restoreQualityPreference();
+			restoreDefaultLanguage();
+
+			if ($playerCCByDefault) {
+				toggleSubtitles();
+			}
+		});
+
 		if (!data.video.liveNow) {
 			if (watchProgressTimeout) {
 				clearInterval(watchProgressTimeout);
@@ -406,13 +415,6 @@
 		if (data.video.fallbackPatch === 'youtubejs') {
 			snackBarAlert = get(_)('player.youtubeJsFallBack');
 			ui('#snackbar-alert');
-		}
-
-		restoreQualityPreference();
-		restoreDefaultLanguage();
-
-		if ($playerCCByDefault) {
-			toggleSubtitles();
 		}
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {

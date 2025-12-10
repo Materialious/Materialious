@@ -67,29 +67,32 @@
 	</a>
 	{#if !hideSubscribe}
 		{#if $authStore}
-			<button
-				onclick={toggleSubscribed}
-				class:inverse-surface={!subscribed}
-				class:border={subscribed}
-			>
-				{#if !subscribed}
-					{$_('subscribe')}
-				{:else}
-					{$_('unsubscribe')}
-				{/if}
-			</button>
-			{#if window.indexedDB}
+			<nav class="group split">
 				<button
-					class:inverse-surface={!favoritedChannel}
-					class:border={favoritedChannel}
-					onclick={toggleFavourited}
+					onclick={toggleSubscribed}
+					class:inverse-surface={!subscribed}
+					class:border={subscribed}
 				>
-					<i>star</i>
-					<div class="tooltip">
-						{favoritedChannel ? $_('unfavouriteChannel') : $_('favouriteChannel')}
-					</div>
+					{#if !subscribed}
+						{$_('subscribe')}
+					{:else}
+						{$_('unsubscribe')}
+					{/if}
 				</button>
-			{/if}
+				{#if window.indexedDB && subscribed}
+					<button
+						class:inverse-surface={!favoritedChannel}
+						class:border={favoritedChannel}
+						onclick={toggleFavourited}
+						class="square"
+					>
+						<i>star</i>
+						<div class="tooltip">
+							{favoritedChannel ? $_('unfavouriteChannel') : $_('favouriteChannel')}
+						</div>
+					</button>
+				{/if}
+			</nav>
 		{:else}
 			<button class="inverse-surface" disabled>
 				{$_('subscribe')}

@@ -69,7 +69,7 @@ I've commented out places what aren't relevant but might be in the future.-->
     <td>MacOS (x64 & arm64)</td>
     <td>
       <a href="https://github.com/Materialious/Materialious/releases/latest/download/Materialious-darwin-universal.dmg">
-        <img width="220" alt="MacOS Download" src="https://reachify.io/wp-content/uploads/2018/09/mac-download-button-1.png">
+        <img width="220" alt="MacOS Download" src="https://www.filesdna.com/wp-content/uploads/2021/03/mac-download-button-1.png">
       </a>
     </td>
   </tr>

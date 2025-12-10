@@ -1,29 +1,24 @@
 <script lang="ts">
 	import {
-		amSubscribed,
-		deleteUnsubscribe,
 		getChannelContent,
-		postSubscribe,
 		searchChannelContent,
 		type channelContentTypes,
 		type channelSortBy
 	} from '$lib/api';
 	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/api/model';
 	import PageLoading from '$lib/components/PageLoading.svelte';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
-	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
+	import { interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { get } from 'svelte/store';
 	import ItemsList from '$lib/components/ItemsList.svelte';
+	import Author from '$lib/components/Author.svelte';
 
 	let { data } = $props();
-
-	let isSubscribed = $state(false);
 
 	let tab: channelContentTypes = $state('videos');
 
@@ -77,34 +72,12 @@
 		displayContent = await getChannelContent(data.channel.authorId, { type: tab });
 	}
 
-	let channelPfp: string | undefined = $state();
 	onMount(async () => {
 		displayContent = await getChannelContent(data.channel.authorId, {
 			type: 'videos',
 			sortBy: sortBy
 		});
-
-		if (!get(interfaceLowBandwidthMode)) {
-			const channelPfpResp = await fetch(
-				proxyGoogleImage(getBestThumbnail(data.channel.authorThumbnails))
-			);
-			channelPfp = URL.createObjectURL(await channelPfpResp.blob());
-		}
-
-		if (get(authStore)) {
-			isSubscribed = await amSubscribed(data.channel.authorId);
-		}
 	});
-
-	async function toggleSubscribed() {
-		if (isSubscribed) {
-			await deleteUnsubscribe(data.channel.authorId);
-		} else {
-			await postSubscribe(data.channel.authorId);
-		}
-
-		isSubscribed = !isSubscribed;
-	}
 </script>
 
 <div class="padding">
@@ -117,78 +90,43 @@
 		/>
 	{/if}
 	<div class="description">
-		{#if !$interfaceLowBandwidthMode}
-			<div class="m l">
-				{#if channelPfp}
-					<img
-						loading="lazy"
-						style="margin-right: 1em;"
-						class="circle extra"
-						src={channelPfp}
-						alt="Channel profile"
-					/>
-				{:else}
-					<progress style="padding: 15px;" class="circle"></progress>
-				{/if}
-			</div>
-		{/if}
-
 		<div>
-			<h2>{data.channel.author}</h2>
-			<p>{cleanNumber(data.channel.subCount)} {$_('subscribers')}</p>
+			<Author channel={{ ...data.channel, subCountText: cleanNumber(data.channel.subCount) }} />
 			<p style="width: 60vw;">{data.channel.description}</p>
 		</div>
-		<div class="grid no-padding">
-			<div class="s12 m12 l5">
-				<button
-					onclick={toggleSubscribed}
-					class:inverse-surface={!isSubscribed}
-					class:border={isSubscribed}
-				>
-					{#if !isSubscribed}
-						{$_('subscribe')}
-					{:else}
-						{$_('unsubscribe')}
+		{#if !$isAndroidTvStore}
+			<button class="border">
+				<i>share</i>
+				<span>{$_('player.share.title')}</span>
+				<menu class="no-wrap mobile">
+					{#if !Capacitor.isNativePlatform()}
+						<li
+							class="row"
+							role="presentation"
+							onclick={async () => {
+								await Clipboard.write({ string: location.href });
+								(document.activeElement as HTMLElement)?.blur();
+							}}
+						>
+							{$_('player.share.materialiousLink')}
+						</li>
 					{/if}
-				</button>
-			</div>
 
-			{#if !$isAndroidTvStore}
-				<div class="s12 m12 l5">
-					<button class="border">
-						<i>share</i>
-						<span>{$_('player.share.title')}</span>
-						<menu class="no-wrap mobile">
-							{#if !Capacitor.isNativePlatform()}
-								<li
-									class="row"
-									role="presentation"
-									onclick={async () => {
-										await Clipboard.write({ string: location.href });
-										(document.activeElement as HTMLElement)?.blur();
-									}}
-								>
-									{$_('player.share.materialiousLink')}
-								</li>
-							{/if}
-
-							<li
-								class="row"
-								role="presentation"
-								onclick={async () => {
-									await Clipboard.write({
-										string: `https://www.youtube.com/channel/${data.channel.authorId}`
-									});
-									(document.activeElement as HTMLElement)?.blur();
-								}}
-							>
-								{$_('player.share.youtubeLink')}
-							</li>
-						</menu>
-					</button>
-				</div>
-			{/if}
-		</div>
+					<li
+						class="row"
+						role="presentation"
+						onclick={async () => {
+							await Clipboard.write({
+								string: `https://www.youtube.com/channel/${data.channel.authorId}`
+							});
+							(document.activeElement as HTMLElement)?.blur();
+						}}
+					>
+						{$_('player.share.youtubeLink')}
+					</li>
+				</menu>
+			</button>
+		{/if}
 	</div>
 
 	<div class="tabs left-align scroll">

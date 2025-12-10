@@ -1,5 +1,4 @@
 import {
-	amSubscribed,
 	getComments,
 	getDislikes,
 	getPersonalPlaylists,
@@ -79,8 +78,7 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		streamed: {
 			personalPlaylists: personalPlaylists,
 			returnYTDislikes: returnYTDislikes,
-			comments: comments,
-			subscribed: amSubscribed(video.authorId)
+			comments: comments
 		}
 	};
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
 	import Player from '$lib/components/Player.svelte';
-	import Author from '$lib/components/watch/Author.svelte';
+	import Author from '$lib/components/Author.svelte';
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import { letterCase } from '$lib/letterCasing';
@@ -17,9 +17,6 @@
 	let playerElement: HTMLMediaElement | undefined = $state();
 	let showInfo = $state(false);
 	let playerCurrentTime: number = $state(0);
-
-	let subscribed: boolean = $state(false);
-	data.streamed.subscribed.then((isSubbed) => (subscribed = isSubbed));
 
 	onMount(() => {
 		if (playerElement) {
@@ -121,7 +118,7 @@
 {#if showInfo}
 	<article id="shown-info" transition:fade>
 		<h5>{letterCase(data.video.title)}</h5>
-		<Author bind:subscribed video={data.video} />
+		<Author channel={data.video} />
 		<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
 		<article class="border">
 			<Description video={data.video} description={data.content.description} />

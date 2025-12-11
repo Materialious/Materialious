@@ -205,5 +205,7 @@
     },
     "newest": "Neusti",
     "oldest": "Ältisti",
-    "popular": "Populär"
+    "popular": "Populär",
+    "favouriteChannel": "Kanal favorisiere",
+    "unfavouriteChannel": "Kanal entfavorisiere"
 }

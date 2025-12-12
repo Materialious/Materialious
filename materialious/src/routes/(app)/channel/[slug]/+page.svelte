@@ -9,16 +9,15 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
-	import { interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
+	import { channelCacheStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
-	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/ItemsList.svelte';
 	import Author from '$lib/components/Author.svelte';
-
-	let { data } = $props();
+	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 
 	let tab: channelContentTypes = $state('videos');
 
@@ -31,8 +30,12 @@
 	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined =
 		$state(undefined);
 
+	onMount(() => {
+		displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
+	});
+
 	async function searchChannel() {
-		displayContent = await searchChannelContent(data.channel.authorId, channelSearch);
+		displayContent = await searchChannelContent(page.params.slug, channelSearch);
 	}
 
 	async function loadMore(event: InfiniteEvent) {
@@ -43,7 +46,7 @@
 			return;
 		}
 
-		const newContent = await getChannelContent(data.channel.authorId, {
+		const newContent = await getChannelContent(page.params.slug, {
 			type: tab,
 			continuation: displayContent.continuation,
 			sortBy: sortBy
@@ -69,30 +72,28 @@
 	async function changeTab(newTab: 'videos' | 'playlists' | 'streams' | 'shorts') {
 		tab = newTab;
 		displayContent = undefined;
-		displayContent = await getChannelContent(data.channel.authorId, { type: tab });
+		displayContent = await getChannelContent(page.params.slug, { type: tab });
 	}
-
-	onMount(async () => {
-		displayContent = await getChannelContent(data.channel.authorId, {
-			type: 'videos',
-			sortBy: sortBy
-		});
-	});
 </script>
 
 <div class="padding">
-	{#if data.channel.authorBanners.length > 0 && !$interfaceLowBandwidthMode}
+	{#if $channelCacheStore[page.params.slug].channel.authorBanners.length > 0 && !$interfaceLowBandwidthMode}
 		<img
 			loading="lazy"
-			src={proxyGoogleImage(data.channel.authorBanners[0].url)}
+			src={proxyGoogleImage($channelCacheStore[page.params.slug].channel.authorBanners[0].url)}
 			width="100%"
 			alt="Channel banner"
 		/>
 	{/if}
 	<div class="description">
 		<div>
-			<Author channel={{ ...data.channel, subCountText: cleanNumber(data.channel.subCount) }} />
-			<p style="width: 60vw;">{data.channel.description}</p>
+			<Author
+				channel={{
+					...$channelCacheStore[page.params.slug].channel,
+					subCountText: cleanNumber($channelCacheStore[page.params.slug].channel.subCount)
+				}}
+			/>
+			<p style="width: 60vw;">{$channelCacheStore[page.params.slug].channel.description}</p>
 		</div>
 		{#if !$isAndroidTvStore}
 			<button class="border">
@@ -117,7 +118,7 @@
 						role="presentation"
 						onclick={async () => {
 							await Clipboard.write({
-								string: `https://www.youtube.com/channel/${data.channel.authorId}`
+								string: `https://www.youtube.com/channel/${page.params.slug}`
 							});
 							(document.activeElement as HTMLElement)?.blur();
 						}}
@@ -130,25 +131,25 @@
 	</div>
 
 	<div class="tabs left-align scroll">
-		{#if data.channel.tabs.includes('videos')}
+		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('videos')}
 			<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href="#video">
 				<i>movie</i>
 				<span>{$_('videoTabs.videos')}</span>
 			</a>
 		{/if}
-		{#if data.channel.tabs.includes('shorts')}
+		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('shorts')}
 			<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href="#short">
 				<i>smartphone</i>
 				<span>{$_('videoTabs.shorts')}</span>
 			</a>
 		{/if}
-		{#if data.channel.tabs.includes('streams')}
+		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('streams')}
 			<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href="#stream">
 				<i>stream</i>
 				<span>{$_('videoTabs.streams')}</span>
 			</a>
 		{/if}
-		{#if data.channel.tabs.includes('playlists')}
+		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('playlists')}
 			<a class:active={tab === 'playlists'} onclick={() => changeTab('playlists')} href="#playlist">
 				<i>playlist_add_check</i>
 				<span>{$_('videoTabs.playlists')}</span>
@@ -165,7 +166,7 @@
 						onclick={async () => {
 							sortBy = sortingOption;
 
-							displayContent = await getChannelContent(data.channel.authorId, {
+							displayContent = await getChannelContent(page.params.slug, {
 								type: tab,
 								sortBy: sortBy
 							});

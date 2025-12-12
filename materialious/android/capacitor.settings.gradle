@@ -23,5 +23,8 @@ project(':capacitor-screen-orientation').projectDir = new File('../node_modules/
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/share/android')
 
+include ':capacitor-music-controls-plugin'
+project(':capacitor-music-controls-plugin').projectDir = new File('../node_modules/capacitor-music-controls-plugin/android')
+
 include ':capacitor-nodejs'
 project(':capacitor-nodejs').projectDir = new File('../node_modules/capacitor-nodejs/android')

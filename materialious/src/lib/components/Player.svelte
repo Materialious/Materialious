@@ -12,6 +12,7 @@
 	import Mousetrap from 'mousetrap';
 	import 'shaka-player/dist/controls.css';
 	import '$lib/css/shaka-player-theme.css';
+	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
@@ -570,7 +571,57 @@
 
 		await androidHandleRotate();
 
-		if ('mediaSession' in navigator) {
+		if (Capacitor.getPlatform() === 'android') {
+			await CapacitorMusicControls.create({
+				track: data.video.title,
+				artist: data.video.author,
+				cover: getBestThumbnail(data.video.videoThumbnails, 800, 800),
+				hasPrev: data.playlistId !== null,
+				hasNext: data.playlistId !== null,
+				isPlaying: true,
+				hasClose: true,
+				dismissable: true,
+				playIcon: 'media_play',
+				pauseIcon: 'media_pause',
+				prevIcon: 'media_prev',
+				nextIcon: 'media_next',
+				closeIcon: 'media_close',
+				notificationIcon: 'notification',
+				ticker: `Now playing "${data.video.title}"`
+			});
+
+			// @ts-expect-error: Is handle correctly via https://github.com/ingageco/capacitor-music-controls-plugin
+			document.addEventListener('controlsNotification', (event: { message: string }) => {
+				if (
+					event.message === 'music-controls-headset-unplugged' ||
+					event.message === 'music-controls-pause'
+				) {
+					playerElement?.pause();
+					return;
+				} else if (event.message === 'music-controls-play') {
+					playerElement?.play();
+					return;
+				}
+
+				if (data.playlistId) {
+					if (event.message === 'music-controls-next') {
+						goToNextVideo(data.video, data.playlistId);
+					}
+
+					if (event.message === 'music-controls-previous') {
+						goToPreviousVideo(data.playlistId);
+					}
+				}
+			});
+
+			playerElement?.addEventListener('play', () => {
+				CapacitorMusicControls.updateIsPlaying({ isPlaying: true });
+			});
+
+			playerElement?.addEventListener('pause', () => {
+				CapacitorMusicControls.updateIsPlaying({ isPlaying: false });
+			});
+		} else if ('mediaSession' in navigator) {
 			const metadataArtwork: MediaImage[] = [];
 			data.video.videoThumbnails.forEach((thumbnail) => {
 				metadataArtwork.push({
@@ -800,14 +851,18 @@
 	}
 
 	onDestroy(async () => {
-		if (Capacitor.getPlatform() === 'android' && !$isAndroidTvStore) {
-			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
+		if (Capacitor.getPlatform() === 'android') {
+			if (!$isAndroidTvStore) {
+				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 
-			if (originalOrigination) {
-				await ScreenOrientation.lock({
-					orientation: originalOrigination.type
-				});
+				if (originalOrigination) {
+					await ScreenOrientation.lock({
+						orientation: originalOrigination.type
+					});
+				}
 			}
+
+			await CapacitorMusicControls.destroy();
 		}
 
 		try {

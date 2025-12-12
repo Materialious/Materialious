@@ -411,13 +411,24 @@
 				>
 					<div class="pip-info">
 						{#if playerIsPip}
-							<nav>
-								<h6 class="max">{truncate($playerState.data.video.title, 20)}</h6>
-								<button class="border m l" onclick={() => playerState.set(undefined)}>
-									<i>close</i>
-								</button>
-							</nav>
-							<div class="space"></div>
+							<div>
+								<nav>
+									<h6 class="max">{truncate($playerState.data.video.title, 25)}</h6>
+									<button class="border m l" onclick={() => playerState.set(undefined)}>
+										<i>close</i>
+									</button>
+								</nav>
+								<nav class="s">
+									<a
+										class="button border"
+										href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
+										><i>keyboard_arrow_right</i></a
+									>
+									<button class="border" onclick={() => playerState.set(undefined)}>
+										<i>close</i>
+									</button>
+								</nav>
+							</div>
 						{/if}
 						<div class="player">
 							{#key $playerState.data.video.videoId}
@@ -426,17 +437,6 @@
 						</div>
 					</div>
 					{#if playerIsPip}
-						<nav class="s">
-							<a
-								class="button border"
-								href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
-								><i>keyboard_arrow_right</i></a
-							>
-							<button class="border" onclick={() => playerState.set(undefined)}>
-								<i>close</i>
-							</button>
-						</nav>
-
 						<nav class="m l">
 							<Author channel={$playerState.data.video} hideSubscribe={true} />
 							<div class="max"></div>
@@ -532,6 +532,10 @@
 		.pip > .pip-info {
 			display: flex;
 			justify-content: space-between;
+		}
+
+		.pip h6 {
+			font-size: 1em;
 		}
 	}
 </style>

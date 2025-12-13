@@ -606,9 +606,7 @@
 				if (data.playlistId) {
 					if (event.message === 'music-controls-next') {
 						goToNextVideo(data.video, data.playlistId);
-					}
-
-					if (event.message === 'music-controls-previous') {
+					} else if (event.message === 'music-controls-previous') {
 						goToPreviousVideo(data.playlistId);
 					}
 				}

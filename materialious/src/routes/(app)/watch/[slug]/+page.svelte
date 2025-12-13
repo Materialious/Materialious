@@ -339,7 +339,7 @@
 			await addPlaylistVideo(playlistId, data.video.videoId);
 		}
 
-		setTimeout(async () => (personalPlaylists = await getPersonalPlaylists()), 500);
+		personalPlaylists = await getPersonalPlaylists();
 	}
 
 	async function loadMoreComments() {
@@ -444,7 +444,7 @@
 						</div>
 						<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
 					</button>
-					{#if personalPlaylists}
+					{#if personalPlaylists && personalPlaylists.length > 0}
 						<button class="border">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>

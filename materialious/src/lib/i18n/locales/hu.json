@@ -205,5 +205,7 @@
     },
     "newest": "Legújabb",
     "oldest": "Legrégebbi",
-    "popular": "Népszerű"
+    "popular": "Népszerű",
+    "favouriteChannel": "Csatorna kedvelése",
+    "unfavouriteChannel": "Csatorna eltávolítása a kedvencekből"
 }

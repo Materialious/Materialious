@@ -82,6 +82,7 @@
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
+	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
 	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
 	let playerLoop = $state($playerAlwaysLoopStore);
@@ -521,12 +522,6 @@
 
 		await player.attach(playerElement);
 
-		shaka.ui.Controls.registerElement('end_time', {
-			create: (parent: HTMLElement, controls: shaka.ui.Controls) => {
-				return new EndTimeElement(parent, controls);
-			}
-		});
-
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
@@ -556,16 +551,6 @@
 				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
 				response.data = new TextEncoder().encode(cleaned).buffer;
 			}
-		});
-
-		// Required to stop buttons from being still selected when fullscreening
-		document?.addEventListener('fullscreenchange', async () => {
-			const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
-			buttons.forEach((button) => {
-				// Reset the button's focus and active states
-				(button as HTMLElement).blur(); // Remove focus from the button
-				button.removeAttribute('aria-pressed'); // Reset any ARIA attributes that might indicate selection
-			});
 		});
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
@@ -800,6 +785,8 @@
 
 		// Update video player height again on video loaded.
 		updateVideoPlayerHeight();
+
+		playerTextTracks = player.getTextTracks();
 	});
 
 	async function getLastPlayPos(): Promise<number> {
@@ -990,6 +977,27 @@
 					<p class="no-padding no-margin">
 						{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
 					</p>
+					{#if playerTextTracks && playerTextTracks.length > 0}
+						<button>
+							<i>closed_caption</i>
+							<menu class="no-wrap mobile">
+								<li role="presentation" onclick={() => player.setTextTrackVisibility(false)}>
+									{$_('player.controls.off')}
+								</li>
+								{#each playerTextTracks as track (track)}
+									<li
+										role="presentation"
+										onclick={() => {
+											player.selectTextTrack(track);
+											player.setTextTrackVisibility(true);
+										}}
+									>
+										{track.label}
+									</li>
+								{/each}
+							</menu>
+						</button>
+					{/if}
 					<button>
 						<i>settings</i>
 						<menu class="no-wrap mobile">

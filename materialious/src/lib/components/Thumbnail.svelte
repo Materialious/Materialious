@@ -253,6 +253,7 @@
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;
+		display: inline-block;
 	}
 
 	.thumbnail img {

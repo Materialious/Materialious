@@ -35,6 +35,7 @@
 		playerSavePlaybackPositionStore,
 		playerState,
 		playerStatisticsByDefault,
+		playertheatreModeIsActive,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
@@ -71,6 +72,7 @@
 	let player: shaka.Player;
 	let shakaUi: shaka.ui.Overlay;
 	let sabrAdapter: SabrStreamingAdapter | null;
+	let playerContainer: HTMLElement;
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -86,6 +88,10 @@
 
 	themeColorStore.subscribe(updateSeekBarTheme);
 	darkModeStore.subscribe(updateSeekBarTheme);
+	playertheatreModeIsActive.subscribe(async () => {
+		await tick();
+		updateVideoPlayerHeight();
+	});
 
 	function restoreDefaultLanguage() {
 		if (!$playerDefaultLanguage || $playerDefaultLanguage === 'original') {
@@ -437,6 +443,16 @@
 		await loadVideo();
 	}
 
+	// Due to how our player is rendered in layout for stateful pip
+	// we calaculate player height to then allow children pages
+	// to wrap around it.
+	function updateVideoPlayerHeight() {
+		if (playerContainer) {
+			const height = playerContainer.getBoundingClientRect().height;
+			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+		}
+	}
+
 	onMount(async () => {
 		shaka.polyfill.installAll();
 		if (!shaka.Player.isBrowserSupported()) {
@@ -470,24 +486,13 @@
 			playerState.set({ ...$playerState, playerElement: playerElement });
 		}
 
-		// Due to how our player is rendered in layout for stateful pip
-		// we calaculate player height to then allow children pages
-		// to wrap around it.
-		function updateVideoPlayerHeight() {
-			const container = document.getElementById('shaka-container') as HTMLElement;
-
-			if (container) {
-				const height = container.getBoundingClientRect().height;
-				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
-			}
-		}
-		window.addEventListener('resize', updateVideoPlayerHeight);
-		updateVideoPlayerHeight();
-
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
 
-		const playerContainer = document.getElementById('shaka-container') as HTMLElement;
+		playerContainer = document.getElementById('shaka-container') as HTMLElement;
+
+		window.addEventListener('resize', updateVideoPlayerHeight);
+		updateVideoPlayerHeight();
 
 		shakaUi = new shaka.ui.Overlay(player, playerContainer, playerElement);
 
@@ -788,6 +793,9 @@
 				await reloadVideo();
 			}
 		}
+
+		// Update video player height again on video loaded.
+		updateVideoPlayerHeight();
 	});
 
 	async function getLastPlayPos(): Promise<number> {
@@ -868,6 +876,8 @@
 		} catch {
 			// Continue regardless of error
 		}
+
+		window.removeEventListener('resize', updateVideoPlayerHeight);
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 

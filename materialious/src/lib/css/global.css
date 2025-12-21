@@ -79,7 +79,8 @@ menu {
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;
-		top: 10% !important;
+		top: 20% !important;
+		height: 100vh !important;
 		width: 100% !important;
 		z-index: 99999;
 		transform: unset !important;

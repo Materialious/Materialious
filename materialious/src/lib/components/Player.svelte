@@ -905,6 +905,16 @@
 	class:contain-video={!$isAndroidTvStore}
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
+	role="presentation"
+	onclick={(event) => {
+		if (
+			event.target &&
+			event.target instanceof HTMLElement &&
+			event.target.id === 'player-center'
+		) {
+			toggleVideoPlaybackStatus();
+		}
+	}}
 >
 	<video
 		controls={false}
@@ -921,7 +931,7 @@
 		{#if playerIsBuffering}
 			<progress class="circle large indeterminate" value="50" max="100"></progress>
 		{:else if !playerCurrentPlaybackState}
-			<button class="circle large">
+			<button class="circle extra" onclick={toggleVideoPlaybackStatus}>
 				<i>play_arrow</i>
 			</button>
 		{/if}

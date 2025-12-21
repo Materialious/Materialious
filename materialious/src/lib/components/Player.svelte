@@ -44,7 +44,6 @@
 	import { setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
-	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
@@ -918,7 +917,7 @@
 		{#if playerIsBuffering}
 			<progress class="circle large indeterminate" value="50" max="100"></progress>
 		{:else if !playerCurrentPlaybackState}
-			<button class="circle extra" onclick={toggleVideoPlaybackStatus}>
+			<button class="extra fill" onclick={toggleVideoPlaybackStatus}>
 				<i>play_arrow</i>
 			</button>
 		{/if}
@@ -926,7 +925,7 @@
 	{#if !hideControls}
 		<div id="player-controls">
 			<article class="round white" style="width: 100%;padding: 0;height: 10px;">
-				<label class="slider max">
+				<label class="slider max" style="color: var(--secondary-container);">
 					<input
 						oninput={() => {
 							playerIsSeeking = true;
@@ -944,7 +943,7 @@
 
 			<nav>
 				<nav class="no-wrap">
-					<button onclick={toggleVideoPlaybackStatus}>
+					<button class="fill" onclick={toggleVideoPlaybackStatus}>
 						<i>
 							{#if playerCurrentPlaybackState}
 								pause
@@ -954,31 +953,40 @@
 						</i>
 					</button>
 					{#if Capacitor.getPlatform() !== 'android'}
-						<label class="slider">
-							<input
-								oninput={() => {
-									if (!playerElement) return;
+						<article
+							id="volume-slider"
+							class="round white"
+							style="padding: 0;height: 10px;width: 150px;"
+						>
+							<label class="slider max" style="color: var(--secondary-container);">
+								<input
+									oninput={() => {
+										if (!playerElement) return;
 
-									playerElement.volume = playerVolume;
-								}}
-								bind:value={playerVolume}
-								type="range"
-								step="0.1"
-								max="1"
-							/>
-							<span></span>
-						</label>
+										playerElement.volume = playerVolume;
+									}}
+									bind:value={playerVolume}
+									type="range"
+									step="0.1"
+									max="1"
+								/>
+								<span></span>
+							</label>
+						</article>
 					{/if}
 				</nav>
 
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					<p class="no-padding no-margin">
+					<p
+						class="chip"
+						style="background-color: var(--secondary-container) !important;color: var(--on-secondary-container) !important"
+					>
 						{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
 					</p>
 					{#if playerTextTracks && playerTextTracks.length > 0}
-						<button>
+						<button class="fill">
 							<i>closed_caption</i>
 							<menu class="no-wrap mobile">
 								<li role="presentation" onclick={() => player.setTextTrackVisibility(false)}>
@@ -998,7 +1006,7 @@
 							</menu>
 						</button>
 					{/if}
-					<button>
+					<button class="fill">
 						<i>settings</i>
 						<menu class="no-wrap mobile">
 							{#if playerSettings !== 'root'}
@@ -1188,7 +1196,7 @@
 	}
 
 	menu.mobile {
-		transform: scale(1) translateY(-50%) translateX(0);
+		transform: scale(1) translateY(-40%) translateX(0);
 		width: 300px;
 		height: 200px;
 	}

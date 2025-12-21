@@ -10,8 +10,6 @@
 	import ui from 'beercss';
 	import ISO6391 from 'iso-639-1';
 	import Mousetrap from 'mousetrap';
-	import 'shaka-player/dist/controls.css';
-	import '$lib/css/shaka-player-theme.css';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -22,9 +20,9 @@
 	import type { VideoPlay } from '../api/model';
 	import {
 		authStore,
-		darkModeStore,
 		instanceStore,
 		isAndroidTvStore,
+		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
 		playerAutoPlayStore,
 		playerCCByDefault,
@@ -34,31 +32,36 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
-		playerStatisticsByDefault,
+		playertheatreModeIsActive,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
-		synciousStore,
-		themeColorStore
+		synciousStore
 	} from '../store';
-	import { getDynamicTheme, setStatusBarColor } from '../theme';
+	import { setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
 	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
-	import { EndTimeElement } from '$lib/shaka-elements/endTime';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
+		hideControls?: boolean;
 	}
 
-	let { data, isEmbed = false, playerElement = $bindable(undefined) }: Props = $props();
+	let {
+		data,
+		isEmbed = false,
+		playerElement = $bindable(undefined),
+		hideControls = false
+	}: Props = $props();
 
 	let segments: Segment[] = [];
 
@@ -69,23 +72,27 @@
 	let showVideoRetry = $state(false);
 
 	let player: shaka.Player;
-	let shakaUi: shaka.ui.Overlay;
 	let sabrAdapter: SabrStreamingAdapter | null;
+	let playerContainer: HTMLElement;
+
+	let playerCurrentPlaybackState = $state(false);
+	let playerCurrentTime = $state(0);
+	let playerMaxKnownTime = $state(0);
+	let playerIsSeeking = $state(false);
+	let playerIsBuffering = $state(false);
+	let playerVolume = $state(0);
+	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
+	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);
+	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
+	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
+	let playerLoop = $state($playerAlwaysLoopStore);
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
-	async function updateSeekBarTheme() {
-		if (!shakaUi) return;
+	playertheatreModeIsActive.subscribe(async () => {
 		await tick();
-		shakaUi.configure({
-			seekBarColors: {
-				played: (await getDynamicTheme())['--primary']
-			}
-		});
-	}
-
-	themeColorStore.subscribe(updateSeekBarTheme);
-	darkModeStore.subscribe(updateSeekBarTheme);
+		updateVideoPlayerHeight();
+	});
 
 	function restoreDefaultLanguage() {
 		if (!$playerDefaultLanguage || $playerDefaultLanguage === 'original') {
@@ -109,8 +116,24 @@
 		}
 	}
 
+	function filterUniqueAudioTracks(tracks: shaka.extern.AudioTrack[]): shaka.extern.AudioTrack[] {
+		const uniqueTracks: shaka.extern.AudioTrack[] = [];
+		const seen = new SvelteSet<string>();
+
+		for (const track of tracks) {
+			const identifier = `${track.language}-${track.label || 'No Label'}`;
+			if (!seen.has(identifier)) {
+				seen.add(identifier);
+				uniqueTracks.push(track);
+			}
+		}
+
+		return uniqueTracks;
+	}
+
 	function saveVolumePreference() {
 		if (!playerElement) return;
+		playerVolume = playerElement.volume;
 		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
 	}
 
@@ -118,6 +141,7 @@
 		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
 		if (savedVolume && playerElement) {
 			playerElement.volume = parseFloat(savedVolume);
+			playerVolume = playerElement.volume;
 		}
 	}
 
@@ -298,20 +322,26 @@
 
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
 
+	function setActiveVideoTrack() {
+		const videoTracks = player.getVideoTracks();
+		playerCurrentVideoTrack = videoTracks.find((track) => track.active);
+	}
+
+	function setActiveAudioTrack() {
+		const audioTracks = player.getAudioTracks();
+		playerCurrentAudioTrack = audioTracks.find((track) => track.active);
+	}
+
 	async function loadVideo() {
 		showVideoRetry = false;
 
 		sabrAdapter = await injectSabr(data.video, player);
 
-		try {
-			document.getElementsByClassName('shaka-ad-info')[0].remove();
-		} catch {
-			// Continue regardless of error
-		}
-
 		player.addEventListener('loaded', () => {
 			restoreQualityPreference();
 			restoreDefaultLanguage();
+			setActiveVideoTrack();
+			setActiveAudioTrack();
 
 			if ($playerCCByDefault) {
 				toggleSubtitles();
@@ -421,20 +451,30 @@
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
 		}
-
-		if ($playerStatisticsByDefault) {
-			// Appears to be no native way in shaka to toggle statistics on and off
-			const shakaStatisticsButton = document.querySelector('.shaka-statistics-button') as
-				| HTMLButtonElement
-				| undefined;
-			shakaStatisticsButton?.click();
-		}
 	}
 
 	async function reloadVideo() {
 		showVideoRetry = false;
 		data.video = await patchYoutubeJs(data.video.videoId);
 		await loadVideo();
+	}
+
+	function toggleVideoPlaybackStatus() {
+		if (playerCurrentPlaybackState) {
+			playerElement?.pause();
+		} else {
+			playerElement?.play();
+		}
+	}
+
+	// Due to how our player is rendered in layout for stateful pip
+	// we calaculate player height to then allow children pages
+	// to wrap around it.
+	function updateVideoPlayerHeight() {
+		if (playerContainer) {
+			const height = playerContainer.getBoundingClientRect().height;
+			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+		}
 	}
 
 	onMount(async () => {
@@ -466,65 +506,21 @@
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
+		playerElement.loop = playerLoop;
+
 		if ($playerState) {
 			playerState.set({ ...$playerState, playerElement: playerElement });
 		}
 
-		// Due to how our player is rendered in layout for stateful pip
-		// we calaculate player height to then allow children pages
-		// to wrap around it.
-		function updateVideoPlayerHeight() {
-			const container = document.getElementById('shaka-container') as HTMLElement;
-
-			if (container) {
-				const height = container.getBoundingClientRect().height;
-				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
-			}
-		}
-		window.addEventListener('resize', updateVideoPlayerHeight);
-		updateVideoPlayerHeight();
-
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
 
-		const playerContainer = document.getElementById('shaka-container') as HTMLElement;
+		playerContainer = document.getElementById('player-container') as HTMLElement;
 
-		shakaUi = new shaka.ui.Overlay(player, playerContainer, playerElement);
+		window.addEventListener('resize', updateVideoPlayerHeight);
+		updateVideoPlayerHeight();
 
 		await player.attach(playerElement);
-
-		shaka.ui.Controls.registerElement('end_time', {
-			create: (parent: HTMLElement, controls: shaka.ui.Controls) => {
-				return new EndTimeElement(parent, controls);
-			}
-		});
-
-		shakaUi.configure({
-			addBigPlayButton: Capacitor.getPlatform() === 'android',
-			controlPanelElements: [
-				'play_pause',
-				Capacitor.getPlatform() === 'android' ? '' : 'volume',
-				'spacer',
-				'time_and_duration',
-				data.video.liveNow || data.video.lengthSeconds < 240 ? '' : 'end_time',
-				'captions',
-				'overflow_menu',
-				'fullscreen'
-			],
-			overflowMenuButtons: [
-				'cast',
-				'airplay',
-				'quality',
-				'playback_rate',
-				'loop',
-				'language',
-				'statistics'
-			],
-			playbackRates: playbackRates,
-			enableTooltips: false
-		});
-
-		updateSeekBarTheme();
 
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
@@ -555,16 +551,6 @@
 				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
 				response.data = new TextEncoder().encode(cleaned).buffer;
 			}
-		});
-
-		// Required to stop buttons from being still selected when fullscreening
-		document?.addEventListener('fullscreenchange', async () => {
-			const buttons = document.querySelectorAll('.shaka-controls-button-panel button');
-			buttons.forEach((button) => {
-				// Reset the button's focus and active states
-				(button as HTMLElement).blur(); // Remove focus from the button
-				button.removeAttribute('aria-pressed'); // Reset any ARIA attributes that might indicate selection
-			});
 		});
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
@@ -710,17 +696,6 @@
 			});
 		}
 
-		const volumeContainer = playerContainer.getElementsByClassName('shaka-volume-bar-container');
-		volumeContainer[0]?.addEventListener('mousewheel', (event) => {
-			event.preventDefault();
-			const delta = Math.sign((event as any).deltaY);
-			const newVolume = Math.max(
-				0,
-				Math.min(1, (playerElement as HTMLMediaElement).volume - delta * 0.05)
-			);
-			(playerElement as HTMLMediaElement).volume = newVolume;
-		});
-
 		Mousetrap.bind('c', () => {
 			toggleSubtitles();
 			return false;
@@ -730,7 +705,7 @@
 			if (document.fullscreenElement) {
 				document.exitFullscreen();
 			} else {
-				shakaUi.getControls()?.toggleFullScreen();
+				playerContainer.requestFullscreen();
 			}
 			return false;
 		});
@@ -765,12 +740,47 @@
 			playerElement.currentTime += frameTime;
 		});
 
+		const volumeContainer = document.getElementById('volume-slider');
+		volumeContainer?.addEventListener('mousewheel', (event) => {
+			event.preventDefault();
+			const delta = Math.sign((event as any).deltaY);
+			const newVolume = Math.max(
+				0,
+				Math.min(1, (playerElement as HTMLMediaElement).volume - delta * 0.05)
+			);
+			(playerElement as HTMLMediaElement).volume = newVolume;
+			playerVolume = newVolume;
+		});
+
 		playerElement?.addEventListener('pause', async () => {
+			playerCurrentPlaybackState = false;
+			playerIsBuffering = false;
 			savePlayerPos();
 		});
 
 		playerElement?.addEventListener('ended', async () => {
+			playerCurrentPlaybackState = false;
+			playerIsBuffering = false;
 			await goToNextVideo(data.video, data.playlistId);
+		});
+
+		playerElement?.addEventListener('playing', () => {
+			playerCurrentPlaybackState = true;
+			playerIsBuffering = false;
+		});
+
+		playerElement?.addEventListener('waiting', () => {
+			playerCurrentPlaybackState = false;
+			playerIsBuffering = true;
+		});
+
+		playerElement?.addEventListener('timeupdate', () => {
+			if (playerIsSeeking) return;
+			playerCurrentTime = playerElement?.currentTime ?? 0;
+
+			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
+				playerMaxKnownTime = Number(playerElement?.currentTime);
+			}
 		});
 
 		try {
@@ -788,6 +798,11 @@
 				await reloadVideo();
 			}
 		}
+
+		// Update video player height again on video loaded.
+		updateVideoPlayerHeight();
+
+		playerTextTracks = player.getTextTracks();
 	});
 
 	async function getLastPlayPos(): Promise<number> {
@@ -869,6 +884,8 @@
 			// Continue regardless of error
 		}
 
+		window.removeEventListener('resize', updateVideoPlayerHeight);
+
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
 		if (watchProgressTimeout) {
@@ -883,20 +900,24 @@
 			player.unload();
 			player.destroy();
 		}
-
-		if (shakaUi) {
-			shakaUi.destroy();
-		}
 	});
 </script>
 
 <div
-	id="shaka-container"
-	class="player-theme"
+	id="player-container"
 	class:contain-video={!$isAndroidTvStore}
 	class:tv-contain-video={$isAndroidTvStore}
-	data-shaka-player-container
 	class:hide={showVideoRetry}
+	role="presentation"
+	onclick={(event) => {
+		if (
+			event.target &&
+			event.target instanceof HTMLElement &&
+			event.target.id === 'player-center'
+		) {
+			toggleVideoPlaybackStatus();
+		}
+	}}
 >
 	<video
 		controls={false}
@@ -907,6 +928,276 @@
 	{#if isEmbed && !$isAndroidTvStore}
 		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
 			{data.video.title}
+		</div>
+	{/if}
+	<p id="mobile-time" class="chip primary s">
+		{#if data.video.liveNow}
+			{$_('thumbnail.live')}
+		{:else}
+			{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+		{/if}
+	</p>
+	<div id="player-center">
+		{#if playerIsBuffering}
+			<progress class="circle large indeterminate" value="50" max="100"></progress>
+		{:else if !playerCurrentPlaybackState}
+			<button class="extra" onclick={toggleVideoPlaybackStatus}>
+				<i>play_arrow</i>
+			</button>
+		{/if}
+	</div>
+	{#if !hideControls}
+		<div id="player-controls">
+			<article class="round" style="width: 100%;padding: 0;height: 10px;">
+				<label class="slider max">
+					<input
+						oninput={() => {
+							playerIsSeeking = true;
+							if (playerElement) playerElement.currentTime = playerCurrentTime;
+						}}
+						onchange={() => (playerIsSeeking = false)}
+						type="range"
+						min="0"
+						bind:value={playerCurrentTime}
+						max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
+					/>
+					<span></span>
+				</label>
+			</article>
+
+			<nav>
+				<nav class="no-wrap">
+					<button onclick={toggleVideoPlaybackStatus}>
+						<i>
+							{#if playerCurrentPlaybackState}
+								pause
+							{:else}
+								play_arrow
+							{/if}
+						</i>
+					</button>
+					{#if Capacitor.getPlatform() !== 'android'}
+						<article
+							id="volume-slider"
+							class="round m l"
+							style="padding: 0;height: 10px;width: 150px;"
+						>
+							<label class="slider max">
+								<input
+									oninput={() => {
+										if (!playerElement) return;
+
+										playerElement.volume = playerVolume;
+									}}
+									bind:value={playerVolume}
+									type="range"
+									step="0.1"
+									max="1"
+								/>
+								<span></span>
+							</label>
+						</article>
+					{/if}
+				</nav>
+
+				<div class="max"></div>
+
+				<nav class="no-wrap">
+					<p class="chip primary m l" style="border: none;">
+						{#if data.video.liveNow}
+							{$_('thumbnail.live')}
+						{:else}
+							{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+						{/if}
+					</p>
+					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
+						<button>
+							<i>closed_caption</i>
+							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
+								<li
+									role="presentation"
+									data-ui="#cc-menu"
+									onclick={() => player.setTextTrackVisibility(false)}
+								>
+									{$_('player.controls.off')}
+								</li>
+								{#each playerTextTracks as track (track)}
+									<li
+										role="presentation"
+										data-ui="#cc-menu"
+										onclick={() => {
+											player.selectTextTrack(track);
+											player.setTextTrackVisibility(true);
+										}}
+									>
+										{track.label}
+									</li>
+								{/each}
+							</menu>
+						</button>
+					{/if}
+					<button>
+						<i>settings</i>
+						<menu class="no-wrap mobile" id="settings-menu">
+							{#if playerSettings !== 'root'}
+								<li role="presentation" onclick={() => (playerSettings = 'root')}>
+									<i>arrow_back</i>
+									{$_('player.controls.back')}
+								</li>
+							{/if}
+							{#if playerSettings === 'root'}
+								<li role="presentation" onclick={() => (playerSettings = 'quality')}>
+									<nav class="no-wrap" style="width: 100%;">
+										<i>high_quality</i>
+										{$_('player.controls.quality')}
+
+										<div class="max"></div>
+
+										<span class="chip">
+											{#if playerCurrentVideoTrack}
+												{playerCurrentVideoTrack.height}p
+											{:else}
+												{$_('player.controls.auto')}
+											{/if}
+										</span>
+									</nav>
+								</li>
+								<li role="presentation" onclick={() => (playerSettings = 'speed')}>
+									<nav class="no-wrap" style="width: 100%;">
+										<i>speed</i>
+										{$_('player.controls.playbackSpeed')}
+
+										<div class="max"></div>
+
+										<span class="chip">
+											{playerElement?.playbackRate}x
+										</span>
+									</nav>
+								</li>
+								{#if playerCurrentAudioTrack && playerCurrentAudioTrack.label !== null}
+									<li role="presentation" onclick={() => (playerSettings = 'language')}>
+										<nav class="no-wrap" style="width: 100%;">
+											<i>language</i>
+											{$_('player.controls.language')}
+
+											<div class="max"></div>
+
+											<span class="chip">
+												{#if playerCurrentAudioTrack}
+													{playerCurrentAudioTrack.language !== 'und'
+														? ISO6391.getName(playerCurrentAudioTrack.language)
+														: playerCurrentAudioTrack.label}
+												{/if}
+											</span>
+										</nav>
+									</li>
+								{/if}
+								<li
+									role="presentation"
+									onclick={() => {
+										if (playerElement) playerElement.loop = !playerLoop;
+										playerLoop = !playerLoop;
+									}}
+								>
+									<nav class="no-wrap" style="width: 100%;">
+										<i>all_inclusive</i>
+										{$_('player.controls.loop')}
+
+										<div class="max"></div>
+
+										<span class="chip">
+											{playerLoop ? $_('player.controls.on') : $_('player.controls.off')}
+										</span>
+									</nav>
+								</li>
+							{:else if playerSettings === 'quality'}
+								<li
+									role="presentation"
+									onclick={() => {
+										playerSettings = 'root';
+										player.configure({ abr: true });
+										playerCurrentVideoTrack = undefined;
+									}}
+								>
+									{$_('player.controls.auto')}
+								</li>
+								{#each player.getVideoTracks().sort((a, b) => {
+									const heightA = a.height || 0;
+									const heightB = b.height || 0;
+									const widthA = a.width || 0;
+									const widthB = b.width || 0;
+									return heightB - heightA || widthB - widthA;
+								}) as track (track)}
+									<li
+										role="presentation"
+										onclick={() => {
+											playerSettings = 'root';
+											player.selectVideoTrack(track, true);
+											setActiveVideoTrack();
+										}}
+									>
+										{track.height}p
+									</li>
+								{/each}
+							{:else if playerSettings === 'speed'}
+								{#each playbackRates as playbackRate (playbackRate)}
+									<li
+										role="presentation"
+										onclick={() => {
+											playerSettings = 'root';
+											if (playerElement) playerElement.playbackRate = playbackRate;
+										}}
+									>
+										{playbackRate}
+									</li>
+								{/each}
+							{:else if playerSettings === 'language'}
+								{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
+									<li
+										role="presentation"
+										onclick={() => {
+											playerSettings = 'root';
+											player.selectAudioTrack(track);
+											setActiveAudioTrack();
+										}}
+									>
+										{#if track.language !== 'und'}
+											{ISO6391.getName(track.language)} -
+										{/if}
+										{track.label}
+									</li>
+								{/each}
+							{/if}
+						</menu>
+					</button>
+					{#if document.pictureInPictureEnabled}
+						<button
+							onclick={() => {
+								(playerElement as HTMLVideoElement).requestPictureInPicture();
+							}}
+						>
+							<i>pip</i>
+						</button>
+					{/if}
+					<button
+						onclick={() => {
+							if (document.fullscreenElement) {
+								document.exitFullscreen();
+							} else {
+								playerContainer.requestFullscreen();
+							}
+						}}
+					>
+						<i>
+							{#if document.fullscreenElement}
+								fullscreen_exit
+							{:else}
+								fullscreen
+							{/if}
+						</i>
+					</button>
+				</nav>
+			</nav>
 		</div>
 	{/if}
 </div>
@@ -938,6 +1229,59 @@
 {/if}
 
 <style>
+	#player-container {
+		position: relative;
+		width: 100%;
+	}
+
+	#player-controls {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		opacity: 0;
+		transition: opacity 2s ease;
+		padding: 10px;
+	}
+
+	#player-center {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#mobile-time {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		border: none;
+		opacity: 0;
+		transition: opacity 2s ease;
+	}
+
+	#player-container:focus-within #player-controls,
+	#player-container:active #player-controls,
+	#player-container:hover #player-controls {
+		opacity: 1;
+		transition: opacity 0.3s ease;
+	}
+
+	#player-container:focus-within #mobile-time,
+	#player-container:active #mobile-time,
+	#player-container:hover #mobile-time {
+		opacity: 1;
+		transition: opacity 0.3s ease;
+	}
+
+	menu.mobile {
+		transform: scale(1) translateY(-40%) translateX(0);
+		width: 300px;
+		height: 200px;
+	}
+
 	.contain-video {
 		max-height: 80vh;
 		max-width: calc(80vh * 16 / 9);

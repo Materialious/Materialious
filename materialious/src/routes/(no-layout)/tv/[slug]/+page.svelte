@@ -112,7 +112,7 @@
 </script>
 
 {#key data.video.videoId}
-	<Player bind:playerElement isEmbed={true} {data} />
+	<Player bind:playerElement isEmbed={true} {data} hideControls={true} />
 {/key}
 
 {#if showInfo}

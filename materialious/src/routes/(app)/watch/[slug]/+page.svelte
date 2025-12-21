@@ -390,6 +390,7 @@
 						{premiereTime}
 					</h6>
 				</article>
+				<div class="space"></div>
 			{/if}
 		</div>
 
@@ -716,6 +717,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
+	}
+
+	.video-placeholder {
+		height: 50vh;
 	}
 
 	@media screen and (max-width: 1000px) {

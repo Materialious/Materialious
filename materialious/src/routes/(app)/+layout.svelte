@@ -418,6 +418,7 @@
 										<i>close</i>
 									</button>
 								</nav>
+								<div class="space"></div>
 								<nav class="s">
 									<a
 										class="button border"
@@ -432,7 +433,7 @@
 						{/if}
 						<div class="player">
 							{#key $playerState.data.video.videoId}
-								<Player data={$playerState.data} />
+								<Player data={$playerState.data} hideControls={playerIsPip} />
 							{/key}
 						</div>
 					</div>

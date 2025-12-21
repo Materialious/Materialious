@@ -82,6 +82,7 @@ menu {
 		top: 10% !important;
 		width: 100% !important;
 		z-index: 99999;
+		transform: unset !important;
 	}
 
 	main.root {

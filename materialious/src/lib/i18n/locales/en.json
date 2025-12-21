@@ -124,7 +124,17 @@
 		"youtubeJsLoading": "Video failed to load, attempting to reload with local video fallback.",
 		"retryText": "Video failed to load, how would you like to continue?",
 		"enableYoutubejsTemp": "Use local video fallback once",
-		"enableYoutubejsPerm": "Always allow local video fallback"
+		"enableYoutubejsPerm": "Always allow local video fallback",
+		"controls": {
+			"back": "Back",
+			"quality": "Quality",
+			"auto": "Auto",
+			"playbackSpeed": "Playback speed",
+			"loop": "Loop",
+			"on": "On",
+			"off": "Off",
+			"language": "Language"
+		}
 	},
 	"layout": {
 		"interface": "Interface",

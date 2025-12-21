@@ -77,6 +77,7 @@
 
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
+	let playerMaxKnownTime = $state(0);
 	let playerIsSeeking = $state(false);
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
@@ -739,6 +740,18 @@
 			playerElement.currentTime += frameTime;
 		});
 
+		const volumeContainer = document.getElementById('volume-slider');
+		volumeContainer?.addEventListener('mousewheel', (event) => {
+			event.preventDefault();
+			const delta = Math.sign((event as any).deltaY);
+			const newVolume = Math.max(
+				0,
+				Math.min(1, (playerElement as HTMLMediaElement).volume - delta * 0.05)
+			);
+			(playerElement as HTMLMediaElement).volume = newVolume;
+			playerVolume = newVolume;
+		});
+
 		playerElement?.addEventListener('pause', async () => {
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
@@ -764,6 +777,10 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			if (playerIsSeeking) return;
 			playerCurrentTime = playerElement?.currentTime ?? 0;
+
+			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
+				playerMaxKnownTime = Number(playerElement?.currentTime);
+			}
 		});
 
 		try {
@@ -935,7 +952,7 @@
 						type="range"
 						min="0"
 						bind:value={playerCurrentTime}
-						max={data.video.lengthSeconds}
+						max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
 					/>
 					<span></span>
 				</label>
@@ -983,18 +1000,27 @@
 						class="chip"
 						style="background-color: var(--secondary-container) !important;color: var(--on-secondary-container) !important"
 					>
-						{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+						{#if data.video.liveNow}
+							{$_('thumbnail.live')}
+						{:else}
+							{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+						{/if}
 					</p>
-					{#if playerTextTracks && playerTextTracks.length > 0}
+					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
 						<button class="fill">
 							<i>closed_caption</i>
-							<menu class="no-wrap mobile">
-								<li role="presentation" onclick={() => player.setTextTrackVisibility(false)}>
+							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
+								<li
+									role="presentation"
+									data-ui="#cc-menu"
+									onclick={() => player.setTextTrackVisibility(false)}
+								>
 									{$_('player.controls.off')}
 								</li>
 								{#each playerTextTracks as track (track)}
 									<li
 										role="presentation"
+										data-ui="#cc-menu"
 										onclick={() => {
 											player.selectTextTrack(track);
 											player.setTextTrackVisibility(true);
@@ -1008,7 +1034,7 @@
 					{/if}
 					<button class="fill">
 						<i>settings</i>
-						<menu class="no-wrap mobile">
+						<menu class="no-wrap mobile" id="settings-menu">
 							{#if playerSettings !== 'root'}
 								<li role="presentation" onclick={() => (playerSettings = 'root')}>
 									<i>arrow_back</i>
@@ -1078,6 +1104,7 @@
 								</li>
 							{:else if playerSettings === 'quality'}
 								<li
+									data-ui="#settings-menu"
 									role="presentation"
 									onclick={() => {
 										playerSettings = 'root';
@@ -1095,6 +1122,7 @@
 									return heightB - heightA || widthB - widthA;
 								}) as track (track)}
 									<li
+										data-ui="#settings-menu"
 										role="presentation"
 										onclick={() => {
 											playerSettings = 'root';
@@ -1108,6 +1136,7 @@
 							{:else if playerSettings === 'speed'}
 								{#each playbackRates as playbackRate (playbackRate)}
 									<li
+										data-ui="#settings-menu"
 										role="presentation"
 										onclick={() => {
 											playerSettings = 'root';
@@ -1120,6 +1149,7 @@
 							{:else if playerSettings === 'language'}
 								{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
 									<li
+										data-ui="#settings-menu"
 										role="presentation"
 										onclick={() => {
 											playerSettings = 'root';
@@ -1132,6 +1162,24 @@
 								{/each}
 							{/if}
 						</menu>
+					</button>
+					<button
+						class="fill"
+						onclick={() => {
+							if (document.fullscreenElement) {
+								document.exitFullscreen();
+							} else {
+								playerContainer.requestFullscreen();
+							}
+						}}
+					>
+						<i>
+							{#if document.fullscreenElement}
+								fullscreen_exit
+							{:else}
+								fullscreen
+							{/if}
+						</i>
 					</button>
 				</nav>
 			</nav>
@@ -1190,6 +1238,8 @@
 		justify-content: center;
 	}
 
+	#player-container:focus-within #player-controls,
+	#player-container:active #player-controls,
 	#player-container:hover #player-controls {
 		opacity: 1;
 		transition: opacity 0.3s ease;

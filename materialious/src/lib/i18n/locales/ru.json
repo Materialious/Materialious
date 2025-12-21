@@ -75,7 +75,8 @@
             "materialiousLink": "Скопировать ссылку на Materialious",
             "invidiousRedirect": "Скопировать ссылку на сервер Invidious",
             "youtubeLink": "Скопировать ссылку на Youtube",
-            "includeTimestamp": "С отметкой времени"
+            "includeTimestamp": "С отметкой времени",
+            "copiedSuccess": "Скопированно в буфер обмена"
         },
         "download": "Скачать",
         "downloadSteps": {
@@ -176,7 +177,8 @@
         "companionUrl": "URL-адрес компаньона",
         "expandChapters": "Раскрывать главы по умолчанию",
         "disableAutoUpdate": "Отключить автоматические обновления",
-        "about": "О приложении"
+        "about": "О приложении",
+        "androidNativeShare": "Использовать native share"
     },
     "subscribe": "Подписаться",
     "invalidInstance": "Проверьте URL-адрес. Если он правильный, то возможно сервер сейчас недоступен или не поддерживает сторонние клиенты.",
@@ -203,5 +205,7 @@
     "contributors": "Участники",
     "newest": "Сначала новые",
     "oldest": "Сначала старые",
-    "popular": "Популярные"
+    "popular": "Популярные",
+    "favouriteChannel": "Любимый канал",
+    "unfavouriteChannel": "Нелюбимый канал"
 }

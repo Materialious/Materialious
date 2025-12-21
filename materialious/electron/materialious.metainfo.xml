@@ -3,7 +3,7 @@
   <id type="desktop-application">us.materialio.Materialious</id>
   <metadata_license>CC0-1.0</metadata_license>
   <name>Materialious</name>
-  <summary>Materialious is a privacy respecting frontend for YouTube built ontop of Invidious.</summary>
+  <summary>Materialious is a privacy respecting frontend for YouTube built on top of Invidious.</summary>
   <description>
     <p>Materialious is a client for Invidious using material design. It lets you browse and watch videos, manage playlists and visit channels.</p>
     <p>Features:</p>

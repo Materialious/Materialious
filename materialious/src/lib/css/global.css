@@ -86,10 +86,6 @@ menu {
 		transform: unset !important;
 	}
 
-	#volume-slider {
-		display: none;
-	}
-
 	main.root {
 		scrollbar-width: none !important;
 	}

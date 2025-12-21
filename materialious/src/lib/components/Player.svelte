@@ -972,7 +972,7 @@
 					{#if Capacitor.getPlatform() !== 'android'}
 						<article
 							id="volume-slider"
-							class="round white"
+							class="round white m l"
 							style="padding: 0;height: 10px;width: 150px;"
 						>
 							<label class="slider max" style="color: var(--secondary-container);">

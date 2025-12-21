@@ -930,7 +930,7 @@
 			{data.video.title}
 		</div>
 	{/if}
-	<p class="chip primary s" style="position: absolute;top: 10px;right: 10px;border: none;">
+	<p id="mobile-time" class="chip primary s">
 		{#if data.video.liveNow}
 			{$_('thumbnail.live')}
 		{:else}
@@ -1253,9 +1253,25 @@
 		justify-content: center;
 	}
 
+	#mobile-time {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		border: none;
+		opacity: 0;
+		transition: opacity 2s ease;
+	}
+
 	#player-container:focus-within #player-controls,
 	#player-container:active #player-controls,
 	#player-container:hover #player-controls {
+		opacity: 1;
+		transition: opacity 0.3s ease;
+	}
+
+	#player-container:focus-within #mobile-time,
+	#player-container:active #mobile-time,
+	#player-container:hover #mobile-time {
 		opacity: 1;
 		transition: opacity 0.3s ease;
 	}

@@ -16,6 +16,7 @@
 		interfaceLowBandwidthMode,
 		isAndroidTvStore,
 		playerSavePlaybackPositionStore,
+		playerState,
 		syncPartyConnectionsStore,
 		syncPartyPeerStore,
 		synciousInstanceStore,
@@ -119,7 +120,9 @@
 		removeEventListener('resize', disableSideways);
 	});
 
-	function syncChangeVideo() {
+	function onVideoSelected() {
+		playerState.set(undefined);
+
 		if ($syncPartyConnectionsStore) {
 			const events = {
 				events: [{ type: 'change-video', videoId: video.videoId }]
@@ -166,7 +169,7 @@
 			class="wave thumbnail"
 			href={watchUrl.toString()}
 			data-sveltekit-preload-data="off"
-			onclick={syncChangeVideo}
+			onclick={onVideoSelected}
 		>
 			{#if !$interfaceLowBandwidthMode}
 				{#if !thumbnail}
@@ -213,6 +216,7 @@
 				class="video-title"
 				data-sveltekit-preload-data="off"
 				href={watchUrl.toString()}
+				onclick={onVideoSelected}
 			>
 				<span class="bold">{letterCase(video.title.trimEnd())}</span>
 			</a>

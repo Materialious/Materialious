@@ -705,7 +705,7 @@
 			if (document.fullscreenElement) {
 				document.exitFullscreen();
 			} else {
-				// TODO
+				playerContainer.requestFullscreen();
 			}
 			return false;
 		});
@@ -930,19 +930,26 @@
 			{data.video.title}
 		</div>
 	{/if}
+	<p class="chip primary s" style="position: absolute;top: 10px;right: 10px;border: none;">
+		{#if data.video.liveNow}
+			{$_('thumbnail.live')}
+		{:else}
+			{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+		{/if}
+	</p>
 	<div id="player-center">
 		{#if playerIsBuffering}
 			<progress class="circle large indeterminate" value="50" max="100"></progress>
 		{:else if !playerCurrentPlaybackState}
-			<button class="extra fill" onclick={toggleVideoPlaybackStatus}>
+			<button class="extra" onclick={toggleVideoPlaybackStatus}>
 				<i>play_arrow</i>
 			</button>
 		{/if}
 	</div>
 	{#if !hideControls}
 		<div id="player-controls">
-			<article class="round white" style="width: 100%;padding: 0;height: 10px;">
-				<label class="slider max" style="color: var(--secondary-container);">
+			<article class="round" style="width: 100%;padding: 0;height: 10px;">
+				<label class="slider max">
 					<input
 						oninput={() => {
 							playerIsSeeking = true;
@@ -960,7 +967,7 @@
 
 			<nav>
 				<nav class="no-wrap">
-					<button class="fill" onclick={toggleVideoPlaybackStatus}>
+					<button onclick={toggleVideoPlaybackStatus}>
 						<i>
 							{#if playerCurrentPlaybackState}
 								pause
@@ -972,10 +979,10 @@
 					{#if Capacitor.getPlatform() !== 'android'}
 						<article
 							id="volume-slider"
-							class="round white m l"
+							class="round m l"
 							style="padding: 0;height: 10px;width: 150px;"
 						>
-							<label class="slider max" style="color: var(--secondary-container);">
+							<label class="slider max">
 								<input
 									oninput={() => {
 										if (!playerElement) return;
@@ -996,10 +1003,7 @@
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					<p
-						class="chip"
-						style="background-color: var(--secondary-container) !important;color: var(--on-secondary-container) !important"
-					>
+					<p class="chip primary m l" style="border: none;">
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
@@ -1007,7 +1011,7 @@
 						{/if}
 					</p>
 					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-						<button class="fill">
+						<button>
 							<i>closed_caption</i>
 							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 								<li
@@ -1032,7 +1036,7 @@
 							</menu>
 						</button>
 					{/if}
-					<button class="fill">
+					<button>
 						<i>settings</i>
 						<menu class="no-wrap mobile" id="settings-menu">
 							{#if playerSettings !== 'root'}
@@ -1070,20 +1074,24 @@
 										</span>
 									</nav>
 								</li>
-								<li role="presentation" onclick={() => (playerSettings = 'language')}>
-									<nav class="no-wrap" style="width: 100%;">
-										<i>language</i>
-										{$_('player.controls.language')}
+								{#if playerCurrentAudioTrack && playerCurrentAudioTrack.label !== null}
+									<li role="presentation" onclick={() => (playerSettings = 'language')}>
+										<nav class="no-wrap" style="width: 100%;">
+											<i>language</i>
+											{$_('player.controls.language')}
 
-										<div class="max"></div>
+											<div class="max"></div>
 
-										<span class="chip">
-											{#if playerCurrentAudioTrack}
-												{ISO6391.getName(playerCurrentAudioTrack.language)}
-											{/if}
-										</span>
-									</nav>
-								</li>
+											<span class="chip">
+												{#if playerCurrentAudioTrack}
+													{playerCurrentAudioTrack.language !== 'und'
+														? ISO6391.getName(playerCurrentAudioTrack.language)
+														: playerCurrentAudioTrack.label}
+												{/if}
+											</span>
+										</nav>
+									</li>
+								{/if}
 								<li
 									role="presentation"
 									onclick={() => {
@@ -1104,7 +1112,6 @@
 								</li>
 							{:else if playerSettings === 'quality'}
 								<li
-									data-ui="#settings-menu"
 									role="presentation"
 									onclick={() => {
 										playerSettings = 'root';
@@ -1122,7 +1129,6 @@
 									return heightB - heightA || widthB - widthA;
 								}) as track (track)}
 									<li
-										data-ui="#settings-menu"
 										role="presentation"
 										onclick={() => {
 											playerSettings = 'root';
@@ -1136,7 +1142,6 @@
 							{:else if playerSettings === 'speed'}
 								{#each playbackRates as playbackRate (playbackRate)}
 									<li
-										data-ui="#settings-menu"
 										role="presentation"
 										onclick={() => {
 											playerSettings = 'root';
@@ -1149,7 +1154,6 @@
 							{:else if playerSettings === 'language'}
 								{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
 									<li
-										data-ui="#settings-menu"
 										role="presentation"
 										onclick={() => {
 											playerSettings = 'root';
@@ -1157,14 +1161,25 @@
 											setActiveAudioTrack();
 										}}
 									>
-										{ISO6391.getName(track.language)} - {track.label}
+										{#if track.language !== 'und'}
+											{ISO6391.getName(track.language)} -
+										{/if}
+										{track.label}
 									</li>
 								{/each}
 							{/if}
 						</menu>
 					</button>
+					{#if document.pictureInPictureEnabled}
+						<button
+							onclick={() => {
+								(playerElement as HTMLVideoElement).requestPictureInPicture();
+							}}
+						>
+							<i>pip</i>
+						</button>
+					{/if}
 					<button
-						class="fill"
 						onclick={() => {
 							if (document.fullscreenElement) {
 								document.exitFullscreen();

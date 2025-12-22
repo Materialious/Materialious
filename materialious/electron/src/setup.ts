@@ -187,7 +187,6 @@ export class ElectronCapacitorApp {
 		} else {
 			this.loadMainWindow(this);
 		}
-
 		globalShortcut.register('Control+Shift+I', () => {
 			this.MainWindow.webContents.toggleDevTools();
 		});

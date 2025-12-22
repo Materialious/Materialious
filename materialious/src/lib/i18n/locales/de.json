@@ -102,7 +102,17 @@
         "chapters": "Kapitel",
         "retryText": "Das Video konnte nicht geladen werden, wie möchtest du weiterfahren?",
         "youtubeJsLoading": "Das Video konnte nicht geladen werden, es wird mit lokalem Video-Fallback erneut versucht.",
-        "premiere": "Video wird verfügbar sein"
+        "premiere": "Video wird verfügbar sein",
+        "controls": {
+            "back": "Zurück",
+            "quality": "Qualität",
+            "auto": "Automatisch",
+            "playbackSpeed": "Wiedergabegeschwindigkeit",
+            "loop": "Schleife",
+            "on": "An",
+            "off": "Aus",
+            "language": "Sprache"
+        }
     },
     "layout": {
         "interface": "Benutzeroberfläche",

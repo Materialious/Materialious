@@ -974,7 +974,7 @@
 	{#if !hideControls}
 		<div id="player-controls">
 			<article class="round" style="width: 100%;padding: 0;height: 10px;">
-				<label class="slider max">
+				<label id="progress-slider" class="slider max">
 					{#key playerCurrentTime}
 						<input
 							oninput={handleTimeChange}
@@ -1295,6 +1295,10 @@
 		border: none;
 		opacity: 0;
 		transition: opacity 2s ease;
+	}
+
+	#progress-slider > span {
+		transition: 0.25s;
 	}
 
 	#player-container:focus-within #player-controls,

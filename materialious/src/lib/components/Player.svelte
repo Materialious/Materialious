@@ -78,7 +78,6 @@
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(0);
-	let playerIsSeeking = $state(false);
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
@@ -86,6 +85,10 @@
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
 	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
 	let playerLoop = $state($playerAlwaysLoopStore);
+	let playerTimelineTooltipVisible: boolean = $state(false);
+	let playerTimelineTimeHover: number = $state(0);
+	let playerTimelineMouseX: number = $state(0);
+	let playerTimelineLastUpdate: number = 0;
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -330,6 +333,11 @@
 	function setActiveAudioTrack() {
 		const audioTracks = player.getAudioTracks();
 		playerCurrentAudioTrack = audioTracks.find((track) => track.active);
+	}
+
+	function handleTimeChange(event: Event) {
+		playerCurrentTime = parseFloat((event.target as HTMLInputElement).value);
+		if (playerElement) playerElement.currentTime = playerCurrentTime;
 	}
 
 	async function loadVideo() {
@@ -775,8 +783,9 @@
 		});
 
 		playerElement?.addEventListener('timeupdate', () => {
-			if (playerIsSeeking) return;
-			playerCurrentTime = playerElement?.currentTime ?? 0;
+			if (!playerElement) return;
+
+			playerCurrentTime = playerElement.currentTime ?? 0;
 
 			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
 				playerMaxKnownTime = Number(playerElement?.currentTime);
@@ -863,6 +872,24 @@
 		}
 	}
 
+	function handleMouseMove(event: MouseEvent) {
+		const currentTime = Date.now();
+		if (currentTime - playerTimelineLastUpdate < 60) return;
+		playerTimelineLastUpdate = currentTime;
+
+		const input = event.target as HTMLInputElement;
+		const boundingRect = input.getBoundingClientRect();
+		playerTimelineMouseX = event.clientX - boundingRect.left;
+
+		const percent = playerTimelineMouseX / input.clientWidth;
+		playerTimelineTimeHover = Math.round(percent * (data.video.lengthSeconds || 0));
+		playerTimelineTooltipVisible = true;
+	}
+
+	function handleMouseLeave(): void {
+		playerTimelineTooltipVisible = false;
+	}
+
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android') {
 			if (!$isAndroidTvStore) {
@@ -888,13 +915,9 @@
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
-		if (watchProgressTimeout) {
-			clearTimeout(watchProgressTimeout);
-		}
+		if (watchProgressTimeout) clearTimeout(watchProgressTimeout);
 
-		if (sabrAdapter) {
-			sabrAdapter.dispose();
-		}
+		if (sabrAdapter) sabrAdapter.dispose();
 
 		if (player) {
 			player.unload();
@@ -930,13 +953,15 @@
 			{data.video.title}
 		</div>
 	{/if}
-	<p id="mobile-time" class="chip primary s">
-		{#if data.video.liveNow}
-			{$_('thumbnail.live')}
-		{:else}
-			{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
-		{/if}
-	</p>
+	{#if !hideControls}
+		<p id="mobile-time" class="chip primary s">
+			{#if data.video.liveNow}
+				{$_('thumbnail.live')}
+			{:else}
+				{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+			{/if}
+		</p>
+	{/if}
 	<div id="player-center">
 		{#if playerIsBuffering}
 			<progress class="circle large indeterminate" value="50" max="100"></progress>
@@ -950,20 +975,27 @@
 		<div id="player-controls">
 			<article class="round" style="width: 100%;padding: 0;height: 10px;">
 				<label class="slider max">
-					<input
-						oninput={() => {
-							playerIsSeeking = true;
-							if (playerElement) playerElement.currentTime = playerCurrentTime;
-						}}
-						onchange={() => (playerIsSeeking = false)}
-						type="range"
-						min="0"
-						bind:value={playerCurrentTime}
-						max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
-					/>
+					{#key playerCurrentTime}
+						<input
+							oninput={handleTimeChange}
+							type="range"
+							min={0}
+							step={0.1}
+							bind:value={playerCurrentTime}
+							max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
+							onmousemove={handleMouseMove}
+							onmouseleave={handleMouseLeave}
+						/>
+					{/key}
 					<span></span>
 				</label>
 			</article>
+
+			{#if playerTimelineTooltipVisible}
+				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
+					{videoLength(playerTimelineTimeHover)}
+				</div>
+			{/if}
 
 			<nav>
 				<nav class="no-wrap">
@@ -983,17 +1015,19 @@
 							style="padding: 0;height: 10px;width: 150px;"
 						>
 							<label class="slider max">
-								<input
-									oninput={() => {
-										if (!playerElement) return;
+								{#key playerVolume}
+									<input
+										oninput={() => {
+											if (!playerElement) return;
 
-										playerElement.volume = playerVolume;
-									}}
-									bind:value={playerVolume}
-									type="range"
-									step="0.1"
-									max="1"
-								/>
+											playerElement.volume = playerVolume;
+										}}
+										bind:value={playerVolume}
+										type="range"
+										step="0.1"
+										max="1"
+									/>
+								{/key}
 								<span></span>
 							</label>
 						</article>
@@ -1255,8 +1289,9 @@
 
 	#mobile-time {
 		position: absolute;
-		top: 10px;
-		right: 10px;
+		top: 0;
+		right: 0;
+		padding: 10px;
 		border: none;
 		opacity: 0;
 		transition: opacity 2s ease;

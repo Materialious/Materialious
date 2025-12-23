@@ -954,7 +954,7 @@
 		</div>
 	{/if}
 	{#if !hideControls}
-		<p id="mobile-time" class="chip primary s">
+		<p id="mobile-time" class="chip secondary s">
 			{#if data.video.liveNow}
 				{$_('thumbnail.live')}
 			{:else}
@@ -966,7 +966,7 @@
 		{#if playerIsBuffering}
 			<progress class="circle large indeterminate" value="50" max="100"></progress>
 		{:else if !playerCurrentPlaybackState}
-			<button class="extra" onclick={toggleVideoPlaybackStatus}>
+			<button class="extra secondary" onclick={toggleVideoPlaybackStatus}>
 				<i>play_arrow</i>
 			</button>
 		{/if}
@@ -999,7 +999,7 @@
 
 			<nav>
 				<nav class="no-wrap">
-					<button onclick={toggleVideoPlaybackStatus}>
+					<button class="secondary" onclick={toggleVideoPlaybackStatus}>
 						<i>
 							{#if playerCurrentPlaybackState}
 								pause
@@ -1037,7 +1037,7 @@
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					<p class="chip primary m l" style="border: none;">
+					<p class="chip secondary m l" style="border: none;">
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
@@ -1045,7 +1045,7 @@
 						{/if}
 					</p>
 					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-						<button>
+						<button class="secondary">
 							<i>closed_caption</i>
 							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 								<li
@@ -1070,7 +1070,7 @@
 							</menu>
 						</button>
 					{/if}
-					<button>
+					<button class="secondary">
 						<i>settings</i>
 						<menu class="no-wrap mobile" id="settings-menu">
 							{#if playerSettings !== 'root'}
@@ -1206,6 +1206,7 @@
 					</button>
 					{#if document.pictureInPictureEnabled}
 						<button
+							class="secondary"
 							onclick={() => {
 								(playerElement as HTMLVideoElement).requestPictureInPicture();
 							}}
@@ -1214,6 +1215,7 @@
 						</button>
 					{/if}
 					<button
+						class="secondary"
 						onclick={() => {
 							if (document.fullscreenElement) {
 								document.exitFullscreen();

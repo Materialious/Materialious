@@ -886,8 +886,41 @@
 		playerTimelineTooltipVisible = true;
 	}
 
-	function handleMouseLeave(): void {
+	function handleMouseLeave() {
 		playerTimelineTooltipVisible = false;
+	}
+
+	function onVideoClick(
+		event: MouseEvent & {
+			currentTarget: EventTarget & HTMLDivElement;
+		}
+	) {
+		if (
+			event.target &&
+			event.target instanceof HTMLElement &&
+			event.target.id === 'player-center' &&
+			playerElement
+		) {
+			const container = event.currentTarget;
+
+			const rect = container.getBoundingClientRect();
+			const clickX = event.clientX - rect.left;
+			const width = rect.width;
+
+			if (clickX < width / 3) {
+				// Left third, back 10s
+				playerElement.currentTime = Math.max(0, playerElement.currentTime - 10);
+			} else if (clickX < (2 * width) / 3) {
+				// Middle third, toggle play/pause
+				toggleVideoPlaybackStatus();
+			} else {
+				// Right third, forward 10s
+				playerElement.currentTime = Math.min(
+					playerElement.duration,
+					playerElement.currentTime + 10
+				);
+			}
+		}
 	}
 
 	onDestroy(async () => {
@@ -932,15 +965,7 @@
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
 	role="presentation"
-	onclick={(event) => {
-		if (
-			event.target &&
-			event.target instanceof HTMLElement &&
-			event.target.id === 'player-center'
-		) {
-			toggleVideoPlaybackStatus();
-		}
-	}}
+	onclick={onVideoClick}
 >
 	<video
 		controls={false}
@@ -954,7 +979,7 @@
 		</div>
 	{/if}
 	{#if !hideControls}
-		<p id="mobile-time" class="chip primary s">
+		<p id="mobile-time" class="chip secondary s">
 			{#if data.video.liveNow}
 				{$_('thumbnail.live')}
 			{:else}
@@ -966,7 +991,7 @@
 		{#if playerIsBuffering}
 			<progress class="circle large indeterminate" value="50" max="100"></progress>
 		{:else if !playerCurrentPlaybackState}
-			<button class="extra" onclick={toggleVideoPlaybackStatus}>
+			<button class="extra secondary" onclick={toggleVideoPlaybackStatus}>
 				<i>play_arrow</i>
 			</button>
 		{/if}
@@ -974,7 +999,7 @@
 	{#if !hideControls}
 		<div id="player-controls">
 			<article class="round" style="width: 100%;padding: 0;height: 10px;">
-				<label class="slider max">
+				<label id="progress-slider" class="slider max">
 					{#key playerCurrentTime}
 						<input
 							oninput={handleTimeChange}
@@ -999,7 +1024,7 @@
 
 			<nav>
 				<nav class="no-wrap">
-					<button onclick={toggleVideoPlaybackStatus}>
+					<button class="secondary" onclick={toggleVideoPlaybackStatus}>
 						<i>
 							{#if playerCurrentPlaybackState}
 								pause
@@ -1037,7 +1062,7 @@
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					<p class="chip primary m l" style="border: none;">
+					<p class="chip secondary m l" style="border: none;">
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
@@ -1045,7 +1070,7 @@
 						{/if}
 					</p>
 					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-						<button>
+						<button class="secondary">
 							<i>closed_caption</i>
 							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 								<li
@@ -1070,7 +1095,7 @@
 							</menu>
 						</button>
 					{/if}
-					<button>
+					<button class="secondary">
 						<i>settings</i>
 						<menu class="no-wrap mobile" id="settings-menu">
 							{#if playerSettings !== 'root'}
@@ -1206,6 +1231,7 @@
 					</button>
 					{#if document.pictureInPictureEnabled}
 						<button
+							class="secondary"
 							onclick={() => {
 								(playerElement as HTMLVideoElement).requestPictureInPicture();
 							}}
@@ -1214,6 +1240,7 @@
 						</button>
 					{/if}
 					<button
+						class="secondary"
 						onclick={() => {
 							if (document.fullscreenElement) {
 								document.exitFullscreen();
@@ -1295,6 +1322,10 @@
 		border: none;
 		opacity: 0;
 		transition: opacity 2s ease;
+	}
+
+	#progress-slider > span {
+		transition: 0.25s;
 	}
 
 	#player-container:focus-within #player-controls,

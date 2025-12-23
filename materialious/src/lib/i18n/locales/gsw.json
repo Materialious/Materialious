@@ -184,7 +184,17 @@
         "enableYoutubejsPerm": "Lokale Video-Fallback immer erlaube",
         "enableYoutubejsTemp": "Nutz eimalig de lokali Video-Fallback",
         "youtubeJsFallBack": "Lokale Video-Fallback wird gnutzt",
-        "premiere": "Video wird verfüegbar sii"
+        "premiere": "Video wird verfüegbar sii",
+        "controls": {
+            "back": "Zrugg",
+            "quality": "Qualität",
+            "auto": "Automatisch",
+            "playbackSpeed": "Widergabegschwindigkeit",
+            "loop": "Schleife",
+            "on": "Aa",
+            "off": "Uus",
+            "language": "Spraach"
+        }
     },
     "subscribe": "Abonniere",
     "invidiousLogin": "Bitte meld dich mit dim Invidious-Konto aa",

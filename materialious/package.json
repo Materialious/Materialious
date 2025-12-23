@@ -50,7 +50,7 @@
 		"@capacitor/core": "^7.4.4",
 		"@capacitor/preferences": "^7.0.2",
 		"@capacitor/screen-orientation": "^7.0.0",
-		"@capacitor/share": "^7.0.2",
+		"@capacitor/share": "^8.0.0",
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"beercss": "^3.13.1",

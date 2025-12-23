@@ -886,8 +886,41 @@
 		playerTimelineTooltipVisible = true;
 	}
 
-	function handleMouseLeave(): void {
+	function handleMouseLeave() {
 		playerTimelineTooltipVisible = false;
+	}
+
+	function onVideoClick(
+		event: MouseEvent & {
+			currentTarget: EventTarget & HTMLDivElement;
+		}
+	) {
+		if (
+			event.target &&
+			event.target instanceof HTMLElement &&
+			event.target.id === 'player-center' &&
+			playerElement
+		) {
+			const container = event.currentTarget;
+
+			const rect = container.getBoundingClientRect();
+			const clickX = event.clientX - rect.left;
+			const width = rect.width;
+
+			if (clickX < width / 3) {
+				// Left third, back 10s
+				playerElement.currentTime = Math.max(0, playerElement.currentTime - 10);
+			} else if (clickX < (2 * width) / 3) {
+				// Middle third, toggle play/pause
+				toggleVideoPlaybackStatus();
+			} else {
+				// Right third, forward 10s
+				playerElement.currentTime = Math.min(
+					playerElement.duration,
+					playerElement.currentTime + 10
+				);
+			}
+		}
 	}
 
 	onDestroy(async () => {
@@ -932,15 +965,7 @@
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
 	role="presentation"
-	onclick={(event) => {
-		if (
-			event.target &&
-			event.target instanceof HTMLElement &&
-			event.target.id === 'player-center'
-		) {
-			toggleVideoPlaybackStatus();
-		}
-	}}
+	onclick={onVideoClick}
 >
 	<video
 		controls={false}

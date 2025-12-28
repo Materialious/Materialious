@@ -7,7 +7,7 @@
     "cancel": "İptal",
     "create": "Oluştur",
     "title": "Başlık",
-    "searchPlaceholder": "Ara...",
+    "searchPlaceholder": "Ara",
     "delete": "Sil",
     "deleteAllHistory": "Tüm geçmişi sil",
     "skipping": "Atla",
@@ -44,7 +44,9 @@
         "private": "Gizli",
         "playVideos": "Videoları oynat",
         "shuffleVideos": "Videoları karışık oynat",
-        "loopPlaylist": "Çalma listesini tekrarla"
+        "loopPlaylist": "Çalma listesini tekrarla",
+        "next": "Sıradaki",
+        "previous": "Önceki"
     },
     "thumbnail": {
         "live": "CANLI",
@@ -67,7 +69,8 @@
             "title": "Paylaş",
             "materialiousLink": "Bağlantıyı Materialious a kopyala",
             "invidiousRedirect": "Invidious yönlendirme bağlantısını kopyala",
-            "youtubeLink": "Youtube bağlantısını kopyala"
+            "youtubeLink": "Youtube bağlantısını kopyala",
+            "copiedSuccess": "Panoya kopyalandı"
         },
         "download": "İndir",
         "downloadSteps": {
@@ -82,7 +85,19 @@
         },
         "noPlaylists": "Oynatma listesi yok",
         "unableToLoadComments": "Yorumlar yüklenemiyor",
-        "addToPlaylist": "Oynatma listesine ekle"
+        "addToPlaylist": "Oynatma listesine ekle",
+        "pauseTimer": "Zamanlayıcıyı durdur",
+        "preferredQuality": "Tercih edilen kalite",
+        "chapters": "Bölümler",
+        "defaultLanguage": "Varsayılan Dil",
+        "retryText": "Video yüklenemedi, nasıl devam etmek istersiniz?",
+        "controls": {
+            "quality": "Kalite",
+            "auto": "Otomatik",
+            "playbackSpeed": "Oynatma hızı",
+            "loop": "Döngü",
+            "language": "Dil"
+        }
     },
     "layout": {
         "interface": "Arayüz",
@@ -101,7 +116,8 @@
             "theme": "Tema",
             "darkMode": "Koyu mod",
             "lightMode": "Açık Mod",
-            "color": "Renk"
+            "color": "Renk",
+            "AmoledTheme": "Amoled tema"
         },
         "searchSuggestions": "Önerileri ara",
         "previewVideoOnHover": "Fareyle üzerine gelindiğinde videoyu ön izleyin",
@@ -141,7 +157,11 @@
             "thumbnailInstanceUrl": "Küçük resim görünüm URL'si",
             "titleOnly": "Sadece başlık"
         },
-        "allowInsecureRequests": "Güvenli olmayan isteklere izin ver"
+        "allowInsecureRequests": "Güvenli olmayan isteklere izin ver",
+        "about": "Hakkında",
+        "lowBandwidthMode": "Düşük bant genişliği modu",
+        "searchHistory": "Arama geçmişi",
+        "disableAutoUpdate": "Otomatik güncellemeleri devre dışı bırak"
     },
     "subscribe": "Abone Ol",
     "premium": "Premium YouTube içeriği Materialious ile izlenemez.",
@@ -157,5 +177,18 @@
     "comments": "yorumlar",
     "reply": "cevapla",
     "login": "Giriş",
-    "invidiousLogin": "Lütfen Invidious hesabınız ile giriş yapınız"
+    "invidiousLogin": "Lütfen Invidious hesabınız ile giriş yapınız",
+    "popularPageDisabled": "Popüler sayfası Yöneticiler tarafından devre dışı bırakıldı",
+    "filters": {
+        "filters": "Filtreler",
+        "type": "Tür",
+        "uploadDate": "Yüklenme tarihi",
+        "duration": "Uzunluk",
+        "features": "Özellikler"
+    },
+    "contributors": "Katkıda bulunanlar",
+    "version": "Sürüm",
+    "newest": "En yeni",
+    "oldest": "En eski",
+    "popular": "Popüler"
 }

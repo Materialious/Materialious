@@ -117,7 +117,7 @@
     "defaultPage": "Alapértelmezett oldal",
     "player": {
         "youtubeJsFallBack": "Helyi videó visszatérés van használatban",
-        "preferredQuality": "Előnyben részesített minőség",
+        "preferredQuality": "Előnyben részesített felbontás",
         "share": {
             "includeTimestamp": "Időbélyeggel ellátott",
             "title": "Megosztás",
@@ -150,7 +150,17 @@
         "enableYoutubejsPerm": "Mindig engedélyezze a helyi videó visszatérést",
         "retryText": "A videó betöltése siketelen, hogyan szeretné folytatni?",
         "youtubeJsLoading": "A videó betöltése sikertelen, újraprobálkozás a helyi videó visszatéréssel.",
-        "premiere": "A videó elérhető lesz ekkor"
+        "premiere": "A videó elérhető lesz ekkor",
+        "controls": {
+            "back": "Vissza",
+            "quality": "Felbontás",
+            "auto": "Automatikus",
+            "playbackSpeed": "Lejátszási sebesség",
+            "loop": "Folyamatos lejátszás",
+            "on": "Be",
+            "off": "Ki",
+            "language": "Nyelv"
+        }
     },
     "title": "Cím",
     "subscriptions": {

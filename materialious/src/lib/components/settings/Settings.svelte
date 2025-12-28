@@ -175,4 +175,8 @@
 	.tabbed > a {
 		flex: none;
 	}
+
+	#dialog-settings {
+		width: 80%;
+	}
 </style>

@@ -525,11 +525,6 @@
 			width: 150px;
 		}
 
-		.pip > .pip-info > nav {
-			align-items: start;
-			padding-right: 0.5em;
-		}
-
 		.pip > .pip-info {
 			display: flex;
 			justify-content: space-between;

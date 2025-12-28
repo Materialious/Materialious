@@ -68,7 +68,7 @@
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
 	// eslint-disable-next-line no-undef
-	let watchProgressTimeout: NodeJS.Timeout;
+	let watchProgressInterval: NodeJS.Timeout;
 	let showVideoRetry = $state(false);
 
 	let player: shaka.Player;
@@ -365,11 +365,11 @@
 		});
 
 		if (!data.video.liveNow) {
-			if (watchProgressTimeout) {
-				clearInterval(watchProgressTimeout);
+			if (watchProgressInterval) {
+				clearInterval(watchProgressInterval);
 			}
 			// Auto save watch progress every minute.
-			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
+			watchProgressInterval = setInterval(() => savePlayerPos(), 60000);
 			setupSponsorSkip();
 
 			let dashUrl: string;
@@ -967,7 +967,7 @@
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
-		if (watchProgressTimeout) clearTimeout(watchProgressTimeout);
+		if (watchProgressInterval) clearTimeout(watchProgressInterval);
 
 		if (sabrAdapter) sabrAdapter.dispose();
 

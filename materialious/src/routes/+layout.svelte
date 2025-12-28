@@ -12,6 +12,13 @@
 				box-shadow: none !important;
 			}
 		</style>
+	{:else}
+		<style>
+			:focus {
+				outline: none !important;
+				box-shadow: none !important;
+			}
+		</style>
 	{/if}
 </svelte:head>
 

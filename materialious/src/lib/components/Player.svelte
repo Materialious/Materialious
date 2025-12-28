@@ -3,7 +3,7 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
 	import { type PhasedDescription } from '$lib/timestamps';
-	import { SafeArea } from '@capacitor-community/safe-area';
+	import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { error, type Page } from '@sveltejs/kit';
@@ -43,7 +43,12 @@
 	} from '../store';
 	import { setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
-	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
+	import {
+		goToNextVideo,
+		goToPreviousVideo,
+		playbackRates,
+		playerDoubleTapSeek
+	} from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
@@ -68,16 +73,17 @@
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
 	// eslint-disable-next-line no-undef
-	let watchProgressTimeout: NodeJS.Timeout;
+	let watchProgressInterval: NodeJS.Timeout;
 	let showVideoRetry = $state(false);
 
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
 	let playerContainer: HTMLElement;
+	let bufferBar: HTMLElement | undefined = $state();
 
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
-	let playerMaxKnownTime = $state(0);
+	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
@@ -89,6 +95,13 @@
 	let playerTimelineTimeHover: number = $state(0);
 	let playerTimelineMouseX: number = $state(0);
 	let playerTimelineLastUpdate: number = 0;
+	let playerVideoEndTimePretty: string = $state('');
+
+	let clickCount = $state(0);
+	// eslint-disable-next-line no-undef
+	let clickCounterTimeout: NodeJS.Timeout;
+
+	let seekDirection: 'forwards' | 'backwards' = $state('forwards');
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -192,14 +205,14 @@
 
 		if (isFullScreen) {
 			// Ensure bar color is black while in fullscreen
-			await SafeArea.enable({
-				config: {
-					customColorsForSystemBars: true,
-					statusBarColor: '#00000000',
-					statusBarContent: 'light',
-					navigationBarColor: '#00000000',
-					navigationBarContent: 'light'
-				}
+			await SafeArea.setSystemBarsStyle({
+				style: SystemBarsStyle.Dark
+			});
+			await SafeArea.hideSystemBars({
+				type: SystemBarsType.NavigationBar
+			});
+			await SafeArea.hideSystemBars({
+				type: SystemBarsType.StatusBar
 			});
 		} else {
 			await setStatusBarColor();
@@ -340,6 +353,14 @@
 		if (playerElement) playerElement.currentTime = playerCurrentTime;
 	}
 
+	function toggleFullscreen() {
+		if (document.fullscreenElement) {
+			document.exitFullscreen();
+		} else {
+			playerContainer.requestFullscreen();
+		}
+	}
+
 	async function loadVideo() {
 		showVideoRetry = false;
 
@@ -357,11 +378,11 @@
 		});
 
 		if (!data.video.liveNow) {
-			if (watchProgressTimeout) {
-				clearInterval(watchProgressTimeout);
+			if (watchProgressInterval) {
+				clearInterval(watchProgressInterval);
 			}
 			// Auto save watch progress every minute.
-			watchProgressTimeout = setInterval(() => savePlayerPos(), 60000);
+			watchProgressInterval = setInterval(() => savePlayerPos(), 60000);
 			setupSponsorSkip();
 
 			let dashUrl: string;
@@ -692,14 +713,14 @@
 		if (!$isAndroidTvStore) {
 			Mousetrap.bind('right', () => {
 				if (!playerElement) return;
-				playerElement.currentTime = playerElement.currentTime + 10;
+				playerElement.currentTime = playerElement.currentTime + playerDoubleTapSeek;
 				return false;
 			});
 
 			Mousetrap.bind('left', () => {
 				if (!playerElement) return;
 
-				playerElement.currentTime = playerElement.currentTime - 10;
+				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
 				return false;
 			});
 		}
@@ -710,11 +731,7 @@
 		});
 
 		Mousetrap.bind('f', () => {
-			if (document.fullscreenElement) {
-				document.exitFullscreen();
-			} else {
-				playerContainer.requestFullscreen();
-			}
+			toggleFullscreen();
 			return false;
 		});
 
@@ -788,7 +805,33 @@
 			playerCurrentTime = playerElement.currentTime ?? 0;
 
 			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
-				playerMaxKnownTime = Number(playerElement?.currentTime);
+				playerMaxKnownTime = Number(playerElement.currentTime);
+			}
+
+			const remainingTime = playerMaxKnownTime - playerElement.currentTime;
+			const videoEnds = new Date(Date.now() + remainingTime * 1000);
+
+			playerVideoEndTimePretty = videoEnds.toLocaleTimeString([], {
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: true
+			});
+
+			const buffered = playerElement.buffered;
+
+			if (buffered.length > 0 && bufferBar) {
+				const bufferedEnd = buffered.end(0); // Amount shaka has buffered
+				const startBuffer = Math.max(playerElement.currentTime, 0);
+
+				// Calculate the buffered width as a percentage starting from the current time
+				const bufferedWidth =
+					((bufferedEnd - startBuffer) / (playerMaxKnownTime - startBuffer)) * 100;
+
+				const currentSliderPercentage = (playerCurrentTime / playerMaxKnownTime) * 100;
+
+				const effectiveWidth = Math.min(Math.max(bufferedWidth, 0), currentSliderPercentage);
+				bufferBar.style.width = effectiveWidth + '%';
+				bufferBar.style.left = Math.min(currentSliderPercentage, 100) + '%';
 			}
 		});
 
@@ -898,26 +941,40 @@
 		if (
 			event.target &&
 			event.target instanceof HTMLElement &&
-			event.target.id === 'player-center' &&
+			event.target.id === 'player-tap-controls-area' &&
+			parseFloat(getComputedStyle(event.target).opacity) > 0 &&
 			playerElement
 		) {
+			clickCount++;
+
 			const container = event.currentTarget;
 
 			const rect = container.getBoundingClientRect();
 			const clickX = event.clientX - rect.left;
 			const width = rect.width;
 
+			if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
+
+			clickCounterTimeout = setTimeout(() => {
+				if (clickCount == 1) {
+					toggleVideoPlaybackStatus();
+				}
+
+				clickCount = 0;
+			}, 300);
+
+			if (clickCount < 2) return;
+
 			if (clickX < width / 3) {
-				// Left third, back 10s
-				playerElement.currentTime = Math.max(0, playerElement.currentTime - 10);
+				seekDirection = 'backwards';
+				playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
 			} else if (clickX < (2 * width) / 3) {
-				// Middle third, toggle play/pause
-				toggleVideoPlaybackStatus();
+				toggleFullscreen();
 			} else {
-				// Right third, forward 10s
+				seekDirection = 'forwards';
 				playerElement.currentTime = Math.min(
 					playerElement.duration,
-					playerElement.currentTime + 10
+					playerElement.currentTime + playerDoubleTapSeek
 				);
 			}
 		}
@@ -935,6 +992,8 @@
 				}
 			}
 
+			await setStatusBarColor();
+
 			await CapacitorMusicControls.destroy();
 		}
 
@@ -948,9 +1007,11 @@
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
 
-		if (watchProgressTimeout) clearTimeout(watchProgressTimeout);
+		if (watchProgressInterval) clearTimeout(watchProgressInterval);
 
 		if (sabrAdapter) sabrAdapter.dispose();
+
+		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
 		if (player) {
 			player.unload();
@@ -979,42 +1040,75 @@
 		</div>
 	{/if}
 	{#if !hideControls}
-		<p id="mobile-time" class="chip secondary s">
-			{#if data.video.liveNow}
-				{$_('thumbnail.live')}
-			{:else}
-				{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
-			{/if}
-		</p>
+		<div id="mobile-time">
+			<p class="chip inverse-primary s">
+				{#if data.video.liveNow}
+					{$_('thumbnail.live')}
+				{:else}
+					{videoLength(playerCurrentTime)} / {videoLength(playerMaxKnownTime)}
+				{/if}
+			</p>
+			<p class="chip inverse-primary">
+				{playerVideoEndTimePretty}
+			</p>
+		</div>
 	{/if}
 	<div id="player-center">
-		{#if playerIsBuffering}
-			<progress class="circle large indeterminate" value="50" max="100"></progress>
-		{:else if !playerCurrentPlaybackState}
-			<button class="extra secondary" onclick={toggleVideoPlaybackStatus}>
-				<i>play_arrow</i>
-			</button>
-		{/if}
+		<div class="grid">
+			<div class="s4 m4 l4" id="player-tap-controls-area">
+				{#if clickCount > 1 && seekDirection === 'backwards'}
+					<div
+						class="seek-double-click"
+						class:buffer-left={seekDirection === 'backwards'}
+						id="player-tap-controls-area"
+					>
+						<h4 id="player-tap-controls-area">-{(clickCount - 1) * playerDoubleTapSeek}</h4>
+					</div>
+				{/if}
+			</div>
+			<div class="s4 m4 l4">
+				<div class="player-status" id="player-tap-controls-area">
+					{#if playerIsBuffering}
+						<progress class="circle large indeterminate" value="50" max="100"></progress>
+					{:else if !playerCurrentPlaybackState}
+						<button class="extra inverse-primary" onclick={toggleVideoPlaybackStatus}>
+							<i>play_arrow</i>
+						</button>
+					{/if}
+				</div>
+			</div>
+			<div class="s4 m4 l4" id="player-tap-controls-area">
+				{#if clickCount > 1 && seekDirection === 'forwards'}
+					<div
+						class="seek-double-click"
+						class:buffer-right={seekDirection === 'forwards'}
+						id="player-tap-controls-area"
+					>
+						<h4 id="player-tap-controls-area">+{(clickCount - 1) * playerDoubleTapSeek}</h4>
+					</div>
+				{/if}
+			</div>
+		</div>
 	</div>
 	{#if !hideControls}
 		<div id="player-controls">
-			<article class="round" style="width: 100%;padding: 0;height: 10px;">
-				<label id="progress-slider" class="slider max">
-					{#key playerCurrentTime}
-						<input
-							oninput={handleTimeChange}
-							type="range"
-							min={0}
-							step={0.1}
-							bind:value={playerCurrentTime}
-							max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
-							onmousemove={handleMouseMove}
-							onmouseleave={handleMouseLeave}
-						/>
-					{/key}
-					<span></span>
-				</label>
-			</article>
+			<label class="slider" id="progress-slider">
+				{#key playerCurrentTime}
+					<input
+						style="width: 100%;"
+						type="range"
+						oninput={handleTimeChange}
+						min={0}
+						step={0.1}
+						bind:value={playerCurrentTime}
+						max={playerMaxKnownTime}
+						onmousemove={handleMouseMove}
+						onmouseleave={handleMouseLeave}
+					/>
+				{/key}
+				<span></span>
+				<div bind:this={bufferBar} class="buffered-bar"></div>
+			</label>
 
 			{#if playerTimelineTooltipVisible}
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
@@ -1024,7 +1118,7 @@
 
 			<nav>
 				<nav class="no-wrap">
-					<button class="secondary" onclick={toggleVideoPlaybackStatus}>
+					<button class="inverse-primary" onclick={toggleVideoPlaybackStatus}>
 						<i>
 							{#if playerCurrentPlaybackState}
 								pause
@@ -1034,35 +1128,28 @@
 						</i>
 					</button>
 					{#if Capacitor.getPlatform() !== 'android'}
-						<article
-							id="volume-slider"
-							class="round m l"
-							style="padding: 0;height: 10px;width: 150px;"
-						>
-							<label class="slider max">
-								{#key playerVolume}
-									<input
-										oninput={() => {
-											if (!playerElement) return;
+						<label class="slider round m l" id="volume-slider">
+							{#key playerVolume}
+								<input
+									oninput={() => {
+										if (!playerElement) return;
 
-											playerElement.volume = playerVolume;
-										}}
-										bind:value={playerVolume}
-										type="range"
-										step="0.1"
-										max="1"
-									/>
-								{/key}
-								<span></span>
-							</label>
-						</article>
+										playerElement.volume = playerVolume;
+									}}
+									bind:value={playerVolume}
+									type="range"
+									step="0.1"
+									max="1"
+								/>
+							{/key} <span></span>
+						</label>
 					{/if}
 				</nav>
 
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					<p class="chip secondary m l" style="border: none;">
+					<p class="chip m l" style="height: 100%;">
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
@@ -1070,7 +1157,7 @@
 						{/if}
 					</p>
 					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-						<button class="secondary">
+						<button class="inverse-primary">
 							<i>closed_caption</i>
 							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 								<li
@@ -1095,7 +1182,7 @@
 							</menu>
 						</button>
 					{/if}
-					<button class="secondary">
+					<button class="inverse-primary">
 						<i>settings</i>
 						<menu class="no-wrap mobile" id="settings-menu">
 							{#if playerSettings !== 'root'}
@@ -1231,7 +1318,7 @@
 					</button>
 					{#if document.pictureInPictureEnabled}
 						<button
-							class="secondary"
+							class="inverse-primary"
 							onclick={() => {
 								(playerElement as HTMLVideoElement).requestPictureInPicture();
 							}}
@@ -1240,7 +1327,7 @@
 						</button>
 					{/if}
 					<button
-						class="secondary"
+						class="inverse-primary"
 						onclick={() => {
 							if (document.fullscreenElement) {
 								document.exitFullscreen();
@@ -1305,13 +1392,21 @@
 		padding: 10px;
 	}
 
+	#player-controls span {
+		clip-path: none;
+	}
+
 	#player-center {
 		position: absolute;
 		width: 100%;
 		height: 100%;
+	}
+
+	.player-status {
 		display: flex;
-		align-items: center;
 		justify-content: center;
+		align-items: center;
+		height: var(--video-player-height);
 	}
 
 	#mobile-time {
@@ -1319,13 +1414,22 @@
 		top: 0;
 		right: 0;
 		padding: 10px;
-		border: none;
 		opacity: 0;
 		transition: opacity 2s ease;
 	}
 
+	#mobile-time .chip {
+		border: none;
+		margin: 0;
+	}
+
 	#progress-slider > span {
 		transition: 0.25s;
+	}
+
+	#progress-slider {
+		block-size: 1.5em;
+		margin: 0;
 	}
 
 	#player-container:focus-within #player-controls,
@@ -1340,6 +1444,42 @@
 	#player-container:hover #mobile-time {
 		opacity: 1;
 		transition: opacity 0.3s ease;
+	}
+
+	.seek-double-click {
+		background-color: var(--secondary-container);
+		height: var(--video-player-height);
+		color: var(--secondary);
+		width: 100%;
+		opacity: 0.8;
+		padding: 1em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		user-select: none;
+	}
+
+	.seek-double-click.buffer-right {
+		border-top-left-radius: 2rem;
+		border-bottom-left-radius: 2rem;
+	}
+
+	.seek-double-click.buffer-left {
+		border-top-right-radius: 2rem;
+		border-bottom-right-radius: 2rem;
+	}
+
+	.buffered-bar {
+		position: absolute;
+		height: 1rem;
+		background: var(--secondary);
+		top: 50%;
+		left: 0;
+		transform: translateY(-50%);
+		z-index: 0;
+		pointer-events: none;
+		border-top-right-radius: 2rem;
+		border-bottom-right-radius: 2rem;
 	}
 
 	menu.mobile {
@@ -1388,5 +1528,26 @@
 
 	.hide {
 		display: none;
+	}
+
+	.chip {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
+		border: none;
+	}
+
+	.slider > span {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
+	}
+
+	.slider > input::-webkit-slider-thumb {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
+	}
+
+	.slider > input::-moz-range-thumb {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
 	}
 </style>

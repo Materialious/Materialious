@@ -172,7 +172,15 @@
 </dialog>
 
 <style>
+	.tabbed {
+		padding: 0 1em;
+	}
+
 	.tabbed > a {
 		flex: none;
+	}
+
+	#dialog-settings {
+		width: fit-content;
 	}
 </style>

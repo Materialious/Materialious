@@ -7,6 +7,9 @@ const config: CapacitorConfig = {
 	plugins: {
 		CapacitorNodeJS: {
 			nodeDir: 'nodejs-android'
+		},
+		SystemBars: {
+			insetsHandling: 'disable'
 		}
 	},
 	server: {

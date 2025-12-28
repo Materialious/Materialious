@@ -41,21 +41,12 @@ button,
 }
 
 nav.top {
-	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 	padding-bottom: 1em;
-}
-
-nav.bottom {
-	padding-bottom: var(--safe-area-inset-bottom) !important;
 }
 
 main.root {
 	max-height: 100vh;
 	overflow-y: auto;
-}
-
-dialog {
-	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 }
 
 .row {

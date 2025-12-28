@@ -2,7 +2,7 @@ import { Capacitor } from '@capacitor/core';
 import ui from 'beercss';
 import { tick } from 'svelte';
 import { get } from 'svelte/store';
-import { SafeArea } from '@capacitor-community/safe-area';
+import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
 import { darkModeStore, interfaceAmoledTheme } from './store';
 
 export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
@@ -23,20 +23,15 @@ export async function setStatusBarColor() {
 
 	await tick();
 
-	const surfaceColor = get(interfaceAmoledTheme)
-		? '#000000'
-		: (await getDynamicTheme())['--surface-container'];
+	await SafeArea.setSystemBarsStyle({
+		style: get(darkModeStore) ? SystemBarsStyle.Dark : SystemBarsStyle.Light
+	});
 
-	const contentColor = !get(darkModeStore) ? 'dark' : 'light';
-
-	await SafeArea.enable({
-		config: {
-			customColorsForSystemBars: true,
-			statusBarColor: surfaceColor,
-			statusBarContent: contentColor,
-			navigationBarColor: surfaceColor,
-			navigationBarContent: contentColor
-		}
+	await SafeArea.showSystemBars({
+		type: SystemBarsType.NavigationBar
+	});
+	await SafeArea.showSystemBars({
+		type: SystemBarsType.StatusBar
 	});
 }
 

@@ -1,19 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "us.materialio.app"
-    compileSdk rootProject.ext.compileSdkVersion
+    namespace = "us.materialio.app"
+    compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "us.materialio.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 180
-        versionName "1.12.8"
+        versionCode 181
+        versionName "1.12.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
-            ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'

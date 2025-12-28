@@ -939,6 +939,7 @@
 		playerTimelineTooltipVisible = false;
 	}
 
+	let androidFirstTap = true;
 	function onVideoClick(
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLDivElement;
@@ -948,10 +949,15 @@
 			event.target &&
 			event.target instanceof HTMLElement &&
 			event.target.id === 'player-tap-controls-area' &&
-			parseFloat(getComputedStyle(event.target).opacity) > 0 &&
 			playerElement
 		) {
 			clickCount++;
+
+			// Force android to tap an addtional time.
+			if (Capacitor.getPlatform() === 'android' && androidFirstTap) {
+				androidFirstTap = false;
+				return;
+			}
 
 			const container = event.currentTarget;
 
@@ -964,6 +970,17 @@
 			clickCounterTimeout = setTimeout(() => {
 				if (clickCount == 1) {
 					toggleVideoPlaybackStatus();
+				}
+
+				if (
+					Capacitor.getPlatform() === 'android' &&
+					event.target &&
+					event.target instanceof HTMLElement &&
+					parseFloat(getComputedStyle(event.target).opacity) > 0
+				) {
+					androidFirstTap = false;
+				} else {
+					androidFirstTap = true;
 				}
 
 				clickCount = 0;
@@ -1392,6 +1409,7 @@
 		opacity: 0;
 		transition: opacity 2s ease;
 		padding: 10px;
+		user-select: none;
 	}
 
 	#player-controls span {
@@ -1439,6 +1457,7 @@
 	#player-container:hover #player-controls {
 		opacity: 1;
 		transition: opacity 0.3s ease;
+		user-select: all;
 	}
 
 	#player-container:focus-within #mobile-time,

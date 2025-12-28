@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
-	import { type PhasedDescription } from '$lib/timestamps';
+	import { type PhasedDescription, type Timestamp } from '$lib/timestamps';
 	import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
@@ -95,9 +95,9 @@
 	let playerTimelineTooltipVisible: boolean = $state(false);
 	let playerTimelineTimeHover: number = $state(0);
 	let playerTimelineMouseX: number = $state(0);
-	let playerTimelineLastUpdate: number = 0;
 	let playerVideoEndTimePretty: string = $state('');
 	let playerBufferedTo: number = $state(0);
+	let playerCloestTimestamp: Timestamp | undefined = $state();
 
 	let clickCount = $state(0);
 	// eslint-disable-next-line no-undef
@@ -111,6 +111,10 @@
 		await tick();
 		updateVideoPlayerHeight();
 	});
+
+	function getMarkerWidth(startTime: number, endTime: number): string {
+		return `${((endTime - startTime) / playerMaxKnownTime) * 100}%`;
+	}
 
 	function restoreDefaultLanguage() {
 		if (!$playerDefaultLanguage || $playerDefaultLanguage === 'original') {
@@ -441,8 +445,7 @@
 			if (data.content.timestamps) {
 				let chapterWebVTT = 'WEBVTT\n\n';
 
-				let timestampIndex = 0;
-				data.content.timestamps.forEach((timestamp) => {
+				data.content.timestamps.forEach((timestamp, timestampIndex) => {
 					let endTime: string;
 					if (timestampIndex === data.content.timestamps.length - 1) {
 						endTime = videoLength(data.video.lengthSeconds);
@@ -451,15 +454,15 @@
 					}
 
 					chapterWebVTT += `${padTime(timestamp.timePretty)}.000 --> ${padTime(endTime)}.000\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
-
-					timestampIndex += 1;
 				});
 
-				if (timestampIndex > 0) {
+				try {
 					player.addChaptersTrack(
 						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
 						get(playerDefaultLanguage)
 					);
+				} catch {
+					// Continue regardless
 				}
 			}
 		} else {
@@ -918,24 +921,33 @@
 		}
 	}
 
+	let requestAnimationTooltip: number | undefined;
 	function handleMouseMove(event: MouseEvent) {
-		playerPauseTimeUpdates = true;
+		if (requestAnimationTooltip) return;
 
-		const currentTime = Date.now();
-		if (currentTime - playerTimelineLastUpdate < 60) return;
-		playerTimelineLastUpdate = currentTime;
+		requestAnimationTooltip = requestAnimationFrame(() => {
+			const input = event.target as HTMLInputElement;
+			const rect = input.getBoundingClientRect();
+			playerTimelineMouseX = event.clientX - rect.left;
 
-		const input = event.target as HTMLInputElement;
-		const boundingRect = input.getBoundingClientRect();
-		playerTimelineMouseX = event.clientX - boundingRect.left;
+			const percent = Math.min(Math.max(playerTimelineMouseX / input.clientWidth, 0), 1);
+			playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
 
-		const percent = playerTimelineMouseX / input.clientWidth;
-		playerTimelineTimeHover = Math.round(percent * (data.video.lengthSeconds || 0));
-		playerTimelineTooltipVisible = true;
+			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
+				let endTime: number;
+				if (chapterIndex === data.content.timestamps.length - 1) {
+					endTime = data.video.lengthSeconds;
+				} else {
+					endTime = data.content.timestamps[chapterIndex + 1].time;
+				}
+				return playerTimelineTimeHover >= chapter.time && playerTimelineTimeHover < endTime;
+			});
+			playerTimelineTooltipVisible = true;
+			requestAnimationTooltip = undefined;
+		});
 	}
 
 	function handleMouseLeave() {
-		playerPauseTimeUpdates = false;
 		playerTimelineTooltipVisible = false;
 	}
 
@@ -984,7 +996,7 @@
 				}
 
 				clickCount = 0;
-			}, 300);
+			}, 200);
 
 			if (clickCount < 2) return;
 
@@ -1116,10 +1128,10 @@
 					<input
 						style="width: 100%;"
 						type="range"
-						onchange={handleTimeChange}
+						oninput={handleTimeChange}
 						min={0}
 						step={0.1}
-						value={playerCurrentTime}
+						bind:value={playerCurrentTime}
 						max={playerMaxKnownTime}
 						onmousemove={handleMouseMove}
 						onmouseleave={handleMouseLeave}
@@ -1127,10 +1139,25 @@
 				{/key}
 				<span></span>
 				<div bind:this={playerBufferBar} class="buffered-bar"></div>
+				{#each data.content.timestamps as chapter, index (chapter)}
+					<div
+						class="chapter-marker"
+						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
+						style:width={getMarkerWidth(
+							chapter.time,
+							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
+						)}
+					></div>
+				{/each}
 			</label>
 
 			{#if playerTimelineTooltipVisible}
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
+					{#if playerCloestTimestamp}
+						{playerCloestTimestamp.title}
+					{/if}
+					<br />
+
 					{videoLength(playerTimelineTimeHover)}
 				</div>
 			{/if}
@@ -1160,7 +1187,8 @@
 									step="0.1"
 									max="1"
 								/>
-							{/key} <span></span>
+							{/key}
+							<span></span>
 						</label>
 					{/if}
 				</nav>
@@ -1501,6 +1529,19 @@
 		pointer-events: none;
 		border-top-right-radius: 2rem;
 		border-bottom-right-radius: 2rem;
+	}
+
+	.chapter-marker {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		left: 0;
+		height: 1rem;
+		background-color: var(--secondary);
+		opacity: 0.5;
+		border-radius: 2rem;
+		z-index: 0;
+		pointer-events: none;
 	}
 
 	menu.mobile {

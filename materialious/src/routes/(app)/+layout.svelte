@@ -269,14 +269,6 @@
 <svelte:head>
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html webManifestLink}
-
-	{#if Capacitor.getPlatform() === 'android' && !$isAndroidTvStore}
-		<style>
-			nav.top {
-				height: 120px;
-			}
-		</style>
-	{/if}
 </svelte:head>
 
 <div>

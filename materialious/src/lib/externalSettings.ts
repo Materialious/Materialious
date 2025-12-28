@@ -34,7 +34,6 @@ import {
 	themeColorStore,
 	interfaceAutoExpandChapters,
 	playerDefaultPlaybackSpeed,
-	playerStatisticsByDefault,
 	playerCCByDefault,
 	playerMiniplayerEnabled
 } from '$lib/store';
@@ -214,11 +213,6 @@ const persistedStores: {
 		name: 'defaultPlaybackSpeed',
 		store: playerDefaultPlaybackSpeed,
 		type: 'number'
-	},
-	{
-		name: 'playerStatistics',
-		store: playerStatisticsByDefault,
-		type: 'boolean'
 	},
 	{
 		name: 'CCByDefault',

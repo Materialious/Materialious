@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
-	import { type PhasedDescription } from '$lib/timestamps';
+	import { type PhasedDescription, type Timestamp } from '$lib/timestamps';
 	import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
@@ -78,12 +78,13 @@
 
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
-	let playerContainer: HTMLElement;
-	let bufferBar: HTMLElement | undefined = $state();
 
+	let playerContainer: HTMLElement;
+	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
+	let playerPauseTimeUpdates = $state(false);
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
@@ -94,8 +95,9 @@
 	let playerTimelineTooltipVisible: boolean = $state(false);
 	let playerTimelineTimeHover: number = $state(0);
 	let playerTimelineMouseX: number = $state(0);
-	let playerTimelineLastUpdate: number = 0;
 	let playerVideoEndTimePretty: string = $state('');
+	let playerBufferedTo: number = $state(0);
+	let playerCloestTimestamp: Timestamp | undefined = $state();
 
 	let clickCount = $state(0);
 	// eslint-disable-next-line no-undef
@@ -109,6 +111,10 @@
 		await tick();
 		updateVideoPlayerHeight();
 	});
+
+	function getMarkerWidth(startTime: number, endTime: number): string {
+		return `${((endTime - startTime) / playerMaxKnownTime) * 100}%`;
+	}
 
 	function restoreDefaultLanguage() {
 		if (!$playerDefaultLanguage || $playerDefaultLanguage === 'original') {
@@ -439,8 +445,7 @@
 			if (data.content.timestamps) {
 				let chapterWebVTT = 'WEBVTT\n\n';
 
-				let timestampIndex = 0;
-				data.content.timestamps.forEach((timestamp) => {
+				data.content.timestamps.forEach((timestamp, timestampIndex) => {
 					let endTime: string;
 					if (timestampIndex === data.content.timestamps.length - 1) {
 						endTime = videoLength(data.video.lengthSeconds);
@@ -449,15 +454,15 @@
 					}
 
 					chapterWebVTT += `${padTime(timestamp.timePretty)}.000 --> ${padTime(endTime)}.000\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
-
-					timestampIndex += 1;
 				});
 
-				if (timestampIndex > 0) {
+				try {
 					player.addChaptersTrack(
 						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
 						get(playerDefaultLanguage)
 					);
+				} catch {
+					// Continue regardless
 				}
 			}
 		} else {
@@ -802,7 +807,9 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			if (!playerElement) return;
 
-			playerCurrentTime = playerElement.currentTime ?? 0;
+			if (!playerPauseTimeUpdates) {
+				playerCurrentTime = playerElement.currentTime ?? 0;
+			}
 
 			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
 				playerMaxKnownTime = Number(playerElement.currentTime);
@@ -819,19 +826,18 @@
 
 			const buffered = playerElement.buffered;
 
-			if (buffered.length > 0 && bufferBar) {
-				const bufferedEnd = buffered.end(0); // Amount shaka has buffered
-				const startBuffer = Math.max(playerElement.currentTime, 0);
+			if (buffered.length > 0 && playerBufferBar) {
+				playerBufferedTo = buffered.end(0);
 
-				// Calculate the buffered width as a percentage starting from the current time
-				const bufferedWidth =
-					((bufferedEnd - startBuffer) / (playerMaxKnownTime - startBuffer)) * 100;
+				const bufferedPercent = (playerBufferedTo / playerMaxKnownTime) * 100;
+				const progressPercent = (playerCurrentTime / playerMaxKnownTime) * 100;
 
-				const currentSliderPercentage = (playerCurrentTime / playerMaxKnownTime) * 100;
+				const bufferAhead = Math.max(0, bufferedPercent - progressPercent);
 
-				const effectiveWidth = Math.min(Math.max(bufferedWidth, 0), currentSliderPercentage);
-				bufferBar.style.width = effectiveWidth + '%';
-				bufferBar.style.left = Math.min(currentSliderPercentage, 100) + '%';
+				const effectiveWidth = Math.min(bufferAhead, 100 - progressPercent);
+
+				playerBufferBar.style.left = progressPercent + '%';
+				playerBufferBar.style.width = effectiveWidth + '%';
 			}
 		});
 
@@ -915,24 +921,37 @@
 		}
 	}
 
+	let requestAnimationTooltip: number | undefined;
 	function handleMouseMove(event: MouseEvent) {
-		const currentTime = Date.now();
-		if (currentTime - playerTimelineLastUpdate < 60) return;
-		playerTimelineLastUpdate = currentTime;
+		if (requestAnimationTooltip) return;
 
-		const input = event.target as HTMLInputElement;
-		const boundingRect = input.getBoundingClientRect();
-		playerTimelineMouseX = event.clientX - boundingRect.left;
+		requestAnimationTooltip = requestAnimationFrame(() => {
+			const input = event.target as HTMLInputElement;
+			const rect = input.getBoundingClientRect();
+			playerTimelineMouseX = event.clientX - rect.left;
 
-		const percent = playerTimelineMouseX / input.clientWidth;
-		playerTimelineTimeHover = Math.round(percent * (data.video.lengthSeconds || 0));
-		playerTimelineTooltipVisible = true;
+			const percent = Math.min(Math.max(playerTimelineMouseX / input.clientWidth, 0), 1);
+			playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
+
+			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
+				let endTime: number;
+				if (chapterIndex === data.content.timestamps.length - 1) {
+					endTime = data.video.lengthSeconds;
+				} else {
+					endTime = data.content.timestamps[chapterIndex + 1].time;
+				}
+				return playerTimelineTimeHover >= chapter.time && playerTimelineTimeHover < endTime;
+			});
+			playerTimelineTooltipVisible = true;
+			requestAnimationTooltip = undefined;
+		});
 	}
 
 	function handleMouseLeave() {
 		playerTimelineTooltipVisible = false;
 	}
 
+	let androidFirstTap = true;
 	function onVideoClick(
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLDivElement;
@@ -942,10 +961,15 @@
 			event.target &&
 			event.target instanceof HTMLElement &&
 			event.target.id === 'player-tap-controls-area' &&
-			parseFloat(getComputedStyle(event.target).opacity) > 0 &&
 			playerElement
 		) {
 			clickCount++;
+
+			// Force android to tap an addtional time.
+			if (Capacitor.getPlatform() === 'android' && androidFirstTap) {
+				androidFirstTap = false;
+				return;
+			}
 
 			const container = event.currentTarget;
 
@@ -960,8 +984,19 @@
 					toggleVideoPlaybackStatus();
 				}
 
+				if (
+					Capacitor.getPlatform() === 'android' &&
+					event.target &&
+					event.target instanceof HTMLElement &&
+					parseFloat(getComputedStyle(event.target).opacity) > 0
+				) {
+					androidFirstTap = false;
+				} else {
+					androidFirstTap = true;
+				}
+
 				clickCount = 0;
-			}, 300);
+			}, 200);
 
 			if (clickCount < 2) return;
 
@@ -1070,10 +1105,6 @@
 				<div class="player-status" id="player-tap-controls-area">
 					{#if playerIsBuffering}
 						<progress class="circle large indeterminate" value="50" max="100"></progress>
-					{:else if !playerCurrentPlaybackState}
-						<button class="extra inverse-primary" onclick={toggleVideoPlaybackStatus}>
-							<i>play_arrow</i>
-						</button>
 					{/if}
 				</div>
 			</div>
@@ -1107,11 +1138,26 @@
 					/>
 				{/key}
 				<span></span>
-				<div bind:this={bufferBar} class="buffered-bar"></div>
+				<div bind:this={playerBufferBar} class="buffered-bar"></div>
+				{#each data.content.timestamps as chapter, index (chapter)}
+					<div
+						class="chapter-marker"
+						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
+						style:width={getMarkerWidth(
+							chapter.time,
+							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
+						)}
+					></div>
+				{/each}
 			</label>
 
 			{#if playerTimelineTooltipVisible}
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
+					{#if playerCloestTimestamp}
+						{playerCloestTimestamp.title}
+						<br />
+					{/if}
+
 					{videoLength(playerTimelineTimeHover)}
 				</div>
 			{/if}
@@ -1141,7 +1187,8 @@
 									step="0.1"
 									max="1"
 								/>
-							{/key} <span></span>
+							{/key}
+							<span></span>
 						</label>
 					{/if}
 				</nav>
@@ -1390,6 +1437,7 @@
 		opacity: 0;
 		transition: opacity 2s ease;
 		padding: 10px;
+		user-select: none;
 	}
 
 	#player-controls span {
@@ -1428,7 +1476,7 @@
 	}
 
 	#progress-slider {
-		block-size: 1.5em;
+		block-size: 1em;
 		margin: 0;
 	}
 
@@ -1437,6 +1485,7 @@
 	#player-container:hover #player-controls {
 		opacity: 1;
 		transition: opacity 0.3s ease;
+		user-select: all;
 	}
 
 	#player-container:focus-within #mobile-time,
@@ -1480,6 +1529,19 @@
 		pointer-events: none;
 		border-top-right-radius: 2rem;
 		border-bottom-right-radius: 2rem;
+	}
+
+	.chapter-marker {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		left: 0;
+		height: 1rem;
+		background-color: var(--secondary);
+		opacity: 0.5;
+		border-radius: 2rem;
+		z-index: 0;
+		pointer-events: none;
 	}
 
 	menu.mobile {

@@ -165,11 +165,6 @@ export const playerDefaultPlaybackSpeed: Writable<number> = persist(
 	createStorage(),
 	'defaultPlaybackSpeed'
 );
-export const playerStatisticsByDefault = persist(
-	writable(false),
-	createStorage(),
-	'playerStatistics'
-);
 export const playerMiniplayerEnabled = persist(
 	writable(true),
 	createStorage(),

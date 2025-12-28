@@ -3,7 +3,7 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
 	import { type PhasedDescription } from '$lib/timestamps';
-	import { SafeArea } from '@capacitor-community/safe-area';
+	import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { error, type Page } from '@sveltejs/kit';
@@ -43,7 +43,12 @@
 	} from '../store';
 	import { setStatusBarColor } from '../theme';
 	import { patchYoutubeJs } from '$lib/patches/youtubejs';
-	import { goToNextVideo, goToPreviousVideo, playbackRates } from '$lib/player';
+	import {
+		goToNextVideo,
+		goToPreviousVideo,
+		playbackRates,
+		playerDoubleTapSeek
+	} from '$lib/player';
 	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
@@ -89,6 +94,12 @@
 	let playerTimelineTimeHover: number = $state(0);
 	let playerTimelineMouseX: number = $state(0);
 	let playerTimelineLastUpdate: number = 0;
+
+	let clickCount = $state(0);
+	// eslint-disable-next-line no-undef
+	let clickCounterTimeout: NodeJS.Timeout;
+
+	let seekDirection: 'forwards' | 'backwards' = '';
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -192,14 +203,14 @@
 
 		if (isFullScreen) {
 			// Ensure bar color is black while in fullscreen
-			await SafeArea.enable({
-				config: {
-					customColorsForSystemBars: true,
-					statusBarColor: '#00000000',
-					statusBarContent: 'light',
-					navigationBarColor: '#00000000',
-					navigationBarContent: 'light'
-				}
+			await SafeArea.setSystemBarsStyle({
+				style: SystemBarsStyle.Light
+			});
+			await SafeArea.hideSystemBars({
+				type: SystemBarsType.NavigationBar
+			});
+			await SafeArea.hideSystemBars({
+				type: SystemBarsType.StatusBar
 			});
 		} else {
 			await setStatusBarColor();
@@ -700,14 +711,14 @@
 		if (!$isAndroidTvStore) {
 			Mousetrap.bind('right', () => {
 				if (!playerElement) return;
-				playerElement.currentTime = playerElement.currentTime + 10;
+				playerElement.currentTime = playerElement.currentTime + playerDoubleTapSeek;
 				return false;
 			});
 
 			Mousetrap.bind('left', () => {
 				if (!playerElement) return;
 
-				playerElement.currentTime = playerElement.currentTime - 10;
+				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
 				return false;
 			});
 		}
@@ -894,9 +905,6 @@
 		playerTimelineTooltipVisible = false;
 	}
 
-	let clickCount = $state(0);
-	// eslint-disable-next-line no-undef
-	let clickCounterTimeout: NodeJS.Timeout;
 	function onVideoClick(
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLDivElement;
@@ -905,7 +913,7 @@
 		if (
 			event.target &&
 			event.target instanceof HTMLElement &&
-			event.target.id === 'player-center' &&
+			event.target.id === 'player-tap-controls-area' &&
 			parseFloat(getComputedStyle(event.target).opacity) > 0 &&
 			playerElement
 		) {
@@ -930,13 +938,15 @@
 			if (clickCount < 2) return;
 
 			if (clickX < width / 3) {
-				playerElement.currentTime = Math.max(0, playerElement.currentTime - 10);
+				seekDirection = 'backwards';
+				playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
 			} else if (clickX < (2 * width) / 3) {
 				toggleFullscreen();
 			} else {
+				seekDirection = 'forwards';
 				playerElement.currentTime = Math.min(
 					playerElement.duration,
-					playerElement.currentTime + 10
+					playerElement.currentTime + playerDoubleTapSeek
 				);
 			}
 		}
@@ -953,6 +963,8 @@
 					});
 				}
 			}
+
+			await setStatusBarColor();
 
 			await CapacitorMusicControls.destroy();
 		}
@@ -1009,13 +1021,33 @@
 		</p>
 	{/if}
 	<div id="player-center">
-		{#if playerIsBuffering}
-			<progress class="circle large indeterminate" value="50" max="100"></progress>
-		{:else if !playerCurrentPlaybackState}
-			<button class="extra secondary" onclick={toggleVideoPlaybackStatus}>
-				<i>play_arrow</i>
-			</button>
-		{/if}
+		<div class="grid">
+			<div class="s4 m4 l4" id="player-tap-controls-area">
+				{#if clickCount > 1 && seekDirection === 'backwards'}
+					<div class="seek-double-click" id="player-tap-controls-area">
+						<h4 id="player-tap-controls-area">-{(clickCount - 1) * playerDoubleTapSeek}</h4>
+					</div>
+				{/if}
+			</div>
+			<div class="s4 m4 l4">
+				<div class="player-status" id="player-tap-controls-area">
+					{#if playerIsBuffering}
+						<progress class="circle large indeterminate" value="50" max="100"></progress>
+					{:else if !playerCurrentPlaybackState}
+						<button class="extra secondary" onclick={toggleVideoPlaybackStatus}>
+							<i>play_arrow</i>
+						</button>
+					{/if}
+				</div>
+			</div>
+			<div class="s4 m4 l4" id="player-tap-controls-area">
+				{#if clickCount > 1 && seekDirection === 'forwards'}
+					<div class="seek-double-click" id="player-tap-controls-area">
+						<h4 id="player-tap-controls-area">+{(clickCount - 1) * playerDoubleTapSeek}</h4>
+					</div>
+				{/if}
+			</div>
+		</div>
 	</div>
 	{#if !hideControls}
 		<div id="player-controls">
@@ -1330,9 +1362,13 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
+	}
+
+	.player-status {
 		display: flex;
-		align-items: center;
 		justify-content: center;
+		align-items: center;
+		height: var(--video-player-height);
 	}
 
 	#mobile-time {
@@ -1361,6 +1397,19 @@
 	#player-container:hover #mobile-time {
 		opacity: 1;
 		transition: opacity 0.3s ease;
+	}
+
+	.seek-double-click {
+		background-color: var(--secondary-container);
+		height: var(--video-player-height);
+		color: var(--secondary);
+		width: 100%;
+		opacity: 0.8;
+		padding: 1em;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		user-select: none;
 	}
 
 	menu.mobile {

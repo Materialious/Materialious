@@ -25,7 +25,7 @@ async function main() {
 		}
 
 		// Write the data to a JSON file
-		fs.writeFileSync(path.join(__dirname, outputDir, outputFile), JSON.stringify(data));
+		fs.writeFileSync(path.join(outputDir, outputFile), JSON.stringify(data));
 		console.log('Github contributors fetched and written to', path.join(outputDir, outputFile));
 	} catch (error) {
 		console.error('Error fetching data:', error);

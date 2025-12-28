@@ -23,10 +23,8 @@ export async function setStatusBarColor() {
 
 	await tick();
 
-	const barStyle = !get(darkModeStore) ? SystemBarsStyle.Dark : SystemBarsStyle.Light;
-
 	await SafeArea.setSystemBarsStyle({
-		style: barStyle
+		style: get(darkModeStore) ? SystemBarsStyle.Dark : SystemBarsStyle.Light
 	});
 
 	await SafeArea.showSystemBars({

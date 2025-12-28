@@ -206,7 +206,7 @@
 		if (isFullScreen) {
 			// Ensure bar color is black while in fullscreen
 			await SafeArea.setSystemBarsStyle({
-				style: SystemBarsStyle.Light
+				style: SystemBarsStyle.Dark
 			});
 			await SafeArea.hideSystemBars({
 				type: SystemBarsType.NavigationBar
@@ -829,9 +829,9 @@
 
 				const currentSliderPercentage = (playerCurrentTime / playerMaxKnownTime) * 100;
 
-				const effectiveWidth = Math.max(bufferedWidth, 0);
+				const effectiveWidth = Math.min(Math.max(bufferedWidth, 0), currentSliderPercentage);
 				bufferBar.style.width = effectiveWidth + '%';
-				bufferBar.style.left = currentSliderPercentage + '%';
+				bufferBar.style.left = Math.min(currentSliderPercentage, 100) + '%';
 			}
 		});
 
@@ -1041,14 +1041,14 @@
 	{/if}
 	{#if !hideControls}
 		<div id="mobile-time">
-			<p class="chip secondary s">
+			<p class="chip inverse-primary s">
 				{#if data.video.liveNow}
 					{$_('thumbnail.live')}
 				{:else}
 					{videoLength(playerCurrentTime)} / {videoLength(playerMaxKnownTime)}
 				{/if}
 			</p>
-			<p class="chip secondary">
+			<p class="chip inverse-primary">
 				{playerVideoEndTimePretty}
 			</p>
 		</div>
@@ -1057,7 +1057,11 @@
 		<div class="grid">
 			<div class="s4 m4 l4" id="player-tap-controls-area">
 				{#if clickCount > 1 && seekDirection === 'backwards'}
-					<div class="seek-double-click" id="player-tap-controls-area">
+					<div
+						class="seek-double-click"
+						class:buffer-left={seekDirection === 'backwards'}
+						id="player-tap-controls-area"
+					>
 						<h4 id="player-tap-controls-area">-{(clickCount - 1) * playerDoubleTapSeek}</h4>
 					</div>
 				{/if}
@@ -1067,7 +1071,7 @@
 					{#if playerIsBuffering}
 						<progress class="circle large indeterminate" value="50" max="100"></progress>
 					{:else if !playerCurrentPlaybackState}
-						<button class="extra secondary" onclick={toggleVideoPlaybackStatus}>
+						<button class="extra inverse-primary" onclick={toggleVideoPlaybackStatus}>
 							<i>play_arrow</i>
 						</button>
 					{/if}
@@ -1075,7 +1079,11 @@
 			</div>
 			<div class="s4 m4 l4" id="player-tap-controls-area">
 				{#if clickCount > 1 && seekDirection === 'forwards'}
-					<div class="seek-double-click" id="player-tap-controls-area">
+					<div
+						class="seek-double-click"
+						class:buffer-right={seekDirection === 'forwards'}
+						id="player-tap-controls-area"
+					>
 						<h4 id="player-tap-controls-area">+{(clickCount - 1) * playerDoubleTapSeek}</h4>
 					</div>
 				{/if}
@@ -1085,30 +1093,32 @@
 	{#if !hideControls}
 		<div id="player-controls">
 			<label class="slider" id="progress-slider">
-				<input
-					style="width: 100%;"
-					type="range"
-					oninput={handleTimeChange}
-					min={0}
-					step={0.1}
-					bind:value={playerCurrentTime}
-					max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
-					onmousemove={handleMouseMove}
-					onmouseleave={handleMouseLeave}
-				/>
+				{#key playerCurrentTime}
+					<input
+						style="width: 100%;"
+						type="range"
+						oninput={handleTimeChange}
+						min={0}
+						step={0.1}
+						bind:value={playerCurrentTime}
+						max={playerMaxKnownTime}
+						onmousemove={handleMouseMove}
+						onmouseleave={handleMouseLeave}
+					/>
+				{/key}
 				<span></span>
 				<div bind:this={bufferBar} class="buffered-bar"></div>
 			</label>
 
 			{#if playerTimelineTooltipVisible}
-				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX + 40}px;">
+				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
 					{videoLength(playerTimelineTimeHover)}
 				</div>
 			{/if}
 
 			<nav>
 				<nav class="no-wrap">
-					<button class="secondary" onclick={toggleVideoPlaybackStatus}>
+					<button class="inverse-primary" onclick={toggleVideoPlaybackStatus}>
 						<i>
 							{#if playerCurrentPlaybackState}
 								pause
@@ -1139,7 +1149,7 @@
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					<p class="chip secondary m l" style="border: none;">
+					<p class="chip m l" style="height: 100%;">
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
@@ -1147,7 +1157,7 @@
 						{/if}
 					</p>
 					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-						<button class="secondary">
+						<button class="inverse-primary">
 							<i>closed_caption</i>
 							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 								<li
@@ -1172,7 +1182,7 @@
 							</menu>
 						</button>
 					{/if}
-					<button class="secondary">
+					<button class="inverse-primary">
 						<i>settings</i>
 						<menu class="no-wrap mobile" id="settings-menu">
 							{#if playerSettings !== 'root'}
@@ -1308,7 +1318,7 @@
 					</button>
 					{#if document.pictureInPictureEnabled}
 						<button
-							class="secondary"
+							class="inverse-primary"
 							onclick={() => {
 								(playerElement as HTMLVideoElement).requestPictureInPicture();
 							}}
@@ -1317,7 +1327,7 @@
 						</button>
 					{/if}
 					<button
-						class="secondary"
+						class="inverse-primary"
 						onclick={() => {
 							if (document.fullscreenElement) {
 								document.exitFullscreen();
@@ -1417,6 +1427,11 @@
 		transition: 0.25s;
 	}
 
+	#progress-slider {
+		block-size: 0;
+		margin: 0;
+	}
+
 	#player-container:focus-within #player-controls,
 	#player-container:active #player-controls,
 	#player-container:hover #player-controls {
@@ -1444,6 +1459,16 @@
 		user-select: none;
 	}
 
+	.seek-double-click.buffer-right {
+		border-top-left-radius: 2rem;
+		border-bottom-left-radius: 2rem;
+	}
+
+	.seek-double-click.buffer-left {
+		border-top-right-radius: 2rem;
+		border-bottom-right-radius: 2rem;
+	}
+
 	.buffered-bar {
 		position: absolute;
 		height: 1rem;
@@ -1453,6 +1478,8 @@
 		transform: translateY(-50%);
 		z-index: 0;
 		pointer-events: none;
+		border-top-right-radius: 2rem;
+		border-bottom-right-radius: 2rem;
 	}
 
 	menu.mobile {
@@ -1501,5 +1528,26 @@
 
 	.hide {
 		display: none;
+	}
+
+	.chip {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
+		border: none;
+	}
+
+	.slider > span {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
+	}
+
+	.slider > input::-webkit-slider-thumb {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
+	}
+
+	.slider > input::-moz-range-thumb {
+		background-color: var(--inverse-primary);
+		color: var(--primary);
 	}
 </style>

@@ -902,14 +902,11 @@
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
-		const playerControls = document.getElementById('player-controls');
-
-		if (!playerControls) return;
-
 		if (
-			event.currentTarget &&
-			event.currentTarget.id === 'player-container' &&
-			parseFloat(getComputedStyle(playerControls).opacity) > 0 &&
+			event.target &&
+			event.target instanceof HTMLElement &&
+			event.target.id === 'player-center' &&
+			parseFloat(getComputedStyle(event.target).opacity) > 0 &&
 			playerElement
 		) {
 			clickCount++;

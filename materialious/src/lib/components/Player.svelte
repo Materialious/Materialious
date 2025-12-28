@@ -78,9 +78,9 @@
 
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
-	let playerContainer: HTMLElement;
-	let bufferBar: HTMLElement | undefined = $state();
 
+	let playerContainer: HTMLElement;
+	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
@@ -96,6 +96,7 @@
 	let playerTimelineMouseX: number = $state(0);
 	let playerTimelineLastUpdate: number = 0;
 	let playerVideoEndTimePretty: string = $state('');
+	let playerBufferedTo: number = $state(0);
 
 	let clickCount = $state(0);
 	// eslint-disable-next-line no-undef
@@ -819,19 +820,18 @@
 
 			const buffered = playerElement.buffered;
 
-			if (buffered.length > 0 && bufferBar) {
-				const bufferedEnd = buffered.end(0); // Amount shaka has buffered
-				const startBuffer = Math.max(playerElement.currentTime, 0);
+			if (buffered.length > 0 && playerBufferBar) {
+				playerBufferedTo = buffered.end(0);
 
-				// Calculate the buffered width as a percentage starting from the current time
-				const bufferedWidth =
-					((bufferedEnd - startBuffer) / (playerMaxKnownTime - startBuffer)) * 100;
+				const bufferedPercent = (playerBufferedTo / playerMaxKnownTime) * 100;
+				const progressPercent = (playerCurrentTime / playerMaxKnownTime) * 100;
 
-				const currentSliderPercentage = (playerCurrentTime / playerMaxKnownTime) * 100;
+				const bufferAhead = Math.max(0, bufferedPercent - progressPercent);
 
-				const effectiveWidth = Math.min(Math.max(bufferedWidth, 0), currentSliderPercentage);
-				bufferBar.style.width = effectiveWidth + '%';
-				bufferBar.style.left = Math.min(currentSliderPercentage, 100) + '%';
+				const effectiveWidth = Math.min(bufferAhead, 100 - progressPercent);
+
+				playerBufferBar.style.left = progressPercent + '%';
+				playerBufferBar.style.width = effectiveWidth + '%';
 			}
 		});
 
@@ -1070,10 +1070,6 @@
 				<div class="player-status" id="player-tap-controls-area">
 					{#if playerIsBuffering}
 						<progress class="circle large indeterminate" value="50" max="100"></progress>
-					{:else if !playerCurrentPlaybackState}
-						<button class="extra inverse-primary" onclick={toggleVideoPlaybackStatus}>
-							<i>play_arrow</i>
-						</button>
 					{/if}
 				</div>
 			</div>
@@ -1107,7 +1103,7 @@
 					/>
 				{/key}
 				<span></span>
-				<div bind:this={bufferBar} class="buffered-bar"></div>
+				<div bind:this={playerBufferBar} class="buffered-bar"></div>
 			</label>
 
 			{#if playerTimelineTooltipVisible}
@@ -1428,7 +1424,7 @@
 	}
 
 	#progress-slider {
-		block-size: 1.5em;
+		block-size: 1em;
 		margin: 0;
 	}
 

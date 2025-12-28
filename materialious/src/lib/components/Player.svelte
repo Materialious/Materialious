@@ -95,6 +95,7 @@
 	let playerTimelineTimeHover: number = $state(0);
 	let playerTimelineMouseX: number = $state(0);
 	let playerTimelineLastUpdate: number = 0;
+	let playerVideoEndTimePretty: string = $state('');
 
 	let clickCount = $state(0);
 	// eslint-disable-next-line no-undef
@@ -804,8 +805,17 @@
 			playerCurrentTime = playerElement.currentTime ?? 0;
 
 			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
-				playerMaxKnownTime = Number(playerElement?.currentTime);
+				playerMaxKnownTime = Number(playerElement.currentTime);
 			}
+
+			const remainingTime = playerMaxKnownTime - playerElement.currentTime;
+			const videoEnds = new Date(Date.now() + remainingTime * 1000);
+
+			playerVideoEndTimePretty = videoEnds.toLocaleTimeString([], {
+				hour: '2-digit',
+				minute: '2-digit',
+				hour12: true
+			});
 
 			const buffered = playerElement.buffered;
 
@@ -1030,13 +1040,18 @@
 		</div>
 	{/if}
 	{#if !hideControls}
-		<p id="mobile-time" class="chip secondary s">
-			{#if data.video.liveNow}
-				{$_('thumbnail.live')}
-			{:else}
-				{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
-			{/if}
-		</p>
+		<div id="mobile-time">
+			<p class="chip secondary s">
+				{#if data.video.liveNow}
+					{$_('thumbnail.live')}
+				{:else}
+					{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+				{/if}
+			</p>
+			<p class="chip secondary">
+				{playerVideoEndTimePretty}
+			</p>
+		</div>
 	{/if}
 	<div id="player-center">
 		<div class="grid">
@@ -1389,9 +1404,13 @@
 		top: 0;
 		right: 0;
 		padding: 10px;
-		border: none;
 		opacity: 0;
 		transition: opacity 2s ease;
+	}
+
+	#mobile-time .chip {
+		border: none;
+		margin: 0;
 	}
 
 	#progress-slider > span {

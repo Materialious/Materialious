@@ -1155,8 +1155,8 @@
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
 					{#if playerCloestTimestamp}
 						{playerCloestTimestamp.title}
+						<br />
 					{/if}
-					<br />
 
 					{videoLength(playerTimelineTimeHover)}
 				</div>

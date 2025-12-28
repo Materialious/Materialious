@@ -3,8 +3,8 @@
 	"version": "1.12.9",
 	"private": true,
 	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
+		"dev": "npm run patch:github && vite dev",
+		"build": "npm run patch:github && vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -12,6 +12,7 @@
 		"eslint": "eslint .",
 		"format": "prettier --write .",
 		"patch:shaka": "node ./scripts/patchShaka.mjs",
+		"patch:github": "node ./scripts/githubContributors.mjs",
 		"postinstall": "npm run patch:shaka"
 	},
 	"devDependencies": {

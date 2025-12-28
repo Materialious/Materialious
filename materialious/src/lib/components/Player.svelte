@@ -1045,7 +1045,7 @@
 				{#if data.video.liveNow}
 					{$_('thumbnail.live')}
 				{:else}
-					{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+					{videoLength(playerCurrentTime)} / {videoLength(playerMaxKnownTime)}
 				{/if}
 			</p>
 			<p class="chip secondary">

@@ -79,10 +79,11 @@
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
 	let playerContainer: HTMLElement;
+	let bufferBar: HTMLElement | undefined = $state();
 
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
-	let playerMaxKnownTime = $state(0);
+	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
@@ -99,7 +100,7 @@
 	// eslint-disable-next-line no-undef
 	let clickCounterTimeout: NodeJS.Timeout;
 
-	let seekDirection: 'forwards' | 'backwards' = '';
+	let seekDirection: 'forwards' | 'backwards' = $state('forwards');
 
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
@@ -805,6 +806,23 @@
 			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
 				playerMaxKnownTime = Number(playerElement?.currentTime);
 			}
+
+			const buffered = playerElement.buffered;
+
+			if (buffered.length > 0 && bufferBar) {
+				const bufferedEnd = buffered.end(0); // Amount shaka has buffered
+				const startBuffer = Math.max(playerElement.currentTime, 0);
+
+				// Calculate the buffered width as a percentage starting from the current time
+				const bufferedWidth =
+					((bufferedEnd - startBuffer) / (playerMaxKnownTime - startBuffer)) * 100;
+
+				const currentSliderPercentage = (playerCurrentTime / playerMaxKnownTime) * 100;
+
+				const effectiveWidth = Math.max(bufferedWidth, 0);
+				bufferBar.style.width = effectiveWidth + '%';
+				bufferBar.style.left = currentSliderPercentage + '%';
+			}
 		});
 
 		try {
@@ -1051,26 +1069,24 @@
 	</div>
 	{#if !hideControls}
 		<div id="player-controls">
-			<article class="round" style="width: 100%;padding: 0;height: 10px;">
-				<label id="progress-slider" class="slider max">
-					{#key playerCurrentTime}
-						<input
-							oninput={handleTimeChange}
-							type="range"
-							min={0}
-							step={0.1}
-							bind:value={playerCurrentTime}
-							max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
-							onmousemove={handleMouseMove}
-							onmouseleave={handleMouseLeave}
-						/>
-					{/key}
-					<span></span>
-				</label>
-			</article>
+			<label class="slider" id="progress-slider">
+				<input
+					style="width: 100%;"
+					type="range"
+					oninput={handleTimeChange}
+					min={0}
+					step={0.1}
+					bind:value={playerCurrentTime}
+					max={data.video.liveNow ? playerMaxKnownTime : data.video.lengthSeconds}
+					onmousemove={handleMouseMove}
+					onmouseleave={handleMouseLeave}
+				/>
+				<span></span>
+				<div bind:this={bufferBar} class="buffered-bar"></div>
+			</label>
 
 			{#if playerTimelineTooltipVisible}
-				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
+				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX + 40}px;">
 					{videoLength(playerTimelineTimeHover)}
 				</div>
 			{/if}
@@ -1087,28 +1103,21 @@
 						</i>
 					</button>
 					{#if Capacitor.getPlatform() !== 'android'}
-						<article
-							id="volume-slider"
-							class="round m l"
-							style="padding: 0;height: 10px;width: 150px;"
-						>
-							<label class="slider max">
-								{#key playerVolume}
-									<input
-										oninput={() => {
-											if (!playerElement) return;
+						<label class="slider round m l" id="volume-slider">
+							{#key playerVolume}
+								<input
+									oninput={() => {
+										if (!playerElement) return;
 
-											playerElement.volume = playerVolume;
-										}}
-										bind:value={playerVolume}
-										type="range"
-										step="0.1"
-										max="1"
-									/>
-								{/key}
-								<span></span>
-							</label>
-						</article>
+										playerElement.volume = playerVolume;
+									}}
+									bind:value={playerVolume}
+									type="range"
+									step="0.1"
+									max="1"
+								/>
+							{/key} <span></span>
+						</label>
 					{/if}
 				</nav>
 
@@ -1358,6 +1367,10 @@
 		padding: 10px;
 	}
 
+	#player-controls span {
+		clip-path: none;
+	}
+
 	#player-center {
 		position: absolute;
 		width: 100%;
@@ -1410,6 +1423,17 @@
 		justify-content: center;
 		align-items: center;
 		user-select: none;
+	}
+
+	.buffered-bar {
+		position: absolute;
+		height: 1rem;
+		background: var(--secondary);
+		top: 50%;
+		left: 0;
+		transform: translateY(-50%);
+		z-index: 0;
+		pointer-events: none;
 	}
 
 	menu.mobile {

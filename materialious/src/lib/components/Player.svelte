@@ -1428,7 +1428,7 @@
 	}
 
 	#progress-slider {
-		block-size: 0;
+		block-size: 1.5em;
 		margin: 0;
 	}
 

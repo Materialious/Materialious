@@ -340,6 +340,14 @@
 		if (playerElement) playerElement.currentTime = playerCurrentTime;
 	}
 
+	function toggleFullscreen() {
+		if (document.fullscreenElement) {
+			document.exitFullscreen();
+		} else {
+			playerContainer.requestFullscreen();
+		}
+	}
+
 	async function loadVideo() {
 		showVideoRetry = false;
 
@@ -710,11 +718,7 @@
 		});
 
 		Mousetrap.bind('f', () => {
-			if (document.fullscreenElement) {
-				document.exitFullscreen();
-			} else {
-				playerContainer.requestFullscreen();
-			}
+			toggleFullscreen();
 			return false;
 		});
 
@@ -890,31 +894,49 @@
 		playerTimelineTooltipVisible = false;
 	}
 
+	let clickCount = $state(0);
+	// eslint-disable-next-line no-undef
+	let clickCounterTimeout: NodeJS.Timeout;
 	function onVideoClick(
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		const playerControls = document.getElementById('player-controls');
+
+		if (!playerControls) return;
+
 		if (
-			event.target &&
-			event.target instanceof HTMLElement &&
-			event.target.id === 'player-center' &&
+			event.currentTarget &&
+			event.currentTarget.id === 'player-container' &&
+			parseFloat(getComputedStyle(playerControls).opacity) > 0 &&
 			playerElement
 		) {
+			clickCount++;
+
 			const container = event.currentTarget;
 
 			const rect = container.getBoundingClientRect();
 			const clickX = event.clientX - rect.left;
 			const width = rect.width;
 
+			if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
+
+			clickCounterTimeout = setTimeout(() => {
+				if (clickCount == 1) {
+					toggleVideoPlaybackStatus();
+				}
+
+				clickCount = 0;
+			}, 300);
+
+			if (clickCount < 2) return;
+
 			if (clickX < width / 3) {
-				// Left third, back 10s
 				playerElement.currentTime = Math.max(0, playerElement.currentTime - 10);
 			} else if (clickX < (2 * width) / 3) {
-				// Middle third, toggle play/pause
-				toggleVideoPlaybackStatus();
+				toggleFullscreen();
 			} else {
-				// Right third, forward 10s
 				playerElement.currentTime = Math.min(
 					playerElement.duration,
 					playerElement.currentTime + 10
@@ -951,6 +973,8 @@
 		if (watchProgressTimeout) clearTimeout(watchProgressTimeout);
 
 		if (sabrAdapter) sabrAdapter.dispose();
+
+		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
 		if (player) {
 			player.unload();

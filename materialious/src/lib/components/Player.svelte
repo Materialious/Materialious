@@ -84,6 +84,7 @@
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
+	let playerPauseTimeUpdates = $state(false);
 	let playerIsBuffering = $state(false);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
@@ -803,7 +804,9 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			if (!playerElement) return;
 
-			playerCurrentTime = playerElement.currentTime ?? 0;
+			if (!playerPauseTimeUpdates) {
+				playerCurrentTime = playerElement.currentTime ?? 0;
+			}
 
 			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
 				playerMaxKnownTime = Number(playerElement.currentTime);
@@ -916,6 +919,8 @@
 	}
 
 	function handleMouseMove(event: MouseEvent) {
+		playerPauseTimeUpdates = true;
+
 		const currentTime = Date.now();
 		if (currentTime - playerTimelineLastUpdate < 60) return;
 		playerTimelineLastUpdate = currentTime;
@@ -930,6 +935,7 @@
 	}
 
 	function handleMouseLeave() {
+		playerPauseTimeUpdates = false;
 		playerTimelineTooltipVisible = false;
 	}
 
@@ -1093,10 +1099,10 @@
 					<input
 						style="width: 100%;"
 						type="range"
-						oninput={handleTimeChange}
+						onchange={handleTimeChange}
 						min={0}
 						step={0.1}
-						bind:value={playerCurrentTime}
+						value={playerCurrentTime}
 						max={playerMaxKnownTime}
 						onmousemove={handleMouseMove}
 						onmouseleave={handleMouseLeave}

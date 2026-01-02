@@ -26,9 +26,9 @@
 		if (get(interfaceLowBandwidthMode)) return;
 
 		let imgSrc = '';
-		if (playlist.videos.length > 0) {
+		if (playlist.videos && playlist.videos.length > 0) {
 			imgSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
-		} else if (playlist.playlistThumbnail.length > 0) {
+		} else if (playlist.playlistThumbnail && playlist.playlistThumbnail.length > 0) {
 			imgSrc = playlist.playlistThumbnail;
 		} else {
 			imgSrc = '';

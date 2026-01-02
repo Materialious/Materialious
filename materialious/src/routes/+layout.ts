@@ -6,9 +6,12 @@ import { getResolveUrl } from '$lib/api';
 import '$lib/i18n'; // Import to initialize. Important :)
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
-import { authStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store';
+import { authStore, instanceStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store';
 import { get } from 'svelte/store';
 import '$lib/android/http/androidRequests';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
+import { deserialize } from '@macfja/serializer';
 
 export const ssr = false;
 
@@ -18,6 +21,20 @@ export async function load({ url }) {
 	}
 
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
+
+	// Due to race condition with how we set & save persistent store values
+	// we manually set stores like auth & instance before load.
+	if (Capacitor.getPlatform() === 'android') {
+		const instancePreferences = await Preferences.get({ key: 'invidiousInstance' });
+		if (instancePreferences.value !== null) {
+			instanceStore.set(deserialize(instancePreferences.value));
+		}
+
+		const authPreferences = await Preferences.get({ key: 'authToken' });
+		if (authPreferences.value !== null) {
+			authStore.set(deserialize(authPreferences.value));
+		}
+	}
 
 	const resolvedRoot = resolve('/', {});
 	if (url.pathname.startsWith(resolvedRoot + '@')) {

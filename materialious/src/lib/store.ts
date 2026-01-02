@@ -80,7 +80,7 @@ function createStorage(): StorageInterface<any> | SelfUpdateStorageInterface<any
 	}
 }
 
-function platformDependentDefault(givenValue: any, defaultValue: any): any {
+function ifNotWebDefault(givenValue: any, defaultValue: any): any {
 	if (typeof givenValue !== 'undefined' && givenValue !== null) {
 		return givenValue;
 	} else if (defaultValue && Capacitor.getPlatform() !== 'web') {
@@ -90,7 +90,7 @@ function platformDependentDefault(givenValue: any, defaultValue: any): any {
 
 export const instanceStore: Writable<string> = persist(
 	writable(
-		platformDependentDefault(
+		ifNotWebDefault(
 			!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
 				? undefined
 				: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
@@ -183,7 +183,7 @@ export const playertheatreModeIsActive = writable(false);
 export const returnYtDislikesStore = persist(writable(false), createStorage(), 'returnYtDislikes');
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persist(
 	writable(
-		platformDependentDefault(
+		ifNotWebDefault(
 			import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
 			'https://ryd-proxy.materialio.us'
 		)
@@ -195,7 +195,7 @@ export const returnYTDislikesInstanceStore: Writable<string | null | undefined> 
 export const synciousStore = persist(writable(false), createStorage(), 'syncious');
 export const synciousInstanceStore: Writable<string | null | undefined> = persist(
 	writable(
-		platformDependentDefault(
+		ifNotWebDefault(
 			import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE ||
 				import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
 			'https://extended-api.materialio.us'

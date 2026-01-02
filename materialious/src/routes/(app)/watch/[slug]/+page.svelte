@@ -577,11 +577,15 @@
 							{$_('videos')}
 						</p>
 						<p>
-							<a
-								href={resolve(`/channel/[authorId]`, {
-									authorId: $playlistCacheStore[data.playlistId].info.authorId
-								})}>{$playlistCacheStore[data.playlistId].info.author}</a
-							>
+							{#if $playlistCacheStore[data.playlistId].info.authorId}
+								<a
+									href={resolve(`/channel/[authorId]`, {
+										authorId: $playlistCacheStore[data.playlistId].info.authorId
+									})}>{$playlistCacheStore[data.playlistId].info.author}</a
+								>
+							{:else}
+								{$playlistCacheStore[data.playlistId].info.author}
+							{/if}
 						</p>
 						<nav>
 							<button

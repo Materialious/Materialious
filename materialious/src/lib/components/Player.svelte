@@ -85,7 +85,7 @@
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerPauseTimeUpdates = $state(false);
-	let playerIsBuffering = $state(false);
+	let playerIsBuffering = $state(true);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);
@@ -98,6 +98,11 @@
 	let playerVideoEndTimePretty: string = $state('');
 	let playerBufferedTo: number = $state(0);
 	let playerCloestTimestamp: Timestamp | undefined = $state();
+	let playerControls: HTMLElement | undefined = $state();
+
+	// eslint-disable-next-line no-undef
+	let playerAndroidUITimeout: NodeJS.Timeout;
+	let playerAndroidforceHideControls = $state(false);
 
 	let clickCount = $state(0);
 	// eslint-disable-next-line no-undef
@@ -951,12 +956,22 @@
 		playerTimelineTooltipVisible = false;
 	}
 
-	let androidFirstTap = true;
 	function onVideoClick(
 		event: MouseEvent & {
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		if (Capacitor.getPlatform() === 'android') {
+			if (playerAndroidUITimeout) {
+				clearTimeout(playerAndroidUITimeout);
+				playerAndroidforceHideControls = false;
+			}
+
+			playerAndroidUITimeout = setTimeout(() => {
+				playerAndroidforceHideControls = true;
+			}, 3000);
+		}
+
 		if (
 			event.target &&
 			event.target instanceof HTMLElement &&
@@ -964,12 +979,6 @@
 			playerElement
 		) {
 			clickCount++;
-
-			// Force android to tap an addtional time.
-			if (Capacitor.getPlatform() === 'android' && androidFirstTap) {
-				androidFirstTap = false;
-				return;
-			}
 
 			const container = event.currentTarget;
 
@@ -983,18 +992,6 @@
 				if (clickCount == 1) {
 					toggleVideoPlaybackStatus();
 				}
-
-				if (
-					Capacitor.getPlatform() === 'android' &&
-					event.target &&
-					event.target instanceof HTMLElement &&
-					parseFloat(getComputedStyle(event.target).opacity) > 0
-				) {
-					androidFirstTap = false;
-				} else {
-					androidFirstTap = true;
-				}
-
 				clickCount = 0;
 			}, 200);
 
@@ -1048,6 +1045,8 @@
 
 		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
+		if (playerAndroidUITimeout) clearTimeout(playerAndroidUITimeout);
+
 		if (player) {
 			player.unload();
 			player.destroy();
@@ -1060,8 +1059,10 @@
 	class:contain-video={!$isAndroidTvStore}
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
+	class:force-hide-controls={playerAndroidforceHideControls}
 	role="presentation"
 	onclick={onVideoClick}
+	bind:this={playerContainer}
 >
 	<video
 		controls={false}
@@ -1122,7 +1123,7 @@
 		</div>
 	</div>
 	{#if !hideControls}
-		<div id="player-controls">
+		<div id="player-controls" bind:this={playerControls}>
 			<label class="slider" id="progress-slider">
 				{#key playerCurrentTime}
 					<input
@@ -1493,6 +1494,15 @@
 	#player-container:hover #mobile-time {
 		opacity: 1;
 		transition: opacity 0.3s ease;
+	}
+
+	#player-container.force-hide-controls #player-controls {
+		opacity: 0 !important;
+		pointer-events: none !important;
+	}
+
+	#player-container.force-hide-controls #mobile-time {
+		display: none !important;
 	}
 
 	.seek-double-click {

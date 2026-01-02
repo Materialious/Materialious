@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.12.10",
+	"version": "1.12.11",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -18,7 +18,7 @@
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",
 		"@capacitor/cli": "^8.0.0",
-		"@sveltejs/adapter-auto": "^6.0.1",
+		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.49.1",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
@@ -43,7 +43,7 @@
 	"type": "module",
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.1",
-		"@capacitor-community/safe-area": "^7.0.0-alpha.1",
+		"@capacitor-community/safe-area": "^8.0.1",
 		"@capacitor/android": "^8.0.0",
 		"@capacitor/app": "^8.0.0",
 		"@capacitor/browser": "^8.0.0",

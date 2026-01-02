@@ -967,6 +967,7 @@
 
 			// Force android to tap an addtional time.
 			if (Capacitor.getPlatform() === 'android' && androidFirstTap) {
+				clickCount = 0;
 				androidFirstTap = false;
 				return;
 			}

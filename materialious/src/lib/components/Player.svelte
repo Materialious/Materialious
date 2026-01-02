@@ -85,7 +85,7 @@
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerPauseTimeUpdates = $state(false);
-	let playerIsBuffering = $state(false);
+	let playerIsBuffering = $state(true);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);

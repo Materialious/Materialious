@@ -1045,6 +1045,8 @@
 
 		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
+		if (playerAndroidUITimeout) clearTimeout(playerAndroidUITimeout);
+
 		if (player) {
 			player.unload();
 			player.destroy();

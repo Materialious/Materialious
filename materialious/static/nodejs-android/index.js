@@ -177,6 +177,9 @@ const server = http.createServer((req, res) => {
 		rejectUnauthorized = true;
 		res.writeHead(200);
 		return res.end();
+	} else if (targetUrl === 'check-nodejs') {
+		res.writeHead(200);
+		return res.end();
 	}
 
 	if (!targetUrl.startsWith('http')) {

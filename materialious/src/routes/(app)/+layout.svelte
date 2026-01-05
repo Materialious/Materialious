@@ -420,7 +420,7 @@
 						{/if}
 						<div class="player">
 							{#key $playerState.data.video.videoId}
-								<Player data={$playerState.data} hideControls={playerIsPip} />
+								<Player data={$playerState.data} />
 							{/key}
 						</div>
 					</div>

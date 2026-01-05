@@ -8,13 +8,9 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
+		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore
 	} from '../../store';
-
-	let sponsorCategoriesList: string[] = $state([]);
-	sponsorBlockCategoriesStore.subscribe((value) => {
-		sponsorCategoriesList = value;
-	});
 
 	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
 
@@ -28,13 +24,21 @@
 		{ name: $_('layout.sponsors.tangentJokes'), category: 'filler' }
 	];
 
-	function toggleSponsor(category: string) {
-		if (sponsorCategoriesList.includes(category)) {
-			sponsorBlockCategoriesStore.set(sponsorCategoriesList.filter((value) => value !== category));
+	function onSponsorSet(
+		category: string,
+		event: Event & { currentTarget: EventTarget & HTMLSelectElement }
+	) {
+		const value = event.currentTarget.value as 'automatic' | 'manual' | 'timeline' | 'disabled';
+
+		const categories = get(sponsorBlockCategoriesStore);
+
+		if (value !== 'disabled') {
+			categories[category] = value;
 		} else {
-			sponsorCategoriesList.push(category);
-			sponsorBlockCategoriesStore.set(sponsorCategoriesList);
+			delete categories[category];
 		}
+
+		sponsorBlockCategoriesStore.set(categories);
 	}
 </script>
 
@@ -89,7 +93,7 @@
 	</label>
 </nav>
 
-<!-- <nav class="no-padding">
+<nav class="no-padding">
 	<div class="max">
 		<p>{$_('layout.sponsors.disableTimeline')}</p>
 	</div>
@@ -101,27 +105,36 @@
 		/>
 		<span></span>
 	</label>
-</nav> -->
+</nav>
 
 <hr style="margin: 1em 0;" />
 
 <p class="bold">{$_('layout.sponsors.Catagories')}</p>
 
 {#each sponsorCategories as sponsor (sponsor)}
+	{@const currentCatergoryTrigger = $sponsorBlockCategoriesStore[sponsor.category]}
 	<div class="field middle-align no-margin">
 		<nav class="no-padding">
 			<div class="max">
 				<p>{sponsor.name}</p>
 			</div>
-			<label class="switch" tabindex="0">
-				<input
-					type="checkbox"
-					checked={sponsorCategoriesList.includes(sponsor.category)}
-					onclick={() => toggleSponsor(sponsor.category)}
-					role="switch"
-				/>
-				<span></span>
-			</label>
+			<div class="field suffix border">
+				<select onchange={(event) => onSponsorSet(sponsor.category, event)}>
+					<option selected={currentCatergoryTrigger === undefined} value="disabled"
+						>{$_('disabled')}</option
+					>
+					<option selected={currentCatergoryTrigger === 'automatic'} value="automatic"
+						>{$_('layout.sponsors.automatic')}</option
+					>
+					<option selected={currentCatergoryTrigger === 'manual'} value="manual"
+						>{$_('layout.sponsors.manual')}</option
+					>
+					<option selected={currentCatergoryTrigger === 'timeline'} value="timeline"
+						>{$_('layout.sponsors.timeline')}</option
+					>
+				</select>
+				<i>arrow_drop_down</i>
+			</div>
 		</nav>
 	</div>
 {/each}

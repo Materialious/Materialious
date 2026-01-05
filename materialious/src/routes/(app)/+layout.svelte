@@ -38,7 +38,7 @@
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
@@ -216,20 +216,6 @@
 			}
 		}
 
-		if ($isAndroidTvStore) {
-			const topContent = document.getElementById('top-content') as HTMLElement;
-			Mousetrap.bind(
-				'down',
-				() => {
-					if (topContent.contains(document.activeElement)) {
-						document.getElementById('main-content')?.focus();
-						return true;
-					}
-				},
-				'keyup'
-			);
-		}
-
 		if (Capacitor.getPlatform() === 'android') {
 			document.addEventListener('click', async (event: MouseEvent) => {
 				// Handles opening links in browser for android.
@@ -257,12 +243,6 @@
 		}
 	});
 
-	onDestroy(() => {
-		if ($isAndroidTvStore) {
-			Mousetrap.unbind('down', 'keyup');
-		}
-	});
-
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
 </script>
 
@@ -282,6 +262,10 @@
 		>
 			<Logo />
 		</header>
+		<a href={resolve('/search', {})} class:active={$page.url.href.endsWith('/search')}>
+			<i>search</i>
+			<div>{$_('searchPlaceholder')}</div>
+		</a>
 		{#each getPages() as navPage (navPage)}
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
@@ -290,73 +274,93 @@
 				</a>
 			{/if}
 		{/each}
-	</nav>
-	<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
-		{#if !mobileSearchShow}
-			<button
-				onclick={() => (mobileSearchShow = !mobileSearchShow)}
-				class="transparent s circle large"
-			>
-				<i>search</i>
-			</button>
-		{/if}
-
-		{#if Capacitor.getPlatform() === 'electron'}
-			<nav class="no-space">
-				<button onclick={() => window.history.back()} class="border">
-					<i>arrow_back</i>
-				</button>
-				<button onclick={() => window.history.forward()} class="border">
-					<i>arrow_forward</i>
-				</button>
-			</nav>
-		{/if}
-
-		<div class="max m l"></div>
-
-		<div class="m l">
-			<Search />
-		</div>
-
-		{#if !mobileSearchShow}
-			<div class="max"></div>
-		{/if}
-
-		{#if mobileSearchShow}
-			<div style="width: 100%;">
-				<Search on:searchCancelled={() => (mobileSearchShow = false)} />
-			</div>
-		{:else}
-			{#if !Capacitor.isNativePlatform()}
-				<button data-ui="#sync-party" class="circle large transparent">
-					<i class:primary-text={$syncPartyPeerStore}>group</i>
-					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-				</button>
-			{/if}
-			{#if isLoggedIn}
-				<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
-					><i>notifications</i>
-					<div class="tooltip bottom">{$_('layout.notifications')}</div>
-				</button>
-			{/if}
-			<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
+		{#if $isAndroidTvStore}
+			<div class="divider"></div>
+			<a href="#settings" onclick={() => ui('#dialog-settings')}>
 				<i>settings</i>
-				<div class="tooltip bottom">{$_('layout.settings')}</div>
-			</button>
-
+				<div>{$_('layout.settings')}</div>
+			</a>
 			{#if !isLoggedIn}
-				<button onclick={login} class="circle large transparent">
+				<a onclick={login} href="#login">
 					<i>login</i>
-					<div class="tooltip bottom">{$_('layout.login')}</div>
-				</button>
+					<div>{$_('layout.login')}</div>
+				</a>
 			{:else}
-				<button onclick={logout} class="circle large transparent">
+				<a onclick={logout} href="#logout">
 					<i>logout</i>
-					<div class="tooltip bottom">{$_('layout.logout')}</div>
-				</button>
+					<div>{$_('layout.logout')}</div>
+				</a>
 			{/if}
 		{/if}
 	</nav>
+	{#if !$isAndroidTvStore}
+		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
+			{#if !mobileSearchShow}
+				<button
+					onclick={() => (mobileSearchShow = !mobileSearchShow)}
+					class="transparent s circle large"
+				>
+					<i>search</i>
+				</button>
+			{/if}
+
+			{#if Capacitor.getPlatform() === 'electron'}
+				<nav class="no-space">
+					<button onclick={() => window.history.back()} class="border">
+						<i>arrow_back</i>
+					</button>
+					<button onclick={() => window.history.forward()} class="border">
+						<i>arrow_forward</i>
+					</button>
+				</nav>
+			{/if}
+
+			<div class="max m l"></div>
+
+			<div class="m l">
+				<Search />
+			</div>
+
+			{#if !mobileSearchShow}
+				<div class="max"></div>
+			{/if}
+
+			{#if mobileSearchShow}
+				<div style="width: 100%;">
+					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+				</div>
+			{:else}
+				{#if !Capacitor.isNativePlatform()}
+					<button data-ui="#sync-party" class="circle large transparent">
+						<i class:primary-text={$syncPartyPeerStore}>group</i>
+						<div class="tooltip bottom">{$_('layout.syncParty')}</div>
+					</button>
+				{/if}
+				{#if isLoggedIn}
+					<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
+						><i>notifications</i>
+						<div class="tooltip bottom">{$_('layout.notifications')}</div>
+					</button>
+				{/if}
+				<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
+					<i>settings</i>
+					<div class="tooltip bottom">{$_('layout.settings')}</div>
+				</button>
+
+				{#if !isLoggedIn}
+					<button onclick={login} class="circle large transparent">
+						<i>login</i>
+						<div class="tooltip bottom">{$_('layout.login')}</div>
+					</button>
+				{:else}
+					<button onclick={logout} class="circle large transparent">
+						<i>logout</i>
+						<div class="tooltip bottom">{$_('layout.logout')}</div>
+					</button>
+				{/if}
+			{/if}
+		</nav>
+	{/if}
 
 	<nav class="bottom s">
 		{#each getPages() as navPage (navPage)}

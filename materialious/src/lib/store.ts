@@ -279,11 +279,10 @@ export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist
 	createStorage(),
 	'sponsorBlockUrl'
 );
-export const sponsorBlockCategoriesStore: Writable<string[]> = persist(
-	writable([]),
-	createStorage(),
-	'sponsorBlockCategories'
-);
+
+export const sponsorBlockCategoriesStore: Writable<
+	Record<string, 'automatic' | 'manual' | 'timeline' | undefined>
+> = persist(writable({}), createStorage(), 'sponsorBlockCategoriesv2');
 
 export const sponsorBlockDisplayToastStore: Writable<boolean> = persist(
 	writable(false),

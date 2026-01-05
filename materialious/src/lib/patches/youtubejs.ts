@@ -8,6 +8,7 @@ import type {
 	VideoBase,
 	VideoPlay
 } from '$lib/api/model';
+import { convertToSeconds } from '$lib/numbers';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
 import { USER_AGENT } from 'bgutils-js';
@@ -165,30 +166,43 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	});
 
 	const recommendedVideos: VideoBase[] = [];
-	video.watch_next_feed?.forEach((recommended: Record<string, any>) => {
+	video.watch_next_feed?.forEach((recommended) => {
 		if (
-			!recommended.metadata?.title?.text ||
+			!recommended.is(YTNodes.LockupView) ||
 			recommended.content_type !== 'VIDEO' ||
-			!recommended.metadata.metadata.metadata_rows ||
+			!recommended.metadata ||
+			!recommended.content_image?.is(YTNodes.ThumbnailView) ||
+			!recommended.metadata.metadata ||
 			recommended.metadata.metadata.metadata_rows.length < 2
-		) {
+		)
 			return;
-		}
+
+		const durationOverlay = recommended.content_image.overlays
+			?.find(
+				(overlay) =>
+					overlay.is(YTNodes.ThumbnailOverlayBadgeView) &&
+					overlay.position === 'THUMBNAIL_OVERLAY_BADGE_POSITION_BOTTOM_END'
+			)
+			?.as(YTNodes.ThumbnailOverlayBadgeView);
 
 		recommendedVideos.push({
-			videoThumbnails: (recommended?.content_image?.image as Thumbnail[]) || [],
-			videoId: recommended?.content_id || '',
-			title: recommended.metadata?.title?.text || '',
-			viewCountText: recommended.metadata.metadata.metadata_rows[1]?.metadata_parts[0]
-				? recommended.metadata.metadata.metadata_rows[1]?.metadata_parts[0]?.text.text?.replace(
-						'views',
-						''
-					)
-				: '',
-			lengthSeconds: recommended?.duration?.seconds || 0,
-			author: recommended.metadata.metadata.metadata_rows[0]?.metadata_parts[0]?.text.text || '',
+			videoThumbnails: (recommended?.content_image.image as Thumbnail[]) || [],
+			videoId: recommended.content_id,
+			title: recommended.metadata.title.toString(),
+			viewCountText:
+				(recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text ?? '')
+					.toString()
+					.replace('views', '') || '',
+			author:
+				(
+					recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text ?? ''
+				).toString() || '',
+
+			lengthSeconds: durationOverlay?.badges[0].text
+				? convertToSeconds(durationOverlay?.badges[0].text)
+				: 0,
 			authorId:
-				recommended.metadata?.image?.renderer_context?.command_context?.on_tap.payload?.browseId ||
+				recommended.metadata?.image?.renderer_context?.command_context?.on_tap?.payload?.browseId ||
 				'',
 			type: 'video'
 		});

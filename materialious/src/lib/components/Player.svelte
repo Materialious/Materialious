@@ -38,6 +38,7 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
+		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore
@@ -71,7 +72,8 @@
 		showControls = false
 	}: Props = $props();
 
-	let segments: Segment[] = [];
+	let segments: Segment[] = $state([]);
+	let segmentManualSkip: Segment | undefined = $state();
 
 	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
@@ -264,20 +266,31 @@
 		document.addEventListener('fullscreenchange', onAndroidFullscreenChange);
 	}
 
+	function skipSegment(segment: Segment) {
+		if (!playerElement) return;
+
+		segmentManualSkip = undefined;
+
+		if (Math.round(playerElement.currentTime) >= Math.round(playerElement.duration)) {
+			return;
+		}
+		playerElement.currentTime = segment.endTime + 1;
+		if (!get(sponsorBlockDisplayToastStore)) {
+			snackBarAlert = `${get(_)('skipping')} ${segment.category}`;
+			ui('#snackbar-alert');
+		}
+	}
+
 	async function setupSponsorSkip() {
 		if (!$sponsorBlockUrlStore || !$sponsorBlockCategoriesStore || !$sponsorBlockStore) return;
 
-		if (
-			$sponsorBlockCategoriesStore.length > 0 &&
-			$sponsorBlockUrlStore &&
-			$sponsorBlockUrlStore !== ''
-		) {
+		if ($sponsorBlockCategoriesStore && $sponsorBlockUrlStore && $sponsorBlockUrlStore !== '') {
 			const sponsorBlock = new SponsorBlock('', { baseURL: $sponsorBlockUrlStore });
 
 			try {
 				segments = await sponsorBlock.getSegments(
 					data.video.videoId,
-					$sponsorBlockCategoriesStore as Category[]
+					Object.keys($sponsorBlockCategoriesStore) as Category[]
 				);
 
 				playerElement?.addEventListener('timeupdate', () => {
@@ -288,12 +301,13 @@
 							playerElement.currentTime >= segment.startTime &&
 							playerElement.currentTime <= segment.endTime
 						) {
-							if (Math.round(playerElement.currentTime) >= Math.round(playerElement.duration)) {
-								return;
-							}
-							playerElement.currentTime = segment.endTime + 1;
-							if (!get(sponsorBlockDisplayToastStore)) {
-								snackBarAlert = `${get(_)('skipping')} ${segment.category}`;
+							const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
+
+							if (segmentTrigger === 'automatic') {
+								skipSegment(segment);
+							} else if (segmentTrigger === 'manual') {
+								snackBarAlert = `${get(_)('upcomingSegment')} ${segment.category}`;
+								segmentManualSkip = segment;
 								ui('#snackbar-alert');
 							}
 						}
@@ -747,6 +761,12 @@
 				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
 				return false;
 			});
+
+			Mousetrap.bind('enter', () => {
+				if (segmentManualSkip) {
+					skipSegment(segmentManualSkip);
+				}
+			});
 		}
 
 		Mousetrap.bind('c', () => {
@@ -1057,7 +1077,7 @@
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
-		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right']);
+		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
 		if (watchProgressInterval) clearTimeout(watchProgressInterval);
 
@@ -1170,6 +1190,15 @@
 						)}
 					></div>
 				{/each}
+				{#if !$sponsorBlockTimelineStore}
+					{#each segments as segment (segment)}
+						<div
+							class="chapter-marker segment-marker"
+							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+							style:width={getMarkerWidth(segment.startTime, segment.endTime)}
+						></div>
+					{/each}
+				{/if}
 			</label>
 
 			{#if playerTimelineTooltipVisible}
@@ -1443,6 +1472,9 @@
 {#if !isEmbed}
 	<div class="snackbar" id="snackbar-alert">
 		<span class="bold" style="text-transform: capitalize;">{snackBarAlert}</span>
+		{#if segmentManualSkip}
+			<button onclick={() => skipSegment(segmentManualSkip as Segment)}>{$_('skip')}</button>
+		{/if}
 	</div>
 {/if}
 
@@ -1545,6 +1577,10 @@
 		border-radius: 2rem;
 		z-index: 0;
 		pointer-events: none;
+	}
+
+	.segment-marker {
+		background-color: var(--tertiary);
 	}
 
 	menu.mobile {

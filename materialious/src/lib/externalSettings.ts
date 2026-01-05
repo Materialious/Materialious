@@ -25,7 +25,6 @@ import {
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore,
 	showWarningStore,
-	sponsorBlockCategoriesStore,
 	sponsorBlockDisplayToastStore,
 	sponsorBlockStore,
 	sponsorBlockUrlStore,
@@ -108,11 +107,6 @@ const persistedStores: {
 		name: 'sponsorBlockUrl',
 		store: sponsorBlockUrlStore,
 		type: 'string'
-	},
-	{
-		name: 'sponsorBlockCategories',
-		store: sponsorBlockCategoriesStore,
-		type: 'array'
 	},
 	{
 		name: 'deArrowInstance',

@@ -29,6 +29,8 @@
 	"donate": "Donate",
 	"deleteAllHistory": "Delete all history",
 	"skipping": "Skipping",
+	"skip": "Skip",
+	"upcomingSegment": "Upcoming ",
 	"comments": "comments",
 	"reply": "reply",
 	"replies": "replies",
@@ -203,7 +205,10 @@
 			"intermissionIntroAnimation": "Intermission/Intro Animation",
 			"credits": "Endcards/Credits",
 			"preViewRecapHook": "Preview/Recap/Hook",
-			"tangentJokes": "Filler Tangent/Jokes"
+			"tangentJokes": "Filler Tangent/Jokes",
+			"automatic": "Auto skip",
+			"manual": "Manual skip",
+			"timeline": "Timeline only"
 		},
 		"deArrow": {
 			"title": "DeArrow",

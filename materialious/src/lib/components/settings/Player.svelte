@@ -7,6 +7,7 @@
 	import {
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
+		playerAndroidPauseOnNetworkChange,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerCCByDefault,
@@ -216,6 +217,23 @@
 					type="checkbox"
 					bind:checked={$playerAndroidLockOrientation}
 					onclick={() => playerAndroidLockOrientation.set(!$playerAndroidLockOrientation)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.player.networkChangePause')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$playerAndroidPauseOnNetworkChange}
+					onclick={() => playerAndroidPauseOnNetworkChange.set(!$playerAndroidPauseOnNetworkChange)}
 					role="switch"
 				/>
 				<span></span>

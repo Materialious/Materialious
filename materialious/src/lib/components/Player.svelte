@@ -24,6 +24,7 @@
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
+		playerAndroidPauseOnNetworkChange,
 		playerAutoPlayStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
@@ -53,6 +54,7 @@
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { Network, type ConnectionStatus } from '@capacitor/network';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -76,6 +78,8 @@
 	let watchProgressInterval: NodeJS.Timeout;
 	let showVideoRetry = $state(false);
 
+	let androidInitialNetworkStatus: ConnectionStatus | undefined;
+
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
 
@@ -98,7 +102,6 @@
 	let playerVideoEndTimePretty: string = $state('');
 	let playerBufferedTo: number = $state(0);
 	let playerCloestTimestamp: Timestamp | undefined = $state();
-	let playerControls: HTMLElement | undefined = $state();
 
 	// eslint-disable-next-line no-undef
 	let playerAndroidUITimeout: NodeJS.Timeout;
@@ -597,6 +600,17 @@
 		await androidHandleRotate();
 
 		if (Capacitor.getPlatform() === 'android') {
+			androidInitialNetworkStatus = await Network.getStatus();
+
+			Network.addListener('networkStatusChange', (networkStatus) => {
+				if (
+					androidInitialNetworkStatus?.connectionType !== networkStatus.connectionType &&
+					$playerAndroidPauseOnNetworkChange
+				) {
+					playerElement?.pause();
+				}
+			});
+
 			await CapacitorMusicControls.create({
 				track: data.video.title,
 				artist: data.video.author,
@@ -1024,6 +1038,8 @@
 				}
 			}
 
+			await Network.removeAllListeners();
+
 			await setStatusBarColor();
 
 			await CapacitorMusicControls.destroy();
@@ -1123,7 +1139,7 @@
 		</div>
 	</div>
 	{#if !hideControls}
-		<div id="player-controls" bind:this={playerControls}>
+		<div id="player-controls">
 			<label class="slider" id="progress-slider">
 				{#key playerCurrentTime}
 					<input

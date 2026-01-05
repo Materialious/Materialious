@@ -7,17 +7,14 @@
 	import {
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		isAndroidTvStore,
 		searchHistoryStore
 	} from '../store';
 	import { goToSearch } from '$lib/search';
 
 	let {
-		hideSearchSuggestionsAndHistory = false,
 		autoFocus = false,
 		suggestionsForSearch = $bindable([])
 	}: {
-		hideSearchSuggestionsAndHistory?: boolean;
 		autoFocus?: boolean;
 		suggestionsForSearch?: string[];
 	} = $props();
@@ -120,11 +117,7 @@
 	}}
 	role="presentation"
 >
-	<div
-		class="field prefix fill no-margin rounded"
-		class:search={!$isAndroidTvStore}
-		class:search-tv={$isAndroidTvStore}
-	>
+	<div class="field prefix fill no-margin rounded search">
 		<i class="front" tabindex="-1">search</i>
 		<input
 			tabindex="0"
@@ -157,37 +150,35 @@
 					/>
 					<i class="front" role="presentation" onclick={resetSearch}>close</i>
 				</div>
-				{#if !hideSearchSuggestionsAndHistory}
-					{#if $interfaceSearchSuggestionsStore}
-						{#each suggestionsForSearch as suggestion, index (index)}
-							<li>
-								<a
-									onclick={() => {
-										search = suggestion;
-										onSubmit();
-									}}
-									class:selected={index === selectedSuggestionIndex}
-									href={resolve(`/search/[search]`, { search: encodeURIComponent(suggestion) })}
-								>
-									<div>{suggestion}</div>
-								</a>
-							</li>
-						{/each}
-					{/if}
-					{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
-						{#each $searchHistoryStore as history (history)}
-							<li>
-								<a
-									onclick={() => {
-										search = history;
-									}}
-									href={resolve(`/search/[search]`, { search: encodeURIComponent(history) })}
-								>
-									<div>{history}</div>
-								</a>
-							</li>
-						{/each}
-					{/if}
+				{#if $interfaceSearchSuggestionsStore}
+					{#each suggestionsForSearch as suggestion, index (index)}
+						<li>
+							<a
+								onclick={() => {
+									search = suggestion;
+									onSubmit();
+								}}
+								class:selected={index === selectedSuggestionIndex}
+								href={resolve(`/search/[search]`, { search: encodeURIComponent(suggestion) })}
+							>
+								<div>{suggestion}</div>
+							</a>
+						</li>
+					{/each}
+				{/if}
+				{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
+					{#each $searchHistoryStore as history (history)}
+						<li>
+							<a
+								onclick={() => {
+									search = history;
+								}}
+								href={resolve(`/search/[search]`, { search: encodeURIComponent(history) })}
+							>
+								<div>{history}</div>
+							</a>
+						</li>
+					{/each}
 				{/if}
 			</menu>
 		{/if}
@@ -197,10 +188,6 @@
 <style>
 	.search {
 		width: 500px;
-	}
-
-	.search-tv {
-		width: 600px;
 	}
 
 	.selected {

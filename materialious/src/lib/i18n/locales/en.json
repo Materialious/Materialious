@@ -187,6 +187,7 @@
 			"youtubeJsFallback": "Local video processing fallback",
 			"youtubeJsAlways": "Always use",
 			"lockOrientation": "Orientation locked to aspect ratio",
+			"networkChangePause": "Pause on network change",
 			"defaultPlaybackSpeed": "Default playback speed",
 			"playerStatistics": "Show player statistics by default"
 		},

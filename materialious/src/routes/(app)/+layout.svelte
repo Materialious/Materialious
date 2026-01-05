@@ -38,11 +38,10 @@
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import Mousetrap from 'mousetrap';
 	import { truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 
@@ -74,14 +73,6 @@
 		setAmoledTheme();
 
 		await setStatusBarColor();
-	});
-
-	App.addListener('backButton', async (data) => {
-		if (data.canGoBack) {
-			window.history.back();
-		} else {
-			await App.exitApp();
-		}
 	});
 
 	App.addListener('appUrlOpen', (data) => {

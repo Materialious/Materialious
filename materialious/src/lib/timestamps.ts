@@ -35,6 +35,11 @@ export function processYoutubeLink(line: string): string {
 	}
 }
 
+function cleanTimestampTitle(title: string): string {
+	// Remove leading separators like -, •, |, :, /, \, *, #, >, ~ and whitespace
+	return title.replace(/^[\s\-•|:/\\*#>~]+/, '').trim();
+}
+
 export function phaseDescription(
 	videoId: string,
 	content: string,
@@ -67,7 +72,7 @@ export function phaseDescription(
 
 				timestamps.push({
 					time: convertToSeconds(timeParam.replace('s', '')),
-					title: decodeHtmlCharCodes(title),
+					title: cleanTimestampTitle(decodeHtmlCharCodes(title)),
 					timePretty,
 					endTime: -1
 				});
@@ -86,7 +91,7 @@ export function phaseDescription(
 
 				timestamps.push({
 					time: convertToSeconds(time),
-					title: decodeHtmlCharCodes(title),
+					title: cleanTimestampTitle(decodeHtmlCharCodes(title)),
 					timePretty,
 					endTime: -1
 				});

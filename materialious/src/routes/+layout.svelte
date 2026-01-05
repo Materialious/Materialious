@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { isAndroidTvStore } from '$lib/store';
+	import { App } from '@capacitor/app';
 
 	let { children } = $props();
+
+	App.addListener('backButton', async (data) => {
+		if (data.canGoBack) {
+			window.history.back();
+		} else {
+			await App.exitApp();
+		}
+	});
 </script>
 
 <svelte:head>

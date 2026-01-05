@@ -170,6 +170,11 @@ export const playerMiniplayerEnabled = persist(
 	createStorage(),
 	'miniplayerEnabled'
 );
+export const playerAndroidPauseOnNetworkChange = persist(
+	writable(true),
+	createStorage(),
+	'pauseOnNetworkChange'
+);
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
 export interface PlayerState {

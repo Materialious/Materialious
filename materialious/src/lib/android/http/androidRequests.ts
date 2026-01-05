@@ -1,7 +1,9 @@
+import { timeout } from '$lib/misc';
 import { Capacitor } from '@capacitor/core';
 
 const originalFetch = window.fetch;
 const corsProxyUrl: string = 'http://localhost:3000/';
+let mobileNodeLoaded = false;
 
 function needsProxying(target: string): boolean {
 	if (!target.startsWith('http')) return false;
@@ -12,6 +14,21 @@ export const androidFetch = async (
 	requestInput: string | URL | Request,
 	requestOptions?: RequestInit
 ): Promise<Response> => {
+	if (!mobileNodeLoaded) {
+		let mobileNodeResp: Response | undefined;
+
+		while (!mobileNodeResp || !mobileNodeResp.ok) {
+			try {
+				mobileNodeResp = await originalFetch(corsProxyUrl + 'check-nodejs');
+			} catch {
+				// Continue regardless of error
+			}
+			await timeout(100);
+		}
+
+		mobileNodeLoaded = true;
+	}
+
 	const uri = requestInput instanceof Request ? requestInput.url : requestInput.toString();
 
 	if (needsProxying(uri)) {

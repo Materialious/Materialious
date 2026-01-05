@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -8,18 +7,20 @@
 	import {
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		isAndroidTvStore,
 		searchHistoryStore
 	} from '../store';
-	import { isVideoID } from '$lib/misc';
+	import { goToSearch } from '$lib/search';
+
+	let {
+		autoFocus = false,
+		suggestionsForSearch = $bindable([])
+	}: {
+		autoFocus?: boolean;
+		suggestionsForSearch?: string[];
+	} = $props();
 
 	const dispatch = createEventDispatcher();
-
-	let searchSuggestions = $state(false);
-	interfaceSearchSuggestionsStore.subscribe((value) => (searchSuggestions = value));
-
 	let search: string = $state('');
-	let suggestionsForSearch: string[] = $state([]);
 	let selectedSuggestionIndex: number = $state(-1);
 
 	let showSearchBox = $state(false);
@@ -27,7 +28,7 @@
 	// eslint-disable-next-line no-undef
 	let debounceTimer: NodeJS.Timeout;
 	function debouncedSearch(event: any) {
-		if (!searchSuggestions) return;
+		if (!$interfaceSearchSuggestionsStore) return;
 
 		if (debounceTimer) clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(async () => {
@@ -39,32 +40,14 @@
 		}, 250);
 	}
 
-	function handleSubmit(event: Event | undefined = undefined) {
+	function onSubmit(event: Event | undefined = undefined) {
 		event?.preventDefault();
 
-		const searchTrimed = search.trim();
-
-		if (!searchTrimed) return;
-
-		if (isVideoID(searchTrimed)) {
-			// Go directly to video if Video ID provided
-			goto(resolve('/watch/[videoId]', { videoId: searchTrimed }));
-			return;
-		}
+		goToSearch(search);
 
 		selectedSuggestionIndex = -1;
-		goto(resolve(`/search/[search]`, { search: encodeURIComponent(searchTrimed) }));
-
 		suggestionsForSearch = [];
 		showSearchBox = false;
-
-		if ($interfaceSearchHistoryEnabled && !$searchHistoryStore.includes(searchTrimed)) {
-			let pastHistory = $searchHistoryStore;
-			if (pastHistory.length > 15) {
-				pastHistory.pop();
-			}
-			searchHistoryStore.set([searchTrimed, ...pastHistory]);
-		}
 	}
 
 	function handleKeyDown(event: KeyboardEvent) {
@@ -93,7 +76,7 @@
 			}
 		} else if (event.key === 'Enter' && selectedSuggestionIndex !== -1) {
 			search = suggestionsForSearch[selectedSuggestionIndex];
-			handleSubmit();
+			onSubmit();
 		} else if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
 			resetSearch();
 			event.preventDefault();
@@ -116,11 +99,17 @@
 			if (!showSearchBox) resetSearch();
 			return false;
 		});
+
+		if (autoFocus) {
+			showSearchBox = true;
+			await tick();
+			document.getElementById('search')?.focus();
+		}
 	});
 </script>
 
 <form
-	onsubmit={handleSubmit}
+	onsubmit={onSubmit}
 	onclick={async () => {
 		showSearchBox = true;
 		await tick();
@@ -128,11 +117,7 @@
 	}}
 	role="presentation"
 >
-	<div
-		class="field prefix fill no-margin rounded"
-		class:search={!$isAndroidTvStore}
-		class:search-tv={$isAndroidTvStore}
-	>
+	<div class="field prefix fill no-margin rounded search">
 		<i class="front" tabindex="-1">search</i>
 		<input
 			tabindex="0"
@@ -157,7 +142,7 @@
 						onkeydown={handleKeyDown}
 						onkeyup={(event) => {
 							if (event.key === 'Enter') {
-								handleSubmit();
+								onSubmit();
 							} else {
 								debouncedSearch(event);
 							}
@@ -165,13 +150,13 @@
 					/>
 					<i class="front" role="presentation" onclick={resetSearch}>close</i>
 				</div>
-				{#if searchSuggestions}
+				{#if $interfaceSearchSuggestionsStore}
 					{#each suggestionsForSearch as suggestion, index (index)}
 						<li>
 							<a
 								onclick={() => {
 									search = suggestion;
-									handleSubmit();
+									onSubmit();
 								}}
 								class:selected={index === selectedSuggestionIndex}
 								href={resolve(`/search/[search]`, { search: encodeURIComponent(suggestion) })}
@@ -203,10 +188,6 @@
 <style>
 	.search {
 		width: 500px;
-	}
-
-	.search-tv {
-		width: 600px;
 	}
 
 	.selected {

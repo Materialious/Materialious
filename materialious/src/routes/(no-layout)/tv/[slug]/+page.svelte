@@ -17,6 +17,60 @@
 	let playerElement: HTMLMediaElement | undefined = $state();
 	let showInfo = $state(false);
 	let playerCurrentTime: number = $state(0);
+	let showControls = $state(false);
+
+	// eslint-disable-next-line no-undef
+	let seekInterval: NodeJS.Timeout | undefined;
+	let seekStartTime: number = 0;
+	let isSeeking = false;
+
+	function startSeeking(direction: 'left' | 'right') {
+		if (!playerElement || showInfo || isSeeking) return true;
+
+		isSeeking = true;
+		showControls = true;
+		seekStartTime = Date.now();
+
+		const videoDuration = data.video.lengthSeconds;
+		const baseSeekAmount = videoDuration * 0.005; // 0.5% of video duration as base
+
+		// Initial seek
+		if (direction === 'right') {
+			playerElement.currentTime = Math.min(
+				playerElement.currentTime + baseSeekAmount,
+				videoDuration
+			);
+		} else {
+			playerElement.currentTime = Math.max(playerElement.currentTime - baseSeekAmount, 0);
+		}
+
+		// Progressive seeking
+		seekInterval = setInterval(() => {
+			if (!playerElement || !isSeeking) return;
+
+			const holdDuration = (Date.now() - seekStartTime) / 1000; // in seconds
+			const acceleration = Math.min(holdDuration * 0.5, 5); // Cap at 5x acceleration
+			const seekAmount = baseSeekAmount * (1 + acceleration);
+
+			if (direction === 'right') {
+				playerElement.currentTime = Math.min(playerElement.currentTime + seekAmount, videoDuration);
+			} else {
+				playerElement.currentTime = Math.max(playerElement.currentTime - seekAmount, 0);
+			}
+		}, 100);
+
+		return false;
+	}
+
+	function stopSeeking() {
+		isSeeking = false;
+		showControls = false;
+		if (seekInterval) {
+			clearInterval(seekInterval);
+			seekInterval = undefined;
+		}
+		return false;
+	}
 
 	onMount(() => {
 		if (playerElement) {
@@ -67,34 +121,22 @@
 			'keyup'
 		);
 
-		Mousetrap.bind(
-			'right',
-			() => {
-				if (!playerElement || showInfo) return true;
-				playerElement.currentTime = playerElement.currentTime + 10;
-				return false;
-			},
-			'keyup'
-		);
-
-		Mousetrap.bind(
-			'left',
-			() => {
-				if (!playerElement || showInfo) return true;
-
-				playerElement.currentTime = playerElement.currentTime - 10;
-				return false;
-			},
-			'keyup'
-		);
+		// Arrow key seeking bindings
+		Mousetrap.bind('right', () => startSeeking('right'), 'keydown');
+		Mousetrap.bind('right', stopSeeking, 'keyup');
+		Mousetrap.bind('left', () => startSeeking('left'), 'keydown');
+		Mousetrap.bind('left', stopSeeking, 'keyup');
 
 		Mousetrap.bind(
 			'enter',
 			() => {
 				if (!showInfo) {
 					if (playerElement?.paused) {
+						showControls = false;
 						playerElement?.play();
 					} else {
+						showControls = true;
+
 						playerElement?.pause();
 					}
 					return false;
@@ -108,11 +150,14 @@
 
 	onDestroy(() => {
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter']);
+		if (seekInterval) {
+			clearInterval(seekInterval);
+		}
 	});
 </script>
 
 {#key data.video.videoId}
-	<Player bind:playerElement isEmbed={true} {data} hideControls={true} />
+	<Player bind:playerElement isEmbed={true} {data} {showControls} />
 {/key}
 
 {#if showInfo}

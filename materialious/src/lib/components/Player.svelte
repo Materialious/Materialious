@@ -55,19 +55,20 @@
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { Network, type ConnectionStatus } from '@capacitor/network';
+	import { fade } from 'svelte/transition';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
-		hideControls?: boolean;
+		showControls?: boolean;
 	}
 
 	let {
 		data,
 		isEmbed = false,
 		playerElement = $bindable(undefined),
-		hideControls = false
+		showControls = false
 	}: Props = $props();
 
 	let segments: Segment[] = [];
@@ -105,7 +106,6 @@
 
 	// eslint-disable-next-line no-undef
 	let playerAndroidUITimeout: NodeJS.Timeout;
-	let playerAndroidforceHideControls = $state(false);
 
 	let clickCount = $state(0);
 	// eslint-disable-next-line no-undef
@@ -976,14 +976,18 @@
 		}
 	) {
 		if (Capacitor.getPlatform() === 'android') {
+			const initalControlsState = showControls.valueOf();
+
 			if (playerAndroidUITimeout) {
 				clearTimeout(playerAndroidUITimeout);
-				playerAndroidforceHideControls = false;
+				showControls = true;
 			}
 
 			playerAndroidUITimeout = setTimeout(() => {
-				playerAndroidforceHideControls = true;
+				showControls = false;
 			}, 3000);
+
+			if (!initalControlsState) return;
 		}
 
 		if (
@@ -1075,9 +1079,10 @@
 	class:contain-video={!$isAndroidTvStore}
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
-	class:force-hide-controls={playerAndroidforceHideControls}
 	role="presentation"
 	onclick={onVideoClick}
+	onmouseenter={() => (showControls = true)}
+	onmouseleave={() => (showControls = false)}
 	bind:this={playerContainer}
 >
 	<video
@@ -1091,8 +1096,8 @@
 			{data.video.title}
 		</div>
 	{/if}
-	{#if !hideControls}
-		<div id="mobile-time">
+	{#if showControls}
+		<div id="mobile-time" transition:fade>
 			<p class="chip inverse-primary s">
 				{#if data.video.liveNow}
 					{$_('thumbnail.live')}
@@ -1138,22 +1143,21 @@
 			</div>
 		</div>
 	</div>
-	{#if !hideControls}
-		<div id="player-controls">
+	{#if showControls}
+		<div id="player-controls" transition:fade>
 			<label class="slider" id="progress-slider">
-				{#key playerCurrentTime}
-					<input
-						style="width: 100%;"
-						type="range"
-						oninput={handleTimeChange}
-						min={0}
-						step={0.1}
-						bind:value={playerCurrentTime}
-						max={playerMaxKnownTime}
-						onmousemove={handleMouseMove}
-						onmouseleave={handleMouseLeave}
-					/>
-				{/key}
+				<input
+					style="width: 100%;"
+					type="range"
+					oninput={handleTimeChange}
+					min={0}
+					step={0.1}
+					bind:value={playerCurrentTime}
+					max={playerMaxKnownTime}
+					onmousemove={handleMouseMove}
+					onmouseleave={handleMouseLeave}
+					disabled={$isAndroidTvStore}
+				/>
 				<span></span>
 				<div bind:this={playerBufferBar} class="buffered-bar"></div>
 				{#each data.content.timestamps as chapter, index (chapter)}
@@ -1180,19 +1184,19 @@
 			{/if}
 
 			<nav>
-				<nav class="no-wrap">
-					<button class="inverse-primary" onclick={toggleVideoPlaybackStatus}>
-						<i>
-							{#if playerCurrentPlaybackState}
-								pause
-							{:else}
-								play_arrow
-							{/if}
-						</i>
-					</button>
-					{#if Capacitor.getPlatform() !== 'android'}
-						<label class="slider round m l" id="volume-slider">
-							{#key playerVolume}
+				{#if !$isAndroidTvStore}
+					<nav class="no-wrap">
+						<button class="inverse-primary" onclick={toggleVideoPlaybackStatus}>
+							<i>
+								{#if playerCurrentPlaybackState}
+									pause
+								{:else}
+									play_arrow
+								{/if}
+							</i>
+						</button>
+						{#if Capacitor.getPlatform() !== 'android'}
+							<label class="slider round m l" id="volume-slider">
 								<input
 									oninput={() => {
 										if (!playerElement) return;
@@ -1204,11 +1208,11 @@
 									step="0.1"
 									max="1"
 								/>
-							{/key}
-							<span></span>
-						</label>
-					{/if}
-				</nav>
+								<span></span>
+							</label>
+						{/if}
+					</nav>
+				{/if}
 
 				<div class="max"></div>
 
@@ -1220,194 +1224,196 @@
 							{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
 						{/if}
 					</p>
-					{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-						<button class="inverse-primary">
-							<i>closed_caption</i>
-							<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
-								<li
-									role="presentation"
-									data-ui="#cc-menu"
-									onclick={() => player.setTextTrackVisibility(false)}
-								>
-									{$_('player.controls.off')}
-								</li>
-								{#each playerTextTracks as track (track)}
+					{#if !$isAndroidTvStore}
+						{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
+							<button class="inverse-primary">
+								<i>closed_caption</i>
+								<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 									<li
 										role="presentation"
 										data-ui="#cc-menu"
-										onclick={() => {
-											player.selectTextTrack(track);
-											player.setTextTrackVisibility(true);
-										}}
+										onclick={() => player.setTextTrackVisibility(false)}
 									>
-										{track.label}
+										{$_('player.controls.off')}
 									</li>
-								{/each}
-							</menu>
-						</button>
-					{/if}
-					<button class="inverse-primary">
-						<i>settings</i>
-						<menu class="no-wrap mobile" id="settings-menu">
-							{#if playerSettings !== 'root'}
-								<li role="presentation" onclick={() => (playerSettings = 'root')}>
-									<i>arrow_back</i>
-									{$_('player.controls.back')}
-								</li>
-							{/if}
-							{#if playerSettings === 'root'}
-								<li role="presentation" onclick={() => (playerSettings = 'quality')}>
-									<nav class="no-wrap" style="width: 100%;">
-										<i>high_quality</i>
-										{$_('player.controls.quality')}
-
-										<div class="max"></div>
-
-										<span class="chip">
-											{#if playerCurrentVideoTrack}
-												{playerCurrentVideoTrack.height}p
-											{:else}
-												{$_('player.controls.auto')}
-											{/if}
-										</span>
-									</nav>
-								</li>
-								<li role="presentation" onclick={() => (playerSettings = 'speed')}>
-									<nav class="no-wrap" style="width: 100%;">
-										<i>speed</i>
-										{$_('player.controls.playbackSpeed')}
-
-										<div class="max"></div>
-
-										<span class="chip">
-											{playerElement?.playbackRate}x
-										</span>
-									</nav>
-								</li>
-								{#if playerCurrentAudioTrack && playerCurrentAudioTrack.label !== null}
-									<li role="presentation" onclick={() => (playerSettings = 'language')}>
+									{#each playerTextTracks as track (track)}
+										<li
+											role="presentation"
+											data-ui="#cc-menu"
+											onclick={() => {
+												player.selectTextTrack(track);
+												player.setTextTrackVisibility(true);
+											}}
+										>
+											{track.label}
+										</li>
+									{/each}
+								</menu>
+							</button>
+						{/if}
+						<button class="inverse-primary">
+							<i>settings</i>
+							<menu class="no-wrap mobile" id="settings-menu">
+								{#if playerSettings !== 'root'}
+									<li role="presentation" onclick={() => (playerSettings = 'root')}>
+										<i>arrow_back</i>
+										{$_('player.controls.back')}
+									</li>
+								{/if}
+								{#if playerSettings === 'root'}
+									<li role="presentation" onclick={() => (playerSettings = 'quality')}>
 										<nav class="no-wrap" style="width: 100%;">
-											<i>language</i>
-											{$_('player.controls.language')}
+											<i>high_quality</i>
+											{$_('player.controls.quality')}
 
 											<div class="max"></div>
 
 											<span class="chip">
-												{#if playerCurrentAudioTrack}
-													{playerCurrentAudioTrack.language !== 'und'
-														? ISO6391.getName(playerCurrentAudioTrack.language)
-														: playerCurrentAudioTrack.label}
+												{#if playerCurrentVideoTrack}
+													{playerCurrentVideoTrack.height}p
+												{:else}
+													{$_('player.controls.auto')}
 												{/if}
 											</span>
 										</nav>
 									</li>
+									<li role="presentation" onclick={() => (playerSettings = 'speed')}>
+										<nav class="no-wrap" style="width: 100%;">
+											<i>speed</i>
+											{$_('player.controls.playbackSpeed')}
+
+											<div class="max"></div>
+
+											<span class="chip">
+												{playerElement?.playbackRate}x
+											</span>
+										</nav>
+									</li>
+									{#if playerCurrentAudioTrack && playerCurrentAudioTrack.label !== null}
+										<li role="presentation" onclick={() => (playerSettings = 'language')}>
+											<nav class="no-wrap" style="width: 100%;">
+												<i>language</i>
+												{$_('player.controls.language')}
+
+												<div class="max"></div>
+
+												<span class="chip">
+													{#if playerCurrentAudioTrack}
+														{playerCurrentAudioTrack.language !== 'und'
+															? ISO6391.getName(playerCurrentAudioTrack.language)
+															: playerCurrentAudioTrack.label}
+													{/if}
+												</span>
+											</nav>
+										</li>
+									{/if}
+									<li
+										role="presentation"
+										onclick={() => {
+											if (playerElement) playerElement.loop = !playerLoop;
+											playerLoop = !playerLoop;
+										}}
+									>
+										<nav class="no-wrap" style="width: 100%;">
+											<i>all_inclusive</i>
+											{$_('player.controls.loop')}
+
+											<div class="max"></div>
+
+											<span class="chip">
+												{playerLoop ? $_('player.controls.on') : $_('player.controls.off')}
+											</span>
+										</nav>
+									</li>
+								{:else if playerSettings === 'quality'}
+									<li
+										role="presentation"
+										onclick={() => {
+											playerSettings = 'root';
+											player.configure({ abr: true });
+											playerCurrentVideoTrack = undefined;
+										}}
+									>
+										{$_('player.controls.auto')}
+									</li>
+									{#each player.getVideoTracks().sort((a, b) => {
+										const heightA = a.height || 0;
+										const heightB = b.height || 0;
+										const widthA = a.width || 0;
+										const widthB = b.width || 0;
+										return heightB - heightA || widthB - widthA;
+									}) as track (track)}
+										<li
+											role="presentation"
+											onclick={() => {
+												playerSettings = 'root';
+												player.selectVideoTrack(track, true);
+												setActiveVideoTrack();
+											}}
+										>
+											{track.height}p
+										</li>
+									{/each}
+								{:else if playerSettings === 'speed'}
+									{#each playbackRates as playbackRate (playbackRate)}
+										<li
+											role="presentation"
+											onclick={() => {
+												playerSettings = 'root';
+												if (playerElement) playerElement.playbackRate = playbackRate;
+											}}
+										>
+											{playbackRate}
+										</li>
+									{/each}
+								{:else if playerSettings === 'language'}
+									{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
+										<li
+											role="presentation"
+											onclick={() => {
+												playerSettings = 'root';
+												player.selectAudioTrack(track);
+												setActiveAudioTrack();
+											}}
+										>
+											{#if track.language !== 'und'}
+												{ISO6391.getName(track.language)} -
+											{/if}
+											{track.label}
+										</li>
+									{/each}
 								{/if}
-								<li
-									role="presentation"
-									onclick={() => {
-										if (playerElement) playerElement.loop = !playerLoop;
-										playerLoop = !playerLoop;
-									}}
-								>
-									<nav class="no-wrap" style="width: 100%;">
-										<i>all_inclusive</i>
-										{$_('player.controls.loop')}
-
-										<div class="max"></div>
-
-										<span class="chip">
-											{playerLoop ? $_('player.controls.on') : $_('player.controls.off')}
-										</span>
-									</nav>
-								</li>
-							{:else if playerSettings === 'quality'}
-								<li
-									role="presentation"
-									onclick={() => {
-										playerSettings = 'root';
-										player.configure({ abr: true });
-										playerCurrentVideoTrack = undefined;
-									}}
-								>
-									{$_('player.controls.auto')}
-								</li>
-								{#each player.getVideoTracks().sort((a, b) => {
-									const heightA = a.height || 0;
-									const heightB = b.height || 0;
-									const widthA = a.width || 0;
-									const widthB = b.width || 0;
-									return heightB - heightA || widthB - widthA;
-								}) as track (track)}
-									<li
-										role="presentation"
-										onclick={() => {
-											playerSettings = 'root';
-											player.selectVideoTrack(track, true);
-											setActiveVideoTrack();
-										}}
-									>
-										{track.height}p
-									</li>
-								{/each}
-							{:else if playerSettings === 'speed'}
-								{#each playbackRates as playbackRate (playbackRate)}
-									<li
-										role="presentation"
-										onclick={() => {
-											playerSettings = 'root';
-											if (playerElement) playerElement.playbackRate = playbackRate;
-										}}
-									>
-										{playbackRate}
-									</li>
-								{/each}
-							{:else if playerSettings === 'language'}
-								{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
-									<li
-										role="presentation"
-										onclick={() => {
-											playerSettings = 'root';
-											player.selectAudioTrack(track);
-											setActiveAudioTrack();
-										}}
-									>
-										{#if track.language !== 'und'}
-											{ISO6391.getName(track.language)} -
-										{/if}
-										{track.label}
-									</li>
-								{/each}
-							{/if}
-						</menu>
-					</button>
-					{#if document.pictureInPictureEnabled}
+							</menu>
+						</button>
+						{#if document.pictureInPictureEnabled}
+							<button
+								class="inverse-primary"
+								onclick={() => {
+									(playerElement as HTMLVideoElement).requestPictureInPicture();
+								}}
+							>
+								<i>pip</i>
+							</button>
+						{/if}
 						<button
 							class="inverse-primary"
 							onclick={() => {
-								(playerElement as HTMLVideoElement).requestPictureInPicture();
+								if (document.fullscreenElement) {
+									document.exitFullscreen();
+								} else {
+									playerContainer.requestFullscreen();
+								}
 							}}
 						>
-							<i>pip</i>
+							<i>
+								{#if document.fullscreenElement}
+									fullscreen_exit
+								{:else}
+									fullscreen
+								{/if}
+							</i>
 						</button>
 					{/if}
-					<button
-						class="inverse-primary"
-						onclick={() => {
-							if (document.fullscreenElement) {
-								document.exitFullscreen();
-							} else {
-								playerContainer.requestFullscreen();
-							}
-						}}
-					>
-						<i>
-							{#if document.fullscreenElement}
-								fullscreen_exit
-							{:else}
-								fullscreen
-							{/if}
-						</i>
-					</button>
 				</nav>
 			</nav>
 		</div>
@@ -1451,10 +1457,7 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		opacity: 0;
-		transition: opacity 2s ease;
 		padding: 10px;
-		user-select: none;
 	}
 
 	#player-controls span {
@@ -1479,8 +1482,6 @@
 		top: 0;
 		right: 0;
 		padding: 10px;
-		opacity: 0;
-		transition: opacity 2s ease;
 	}
 
 	#mobile-time .chip {
@@ -1495,30 +1496,6 @@
 	#progress-slider {
 		block-size: 1em;
 		margin: 0;
-	}
-
-	#player-container:focus-within #player-controls,
-	#player-container:active #player-controls,
-	#player-container:hover #player-controls {
-		opacity: 1;
-		transition: opacity 0.3s ease;
-		user-select: all;
-	}
-
-	#player-container:focus-within #mobile-time,
-	#player-container:active #mobile-time,
-	#player-container:hover #mobile-time {
-		opacity: 1;
-		transition: opacity 0.3s ease;
-	}
-
-	#player-container.force-hide-controls #player-controls {
-		opacity: 0 !important;
-		pointer-events: none !important;
-	}
-
-	#player-container.force-hide-controls #mobile-time {
-		display: none !important;
 	}
 
 	.seek-double-click {

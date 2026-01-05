@@ -37,7 +37,7 @@ export function processYoutubeLink(line: string): string {
 
 function cleanTimestampTitle(title: string): string {
 	// Remove leading separators like -, •, |, :, /, \, *, #, >, ~ and whitespace
-	return title.replace(/^[\s\-•|:\/\\*#>~]+/, '').trim();
+	return title.replace(/^[\s\-•|:/\\*#>~]+/, '').trim();
 }
 
 export function phaseDescription(

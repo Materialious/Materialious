@@ -96,7 +96,8 @@
             "savePlaybackPosition": "Lejátszási pozíció mentése",
             "localVideoFallback": "Helyi videó visszatérés",
             "theatreModeByDefault": "Szélesvásznú mód alapértelmezetten",
-            "youtubeJsFallback": "Helyi videó visszatérés feldolgozása"
+            "youtubeJsFallback": "Helyi videó visszatérés feldolgozása",
+            "networkChangePause": "Szünet a hálózati változáskor"
         },
         "bookmarklet": "Bookmarklet",
         "instanceUrl": "Példány webcíme",

@@ -1,4 +1,13 @@
 {
     "enabled": "啟用",
-    "disabled": "停用"
+    "disabled": "停用",
+    "player": {
+        "controls": {
+            "language": "語言"
+        }
+    },
+    "layout": {
+        "interface": "介面",
+        "syncPartyWarning": "被邀請的使用者將會看到您的IP位址。"
+    }
 }

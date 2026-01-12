@@ -21,7 +21,7 @@
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.49.1",
-		"@sveltejs/vite-plugin-svelte": "^6.2.1",
+		"@sveltejs/vite-plugin-svelte": "^6.2.4",
 		"@types/event-source-polyfill": "^1.0.5",
 		"@types/he": "^1.2.3",
 		"@types/human-number": "^1.0.2",

@@ -29,7 +29,7 @@
 		"@vite-pwa/sveltekit": "^1.0.0",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-svelte": "^3.13.0",
+		"eslint-plugin-svelte": "^3.14.0",
 		"patch-package": "^8.0.1",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",

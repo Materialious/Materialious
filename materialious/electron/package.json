@@ -29,7 +29,7 @@
 		"electron-is-dev": "~2.0.0",
 		"electron-serve": "~3.0.0",
 		"electron-unhandled": "^4.0.1",
-		"electron-updater": "^6.3.4",
+		"electron-updater": "^6.7.3",
 		"electron-window-state": "^5.0.3",
 		"jsdom": "^27.4.0",
 		"jsonfile": "^6.2.0"

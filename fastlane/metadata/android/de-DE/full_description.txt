@@ -6,7 +6,7 @@ Es lässt dich Videos durchstöbern und anschauen, Wiedergabelisten verwalten un
   <li>Unterstützung für Invidious Companion</li>
   <li>Invidious API Extended Integration</li>
   <li>YouTube.js-Fallback für Desktop & Android, falls Invidious beim Laden von Videos fehlschlägt</li>
-  <li>Unterstützung zur Deaktivierung der Zertifikatsüberprüfung für Homelab-Nutzer</li>
+  <li>Unterstützung zur Deaktivierung der Zertifikatsüberprüfung für Homelab-Setups</li>
   <li>Synchronisiere deinen Wiedergabefortschritt zwischen Invidious-Sitzungen</li>
   <li>Schaue gemeinsam in Synchronisationsgruppen</li>
   <li>Sponsorblock miteingebaut</li>
@@ -15,7 +15,7 @@ Es lässt dich Videos durchstöbern und anschauen, Wiedergabelisten verwalten un
   <li>Keine Werbung</li>
   <li>Kein Tracking</li>
   <li>Hell- und Dunkel-Themes</li>
-  <li>Benutzerdefinierte Farb-Themes</li>
+  <li>Individuelle Farb-Themes</li>
   <li>Integriert mit Invidious Abonnements, Wiedergabeverlauf & mehr</li>
   <li>Livestream-Unterstützung</li>
   <li>Dash-Unterstützung</li>

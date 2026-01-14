@@ -185,5 +185,6 @@
     "popularPageDisabled": "Administratori atspējojuši \"Populārs\" lapu",
     "skip": "Izlaist",
     "reply": "atbilde",
-    "contributors": "Dalībnieki, līdzautori, kas devuši savu artavu"
+    "contributors": "Dalībnieki, līdzautori, kas devuši savu artavu",
+    "loadMore": "Ielādēt vēl"
 }

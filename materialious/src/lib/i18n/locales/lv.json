@@ -68,7 +68,11 @@
             "miniPlayer": "Mini atskaņotājs",
             "playerStatistics": "Rādīt atskaņotāja statistiku pēc noklusējuma",
             "autoPlayNextByDefault": "Automātiski atskaņot nākamo video pēc noklusējuma",
-            "ccByDefault": "Iespējot subtitrus pēc noklusējuma"
+            "ccByDefault": "Iespējot subtitrus pēc noklusējuma",
+            "backgroundPlay": "Atskaņot audio fonā",
+            "dash": "Izmantot DASH",
+            "silenceSkipper": "Izlaist klusuma brīžus (eksperimentāla)",
+            "defaultPlaybackSpeed": "Noklusējuma atskaņošanas ātrums"
         },
         "deArrow": {
             "titleOnly": "Tikai virsrakstu",
@@ -78,7 +82,8 @@
             "Catagories": "Kategorijas",
             "unpaidSelfPromotion": "Neapmaksāts/pašreklāma",
             "sponsor": "Sponsors",
-            "disableToast": "Atspējot uznirstošos logus"
+            "disableToast": "Atspējot uznirstošos logus",
+            "automatic": "Automātiski izlaist"
         },
         "bookmarklet": "Grāmatzīmes sīklietotne",
         "dataPreferences": {

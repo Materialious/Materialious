@@ -190,6 +190,8 @@ export class ElectronCapacitorApp {
 		globalShortcut.register('Control+Shift+I', () => {
 			this.MainWindow.webContents.toggleDevTools();
 		});
+		this.MainWindow.webContents.toggleDevTools();
+
 		// Security
 		this.MainWindow.webContents.setWindowOpenHandler((details) => {
 			shell.openExternal(details.url);

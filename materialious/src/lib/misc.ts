@@ -3,7 +3,11 @@ import { resolve } from '$app/paths';
 import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
-import { interfaceAllowInsecureRequests, isAndroidTvStore } from './store';
+import {
+	interfaceAllowInsecureRequests,
+	interfaceAndroidUseNativeShare,
+	isAndroidTvStore
+} from './store';
 import type {
 	Channel,
 	HashTag,
@@ -14,6 +18,9 @@ import type {
 	VideoBase
 } from './api/model';
 import { page } from '$app/state';
+import { Capacitor } from '@capacitor/core';
+import { Share } from '@capacitor/share';
+import { Clipboard } from '@capacitor/clipboard';
 
 export function isVideoID(videoId: string): boolean {
 	const regExp = /^[a-zA-Z0-9_-]{11}$/;
@@ -46,16 +53,41 @@ export function removeWindowQueryFlag(key: string) {
 }
 
 let PeerInstance: typeof Peer;
-export async function peerJs(peerId: string): Promise<Peer> {
+export interface PeerInstance {
+	host: string;
+	path: string;
+	port: number;
+}
+
+export function determinePeerJsInstance(): PeerInstance {
+	return {
+		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
+		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
+		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || 443
+	};
+}
+
+export async function peerJs(
+	id: string,
+	instance: PeerInstance = determinePeerJsInstance()
+): Promise<Peer> {
 	// https://github.com/peers/peerjs/issues/819
 	if (typeof PeerInstance === 'undefined') {
 		PeerInstance = (await import('peerjs')).Peer;
 	}
-	return new PeerInstance(peerId, {
-		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
-		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
-		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || 443
-	});
+	return new PeerInstance(id, instance);
+}
+
+export async function shareURL(url: string) {
+	if (
+		Capacitor.getPlatform() === 'android' &&
+		(await Share.canShare()).value &&
+		get(interfaceAndroidUseNativeShare)
+	) {
+		await Share.share({ url: url });
+	} else {
+		await Clipboard.write({ string: url });
+	}
 }
 
 export function ensureNoTrailingSlash(url: any): string {

@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { instanceStore, interfaceAndroidUseNativeShare } from '$lib/store';
-	import { Share } from '@capacitor/share';
+	import { instanceStore } from '$lib/store';
 	import ui from 'beercss';
-	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
+	import { shareURL } from '$lib/misc';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -17,19 +16,12 @@
 	let { video, currentTime = $bindable() }: Props = $props();
 	let includeTimestamp: boolean = $state(false);
 
-	async function shareUrl(url: string, param: string = 't') {
+	async function shareVideo(url: string, param: string = 't') {
 		if (includeTimestamp) url += `?${param}=${Math.floor(currentTime ?? 0)}`;
 
-		if (
-			(await Share.canShare()) &&
-			Capacitor.getPlatform() !== 'electron' &&
-			$interfaceAndroidUseNativeShare
-		) {
-			await Share.share({ url: url, dialogTitle: video.title });
-		} else {
-			await Clipboard.write({ string: url });
-			ui('#share-success');
-		}
+		await shareURL(url);
+
+		ui('#share-success');
 	}
 </script>
 
@@ -50,9 +42,9 @@
 		role="presentation"
 		onclick={async () => {
 			if (Capacitor.isNativePlatform()) {
-				shareUrl(`${get(instanceStore)}/watch/${video.videoId}`);
+				shareVideo(`${get(instanceStore)}/watch/${video.videoId}`);
 			} else {
-				shareUrl(
+				shareVideo(
 					`${location.origin}${resolve('/watch/[videoId]', { videoId: video.videoId })}`,
 					'time'
 				);
@@ -66,7 +58,7 @@
 		class="row"
 		role="presentation"
 		onclick={async () => {
-			shareUrl(`https://redirect.invidious.io/watch?v=${video.videoId}`);
+			shareVideo(`https://redirect.invidious.io/watch?v=${video.videoId}`);
 		}}
 	>
 		<div class="min">{$_('player.share.invidiousRedirect')}</div>
@@ -76,7 +68,7 @@
 		class="row"
 		role="presentation"
 		onclick={async () => {
-			shareUrl(`https://www.youtube.com/watch?v=${video.videoId}`);
+			shareVideo(`https://www.youtube.com/watch?v=${video.videoId}`);
 		}}
 	>
 		<div class="min">{$_('player.share.youtubeLink')}</div>

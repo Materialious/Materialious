@@ -253,10 +253,12 @@
 		>
 			<Logo />
 		</header>
-		<a href={resolve('/search', {})} class:active={$page.url.href.endsWith('/search')}>
-			<i>search</i>
-			<div>{$_('searchPlaceholder')}</div>
-		</a>
+		{#if $isAndroidTvStore}
+			<a href={resolve('/search', {})} class:active={$page.url.href.endsWith('/search')}>
+				<i>search</i>
+				<div>{$_('searchPlaceholder')}</div>
+			</a>
+		{/if}
 		{#each getPages() as navPage (navPage)}
 			{#if !navPage.requiresAuth || isLoggedIn}
 				<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
@@ -321,12 +323,10 @@
 					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 				</div>
 			{:else}
-				{#if !Capacitor.isNativePlatform()}
-					<button data-ui="#sync-party" class="circle large transparent">
-						<i class:primary-text={$syncPartyPeerStore}>group</i>
-						<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-					</button>
-				{/if}
+				<button data-ui="#sync-party" class="circle large transparent">
+					<i class:primary-text={$syncPartyPeerStore}>group</i>
+					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
+				</button>
 				{#if isLoggedIn}
 					<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
 						><i>notifications</i>

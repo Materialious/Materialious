@@ -2,15 +2,34 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import { peerJs, removeWindowQueryFlag, setWindowQueryFlag } from '$lib/misc';
+	import {
+		determinePeerJsInstance,
+		peerJs,
+		removeWindowQueryFlag,
+		setWindowQueryFlag,
+		shareURL
+	} from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
-	import { Clipboard } from '@capacitor/clipboard';
 	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { syncPartyConnectionsStore, syncPartyPeerStore } from '../store';
+	import z from 'zod';
+	import { Buffer } from 'buffer';
+	import { Capacitor } from '@capacitor/core';
+
+	const SyncInfo = z.object({
+		host: z.string(),
+		path: z.string(),
+		port: z.number(),
+		syncId: z.string()
+	});
+
+	let syncPartyManualInput: string = $state('');
+
+	const syncOrigin = Capacitor.isNativePlatform() ? 'https://sync.materialio.us' : location.origin;
 
 	function changeVideoEvent(conn: DataConnection) {
 		conn.on('data', (data) => {
@@ -35,6 +54,16 @@
 				}
 			});
 		});
+	}
+
+	function createShareBase64(): string {
+		return Buffer.from(
+			JSON.stringify({
+				...determinePeerJsInstance(),
+				syncId: $syncPartyPeerStore?.id
+			}),
+			'utf-8'
+		).toString('base64');
 	}
 
 	async function startWatchSync() {
@@ -89,24 +118,36 @@
 		}
 	});
 
+	async function joinSyncParty(syncInfo: string) {
+		const parseInfo = SyncInfo.safeParse(
+			JSON.parse(Buffer.from(syncInfo, 'base64').toString('utf-8'))
+		);
+
+		if (parseInfo.error) {
+			return;
+		}
+
+		$syncPartyPeerStore = await peerJs(crypto.randomUUID(), parseInfo.data);
+		$syncPartyPeerStore.on('open', () => {
+			if (!$syncPartyPeerStore) return;
+
+			const conn = $syncPartyPeerStore.connect(parseInfo.data.syncId);
+			syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
+
+			changeVideoEvent(conn);
+		});
+
+		$syncPartyPeerStore.on('disconnected', () => {
+			syncPartyPeerStore.set(null);
+			syncPartyConnectionsStore.set(null);
+		});
+	}
+
 	onMount(async () => {
 		const currentUrl = get(page).url;
-		const syncId = currentUrl.searchParams.get('sync');
-		if (syncId) {
-			$syncPartyPeerStore = await peerJs(crypto.randomUUID());
-			$syncPartyPeerStore.on('open', () => {
-				if (!$syncPartyPeerStore) return;
-
-				const conn = $syncPartyPeerStore.connect(syncId);
-				syncPartyConnectionsStore.set([...($syncPartyConnectionsStore || []), conn]);
-
-				changeVideoEvent(conn);
-			});
-
-			$syncPartyPeerStore.on('disconnected', () => {
-				syncPartyPeerStore.set(null);
-				syncPartyConnectionsStore.set(null);
-			});
+		const syncInfo = currentUrl.searchParams.get('sync');
+		if (syncInfo) {
+			await joinSyncParty(syncInfo);
 		}
 	});
 
@@ -118,25 +159,23 @@
 	});
 </script>
 
-<dialog id="sync-party">
-	<h6>{$_('layout.syncParty')}</h6>
-	<p>{$_('layout.syncPartyWarning')}</p>
+<dialog id="sync-party" class="padding">
+	<h6 class="no-margin">{$_('layout.syncParty')}</h6>
+	<p class="no-margin">{$_('layout.syncPartyWarning')}</p>
 	{#if $syncPartyPeerStore}
 		<nav>
 			<div class="field label border max">
 				<input
 					name="sync-share"
 					readonly
-					value={`${location.origin}${resolve(`/?sync=${$syncPartyPeerStore?.id}`, {})}`}
+					value={`${syncOrigin}${resolve(`/?sync=${createShareBase64()}`, {})}`}
 					type="text"
 				/>
-				<label class="active" for="sync-share">Share URL</label>
+				<label class="active" for="sync-share">{$_('layout.shareURL')}</label>
 			</div>
 			<button
 				onclick={async () => {
-					await Clipboard.write({
-						string: `${location.origin}${resolve(`/?sync=${$syncPartyPeerStore?.id}`, {})}`
-					});
+					await shareURL(`${syncOrigin}${resolve(`/?sync=${createShareBase64()}`, {})}`);
 				}}
 				class="square round"
 			>
@@ -145,6 +184,7 @@
 		</nav>
 	{/if}
 	<div class="space"></div>
+
 	<button
 		class="no-margin"
 		onclick={startWatchSync}
@@ -155,6 +195,29 @@
 			{$_('layout.startSyncParty')}
 		{/if}
 	</button>
+
+	{#if !$syncPartyPeerStore}
+		<div class="space"></div>
+		<hr />
+		<div class="space"></div>
+		<h6 class="no-margin">{$_('layout.joinSyncParty')}</h6>
+		<form
+			onsubmit={async (event) => {
+				event.preventDefault();
+
+				try {
+					await joinSyncParty(new URL(syncPartyManualInput).searchParams.get('sync') || '');
+				} catch {
+					// Continue regardless of error
+				}
+			}}
+		>
+			<div class="field label border max">
+				<input bind:value={syncPartyManualInput} type="text" name="sync-input" />
+				<label for="sync-input">{$_('layout.shareURL')}</label>
+			</div>
+		</form>
+	{/if}
 </dialog>
 
 <div class="snackbar" id="sync-party-connection-join">

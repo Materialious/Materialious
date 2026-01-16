@@ -7,7 +7,8 @@
             "invidiousRedirect": "Kopēt Invidious servera (instances) saiti",
             "title": "Dalīties",
             "youtubeLink": "Kopēt YouTube saiti",
-            "includeTimestamp": "Iekļaut atskaņošanas laiku"
+            "includeTimestamp": "Iekļaut atskaņošanas laiku",
+            "copiedSuccess": "Kopēta starpliktuvē"
         },
         "download": "Lejupielādēt",
         "downloadSteps": {
@@ -31,7 +32,15 @@
         "retryText": "Neizdevās ielādēt video. Kā vēlaties turpināt?",
         "youtubeJsLoading": "Neizdevās ielādēt video, mēģina atkārtoti ielādēt ar vietējo video ieguves rezerves variantu.",
         "enableYoutubejsPerm": "Vienmēr izmantot vietējo video ieguves rezerves variantu",
-        "preferredQuality": "Vēlamā kvalitāte"
+        "preferredQuality": "Vēlamā kvalitāte",
+        "premiere": "Video būs pieejams",
+        "controls": {
+            "quality": "Kvalitāte",
+            "playbackSpeed": "Atskaņošanas ātrums",
+            "on": "Ieslēgt",
+            "off": "Izslēgt",
+            "language": "Valoda"
+        }
     },
     "videos": "video",
     "layout": {
@@ -58,7 +67,12 @@
             "alwaysLoopVideo": "Vienmēr atskaņot (malt) uz riņķi video",
             "miniPlayer": "Mini atskaņotājs",
             "playerStatistics": "Rādīt atskaņotāja statistiku pēc noklusējuma",
-            "autoPlayNextByDefault": "Automātiski atskaņot nākamo video pēc noklusējuma"
+            "autoPlayNextByDefault": "Automātiski atskaņot nākamo video pēc noklusējuma",
+            "ccByDefault": "Iespējot subtitrus pēc noklusējuma",
+            "backgroundPlay": "Atskaņot audio fonā",
+            "dash": "Izmantot DASH",
+            "silenceSkipper": "Izlaist klusuma brīžus (eksperimentāla)",
+            "defaultPlaybackSpeed": "Noklusējuma atskaņošanas ātrums"
         },
         "deArrow": {
             "titleOnly": "Tikai virsrakstu",
@@ -68,7 +82,8 @@
             "Catagories": "Kategorijas",
             "unpaidSelfPromotion": "Neapmaksāts/pašreklāma",
             "sponsor": "Sponsors",
-            "disableToast": "Atspējot uznirstošos logus"
+            "disableToast": "Atspējot uznirstošos logus",
+            "automatic": "Automātiski izlaist"
         },
         "bookmarklet": "Grāmatzīmes sīklietotne",
         "dataPreferences": {
@@ -161,9 +176,15 @@
         "filters": "Filtrēt pēc",
         "type": "Tips",
         "uploadDate": "Augšupielādes datums",
-        "duration": "Ilgums"
+        "duration": "Ilgums",
+        "sortBy": "Kārtot pēc"
     },
     "comments": "komentāri",
     "login": "Autorizēties",
-    "transcript": "Transkripcija"
+    "transcript": "Transkripcija",
+    "popularPageDisabled": "Administratori atspējojuši \"Populārs\" lapu",
+    "skip": "Izlaist",
+    "reply": "atbilde",
+    "contributors": "Dalībnieki, līdzautori, kas devuši savu artavu",
+    "loadMore": "Ielādēt vēl"
 }

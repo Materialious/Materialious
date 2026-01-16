@@ -44,7 +44,10 @@
             "intermissionIntroAnimation": "Szünet/bevezető animáció",
             "credits": "Végképernyő/köszönet",
             "preViewRecapHook": "Bevezető/összegzés/figyelemfelketés",
-            "tangentJokes": "Kitöltő mellékvágányok/poénok"
+            "tangentJokes": "Kitöltő mellékvágányok/poénok",
+            "automatic": "Automatikus átugrás",
+            "manual": "Kézi ugrás",
+            "timeline": "Csak idővonal"
         },
         "syncPartyWarning": "Vegye figyelembe, hogy IP-címe látható lesz az Ön által meghívott felhasználók számára.",
         "expandDescription": "Leírás kibontása alapértelmezetten",
@@ -96,7 +99,8 @@
             "savePlaybackPosition": "Lejátszási pozíció mentése",
             "localVideoFallback": "Helyi videó visszatérés",
             "theatreModeByDefault": "Szélesvásznú mód alapértelmezetten",
-            "youtubeJsFallback": "Helyi videó visszatérés feldolgozása"
+            "youtubeJsFallback": "Helyi videó visszatérés feldolgozása",
+            "networkChangePause": "Szünet a hálózati változáskor"
         },
         "bookmarklet": "Bookmarklet",
         "instanceUrl": "Példány webcíme",
@@ -217,5 +221,7 @@
     "oldest": "Legrégebbi",
     "popular": "Népszerű",
     "favouriteChannel": "Csatorna kedvelése",
-    "unfavouriteChannel": "Csatorna eltávolítása a kedvencekből"
+    "unfavouriteChannel": "Csatorna eltávolítása a kedvencekből",
+    "skip": "Kihagyás",
+    "upcomingSegment": "Közelgő "
 }

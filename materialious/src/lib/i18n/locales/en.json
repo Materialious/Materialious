@@ -146,6 +146,8 @@
 		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
 		"startSyncParty": "Start sync party",
 		"endSyncParty": "End sync party",
+		"joinSyncParty": "Enter sync party URL",
+		"shareURL": "Share URL",
 		"notifications": "Notifications",
 		"noNewNotifications": "No new notifications here",
 		"settings": "Settings",

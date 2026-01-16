@@ -33,7 +33,8 @@
             "youtubeJsAlways": "Immer nutze",
             "lockOrientation": "Uusrichtig as Siiteverhältnis bunde",
             "defaultPlaybackSpeed": "Standardmässigi Widergabegschwindigkeit",
-            "playerStatistics": "Player-Statistike standardmässig aazeige"
+            "playerStatistics": "Player-Statistike standardmässig aazeige",
+            "networkChangePause": "Bi Netzwerchwechsel pausiere"
         },
         "sponsors": {
             "intermissionIntroAnimation": "Unterbrechig/Iistigsanimation",
@@ -45,9 +46,12 @@
             "interactionReminder": "Interaktionsufforderig (Abonniere)",
             "credits": "Abspann",
             "preViewRecapHook": "Vorschau/Rückblick/Hook",
-            "tangentJokes": "Füllendi Abwiichler/Witz"
+            "tangentJokes": "Füllendi Abwiichler/Witz",
+            "automatic": "Automatisch überspringe",
+            "manual": "Manuell überspringe",
+            "timeline": "Nur Ziitleischte"
         },
-        "interface": "Benutzeroberflächi",
+        "interface": "Bedienoberflächi",
         "star": "Sternli uf GitHub vergeh!",
         "syncParty": "Synchronisationsgruppe",
         "startSyncParty": "Synchronisationsgruppe starte",
@@ -83,7 +87,7 @@
             "thumbnailInstanceUrl": "URL vo de Vorschaubilder-Instanz",
             "titleOnly": "Nur Titel"
         },
-        "syncPartyWarning": "Bitte denk dra, dass dini IP für die vo dir iigladne Benutzer sichtbar isch.",
+        "syncPartyWarning": "Bitte denk dra, dass dini IP für die vo dir iigladne Persone sichtbar isch.",
         "displayThumbnailAvatars": "Vorschaubild-Avatar (Langsam)",
         "expandDescription": "Beschriibig standardmässig erwiitere",
         "disableAutoUpdate": "Automatischi Updates deaktiviere",
@@ -114,9 +118,9 @@
     "hideVideo": "Video verstecke",
     "defaultPage": "Standardsiite",
     "syncParty": {
-        "userJoined": "En Benutzer isch dinere Widergabegruppe biiträte.",
-        "userLeft": "En Benutzer het dini Widergabegruppe verlah.",
-        "userOnPrivatePage": "De Benutzer luegt sich grad e privati Siite a, d Synchronisierig wird grad wieder fortgsetzt."
+        "userJoined": "E Person isch dinere Widergabegruppe biiträte.",
+        "userLeft": "E Person het dini Widergabegruppe verlah.",
+        "userOnPrivatePage": "D Person luegt sich grad e privati Siite a, d Synchronisierig wird grad wieder fortgsetzt."
     },
     "videoTabs": {
         "all": "Alli",
@@ -217,5 +221,7 @@
     "oldest": "Ältisti",
     "popular": "Populär",
     "favouriteChannel": "Kanal favorisiere",
-    "unfavouriteChannel": "Kanal entfavorisiere"
+    "unfavouriteChannel": "Kanal entfavorisiere",
+    "skip": "Überspringe",
+    "upcomingSegment": "Kommend "
 }

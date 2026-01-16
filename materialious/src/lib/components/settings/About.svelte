@@ -4,7 +4,7 @@
 
 	let ghContributors: { login: string; avatar_url: string; type: 'Bot' | 'User' }[] = $state([]);
 	onMount(() => {
-		fetch(`${document.location.origin}/localApi/ghContributors.json`, {
+		fetch('/localApi/ghContributors.json', {
 			priority: 'low'
 		}).then(async (resp) => {
 			if (!resp.ok) {

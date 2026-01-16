@@ -27,9 +27,9 @@
     "hideReplies": "Antworten verstecken",
     "hideVideo": "Video verstecken",
     "syncParty": {
-        "userJoined": "Ein Benutzer ist deiner Wiedergabegruppe beigetreten.",
-        "userLeft": "Ein Benutzer hat deine Wiedergabegruppe verlassen.",
-        "userOnPrivatePage": "Der Benutzer sieht sich gerade eine private Seite an, die Synchronisierung wird in Kürze fortgesetzt."
+        "userJoined": "Eine Person ist deiner Wiedergabegruppe beigetreten.",
+        "userLeft": "Eine Person hat deine Wiedergabegruppe verlassen.",
+        "userOnPrivatePage": "Die Person sieht sich gerade eine private Seite an, die Synchronisierung wird in Kürze fortgesetzt."
     },
     "videoTabs": {
         "all": "Alle",
@@ -115,10 +115,10 @@
         }
     },
     "layout": {
-        "interface": "Benutzeroberfläche",
+        "interface": "Bedienoberfläche",
         "star": "Sternchen auf GitHub vergeben!",
         "syncParty": "Synchronisationsgruppe",
-        "syncPartyWarning": "Bitte beachte, dass deine IP für die von dir eingeladenen Benutzer sichtbar ist.",
+        "syncPartyWarning": "Bitte beachte, dass deine IP für die von dir eingeladenen Personen sichtbar ist.",
         "startSyncParty": "Synchronisationsgruppe starten",
         "endSyncParty": "Synchronisationsgruppe stoppen",
         "notifications": "Benachrichtigungen",
@@ -163,7 +163,8 @@
             "defaultPlaybackSpeed": "Standardmäßige Wiedergabegeschwindigkeit",
             "ccByDefault": "Untertitel standardmäßig an",
             "localVideoFallback": "Lokaler Video-Fallback",
-            "playerStatistics": "Player-Statistiken standardmäßig anzeigen"
+            "playerStatistics": "Player-Statistiken standardmäßig anzeigen",
+            "networkChangePause": "Bei Netzwerkwechsel pausieren"
         },
         "bookmarklet": "Lesezeichen",
         "instanceUrl": "URL der Instanz",
@@ -177,7 +178,10 @@
             "intermissionIntroAnimation": "Unterbrechung/Einstiegsanimation",
             "credits": "Abspann",
             "preViewRecapHook": "Vorschau/Rückblick/Hook",
-            "tangentJokes": "Füllende Abweichler/Witze"
+            "tangentJokes": "Füllende Abweichler/Witze",
+            "automatic": "Automatisch überspringen",
+            "manual": "Manuell überspringen",
+            "timeline": "Nur Zeitleiste"
         },
         "deArrow": {
             "title": "DeArrow",
@@ -217,5 +221,7 @@
     "oldest": "Älteste",
     "popular": "Populär",
     "favouriteChannel": "Kanal favorisieren",
-    "unfavouriteChannel": "Kanal entfavorisieren"
+    "unfavouriteChannel": "Kanal entfavorisieren",
+    "skip": "Überspringen",
+    "upcomingSegment": "Kommend "
 }

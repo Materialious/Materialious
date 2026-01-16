@@ -1000,8 +1000,9 @@
 
 			if (playerAndroidUITimeout) {
 				clearTimeout(playerAndroidUITimeout);
-				showControls = true;
 			}
+
+			showControls = true;
 
 			playerAndroidUITimeout = setTimeout(() => {
 				showControls = false;

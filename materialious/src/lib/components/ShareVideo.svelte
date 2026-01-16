@@ -20,11 +20,7 @@
 	async function shareUrl(url: string, param: string = 't') {
 		if (includeTimestamp) url += `?${param}=${Math.floor(currentTime ?? 0)}`;
 
-		if (
-			(await Share.canShare()) &&
-			Capacitor.getPlatform() !== 'electron' &&
-			$interfaceAndroidUseNativeShare
-		) {
+		if ((await Share.canShare()).value && $interfaceAndroidUseNativeShare) {
 			await Share.share({ url: url, dialogTitle: video.title });
 		} else {
 			await Clipboard.write({ string: url });

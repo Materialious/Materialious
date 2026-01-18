@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { instanceStore } from '$lib/store';
-	import ui from 'beercss';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
 	import { shareURL } from '$lib/misc';
+	import { addToast } from './Toast.svelte';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -21,7 +21,11 @@
 
 		await shareURL(url);
 
-		ui('#share-success');
+		addToast({
+			data: {
+				text: $_('player.share.copiedSuccess')
+			}
+		});
 	}
 </script>
 
@@ -74,5 +78,3 @@
 		<div class="min">{$_('player.share.youtubeLink')}</div>
 	</li>
 </menu>
-
-<div class="snackbar" id="share-success">{$_('player.share.copiedSuccess')}</div>

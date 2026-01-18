@@ -10,7 +10,6 @@
 		shareURL
 	} from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
-	import ui from 'beercss';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -19,6 +18,7 @@
 	import z from 'zod';
 	import { Buffer } from 'buffer';
 	import { Capacitor } from '@capacitor/core';
+	import { addToast } from './Toast.svelte';
 
 	const SyncInfo = z.object({
 		host: z.string(),
@@ -45,7 +45,12 @@
 					goto(currentUrl);
 				} else if (event.type === 'goto' && event.path && event.path !== $page.url.pathname) {
 					if (blockedPages.includes(event.path.replace('/', ''))) {
-						ui('#sync-party-private-page');
+						addToast({
+							data: {
+								text: $_('syncParty.userOnPrivatePage'),
+								icon: 'shield_person'
+							}
+						});
 					} else {
 						currentUrl.pathname = event.path;
 						// eslint-disable-next-line svelte/no-navigation-without-resolve
@@ -81,7 +86,12 @@
 		if ($syncPartyPeerStore) {
 			$syncPartyPeerStore.on('connection', (conn) => {
 				conn.on('open', async () => {
-					await ui('#sync-party-connection-join');
+					addToast({
+						data: {
+							text: $_('syncParty.userJoined'),
+							icon: 'person_add'
+						}
+					});
 
 					conn.send({
 						events: [
@@ -97,7 +107,12 @@
 				});
 
 				conn.on('close', async () => {
-					await ui('#sync-party-connection-left');
+					addToast({
+						data: {
+							text: $_('syncParty.userLeft'),
+							icon: 'person_remove'
+						}
+					});
 				});
 			});
 		}
@@ -219,18 +234,3 @@
 		</form>
 	{/if}
 </dialog>
-
-<div class="snackbar" id="sync-party-connection-join">
-	<i>person_add</i>
-	<span>{$_('syncParty.userJoined')}</span>
-</div>
-
-<div class="snackbar" id="sync-party-connection-left">
-	<i>person_remove</i>
-	<span>{$_('syncParty.userLeft')}</span>
-</div>
-
-<div class="snackbar" id="sync-party-private-page">
-	<i>shield_person</i>
-	<span>{$_('syncParty.userOnPrivatePage')}</span>
-</div>

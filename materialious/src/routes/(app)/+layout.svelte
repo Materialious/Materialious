@@ -44,6 +44,7 @@
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
+	import Toast from '$lib/components/Toast.svelte';
 
 	let { children } = $props();
 
@@ -446,6 +447,7 @@
 		{/if}
 
 		<SyncParty />
+		<Toast />
 	</main>
 </div>
 

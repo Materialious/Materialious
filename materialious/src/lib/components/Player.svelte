@@ -57,6 +57,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
+	import { addToast } from './Toast.svelte';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -75,7 +76,6 @@
 	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
 
-	let snackBarAlert = $state('');
 	let originalOrigination: ScreenOrientationResult | undefined;
 	// eslint-disable-next-line no-undef
 	let watchProgressInterval: NodeJS.Timeout;
@@ -276,8 +276,11 @@
 		}
 		playerElement.currentTime = segment.endTime + 1;
 		if (!get(sponsorBlockDisplayToastStore)) {
-			snackBarAlert = `${get(_)('skipping')} ${segment.category}`;
-			ui('#snackbar-alert');
+			addToast({
+				data: {
+					text: `${$_('skipping')} ${segment.category}`
+				}
+			});
 		}
 	}
 
@@ -306,9 +309,18 @@
 							if (segmentTrigger === 'automatic') {
 								skipSegment(segment);
 							} else if (segmentTrigger === 'manual') {
-								snackBarAlert = `${get(_)('upcomingSegment')} ${segment.category}`;
+								if (!segmentManualSkip) {
+									addToast({
+										data: {
+											text: `${$_('upcomingSegment')} ${segment.category}`,
+											action: {
+												action: () => skipSegment(segment),
+												text: $_('skip')
+											}
+										}
+									});
+								}
 								segmentManualSkip = segment;
-								ui('#snackbar-alert');
 							}
 						}
 					});
@@ -500,8 +512,7 @@
 		}
 
 		if (data.video.fallbackPatch === 'youtubejs') {
-			snackBarAlert = get(_)('player.youtubeJsFallBack');
-			ui('#snackbar-alert');
+			addToast({ data: { text: $_('player.youtubeJsFallBack') } });
 		}
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {
@@ -1468,15 +1479,6 @@
 			>
 		{/if}
 	</article>
-{/if}
-
-{#if !isEmbed}
-	<div class="snackbar" id="snackbar-alert">
-		<span class="bold" style="text-transform: capitalize;">{snackBarAlert}</span>
-		{#if segmentManualSkip}
-			<button onclick={() => skipSegment(segmentManualSkip as Segment)}>{$_('skip')}</button>
-		{/if}
-	</div>
 {/if}
 
 <style>

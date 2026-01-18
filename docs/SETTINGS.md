@@ -2,53 +2,62 @@
 
 Materialious allows you to customize various settings by overwriting the default values using the environmental variable `VITE_DEFAULT_SETTINGS`.
 
+---
+
 ## TOC
 
-- [Materialious Settings](#materialious-settings)
-   * [Show warning](#Show-Warning)
-   * [Theme](#theme)
-      + [Dark mode / Light mode](#dark-mode-light-mode)
-      + [Color](#color)
-      + [Amoled](#color)
-   * [Interface](#interface)
-      + [Search suggestions](#search-suggestions)
-      + [Region](#region)
-      + [Letter case for titles](#letter-case-for-titles)
-      + [Auto expand comments](#auto-expand-comments)
-      + [Auto expand description](#auto-expand-desc)
-      + [Low bandwidth mode](#low-bandwidth-mode)
-   * [Player](#player)
-      + [Autoplay video](#autoplay-video)
-      + [Always loop video](#always-loop-video)
-      + [Proxy videos](#proxy-videos)
-      + [Save playback position](#save-playback-position)
-      + [Theatre mode by default](#theatre-mode-by-default)
-      + [Autoplay next by default](#autoplay-next-by-default)
-      + [Default video quality](#default-video-quality)
-   * [Sponsorblock](#sponsorblock)
-      + [Sponsor](#sponsor)
-      + [Unpaid/Self Promotion](#unpaidself-promotion)
-         - [Self Promotion](#self-promotion)
-         - [Unpaid Promotion](#unpaid-promotion)
-      + [Interaction Reminder (Subscribe)](#interaction-reminder-subscribe)
-      + [Intermission/Intro Animation](#intermissionintro-animation)
-      + [Endcards/Credits](#endcardscredits)
-      + [Preview/Recap/Hook](#previewrecaphook)
-      + [Filler Tangent/Jokes](#filler-tangentjokes)
-      + [Display Toast](#sponsorblockdisplaytoast)
-   * [DeArrow](#dearrow)
-      + [DeArrow Enabled](#dearrow-enabled)
-      + [DeArrow Instance](#dearrow-instance)
-      + [DeArrow Thumbnail Instance](#dearrow-thumbnail-instance)
-      + [DeArrow Titles Only](#dearrow-titles-only)
+* [Materialious Settings](#materialious-settings)
+
+  * [Show Warning](#show-warning)
+  * [Theme](#theme)
+    * [Dark mode / Light mode](#dark-mode--light-mode)
+    * [Color](#color)
+    * [Amoled](#amoled)
+  * [Interface](#interface)
+    * [Search suggestions](#search-suggestions)
+    * [Region](#region)
+    * [Letter case for titles](#letter-case-for-titles)
+    * [Auto expand comments](#auto-expand-comments)
+    * [Auto expand description](#auto-expand-description)
+    * [Auto expand chapters](#auto-expand-chapters)
+    * [Low bandwidth mode](#low-bandwidth-mode)
+    * [Display thumbnail avatars](#display-thumbnail-avatars)
+    * [Default page](#default-page)
+  * [Player](#player)
+    * [Autoplay video](#autoplay-video)
+    * [Always loop video](#always-loop-video)
+    * [Proxy videos](#proxy-videos)
+    * [Save playback position](#save-playback-position)
+    * [Theatre mode by default](#theatre-mode-by-default)
+    * [Autoplay next by default](#autoplay-next-by-default)
+    * [Default video quality](#default-video-quality)
+    * [Default playback speed](#default-playback-speed)
+    * [Default language](#default-language)
+    * [Captions enabled by default](#captions-enabled-by-default)
+    * [Miniplayer enabled](#miniplayer-enabled)
+  * [Return YouTube Dislikes](#return-youtube-dislikes)
+  * [SponsorBlock](#sponsorblock)
+    * [SponsorBlock enabled](#sponsorblock-enabled)
+    * [SponsorBlock instance](#sponsorblock-instance)
+    * [SponsorBlock categories](#sponsorblock-categories)
+    * [Display toast](#display-toast)
+  * [DeArrow](#dearrow)
+    * [DeArrow enabled](#dearrow-enabled)
+    * [DeArrow instance](#dearrow-instance)
+    * [DeArrow thumbnail instance](#dearrow-thumbnail-instance)
+    * [DeArrow titles only](#dearrow-titles-only)
+
+---
 
 ## Show Warning
 
-Show warning about Invidious being blocked.
+Show a warning about Invidious being blocked.
 
 ```json
 "showWarning": true
 ```
+
+---
 
 ## Theme
 
@@ -68,13 +77,15 @@ Sets the theme color using a hexadecimal value.
 "themeColor": "#ff0000"
 ```
 
-## Amoled
+### Amoled
 
-Use pure black theme for Materialious, Dark mode must be true.
+Use a pure black theme. Dark mode must be enabled.
 
 ```json
 "amoledTheme": true
 ```
+
+---
 
 ## Interface
 
@@ -86,7 +97,6 @@ Enables or disables search suggestions.
 "searchSuggestions": true
 ```
 
-
 ### Region
 
 Specifies the region using an ISO 3166 country code.
@@ -97,7 +107,14 @@ Specifies the region using an ISO 3166 country code.
 
 ### Letter case for titles
 
-Controls the letter case for titles (e.g., uppercase, lowercase).
+Controls the letter case for video titles.
+
+Possible values:
+
+* `uppercase`
+* `lowercase`
+* `sentence case`
+* `title case`
 
 ```json
 "forceCase": "uppercase"
@@ -105,7 +122,7 @@ Controls the letter case for titles (e.g., uppercase, lowercase).
 
 ### Auto expand comments
 
-Automatically expands comments section.
+Automatically expands the comments section.
 
 ```json
 "autoExpandComments": true
@@ -113,25 +130,47 @@ Automatically expands comments section.
 
 ### Auto expand description
 
-Automatically expands video descriptions.
+Automatically expands the video description.
 
 ```json
 "autoExpandDesc": true
 ```
 
+### Auto expand chapters
+
+Automatically expands the chapters list.
+
+```json
+"autoExpandChapters": true
+```
+
 ### Low bandwidth mode
 
-Avoids loading images.
+Avoids loading images to reduce bandwidth usage.
 
 ```json
 "lowBandwidthMode": true
 ```
 
-### Default quality for videos.
+### Display thumbnail avatars
+
+Shows channel avatars on video thumbnails.
 
 ```json
-"defaultQuality": "1440"
+"displayThumbnailAvatars": true
 ```
+
+### Default page
+
+Sets the default landing page when opening Materialious.
+
+```json
+"defaultPage": "home"
+```
+
+---
+
+## Player
 
 ### Autoplay video
 
@@ -165,116 +204,176 @@ Saves the playback position of videos.
 "savePlaybackPosition": true
 ```
 
-### Return YT Dislikes
-Configures an open-source proxy for the Return YouTube Dislike API, with optional self-hosting.
+### Theatre mode by default
+
+Enables theatre mode automatically when starting a video.
+
+```json
+"theatreModeByDefault": true
+```
+
+### Autoplay next by default
+
+Automatically plays the next video.
+
+```json
+"autoplayNextByDefault": true
+```
+
+### Default video quality
+
+Sets the default video quality.
+
+Available values include:
+
+* `auto`
+* `144`
+* `240`
+* `360`
+* `480`
+* `720`
+* `1080`
+* `1440`
+* `2160`
+
+```json
+"defaultQuality": "1440"
+```
+
+### Default playback speed
+
+Sets the default playback speed.
+
+```json
+"defaultPlaybackSpeed": 1
+```
+
+### Default language
+
+Sets the preferred audio language for videos.
+
+```json
+"defaultLanguage": true
+```
+
+### Captions enabled by default
+
+Automatically enables captions when available.
+
+```json
+"CCByDefault": true
+```
+
+### Miniplayer enabled
+
+Enables the miniplayer feature.
+
+```json
+"miniplayerEnabled": true
+```
+
+---
+
+## Return YouTube Dislikes
+
+Enables the Return YouTube Dislike integration.
 
 ```json
 "returnYtDislikes": true
 ```
 
-## Sponsorblock
+### Return YouTube Dislikes instance
 
-Configures Sponsorblock categories for skipping unwanted video segments.
-
-```json
-"sponsorBlockCategories": "sponsor,interaction,selfpromo"
-```
-
-### Sponsor
-
-Identifies promotional content within a video.
+Specifies the API instance used for fetching dislike counts.
 
 ```json
-"sponsorBlockCategories": "sponsor"
+"returnYTDislikesInstance": "https://ryd-proxy.materialio.us"
 ```
 
-### Unpaid/Self Promotion
+---
 
-Includes categories for unpaid and self-promotion.
+## SponsorBlock
+
+### SponsorBlock enabled
+
+Enables SponsorBlock integration.
 
 ```json
-"sponsorBlockCategories": "selfpromo"
+"sponsorBlock": false
 ```
 
-### Interaction Reminder (Subscribe)
+### SponsorBlock instance
 
-Skips explicit reminders for interactions.
+Specifies the SponsorBlock API instance.
 
 ```json
-"sponsorBlockCategories": "interaction"
+"sponsorBlockUrl": "https://sponsor.ajay.app"
 ```
 
-### Intermission/Intro Animation
+<!--### SponsorBlock categories
 
-Skips intermission or intro animations.
+Defines which SponsorBlock categories should be skipped.
+
+Available values include:
+
+* `sponsor`
+* `interaction`
+* `intro`
+* `outro`
+* `preview`
+* `filler`
+* `selfpromo`
+* `filler`
 
 ```json
-"sponsorBlockCategories": "intro"
-```
+"sponsorBlockCategories": [
+  "intro",
+  "outro",
+  "interaction"
+]
+```-->
 
-### Endcards/Credits
+### Display toast
 
-Skips endcards and credits.
-
-```json
-"sponsorBlockCategories": "outro"
-```
-
-### Preview/Recap/Hook
-
-Skips previews, recaps, or hooks.
-
-```json
-"sponsorBlockCategories": "preview"
-```
-
-### Filler Tangent/Jokes
-
-Skips filler, tangents, or jokes.
-
-```json
-"sponsorBlockCategories": "filler"
-```
-
-### Display Toast
-
-Enables or disables displaying a toast notification when Sponsorblock actions occur.
+Displays a toast notification when SponsorBlock skips a segment.
 
 ```json
 "sponsorBlockDisplayToast": true
 ```
 
+---
+
 ## DeArrow
 
 Controls the DeArrow extension for removing sensational elements from YouTube titles and thumbnails.
 
-### DeArrow Enabled
+### DeArrow enabled
 
-Enables or disables the DeArrow extension.
+Enables or disables DeArrow.
 
 ```json
 "deArrowEnabled": true
 ```
 
-### DeArrow Instance
+### DeArrow instance
 
-Specifies the URL for the DeArrow instance.
+Specifies the DeArrow API instance.
 
 ```json
 "deArrowInstance": "https://sponsor.ajay.app"
 ```
 
-### DeArrow Thumbnail Instance
+### DeArrow thumbnail instance
 
-Specifies the URL for the DeArrow thumbnail instance.
+Specifies the DeArrow thumbnail instance.
 
 ```json
 "deArrowThumbnailInstance": "https://dearrow-thumb.ajay.app"
 ```
 
-### DeArrow Titles Only
+### DeArrow titles only
 
-Configures DeArrow to only modify titles without changing thumbnails.
+Only modifies titles and leaves thumbnails unchanged.
 
 ```json
 "deArrowTitlesOnly": true

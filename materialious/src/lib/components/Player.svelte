@@ -7,7 +7,6 @@
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { error, type Page } from '@sveltejs/kit';
-	import ui from 'beercss';
 	import ISO6391 from 'iso-639-1';
 	import Mousetrap from 'mousetrap';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';

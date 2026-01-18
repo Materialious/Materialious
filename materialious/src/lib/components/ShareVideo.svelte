@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { instanceStore } from '$lib/store';
-	import ui from 'beercss';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';

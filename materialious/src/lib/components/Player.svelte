@@ -91,7 +91,6 @@
 	let playerCurrentPlaybackState = $state(false);
 	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
-	let playerPauseTimeUpdates = $state(false);
 	let playerIsBuffering = $state(true);
 	let playerVolume = $state(0);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
@@ -109,7 +108,7 @@
 	// eslint-disable-next-line no-undef
 	let playerSliderDebounce: NodeJS.Timeout;
 	let playerVolumeElement: HTMLElement | undefined = $state();
-	let playerHideBufferBar: boolean = $state(false);
+	let playerUserManualSeeking: boolean = $state(false);
 	let playerIsFullscreen: boolean = $state(false);
 
 	const playerTimelineSlider = new Slider({
@@ -117,7 +116,7 @@
 		step: 0.1,
 		value: () => playerCurrentTime,
 		onValueChange: (timeToSet) => {
-			playerHideBufferBar = true;
+			playerUserManualSeeking = true;
 			playerCurrentTime = timeToSet;
 
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
@@ -125,7 +124,7 @@
 			playerSliderDebounce = setTimeout(() => {
 				if (playerElement) {
 					playerElement.currentTime = timeToSet;
-					playerHideBufferBar = false;
+					playerUserManualSeeking = false;
 				}
 			}, 300);
 		},
@@ -890,7 +889,7 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			if (!playerElement) return;
 
-			if (!playerPauseTimeUpdates) {
+			if (!playerUserManualSeeking) {
 				playerCurrentTime = playerElement.currentTime ?? 0;
 			}
 
@@ -1222,12 +1221,16 @@
 			>
 				<div class="track">
 					<div class="range"></div>
-					<div {...playerTimelineSlider.thumb}></div>
+					<div {...playerTimelineSlider.thumb}>
+						<div class="tooltip thumb-tooltip">
+							{videoLength(playerCurrentTime)}
+						</div>
+					</div>
 				</div>
 				<div
 					bind:this={playerBufferBar}
 					class="buffered-bar"
-					class:hide={playerHideBufferBar}
+					class:hide={playerUserManualSeeking}
 				></div>
 				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
@@ -1250,7 +1253,7 @@
 				{/if}
 			</div>
 
-			{#if playerTimelineTooltipVisible}
+			{#if playerTimelineTooltipVisible && !playerUserManualSeeking}
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
 					{#if playerCloestTimestamp}
 						{playerCloestTimestamp.title}
@@ -1583,11 +1586,15 @@
 		background: var(--inverse-primary);
 		left: var(--percentage);
 		top: 50%;
-		width: 10px;
+		width: 5px;
 		height: 35px;
 		z-index: 3;
 		cursor: grab;
 		transform: translate(-50%, -50%);
+	}
+
+	.thumb-tooltip {
+		left: var(--percentage);
 	}
 
 	.seek-double-click {

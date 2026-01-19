@@ -444,6 +444,7 @@
 			restoreDefaultLanguage();
 			setActiveVideoTrack();
 			setActiveAudioTrack();
+			updateVideoPlayerHeight();
 
 			if ($playerCCByDefault) {
 				toggleSubtitles();
@@ -1223,27 +1224,31 @@
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}></div>
 				</div>
-			</div>
-			<div bind:this={playerBufferBar} class="buffered-bar" class:hide={playerHideBufferBar}></div>
-			{#each data.content.timestamps as chapter, index (chapter)}
 				<div
-					class="chapter-marker"
-					style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
-					style:width={getMarkerWidth(
-						chapter.time,
-						data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
-					)}
+					bind:this={playerBufferBar}
+					class="buffered-bar"
+					class:hide={playerHideBufferBar}
 				></div>
-			{/each}
-			{#if !$sponsorBlockTimelineStore}
-				{#each segments as segment (segment)}
+				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
-						class="chapter-marker segment-marker"
-						style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
-						style:width={getMarkerWidth(segment.startTime, segment.endTime)}
+						class="chapter-marker"
+						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
+						style:width={getMarkerWidth(
+							chapter.time,
+							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
+						)}
 					></div>
 				{/each}
-			{/if}
+				{#if !$sponsorBlockTimelineStore}
+					{#each segments as segment (segment)}
+						<div
+							class="chapter-marker segment-marker"
+							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+							style:width={getMarkerWidth(segment.startTime, segment.endTime)}
+						></div>
+					{/each}
+				{/if}
+			</div>
 
 			{#if playerTimelineTooltipVisible}
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
@@ -1578,8 +1583,8 @@
 		background: var(--inverse-primary);
 		left: var(--percentage);
 		top: 50%;
-		width: 25px;
-		height: 25px;
+		width: 10px;
+		height: 35px;
 		z-index: 3;
 		cursor: grab;
 		transform: translate(-50%, -50%);
@@ -1612,10 +1617,10 @@
 		position: absolute;
 		height: 1rem;
 		background: var(--secondary);
-		top: 20%;
+		top: 50%;
 		left: 0;
 		transform: translateY(-50%);
-		z-index: 2;
+		z-index: 1;
 		pointer-events: none;
 		border-top-right-radius: 2rem;
 		border-bottom-right-radius: 2rem;
@@ -1623,14 +1628,14 @@
 
 	.chapter-marker {
 		position: absolute;
-		top: 20%;
+		top: 50%;
 		transform: translateY(-50%);
 		left: 0;
 		height: 1rem;
 		background-color: var(--secondary);
 		opacity: 0.5;
 		border-radius: 2rem;
-		z-index: 1;
+		z-index: 2;
 		pointer-events: none;
 	}
 

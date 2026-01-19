@@ -110,6 +110,7 @@
 	let playerSliderDebounce: NodeJS.Timeout;
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerHideBufferBar: boolean = $state(false);
+	let playerIsFullscreen: boolean = $state(false);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -426,8 +427,10 @@
 	function toggleFullscreen() {
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
+			playerIsFullscreen = false;
 		} else {
 			playerContainer.requestFullscreen();
+			playerIsFullscreen = true;
 		}
 	}
 
@@ -1461,18 +1464,9 @@
 								<i>pip</i>
 							</button>
 						{/if}
-						<button
-							class="inverse-primary"
-							onclick={() => {
-								if (document.fullscreenElement) {
-									document.exitFullscreen();
-								} else {
-									playerContainer.requestFullscreen();
-								}
-							}}
-						>
+						<button class="inverse-primary" onclick={toggleFullscreen}>
 							<i>
-								{#if document.fullscreenElement}
+								{#if playerIsFullscreen}
 									fullscreen_exit
 								{:else}
 									fullscreen

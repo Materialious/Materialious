@@ -113,7 +113,9 @@
         "logout": "Kijelentkezés",
         "companionUrl": "Kiegészítő webcím",
         "about": "Névjegy",
-        "androidNativeShare": "Natív megosztás használata"
+        "androidNativeShare": "Natív megosztás használata",
+        "joinSyncParty": "Írja be a szinkronizáló fél webcímét",
+        "shareURL": "Webcím megosztása"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",

@@ -15,6 +15,7 @@
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
+	import { Slider } from 'melt/builders';
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
 	import {
@@ -104,6 +105,43 @@
 	let playerVideoEndTimePretty: string = $state('');
 	let playerBufferedTo: number = $state(0);
 	let playerCloestTimestamp: Timestamp | undefined = $state();
+	let playerSliderElement: HTMLElement | undefined = $state();
+	// eslint-disable-next-line no-undef
+	let playerSliderDebounce: NodeJS.Timeout;
+	let playerVolumeElement: HTMLElement | undefined = $state();
+	let playerHideBufferBar: boolean = $state(false);
+	let playerIsFullscreen: boolean = $state(false);
+
+	const playerTimelineSlider = new Slider({
+		min: 0,
+		step: 0.1,
+		value: () => playerCurrentTime,
+		onValueChange: (timeToSet) => {
+			playerHideBufferBar = true;
+			playerCurrentTime = timeToSet;
+
+			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
+
+			playerSliderDebounce = setTimeout(() => {
+				if (playerElement) {
+					playerElement.currentTime = timeToSet;
+					playerHideBufferBar = false;
+				}
+			}, 300);
+		},
+		max: () => playerMaxKnownTime
+	});
+
+	const playerVolumeSlier = new Slider({
+		onValueChange: (volumeToSet) => {
+			if (!playerElement) return;
+			playerElement.volume = volumeToSet;
+		},
+		value: () => playerVolume,
+		max: 1,
+		min: 0,
+		step: 0.1
+	});
 
 	// eslint-disable-next-line no-undef
 	let playerAndroidUITimeout: NodeJS.Timeout;
@@ -113,7 +151,6 @@
 	let clickCounterTimeout: NodeJS.Timeout;
 
 	let seekDirection: 'forwards' | 'backwards' = $state('forwards');
-
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	playertheatreModeIsActive.subscribe(async () => {
@@ -387,16 +424,13 @@
 		playerCurrentAudioTrack = audioTracks.find((track) => track.active);
 	}
 
-	function handleTimeChange(event: Event) {
-		playerCurrentTime = parseFloat((event.target as HTMLInputElement).value);
-		if (playerElement) playerElement.currentTime = playerCurrentTime;
-	}
-
 	function toggleFullscreen() {
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
+			playerIsFullscreen = false;
 		} else {
 			playerContainer.requestFullscreen();
+			playerIsFullscreen = true;
 		}
 	}
 
@@ -819,8 +853,7 @@
 			playerElement.currentTime += frameTime;
 		});
 
-		const volumeContainer = document.getElementById('volume-slider');
-		volumeContainer?.addEventListener('mousewheel', (event) => {
+		playerVolumeElement?.addEventListener('mousewheel', (event) => {
 			event.preventDefault();
 			const delta = Math.sign((event as any).deltaY);
 			const newVolume = Math.max(
@@ -975,11 +1008,14 @@
 		if (requestAnimationTooltip) return;
 
 		requestAnimationTooltip = requestAnimationFrame(() => {
-			const input = event.target as HTMLInputElement;
-			const rect = input.getBoundingClientRect();
+			if (!playerSliderElement) return;
+			const rect = playerSliderElement.getBoundingClientRect();
 			playerTimelineMouseX = event.clientX - rect.left;
 
-			const percent = Math.min(Math.max(playerTimelineMouseX / input.clientWidth, 0), 1);
+			const percent = Math.min(
+				Math.max(playerTimelineMouseX / playerSliderElement.clientWidth, 0),
+				1
+			);
 			playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
 
 			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
@@ -1176,41 +1212,38 @@
 	</div>
 	{#if showControls}
 		<div id="player-controls" transition:fade>
-			<label class="slider" id="progress-slider">
-				<input
-					style="width: 100%;"
-					type="range"
-					oninput={handleTimeChange}
-					min={0}
-					step={0.1}
-					bind:value={playerCurrentTime}
-					max={playerMaxKnownTime}
-					onmousemove={handleMouseMove}
-					onmouseleave={handleMouseLeave}
-					disabled={$isAndroidTvStore}
-				/>
-				<span></span>
-				<div bind:this={playerBufferBar} class="buffered-bar"></div>
-				{#each data.content.timestamps as chapter, index (chapter)}
+			<div
+				class="player-slider full-width"
+				{...playerTimelineSlider.root}
+				onmousemove={handleMouseMove}
+				onmouseleave={handleMouseLeave}
+				bind:this={playerSliderElement}
+			>
+				<div class="track">
+					<div class="range"></div>
+					<div {...playerTimelineSlider.thumb}></div>
+				</div>
+			</div>
+			<div bind:this={playerBufferBar} class="buffered-bar" class:hide={playerHideBufferBar}></div>
+			{#each data.content.timestamps as chapter, index (chapter)}
+				<div
+					class="chapter-marker"
+					style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
+					style:width={getMarkerWidth(
+						chapter.time,
+						data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
+					)}
+				></div>
+			{/each}
+			{#if !$sponsorBlockTimelineStore}
+				{#each segments as segment (segment)}
 					<div
-						class="chapter-marker"
-						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
-						style:width={getMarkerWidth(
-							chapter.time,
-							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
-						)}
+						class="chapter-marker segment-marker"
+						style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+						style:width={getMarkerWidth(segment.startTime, segment.endTime)}
 					></div>
 				{/each}
-				{#if !$sponsorBlockTimelineStore}
-					{#each segments as segment (segment)}
-						<div
-							class="chapter-marker segment-marker"
-							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
-							style:width={getMarkerWidth(segment.startTime, segment.endTime)}
-						></div>
-					{/each}
-				{/if}
-			</label>
+			{/if}
 
 			{#if playerTimelineTooltipVisible}
 				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
@@ -1236,20 +1269,16 @@
 							</i>
 						</button>
 						{#if Capacitor.getPlatform() !== 'android'}
-							<label class="slider round m l" id="volume-slider">
-								<input
-									oninput={() => {
-										if (!playerElement) return;
-
-										playerElement.volume = playerVolume;
-									}}
-									bind:value={playerVolume}
-									type="range"
-									step="0.1"
-									max="1"
-								/>
-								<span></span>
-							</label>
+							<div
+								bind:this={playerVolumeElement}
+								class="player-slider volume m l"
+								{...playerVolumeSlier.root}
+							>
+								<div class="track">
+									<div class="range"></div>
+									<div {...playerVolumeSlier.thumb}></div>
+								</div>
+							</div>
 						{/if}
 					</nav>
 				{/if}
@@ -1435,18 +1464,9 @@
 								<i>pip</i>
 							</button>
 						{/if}
-						<button
-							class="inverse-primary"
-							onclick={() => {
-								if (document.fullscreenElement) {
-									document.exitFullscreen();
-								} else {
-									playerContainer.requestFullscreen();
-								}
-							}}
-						>
+						<button class="inverse-primary" onclick={toggleFullscreen}>
 							<i>
-								{#if document.fullscreenElement}
+								{#if playerIsFullscreen}
 									fullscreen_exit
 								{:else}
 									fullscreen
@@ -1523,13 +1543,46 @@
 		margin: 0;
 	}
 
-	#progress-slider > span {
-		transition: 0.25s;
+	.player-slider {
+		height: 1rem;
+		margin: 0 auto;
+		border-radius: 0.25rem;
 	}
 
-	#progress-slider {
-		block-size: 1em;
-		margin: 0;
+	.player-slider.full-width {
+		width: 100%;
+	}
+
+	.player-slider.volume {
+		width: 200px;
+	}
+
+	.player-slider .track {
+		background: var(--secondary-container);
+		height: 100%;
+		position: relative;
+		border-radius: 0.25rem;
+	}
+
+	.player-slider .range {
+		position: absolute;
+		background: var(--inverse-primary);
+		inset: 0;
+		right: var(--percentage-inv);
+		border-radius: 0.25rem;
+	}
+
+	.player-slider [data-melt-slider-thumb] {
+		position: absolute;
+		border-radius: 1rem;
+		background: var(--inverse-primary);
+		left: var(--percentage);
+		top: 50%;
+		width: 25px;
+		height: 25px;
+		z-index: 3;
+		cursor: grab;
+		transform: translate(-50%, -50%);
 	}
 
 	.seek-double-click {
@@ -1559,10 +1612,10 @@
 		position: absolute;
 		height: 1rem;
 		background: var(--secondary);
-		top: 50%;
+		top: 20%;
 		left: 0;
 		transform: translateY(-50%);
-		z-index: 0;
+		z-index: 2;
 		pointer-events: none;
 		border-top-right-radius: 2rem;
 		border-bottom-right-radius: 2rem;
@@ -1570,14 +1623,14 @@
 
 	.chapter-marker {
 		position: absolute;
-		top: 50%;
+		top: 20%;
 		transform: translateY(-50%);
 		left: 0;
 		height: 1rem;
 		background-color: var(--secondary);
 		opacity: 0.5;
 		border-radius: 2rem;
-		z-index: 0;
+		z-index: 1;
 		pointer-events: none;
 	}
 
@@ -1637,20 +1690,5 @@
 		background-color: var(--inverse-primary);
 		color: var(--primary);
 		border: none;
-	}
-
-	.slider > span {
-		background-color: var(--inverse-primary);
-		color: var(--primary);
-	}
-
-	.slider > input::-webkit-slider-thumb {
-		background-color: var(--inverse-primary);
-		color: var(--primary);
-	}
-
-	.slider > input::-moz-range-thumb {
-		background-color: var(--inverse-primary);
-		color: var(--primary);
 	}
 </style>

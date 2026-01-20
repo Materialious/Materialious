@@ -1714,10 +1714,6 @@
 		background-color: black;
 	}
 
-	.hide {
-		display: none;
-	}
-
 	.chip {
 		background-color: var(--inverse-primary);
 		color: var(--primary);

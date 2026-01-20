@@ -11,6 +11,10 @@
 	src: url('/static/inter.ttf');
 }
 
+.hide {
+	display: none;
+}
+
 article {
 	box-shadow: none !important;
 }

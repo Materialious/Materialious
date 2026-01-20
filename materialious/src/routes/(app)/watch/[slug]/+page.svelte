@@ -303,6 +303,8 @@
 		) {
 			playerState.set(undefined);
 		}
+
+		playertheatreModeIsActive.set(false);
 	});
 
 	async function goToCurrentPlaylistItem() {

@@ -244,7 +244,11 @@
 </svelte:head>
 
 <div>
-	<nav class="left m l surface-container" class:tv-nav={$isAndroidTvStore}>
+	<nav
+		class="left m l surface-container"
+		class:tv-nav={$isAndroidTvStore}
+		class:hide={$playertheatreModeIsActive}
+	>
 		<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 			<a href={resolve($interfaceDefaultPage, {})}>
 				<Logo />

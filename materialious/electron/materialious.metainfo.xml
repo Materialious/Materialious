@@ -37,6 +37,8 @@
   <url type="homepage">https://materialio.us</url>
   <url type="bugtracker">https://github.com/Materialious/Materialious/issues</url>
   <url type="donation">https://github.com/sponsors/WardPearce</url>
+  <url type="contribute">https://github.com/Materialious/Materialious</url>
+  <url type="vcs-browser">https://github.com/Materialious/Materialious</url>
   <project_license>AGPL-3.0</project_license>
   <developer_name>WardPearce</developer_name>
   <screenshots>
@@ -68,25 +70,25 @@
   </content_rating>
   <releases>
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <release version="1.13.6" date="2026-1-20">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.13.6</url>
     </release>

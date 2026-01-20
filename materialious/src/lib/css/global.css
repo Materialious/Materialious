@@ -51,6 +51,7 @@ nav.top {
 main.root {
 	max-height: 100vh;
 	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .row {

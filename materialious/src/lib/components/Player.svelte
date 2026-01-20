@@ -75,6 +75,16 @@
 
 	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
+	const sponsorSegments = {
+		sponsor: $_('layout.sponsors.sponsor'),
+		selfpromo: $_('layout.sponsors.unpaidSelfPromotion'),
+		interaction: $_('layout.sponsors.interactionReminder'),
+		intro: $_('layout.sponsors.intermissionIntroAnimation'),
+		outro: $_('layout.sponsors.credits'),
+		preview: $_('layout.sponsors.preViewRecapHook'),
+		filler: $_('layout.sponsors.tangentJokes'),
+		music_offtopic: $_('layout.sponsors.musicOffTopic')
+	};
 
 	let originalOrigination: ScreenOrientationResult | undefined;
 	// eslint-disable-next-line no-undef
@@ -98,12 +108,11 @@
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
 	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
 	let playerLoop = $state($playerAlwaysLoopStore);
-	let playerTimelineTooltipVisible: boolean = $state(false);
 	let playerTimelineTimeHover: number = $state(0);
-	let playerTimelineMouseX: number = $state(0);
 	let playerVideoEndTimePretty: string = $state('');
 	let playerBufferedTo: number = $state(0);
 	let playerCloestTimestamp: Timestamp | undefined = $state();
+	let playerCloestSponsor: Segment | undefined = $state();
 	let playerSliderElement: HTMLElement | undefined = $state();
 	// eslint-disable-next-line no-undef
 	let playerSliderDebounce: NodeJS.Timeout;
@@ -330,39 +339,41 @@
 					data.video.videoId,
 					Object.keys($sponsorBlockCategoriesStore) as Category[]
 				);
-
-				playerElement?.addEventListener('timeupdate', () => {
-					segments.forEach((segment) => {
-						if (!playerElement) return;
-
-						if (
-							playerElement.currentTime >= segment.startTime &&
-							playerElement.currentTime <= segment.endTime
-						) {
-							const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
-
-							if (segmentTrigger === 'automatic') {
-								skipSegment(segment);
-							} else if (segmentTrigger === 'manual') {
-								if (!segmentManualSkip) {
-									addToast({
-										data: {
-											text: `${$_('upcomingSegment')} ${segment.category}`,
-											action: {
-												action: () => skipSegment(segment),
-												text: $_('skip')
-											}
-										}
-									});
-								}
-								segmentManualSkip = segment;
-							}
-						}
-					});
-				});
 			} catch (error) {
 				console.error('Sponsorskip errored with:', error);
 			}
+
+			if (segments.length === 0) return;
+
+			playerElement?.addEventListener('timeupdate', () => {
+				segments.forEach((segment) => {
+					if (!playerElement) return;
+
+					if (
+						playerElement.currentTime >= segment.startTime &&
+						playerElement.currentTime <= segment.endTime
+					) {
+						const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
+
+						if (segmentTrigger === 'automatic') {
+							skipSegment(segment);
+						} else if (segmentTrigger === 'manual') {
+							if (!segmentManualSkip) {
+								addToast({
+									data: {
+										text: `${$_('upcomingSegment')} ${segment.category}`,
+										action: {
+											action: () => skipSegment(segment),
+											text: $_('skip')
+										}
+									}
+								});
+							}
+							segmentManualSkip = segment;
+						}
+					}
+				});
+			});
 		}
 	}
 
@@ -438,6 +449,12 @@
 
 		sabrAdapter = await injectSabr(data.video, player);
 
+		if (data.video.fallbackPatch === 'youtubejs') {
+			addToast({ data: { text: $_('player.youtubeJsFallBack') } });
+		}
+
+		setupSponsorSkip();
+
 		player.addEventListener('loaded', () => {
 			restoreQualityPreference();
 			restoreDefaultLanguage();
@@ -456,7 +473,6 @@
 			}
 			// Auto save watch progress every minute.
 			watchProgressInterval = setInterval(() => savePlayerPos(), 60000);
-			setupSponsorSkip();
 
 			let dashUrl: string;
 
@@ -542,10 +558,6 @@
 			} else {
 				await player.load(data.video.hlsUrl + '?local=true');
 			}
-		}
-
-		if (data.video.fallbackPatch === 'youtubejs') {
-			addToast({ data: { text: $_('player.youtubeJsFallBack') } });
 		}
 
 		if ($playerDefaultPlaybackSpeed && playerElement) {
@@ -1004,19 +1016,21 @@
 	}
 
 	let requestAnimationTooltip: number | undefined;
-	function handleMouseMove(event: MouseEvent) {
+	function timelineMouseMove(event: MouseEvent) {
 		if (requestAnimationTooltip) return;
 
 		requestAnimationTooltip = requestAnimationFrame(() => {
 			if (!playerSliderElement) return;
 			const rect = playerSliderElement.getBoundingClientRect();
-			playerTimelineMouseX = event.clientX - rect.left;
 
 			const percent = Math.min(
-				Math.max(playerTimelineMouseX / playerSliderElement.clientWidth, 0),
+				Math.max((event.clientX - rect.left) / playerSliderElement.clientWidth, 0),
 				1
 			);
+
 			playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
+
+			document.documentElement.style.setProperty('--timeline-tooltip-left', `${percent * 100}%`);
 
 			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
 				let endTime: number;
@@ -1027,13 +1041,18 @@
 				}
 				return playerTimelineTimeHover >= chapter.time && playerTimelineTimeHover < endTime;
 			});
-			playerTimelineTooltipVisible = true;
+
+			if (segments.length > 0) {
+				playerCloestSponsor = segments.find((segment) => {
+					return (
+						playerTimelineTimeHover >= segment.startTime &&
+						playerTimelineTimeHover < segment.endTime
+					);
+				});
+			}
+
 			requestAnimationTooltip = undefined;
 		});
-	}
-
-	function handleMouseLeave() {
-		playerTimelineTooltipVisible = false;
 	}
 
 	function onVideoClick(
@@ -1215,11 +1234,23 @@
 			<div
 				class="player-slider full-width"
 				{...playerTimelineSlider.root}
-				onmousemove={handleMouseMove}
-				onmouseleave={handleMouseLeave}
+				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
 				<div class="track">
+					{#if !playerUserManualSeeking}
+						<div class="tooltip" style="position: absolute;left: var(--timeline-tooltip-left);">
+							{#if playerCloestSponsor}
+								{sponsorSegments[playerCloestSponsor.category]}
+								<br />
+							{:else if playerCloestTimestamp}
+								{playerCloestTimestamp.title}
+								<br />
+							{/if}
+
+							{videoLength(playerTimelineTimeHover)}
+						</div>
+					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						<div class="tooltip thumb-tooltip">
@@ -1252,17 +1283,6 @@
 					{/each}
 				{/if}
 			</div>
-
-			{#if playerTimelineTooltipVisible && !playerUserManualSeeking}
-				<div class="tooltip" style="position: absolute; left: {playerTimelineMouseX}px;">
-					{#if playerCloestTimestamp}
-						{playerCloestTimestamp.title}
-						<br />
-					{/if}
-
-					{videoLength(playerTimelineTimeHover)}
-				</div>
-			{/if}
 
 			<nav>
 				{#if !$isAndroidTvStore}

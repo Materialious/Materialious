@@ -208,6 +208,7 @@
 			"credits": "Endcards/Credits",
 			"preViewRecapHook": "Preview/Recap/Hook",
 			"tangentJokes": "Filler Tangent/Jokes",
+			"musicOffTopic": "Non-musical segment",
 			"automatic": "Auto skip",
 			"manual": "Manual skip",
 			"timeline": "Timeline only"

@@ -93,7 +93,10 @@
 					subCountText: cleanNumber($channelCacheStore[page.params.slug].channel.subCount)
 				}}
 			/>
-			<p style="width: 60vw;">{$channelCacheStore[page.params.slug].channel.description}</p>
+			<p style="width: 60vw;max-height: 150px;overflow: scroll;">
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html $channelCacheStore[page.params.slug].channel.description}
+			</p>
 		</div>
 		{#if !$isAndroidTvStore}
 			<button class="border">

@@ -11,6 +11,10 @@
 	src: url('/static/inter.ttf');
 }
 
+.hide {
+	display: none;
+}
+
 article {
 	box-shadow: none !important;
 }
@@ -47,6 +51,7 @@ nav.top {
 main.root {
 	max-height: 100vh;
 	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .row {

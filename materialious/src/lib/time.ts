@@ -9,9 +9,13 @@ dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(advancedFormat);
 
-export function humanFriendlyTimestamp(utcTimestamp: number): string {
+export function humanizeTimestamp(epochTime: number): string {
+	return dayjs.utc(epochTime).local().format('hh:mm A DD/MM/YYYY');
+}
+
+export function relativeTimestamp(epochTime: number): string {
 	const now = dayjs();
-	const timestamp = dayjs.utc(utcTimestamp).local();
+	const timestamp = dayjs.utc(epochTime).local();
 
 	const isSameDay = now.isSame(timestamp, 'day');
 	const isSameMonth = now.isSame(timestamp, 'month');

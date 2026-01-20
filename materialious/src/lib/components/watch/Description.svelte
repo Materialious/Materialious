@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { cleanNumber } from '$lib/numbers';
+	import { cleanNumber, numberWithCommas } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { VideoPlay } from '$lib/api/model';
 	import { onMount } from 'svelte';
 	import { expandSummery } from '$lib/misc';
 	import { interfaceAutoExpandDesc } from '$lib/store';
+	import { humanizeTimestamp } from '$lib/time';
 
 	let { video, description }: { video: VideoPlay; description: string } = $props();
 
@@ -20,8 +21,18 @@
 	<summary id="description" class="bold none">
 		<nav>
 			<div class="max">
-				{cleanNumber(video.viewCount)}
-				{$_('views')} • {video.publishedText}
+				<span>
+					{cleanNumber(video.viewCount)}
+					{$_('views')}
+					<div class="tooltip no-space">{numberWithCommas(video.viewCount)} {$_('views')}</div>
+				</span>
+				•
+				<span>
+					{video.publishedText}
+					{#if !video.fallbackPatch}
+						<div class="tooltip no-space">{humanizeTimestamp(video.published)}</div>
+					{/if}
+				</span>
 			</div>
 		</nav>
 	</summary>

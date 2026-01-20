@@ -245,14 +245,10 @@
 
 <div>
 	<nav class="left m l surface-container" class:tv-nav={$isAndroidTvStore}>
-		<header
-			role="presentation"
-			onclick={() => goto(resolve($interfaceDefaultPage, {}))}
-			style="cursor: pointer;"
-			tabindex="-1"
-			class="small-padding"
-		>
-			<Logo />
+		<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
+			<a href={resolve($interfaceDefaultPage, {})}>
+				<Logo />
+			</a>
 		</header>
 		{#if $isAndroidTvStore}
 			<a href={resolve('/search', {})} class:active={$page.url.href.endsWith('/search')}>

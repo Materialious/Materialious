@@ -39,7 +39,7 @@
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery } from '$lib/misc';
-	import { humanFriendlyTimestamp } from '$lib/time.js';
+	import { relativeTimestamp } from '$lib/time.js';
 	import { getWatchDetails } from '$lib/watch.js';
 	import { page } from '$app/state';
 
@@ -252,12 +252,12 @@
 
 	onMount(async () => {
 		if (data.video.premiereTimestamp) {
-			premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+			premiereTime = relativeTimestamp(data.video.premiereTimestamp);
 			premiereUpdateInterval = setInterval(async () => {
 				data = await getWatchDetails(data.video.videoId, page.url);
 
 				if (data.video.premiereTimestamp) {
-					premiereTime = humanFriendlyTimestamp(data.video.premiereTimestamp);
+					premiereTime = relativeTimestamp(data.video.premiereTimestamp);
 				} else {
 					clearInterval(premiereUpdateInterval);
 					playerState.set({ ...$playerState, data: { ...data } });

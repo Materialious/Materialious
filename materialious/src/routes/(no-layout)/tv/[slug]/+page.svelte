@@ -19,8 +19,7 @@
 	let playerCurrentTime: number = $state(0);
 	let showControls = $state(false);
 
-	// eslint-disable-next-line no-undef
-	let seekInterval: NodeJS.Timeout | undefined;
+	let seekInterval: ReturnType<typeof setTimeout> | undefined;
 	let seekStartTime: number = 0;
 	let isSeeking = false;
 

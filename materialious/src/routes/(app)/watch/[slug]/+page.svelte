@@ -67,8 +67,7 @@
 	let playerCurrentTime: number = $state(0);
 
 	let premiereTime = $state('');
-	// eslint-disable-next-line no-undef
-	let premiereUpdateInterval: NodeJS.Timeout;
+	let premiereUpdateInterval: ReturnType<typeof setTimeout>;
 
 	if (
 		!data.video.premiereTimestamp &&
@@ -362,8 +361,7 @@
 		playertheatreModeIsActive.set(!$playertheatreModeIsActive);
 	}
 
-	// eslint-disable-next-line no-undef
-	let pauseTimeout: NodeJS.Timeout | undefined = $state();
+	let pauseTimeout: ReturnType<typeof setTimeout> | undefined = $state();
 	function setPauseTimer() {
 		if (pauseTimeout) {
 			clearTimeout(pauseTimeout);

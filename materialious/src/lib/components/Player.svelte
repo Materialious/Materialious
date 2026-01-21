@@ -87,8 +87,7 @@
 	};
 
 	let originalOrigination: ScreenOrientationResult | undefined;
-	// eslint-disable-next-line no-undef
-	let watchProgressInterval: NodeJS.Timeout;
+	let watchProgressInterval: ReturnType<typeof setTimeout>;
 	let showVideoRetry = $state(false);
 
 	let androidInitialNetworkStatus: ConnectionStatus | undefined;
@@ -114,8 +113,7 @@
 	let playerCloestTimestamp: Timestamp | undefined = $state();
 	let playerCloestSponsor: Segment | undefined = $state();
 	let playerSliderElement: HTMLElement | undefined = $state();
-	// eslint-disable-next-line no-undef
-	let playerSliderDebounce: NodeJS.Timeout;
+	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerUserManualSeeking: boolean = $state(false);
 	let playerIsFullscreen: boolean = $state(false);
@@ -151,12 +149,10 @@
 		step: 0.1
 	});
 
-	// eslint-disable-next-line no-undef
-	let playerAndroidUITimeout: NodeJS.Timeout;
+	let playerAndroidUITimeout: ReturnType<typeof setTimeout>;
 
 	let clickCount = $state(0);
-	// eslint-disable-next-line no-undef
-	let clickCounterTimeout: NodeJS.Timeout;
+	let clickCounterTimeout: ReturnType<typeof setTimeout>;
 
 	let seekDirection: 'forwards' | 'backwards' = $state('forwards');
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
@@ -588,6 +584,8 @@
 			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
 		}
 	}
+
+	function showPlayerUI() {}
 
 	onMount(async () => {
 		shaka.polyfill.installAll();

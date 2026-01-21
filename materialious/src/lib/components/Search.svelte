@@ -25,8 +25,7 @@
 
 	let showSearchBox = $state(false);
 
-	// eslint-disable-next-line no-undef
-	let debounceTimer: NodeJS.Timeout;
+	let debounceTimer: ReturnType<typeof setTimeout>;
 	function debouncedSearch(event: any) {
 		if (!$interfaceSearchSuggestionsStore) return;
 

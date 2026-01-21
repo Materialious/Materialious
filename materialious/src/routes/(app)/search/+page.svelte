@@ -11,8 +11,7 @@
 	let suggestionsForSearch: string[] = $state([]);
 	let search = $state('');
 
-	// eslint-disable-next-line no-undef
-	let debounceTimer: NodeJS.Timeout;
+	let debounceTimer: ReturnType<typeof setTimeout>;
 	function debouncedSearch(event: any) {
 		if (!$interfaceSearchSuggestionsStore) return;
 

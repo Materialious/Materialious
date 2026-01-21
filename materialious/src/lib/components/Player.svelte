@@ -61,6 +61,8 @@
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+		currentTime?: number;
+		userManualSeeking?: boolean;
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 		showControls?: boolean;
@@ -70,6 +72,8 @@
 		data,
 		isEmbed = false,
 		playerElement = $bindable(undefined),
+		currentTime = $bindable(0),
+		userManualSeeking = $bindable(false),
 		showControls = false
 	}: Props = $props();
 
@@ -87,8 +91,7 @@
 	};
 
 	let originalOrigination: ScreenOrientationResult | undefined;
-	// eslint-disable-next-line no-undef
-	let watchProgressInterval: NodeJS.Timeout;
+	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let showVideoRetry = $state(false);
 
 	let androidInitialNetworkStatus: ConnectionStatus | undefined;
@@ -99,7 +102,6 @@
 	let playerContainer: HTMLElement;
 	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerCurrentPlaybackState = $state(false);
-	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(true);
 	let playerVolume = $state(0);
@@ -114,26 +116,24 @@
 	let playerCloestTimestamp: Timestamp | undefined = $state();
 	let playerCloestSponsor: Segment | undefined = $state();
 	let playerSliderElement: HTMLElement | undefined = $state();
-	// eslint-disable-next-line no-undef
-	let playerSliderDebounce: NodeJS.Timeout;
+	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
-	let playerUserManualSeeking: boolean = $state(false);
 	let playerIsFullscreen: boolean = $state(false);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
 		step: 0.1,
-		value: () => playerCurrentTime,
+		value: () => currentTime,
 		onValueChange: (timeToSet) => {
-			playerUserManualSeeking = true;
-			playerCurrentTime = timeToSet;
+			userManualSeeking = true;
+			currentTime = timeToSet;
 
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
 
 			playerSliderDebounce = setTimeout(() => {
 				if (playerElement) {
 					playerElement.currentTime = timeToSet;
-					playerUserManualSeeking = false;
+					userManualSeeking = false;
 				}
 			}, 300);
 		},
@@ -151,14 +151,12 @@
 		step: 0.1
 	});
 
-	// eslint-disable-next-line no-undef
-	let playerAndroidUITimeout: NodeJS.Timeout;
+	let playerAndroidUITimeout: ReturnType<typeof setTimeout>;
 
 	let clickCount = $state(0);
-	// eslint-disable-next-line no-undef
-	let clickCounterTimeout: NodeJS.Timeout;
+	let clickCounterTimeout: ReturnType<typeof setTimeout>;
 
-	let seekDirection: 'forwards' | 'backwards' = $state('forwards');
+	let seekDirection: 'forwards' | 'backwards' | undefined = $state();
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	playertheatreModeIsActive.subscribe(async () => {
@@ -438,6 +436,8 @@
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
 			playerIsFullscreen = false;
+
+			setTimeout(() => updateVideoPlayerHeight(), 100);
 		} else {
 			playerContainer.requestFullscreen();
 			playerIsFullscreen = true;
@@ -583,10 +583,23 @@
 	// we calaculate player height to then allow children pages
 	// to wrap around it.
 	function updateVideoPlayerHeight() {
-		if (playerContainer) {
-			const height = playerContainer.getBoundingClientRect().height;
-			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+		if (!playerContainer) {
+			return;
 		}
+
+		const height = playerContainer.getBoundingClientRect().height;
+		document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+	}
+
+	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
+	function showPlayerUI() {
+		showControls = true;
+
+		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
+
+		showPlayerUiTimeout = setTimeout(() => {
+			showControls = false;
+		}, 5000);
 	}
 
 	onMount(async () => {
@@ -901,11 +914,11 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			if (!playerElement) return;
 
-			if (!playerUserManualSeeking) {
-				playerCurrentTime = playerElement.currentTime ?? 0;
+			if (!userManualSeeking) {
+				currentTime = playerElement.currentTime ?? 0;
 			}
 
-			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
+			if (playerMaxKnownTime === 0 || currentTime > playerMaxKnownTime) {
 				playerMaxKnownTime = Number(playerElement.currentTime);
 			}
 
@@ -924,7 +937,7 @@
 				playerBufferedTo = buffered.end(0);
 
 				const bufferedPercent = (playerBufferedTo / playerMaxKnownTime) * 100;
-				const progressPercent = (playerCurrentTime / playerMaxKnownTime) * 100;
+				const progressPercent = (currentTime / playerMaxKnownTime) * 100;
 
 				const bufferAhead = Math.max(0, bufferedPercent - progressPercent);
 
@@ -1060,6 +1073,8 @@
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		seekDirection = undefined;
+
 		if (Capacitor.getPlatform() === 'android') {
 			const initalControlsState = showControls.valueOf();
 
@@ -1109,7 +1124,7 @@
 			} else {
 				seekDirection = 'forwards';
 				playerElement.currentTime = Math.min(
-					playerElement.duration,
+					playerMaxKnownTime,
 					playerElement.currentTime + playerDoubleTapSeek
 				);
 			}
@@ -1145,7 +1160,7 @@
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
-		if (watchProgressInterval) clearTimeout(watchProgressInterval);
+		if (watchProgressInterval) clearInterval(watchProgressInterval);
 
 		if (sabrAdapter) sabrAdapter.dispose();
 
@@ -1167,7 +1182,9 @@
 	class:hide={showVideoRetry}
 	role="presentation"
 	onclick={onVideoClick}
-	onmouseenter={() => (showControls = true)}
+	onmouseenter={showPlayerUI}
+	onmousemove={showPlayerUI}
+	onscroll={showPlayerUI}
 	onmouseleave={() => (showControls = false)}
 	bind:this={playerContainer}
 >
@@ -1188,7 +1205,7 @@
 				{#if data.video.liveNow}
 					{$_('thumbnail.live')}
 				{:else}
-					{videoLength(playerCurrentTime)} / {videoLength(playerMaxKnownTime)}
+					{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
 				{/if}
 			</p>
 			<p class="chip inverse-primary">
@@ -1233,12 +1250,13 @@
 		<div id="player-controls" transition:fade>
 			<div
 				class="player-slider full-width"
+				class:disable-tv={$isAndroidTvStore}
 				{...playerTimelineSlider.root}
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
 				<div class="track">
-					{#if !playerUserManualSeeking}
+					{#if !userManualSeeking}
 						<div class="tooltip" style="position: absolute;left: var(--timeline-tooltip-left);">
 							{#if playerCloestSponsor}
 								{sponsorSegments[playerCloestSponsor.category]}
@@ -1254,15 +1272,11 @@
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						<div class="tooltip thumb-tooltip">
-							{videoLength(playerCurrentTime)}
+							{videoLength(currentTime)}
 						</div>
 					</div>
 				</div>
-				<div
-					bind:this={playerBufferBar}
-					class="buffered-bar"
-					class:hide={playerUserManualSeeking}
-				></div>
+				<div bind:this={playerBufferBar} class="buffered-bar" class:hide={userManualSeeking}></div>
 				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
 						class="chapter-marker"
@@ -1318,7 +1332,7 @@
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
-							{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+							{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
 						{/if}
 					</p>
 					{#if !$isAndroidTvStore}
@@ -1668,6 +1682,11 @@
 
 	.segment-marker {
 		background-color: var(--tertiary);
+	}
+
+	.disable-tv {
+		pointer-events: none;
+		cursor: not-allowed;
 	}
 
 	menu.mobile {

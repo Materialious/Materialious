@@ -434,6 +434,8 @@
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
 			playerIsFullscreen = false;
+
+			setTimeout(() => updateVideoPlayerHeight(), 100);
 		} else {
 			playerContainer.requestFullscreen();
 			playerIsFullscreen = true;
@@ -579,10 +581,12 @@
 	// we calaculate player height to then allow children pages
 	// to wrap around it.
 	function updateVideoPlayerHeight() {
-		if (playerContainer) {
-			const height = playerContainer.getBoundingClientRect().height;
-			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+		if (!playerContainer) {
+			return;
 		}
+
+		const height = playerContainer.getBoundingClientRect().height;
+		document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
 	}
 
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;

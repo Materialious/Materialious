@@ -154,7 +154,7 @@
 	let clickCount = $state(0);
 	let clickCounterTimeout: ReturnType<typeof setTimeout>;
 
-	let seekDirection: 'forwards' | 'backwards' = $state('forwards');
+	let seekDirection: 'forwards' | 'backwards' | undefined = $state();
 	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	playertheatreModeIsActive.subscribe(async () => {
@@ -1067,6 +1067,8 @@
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		seekDirection = undefined;
+
 		if (Capacitor.getPlatform() === 'android') {
 			const initalControlsState = showControls.valueOf();
 
@@ -1116,7 +1118,7 @@
 			} else {
 				seekDirection = 'forwards';
 				playerElement.currentTime = Math.min(
-					playerElement.duration,
+					playerMaxKnownTime,
 					playerElement.currentTime + playerDoubleTapSeek
 				);
 			}

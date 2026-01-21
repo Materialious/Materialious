@@ -87,7 +87,7 @@
 	};
 
 	let originalOrigination: ScreenOrientationResult | undefined;
-	let watchProgressInterval: ReturnType<typeof setTimeout>;
+	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let showVideoRetry = $state(false);
 
 	let androidInitialNetworkStatus: ConnectionStatus | undefined;
@@ -585,7 +585,16 @@
 		}
 	}
 
-	function showPlayerUI() {}
+	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
+	function showPlayerUI() {
+		showControls = true;
+
+		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
+
+		showPlayerUiTimeout = setTimeout(() => {
+			showControls = false;
+		}, 5000);
+	}
 
 	onMount(async () => {
 		shaka.polyfill.installAll();
@@ -1143,7 +1152,7 @@
 
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
-		if (watchProgressInterval) clearTimeout(watchProgressInterval);
+		if (watchProgressInterval) clearInterval(watchProgressInterval);
 
 		if (sabrAdapter) sabrAdapter.dispose();
 
@@ -1165,7 +1174,9 @@
 	class:hide={showVideoRetry}
 	role="presentation"
 	onclick={onVideoClick}
-	onmouseenter={() => (showControls = true)}
+	onmouseenter={showPlayerUI}
+	onmousemove={showPlayerUI}
+	onscroll={showPlayerUI}
 	onmouseleave={() => (showControls = false)}
 	bind:this={playerContainer}
 >

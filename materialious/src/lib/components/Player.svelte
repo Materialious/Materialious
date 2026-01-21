@@ -61,6 +61,8 @@
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+		currentTime?: number;
+		userManualSeeking?: boolean;
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 		showControls?: boolean;
@@ -70,6 +72,8 @@
 		data,
 		isEmbed = false,
 		playerElement = $bindable(undefined),
+		currentTime = $bindable(0),
+		userManualSeeking = $bindable(false),
 		showControls = false
 	}: Props = $props();
 
@@ -98,7 +102,6 @@
 	let playerContainer: HTMLElement;
 	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerCurrentPlaybackState = $state(false);
-	let playerCurrentTime = $state(0);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(true);
 	let playerVolume = $state(0);
@@ -115,23 +118,22 @@
 	let playerSliderElement: HTMLElement | undefined = $state();
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
-	let playerUserManualSeeking: boolean = $state(false);
 	let playerIsFullscreen: boolean = $state(false);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
 		step: 0.1,
-		value: () => playerCurrentTime,
+		value: () => currentTime,
 		onValueChange: (timeToSet) => {
-			playerUserManualSeeking = true;
-			playerCurrentTime = timeToSet;
+			userManualSeeking = true;
+			currentTime = timeToSet;
 
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
 
 			playerSliderDebounce = setTimeout(() => {
 				if (playerElement) {
 					playerElement.currentTime = timeToSet;
-					playerUserManualSeeking = false;
+					userManualSeeking = false;
 				}
 			}, 300);
 		},
@@ -912,11 +914,11 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			if (!playerElement) return;
 
-			if (!playerUserManualSeeking) {
-				playerCurrentTime = playerElement.currentTime ?? 0;
+			if (!userManualSeeking) {
+				currentTime = playerElement.currentTime ?? 0;
 			}
 
-			if (playerMaxKnownTime === 0 || playerCurrentTime > playerMaxKnownTime) {
+			if (playerMaxKnownTime === 0 || currentTime > playerMaxKnownTime) {
 				playerMaxKnownTime = Number(playerElement.currentTime);
 			}
 
@@ -935,7 +937,7 @@
 				playerBufferedTo = buffered.end(0);
 
 				const bufferedPercent = (playerBufferedTo / playerMaxKnownTime) * 100;
-				const progressPercent = (playerCurrentTime / playerMaxKnownTime) * 100;
+				const progressPercent = (currentTime / playerMaxKnownTime) * 100;
 
 				const bufferAhead = Math.max(0, bufferedPercent - progressPercent);
 
@@ -1203,7 +1205,7 @@
 				{#if data.video.liveNow}
 					{$_('thumbnail.live')}
 				{:else}
-					{videoLength(playerCurrentTime)} / {videoLength(playerMaxKnownTime)}
+					{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
 				{/if}
 			</p>
 			<p class="chip inverse-primary">
@@ -1248,12 +1250,13 @@
 		<div id="player-controls" transition:fade>
 			<div
 				class="player-slider full-width"
+				class:disable-tv={$isAndroidTvStore}
 				{...playerTimelineSlider.root}
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
 				<div class="track">
-					{#if !playerUserManualSeeking}
+					{#if !userManualSeeking}
 						<div class="tooltip" style="position: absolute;left: var(--timeline-tooltip-left);">
 							{#if playerCloestSponsor}
 								{sponsorSegments[playerCloestSponsor.category]}
@@ -1269,15 +1272,11 @@
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						<div class="tooltip thumb-tooltip">
-							{videoLength(playerCurrentTime)}
+							{videoLength(currentTime)}
 						</div>
 					</div>
 				</div>
-				<div
-					bind:this={playerBufferBar}
-					class="buffered-bar"
-					class:hide={playerUserManualSeeking}
-				></div>
+				<div bind:this={playerBufferBar} class="buffered-bar" class:hide={userManualSeeking}></div>
 				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
 						class="chapter-marker"
@@ -1333,7 +1332,7 @@
 						{#if data.video.liveNow}
 							{$_('thumbnail.live')}
 						{:else}
-							{videoLength(playerCurrentTime)} / {videoLength(data.video.lengthSeconds)}
+							{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
 						{/if}
 					</p>
 					{#if !$isAndroidTvStore}
@@ -1683,6 +1682,11 @@
 
 	.segment-marker {
 		background-color: var(--tertiary);
+	}
+
+	.disable-tv {
+		pointer-events: none;
+		cursor: not-allowed;
 	}
 
 	menu.mobile {

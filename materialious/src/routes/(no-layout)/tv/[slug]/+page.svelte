@@ -18,45 +18,51 @@
 	let showInfo = $state(false);
 	let playerCurrentTime: number = $state(0);
 	let showControls = $state(false);
+	let currentTime = $state(0);
+	let userManualSeeking = $state(false);
 
-	let seekInterval: ReturnType<typeof setTimeout> | undefined;
-	let seekStartTime: number = 0;
+	let seekRaf: number | null = null;
+	let seekStartTime = 0;
 	let isSeeking = false;
+	let lastUpdate = 0;
 
 	function startSeeking(direction: 'left' | 'right') {
+		showControls = true;
+
 		if (!playerElement || showInfo || isSeeking) return true;
 
+		userManualSeeking = true;
 		isSeeking = true;
-		showControls = true;
-		seekStartTime = Date.now();
+		lastUpdate = performance.now();
 
-		const videoDuration = data.video.lengthSeconds;
-		const baseSeekAmount = videoDuration * 0.005; // 0.5% of video duration as base
+		const duration = data.video.lengthSeconds;
+		const base = duration * 0.005; // ~0.5%
 
-		// Initial seek
-		if (direction === 'right') {
-			playerElement.currentTime = Math.min(
-				playerElement.currentTime + baseSeekAmount,
-				videoDuration
-			);
-		} else {
-			playerElement.currentTime = Math.max(playerElement.currentTime - baseSeekAmount, 0);
+		function step(now: number) {
+			if (!isSeeking) return;
+
+			const elapsedTotal = (now - seekStartTime) / 1000; // total hold time
+			const throttleDelta = now - lastUpdate;
+
+			// only update every ~100ms so we don’t overshoot
+			if (throttleDelta > 100) {
+				const factor = 1 + Math.min(elapsedTotal ** 1.2, 3); // gentler acceleration
+				const amount = base * factor;
+
+				if (direction === 'right') {
+					currentTime = Math.min(currentTime + amount, duration);
+				} else {
+					currentTime = Math.max(currentTime - amount, 0);
+				}
+
+				lastUpdate = now;
+			}
+
+			seekRaf = requestAnimationFrame(step);
 		}
 
-		// Progressive seeking
-		seekInterval = setInterval(() => {
-			if (!playerElement || !isSeeking) return;
-
-			const holdDuration = (Date.now() - seekStartTime) / 1000; // in seconds
-			const acceleration = Math.min(holdDuration * 0.5, 5); // Cap at 5x acceleration
-			const seekAmount = baseSeekAmount * (1 + acceleration);
-
-			if (direction === 'right') {
-				playerElement.currentTime = Math.min(playerElement.currentTime + seekAmount, videoDuration);
-			} else {
-				playerElement.currentTime = Math.max(playerElement.currentTime - seekAmount, 0);
-			}
-		}, 100);
+		seekStartTime = performance.now();
+		seekRaf = requestAnimationFrame(step);
 
 		return false;
 	}
@@ -64,11 +70,16 @@
 	function stopSeeking() {
 		isSeeking = false;
 		showControls = false;
-		if (seekInterval) {
-			clearInterval(seekInterval);
-			seekInterval = undefined;
+		userManualSeeking = false;
+
+		if (seekRaf !== null) {
+			cancelAnimationFrame(seekRaf);
+			seekRaf = null;
 		}
-		return false;
+
+		if (playerElement) {
+			playerElement.currentTime = currentTime;
+		}
 	}
 
 	onMount(() => {
@@ -149,14 +160,18 @@
 
 	onDestroy(() => {
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter']);
-		if (seekInterval) {
-			clearInterval(seekInterval);
-		}
 	});
 </script>
 
 {#key data.video.videoId}
-	<Player bind:playerElement isEmbed={true} {data} {showControls} />
+	<Player
+		bind:playerElement
+		bind:currentTime
+		bind:userManualSeeking
+		isEmbed={true}
+		{data}
+		{showControls}
+	/>
 {/key}
 
 {#if showInfo}

@@ -140,7 +140,7 @@
 		max: () => playerMaxKnownTime
 	});
 
-	const playerVolumeSlier = new Slider({
+	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
 			if (!playerElement) return;
 			playerElement.volume = volumeToSet;
@@ -148,7 +148,7 @@
 		value: () => playerVolume,
 		max: 1,
 		min: 0,
-		step: 0.1
+		step: 0.01
 	});
 
 	let playerAndroidUITimeout: ReturnType<typeof setTimeout>;
@@ -1180,6 +1180,7 @@
 	class:contain-video={!$isAndroidTvStore}
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
+	class:hide-cursor={!showControls}
 	role="presentation"
 	onclick={onVideoClick}
 	onmouseenter={showPlayerUI}
@@ -1314,11 +1315,11 @@
 							<div
 								bind:this={playerVolumeElement}
 								class="player-slider volume m l"
-								{...playerVolumeSlier.root}
+								{...playerVolumeSlider.root}
 							>
 								<div class="track">
 									<div class="range"></div>
-									<div {...playerVolumeSlier.thumb}></div>
+									<div {...playerVolumeSlider.thumb}></div>
 								</div>
 							</div>
 						{/if}
@@ -1737,5 +1738,9 @@
 		background-color: var(--inverse-primary);
 		color: var(--primary);
 		border: none;
+	}
+
+	.hide-cursor {
+		cursor: none;
 	}
 </style>

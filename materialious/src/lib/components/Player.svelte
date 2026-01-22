@@ -58,6 +58,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from './Toast.svelte';
+	import { isMobile } from '$lib/misc';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -1075,7 +1076,7 @@
 	) {
 		seekDirection = undefined;
 
-		if (Capacitor.getPlatform() === 'android') {
+		if (isMobile()) {
 			const initalControlsState = showControls.valueOf();
 
 			if (playerAndroidUITimeout) {
@@ -1311,7 +1312,7 @@
 								{/if}
 							</i>
 						</button>
-						{#if Capacitor.getPlatform() !== 'android'}
+						{#if !isMobile()}
 							<div
 								bind:this={playerVolumeElement}
 								class="player-slider volume m l"

@@ -22,6 +22,19 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
 
+export function isMobile(): boolean {
+	const userAgent = navigator.userAgent;
+
+	const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+	const isSmallScreen = window.innerWidth < 768;
+	const isUserAgentMobile =
+		/Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+	return (
+		(hasTouchSupport && isSmallScreen && isUserAgentMobile) || Capacitor.getPlatform() === 'android'
+	);
+}
+
 export function isVideoID(videoId: string): boolean {
 	const regExp = /^[a-zA-Z0-9_-]{11}$/;
 	return regExp.test(videoId);

@@ -22,7 +22,7 @@
 		synciousInstanceStore,
 		synciousStore
 	} from '../store';
-	import { queueSyncious } from '$lib/api/apiExtended';
+	import { queueGetWatchProgress } from '$lib/api/apiExtended';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -109,7 +109,7 @@
 
 		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
 			try {
-				progress = (await queueSyncious(video.videoId))?.time?.toString() ?? undefined;
+				progress = (await queueGetWatchProgress(video.videoId))?.time?.toString() ?? undefined;
 			} catch {
 				// Continue regardless of error
 			}

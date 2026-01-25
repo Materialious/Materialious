@@ -1,8 +1,8 @@
-import type { SynciousProgressModel } from './model';
+import type { ApiExntendedProgressModel } from './model';
 import { getVideoProgress } from '.';
 
 const videoIds: string[] = [];
-const pendingResolves = new Map<string, (result: SynciousProgressModel | undefined) => void>();
+const pendingResolves = new Map<string, (result: ApiExntendedProgressModel | undefined) => void>();
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
 const DEBOUNCE_MS = 1000;
@@ -15,10 +15,10 @@ async function processBatches(): Promise<void> {
 		batches.push(videoIds.splice(0, BATCH_SIZE));
 	}
 
-	const results: SynciousProgressModel[] = [];
+	const results: ApiExntendedProgressModel[] = [];
 
 	for (const batch of batches) {
-		const res: SynciousProgressModel[] = await getVideoProgress(batch.join(','));
+		const res: ApiExntendedProgressModel[] = await getVideoProgress(batch.join(','));
 		results.push(...res);
 
 		// Resolve pending promises for this batch
@@ -33,10 +33,12 @@ async function processBatches(): Promise<void> {
 	}
 }
 
-export function queueSyncious(videoId: string): Promise<SynciousProgressModel | undefined> {
+export function queueGetWatchProgress(
+	videoId: string
+): Promise<ApiExntendedProgressModel | undefined> {
 	videoIds.push(videoId);
 
-	const promise = new Promise<SynciousProgressModel | undefined>((resolve) => {
+	const promise = new Promise<ApiExntendedProgressModel | undefined>((resolve) => {
 		pendingResolves.set(videoId, resolve);
 	});
 

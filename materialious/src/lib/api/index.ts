@@ -27,7 +27,7 @@ import type {
 	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
-	SynciousProgressModel,
+	ApiExntendedProgressModel,
 	Video,
 	VideoPlay
 } from './model';
@@ -447,7 +447,7 @@ function buildApiExtendedAuthHeaders(): Record<string, Record<string, string>> {
 export async function getVideoProgress(
 	videoId: string,
 	fetchOptions: RequestInit = {}
-): Promise<SynciousProgressModel[]> {
+): Promise<ApiExntendedProgressModel[]> {
 	const resp = await fetchErrorHandle(
 		await fetch(`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`, {
 			...buildApiExtendedAuthHeaders(),

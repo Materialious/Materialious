@@ -1,4 +1,4 @@
-import { patchYoutubeJs } from '$lib/patches/youtubejs';
+import { getVideoTYjs } from '$lib/api/youtubejs';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
@@ -27,7 +27,7 @@ import type {
 	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
-	SynciousProgressModel,
+	ApiExntendedProgressModel,
 	Video,
 	VideoPlay
 } from './model';
@@ -86,13 +86,13 @@ export async function getVideo(
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
 	if (get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) {
-		return await patchYoutubeJs(videoId);
+		return await getVideoTYjs(videoId);
 	}
 
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
 
 	if (!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform()) {
-		return await patchYoutubeJs(videoId);
+		return await getVideoTYjs(videoId);
 	} else {
 		await fetchErrorHandle(resp);
 	}
@@ -447,7 +447,7 @@ function buildApiExtendedAuthHeaders(): Record<string, Record<string, string>> {
 export async function getVideoProgress(
 	videoId: string,
 	fetchOptions: RequestInit = {}
-): Promise<SynciousProgressModel[]> {
+): Promise<ApiExntendedProgressModel[]> {
 	const resp = await fetchErrorHandle(
 		await fetch(`${get(synciousInstanceStore)}/video/${encodeURIComponent(videoId)}`, {
 			...buildApiExtendedAuthHeaders(),

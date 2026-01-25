@@ -285,7 +285,7 @@ export interface DeArrow {
 	videoDuration: number;
 }
 
-export interface SynciousProgressModel {
+export interface ApiExntendedProgressModel {
 	time: number;
 	video_id: string;
 }

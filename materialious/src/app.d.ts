@@ -1,6 +1,5 @@
-// See https://kit.svelte.dev/docs/types#app
+import type { IGetChallengeResponse } from 'youtubei.js';
 
-// for information about these interfaces
 declare global {
 	namespace App {
 		// interface Error {}
@@ -11,7 +10,11 @@ declare global {
 	}
 	interface Window {
 		electronAPI: {
-			generatePoToken: (requestKey: string, visitorData: string) => Promise<string>;
+			generatePoToken: (
+				requestKey: string,
+				visitorData: string,
+				challenge: IGetChallengeResponse
+			) => Promise<string>;
 			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promoise<boolean>;
 			doUpdateCheck: (disableAutoUpdate: boolean) => Promise<void>;
 		};

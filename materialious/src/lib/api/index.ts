@@ -1,4 +1,4 @@
-import { patchYoutubeJs } from '$lib/patches/youtubejs';
+import { getVideoTYjs } from '$lib/api/youtubejs';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
@@ -86,13 +86,13 @@ export async function getVideo(
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
 	if (get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) {
-		return await patchYoutubeJs(videoId);
+		return await getVideoTYjs(videoId);
 	}
 
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
 
 	if (!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform()) {
-		return await patchYoutubeJs(videoId);
+		return await getVideoTYjs(videoId);
 	} else {
 		await fetchErrorHandle(resp);
 	}

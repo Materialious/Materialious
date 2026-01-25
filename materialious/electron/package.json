@@ -32,7 +32,8 @@
 		"electron-updater": "^6.3.4",
 		"electron-window-state": "^5.0.3",
 		"jsdom": "^27.4.0",
-		"jsonfile": "^6.2.0"
+		"jsonfile": "^6.2.0",
+		"youtubei.js": "^16.0.1"
 	},
 	"devDependencies": {
 		"electron": "^40.0.0",

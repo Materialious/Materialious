@@ -35,7 +35,7 @@ Platform.shim.eval = async (
 	return new Function(code)();
 };
 
-export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
+export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 	if (!Capacitor.isNativePlatform()) {
 		throw new Error('Platform not supported');
 	}
@@ -82,7 +82,8 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 		throw new Error('Unable to pull video info from youtube.js');
 	}
 
-	poTokenCacheStore.set(await platformMinter(requestKey, videoId));
+	const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+	poTokenCacheStore.set(await platformMinter(requestKey, videoId, challengeResponse));
 
 	let dashUri: string | undefined;
 
@@ -90,7 +91,7 @@ export async function patchYoutubeJs(videoId: string): Promise<VideoPlay> {
 	// https://github.com/LuanRT/googlevideo/issues/42
 	if (video.streaming_data)
 		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.filter(
-			(format) => format.xtags !== 'CgcKAnZiEgEx'
+			(format) => !format.xtags
 		);
 
 	const adaptiveFormats: AdaptiveFormats[] = [];

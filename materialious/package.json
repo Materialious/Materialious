@@ -74,7 +74,7 @@
 		"melt": "^0.44.0",
 		"mousetrap": "^1.6.5",
 		"peerjs": "^1.5.5",
-		"shaka-player": "^4.16.14",
+		"shaka-player": "^4.16.15",
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"youtubei.js": "^16.0.1",

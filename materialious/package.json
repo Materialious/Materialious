@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.13.9",
+	"version": "1.13.10",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -37,13 +37,12 @@
 		"svelte-check": "^4.3.3",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
-		"vite": "^7.3.1",
-		"typescript-eslint": "^8.53.1"
+		"typescript-eslint": "^8.53.1",
+		"vite": "^7.3.1"
 	},
 	"type": "module",
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.1",
-		"@capacitor-community/safe-area": "^8.0.1",
 		"@capacitor/android": "^8.0.0",
 		"@capacitor/app": "^8.0.0",
 		"@capacitor/browser": "^8.0.0",

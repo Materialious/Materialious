@@ -1,8 +1,7 @@
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, SystemBarType } from '@capacitor/core';
 import ui from 'beercss';
-import { tick } from 'svelte';
 import { get } from 'svelte/store';
-import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
+import { SystemBars, SystemBarsStyle } from '@capacitor/core';
 import { darkModeStore, interfaceAmoledTheme } from './store';
 
 export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
@@ -20,18 +19,14 @@ export async function getDynamicTheme(mode?: string): Promise<Record<string, str
 
 export async function setStatusBarColor() {
 	if (Capacitor.getPlatform() !== 'android') return;
-
-	await tick();
-
-	await SafeArea.setSystemBarsStyle({
+	await SystemBars.setStyle({
 		style: get(darkModeStore) ? SystemBarsStyle.Dark : SystemBarsStyle.Light
 	});
-
-	await SafeArea.showSystemBars({
-		type: SystemBarsType.NavigationBar
+	await SystemBars.show({
+		bar: SystemBarType.NavigationBar
 	});
-	await SafeArea.showSystemBars({
-		type: SystemBarsType.StatusBar
+	await SystemBars.show({
+		bar: SystemBarType.StatusBar
 	});
 }
 

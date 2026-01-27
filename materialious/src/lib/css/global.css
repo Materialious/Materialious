@@ -45,7 +45,16 @@ button,
 }
 
 nav.top {
-	padding: 1em 0;
+	padding-bottom: 1em;
+	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
+}
+
+nav.bottom {
+	padding-bottom: var(--safe-area-inset-bottom) !important;
+}
+
+dialog {
+	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 }
 
 main.root {

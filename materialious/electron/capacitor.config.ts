@@ -6,10 +6,7 @@ const config: CapacitorConfig = {
 	webDir: 'build',
 	plugins: {
 		CapacitorNodeJS: {
-			nodeDir: 'nodejs-android'
-		},
-		SystemBars: {
-			insetsHandling: 'disable'
+			nodeDir: 'nodejsAndroid'
 		}
 	},
 	server: {

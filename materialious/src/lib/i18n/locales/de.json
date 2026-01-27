@@ -181,7 +181,8 @@
             "tangentJokes": "Füllende Abweichler/Witze",
             "automatic": "Automatisch überspringen",
             "manual": "Manuell überspringen",
-            "timeline": "Nur Zeitleiste"
+            "timeline": "Nur Zeitleiste",
+            "musicOffTopic": "Nicht-musikalisches Segment"
         },
         "deArrow": {
             "title": "DeArrow",
@@ -194,7 +195,9 @@
         "expandChapters": "Kapitel standardmäßig ausklappen",
         "displayThumbnailAvatars": "Vorschaubild-Avatare (Langsam)",
         "about": "Über",
-        "androidNativeShare": "Natives Teilen nutzen"
+        "androidNativeShare": "Natives Teilen nutzen",
+        "joinSyncParty": "Synchronisationsgruppen-URL eingeben",
+        "shareURL": "URL teilen"
     },
     "subscribe": "Abonnieren",
     "recommendedVideos": "Vorgeschlagene Videos",

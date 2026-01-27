@@ -31,7 +31,7 @@ jobs:
               run: cd ../ && npm install
 
             - name: Build android nodejs packages
-              run: cd ../static/nodejs-android && npm install
+              run: cd ../static/nodejsAndroid && npm install
 
             - name: Build package
               run: cd ../ && npm run build

@@ -47,7 +47,8 @@
             "tangentJokes": "Kitöltő mellékvágányok/poénok",
             "automatic": "Automatikus átugrás",
             "manual": "Kézi ugrás",
-            "timeline": "Csak idővonal"
+            "timeline": "Csak idővonal",
+            "musicOffTopic": "Nem zenei szegmens"
         },
         "syncPartyWarning": "Vegye figyelembe, hogy IP-címe látható lesz az Ön által meghívott felhasználók számára.",
         "expandDescription": "Leírás kibontása alapértelmezetten",

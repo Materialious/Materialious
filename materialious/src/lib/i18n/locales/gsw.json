@@ -49,7 +49,8 @@
             "tangentJokes": "Füllendi Abwiichler/Witz",
             "automatic": "Automatisch überspringe",
             "manual": "Manuell überspringe",
-            "timeline": "Nur Ziitleischte"
+            "timeline": "Nur Ziitleischte",
+            "musicOffTopic": "Nöd-musikalischs Segment"
         },
         "interface": "Bedienoberflächi",
         "star": "Sternli uf GitHub vergeh!",
@@ -92,7 +93,9 @@
         "expandDescription": "Beschriibig standardmässig erwiitere",
         "disableAutoUpdate": "Automatischi Updates deaktiviere",
         "about": "Über",
-        "androidNativeShare": "Nativs Teile bruche"
+        "androidNativeShare": "Nativs Teile bruche",
+        "shareURL": "URL teile",
+        "joinSyncParty": "Synchronistationsgruppe-URL iigeh"
     },
     "videos": "Videos",
     "cancel": "Abbreche",

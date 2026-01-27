@@ -67,7 +67,7 @@ export default ts.config(
 			'package-lock.json',
 			'yarn.lock',
 			// Ignore our nodejs android code
-			'**/nodejs-android/*',
+			'**/nodejsAndroid/*',
 			// Ignore electron code from capacitorjs
 			'**/electron/*',
 			// Ignore build files

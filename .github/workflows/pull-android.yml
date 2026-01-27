@@ -1,46 +1,46 @@
 name: Check Android
 
 on:
-  pull_request:
-    branches: ["main"]
+    pull_request:
+        branches: ["main"]
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  android-check:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./materialious/android
+    android-check:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./materialious/android
 
-    steps:
-      - uses: actions/checkout@v3
+        steps:
+            - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: latest
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: latest
 
-      - name: Install modules
-        run: cd ../ && npm install
+            - name: Install modules
+              run: cd ../ && npm install
 
-      - name: Build android nodejs packages
-        run: cd ../static/nodejs-android && npm install
+            - name: Build android nodejs packages
+              run: cd ../static/nodejsAndroid && npm install
 
-      - name: Build package
-        run: cd ../ && npm run build
+            - name: Build package
+              run: cd ../ && npm run build
 
-      - name: Sync package
-        run: cd ../ && npx cap sync
+            - name: Sync package
+              run: cd ../ && npx cap sync
 
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: "zulu"
-          java-version: "21"
-          cache: "gradle"
+            - name: Setup JDK
+              uses: actions/setup-java@v3
+              with:
+                  distribution: "zulu"
+                  java-version: "21"
+                  cache: "gradle"
 
-      - name: Build App
-        run: |
-          bash gradlew assembleRelease
-          bash gradlew bundleRelease
+            - name: Build App
+              run: |
+                  bash gradlew assembleRelease
+                  bash gradlew bundleRelease

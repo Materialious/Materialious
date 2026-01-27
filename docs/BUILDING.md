@@ -26,6 +26,6 @@ Materialious desktop builds are handled through GitHub using [prod-desktop.yml](
 ### Android Release
 Android builds are handled using the workflow [prod-android.yml](../.github/workflows/prod-android.yml).
 
-- After running the standard `npm install` and `npm run build` commands, we install the modules located in [nodejs-android/](../materialious/static/nodejs-android/) for [Capacitor-NodeJS](https://github.com/hampoelz/Capacitor-NodeJS).
+- After running the standard `npm install` and `npm run build` commands, we install the modules located in [nodejsAndroid/](../materialious/static/nodejsAndroid/) for [Capacitor-NodeJS](https://github.com/hampoelz/Capacitor-NodeJS).
 - The `npx cap sync` command is used to synchronize with [Capacitor](https://capacitorjs.com).
 - The Android build is processed using [setup-java](https://github.com/actions/setup-java/tree/v3/), followed by signing the APK with [sign-android-release](https://github.com/ilharp/sign-android-release/tree/v1.0.4).

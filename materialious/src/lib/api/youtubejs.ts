@@ -91,7 +91,7 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 	// https://github.com/LuanRT/googlevideo/issues/42
 	if (video.streaming_data)
 		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.filter(
-			(format) => !format.xtags
+			(format) => format.xtags !== 'CgcKAnZiEgEx'
 		);
 
 	const adaptiveFormats: AdaptiveFormats[] = [];

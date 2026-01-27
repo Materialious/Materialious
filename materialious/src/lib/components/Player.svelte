@@ -3,7 +3,7 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
 	import { type PhasedDescription, type Timestamp } from '$lib/timestamps';
-	import { SafeArea, SystemBarsStyle, SystemBarsType } from '@capacitor-community/safe-area';
+	import { SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { error, type Page } from '@sveltejs/kit';
@@ -264,14 +264,12 @@
 
 		if (isFullScreen) {
 			// Ensure bar color is black while in fullscreen
-			await SafeArea.setSystemBarsStyle({
-				style: SystemBarsStyle.Dark
+			await SystemBars.setStyle({ style: SystemBarsStyle.Light });
+			await SystemBars.hide({
+				bar: SystemBarType.NavigationBar
 			});
-			await SafeArea.hideSystemBars({
-				type: SystemBarsType.NavigationBar
-			});
-			await SafeArea.hideSystemBars({
-				type: SystemBarsType.StatusBar
+			await SystemBars.hide({
+				bar: SystemBarType.StatusBar
 			});
 		} else {
 			await setStatusBarColor();

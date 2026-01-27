@@ -604,6 +604,11 @@
 	onMount(async () => {
 		shaka.polyfill.installAll();
 		if (!shaka.Player.isBrowserSupported()) {
+			addToast({
+				data: {
+					text: 'Browser not supported for playback.'
+				}
+			});
 			return;
 		}
 

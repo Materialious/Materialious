@@ -707,12 +707,12 @@
 				isPlaying: true,
 				hasClose: true,
 				dismissable: true,
-				playIcon: 'media_play',
-				pauseIcon: 'media_pause',
-				prevIcon: 'media_prev',
-				nextIcon: 'media_next',
-				closeIcon: 'media_close',
-				notificationIcon: 'notification',
+				playIcon: '',
+				pauseIcon: '',
+				prevIcon: '',
+				nextIcon: '',
+				closeIcon: '',
+				notificationIcon: '',
 				ticker: `Now playing "${data.video.title}"`
 			});
 

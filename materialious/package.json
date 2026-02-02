@@ -43,7 +43,7 @@
 	"type": "module",
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.1",
-		"@capacitor/android": "^8.0.0",
+		"@capacitor/android": "^8.0.2",
 		"@capacitor/app": "^8.0.0",
 		"@capacitor/browser": "^8.0.0",
 		"@capacitor/clipboard": "^8.0.0",

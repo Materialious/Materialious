@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { isAndroidTvStore } from '$lib/store';
 	import { App } from '@capacitor/app';
+	import { Capacitor } from '@capacitor/core';
 
 	let { children } = $props();
 

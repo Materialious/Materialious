@@ -40,5 +40,10 @@ export default defineConfig({
 	},
 	define: {
 		'import.meta.env.APP_VERSION': JSON.stringify(pkg.version)
+	},
+	server: {
+		fs: {
+			allow: ['static/inter.ttf']
+		}
 	}
 });

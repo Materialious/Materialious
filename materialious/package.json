@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.13.10",
+	"version": "1.13.11",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -54,7 +54,7 @@
 		"@capacitor/share": "^8.0.0",
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
-		"beercss": "^3.13.1",
+		"beercss": "^4.0.2",
 		"bgutils-js": "^3.2.0",
 		"buffer": "^6.0.3",
 		"capacitor-music-controls-plugin": "^6.1.0",
@@ -77,6 +77,6 @@
 		"sponsorblock-api": "^0.2.4",
 		"svelte-infinite-loading": "^1.4.0",
 		"youtubei.js": "^16.0.1",
-		"zod": "^4.3.5"
+		"zod": "^4.3.6"
 	}
 }

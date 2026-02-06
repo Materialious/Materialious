@@ -129,6 +129,8 @@
 			userManualSeeking = true;
 			currentTime = timeToSet;
 
+			setPlayerTimelineChapters(currentTime);
+
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
 
 			playerSliderDebounce = setTimeout(() => {
@@ -165,8 +167,20 @@
 		updateVideoPlayerHeight();
 	});
 
-	function getMarkerWidth(startTime: number, endTime: number): string {
-		return `${((endTime - startTime) / playerMaxKnownTime) * 100}%`;
+	const markerGapSize = 0.5;
+	const minVisiblePercent = 0.05;
+	function timelineMarker(startTime: number, endTime?: number): string {
+		const ratio = (endTime ? endTime - startTime : startTime) / playerMaxKnownTime;
+		if (ratio <= 0) return `0%`;
+
+		let percent = ratio * 100;
+		if (percent - markerGapSize >= minVisiblePercent) {
+			percent = percent - markerGapSize;
+		} else {
+			percent = minVisiblePercent;
+		}
+
+		return `${percent}%`;
 	}
 
 	function restoreDefaultLanguage() {
@@ -1032,6 +1046,26 @@
 		}
 	}
 
+	function setPlayerTimelineChapters(currentTime: number) {
+		if (data.content.timestamps.length > 0) {
+			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
+				let endTime: number;
+				if (chapterIndex === data.content.timestamps.length - 1) {
+					endTime = data.video.lengthSeconds;
+				} else {
+					endTime = data.content.timestamps[chapterIndex + 1].time;
+				}
+				return currentTime >= chapter.time && currentTime < endTime;
+			});
+		}
+
+		if (segments.length > 0) {
+			playerCloestSponsor = segments.find((segment) => {
+				return currentTime >= segment.startTime && currentTime < segment.endTime;
+			});
+		}
+	}
+
 	let requestAnimationTooltip: number | undefined;
 	function timelineMouseMove(event: MouseEvent) {
 		if (requestAnimationTooltip) return;
@@ -1049,24 +1083,7 @@
 
 			document.documentElement.style.setProperty('--timeline-tooltip-left', `${percent * 100}%`);
 
-			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
-				let endTime: number;
-				if (chapterIndex === data.content.timestamps.length - 1) {
-					endTime = data.video.lengthSeconds;
-				} else {
-					endTime = data.content.timestamps[chapterIndex + 1].time;
-				}
-				return playerTimelineTimeHover >= chapter.time && playerTimelineTimeHover < endTime;
-			});
-
-			if (segments.length > 0) {
-				playerCloestSponsor = segments.find((segment) => {
-					return (
-						playerTimelineTimeHover >= segment.startTime &&
-						playerTimelineTimeHover < segment.endTime
-					);
-				});
-			}
+			setPlayerTimelineChapters(playerTimelineTimeHover);
 
 			requestAnimationTooltip = undefined;
 		});
@@ -1277,6 +1294,14 @@
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						<div class="tooltip thumb-tooltip">
+							{#if playerCloestSponsor}
+								{sponsorSegments[playerCloestSponsor.category]}
+								<br />
+							{:else if playerCloestTimestamp}
+								{playerCloestTimestamp.title}
+								<br />
+							{/if}
+
 							{videoLength(currentTime)}
 						</div>
 					</div>
@@ -1285,8 +1310,8 @@
 				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
 						class="chapter-marker"
-						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
-						style:width={getMarkerWidth(
+						style:left={timelineMarker(chapter.time)}
+						style:width={timelineMarker(
 							chapter.time,
 							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
 						)}
@@ -1296,8 +1321,8 @@
 					{#each segments as segment (segment)}
 						<div
 							class="chapter-marker segment-marker"
-							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
-							style:width={getMarkerWidth(segment.startTime, segment.endTime)}
+							style:left={timelineMarker(segment.startTime)}
+							style:width={timelineMarker(segment.startTime, segment.endTime)}
 						></div>
 					{/each}
 				{/if}
@@ -1617,6 +1642,7 @@
 		inset: 0;
 		right: var(--percentage-inv);
 		border-radius: 0.25rem;
+		opacity: 0.5;
 	}
 
 	.player-slider [data-melt-slider-thumb] {
@@ -1650,13 +1676,13 @@
 	}
 
 	.seek-double-click.buffer-right {
-		border-top-left-radius: 2rem;
-		border-bottom-left-radius: 2rem;
+		border-top-left-radius: 0.25rem;
+		border-bottom-left-radius: 0.25rem;
 	}
 
 	.seek-double-click.buffer-left {
-		border-top-right-radius: 2rem;
-		border-bottom-right-radius: 2rem;
+		border-top-right-radius: 0.25rem;
+		border-bottom-right-radius: 0.25rem;
 	}
 
 	.buffered-bar {
@@ -1668,8 +1694,9 @@
 		transform: translateY(-50%);
 		z-index: 1;
 		pointer-events: none;
-		border-top-right-radius: 2rem;
-		border-bottom-right-radius: 2rem;
+		border-top-right-radius: 0.25rem;
+		border-bottom-right-radius: 0.25rem;
+		opacity: 0.5;
 	}
 
 	.chapter-marker {
@@ -1679,10 +1706,10 @@
 		left: 0;
 		height: 1rem;
 		background-color: var(--secondary);
-		opacity: 0.5;
-		border-radius: 2rem;
+		border-radius: 0.25rem;
 		z-index: 2;
 		pointer-events: none;
+		opacity: 0.5;
 	}
 
 	.segment-marker {

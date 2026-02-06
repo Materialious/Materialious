@@ -4,11 +4,25 @@
 
 :root {
 	--video-player-height: 0px;
+	--safe-area-inset-top: 0px;
 }
 
 @font-face {
 	font-family: Inter;
 	src: url('/inter.ttf');
+}
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+:has(>main) {
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .hide {
@@ -58,9 +72,10 @@ dialog {
 }
 
 main.root {
-	max-height: 100vh;
+	min-height: 0;
 	overflow-y: auto;
 	overflow-x: hidden;
+	overscroll-behavior: contain;
 }
 
 .row {

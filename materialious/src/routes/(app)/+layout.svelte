@@ -61,7 +61,12 @@
 
 	page.subscribe((pageData) => {
 		playerIsPip = !pageData.url.pathname.includes('/watch');
+		requestAnimationFrame(() => resetScroll());
 	});
+
+	playerState.subscribe((player) => {
+		requestAnimationFrame(() => resetScroll());
+	})
 
 	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
@@ -194,6 +199,13 @@
 		await ui('theme', hex);
 	});
 
+	function resetScroll() {
+		const main = document.querySelector('main.root');
+		if (main) main.scrollTop = 0;
+		document.documentElement.scrollTop = 0;
+		document.body.scrollTop = 0;
+	}
+
 	onMount(async () => {
 		ui();
 
@@ -233,6 +245,7 @@
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));
 		}
+		resetScroll();
 	});
 
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');

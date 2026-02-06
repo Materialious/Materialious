@@ -302,6 +302,13 @@
 	</nav>
 	{#if !$isAndroidTvStore}
 		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
+			{#if $playertheatreModeIsActive}
+				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
+					<a href={resolve($interfaceDefaultPage, {})}>
+						<Logo />
+					</a>
+				</header>
+			{/if}
 			{#if !mobileSearchShow}
 				<button
 					onclick={() => (mobileSearchShow = !mobileSearchShow)}

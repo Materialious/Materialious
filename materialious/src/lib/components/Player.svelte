@@ -129,6 +129,7 @@
 			userManualSeeking = true;
 			currentTime = timeToSet;
 
+			showPlayerUI();
 			setPlayerTimelineChapters(currentTime);
 
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
@@ -146,6 +147,7 @@
 	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
 			if (!playerElement) return;
+			showPlayerUI();
 			playerElement.volume = volumeToSet;
 		},
 		value: () => playerVolume,
@@ -153,8 +155,6 @@
 		min: 0,
 		step: 0.01
 	});
-
-	let playerAndroidUITimeout: ReturnType<typeof setTimeout>;
 
 	let clickCount = $state(0);
 	let clickCounterTimeout: ReturnType<typeof setTimeout>;
@@ -167,10 +167,10 @@
 		updateVideoPlayerHeight();
 	});
 
-	const markerGapSize = 0.5;
+	const markerGapSize = 0.1;
 	const minVisiblePercent = 0.05;
-	function timelineMarker(startTime: number, endTime?: number): string {
-		const ratio = (endTime ? endTime - startTime : startTime) / playerMaxKnownTime;
+	function timelineMarkerWidth(startTime: number, endTime: number): string {
+		const ratio = (endTime - startTime) / playerMaxKnownTime;
 		if (ratio <= 0) return `0%`;
 
 		let percent = ratio * 100;
@@ -1098,17 +1098,7 @@
 
 		if (isMobile()) {
 			const initalControlsState = showControls.valueOf();
-
-			if (playerAndroidUITimeout) {
-				clearTimeout(playerAndroidUITimeout);
-			}
-
-			showControls = true;
-
-			playerAndroidUITimeout = setTimeout(() => {
-				showControls = false;
-			}, 3000);
-
+			showPlayerUI();
 			if (!initalControlsState) return;
 		}
 
@@ -1182,12 +1172,9 @@
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
-
 		if (sabrAdapter) sabrAdapter.dispose();
-
 		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
-
-		if (playerAndroidUITimeout) clearTimeout(playerAndroidUITimeout);
+		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		if (player) {
 			player.unload();
@@ -1310,8 +1297,8 @@
 				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
 						class="chapter-marker"
-						style:left={timelineMarker(chapter.time)}
-						style:width={timelineMarker(
+						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
+						style:width={timelineMarkerWidth(
 							chapter.time,
 							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
 						)}
@@ -1321,8 +1308,8 @@
 					{#each segments as segment (segment)}
 						<div
 							class="chapter-marker segment-marker"
-							style:left={timelineMarker(segment.startTime)}
-							style:width={timelineMarker(segment.startTime, segment.endTime)}
+							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+							style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
 						></div>
 					{/each}
 				{/if}

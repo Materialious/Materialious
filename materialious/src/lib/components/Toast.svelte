@@ -62,6 +62,10 @@
 		padding: 0;
 	}
 
+	[data-melt-toaster-root]:empty {
+		display: none;
+	}
+
 	[data-melt-toaster-toast-content]:nth-last-child(n + 4) {
 		z-index: 1;
 		scale: 0.925;

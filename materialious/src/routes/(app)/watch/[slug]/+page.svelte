@@ -536,7 +536,7 @@
 		{/if}
 
 		{#if comments && comments.comments.length > 0}
-			<article class="border">
+			<article class="border comment-list">
 				<details>
 					<summary id="comment-section" class="none bold">
 						<nav>
@@ -551,7 +551,11 @@
 							<Comment {comment} videoId={data.video.videoId}></Comment>
 						{/each}
 						{#if comments.continuation}
-							<button onclick={loadMoreComments} class="margin">{$_('loadMore')}</button>
+							<div class="space"></div>
+							<button onclick={loadMoreComments} class="secondary">
+								<i>read_more</i>
+								<span>{$_('loadMore')}</span>
+							</button>
 						{/if}
 					</div>
 				</details>
@@ -709,6 +713,12 @@
 <style>
 	.chapter-list {
 		max-height: 300px;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+
+	.comment-list {
+		max-height: 600px;
 		overflow-y: scroll;
 		overflow-x: hidden;
 	}

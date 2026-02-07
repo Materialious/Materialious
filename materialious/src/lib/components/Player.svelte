@@ -120,6 +120,7 @@
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
+	let playerAirplayAvailability: boolean = $state(false);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -649,6 +650,11 @@
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
+		// Enable AirPlay if supported
+		if ((playerElement as any).webkitShowPlaybackTargetPicker) {
+			playerAirplayAvailability = true;
+		}
+
 		playerElement.loop = playerLoop;
 
 		if ($playerState) {
@@ -988,6 +994,12 @@
 		playerTextTracks = player.getTextTracks();
 	});
 
+	function handleAirPlayClick() {
+		if ((playerElement as any).webkitShowPlaybackTargetPicker) {
+			(playerElement as any).webkitShowPlaybackTargetPicker();
+		}
+	}
+
 	async function getLastPlayPos(): Promise<number> {
 		if (loadTimeFromUrl($page) || !$playerSavePlaybackPositionStore) return 0;
 
@@ -1201,6 +1213,7 @@
 		controls={false}
 		autoplay={$playerAutoPlayStore}
 		id="player"
+		x-webkit-airplay="allow"
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
 	{#if isEmbed && !$isAndroidTvStore}
@@ -1513,6 +1526,14 @@
 								{/if}
 							</menu>
 						</button>
+						{#if playerAirplayAvailability}
+							<button
+								class="inverse-primary"
+								onclick={handleAirPlayClick}
+								title="AirPlay">
+								<i>airplay</i>
+							</button>
+						{/if}
 						{#if document.pictureInPictureEnabled}
 							<button
 								class="inverse-primary"

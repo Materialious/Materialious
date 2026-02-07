@@ -64,7 +64,7 @@
 		requestAnimationFrame(() => resetScroll());
 	});
 
-	playerState.subscribe((player) => {
+	playerState.subscribe(() => {
 		requestAnimationFrame(() => resetScroll());
 	})
 

@@ -1172,12 +1172,9 @@
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
-
 		if (sabrAdapter) sabrAdapter.dispose();
-
 		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
-
-		if (playerAndroidUITimeout) clearTimeout(playerAndroidUITimeout);
+		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		if (player) {
 			player.unload();

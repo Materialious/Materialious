@@ -245,7 +245,32 @@ export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<
 	const resp = await fetchErrorHandle(
 		await fetch(buildPath('auth/subscriptions'), { ...buildAuthHeaders(), ...fetchOptions })
 	);
-	return await resp.json();
+	const subscriptions: Subscription[] = await resp.json();
+
+	const enrichedSubs = await Promise.all(
+		subscriptions.map(async (sub) => {
+			try {
+				const channelResp = await fetchErrorHandle(
+					await fetch(buildPath(`channels/${sub.authorId}`), fetchOptions)
+				);
+				const channelData = await channelResp.json();
+
+				return {
+					...sub,
+					authorBanners: channelData.authorBanners ?? [],
+					authorThumbnails: channelData.authorThumbnails ?? []
+				};
+			} catch (e) {
+				return {
+					...sub,
+					authorBanners: [],
+					authorThumbnails: []
+				};
+			}
+		})
+	);
+
+	return enrichedSubs;
 }
 
 export async function amSubscribed(

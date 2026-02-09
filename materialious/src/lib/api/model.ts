@@ -264,6 +264,8 @@ export interface Feed {
 export interface Subscription {
 	author: string;
 	authorId: string;
+	authorBanners: Image[];
+	authorThumbnails: Image[];
 }
 
 export interface DeArrow {

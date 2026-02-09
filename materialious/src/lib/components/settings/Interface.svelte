@@ -32,6 +32,7 @@
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
+	import { addToast } from '../Toast.svelte';
 
 	let invidiousInstance = $state(get(instanceStore));
 	let region = $state(get(interfaceRegionStore));
@@ -401,8 +402,14 @@
 		<h6>{$_('layout.bookmarklet')}</h6>
 		<button
 			class="no-margin"
-			onclick={async () => await Clipboard.write({ string: bookmarkletSaveToUrl() })}
-			>{$_('copyUrl')}</button
+			onclick={async () => {
+				await Clipboard.write({ string: bookmarkletSaveToUrl() });
+				addToast({
+					data: {
+						text: $_('player.share.copiedSuccess')
+					}
+				});
+			}}>{$_('copyUrl')}</button
 		>
 	</div>
 {/if}

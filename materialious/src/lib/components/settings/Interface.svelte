@@ -396,6 +396,7 @@
 </div>
 
 {#if !Capacitor.isNativePlatform()}
+	<div class="space"></div>
 	<div class="settings">
 		<h6>{$_('layout.bookmarklet')}</h6>
 		<button

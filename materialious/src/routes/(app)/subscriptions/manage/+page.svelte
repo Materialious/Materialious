@@ -50,6 +50,39 @@
 		window.addEventListener('resize', updateWidth);
 		return () => window.removeEventListener('resize', updateWidth);
 	});
+
+	function lazyBg(node: HTMLElement, src?: string) {
+		let obs: IntersectionObserver | null = null;
+
+		const observe = (url?: string) => {
+		if (obs) {
+			obs.disconnect();
+			obs = null;
+		}
+		if (!url) {
+			node.style.backgroundImage = '';
+			return;
+		}
+
+		obs = new IntersectionObserver((entries, o) => {
+			if (entries[0].isIntersecting) {
+				node.style.backgroundImage = `url(${url})`;
+				o.unobserve(node);
+			}
+		});
+			obs.observe(node);
+		};
+
+		observe(src);
+		return {
+			update(newSrc?: string) {
+				observe(newSrc); 
+			},
+			destroy() {
+				if (obs) obs.disconnect();
+			}
+		};
+	}
 </script>
 
 <div class="padding">
@@ -64,8 +97,8 @@
 
 	{#each subscriptions as sub (sub.authorId)}
 		<article
-			class="subscription-article"
-			style="background-image: url({closestByWidth(sub.authorBanners, pageWidth)?.url});"
+			use:lazyBg={closestByWidth(sub.authorBanners, pageWidth)?.url}
+			class="subscription-article lazy-bg"
 		>
 			<div class="banner-overlay"></div>
 
@@ -75,6 +108,7 @@
 						src={closestByWidth(sub.authorThumbnails, 64)?.url} 
 						alt={sub.author} 
 						class="sub-thumbnail rounded-circle"
+						loading="lazy"
 					/>
 					<h6 class="m-0">{sub.author}</h6>
 				</a>
@@ -127,6 +161,10 @@
 		inset: 0;
 		background-color: rgba(0, 0, 0, 0.3);
 		pointer-events: none;
+	}
+
+	.lazy-bg {
+		background-color: var(--surface-container-low);
 	}
 
 	.sub-thumbnail {

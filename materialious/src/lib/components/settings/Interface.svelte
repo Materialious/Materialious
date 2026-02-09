@@ -35,6 +35,7 @@
 		themeColorStore
 	} from '../../store';
 	import { addToast } from '../Toast.svelte';
+	import { tick } from 'svelte';
 
 	let invidiousInstance = $state(get(instanceStore));
 	let region = $state(get(interfaceRegionStore));
@@ -54,9 +55,10 @@
 		if (!color.hex) return;
 		if (colorPickerDebounce) clearTimeout(colorPickerDebounce);
 
-		colorPickerDebounce = setTimeout(() => {
-			setAmoledTheme();
+		colorPickerDebounce = setTimeout(async () => {
 			themeColorStore.set(color.hex);
+			await tick();
+			setAmoledTheme();
 		}, 10);
 	}
 
@@ -451,7 +453,7 @@
 		--cp-input-color: var(--surface);
 		--cp-button-hover-color: var(--surface-variant);
 		--slider-width: 50px;
-		--picker-width: 60vw;
+		--picker-width: 45vw;
 		width: 100%;
 	}
 

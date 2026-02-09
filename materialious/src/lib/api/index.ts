@@ -260,7 +260,7 @@ export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<
 					authorBanners: channelData.authorBanners ?? [],
 					authorThumbnails: channelData.authorThumbnails ?? []
 				};
-			} catch (e) {
+			} catch {
 				return {
 					...sub,
 					authorBanners: [],

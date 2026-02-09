@@ -536,7 +536,7 @@
 		{/if}
 
 		{#if comments && comments.comments.length > 0}
-			<article class="border comment-list">
+			<article class="border">
 				<details>
 					<summary id="comment-section" class="none bold">
 						<nav>
@@ -546,7 +546,7 @@
 
 					<div class="space"></div>
 
-					<div class="medium scroll">
+					<div class="comment-list">
 						{#each comments.comments as comment (comment)}
 							<Comment {comment} videoId={data.video.videoId}></Comment>
 						{/each}
@@ -711,16 +711,18 @@
 </dialog>
 
 <style>
-	.chapter-list {
-		max-height: 300px;
+	.chapter-list,
+	.comment-list {
 		overflow-y: scroll;
 		overflow-x: hidden;
 	}
 
+	.chapter-list {
+		max-height: 300px;
+	}
+
 	.comment-list {
 		max-height: 600px;
-		overflow-y: scroll;
-		overflow-x: hidden;
 	}
 
 	.recommended {

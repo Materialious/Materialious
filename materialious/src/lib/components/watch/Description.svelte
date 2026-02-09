@@ -37,7 +37,7 @@
 		</nav>
 	</summary>
 	<div class="space"></div>
-	<div class="medium scroll">
+	<div class="description">
 		<div style="white-space: pre-line; overflow-wrap: break-word;">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html description}
@@ -58,3 +58,11 @@
 		{/if}
 	</div>
 </details>
+
+<style>
+	.description {
+		overflow-y: scroll;
+		overflow-x: hidden;
+		max-height: 300px;
+	}
+</style>

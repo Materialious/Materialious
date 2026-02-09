@@ -121,6 +121,14 @@ menu {
 	margin: 0 !important;
 }
 
+.tooltip {
+	background-color: var(--surface) !important;
+	border: 0.1px solid var(--primary) !important;
+	box-shadow: none !important;
+	border-radius: 0.25rem !important;
+	color: var(--on-surface) !important;
+}
+
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;

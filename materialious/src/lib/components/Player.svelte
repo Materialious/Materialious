@@ -120,6 +120,8 @@
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
+	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
+	let playerInitalInteract = true;
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -612,6 +614,7 @@
 
 		showPlayerUiTimeout = setTimeout(() => {
 			showControls = false;
+			playerInitalInteract = true;
 		}, 5000);
 	}
 
@@ -1097,26 +1100,41 @@
 	}
 
 	let requestAnimationTooltip: number | undefined;
+	let latestMouseX: number | undefined;
+
 	function timelineMouseMove(event: MouseEvent) {
-		if (requestAnimationTooltip) return;
+		latestMouseX = event.clientX;
 
-		requestAnimationTooltip = requestAnimationFrame(() => {
-			if (!playerSliderElement) return;
-			const rect = playerSliderElement.getBoundingClientRect();
+		if (!requestAnimationTooltip) {
+			requestAnimationTooltip = requestAnimationFrame(updateTooltip);
+		}
+	}
 
-			const percent = Math.min(
-				Math.max((event.clientX - rect.left) / playerSliderElement.clientWidth, 0),
-				1
-			);
-
-			playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
-
-			document.documentElement.style.setProperty('--timeline-tooltip-left', `${percent * 100}%`);
-
-			setPlayerTimelineChapters(playerTimelineTimeHover);
-
+	function updateTooltip() {
+		if (!playerSliderElement || latestMouseX === undefined) {
 			requestAnimationTooltip = undefined;
-		});
+			return;
+		}
+
+		const rect = playerSliderElement.getBoundingClientRect();
+		const percent = Math.min(Math.max((latestMouseX - rect.left) / rect.width, 0), 1);
+
+		playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
+		setPlayerTimelineChapters(playerTimelineTimeHover);
+
+		if (playerTimelineTooltip) {
+			const tooltipWidth = playerTimelineTooltip.offsetWidth;
+			const tooltipHeight = playerTimelineTooltip.offsetHeight;
+			const sliderWidth = playerSliderElement.clientWidth;
+
+			let left = percent * sliderWidth;
+			left = Math.min(Math.max(left, tooltipWidth / 2), sliderWidth - tooltipWidth / 2);
+			playerTimelineTooltip.style.transform = `translateX(${left - tooltipWidth / 2}px)`;
+
+			playerTimelineTooltip.style.top = `${-tooltipHeight - 5}px`;
+		}
+
+		requestAnimationTooltip = undefined;
 	}
 
 	function onVideoClick(
@@ -1124,51 +1142,54 @@
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		event.preventDefault();
 		seekDirection = undefined;
 
-		if (isMobile()) {
-			const initalControlsState = showControls.valueOf();
-			showPlayerUI();
-			if (!initalControlsState) return;
+		if (
+			!event.target ||
+			!(event.target instanceof HTMLElement) ||
+			event.target.id !== 'player-tap-controls-area' ||
+			!playerElement
+		) {
+			return;
 		}
 
-		if (
-			event.target &&
-			event.target instanceof HTMLElement &&
-			event.target.id === 'player-tap-controls-area' &&
-			playerElement
-		) {
-			clickCount++;
+		if (isMobile() && playerInitalInteract) {
+			showPlayerUI();
+			playerInitalInteract = false;
+			clickCount = 0;
+			return;
+		}
 
-			const container = event.currentTarget;
+		clickCount++;
 
-			const rect = container.getBoundingClientRect();
-			const clickX = event.clientX - rect.left;
-			const width = rect.width;
+		const container = event.currentTarget;
+		const rect = container.getBoundingClientRect();
+		const clickX = event.clientX - rect.left;
+		const width = rect.width;
 
-			if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
+		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
-			clickCounterTimeout = setTimeout(() => {
-				if (clickCount == 1) {
-					toggleVideoPlaybackStatus();
-				}
-				clickCount = 0;
-			}, 200);
-
-			if (clickCount < 2) return;
-
-			if (clickX < width / 3) {
-				seekDirection = 'backwards';
-				playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
-			} else if (clickX < (2 * width) / 3) {
-				toggleFullscreen();
-			} else {
-				seekDirection = 'forwards';
-				playerElement.currentTime = Math.min(
-					playerMaxKnownTime,
-					playerElement.currentTime + playerDoubleTapSeek
-				);
+		clickCounterTimeout = setTimeout(() => {
+			if (clickCount == 1) {
+				toggleVideoPlaybackStatus();
 			}
+			clickCount = 0;
+		}, 200);
+
+		if (clickCount < 2) return;
+
+		if (clickX < width / 3) {
+			seekDirection = 'backwards';
+			playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
+		} else if (clickX < (2 * width) / 3) {
+			toggleFullscreen();
+		} else {
+			seekDirection = 'forwards';
+			playerElement.currentTime = Math.min(
+				playerMaxKnownTime,
+				playerElement.currentTime + playerDoubleTapSeek
+			);
 		}
 	}
 
@@ -1224,7 +1245,10 @@
 	onmouseenter={showPlayerUI}
 	onmousemove={showPlayerUI}
 	onscroll={showPlayerUI}
-	onmouseleave={() => (showControls = false)}
+	onmouseleave={() => {
+		showControls = false;
+		playerInitalInteract = true;
+	}}
 	bind:this={playerContainer}
 >
 	<video
@@ -1294,31 +1318,26 @@
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
+				{#snippet timelineTooltip()}
+					{#if playerCloestSponsor}
+						{sponsorSegments[playerCloestSponsor.category]}
+						<br />
+					{:else if playerCloestTimestamp}
+						{playerCloestTimestamp.title}
+						<br />
+					{/if}
+				{/snippet}
 				<div class="track">
 					{#if !userManualSeeking}
-						<div class="tooltip" style="position: absolute;left: var(--timeline-tooltip-left);">
-							{#if playerCloestSponsor}
-								{sponsorSegments[playerCloestSponsor.category]}
-								<br />
-							{:else if playerCloestTimestamp}
-								{playerCloestTimestamp.title}
-								<br />
-							{/if}
-
+						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
+							{@render timelineTooltip()}
 							{videoLength(playerTimelineTimeHover)}
 						</div>
 					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						<div class="tooltip thumb-tooltip">
-							{#if playerCloestSponsor}
-								{sponsorSegments[playerCloestSponsor.category]}
-								<br />
-							{:else if playerCloestTimestamp}
-								{playerCloestTimestamp.title}
-								<br />
-							{/if}
-
+							{@render timelineTooltip()}
 							{videoLength(currentTime)}
 						</div>
 					</div>
@@ -1612,6 +1631,10 @@
 		clip-path: none;
 	}
 
+	#player-tap-controls-area {
+		touch-action: manipulation;
+	}
+
 	#player-center {
 		position: absolute;
 		width: 100%;
@@ -1795,5 +1818,14 @@
 
 	.hide-cursor {
 		cursor: none;
+	}
+
+	.timeline.tooltip {
+		position: absolute;
+		left: 0;
+		transform: translateX(0%);
+		transition: none;
+		pointer-events: none;
+		will-change: transform;
 	}
 </style>

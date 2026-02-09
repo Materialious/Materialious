@@ -1,4 +1,7 @@
 import { page } from '$app/state';
+import { get, type Writable } from 'svelte/store';
+import { z } from 'zod';
+
 import {
 	darkModeStore,
 	deArrowEnabledStore,
@@ -34,256 +37,275 @@ import {
 	interfaceAutoExpandChapters,
 	playerDefaultPlaybackSpeed,
 	playerCCByDefault,
-	playerMiniplayerEnabled
+	playerMiniplayerEnabled,
+	sponsorBlockCategoriesStore
 } from '$lib/store';
-import { get, type Writable } from 'svelte/store';
 
-const persistedStores: {
+type PersistedStore<T> = {
 	name: string;
-	store: Writable<any>;
-	type: 'string' | 'boolean' | 'array' | 'number';
-}[] = [
+	store: Writable<T>;
+	schema: z.ZodType<T>;
+	serialize?: (value: T) => string;
+};
+
+function parseWithSchema<T>(schema: z.ZodType<T>, raw: unknown): T | undefined {
+	try {
+		if (typeof raw === 'string') {
+			// Try JSON first (records / objects)
+			try {
+				return schema.parse(JSON.parse(raw));
+			} catch {
+				return schema.parse(raw);
+			}
+		}
+		return schema.parse(raw);
+	} catch {
+		return undefined;
+	}
+}
+
+const zBoolean = z.coerce.boolean();
+const zNumber = z.coerce.number();
+const zString = z.string();
+const zChapterMode = z.enum(['automatic', 'manual', 'timeline']);
+const zChapterModeRecord = z.record(z.string(), zChapterMode.optional());
+
+const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'returnYTDislikesInstance',
 		store: returnYTDislikesInstanceStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'darkMode',
 		store: darkModeStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'themeColor',
 		store: themeColorStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'autoPlay',
 		store: playerAutoPlayStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'alwaysLoop',
 		store: playerAlwaysLoopStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'proxyVideos',
 		store: playerProxyVideosStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'savePlaybackPosition',
 		store: playerSavePlaybackPositionStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'theatreModeByDefault',
 		store: playerTheatreModeByDefaultStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'autoplayNextByDefault',
 		store: playerAutoplayNextByDefaultStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'returnYtDislikes',
 		store: returnYtDislikesStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'searchSuggestions',
 		store: interfaceSearchSuggestionsStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'sponsorBlock',
 		store: sponsorBlockStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'sponsorBlockUrl',
 		store: sponsorBlockUrlStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'deArrowInstance',
 		store: deArrowInstanceStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'deArrowEnabled',
 		store: deArrowEnabledStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'deArrowThumbnailInstance',
 		store: deArrowThumbnailInstanceStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'syncious',
 		store: synciousStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'synciousInstance',
 		store: synciousInstanceStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'region',
 		store: interfaceRegionStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'forceCase',
 		store: interfaceForceCase,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'autoExpandComments',
 		store: interfaceAutoExpandComments,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'autoExpandDesc',
 		store: interfaceAutoExpandDesc,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'deArrowTitlesOnly',
 		store: deArrowTitlesOnly,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'sponsorBlockDisplayToast',
 		store: sponsorBlockDisplayToastStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'amoledTheme',
 		store: interfaceAmoledTheme,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'showWarning',
 		store: showWarningStore,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'lowBandwidthMode',
 		store: interfaceLowBandwidthMode,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'displayThumbnailAvatars',
 		store: interfaceDisplayThumbnailAvatars,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'defaultLanguage',
 		store: playerDefaultLanguage,
-		type: 'boolean'
+		schema: zString
 	},
 	{
 		name: 'defaultPage',
 		store: interfaceDefaultPage,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'defaultQuality',
 		store: playerDefaultQualityStore,
-		type: 'string'
+		schema: zString
 	},
 	{
 		name: 'autoExpandChapters',
 		store: interfaceAutoExpandChapters,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'defaultPlaybackSpeed',
 		store: playerDefaultPlaybackSpeed,
-		type: 'number'
+		schema: zNumber
 	},
 	{
 		name: 'CCByDefault',
 		store: playerCCByDefault,
-		type: 'boolean'
+		schema: zBoolean
 	},
 	{
 		name: 'miniplayerEnabled',
 		store: playerMiniplayerEnabled,
-		type: 'boolean'
+		schema: zBoolean
+	},
+	{
+		name: 'sponsorBlockCategoriesv2',
+		store: sponsorBlockCategoriesStore,
+		schema: zChapterModeRecord,
+		serialize: JSON.stringify
 	}
 ];
 
-function setStores(toSet: Record<string, any>, overwriteExisting: boolean = false) {
-	persistedStores.forEach((store) => {
-		const paramValue = toSet[store.name];
-		if (typeof paramValue !== 'undefined' && overwriteExisting) {
-			let value: any;
+function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
+	if (!overwriteExisting) return;
 
-			if (store.type === 'array') {
-				value = paramValue.split(',');
-			} else if (store.type === 'number') {
-				value = Number(paramValue);
-			} else if (store.type === 'boolean') {
-				value = typeof paramValue === 'string' ? paramValue === 'true' : paramValue;
-			} else {
-				value = paramValue;
-			}
+	for (const { name, store, schema } of persistedStores) {
+		const raw = toSet[name];
+		if (raw === undefined) continue;
 
-			store.store.set(value);
+		const parsed = parseWithSchema(schema, raw);
+		if (parsed !== undefined) {
+			store.set(parsed);
 		}
-	});
+	}
 }
 
 export function loadSettingsFromEnv() {
 	if (typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'string') return;
 
-	// If $VITE_DEFAULT_SETTINGS is passed via docker, it will be wrapped with quotations.
-	let defaultSettingsJson = import.meta.env.VITE_DEFAULT_SETTINGS;
+	let raw = import.meta.env.VITE_DEFAULT_SETTINGS;
 
-	if (defaultSettingsJson.startsWith('"')) {
-		defaultSettingsJson = defaultSettingsJson.slice(1);
-	}
-
-	if (defaultSettingsJson.endsWith('"')) {
-		defaultSettingsJson = defaultSettingsJson.slice(0, -1);
-	}
+	// Docker wraps env vars in quotes
+	if (raw.startsWith('"')) raw = raw.slice(1);
+	if (raw.endsWith('"')) raw = raw.slice(0, -1);
 
 	let isInitialLoad = false;
 	try {
-		const isInitialLoadStorage = localStorage.getItem('initialLoadState');
-		if (isInitialLoadStorage === null) {
+		if (localStorage.getItem('initialLoadState') === null) {
 			isInitialLoad = true;
 			localStorage.setItem('initialLoadState', '0');
 		}
 	} catch {
-		// In an environment where localstorage isn't allowed, treat as initial load.
 		isInitialLoad = true;
 	}
 
 	try {
-		const defaultSettings = JSON.parse(defaultSettingsJson);
-		setStores(defaultSettings, isInitialLoad);
-	} catch (error) {
-		console.log(error);
+		const parsed = JSON.parse(raw);
+		setStores(parsed, isInitialLoad);
+	} catch (err) {
+		console.error(err);
 	}
 }
 
 export function bookmarkletSaveToUrl(): string {
 	const url = new URL(location.origin);
 
-	persistedStores.forEach((store) => {
-		const value = get(store.store);
-		if (value !== null && value !== undefined) {
-			url.searchParams.set(store.name, value.toString());
+	for (const { name, store, serialize } of persistedStores) {
+		const value = get(store);
+		const encoded = serialize ? serialize(value) : value?.toString();
+
+		if (encoded !== undefined) {
+			url.searchParams.set(name, encoded);
 		}
-	});
+	}
 
 	return url.toString();
 }

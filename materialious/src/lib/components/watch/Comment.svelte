@@ -7,7 +7,7 @@
 	import { interfaceLowBandwidthMode } from '$lib/store';
 	import { onMount } from 'svelte';
 	import CommentSelf from './Comment.svelte';
-	import { insecureRequestImageHandler } from '$lib/misc';
+	import { insecureRequestImageHandler, truncate } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 
 	interface Props {
@@ -68,7 +68,7 @@
 			<div class="comment-info">
 				<a href={resolve(`/channel/[authorId]`, { authorId: comment.authorId })} class="author">
 					<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>
-						{comment.author}
+						{truncate(comment.author, 12)}
 					</span>
 					<span class="secondary-text">{comment.publishedText}</span>
 				</a>

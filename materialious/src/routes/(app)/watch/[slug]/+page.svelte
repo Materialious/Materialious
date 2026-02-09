@@ -546,12 +546,16 @@
 
 					<div class="space"></div>
 
-					<div class="medium scroll">
+					<div class="comment-list">
 						{#each comments.comments as comment (comment)}
 							<Comment {comment} videoId={data.video.videoId}></Comment>
 						{/each}
 						{#if comments.continuation}
-							<button onclick={loadMoreComments} class="margin">{$_('loadMore')}</button>
+							<div class="space"></div>
+							<button onclick={loadMoreComments} class="secondary">
+								<i>read_more</i>
+								<span>{$_('loadMore')}</span>
+							</button>
 						{/if}
 					</div>
 				</details>
@@ -707,10 +711,18 @@
 </dialog>
 
 <style>
-	.chapter-list {
-		max-height: 300px;
+	.chapter-list,
+	.comment-list {
 		overflow-y: scroll;
 		overflow-x: hidden;
+	}
+
+	.chapter-list {
+		max-height: 300px;
+	}
+
+	.comment-list {
+		max-height: 600px;
 	}
 
 	.recommended {

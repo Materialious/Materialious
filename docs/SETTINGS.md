@@ -310,7 +310,7 @@ Specifies the SponsorBlock API instance.
 "sponsorBlockUrl": "https://sponsor.ajay.app"
 ```
 
-<!--### SponsorBlock categories
+### SponsorBlock categories
 
 Defines which SponsorBlock categories should be skipped.
 
@@ -326,12 +326,8 @@ Available values include:
 * `filler`
 
 ```json
-"sponsorBlockCategories": [
-  "intro",
-  "outro",
-  "interaction"
-]
-```-->
+"sponsorBlockCategoriesv2": {"sponsor":"manual","selfpromo":"automatic","preview":"timeline",}
+```
 
 ### Display toast
 

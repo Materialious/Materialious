@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.13.12",
+	"version": "1.13.15",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -34,6 +34,7 @@
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
 		"svelte": "^5.47.0",
+		"svelte-awesome-color-picker": "^4.1.1",
 		"svelte-check": "^4.3.3",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",

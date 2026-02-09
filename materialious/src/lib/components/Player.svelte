@@ -120,6 +120,8 @@
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
+	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
+	let playerInitalInteract = true;
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -129,6 +131,7 @@
 			userManualSeeking = true;
 			currentTime = timeToSet;
 
+			showPlayerUI();
 			setPlayerTimelineChapters(currentTime);
 
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
@@ -146,6 +149,7 @@
 	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
 			if (!playerElement) return;
+			showPlayerUI();
 			playerElement.volume = volumeToSet;
 		},
 		value: () => playerVolume,
@@ -153,8 +157,6 @@
 		min: 0,
 		step: 0.01
 	});
-
-	let playerAndroidUITimeout: ReturnType<typeof setTimeout>;
 
 	let clickCount = $state(0);
 	let clickCounterTimeout: ReturnType<typeof setTimeout>;
@@ -167,10 +169,10 @@
 		updateVideoPlayerHeight();
 	});
 
-	const markerGapSize = 0.5;
+	const markerGapSize = 0.1;
 	const minVisiblePercent = 0.05;
-	function timelineMarker(startTime: number, endTime?: number): string {
-		const ratio = (endTime ? endTime - startTime : startTime) / playerMaxKnownTime;
+	function timelineMarkerWidth(startTime: number, endTime: number): string {
+		const ratio = (endTime - startTime) / playerMaxKnownTime;
 		if (ratio <= 0) return `0%`;
 
 		let percent = ratio * 100;
@@ -612,6 +614,7 @@
 
 		showPlayerUiTimeout = setTimeout(() => {
 			showControls = false;
+			playerInitalInteract = true;
 		}, 5000);
 	}
 
@@ -648,6 +651,11 @@
 			}
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
+
+		// Enable AirPlay if supported
+		if (hasWebkitShowPlaybackTargetPicker(playerElement)) {
+			playerElement.setAttribute('x-webkit-airplay', 'allow');
+		}
 
 		playerElement.loop = playerLoop;
 
@@ -832,6 +840,9 @@
 			} else {
 				playerElement.pause();
 			}
+
+			showPlayerUI();
+
 			return false;
 		});
 
@@ -839,44 +850,48 @@
 			Mousetrap.bind('right', () => {
 				if (!playerElement) return;
 				playerElement.currentTime = playerElement.currentTime + playerDoubleTapSeek;
+				showPlayerUI();
 				return false;
 			});
 
 			Mousetrap.bind('left', () => {
 				if (!playerElement) return;
-
 				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
+				showPlayerUI();
 				return false;
 			});
 
 			Mousetrap.bind('enter', () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
+					showPlayerUI();
 				}
 			});
 		}
 
 		Mousetrap.bind('c', () => {
 			toggleSubtitles();
+			showPlayerUI();
 			return false;
 		});
 
 		Mousetrap.bind('f', () => {
 			toggleFullscreen();
+			showPlayerUI();
 			return false;
 		});
 
 		Mousetrap.bind('shift+left', () => {
 			if (!playerElement) return;
-
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
+			showPlayerUI();
 			return false;
 		});
 
 		Mousetrap.bind('shift+right', () => {
 			if (!playerElement) return;
-
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
+			showPlayerUI();
 			return false;
 		});
 
@@ -886,6 +901,8 @@
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
 			const frameTime = 1 / (currentTrack?.frameRate || 30);
 			playerElement.currentTime -= frameTime;
+
+			showPlayerUI();
 		});
 
 		Mousetrap.bind('.', () => {
@@ -894,6 +911,8 @@
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
 			const frameTime = 1 / (currentTrack?.frameRate || 30);
 			playerElement.currentTime += frameTime;
+
+			showPlayerUI();
 		});
 
 		playerVolumeElement?.addEventListener('mousewheel', (event) => {
@@ -911,6 +930,7 @@
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
 			savePlayerPos();
+			showPlayerUI();
 		});
 
 		playerElement?.addEventListener('ended', async () => {
@@ -927,6 +947,7 @@
 		playerElement?.addEventListener('waiting', () => {
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = true;
+			showPlayerUI();
 		});
 
 		playerElement?.addEventListener('timeupdate', () => {
@@ -987,6 +1008,18 @@
 
 		playerTextTracks = player.getTextTracks();
 	});
+
+	function hasWebkitShowPlaybackTargetPicker(
+		el: HTMLMediaElement
+	): el is HTMLMediaElement & { webkitShowPlaybackTargetPicker: () => void } {
+		return typeof (el as any).webkitShowPlaybackTargetPicker === 'function';
+	}
+
+	function handleAirPlayClick() {
+		if (playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)) {
+			playerElement.webkitShowPlaybackTargetPicker();
+		}
+	}
 
 	async function getLastPlayPos(): Promise<number> {
 		if (loadTimeFromUrl($page) || !$playerSavePlaybackPositionStore) return 0;
@@ -1067,26 +1100,41 @@
 	}
 
 	let requestAnimationTooltip: number | undefined;
+	let latestMouseX: number | undefined;
+
 	function timelineMouseMove(event: MouseEvent) {
-		if (requestAnimationTooltip) return;
+		latestMouseX = event.clientX;
 
-		requestAnimationTooltip = requestAnimationFrame(() => {
-			if (!playerSliderElement) return;
-			const rect = playerSliderElement.getBoundingClientRect();
+		if (!requestAnimationTooltip) {
+			requestAnimationTooltip = requestAnimationFrame(updateTooltip);
+		}
+	}
 
-			const percent = Math.min(
-				Math.max((event.clientX - rect.left) / playerSliderElement.clientWidth, 0),
-				1
-			);
-
-			playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
-
-			document.documentElement.style.setProperty('--timeline-tooltip-left', `${percent * 100}%`);
-
-			setPlayerTimelineChapters(playerTimelineTimeHover);
-
+	function updateTooltip() {
+		if (!playerSliderElement || latestMouseX === undefined) {
 			requestAnimationTooltip = undefined;
-		});
+			return;
+		}
+
+		const rect = playerSliderElement.getBoundingClientRect();
+		const percent = Math.min(Math.max((latestMouseX - rect.left) / rect.width, 0), 1);
+
+		playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
+		setPlayerTimelineChapters(playerTimelineTimeHover);
+
+		if (playerTimelineTooltip) {
+			const tooltipWidth = playerTimelineTooltip.offsetWidth;
+			const tooltipHeight = playerTimelineTooltip.offsetHeight;
+			const sliderWidth = playerSliderElement.clientWidth;
+
+			let left = percent * sliderWidth;
+			left = Math.min(Math.max(left, tooltipWidth / 2), sliderWidth - tooltipWidth / 2);
+			playerTimelineTooltip.style.transform = `translateX(${left - tooltipWidth / 2}px)`;
+
+			playerTimelineTooltip.style.top = `${-tooltipHeight - 5}px`;
+		}
+
+		requestAnimationTooltip = undefined;
 	}
 
 	function onVideoClick(
@@ -1094,61 +1142,54 @@
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		event.preventDefault();
 		seekDirection = undefined;
 
-		if (isMobile()) {
-			const initalControlsState = showControls.valueOf();
-
-			if (playerAndroidUITimeout) {
-				clearTimeout(playerAndroidUITimeout);
-			}
-
-			showControls = true;
-
-			playerAndroidUITimeout = setTimeout(() => {
-				showControls = false;
-			}, 3000);
-
-			if (!initalControlsState) return;
+		if (
+			!event.target ||
+			!(event.target instanceof HTMLElement) ||
+			event.target.id !== 'player-tap-controls-area' ||
+			!playerElement
+		) {
+			return;
 		}
 
-		if (
-			event.target &&
-			event.target instanceof HTMLElement &&
-			event.target.id === 'player-tap-controls-area' &&
-			playerElement
-		) {
-			clickCount++;
+		if (isMobile() && playerInitalInteract) {
+			showPlayerUI();
+			playerInitalInteract = false;
+			clickCount = 0;
+			return;
+		}
 
-			const container = event.currentTarget;
+		clickCount++;
 
-			const rect = container.getBoundingClientRect();
-			const clickX = event.clientX - rect.left;
-			const width = rect.width;
+		const container = event.currentTarget;
+		const rect = container.getBoundingClientRect();
+		const clickX = event.clientX - rect.left;
+		const width = rect.width;
 
-			if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
+		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
-			clickCounterTimeout = setTimeout(() => {
-				if (clickCount == 1) {
-					toggleVideoPlaybackStatus();
-				}
-				clickCount = 0;
-			}, 200);
-
-			if (clickCount < 2) return;
-
-			if (clickX < width / 3) {
-				seekDirection = 'backwards';
-				playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
-			} else if (clickX < (2 * width) / 3) {
-				toggleFullscreen();
-			} else {
-				seekDirection = 'forwards';
-				playerElement.currentTime = Math.min(
-					playerMaxKnownTime,
-					playerElement.currentTime + playerDoubleTapSeek
-				);
+		clickCounterTimeout = setTimeout(() => {
+			if (clickCount == 1) {
+				toggleVideoPlaybackStatus();
 			}
+			clickCount = 0;
+		}, 200);
+
+		if (clickCount < 2) return;
+
+		if (clickX < width / 3) {
+			seekDirection = 'backwards';
+			playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
+		} else if (clickX < (2 * width) / 3) {
+			toggleFullscreen();
+		} else {
+			seekDirection = 'forwards';
+			playerElement.currentTime = Math.min(
+				playerMaxKnownTime,
+				playerElement.currentTime + playerDoubleTapSeek
+			);
 		}
 	}
 
@@ -1182,12 +1223,9 @@
 		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
-
 		if (sabrAdapter) sabrAdapter.dispose();
-
 		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
-
-		if (playerAndroidUITimeout) clearTimeout(playerAndroidUITimeout);
+		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		if (player) {
 			player.unload();
@@ -1207,7 +1245,10 @@
 	onmouseenter={showPlayerUI}
 	onmousemove={showPlayerUI}
 	onscroll={showPlayerUI}
-	onmouseleave={() => (showControls = false)}
+	onmouseleave={() => {
+		showControls = false;
+		playerInitalInteract = true;
+	}}
 	bind:this={playerContainer}
 >
 	<video
@@ -1277,31 +1318,26 @@
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
+				{#snippet timelineTooltip()}
+					{#if playerCloestSponsor}
+						{sponsorSegments[playerCloestSponsor.category]}
+						<br />
+					{:else if playerCloestTimestamp}
+						{playerCloestTimestamp.title}
+						<br />
+					{/if}
+				{/snippet}
 				<div class="track">
 					{#if !userManualSeeking}
-						<div class="tooltip" style="position: absolute;left: var(--timeline-tooltip-left);">
-							{#if playerCloestSponsor}
-								{sponsorSegments[playerCloestSponsor.category]}
-								<br />
-							{:else if playerCloestTimestamp}
-								{playerCloestTimestamp.title}
-								<br />
-							{/if}
-
+						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
+							{@render timelineTooltip()}
 							{videoLength(playerTimelineTimeHover)}
 						</div>
 					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						<div class="tooltip thumb-tooltip">
-							{#if playerCloestSponsor}
-								{sponsorSegments[playerCloestSponsor.category]}
-								<br />
-							{:else if playerCloestTimestamp}
-								{playerCloestTimestamp.title}
-								<br />
-							{/if}
-
+							{@render timelineTooltip()}
 							{videoLength(currentTime)}
 						</div>
 					</div>
@@ -1310,8 +1346,8 @@
 				{#each data.content.timestamps as chapter, index (chapter)}
 					<div
 						class="chapter-marker"
-						style:left={timelineMarker(chapter.time)}
-						style:width={timelineMarker(
+						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
+						style:width={timelineMarkerWidth(
 							chapter.time,
 							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
 						)}
@@ -1321,8 +1357,8 @@
 					{#each segments as segment (segment)}
 						<div
 							class="chapter-marker segment-marker"
-							style:left={timelineMarker(segment.startTime)}
-							style:width={timelineMarker(segment.startTime, segment.endTime)}
+							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+							style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
 						></div>
 					{/each}
 				{/if}
@@ -1526,6 +1562,11 @@
 								{/if}
 							</menu>
 						</button>
+						{#if playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)}
+							<button class="inverse-primary" onclick={handleAirPlayClick} title="AirPlay">
+								<i>airplay</i>
+							</button>
+						{/if}
 						{#if document.pictureInPictureEnabled}
 							<button
 								class="inverse-primary"
@@ -1588,6 +1629,10 @@
 
 	#player-controls span {
 		clip-path: none;
+	}
+
+	#player-tap-controls-area {
+		touch-action: manipulation;
 	}
 
 	#player-center {
@@ -1773,5 +1818,14 @@
 
 	.hide-cursor {
 		cursor: none;
+	}
+
+	.timeline.tooltip {
+		position: absolute;
+		left: 0;
+		transform: translateX(0%);
+		transition: none;
+		pointer-events: none;
+		will-change: transform;
 	}
 </style>

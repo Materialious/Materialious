@@ -19,7 +19,7 @@ body {
 	overflow: hidden;
 }
 
-:has(>main) {
+:has(> main) {
 	height: 100%;
 	min-height: 0;
 	overflow: hidden;
@@ -94,6 +94,31 @@ main.root {
 menu {
 	left: auto;
 	right: 0;
+}
+
+.color-picker .picker {
+	display: none !important;
+}
+
+.color-picker .wrapper {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.color-picker .thumb {
+	height: 20px !important;
+	width: 20px !important;
+	opacity: 0.5 !important;
+}
+
+.color-picker .track {
+	border-radius: 0.25rem !important;
+}
+
+.color-picker .h {
+	margin-top: 0 !important;
+	justify-content: flex-start !important;
+	margin: 0 !important;
 }
 
 @media screen and (max-width: 1000px) {

@@ -120,6 +120,7 @@
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
+	let playerInitalInteract = true;
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -612,6 +613,7 @@
 
 		showPlayerUiTimeout = setTimeout(() => {
 			showControls = false;
+			playerInitalInteract = true;
 		}, 5000);
 	}
 
@@ -1124,51 +1126,54 @@
 			currentTarget: EventTarget & HTMLDivElement;
 		}
 	) {
+		event.preventDefault();
 		seekDirection = undefined;
 
-		if (isMobile()) {
-			const initalControlsState = showControls.valueOf();
-			showPlayerUI();
-			if (!initalControlsState) return;
+		if (
+			!event.target ||
+			!(event.target instanceof HTMLElement) ||
+			event.target.id !== 'player-tap-controls-area' ||
+			!playerElement
+		) {
+			return;
 		}
 
-		if (
-			event.target &&
-			event.target instanceof HTMLElement &&
-			event.target.id === 'player-tap-controls-area' &&
-			playerElement
-		) {
-			clickCount++;
+		if (isMobile() && playerInitalInteract) {
+			showPlayerUI();
+			playerInitalInteract = false;
+			clickCount = 0;
+			return;
+		}
 
-			const container = event.currentTarget;
+		clickCount++;
 
-			const rect = container.getBoundingClientRect();
-			const clickX = event.clientX - rect.left;
-			const width = rect.width;
+		const container = event.currentTarget;
+		const rect = container.getBoundingClientRect();
+		const clickX = event.clientX - rect.left;
+		const width = rect.width;
 
-			if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
+		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
-			clickCounterTimeout = setTimeout(() => {
-				if (clickCount == 1) {
-					toggleVideoPlaybackStatus();
-				}
-				clickCount = 0;
-			}, 200);
-
-			if (clickCount < 2) return;
-
-			if (clickX < width / 3) {
-				seekDirection = 'backwards';
-				playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
-			} else if (clickX < (2 * width) / 3) {
-				toggleFullscreen();
-			} else {
-				seekDirection = 'forwards';
-				playerElement.currentTime = Math.min(
-					playerMaxKnownTime,
-					playerElement.currentTime + playerDoubleTapSeek
-				);
+		clickCounterTimeout = setTimeout(() => {
+			if (clickCount == 1) {
+				toggleVideoPlaybackStatus();
 			}
+			clickCount = 0;
+		}, 200);
+
+		if (clickCount < 2) return;
+
+		if (clickX < width / 3) {
+			seekDirection = 'backwards';
+			playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
+		} else if (clickX < (2 * width) / 3) {
+			toggleFullscreen();
+		} else {
+			seekDirection = 'forwards';
+			playerElement.currentTime = Math.min(
+				playerMaxKnownTime,
+				playerElement.currentTime + playerDoubleTapSeek
+			);
 		}
 	}
 
@@ -1224,7 +1229,10 @@
 	onmouseenter={showPlayerUI}
 	onmousemove={showPlayerUI}
 	onscroll={showPlayerUI}
-	onmouseleave={() => (showControls = false)}
+	onmouseleave={() => {
+		showControls = false;
+		playerInitalInteract = true;
+	}}
 	bind:this={playerContainer}
 >
 	<video
@@ -1610,6 +1618,10 @@
 
 	#player-controls span {
 		clip-path: none;
+	}
+
+	#player-tap-controls-area {
+		touch-action: manipulation;
 	}
 
 	#player-center {

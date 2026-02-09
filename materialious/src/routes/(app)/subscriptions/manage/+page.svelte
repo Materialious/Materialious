@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { deleteUnsubscribe, type Image } from '$lib/api';
+	import { deleteUnsubscribe } from '$lib/api';
+	import { type Image } from '$lib/api/model';
 	import Fuse from 'fuse.js';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';

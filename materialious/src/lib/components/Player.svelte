@@ -837,6 +837,9 @@
 			} else {
 				playerElement.pause();
 			}
+
+			showPlayerUI();
+
 			return false;
 		});
 
@@ -844,44 +847,48 @@
 			Mousetrap.bind('right', () => {
 				if (!playerElement) return;
 				playerElement.currentTime = playerElement.currentTime + playerDoubleTapSeek;
+				showPlayerUI();
 				return false;
 			});
 
 			Mousetrap.bind('left', () => {
 				if (!playerElement) return;
-
 				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
+				showPlayerUI();
 				return false;
 			});
 
 			Mousetrap.bind('enter', () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
+					showPlayerUI();
 				}
 			});
 		}
 
 		Mousetrap.bind('c', () => {
 			toggleSubtitles();
+			showPlayerUI();
 			return false;
 		});
 
 		Mousetrap.bind('f', () => {
 			toggleFullscreen();
+			showPlayerUI();
 			return false;
 		});
 
 		Mousetrap.bind('shift+left', () => {
 			if (!playerElement) return;
-
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
+			showPlayerUI();
 			return false;
 		});
 
 		Mousetrap.bind('shift+right', () => {
 			if (!playerElement) return;
-
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
+			showPlayerUI();
 			return false;
 		});
 
@@ -891,6 +898,8 @@
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
 			const frameTime = 1 / (currentTrack?.frameRate || 30);
 			playerElement.currentTime -= frameTime;
+
+			showPlayerUI();
 		});
 
 		Mousetrap.bind('.', () => {
@@ -899,6 +908,8 @@
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
 			const frameTime = 1 / (currentTrack?.frameRate || 30);
 			playerElement.currentTime += frameTime;
+
+			showPlayerUI();
 		});
 
 		playerVolumeElement?.addEventListener('mousewheel', (event) => {
@@ -916,6 +927,7 @@
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
 			savePlayerPos();
+			showPlayerUI();
 		});
 
 		playerElement?.addEventListener('ended', async () => {
@@ -932,6 +944,7 @@
 		playerElement?.addEventListener('waiting', () => {
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = true;
+			showPlayerUI();
 		});
 
 		playerElement?.addEventListener('timeupdate', () => {
@@ -996,11 +1009,11 @@
 	function hasWebkitShowPlaybackTargetPicker(
 		el: HTMLMediaElement
 	): el is HTMLMediaElement & { webkitShowPlaybackTargetPicker: () => void } {
-		return typeof (el as any).webkitShowPlaybackTargetPicker === "function";
+		return typeof (el as any).webkitShowPlaybackTargetPicker === 'function';
 	}
 
 	function handleAirPlayClick() {
-		if(playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)) {
+		if (playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)) {
 			playerElement.webkitShowPlaybackTargetPicker();
 		}
 	}
@@ -1531,10 +1544,7 @@
 							</menu>
 						</button>
 						{#if playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)}
-							<button
-								class="inverse-primary"
-								onclick={handleAirPlayClick}
-								title="AirPlay">
+							<button class="inverse-primary" onclick={handleAirPlayClick} title="AirPlay">
 								<i>airplay</i>
 							</button>
 						{/if}

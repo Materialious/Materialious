@@ -8,10 +8,12 @@
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
+	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash } from '../../misc';
+	import { ensureNoTrailingSlash, isMobile } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
+	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		authStore,
 		darkModeStore,
@@ -40,12 +42,22 @@
 	let defaultPage = $state(get(interfaceDefaultPage));
 
 	let invalidInstance = $state(false);
+	let colorPickerOpen = $state(false);
+	let colorPickerDebounce: ReturnType<typeof setTimeout>;
 
-	async function setColor(color: any) {
-		const target = color.target;
-		const hex = (target as { value: string }).value;
-		setAmoledTheme();
-		themeColorStore.set(hex);
+	async function setColor(color: {
+		hsv: HsvaColor | null;
+		rgb: RgbaColor | null;
+		hex: string | null;
+		color: Colord | null;
+	}) {
+		if (!color.hex) return;
+		if (colorPickerDebounce) clearTimeout(colorPickerDebounce);
+
+		colorPickerDebounce = setTimeout(() => {
+			setAmoledTheme();
+			themeColorStore.set(color.hex);
+		}, 10);
 	}
 
 	function toggleDarkMode() {
@@ -140,8 +152,11 @@
 			</button>
 		</nav>
 	</form>
-	{#if invalidInstance}
-		<div style="margin-bottom: 6em;"></div>
+
+	{#if isMobile()}
+		{#if invalidInstance}
+			<div style="margin-bottom: 6em;"></div>
+		{/if}
 	{/if}
 
 	{#if Capacitor.isNativePlatform() && (invalidInstance || $interfaceAllowInsecureRequests)}
@@ -173,13 +188,27 @@
 		<span>{$_('layout.theme.lightMode')}</span>
 	{/if}
 </button>
-<button>
+<button onclick={() => (colorPickerOpen = !colorPickerOpen)}>
 	<i>palette</i>
 	<span>{$_('layout.theme.color')}</span>
-	<input onchange={setColor} type="color" />
 </button>
 
-<div class="margin"></div>
+{#if colorPickerOpen}
+	<div class="space"></div>
+
+	<div class="color-picker">
+		<ColorPicker
+			isTextInput={false}
+			isDialog={false}
+			onInput={setColor}
+			position="responsive"
+			isAlpha={false}
+			sliderDirection="horizontal"
+		/>
+	</div>
+{/if}
+
+<div class="space"></div>
 
 {#if $darkModeStore}
 	<div class="field no-margin">
@@ -413,3 +442,22 @@
 		>
 	</div>
 {/if}
+
+<style>
+	.color-picker {
+		--cp-bg-color: var(--surface-container);
+		--cp-border-color: transparent;
+		--cp-text-color: var(--on-surface);
+		--cp-input-color: var(--surface);
+		--cp-button-hover-color: var(--surface-variant);
+		--slider-width: 50px;
+		--picker-width: 60vw;
+		width: 100%;
+	}
+
+	@media screen and (max-width: 640px) {
+		.color-picker {
+			--picker-width: 85vw;
+		}
+	}
+</style>

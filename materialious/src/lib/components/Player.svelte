@@ -523,13 +523,13 @@
 			}
 
 			if (data.video.storyboards && data.video.storyboards.length > 2) {
-				storyboardThumbnails(
-					data.video.storyboards[2],
-					playerTimelineThumbnailsCache,
-					playerMaxKnownTime
-				).then((thumbnails) => {
-					playerTimelineThumbnails = thumbnails;
-				});
+				try {
+					storyboardThumbnails(data.video).then((thumbnails) => {
+						playerTimelineThumbnails = thumbnails;
+					});
+				} catch {
+					// Continue regardless of error.
+				}
 			}
 
 			if (
@@ -1374,9 +1374,13 @@
 						></canvas>
 					{/if}
 					{#if playerCloestSponsor}
-						<p class="no-margin">{sponsorSegments[playerCloestSponsor.category]}</p>
+						<p class="no-margin" style="padding: 0 0.5rem;">
+							{sponsorSegments[playerCloestSponsor.category]}
+						</p>
 					{:else if playerCloestTimestamp}
-						<p class="no-margin">{truncate(playerCloestTimestamp.title, 22)}</p>
+						<p class="no-margin" style="padding: 0 0.5rem;">
+							{truncate(playerCloestTimestamp.title, 22)}
+						</p>
 					{/if}
 				{/snippet}
 				<div class="track">

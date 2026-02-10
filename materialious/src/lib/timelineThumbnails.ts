@@ -1,5 +1,8 @@
-import type { StoryBoard } from './api/model';
+import { get } from 'svelte/store';
+import type { VideoPlay } from './api/model';
 import { ImageCache } from './images';
+import { instanceStore } from './store';
+import { parseText } from 'media-captions';
 
 export interface TimelineThumbnail {
 	url: string;
@@ -9,58 +12,70 @@ export interface TimelineThumbnail {
 	index: number;
 }
 
-export async function storyboardThumbnails(
-	storyboard: StoryBoard,
-	imageCache: ImageCache,
-	videoLength: number
-): Promise<TimelineThumbnail[]> {
-	const { count, storyboardCount, width, height, templateUrl } = storyboard;
+export async function storyboardThumbnails(video: VideoPlay): Promise<TimelineThumbnail[]> {
+	if (!video.storyboards || video.storyboards.length < 2) return [];
 
-	// Our ytjs implementation doesn't do this right,
-	// so just assume its incorrect and fetch manually.
-	// Doesn't actually add any extra overhead.
-	const firstSheetUrl = templateUrl.replace('M$M', `M0`);
-	const firstSheetImage = await imageCache.load(firstSheetUrl);
-	if (!firstSheetImage) {
-		return [];
-	}
-
-	const storyboardWidth = firstSheetImage.width;
-	const storyboardHeight = firstSheetImage.height;
-
-	const cols = Math.floor(storyboardWidth / width);
-	const rows = Math.floor(storyboardHeight / height);
 	const thumbnails: TimelineThumbnail[] = [];
 
-	const totalThumbnails = storyboardCount * count;
-	const videoDurationMs = videoLength * 1000;
+	if (video.fallbackPatch === 'youtubejs') {
+		const { count, storyboardCount, width, height, templateUrl } = video.storyboards[2];
 
-	let globalIndex = 0;
+		const totalThumbnails = storyboardCount * count;
+		const videoDurationMs = video.lengthSeconds * 1000;
+		const timeInterval = videoDurationMs / totalThumbnails;
 
-	for (let sheetIndex = 0; sheetIndex < storyboardCount; sheetIndex++) {
-		const url = templateUrl.replace('M$M', `M${sheetIndex}`);
+		for (let sheetIndex = 0; sheetIndex < storyboardCount; sheetIndex++) {
+			const url = templateUrl.replace('M$M', `M${sheetIndex}`);
 
-		// Pre-cache sheet
-		imageCache.load(url);
-
-		for (let i = 0; i < count; i++) {
-			const localIndex = i % (cols * rows);
-			const row = Math.floor(localIndex / cols);
-
-			if (row >= rows) break;
-
-			const time = Math.floor((globalIndex / totalThumbnails) * videoDurationMs);
-
+			const time = Math.floor(sheetIndex * count * timeInterval);
 			thumbnails.push({
 				url,
 				time,
 				width,
 				height,
-				index: globalIndex
+				index: sheetIndex * count
 			});
-
-			globalIndex++;
 		}
+	} else {
+		const WebVTTResp = await fetch(`${get(instanceStore)}${video.storyboards[2].url}`);
+		if (!WebVTTResp.ok) return [];
+
+		const thumbnailsSheets = await parseText(await WebVTTResp.text(), {
+			strict: true,
+			type: 'vtt'
+		});
+
+		const processedUrls = new Set<string>();
+
+		let index = 0;
+
+		thumbnailsSheets.cues.forEach((cue) => {
+			const urlParts = cue.text.split('#');
+			const cleanedUrl = urlParts[0];
+
+			if (!processedUrls.has(cleanedUrl)) {
+				const xywh = urlParts[1];
+				const xywhValues = xywh.split(',');
+
+				if (xywhValues.length !== 4) {
+					return [];
+				}
+
+				const [, , thumbWidth, thumbHeight] = xywhValues.map(Number);
+
+				processedUrls.add(cleanedUrl);
+
+				thumbnails.push({
+					url: cleanedUrl,
+					time: cue.startTime * 1000,
+					width: thumbWidth,
+					height: thumbHeight,
+					index
+				});
+
+				index++;
+			}
+		});
 	}
 
 	return thumbnails;

@@ -128,19 +128,26 @@
 	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
 	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
 	let playerTimelineThumbnailsCache = new ImageCache();
-	let playerTimelineThumbnailCanvas: HTMLCanvasElement | undefined = $state();
+	let playerTimelineThumbnailCanvas: {
+		timeline?: HTMLCanvasElement;
+		thumb?: HTMLCanvasElement;
+	} = $state({});
 	let playerInitalInteract = true;
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
 		step: 0.1,
 		value: () => currentTime,
-		onValueChange: (timeToSet) => {
+		onValueChange: async (timeToSet) => {
 			userManualSeeking = true;
 			currentTime = timeToSet;
 
 			showPlayerUI();
 			setPlayerTimelineChapters(currentTime);
+
+			if (playerTimelineThumbnailCanvas.thumb) {
+				await setPlayerTimelineThumbnails(currentTime, playerTimelineThumbnailCanvas.thumb);
+			}
 
 			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
 
@@ -515,13 +522,14 @@
 				dashUrl += '?local=true';
 			}
 
-			if (data.video.storyboards && data.video.storyboards.length > 1) {
-				// Use best possible thumbnails
-				playerTimelineThumbnails = await storyboardThumbnails(
-					data.video.storyboards[data.video.storyboards.length - 1],
+			if (data.video.storyboards && data.video.storyboards.length > 2) {
+				storyboardThumbnails(
+					data.video.storyboards[2],
 					playerTimelineThumbnailsCache,
 					playerMaxKnownTime
-				);
+				).then((thumbnails) => {
+					playerTimelineThumbnails = thumbnails;
+				});
 			}
 
 			if (
@@ -1127,6 +1135,19 @@
 		}
 	}
 
+	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
+		const canvasContext = canvas.getContext('2d');
+
+		if (canvasContext) {
+			await drawTimelineThumbnail(
+				canvasContext,
+				playerTimelineThumbnailsCache,
+				playerTimelineThumbnails,
+				time
+			);
+		}
+	}
+
 	async function updateTooltip() {
 		if (!playerSliderElement || latestMouseX === undefined) {
 			requestAnimationTooltip = undefined;
@@ -1139,17 +1160,11 @@
 		playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
 		setPlayerTimelineChapters(playerTimelineTimeHover);
 
-		if (playerTimelineThumbnailCanvas) {
-			const canvasContext = playerTimelineThumbnailCanvas.getContext('2d');
-
-			if (canvasContext) {
-				await drawTimelineThumbnail(
-					canvasContext,
-					playerTimelineThumbnailsCache,
-					playerTimelineThumbnails,
-					playerTimelineTimeHover
-				);
-			}
+		if (playerTimelineThumbnailCanvas.timeline) {
+			await setPlayerTimelineThumbnails(
+				playerTimelineTimeHover,
+				playerTimelineThumbnailCanvas.timeline
+			);
 		}
 
 		if (playerTimelineTooltip) {
@@ -1350,35 +1365,31 @@
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
-				{#snippet timelineTooltip()}
+				{#snippet timelineTooltip(key: 'thumb' | 'timeline')}
+					{#if playerTimelineThumbnails.length > 0}
+						<canvas
+							bind:this={playerTimelineThumbnailCanvas[key]}
+							width={playerTimelineThumbnails[0].width}
+							height={playerTimelineThumbnails[0].height}
+						></canvas>
+					{/if}
 					{#if playerCloestSponsor}
-						{sponsorSegments[playerCloestSponsor.category]}
-						<br />
+						<p class="no-margin">{sponsorSegments[playerCloestSponsor.category]}</p>
 					{:else if playerCloestTimestamp}
-						{truncate(playerCloestTimestamp.title, 22)}
-						<br />
+						<p class="no-margin">{truncate(playerCloestTimestamp.title, 22)}</p>
 					{/if}
 				{/snippet}
 				<div class="track">
 					{#if !userManualSeeking}
 						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
-							{#if playerTimelineThumbnails.length > 0}
-								<canvas
-									bind:this={playerTimelineThumbnailCanvas}
-									width={playerTimelineThumbnails[0].width}
-									height={playerTimelineThumbnails[0].height}
-								>
-									></canvas
-								>
-							{/if}
-							{@render timelineTooltip()}
+							{@render timelineTooltip('timeline')}
 							{videoLength(playerTimelineTimeHover)}
 						</div>
 					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
-						<div class="tooltip thumb-tooltip">
-							{@render timelineTooltip()}
+						<div class="tooltip thumb">
+							{@render timelineTooltip('thumb')}
 							{videoLength(currentTime)}
 						</div>
 					</div>
@@ -1748,10 +1759,6 @@
 		transform: translate(-50%, -50%);
 	}
 
-	.thumb-tooltip {
-		left: var(--percentage);
-	}
-
 	.seek-double-click {
 		background-color: var(--secondary-container);
 		height: var(--video-player-height);
@@ -1873,13 +1880,20 @@
 		pointer-events: none;
 		will-change: transform;
 		padding: 0;
-		border-radius: 0.25rem;
 		display: block;
 	}
 
-	.timeline.tooltip canvas {
+	.timeline.tooltip canvas,
+	.tooltip.thumb canvas {
 		display: block;
 		margin-bottom: 0.1rem;
 		height: 100px;
+		border-radius: 0.25rem;
+	}
+
+	.tooltip.thumb {
+		left: var(--percentage);
+		display: block;
+		padding: 0;
 	}
 </style>

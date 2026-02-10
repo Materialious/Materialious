@@ -40,7 +40,7 @@ export async function storyboardThumbnails(
 	for (let sheetIndex = 0; sheetIndex < storyboardCount; sheetIndex++) {
 		const url = templateUrl.replace('M$M', `M${sheetIndex}`);
 
-		// Preload all images.
+		// Pre-cache sheet
 		imageCache.load(url);
 
 		for (let i = 0; i < count; i++) {

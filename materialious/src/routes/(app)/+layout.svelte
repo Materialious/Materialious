@@ -352,7 +352,7 @@
 				{#if isLoggedIn}
 					<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
 						><i>notifications</i>
-						<div class="badge">
+						<div class="badge secondary">
 							{#if notifications.length > 99}
 								99+
 							{:else}

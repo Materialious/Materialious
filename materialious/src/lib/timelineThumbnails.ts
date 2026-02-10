@@ -7,7 +7,6 @@ export interface TimelineThumbnail {
 	width: number;
 	height: number;
 	index: number;
-	localIndex: number;
 }
 
 export async function storyboardThumbnails(
@@ -57,8 +56,7 @@ export async function storyboardThumbnails(
 				time,
 				width,
 				height,
-				index: globalIndex,
-				localIndex
+				index: globalIndex
 			});
 
 			globalIndex++;

@@ -2,6 +2,31 @@ import { get } from 'svelte/store';
 import type { Image } from './api/model';
 import { instanceStore } from './store';
 
+export class ImageCache {
+	private cache = new Map<string, HTMLImageElement>();
+
+	load(src: string): Promise<HTMLImageElement> {
+		if (this.cache.has(src)) {
+			return Promise.resolve(this.cache.get(src)!);
+		}
+
+		return new Promise((resolve, reject) => {
+			const img = new Image();
+			img.crossOrigin = 'anonymous';
+			img.onload = () => {
+				this.cache.set(src, img);
+				resolve(img);
+			};
+			img.onerror = reject;
+			img.src = src;
+		});
+	}
+
+	clear() {
+		this.cache.clear();
+	}
+}
+
 export function getBestThumbnail(
 	images: Image[] | null,
 	maxWidthDimension: number = 480,

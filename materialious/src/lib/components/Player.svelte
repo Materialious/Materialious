@@ -140,7 +140,7 @@
 		step: 0.1,
 		value: () => currentTime,
 		onValueChange: async (timeToSet) => {
-			if (requestAnimationTooltip === undefined) playerSliderInteracted = true;
+			playerSliderInteracted = true;
 			userManualSeeking = true;
 			currentTime = timeToSet;
 

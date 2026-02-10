@@ -66,7 +66,7 @@
 
 	playerState.subscribe(() => {
 		requestAnimationFrame(() => resetScroll());
-	})
+	});
 
 	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
@@ -245,6 +245,7 @@
 		if (isLoggedIn) {
 			loadNotifications().catch(() => authStore.set(null));
 		}
+
 		resetScroll();
 	});
 
@@ -351,6 +352,13 @@
 				{#if isLoggedIn}
 					<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
 						><i>notifications</i>
+						<div class="badge">
+							{#if notifications.length > 99}
+								99+
+							{:else}
+								{notifications.length}
+							{/if}
+						</div>
 						<div class="tooltip bottom">{$_('layout.notifications')}</div>
 					</button>
 				{/if}
@@ -401,7 +409,7 @@
 		{:else}
 			{#each notifications as notification (notification)}
 				<article class="no-padding border">
-					<Thumbnail video={notification}></Thumbnail>
+					<Thumbnail video={notification} sideways={true}></Thumbnail>
 				</article>
 			{/each}
 		{/if}
@@ -522,11 +530,19 @@
 		justify-content: center;
 	}
 
+	#dialog-notifications {
+		width: 500px;
+	}
+
 	@media only screen and (max-width: 993px) {
 		.pip {
 			width: 100%;
 			bottom: 100px;
 			right: 0px;
+		}
+
+		#dialog-notifications {
+			width: 100%;
 		}
 
 		.pip > .pip-info > .player {

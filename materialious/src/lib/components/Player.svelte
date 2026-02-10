@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { getBestThumbnail } from '$lib/images';
+	import { getBestThumbnail, ImageCache } from '$lib/images';
 	import { padTime, videoLength } from '$lib/numbers';
 	import { type PhasedDescription, type Timestamp } from '$lib/timestamps';
 	import { SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
@@ -58,7 +58,12 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from './Toast.svelte';
-	import { isMobile } from '$lib/misc';
+	import { isMobile, truncate } from '$lib/misc';
+	import {
+		drawTimelineThumbnail,
+		storyboardThumbnails,
+		type TimelineThumbnail
+	} from '$lib/timelineThumbnails';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -121,6 +126,9 @@
 	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
 	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
+	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
+	let playerTimelineThumbnailsCache = new ImageCache();
+	let playerTimelineThumbnailCanvas: HTMLCanvasElement | undefined = $state();
 	let playerInitalInteract = true;
 
 	const playerTimelineSlider = new Slider({
@@ -505,6 +513,15 @@
 
 			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || $playerProxyVideosStore)) {
 				dashUrl += '?local=true';
+			}
+
+			if (data.video.storyboards && data.video.storyboards.length > 1) {
+				// Use best possible thumbnails
+				playerTimelineThumbnails = await storyboardThumbnails(
+					data.video.storyboards[data.video.storyboards.length - 1],
+					playerTimelineThumbnailsCache,
+					playerMaxKnownTime
+				);
 			}
 
 			if (
@@ -1110,7 +1127,7 @@
 		}
 	}
 
-	function updateTooltip() {
+	async function updateTooltip() {
 		if (!playerSliderElement || latestMouseX === undefined) {
 			requestAnimationTooltip = undefined;
 			return;
@@ -1121,6 +1138,19 @@
 
 		playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
 		setPlayerTimelineChapters(playerTimelineTimeHover);
+
+		if (playerTimelineThumbnailCanvas) {
+			const canvasContext = playerTimelineThumbnailCanvas.getContext('2d');
+
+			if (canvasContext) {
+				await drawTimelineThumbnail(
+					canvasContext,
+					playerTimelineThumbnailsCache,
+					playerTimelineThumbnails,
+					playerTimelineTimeHover
+				);
+			}
+		}
 
 		if (playerTimelineTooltip) {
 			const tooltipWidth = playerTimelineTooltip.offsetWidth;
@@ -1217,6 +1247,8 @@
 		} catch {
 			// Continue regardless of error
 		}
+
+		playerTimelineThumbnailsCache.clear();
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
@@ -1323,13 +1355,22 @@
 						{sponsorSegments[playerCloestSponsor.category]}
 						<br />
 					{:else if playerCloestTimestamp}
-						{playerCloestTimestamp.title}
+						{truncate(playerCloestTimestamp.title, 22)}
 						<br />
 					{/if}
 				{/snippet}
 				<div class="track">
 					{#if !userManualSeeking}
 						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
+							{#if playerTimelineThumbnails.length > 0}
+								<canvas
+									bind:this={playerTimelineThumbnailCanvas}
+									width={playerTimelineThumbnails[0].width}
+									height={playerTimelineThumbnails[0].height}
+								>
+									></canvas
+								>
+							{/if}
 							{@render timelineTooltip()}
 							{videoLength(playerTimelineTimeHover)}
 						</div>
@@ -1614,6 +1655,10 @@
 {/if}
 
 <style>
+	:root {
+		--player-timeline-height: 1.1rem;
+	}
+
 	#player-container {
 		position: relative;
 		width: 100%;
@@ -1661,7 +1706,7 @@
 	}
 
 	.player-slider {
-		height: 1rem;
+		height: var(--player-timeline-height);
 		margin: 0 auto;
 		border-radius: 0.25rem;
 	}
@@ -1732,7 +1777,7 @@
 
 	.buffered-bar {
 		position: absolute;
-		height: 1rem;
+		height: var(--player-timeline-height);
 		background: var(--secondary);
 		top: 50%;
 		left: 0;
@@ -1749,7 +1794,7 @@
 		top: 50%;
 		transform: translateY(-50%);
 		left: 0;
-		height: 1rem;
+		height: var(--player-timeline-height);
 		background-color: var(--secondary);
 		border-radius: 0.25rem;
 		z-index: 2;
@@ -1827,5 +1872,14 @@
 		transition: none;
 		pointer-events: none;
 		will-change: transform;
+		padding: 0;
+		border-radius: 0.25rem;
+		display: block;
+	}
+
+	.timeline.tooltip canvas {
+		display: block;
+		margin-bottom: 0.1rem;
+		height: 100px;
 	}
 </style>

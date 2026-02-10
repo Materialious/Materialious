@@ -96,13 +96,8 @@ export async function drawTimelineThumbnail(
 		return Math.abs(curr.time - timeInMs) < Math.abs(prev.time - timeInMs) ? curr : prev;
 	});
 
-	let spriteSheetEndTime: number;
 	const nextThumbnail = thumbnails.find((thumb) => thumb.time > closest.time);
-	if (nextThumbnail) {
-		spriteSheetEndTime = nextThumbnail.time;
-	} else {
-		spriteSheetEndTime = video.lengthSeconds * 1000;
-	}
+	const spriteSheetEndTime = nextThumbnail ? nextThumbnail.time : video.lengthSeconds * 1000;
 
 	const img = await imageCache.load(closest.url);
 	if (!img) {

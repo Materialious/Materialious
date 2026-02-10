@@ -352,6 +352,13 @@
 					<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
 						><i>notifications</i>
 						<div class="tooltip bottom">{$_('layout.notifications')}</div>
+						{#if notifications.length !== 0}
+							{#if notifications.length <= 99}
+								<span class="notif" data-count="{notifications.length}"></span>
+							{:else}
+								<span class="notif" data-count="99+"></span>
+							{/if}
+						{/if}
 					</button>
 				{/if}
 				<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
@@ -542,5 +549,31 @@
 		.pip h6 {
 			font-size: 1em;
 		}
+	}
+
+	.notif {
+		position: absolute;
+		top: 0;
+		right: 0;
+		transform: translate(-25%, 25%);
+		background-color: var(--primary);
+		color: var(--on-primary);
+		font-size: 0.75em;
+		font-weight: bold;
+		width: 2em;
+		height: 2em;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.notif[data-count]:after {
+		content: attr(data-count);
+		display: block;
+		text-align: center;
+		width: 100%;
 	}
 </style>

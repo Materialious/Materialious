@@ -1143,6 +1143,7 @@
 				canvasContext,
 				playerTimelineThumbnailsCache,
 				playerTimelineThumbnails,
+				data.video,
 				time
 			);
 		}

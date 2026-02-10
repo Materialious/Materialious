@@ -85,17 +85,24 @@ export async function drawTimelineThumbnail(
 	ctx: CanvasRenderingContext2D,
 	imageCache: ImageCache,
 	thumbnails: TimelineThumbnail[],
-	time: number
+	video: VideoPlay,
+	currentTime: number
 ): Promise<void> {
 	if (!thumbnails.length) return;
 
-	const timeInMs = time * 1000;
+	const timeInMs = currentTime * 1000;
 
-	const closest = thumbnails.reduce((prev, curr) =>
-		Math.abs(curr.time - timeInMs) < Math.abs(prev.time - timeInMs) ? curr : prev
-	);
+	const closest = thumbnails.reduce((prev, curr) => {
+		return Math.abs(curr.time - timeInMs) < Math.abs(prev.time - timeInMs) ? curr : prev;
+	});
 
-	if (!closest.url) return;
+	let spriteSheetEndTime: number;
+	const nextThumbnail = thumbnails.find((thumb) => thumb.time > closest.time);
+	if (nextThumbnail) {
+		spriteSheetEndTime = nextThumbnail.time;
+	} else {
+		spriteSheetEndTime = video.lengthSeconds * 1000;
+	}
 
 	const img = await imageCache.load(closest.url);
 	if (!img) {
@@ -105,24 +112,23 @@ export async function drawTimelineThumbnail(
 	const sheetWidth = img.width;
 	const sheetHeight = img.height;
 
-	const cols = Math.floor(sheetWidth / closest.width);
-	const rows = Math.floor(sheetHeight / closest.height);
+	const thumbWidth = closest.width;
+	const thumbHeight = closest.height;
+
+	const cols = Math.floor(sheetWidth / thumbWidth);
+	const rows = Math.floor(sheetHeight / thumbHeight);
+
 	const thumbnailsPerSheet = cols * rows;
 
-	const indexInSheet = closest.index % thumbnailsPerSheet;
-	const thumbX = (indexInSheet % cols) * closest.width;
-	const thumbY = Math.floor(indexInSheet / cols) * closest.height;
+	const elapsedTime = timeInMs - closest.time;
+	const totalDuration = spriteSheetEndTime - closest.time;
+	const elapsedPercentage = Math.min(Math.max(elapsedTime / totalDuration, 0), 1);
 
-	ctx.clearRect(0, 0, closest.width, closest.height);
-	ctx.drawImage(
-		img,
-		thumbX,
-		thumbY,
-		closest.width,
-		closest.height,
-		0,
-		0,
-		closest.width,
-		closest.height
-	);
+	const indexInSheet = Math.floor(elapsedPercentage * thumbnailsPerSheet);
+
+	const thumbX = (indexInSheet % cols) * thumbWidth;
+	const thumbY = Math.floor(indexInSheet / cols) * thumbHeight;
+
+	ctx.clearRect(0, 0, thumbWidth, thumbHeight);
+	ctx.drawImage(img, thumbX, thumbY, thumbWidth, thumbHeight, 0, 0, thumbWidth, thumbHeight);
 }

@@ -1353,10 +1353,11 @@
 				{#snippet timelineTooltip()}
 					{#if playerCloestSponsor}
 						{sponsorSegments[playerCloestSponsor.category]}
+						<br />
 					{:else if playerCloestTimestamp}
 						{truncate(playerCloestTimestamp.title, 24)}
+						<br />
 					{/if}
-					<br />
 				{/snippet}
 				<div class="track">
 					{#if !userManualSeeking}

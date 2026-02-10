@@ -40,6 +40,9 @@ export async function storyboardThumbnails(
 	for (let sheetIndex = 0; sheetIndex < storyboardCount; sheetIndex++) {
 		const url = templateUrl.replace('M$M', `M${sheetIndex}`);
 
+		// Pre-cache sheet
+		imageCache.load(url);
+
 		for (let i = 0; i < count; i++) {
 			const localIndex = i % (cols * rows);
 			const row = Math.floor(localIndex / cols);
@@ -47,9 +50,6 @@ export async function storyboardThumbnails(
 			if (row >= rows) break;
 
 			const time = Math.floor((globalIndex / totalThumbnails) * videoDurationMs);
-
-			// Pre-cache sheet
-			imageCache.load(url);
 
 			thumbnails.push({
 				url,

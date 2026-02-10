@@ -1355,7 +1355,7 @@
 						{sponsorSegments[playerCloestSponsor.category]}
 						<br />
 					{:else if playerCloestTimestamp}
-						{truncate(playerCloestTimestamp.title, 24)}
+						{truncate(playerCloestTimestamp.title, 22)}
 						<br />
 					{/if}
 				{/snippet}

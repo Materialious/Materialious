@@ -133,12 +133,14 @@
 		thumb?: HTMLCanvasElement;
 	} = $state({});
 	let playerInitalInteract = true;
+	let playerSliderInteracted = $state(false);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
 		step: 0.1,
 		value: () => currentTime,
 		onValueChange: async (timeToSet) => {
+			playerSliderInteracted = true;
 			userManualSeeking = true;
 			currentTime = timeToSet;
 
@@ -155,6 +157,7 @@
 				if (playerElement) {
 					playerElement.currentTime = timeToSet;
 					userManualSeeking = false;
+					playerSliderInteracted = false;
 				}
 			}, 300);
 		},
@@ -523,13 +526,13 @@
 			}
 
 			if (data.video.storyboards && data.video.storyboards.length > 2) {
-				storyboardThumbnails(
-					data.video.storyboards[2],
-					playerTimelineThumbnailsCache,
-					playerMaxKnownTime
-				).then((thumbnails) => {
-					playerTimelineThumbnails = thumbnails;
-				});
+				try {
+					storyboardThumbnails(data.video).then((thumbnails) => {
+						playerTimelineThumbnails = thumbnails;
+					});
+				} catch {
+					// Continue regardless of error.
+				}
 			}
 
 			if (
@@ -1143,6 +1146,7 @@
 				canvasContext,
 				playerTimelineThumbnailsCache,
 				playerTimelineThumbnails,
+				data.video,
 				time
 			);
 		}
@@ -1374,9 +1378,13 @@
 						></canvas>
 					{/if}
 					{#if playerCloestSponsor}
-						<p class="no-margin">{sponsorSegments[playerCloestSponsor.category]}</p>
+						<p class="no-margin" style="padding: 0 0.5rem;">
+							{sponsorSegments[playerCloestSponsor.category]}
+						</p>
 					{:else if playerCloestTimestamp}
-						<p class="no-margin">{truncate(playerCloestTimestamp.title, 22)}</p>
+						<p class="no-margin" style="padding: 0 0.5rem;">
+							{truncate(playerCloestTimestamp.title, 22)}
+						</p>
 					{/if}
 				{/snippet}
 				<div class="track">
@@ -1388,10 +1396,12 @@
 					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
-						<div class="tooltip thumb">
-							{@render timelineTooltip('thumb')}
-							{videoLength(currentTime)}
-						</div>
+						{#if playerSliderInteracted}
+							<div class="tooltip thumb">
+								{@render timelineTooltip('thumb')}
+								{videoLength(currentTime)}
+							</div>
+						{/if}
 					</div>
 				</div>
 				<div bind:this={playerBufferBar} class="buffered-bar" class:hide={userManualSeeking}></div>

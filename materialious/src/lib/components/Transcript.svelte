@@ -7,6 +7,7 @@
 	import type { VideoPlay } from '../api/model';
 	import { decodeHtmlCharCodes } from '../misc';
 	import { instanceStore } from '../store';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		video: VideoPlay;
@@ -52,29 +53,7 @@
 			`${!video.fallbackPatch ? new URL(get(instanceStore)).origin : ''}${url}`
 		);
 		transcript = await parseText(await resp.text(), { strict: false });
-
-		// Group cues by Math.ceil(startTime)
-		// eslint-disable-next-line svelte/prefer-svelte-reactivity
-		const startTimeMap = new Map<number, VTTCue[]>();
-		for (const cue of transcript.cues) {
-			const roundedTime = Math.ceil(cue.startTime);
-			if (!startTimeMap.has(roundedTime)) {
-				startTimeMap.set(roundedTime, []);
-			}
-			startTimeMap.get(roundedTime)!.push(cue);
-		}
-
-		// Keep only the second cue if multiple exist for the same rounded time
-		transcriptCues = [];
-		for (const [, cues] of startTimeMap.entries()) {
-			if (cues.length === 1) {
-				transcriptCues.push(cues[0]);
-			} else if (cues.length >= 2) {
-				transcriptCues.push(cues[1]); // Keep the second one
-			}
-		}
-
-		transcript.cues = transcriptCues;
+		transcriptCues = transcript.cues;
 
 		isLoading = false;
 	}
@@ -95,8 +74,8 @@
 	}
 </script>
 
-<article class="scroll border" style="height: 75vh;" id="transcript">
-	<article class="no-elevate" style="position: sticky; top: 0; z-index: 3;">
+<article class="scroll border no-padding" style="height: 75vh;" id="transcript">
+	<article class="no-elevate padding" style="position: sticky; top: 0; z-index: 3;">
 		<h6>{$_('transcript')}</h6>
 		<div class="field label suffix border">
 			<select bind:value={url} onchange={loadTranscript} name="captions">
@@ -137,7 +116,6 @@
 				{#each transcriptCues as cue (cue)}
 					<div
 						class="transcript-line"
-						id={`transcript-line-${cue.startTime}`}
 						role="presentation"
 						onclick={() => (playerElement.currentTime = cue.startTime)}
 						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}

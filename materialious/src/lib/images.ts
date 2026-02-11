@@ -53,9 +53,9 @@ export function getBestThumbnail(
 }
 
 export function proxyGoogleImage(source: string): string {
-	if (isYTBackend()) return source;
-
 	if (source.startsWith('//')) source = `https:${source}`;
+
+	if (isYTBackend()) return source;
 
 	let path: string | undefined;
 	try {

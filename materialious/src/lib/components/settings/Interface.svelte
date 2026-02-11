@@ -17,6 +17,7 @@
 	import {
 		authStore,
 		darkModeStore,
+		feedCacheStore,
 		instanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
@@ -31,6 +32,8 @@
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
+		playlistCacheStore,
+		searchCacheStore,
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
@@ -105,6 +108,10 @@
 
 		instanceStore.set(instance);
 		authStore.set(null);
+		feedCacheStore.set({});
+		searchCacheStore.set({});
+		playlistCacheStore.set({});
+
 		goto(resolve('/', {}), { replaceState: true });
 		ui('#dialog-settings');
 	}

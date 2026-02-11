@@ -1,5 +1,6 @@
 import { decodeHtmlCharCodes } from './misc';
-import { convertToSeconds } from './numbers';
+import { videoLength } from './numbers';
+import { convertToSeconds, padTime } from './time';
 
 export type Timestamp = { title: string; time: number; timePretty: string; endTime: number };
 export type Timestamps = Timestamp[];
@@ -117,4 +118,21 @@ export function phaseDescription(
 	const filteredContent = filteredLines.join('\n');
 
 	return { description: filteredContent, timestamps };
+}
+
+export function generateChapterWebVTT(timestamps: Timestamp[], videoLengthSeconds: number) {
+	let chapterWebVTT = 'WEBVTT\n\n';
+
+	timestamps.forEach((timestamp, timestampIndex) => {
+		let endTime: string;
+		if (timestampIndex === timestamps.length - 1) {
+			endTime = videoLength(videoLengthSeconds);
+		} else {
+			endTime = timestamps[timestampIndex + 1].timePretty;
+		}
+
+		chapterWebVTT += `${padTime(timestamp.timePretty)}.000 --> ${padTime(endTime)}.000\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
+	});
+
+	return chapterWebVTT;
 }

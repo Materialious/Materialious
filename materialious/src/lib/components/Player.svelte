@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { getBestThumbnail, ImageCache } from '$lib/images';
-	import { padTime, videoLength } from '$lib/numbers';
-	import { type PhasedDescription, type Timestamp } from '$lib/timestamps';
+	import { videoLength } from '$lib/numbers';
+	import { generateChapterWebVTT, type PhasedDescription, type Timestamp } from '$lib/description';
 	import { SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
@@ -60,6 +60,7 @@
 	import { addToast } from './Toast.svelte';
 	import { isMobile, truncate } from '$lib/misc';
 	import {
+		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
 		storyboardThumbnails,
 		type TimelineThumbnail
@@ -134,6 +135,7 @@
 	} = $state({});
 	let playerInitalInteract = true;
 	let playerSliderInteracted = $state(false);
+	let playerShowTimelineThumbnail = $state(true);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -155,9 +157,10 @@
 
 			playerSliderDebounce = setTimeout(() => {
 				if (playerElement) {
-					playerElement.currentTime = timeToSet;
+					playerElement.currentTime = currentTime;
 					userManualSeeking = false;
 					playerSliderInteracted = false;
+					playerShowTimelineThumbnail = false;
 				}
 			}, 300);
 		},
@@ -526,12 +529,36 @@
 			}
 
 			if (data.video.storyboards && data.video.storyboards.length > 2) {
-				try {
-					storyboardThumbnails(data.video).then((thumbnails) => {
-						playerTimelineThumbnails = thumbnails;
-					});
-				} catch {
-					// Continue regardless of error.
+				let thumbnailVTT: string | undefined;
+
+				const selectedStoryboard = data.video.storyboards[2];
+
+				if (
+					data.video.fallbackPatch === 'youtubejs' &&
+					typeof selectedStoryboard.rows !== 'undefined' &&
+					typeof selectedStoryboard.columns !== 'undefined'
+				) {
+					thumbnailVTT = generateThumbnailWebVTT(
+						{
+							...selectedStoryboard,
+							rows: selectedStoryboard.rows,
+							columns: selectedStoryboard.columns
+						},
+						playerMaxKnownTime
+					);
+				} else if (!data.video.fallbackPatch) {
+					const thumbnailVTTResp = await fetch(`${$instanceStore}${selectedStoryboard.url}`);
+					if (thumbnailVTTResp.ok) thumbnailVTT = await thumbnailVTTResp.text();
+				}
+
+				if (thumbnailVTT) {
+					try {
+						storyboardThumbnails(thumbnailVTT).then((thumbnails) => {
+							playerTimelineThumbnails = thumbnails;
+						});
+					} catch {
+						// Continue regardless of error.
+					}
 				}
 			}
 
@@ -569,22 +596,9 @@
 			}
 
 			if (data.content.timestamps) {
-				let chapterWebVTT = 'WEBVTT\n\n';
-
-				data.content.timestamps.forEach((timestamp, timestampIndex) => {
-					let endTime: string;
-					if (timestampIndex === data.content.timestamps.length - 1) {
-						endTime = videoLength(data.video.lengthSeconds);
-					} else {
-						endTime = data.content.timestamps[timestampIndex + 1].timePretty;
-					}
-
-					chapterWebVTT += `${padTime(timestamp.timePretty)}.000 --> ${padTime(endTime)}.000\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
-				});
-
 				try {
 					player.addChaptersTrack(
-						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
+						`data:text/vtt;base64,${btoa(generateChapterWebVTT(data.content.timestamps, playerMaxKnownTime))}`,
 						get(playerDefaultLanguage)
 					);
 				} catch {
@@ -1018,6 +1032,8 @@
 		try {
 			await loadVideo();
 		} catch (error: unknown) {
+			console.error(error);
+
 			if (
 				!Capacitor.isNativePlatform() ||
 				data.video.fallbackPatch === 'youtubejs' ||
@@ -1127,6 +1143,19 @@
 		}
 	}
 
+	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
+		const canvasContext = canvas.getContext('2d');
+
+		if (canvasContext) {
+			await drawTimelineThumbnail(
+				canvasContext,
+				playerTimelineThumbnailsCache,
+				playerTimelineThumbnails,
+				time
+			);
+		}
+	}
+
 	let requestAnimationTooltip: number | undefined;
 	let latestMouseX: number | undefined;
 
@@ -1138,25 +1167,13 @@
 		}
 	}
 
-	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
-		const canvasContext = canvas.getContext('2d');
-
-		if (canvasContext) {
-			await drawTimelineThumbnail(
-				canvasContext,
-				playerTimelineThumbnailsCache,
-				playerTimelineThumbnails,
-				data.video,
-				time
-			);
-		}
-	}
-
 	async function updateTooltip() {
 		if (!playerSliderElement || latestMouseX === undefined) {
 			requestAnimationTooltip = undefined;
 			return;
 		}
+
+		playerShowTimelineThumbnail = true;
 
 		const rect = playerSliderElement.getBoundingClientRect();
 		const percent = Math.min(Math.max((latestMouseX - rect.left) / rect.width, 0), 1);
@@ -1369,7 +1386,7 @@
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
-				{#snippet timelineTooltip(key: 'thumb' | 'timeline')}
+				{#snippet timelineTooltip(key: 'thumb' | 'timeline', timeInSeconds: number)}
 					{#if playerTimelineThumbnails.length > 0}
 						<canvas
 							bind:this={playerTimelineThumbnailCanvas[key]}
@@ -1386,20 +1403,19 @@
 							{truncate(playerCloestTimestamp.title, 22)}
 						</p>
 					{/if}
+					{videoLength(timeInSeconds)}
 				{/snippet}
 				<div class="track">
-					{#if !userManualSeeking}
+					{#if !userManualSeeking && playerShowTimelineThumbnail}
 						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
-							{@render timelineTooltip('timeline')}
-							{videoLength(playerTimelineTimeHover)}
+							{@render timelineTooltip('timeline', playerTimelineTimeHover)}
 						</div>
 					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						{#if playerSliderInteracted}
 							<div class="tooltip thumb">
-								{@render timelineTooltip('thumb')}
-								{videoLength(currentTime)}
+								{@render timelineTooltip('thumb', currentTime)}
 							</div>
 						{/if}
 					</div>

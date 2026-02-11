@@ -1,82 +1,114 @@
-import { get } from 'svelte/store';
-import type { VideoPlay } from './api/model';
+import type { StoryBoard } from './api/model';
 import { ImageCache } from './images';
-import { instanceStore } from './store';
 import { parseText } from 'media-captions';
+import { findElementForTime } from './misc';
 
 export interface TimelineThumbnail {
 	url: string;
-	time: number;
+	startTime: number;
+	endTime: number;
 	width: number;
 	height: number;
 	index: number;
+	yCoord: number;
+	xCoord: number;
 }
 
-export async function storyboardThumbnails(video: VideoPlay): Promise<TimelineThumbnail[]> {
-	if (!video.storyboards || video.storyboards.length < 2) return [];
+// Modified implementation from Freetube
+// https://github.com/FreeTubeApp/FreeTube/blob/20a44152fb1465cc01f496f1e22abd6a9a4b8390/src/renderer/helpers/utils.js#L107
+export function generateThumbnailWebVTT(
+	storyboard: StoryBoard & { columns: number; rows: number },
+	videoLengthSeconds: number
+) {
+	let vttString = 'WEBVTT\n\n';
+	// Amount of thumbnails per sheet
+	const numberOfThumbnailsPerSheet = storyboard.columns * storyboard.rows;
+	// Amount of sheets
+	const numberOfSheets = storyboard.count;
+	let intervalInSeconds;
+	if (storyboard.interval > 0) {
+		intervalInSeconds = storyboard.interval / 1000;
+	} else {
+		intervalInSeconds = videoLengthSeconds / (numberOfSheets * numberOfThumbnailsPerSheet);
+	}
+	let startHours = 0;
+	let startMinutes = 0;
+	let startSeconds = 0;
+	let endHours = 0;
+	let endMinutes = 0;
+	let endSeconds = intervalInSeconds;
+	for (let i = 0; i < numberOfSheets; i++) {
+		const currentUrl = storyboard.templateUrl.replace('$M.jpg', `${i}.jpg`);
+		let xCoord = 0;
+		let yCoord = 0;
+		for (let j = 0; j < numberOfThumbnailsPerSheet; j++) {
+			// add the timestamp information
+			const paddedStartHours = startHours.toString().padStart(2, '0');
+			const paddedStartMinutes = startMinutes.toString().padStart(2, '0');
+			const paddedStartSeconds = startSeconds.toFixed(3).padStart(6, '0');
+			const paddedEndHours = endHours.toString().padStart(2, '0');
+			const paddedEndMinutes = endMinutes.toString().padStart(2, '0');
+			const paddedEndSeconds = endSeconds.toFixed(3).padStart(6, '0');
+			vttString += `${paddedStartHours}:${paddedStartMinutes}:${paddedStartSeconds} --> ${paddedEndHours}:${paddedEndMinutes}:${paddedEndSeconds}\n`;
+			// add the current image url as well as the x, y, width, height information
+			vttString += `${currentUrl}#xywh=${xCoord},${yCoord},${storyboard.width},${storyboard.height}\n\n`;
+			// update the variables
+			startHours = endHours;
+			startMinutes = endMinutes;
+			startSeconds = endSeconds;
+			endSeconds += intervalInSeconds;
+			if (endSeconds >= 60) {
+				endSeconds -= 60;
+				endMinutes += 1;
+			}
+			if (endMinutes >= 60) {
+				endMinutes -= 60;
+				endHours += 1;
+			}
+			// x coordinate can only be smaller than the width of one subimage * the number of subimages per row
+			xCoord = (xCoord + storyboard.width) % (storyboard.width * storyboard.columns);
+			// only if the x coordinate is , so in a new row, we have to update the y coordinate
+			if (xCoord === 0) {
+				yCoord += storyboard.height;
+			}
+		}
+	}
+	return vttString;
+}
 
+export async function storyboardThumbnails(WebVTT: string): Promise<TimelineThumbnail[]> {
 	const thumbnails: TimelineThumbnail[] = [];
 
-	if (video.fallbackPatch === 'youtubejs') {
-		const { count, storyboardCount, width, height, templateUrl } = video.storyboards[2];
+	const thumbnailsSheets = await parseText(WebVTT, {
+		strict: true,
+		type: 'vtt'
+	});
 
-		const totalThumbnails = storyboardCount * count;
-		const videoDurationMs = video.lengthSeconds * 1000;
-		const timeInterval = videoDurationMs / totalThumbnails;
+	let index = 0;
+	thumbnailsSheets.cues.forEach((cue) => {
+		const urlParts = cue.text.split('#xywh=');
+		const xywh = urlParts[1];
+		const xywhValues = xywh.split(',');
 
-		for (let sheetIndex = 0; sheetIndex < storyboardCount; sheetIndex++) {
-			const url = templateUrl.replace('M$M', `M${sheetIndex}`);
-
-			const time = Math.floor(sheetIndex * count * timeInterval);
-			thumbnails.push({
-				url,
-				time,
-				width,
-				height,
-				index: sheetIndex * count
-			});
+		if (xywhValues.length !== 4) {
+			return [];
 		}
-	} else {
-		const WebVTTResp = await fetch(`${get(instanceStore)}${video.storyboards[2].url}`);
-		if (!WebVTTResp.ok) return [];
 
-		const thumbnailsSheets = await parseText(await WebVTTResp.text(), {
-			strict: true,
-			type: 'vtt'
+		const [xCoord, yCoord, thumbWidth, thumbHeight] = xywhValues.map(Number);
+
+		thumbnails.push({
+			url: cue.text,
+			startTime: cue.startTime,
+			endTime: cue.endTime,
+			width: thumbWidth,
+			height: thumbHeight,
+			index,
+			xCoord,
+			yCoord
 		});
 
-		const processedUrls = new Set<string>();
-
-		let index = 0;
-
-		thumbnailsSheets.cues.forEach((cue) => {
-			const urlParts = cue.text.split('#');
-			const cleanedUrl = urlParts[0];
-
-			if (!processedUrls.has(cleanedUrl)) {
-				const xywh = urlParts[1];
-				const xywhValues = xywh.split(',');
-
-				if (xywhValues.length !== 4) {
-					return [];
-				}
-
-				const [, , thumbWidth, thumbHeight] = xywhValues.map(Number);
-
-				processedUrls.add(cleanedUrl);
-
-				thumbnails.push({
-					url: cleanedUrl,
-					time: cue.startTime * 1000,
-					width: thumbWidth,
-					height: thumbHeight,
-					index
-				});
-
-				index++;
-			}
-		});
-	}
+		index++;
+	});
 
 	return thumbnails;
 }
@@ -85,45 +117,37 @@ export async function drawTimelineThumbnail(
 	ctx: CanvasRenderingContext2D,
 	imageCache: ImageCache,
 	thumbnails: TimelineThumbnail[],
-	video: VideoPlay,
 	currentTime: number
 ): Promise<void> {
 	if (!thumbnails.length) return;
 
-	const timeInMs = currentTime * 1000;
+	const thumbnail = findElementForTime(
+		thumbnails,
+		currentTime,
+		(thumbnail: TimelineThumbnail) => thumbnail.startTime,
+		(thumbnail: TimelineThumbnail) => thumbnail.endTime
+	);
 
-	const closest = thumbnails.reduce((prev, curr) => {
-		return Math.abs(curr.time - timeInMs) < Math.abs(prev.time - timeInMs) ? curr : prev;
-	});
+	if (!thumbnail) return;
 
-	const nextThumbnail = thumbnails.find((thumb) => thumb.time > closest.time);
-	const spriteSheetEndTime = nextThumbnail ? nextThumbnail.time : video.lengthSeconds * 1000;
-
-	const img = await imageCache.load(closest.url);
+	const img = await imageCache.load(thumbnail.url);
 	if (!img) {
 		return;
 	}
 
-	const sheetWidth = img.width;
-	const sheetHeight = img.height;
-
-	const thumbWidth = closest.width;
-	const thumbHeight = closest.height;
-
-	const cols = Math.floor(sheetWidth / thumbWidth);
-	const rows = Math.floor(sheetHeight / thumbHeight);
-
-	const thumbnailsPerSheet = cols * rows;
-
-	const elapsedTime = timeInMs - closest.time;
-	const totalDuration = spriteSheetEndTime - closest.time;
-	const elapsedPercentage = Math.min(Math.max(elapsedTime / totalDuration, 0), 1);
-
-	const indexInSheet = Math.floor(elapsedPercentage * thumbnailsPerSheet);
-
-	const thumbX = (indexInSheet % cols) * thumbWidth;
-	const thumbY = Math.floor(indexInSheet / cols) * thumbHeight;
+	const thumbWidth = thumbnail.width;
+	const thumbHeight = thumbnail.height;
 
 	ctx.clearRect(0, 0, thumbWidth, thumbHeight);
-	ctx.drawImage(img, thumbX, thumbY, thumbWidth, thumbHeight, 0, 0, thumbWidth, thumbHeight);
+	ctx.drawImage(
+		img,
+		thumbnail.xCoord,
+		thumbnail.yCoord,
+		thumbWidth,
+		thumbHeight,
+		0,
+		0,
+		thumbWidth,
+		thumbHeight
+	);
 }

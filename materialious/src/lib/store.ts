@@ -25,7 +25,7 @@ import type {
 	VideoPlay
 } from './api/model';
 import { ensureNoTrailingSlash } from './misc';
-import type { PhasedDescription } from './timestamps';
+import type { PhasedDescription } from './description';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;

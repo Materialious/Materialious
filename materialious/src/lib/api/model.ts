@@ -125,6 +125,8 @@ export interface StoryBoard {
 	storyboardWidth: number;
 	storyboardHeight: number;
 	storyboardCount: number;
+	columns?: number;
+	rows?: number;
 }
 
 export interface ReturnYTDislikes {

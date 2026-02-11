@@ -47,9 +47,7 @@ export async function getWatchDetails(videoId: string, url: URL) {
 
 	let comments;
 	try {
-		comments = video.liveNow
-			? null
-			: getComments(videoId, { sort_by: 'top', source: 'youtube' }, { priority: 'low' });
+		comments = video.liveNow ? null : getComments(videoId, { sort_by: 'top' }, { priority: 'low' });
 	} catch {
 		comments = null;
 	}

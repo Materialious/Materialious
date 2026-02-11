@@ -3,7 +3,6 @@ import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
 	authStore,
-	backendInUseStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
 	instanceStore,
@@ -29,10 +28,15 @@ import type {
 	Video,
 	VideoPlay,
 	SearchOptions,
-	SearchResults
+	SearchResults,
+	CommentsOptions
 } from './model';
-import { searchSetDefaults } from './misc';
+import { commentsSetDefaults, searchSetDefaults } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
+import { isYTBackend } from '$lib/misc';
+import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
+import { getResolveUrlYTjs } from './youtubejs/misc';
+import { getCommentsYTjs } from './youtubejs/comments';
 
 export function buildPath(path: string): URL {
 	return new URL(`${get(instanceStore)}/api/v1/${path}`);
@@ -73,11 +77,20 @@ export function buildAuthHeaders(): { headers: Record<string, string> } {
 }
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
+	if (isYTBackend()) {
+		// Home page will be subscription page when using Youtube backend
+		return [];
+	}
+
 	const resp = await fetchErrorHandle(await fetch(buildPath('popular'), fetchOptions));
 	return await resp.json();
 }
 
 export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
+	if (isYTBackend()) {
+		return await getResolveUrlYTjs(url);
+	}
+
 	const resp = await fetchErrorHandle(await fetch(`${buildPath('resolveurl')}?url=${url}`));
 	return await resp.json();
 }
@@ -87,7 +100,7 @@ export async function getVideo(
 	local: boolean = false,
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
-	if (get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) {
+	if ((get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) || isYTBackend()) {
 		return await getVideoYTjs(videoId);
 	}
 
@@ -113,23 +126,17 @@ export async function getDislikes(
 
 export async function getComments(
 	videoId: string,
-	parameters: {
-		sort_by?: 'top' | 'new';
-		source?: 'youtube' | 'reddit';
-		continuation?: string;
-	},
+	options: CommentsOptions,
 	fetchOptions?: RequestInit
 ): Promise<Comments> {
-	if (typeof parameters.sort_by === 'undefined') {
-		parameters.sort_by = 'top';
-	}
+	commentsSetDefaults(options);
 
-	if (typeof parameters.source === 'undefined') {
-		parameters.source = 'youtube';
+	if (isYTBackend()) {
+		return await getCommentsYTjs(videoId, options);
 	}
 
 	const path = buildPath(`comments/${videoId}`);
-	path.search = new URLSearchParams(parameters).toString();
+	path.search = new URLSearchParams(options).toString();
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
@@ -184,6 +191,10 @@ export async function getSearchSuggestions(
 	search: string,
 	fetchOptions?: RequestInit
 ): Promise<SearchSuggestion> {
+	if (isYTBackend()) {
+		return getSearchSuggestionsYTjs(search);
+	}
+
 	const path = buildPath('search/suggestions');
 	path.search = new URLSearchParams({ q: search }).toString();
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
@@ -200,11 +211,11 @@ export async function getSearch(
 	options: SearchOptions,
 	fetchOptions?: RequestInit
 ): Promise<SearchResults> {
-	if (get(backendInUseStore) === 'yt') {
+	searchSetDefaults(options);
+
+	if (isYTBackend()) {
 		return await getSearchYTjs(search, options);
 	}
-
-	searchSetDefaults(options);
 
 	const path = buildPath('search');
 	path.search = new URLSearchParams({ ...options, q: search }).toString();

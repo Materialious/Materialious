@@ -23,14 +23,17 @@
 	const replyText: string = comment.replies?.replyCount > 1 ? $_('replies') : $_('reply');
 
 	async function loadReplies(continuation: string) {
-		try {
-			replies = await getComments(videoId, {
-				continuation: continuation,
-				sort_by: 'top',
-				source: 'youtube'
-			});
-		} catch {
-			// Continue regardless of error
+		if (comment.getReplies) {
+			replies = await comment.getReplies();
+		} else {
+			try {
+				replies = await getComments(videoId, {
+					continuation: continuation,
+					sort_by: 'top'
+				});
+			} catch {
+				// Continue regardless of error
+			}
 		}
 	}
 

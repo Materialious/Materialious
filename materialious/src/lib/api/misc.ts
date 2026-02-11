@@ -1,4 +1,4 @@
-import type { SearchOptions } from './model';
+import type { CommentsOptions, SearchOptions } from './model';
 
 export function searchSetDefaults(options: SearchOptions) {
 	if (typeof options.sort_by === 'undefined') {
@@ -11,5 +11,11 @@ export function searchSetDefaults(options: SearchOptions) {
 
 	if (typeof options.page === 'undefined') {
 		options.page = '1';
+	}
+}
+
+export function commentsSetDefaults(options: CommentsOptions) {
+	if (typeof options.sort_by === 'undefined') {
+		options.sort_by = 'top';
 	}
 }

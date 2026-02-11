@@ -168,6 +168,7 @@ export interface Comment {
 		replyCount: number;
 		continuation: string;
 	};
+	getReplies?: () => Promise<Comments>;
 }
 
 export interface Comments {
@@ -306,4 +307,9 @@ export interface SynciousSaveProgressModel {
 
 export type SearchResults = (Channel | Video | Playlist | HashTag)[] & {
 	getContinuation?: () => Promise<SearchResults>;
+};
+
+export type CommentsOptions = {
+	sort_by?: 'top' | 'new';
+	continuation?: string;
 };

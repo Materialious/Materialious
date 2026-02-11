@@ -1,7 +1,6 @@
 import { cleanNumber, extractNumber } from '$lib/numbers';
 import { convertToSeconds } from '$lib/time';
 import { getInnertube } from '.';
-import { searchSetDefaults } from '../misc';
 import type { Channel, SearchOptions, SearchResults, Thumbnail, Video } from '../model';
 import { YTNodes, type Types, YT } from 'youtubei.js';
 
@@ -67,8 +66,6 @@ export async function getSearchYTjs(
 	options: SearchOptions
 ): Promise<SearchResults> {
 	const innertube = await getInnertube();
-
-	searchSetDefaults(options);
 
 	const innerResults = await innertube.search(search, {
 		sort_by: options.sort_by,

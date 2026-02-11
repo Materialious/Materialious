@@ -4,6 +4,7 @@ import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import {
+	backendInUseStore,
 	interfaceAllowInsecureRequests,
 	interfaceAndroidUseNativeShare,
 	isAndroidTvStore
@@ -221,4 +222,8 @@ export function findElementForTime<T>(
 	}
 
 	return null;
+}
+
+export function isYTBackend(): boolean {
+	return get(backendInUseStore) === 'yt' && Capacitor.isNativePlatform();
 }

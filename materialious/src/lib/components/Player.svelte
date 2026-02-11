@@ -58,7 +58,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from './Toast.svelte';
-	import { isMobile, truncate } from '$lib/misc';
+	import { isMobile, isYTBackend, truncate } from '$lib/misc';
 	import {
 		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
@@ -485,7 +485,7 @@
 
 		sabrAdapter = await injectSabr(data.video, player);
 
-		if (data.video.fallbackPatch === 'youtubejs') {
+		if (data.video.fallbackPatch === 'youtubejs' && !isYTBackend()) {
 			addToast({ data: { text: $_('player.youtubeJsFallBack') } });
 		}
 

@@ -28,9 +28,9 @@ export function relativeTimestamp(epochTime: number): string {
 	if (isSameDay || isSameWeek) {
 		return diffDuration.humanize(true);
 	} else if (isSameMonth) {
-		return timestamp.format('Do @ h:mm A');
+		return timestamp.format('Do h:mm A');
 	} else if (isThisYear) {
-		return timestamp.format('MMMM Do @ h:mm A');
+		return timestamp.format('MMMM Do h:mm A');
 	} else {
 		return timestamp.format('MMMM Do YYYY h:mm A');
 	}

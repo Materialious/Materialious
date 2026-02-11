@@ -1,9 +1,9 @@
 import { cleanNumber, extractNumber } from '$lib/numbers';
 import { convertToSeconds } from '$lib/time';
-import type { Channel, Thumbnail, Video } from '../model';
+import type { Channel, Playlist, Thumbnail, Video } from '../model';
 import { Helpers, YTNodes } from 'youtubei.js';
 
-export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | undefined {
+export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Playlist | undefined {
 	if (item.is(YTNodes.Video)) {
 		const views = extractNumber(item.view_count?.toString() || '');
 		return {
@@ -39,6 +39,27 @@ export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | und
 			description: item.description_snippet.text ?? '',
 			descriptionHml: item.description_snippet.toHTML() ?? '',
 			authorThumbnails: item.author.thumbnails as Thumbnail[]
+		};
+	} else if (item.is(YTNodes.LockupView) && item.content_type === 'PLAYLIST') {
+		let author = '';
+		const metadataRows = item.metadata?.metadata?.metadata_rows[0];
+		if (metadataRows && metadataRows.metadata_parts) {
+			author = metadataRows.metadata_parts[0].text?.text ?? '';
+		}
+		return {
+			type: 'playlist',
+			title: item.metadata?.title.text ?? '',
+			playlistId: item.content_id,
+			playlistThumbnail: item.content_image?.is(YTNodes.CollectionThumbnailView)
+				? item.content_image.primary_thumbnail?.is(YTNodes.ThumbnailView)
+					? item.content_image.primary_thumbnail.image[0].url
+					: ''
+				: '',
+			authorVerified: false,
+			author,
+			authorId: '',
+			videoCount: 0,
+			videos: []
 		};
 	}
 }

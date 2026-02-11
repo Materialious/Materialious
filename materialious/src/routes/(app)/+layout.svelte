@@ -19,15 +19,12 @@
 	import {
 		authStore,
 		darkModeStore,
-		feedCacheStore,
 		instanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
 		playerState,
 		playertheatreModeIsActive,
-		playlistCacheStore,
-		searchCacheStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -42,7 +39,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { truncate } from '$lib/misc';
+	import { logoutStores, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
@@ -182,10 +179,7 @@
 	}
 
 	function logout() {
-		authStore.set(null);
-		feedCacheStore.set({});
-		searchCacheStore.set({});
-		playlistCacheStore.set({});
+		logoutStores();
 		goto(resolve('/', {}));
 	}
 

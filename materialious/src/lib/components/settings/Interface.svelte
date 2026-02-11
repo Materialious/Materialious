@@ -11,14 +11,13 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, isMobile } from '../../misc';
+	import { ensureNoTrailingSlash, isMobile, logoutStores } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		authStore,
 		backendInUseStore,
 		darkModeStore,
-		feedCacheStore,
 		instanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
@@ -33,8 +32,6 @@
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		playlistCacheStore,
-		searchCacheStore,
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
@@ -78,6 +75,12 @@
 		}
 	}
 
+	function clearPreviousInstance() {
+		logoutStores();
+		ui('#dialog-settings');
+		location.reload();
+	}
+
 	async function setInstance(event: Event) {
 		event.preventDefault();
 
@@ -108,18 +111,14 @@
 		}
 
 		instanceStore.set(instance);
-		authStore.set(null);
-		feedCacheStore.set({});
-		searchCacheStore.set({});
-		playlistCacheStore.set({});
 
-		goto(resolve('/', {}), { replaceState: true });
-		ui('#dialog-settings');
+		clearPreviousInstance();
 	}
 
 	async function setBackend(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
+		clearPreviousInstance();
 	}
 
 	function allowInsecureRequests() {

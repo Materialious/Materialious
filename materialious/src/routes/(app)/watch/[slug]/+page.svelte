@@ -348,12 +348,16 @@
 			return;
 		}
 
-		const loadedComments = await getComments(data.video.videoId, {
-			continuation: comments?.continuation
-		});
+		let loadedComments: Comments;
+		if (comments.getContinuation) {
+			loadedComments = await comments.getContinuation();
+		} else {
+			loadedComments = await getComments(data.video.videoId, {
+				continuation: comments?.continuation
+			});
+		}
 
 		comments.continuation = loadedComments.continuation;
-
 		comments.comments = [...comments.comments, ...loadedComments.comments];
 	}
 

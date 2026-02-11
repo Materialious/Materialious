@@ -176,6 +176,7 @@ export interface Comments {
 	videoId: string;
 	continuation?: string;
 	comments: Comment[];
+	getContinuation?: () => Promise<Comments>;
 }
 
 export interface Channel {

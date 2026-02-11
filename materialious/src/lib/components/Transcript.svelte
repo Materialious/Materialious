@@ -7,7 +7,6 @@
 	import type { VideoPlay } from '../api/model';
 	import { decodeHtmlCharCodes } from '../misc';
 	import { instanceStore } from '../store';
-	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		video: VideoPlay;

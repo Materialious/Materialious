@@ -1031,6 +1031,8 @@
 		try {
 			await loadVideo();
 		} catch (error: unknown) {
+			console.error(error);
+
 			if (
 				!Capacitor.isNativePlatform() ||
 				data.video.fallbackPatch === 'youtubejs' ||

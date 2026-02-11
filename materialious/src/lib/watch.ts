@@ -13,7 +13,7 @@ import {
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
-import { phaseDescription } from '$lib/timestamps';
+import { phaseDescription } from '$lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { _ } from './i18n';

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { getBestThumbnail, ImageCache } from '$lib/images';
-	import { padTime, videoLength } from '$lib/numbers';
-	import { type PhasedDescription, type Timestamp } from '$lib/timestamps';
+	import { videoLength } from '$lib/numbers';
+	import { generateChapterWebVTT, type PhasedDescription, type Timestamp } from '$lib/description';
 	import { SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
@@ -60,10 +60,12 @@
 	import { addToast } from './Toast.svelte';
 	import { isMobile, truncate } from '$lib/misc';
 	import {
+		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
 		storyboardThumbnails,
 		type TimelineThumbnail
 	} from '$lib/timelineThumbnails';
+	import { padTime } from '$lib/time';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
@@ -526,12 +528,36 @@
 			}
 
 			if (data.video.storyboards && data.video.storyboards.length > 2) {
-				try {
-					storyboardThumbnails(data.video).then((thumbnails) => {
-						playerTimelineThumbnails = thumbnails;
-					});
-				} catch {
-					// Continue regardless of error.
+				let thumbnailVTT: string | undefined;
+
+				const selectedStoryboard = data.video.storyboards[2];
+
+				if (
+					data.video.fallbackPatch === 'youtubejs' &&
+					typeof selectedStoryboard.rows !== 'undefined' &&
+					typeof selectedStoryboard.columns !== 'undefined'
+				) {
+					thumbnailVTT = generateThumbnailWebVTT(
+						{
+							...selectedStoryboard,
+							rows: selectedStoryboard.rows,
+							columns: selectedStoryboard.columns
+						},
+						playerMaxKnownTime
+					);
+				} else if (!data.video.fallbackPatch) {
+					const thumbnailVTTResp = await fetch(`${$instanceStore}${selectedStoryboard.url}`);
+					if (thumbnailVTTResp.ok) thumbnailVTT = await thumbnailVTTResp.text();
+				}
+
+				if (thumbnailVTT) {
+					try {
+						storyboardThumbnails(thumbnailVTT).then((thumbnails) => {
+							playerTimelineThumbnails = thumbnails;
+						});
+					} catch {
+						// Continue regardless of error.
+					}
 				}
 			}
 
@@ -569,22 +595,9 @@
 			}
 
 			if (data.content.timestamps) {
-				let chapterWebVTT = 'WEBVTT\n\n';
-
-				data.content.timestamps.forEach((timestamp, timestampIndex) => {
-					let endTime: string;
-					if (timestampIndex === data.content.timestamps.length - 1) {
-						endTime = videoLength(data.video.lengthSeconds);
-					} else {
-						endTime = data.content.timestamps[timestampIndex + 1].timePretty;
-					}
-
-					chapterWebVTT += `${padTime(timestamp.timePretty)}.000 --> ${padTime(endTime)}.000\n${timestamp.title.replaceAll('-', '').trim()}\n\n`;
-				});
-
 				try {
 					player.addChaptersTrack(
-						`data:text/vtt;base64,${btoa(chapterWebVTT)}`,
+						`data:text/vtt;base64,${btoa(generateChapterWebVTT(data.content.timestamps, playerMaxKnownTime))}`,
 						get(playerDefaultLanguage)
 					);
 				} catch {
@@ -1146,7 +1159,6 @@
 				canvasContext,
 				playerTimelineThumbnailsCache,
 				playerTimelineThumbnails,
-				data.video,
 				time
 			);
 		}

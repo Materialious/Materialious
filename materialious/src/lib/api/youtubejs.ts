@@ -8,8 +8,8 @@ import type {
 	VideoBase,
 	VideoPlay
 } from '$lib/api/model';
-import { convertToSeconds } from '$lib/numbers';
 import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
+import { convertToSeconds } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
 import { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
@@ -221,7 +221,9 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 				interval: board.interval,
 				storyboardCount: board.storyboard_count,
 				storyboardHeight: board.thumbnail_height,
-				storyboardWidth: board.thumbnail_width
+				storyboardWidth: board.thumbnail_width,
+				columns: board.columns,
+				rows: board.rows
 			});
 		});
 	}

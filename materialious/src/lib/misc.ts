@@ -189,3 +189,36 @@ export function createVideoUrl(videoId: string, playlistId: string): URL {
 export function timeout(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export function findElementForTime<T>(
+	elements: T[],
+	currentTime: number,
+	getStartTime: (element: T) => number,
+	getEndTime: (element: T) => number
+): T | null {
+	let left = 0;
+	let right = elements.length - 1;
+
+	while (left <= right) {
+		const mid = Math.floor((left + right) / 2);
+		const element = elements[mid];
+		const startTime = getStartTime(element);
+		const endTime = getEndTime(element);
+
+		// Check if currentTime is within the time range of the element
+		if (currentTime >= startTime && currentTime <= endTime) {
+			return element;
+		}
+
+		// If currentTime is earlier, search the left half
+		if (currentTime < startTime) {
+			right = mid - 1;
+		}
+		// If currentTime is later, search the right half
+		else {
+			left = mid + 1;
+		}
+	}
+
+	return null;
+}

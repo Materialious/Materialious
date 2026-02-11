@@ -13,8 +13,6 @@ import {
 	synciousInstanceStore
 } from '../store';
 import type {
-	ChannelContentPlaylists,
-	ChannelContentVideos,
 	ChannelPage,
 	Comments,
 	DeArrow,
@@ -40,6 +38,13 @@ import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
 import { getResolveUrlYTjs } from './youtubejs/misc';
 import { getCommentsYTjs } from './youtubejs/comments';
 import { getChannelContentYTjs, getChannelYTjs } from './youtubejs/channel';
+import {
+	amSubscribedYTjs,
+	deleteUnsubscribeYTjs,
+	getFeedYTjs,
+	getSubscriptionsYTjs,
+	postSubscribeYTjs
+} from './youtubejs/subscriptions';
 
 export function buildPath(path: string): URL {
 	return new URL(`${get(instanceStore)}/api/v1/${path}`);
@@ -81,7 +86,6 @@ export function buildAuthHeaders(): { headers: Record<string, string> } {
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	if (isYTBackend()) {
-		// Home page will be subscription page when using Youtube backend
 		return [];
 	}
 
@@ -231,6 +235,10 @@ export async function getFeed(
 	page: number,
 	fetchOptions: RequestInit = {}
 ): Promise<Feed> {
+	if (isYTBackend()) {
+		return getFeedYTjs(maxResults, page);
+	}
+
 	const path = buildPath('auth/feed');
 	path.search = new URLSearchParams({
 		max_results: maxResults.toString(),
@@ -243,6 +251,9 @@ export async function getFeed(
 }
 
 export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<Subscription[]> {
+	if (isYTBackend()) {
+		return getSubscriptionsYTjs();
+	}
 	const resp = await fetchErrorHandle(
 		await fetch(buildPath('auth/subscriptions'), { ...buildAuthHeaders(), ...fetchOptions })
 	);
@@ -253,6 +264,10 @@ export async function amSubscribed(
 	authorId: string,
 	fetchOptions: RequestInit = {}
 ): Promise<boolean> {
+	if (isYTBackend()) {
+		return amSubscribedYTjs(authorId);
+	}
+
 	if (!get(authStore)) return false;
 
 	try {
@@ -266,6 +281,10 @@ export async function amSubscribed(
 }
 
 export async function postSubscribe(authorId: string, fetchOptions: RequestInit = {}) {
+	if (isYTBackend()) {
+		return postSubscribeYTjs(authorId);
+	}
+
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/subscriptions/${authorId}`), {
 			method: 'POST',
@@ -276,6 +295,10 @@ export async function postSubscribe(authorId: string, fetchOptions: RequestInit 
 }
 
 export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestInit = {}) {
+	if (isYTBackend()) {
+		return deleteUnsubscribeYTjs(authorId);
+	}
+
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/subscriptions/${authorId}`), {
 			method: 'DELETE',

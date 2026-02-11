@@ -38,7 +38,7 @@
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
-	import { expandSummery } from '$lib/misc';
+	import { expandSummery, isYTBackend } from '$lib/misc';
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time.js';
 	import { getWatchDetails } from '$lib/watch.js';
 	import { page } from '$app/state';
@@ -490,7 +490,7 @@
 						<button disabled class="border">
 							<i>add</i>
 							<div class="tooltip">
-								{#if $authStore}
+								{#if $authStore || isYTBackend()}
 									{$_('player.noPlaylists')}
 								{:else}
 									{$_('loginRequired')}

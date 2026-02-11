@@ -3,7 +3,7 @@
 	import { amSubscribed, deleteUnsubscribe, postSubscribe } from '$lib/api';
 	import type { Image } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
-	import { truncate } from '$lib/misc';
+	import { isYTBackend, truncate } from '$lib/misc';
 	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { localDb } from '$lib/dexie';
@@ -71,7 +71,7 @@
 		</nav>
 	</a>
 	{#if !hideSubscribe}
-		{#if $authStore}
+		{#if $authStore || isYTBackend()}
 			<nav class="group split">
 				<button
 					onclick={toggleSubscribed}

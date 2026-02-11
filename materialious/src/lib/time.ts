@@ -18,13 +18,14 @@ export function relativeTimestamp(epochTime: number): string {
 	const timestamp = dayjs.utc(epochTime).local();
 
 	const isSameDay = now.isSame(timestamp, 'day');
+	const isSameWeek = now.isSame(timestamp, 'week');
 	const isSameMonth = now.isSame(timestamp, 'month');
 	const isThisYear = now.isSame(timestamp, 'year');
 
 	const diffMilliseconds = timestamp.diff(now);
 	const diffDuration = dayjs.duration(diffMilliseconds);
 
-	if (isSameDay) {
+	if (isSameDay || isSameWeek) {
 		return diffDuration.humanize(true);
 	} else if (isSameMonth) {
 		return timestamp.format('Do @ h:mm A');

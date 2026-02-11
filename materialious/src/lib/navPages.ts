@@ -1,5 +1,6 @@
 import { _ } from '$lib/i18n';
 import { get } from 'svelte/store';
+import { isYTBackend } from './misc';
 
 export type Pages = { icon: string; href: string; name: string; requiresAuth: boolean }[];
 
@@ -8,7 +9,7 @@ export function getPages(): Pages {
 	return [
 		{
 			icon: 'home',
-			href: '/',
+			href: !isYTBackend() ? '/' : '/subscriptions',
 			name: get(_)('pages.home'),
 			requiresAuth: false
 		},

@@ -65,7 +65,6 @@
 		storyboardThumbnails,
 		type TimelineThumbnail
 	} from '$lib/timelineThumbnails';
-	import { padTime } from '$lib/time';
 
 	interface Props {
 		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };

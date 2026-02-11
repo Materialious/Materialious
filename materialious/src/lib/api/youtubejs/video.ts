@@ -8,13 +8,14 @@ import type {
 	VideoBase,
 	VideoPlay
 } from '$lib/api/model';
-import { interfaceRegionStore, poTokenCacheStore } from '$lib/store';
+import { poTokenCacheStore } from '$lib/store';
 import { convertToSeconds } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
-import { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
-import { Innertube, UniversalCache, Utils, YT, YTNodes, Platform } from 'youtubei.js';
+import { Utils, YT, YTNodes, Platform } from 'youtubei.js';
+import { getInnertube } from '.';
+import { cleanNumber, extractNumber } from '$lib/numbers';
 
 Platform.shim.eval = async (
 	data: Types.BuildScriptResult,
@@ -35,17 +36,12 @@ Platform.shim.eval = async (
 	return new Function(code)();
 };
 
-export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
+export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 	if (!Capacitor.isNativePlatform()) {
 		throw new Error('Platform not supported');
 	}
 
-	const youtube = await Innertube.create({
-		fetch: fetch,
-		cache: new UniversalCache(false),
-		location: get(interfaceRegionStore),
-		user_agent: USER_AGENT
-	});
+	const innertube = await getInnertube();
 
 	const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
@@ -57,7 +53,7 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 	const clientPlaybackNonce = Utils.generateRandomString(16);
 
 	const watchEndpoint = new YTNodes.NavigationEndpoint({ watchEndpoint: { videoId } });
-	const rawPlayerResponse = await watchEndpoint.call(youtube.actions, {
+	const rawPlayerResponse = await watchEndpoint.call(innertube.actions, {
 		contentCheckOk: true,
 		racyCheckOk: true,
 		playbackContext: {
@@ -65,16 +61,16 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 				pyv: true
 			},
 			contentPlaybackContext: {
-				signatureTimestamp: youtube.session.player?.signature_timestamp
+				signatureTimestamp: innertube.session.player?.signature_timestamp
 			}
 		}
 	});
-	const rawNextResponse = await watchEndpoint.call(youtube.actions, {
+	const rawNextResponse = await watchEndpoint.call(innertube.actions, {
 		override_endpoint: '/next'
 	});
 	const video = new YT.VideoInfo(
 		[rawPlayerResponse, rawNextResponse],
-		youtube.actions,
+		innertube.actions,
 		clientPlaybackNonce
 	);
 
@@ -82,7 +78,7 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 		throw new Error('Unable to pull video info from youtube.js');
 	}
 
-	const challengeResponse = await youtube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+	const challengeResponse = await innertube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
 	poTokenCacheStore.set(await platformMinter(requestKey, videoId, challengeResponse));
 
 	let dashUri: string | undefined;
@@ -139,7 +135,7 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 
 	let authorThumbnails: Image[];
 	if (video.basic_info.channel_id) {
-		const channel = await youtube.getChannel(video.basic_info.channel_id);
+		const channel = await innertube.getChannel(video.basic_info.channel_id);
 		authorThumbnails = channel.metadata.avatar as Image[];
 	} else {
 		authorThumbnails = [];
@@ -151,7 +147,7 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 
 		url.searchParams.set('potc', '1');
 		url.searchParams.set('pot', get(poTokenCacheStore) ?? '');
-		url.searchParams.set('c', youtube.session.context.client.clientName);
+		url.searchParams.set('c', innertube.session.context.client.clientName);
 		url.searchParams.set('fmt', 'vtt');
 
 		// Remove &xosf=1 as it adds `position:63% line:0%` to the subtitle lines
@@ -190,10 +186,13 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 			videoThumbnails: (recommended?.content_image.image as Thumbnail[]) || [],
 			videoId: recommended.content_id,
 			title: recommended.metadata.title.toString(),
-			viewCountText:
-				(recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text ?? '')
-					.toString()
-					.replace('views', '') || '',
+			viewCountText: cleanNumber(
+				extractNumber(
+					(
+						recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text ?? ''
+					).toString()
+				)
+			),
 			author:
 				(
 					recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text ?? ''
@@ -271,7 +270,7 @@ export async function getVideoTYjs(videoId: string): Promise<VideoPlay> {
 		keywords: video.basic_info.keywords || [],
 		allowedRegions: [],
 		ytjs: {
-			innertube: youtube,
+			innertube: innertube,
 			video: video,
 			clientPlaybackNonce: clientPlaybackNonce,
 			rawApiResponse: rawPlayerResponse

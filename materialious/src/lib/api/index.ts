@@ -1,4 +1,4 @@
-import { getVideoTYjs } from '$lib/api/youtubejs';
+import { getVideoYTjs } from '$lib/api/youtubejs/video';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
@@ -13,15 +13,12 @@ import {
 	synciousInstanceStore
 } from '../store';
 import type {
-	Channel,
 	ChannelContentPlaylists,
 	ChannelContentVideos,
 	ChannelPage,
 	Comments,
 	DeArrow,
 	Feed,
-	HashTag,
-	Playlist,
 	PlaylistPage,
 	ResolvedUrl,
 	ReturnYTDislikes,
@@ -29,8 +26,12 @@ import type {
 	Subscription,
 	ApiExntendedProgressModel,
 	Video,
-	VideoPlay
+	VideoPlay,
+	SearchOptions,
+	SearchResults
 } from './model';
+import { searchSetDefaults } from './misc';
+import { getSearchYTjs } from './youtubejs/search';
 
 export function buildPath(path: string): URL {
 	return new URL(`${get(instanceStore)}/api/v1/${path}`);
@@ -86,13 +87,13 @@ export async function getVideo(
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
 	if (get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) {
-		return await getVideoTYjs(videoId);
+		return await getVideoYTjs(videoId);
 	}
 
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
 
 	if (!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform()) {
-		return await getVideoTYjs(videoId);
+		return await getVideoYTjs(videoId);
 	} else {
 		await fetchErrorHandle(resp);
 	}
@@ -193,31 +194,14 @@ export async function getHashtag(tag: string, page: number = 0): Promise<{ resul
 	return await resp.json();
 }
 
-export interface SearchOptions {
-	sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
-	type?: 'video' | 'playlist' | 'channel' | 'all';
-	duration?: 'short' | 'medium' | 'long';
-	date?: 'hour' | 'today' | 'week' | 'month' | 'year';
-	features?: string;
-	page?: string;
-}
-
 export async function getSearch(
 	search: string,
 	options: SearchOptions,
 	fetchOptions?: RequestInit
-): Promise<(Channel | Video | Playlist | HashTag)[]> {
-	if (typeof options.sort_by === 'undefined') {
-		options.sort_by = 'relevance';
-	}
+): Promise<SearchResults> {
+	searchSetDefaults(options);
 
-	if (typeof options.type === 'undefined') {
-		options.type = 'all';
-	}
-
-	if (typeof options.page === 'undefined') {
-		options.page = '1';
-	}
+	await getSearchYTjs(search, options);
 
 	const path = buildPath('search');
 	path.search = new URLSearchParams({ ...options, q: search }).toString();

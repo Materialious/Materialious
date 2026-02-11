@@ -1,5 +1,10 @@
 import humanNumber from 'human-number';
 
+export function extractNumber(input: string): number {
+	const digits = input.replace(/\D+/g, '');
+	return digits === '' ? NaN : Number(digits);
+}
+
 export function numberWithCommas(number: number) {
 	if (typeof number === 'undefined') return;
 	return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

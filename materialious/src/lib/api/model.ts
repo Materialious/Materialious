@@ -1,5 +1,14 @@
 import type { ApiResponse, Innertube, YT } from 'youtubei.js';
 
+export interface SearchOptions {
+	sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
+	type?: 'video' | 'playlist' | 'channel' | 'all';
+	duration?: 'short' | 'medium' | 'long';
+	date?: 'hour' | 'today' | 'week' | 'month' | 'year';
+	features?: string;
+	page?: string;
+}
+
 export interface Image {
 	url: string;
 	width: number;
@@ -7,7 +16,6 @@ export interface Image {
 }
 
 export interface Thumbnail {
-	quality: string;
 	url: string;
 	width: number;
 	height: number;
@@ -295,3 +303,5 @@ export interface ApiExntendedProgressModel {
 export interface SynciousSaveProgressModel {
 	time: number;
 }
+
+export type SearchResults = (Channel | Video | Playlist | HashTag)[];

@@ -44,7 +44,7 @@
 		synciousStore
 	} from '../store';
 	import { setStatusBarColor } from '../theme';
-	import { getVideoTYjs } from '$lib/api/youtubejs';
+	import { getVideoYTjs } from '$lib/api/youtubejs/video';
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
@@ -624,7 +624,7 @@
 
 	async function reloadVideo() {
 		showVideoRetry = false;
-		data.video = await getVideoTYjs(data.video.videoId);
+		data.video = await getVideoYTjs(data.video.videoId);
 		await loadVideo();
 	}
 

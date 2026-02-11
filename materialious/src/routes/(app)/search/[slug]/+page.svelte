@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { getSearch, type SearchOptions } from '$lib/api';
+	import { getSearch } from '$lib/api';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { searchCacheStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/ItemsList.svelte';
+	import type { SearchOptions } from '$lib/api/model.js';
 
 	let { data } = $props();
 

@@ -24,8 +24,8 @@ import type {
 	VideoBase,
 	VideoPlay
 } from './api/model';
-import { ensureNoTrailingSlash } from './misc';
 import type { PhasedDescription } from './description';
+import { ensureNoTrailingSlash } from './misc';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;
@@ -99,6 +99,12 @@ export const instanceStore: Writable<string> = persist(
 	),
 	createStorage(),
 	'invidiousInstance'
+);
+
+export const backendInUseStore: Writable<'ivg' | 'yt'> = persist(
+	writable('ivg'),
+	createStorage(),
+	'backendInUse'
 );
 
 export const authStore: Writable<null | { username: string; token: string }> = persist(

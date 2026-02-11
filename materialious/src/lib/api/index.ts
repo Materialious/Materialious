@@ -3,6 +3,7 @@ import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
 	authStore,
+	backendInUseStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
 	instanceStore,
@@ -199,9 +200,11 @@ export async function getSearch(
 	options: SearchOptions,
 	fetchOptions?: RequestInit
 ): Promise<SearchResults> {
-	searchSetDefaults(options);
+	if (get(backendInUseStore) === 'yt') {
+		return await getSearchYTjs(search, options);
+	}
 
-	await getSearchYTjs(search, options);
+	searchSetDefaults(options);
 
 	const path = buildPath('search');
 	path.search = new URLSearchParams({ ...options, q: search }).toString();

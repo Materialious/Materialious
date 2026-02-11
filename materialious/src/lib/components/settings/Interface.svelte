@@ -16,6 +16,7 @@
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		authStore,
+		backendInUseStore,
 		darkModeStore,
 		feedCacheStore,
 		instanceStore,
@@ -116,6 +117,11 @@
 		ui('#dialog-settings');
 	}
 
+	async function setBackend(event: Event) {
+		const select = event.target as HTMLSelectElement;
+		backendInUseStore.set(select.value as 'ivg' | 'yt');
+	}
+
 	function allowInsecureRequests() {
 		if (!Capacitor.isNativePlatform()) return;
 		interfaceAllowInsecureRequests.set(!$interfaceAllowInsecureRequests);
@@ -147,20 +153,38 @@
 </script>
 
 {#if Capacitor.isNativePlatform()}
-	<form onsubmit={setInstance}>
-		<nav>
-			<div class="field label border max" class:invalid={invalidInstance}>
-				<input tabindex="0" bind:value={invidiousInstance} name="invidious-instance" type="text" />
-				<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
-				{#if invalidInstance}
-					<span class="error">{$_('invalidInstance')}</span>
-				{/if}
-			</div>
-			<button class="square round">
-				<i>done</i>
-			</button>
-		</nav>
-	</form>
+	<div class="field label suffix border">
+		<select name="backend-in-use" onchange={setBackend}>
+			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
+			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube</option>
+		</select>
+		<label for="backend-in-use">{$_('backend')}</label>
+		<i>arrow_drop_down</i>
+	</div>
+
+	{#if $backendInUseStore === 'ivg'}
+		<form onsubmit={setInstance}>
+			<nav>
+				<div class="field label border max" class:invalid={invalidInstance}>
+					<input
+						tabindex="0"
+						bind:value={invidiousInstance}
+						name="invidious-instance"
+						type="text"
+					/>
+					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
+					{#if invalidInstance}
+						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+	{:else}
+		<div class="space"></div>
+	{/if}
 
 	{#if isMobile()}
 		{#if invalidInstance}

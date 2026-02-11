@@ -136,6 +136,7 @@
 	} = $state({});
 	let playerInitalInteract = true;
 	let playerSliderInteracted = $state(false);
+	let playerShowTimelineThumbnail = $state(true);
 
 	const playerTimelineSlider = new Slider({
 		min: 0,
@@ -157,9 +158,10 @@
 
 			playerSliderDebounce = setTimeout(() => {
 				if (playerElement) {
-					playerElement.currentTime = timeToSet;
+					playerElement.currentTime = currentTime;
 					userManualSeeking = false;
 					playerSliderInteracted = false;
+					playerShowTimelineThumbnail = false;
 				}
 			}, 300);
 		},
@@ -1142,17 +1144,6 @@
 		}
 	}
 
-	let requestAnimationTooltip: number | undefined;
-	let latestMouseX: number | undefined;
-
-	function timelineMouseMove(event: MouseEvent) {
-		latestMouseX = event.clientX;
-
-		if (!requestAnimationTooltip) {
-			requestAnimationTooltip = requestAnimationFrame(updateTooltip);
-		}
-	}
-
 	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
 		const canvasContext = canvas.getContext('2d');
 
@@ -1166,11 +1157,24 @@
 		}
 	}
 
+	let requestAnimationTooltip: number | undefined;
+	let latestMouseX: number | undefined;
+
+	function timelineMouseMove(event: MouseEvent) {
+		latestMouseX = event.clientX;
+
+		if (!requestAnimationTooltip) {
+			requestAnimationTooltip = requestAnimationFrame(updateTooltip);
+		}
+	}
+
 	async function updateTooltip() {
 		if (!playerSliderElement || latestMouseX === undefined) {
 			requestAnimationTooltip = undefined;
 			return;
 		}
+
+		playerShowTimelineThumbnail = true;
 
 		const rect = playerSliderElement.getBoundingClientRect();
 		const percent = Math.min(Math.max((latestMouseX - rect.left) / rect.width, 0), 1);
@@ -1383,7 +1387,7 @@
 				onmousemove={timelineMouseMove}
 				bind:this={playerSliderElement}
 			>
-				{#snippet timelineTooltip(key: 'thumb' | 'timeline')}
+				{#snippet timelineTooltip(key: 'thumb' | 'timeline', timeInSeconds: number)}
 					{#if playerTimelineThumbnails.length > 0}
 						<canvas
 							bind:this={playerTimelineThumbnailCanvas[key]}
@@ -1400,20 +1404,19 @@
 							{truncate(playerCloestTimestamp.title, 22)}
 						</p>
 					{/if}
+					{videoLength(timeInSeconds)}
 				{/snippet}
 				<div class="track">
-					{#if !userManualSeeking}
+					{#if !userManualSeeking && playerShowTimelineThumbnail}
 						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
-							{@render timelineTooltip('timeline')}
-							{videoLength(playerTimelineTimeHover)}
+							{@render timelineTooltip('timeline', playerTimelineTimeHover)}
 						</div>
 					{/if}
 					<div class="range"></div>
 					<div {...playerTimelineSlider.thumb}>
 						{#if playerSliderInteracted}
 							<div class="tooltip thumb">
-								{@render timelineTooltip('thumb')}
-								{videoLength(currentTime)}
+								{@render timelineTooltip('thumb', currentTime)}
 							</div>
 						{/if}
 					</div>

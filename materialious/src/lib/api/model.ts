@@ -304,4 +304,6 @@ export interface SynciousSaveProgressModel {
 	time: number;
 }
 
-export type SearchResults = (Channel | Video | Playlist | HashTag)[];
+export type SearchResults = (Channel | Video | Playlist | HashTag)[] & {
+	getContinuation?: () => Promise<SearchResults>;
+};

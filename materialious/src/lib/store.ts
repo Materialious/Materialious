@@ -20,6 +20,7 @@ import type {
 	Playlist,
 	PlaylistPage,
 	PlaylistPageVideo,
+	SearchResults,
 	Video,
 	VideoBase,
 	VideoPlay
@@ -334,7 +335,7 @@ export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];
 }> = writable({});
 export const searchCacheStore: Writable<{
-	[searchTypeAndQuery: string]: (Channel | Video | Playlist | HashTag)[];
+	[searchTypeAndQuery: string]: SearchResults;
 }> = writable({});
 export const feedLastItemId: Writable<string | undefined> = writable(undefined);
 export const playlistCacheStore: Writable<{

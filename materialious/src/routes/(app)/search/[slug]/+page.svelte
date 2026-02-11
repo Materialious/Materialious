@@ -5,7 +5,7 @@
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/ItemsList.svelte';
-	import type { SearchOptions } from '$lib/api/model.js';
+	import type { SearchOptions, SearchResults } from '$lib/api/model.js';
 
 	let { data } = $props();
 
@@ -69,18 +69,28 @@
 	}
 
 	async function loadMore(event: InfiniteEvent) {
-		currentPage++;
-		searchOptions = {
-			...searchOptions,
-			page: currentPage.toString()
-		};
-		const newSearch = await getSearch(data.slug, searchOptions);
+		let newSearch: SearchResults;
+
+		const searchCacheItem = $searchCacheStore[data.searchStoreId];
+
+		if (searchCacheItem.getContinuation) {
+			newSearch = await searchCacheItem.getContinuation();
+			searchCacheItem.getContinuation = newSearch.getContinuation;
+		} else {
+			currentPage++;
+			searchOptions = {
+				...searchOptions,
+				page: currentPage.toString()
+			};
+
+			newSearch = await getSearch(data.slug, searchOptions);
+		}
 
 		if (newSearch.length === 0) {
 			event.detail.complete();
 		} else {
 			searchCacheStore.set({
-				[data.searchStoreId]: [...($searchCacheStore[data.searchStoreId] ?? []), ...newSearch]
+				[data.searchStoreId]: [...(searchCacheItem ?? []), ...newSearch]
 			});
 			event.detail.loaded();
 		}

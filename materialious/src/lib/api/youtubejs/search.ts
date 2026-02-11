@@ -3,23 +3,9 @@ import { convertToSeconds } from '$lib/time';
 import { getInnertube } from '.';
 import { searchSetDefaults } from '../misc';
 import type { Channel, SearchOptions, SearchResults, Thumbnail, Video } from '../model';
-import { YTNodes, type Types } from 'youtubei.js';
+import { YTNodes, type Types, YT } from 'youtubei.js';
 
-export async function getSearchYTjs(
-	search: string,
-	options: SearchOptions
-): Promise<SearchResults> {
-	const innertube = await getInnertube();
-
-	searchSetDefaults(options);
-
-	const innerResults = await innertube.search(search, {
-		sort_by: options.sort_by,
-		duration: options.duration,
-		features: [options.features] as Types.Feature[],
-		upload_date: options.date
-	});
-
+function invidiousSchema(innerResults: YT.Search): SearchResults {
 	const searchResults: SearchResults = [];
 
 	innerResults.results.forEach((result) => {
@@ -63,6 +49,36 @@ export async function getSearchYTjs(
 			searchResults.push(patchedResult);
 		}
 	});
+
+	return searchResults;
+}
+
+function setGetContinuation(innerResults: YT.Search) {
+	return async () => {
+		const result = await innerResults.getContinuation();
+		const searchResults = invidiousSchema(result);
+		searchResults.getContinuation = setGetContinuation(result);
+		return searchResults;
+	};
+}
+
+export async function getSearchYTjs(
+	search: string,
+	options: SearchOptions
+): Promise<SearchResults> {
+	const innertube = await getInnertube();
+
+	searchSetDefaults(options);
+
+	const innerResults = await innertube.search(search, {
+		sort_by: options.sort_by,
+		duration: options.duration,
+		features: [options.features] as Types.Feature[],
+		upload_date: options.date
+	});
+
+	const searchResults = invidiousSchema(innerResults);
+	searchResults.getContinuation = setGetContinuation(innerResults);
 
 	return searchResults;
 }

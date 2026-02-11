@@ -23,6 +23,7 @@
 		synciousStore
 	} from '../store';
 	import { queueGetWatchProgress } from '$lib/api/apiExtended';
+	import { relativeTimestamp } from '$lib/time';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo;
@@ -175,7 +176,9 @@
 				{#if !thumbnail}
 					<div class="secondary-container" style="width: 100%;height: {placeholderHeight}px;"></div>
 				{:else}
-					<img class="responsive" loading="lazy" src={thumbnail.src} alt="Thumbnail for video" />
+					<div class:crop={thumbnail.height > 180}>
+						<img class="responsive" loading="lazy" src={thumbnail.src} alt="Thumbnail for video" />
+					</div>
 				{/if}
 			{/if}
 			{#if progress}
@@ -243,9 +246,12 @@
 					{$_('views')}
 				{/if}
 
-				{#if 'publishedText' in video}
+				{#if 'published' in video}
 					<div class="max">
-						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)} • {video.publishedText}
+						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)} • {relativeTimestamp(
+							video.published,
+							false
+						)}
 					</div>
 				{/if}
 			</div>
@@ -254,6 +260,22 @@
 </div>
 
 <style>
+	.crop {
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	.crop img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		clip-path: inset(30px 0 30px 0);
+		display: block;
+		transform: translateY(-30px);
+		margin-bottom: -60px;
+	}
+
 	.thumbnail {
 		width: 100%;
 		overflow: hidden;

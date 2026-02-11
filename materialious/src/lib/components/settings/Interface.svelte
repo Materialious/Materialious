@@ -78,6 +78,7 @@
 	function clearPreviousInstance() {
 		logoutStores();
 		ui('#dialog-settings');
+		goto(resolve('/', {}), { replaceState: true });
 		location.reload();
 	}
 

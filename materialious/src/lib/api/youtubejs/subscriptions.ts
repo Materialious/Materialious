@@ -65,7 +65,7 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 			entry.getElementsByTagName('published')[0]?.textContent || new Date()
 		);
 		const published = publishedAt.getTime();
-		const publishedText = relativeTimestamp(published);
+		const publishedText = relativeTimestamp(published, false);
 		const author =
 			entry.getElementsByTagName('author')[0]?.getElementsByTagName('name')[0]?.textContent ||
 			'Unknown Author';
@@ -131,14 +131,20 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
 	const channelSubscriptions = await localDb.channelSubscriptions.toArray();
 
+	const toUpdatePromises: Promise<void>[] = [];
+
 	const now = new Date();
 	for (const channel of channelSubscriptions) {
 		const lastRSSFetch = new Date(channel.lastRSSFetch);
 		const timeDifference = now.getTime() - lastRSSFetch.getTime();
 		const oneDayInMillis = 6 * 60 * 60 * 1000;
 		if (timeDifference > oneDayInMillis) {
-			parseChannelRSS(channel.channelId);
+			toUpdatePromises.push(parseChannelRSS(channel.channelId));
 		}
+	}
+
+	if (toUpdatePromises) {
+		await Promise.all(toUpdatePromises);
 	}
 
 	const videos = await localDb.subscriptionFeed.toArray();

@@ -349,16 +349,25 @@
 		}
 
 		let loadedComments: Comments;
-		if (comments.getContinuation) {
-			loadedComments = await comments.getContinuation();
-		} else {
-			loadedComments = await getComments(data.video.videoId, {
-				continuation: comments?.continuation
-			});
-		}
 
-		comments.continuation = loadedComments.continuation;
-		comments.comments = [...comments.comments, ...loadedComments.comments];
+		try {
+			if (comments.getContinuation) {
+				loadedComments = await comments.getContinuation();
+			} else if (comments.continuation) {
+				loadedComments = await getComments(data.video.videoId, {
+					continuation: comments.continuation
+				});
+			} else {
+				return;
+			}
+
+			if (loadedComments.comments.length > 0) {
+				comments.continuation = loadedComments.continuation;
+				comments.comments = [...comments.comments, ...loadedComments.comments];
+			}
+		} catch (error) {
+			console.error('Error loading more comments:', error);
+		}
 	}
 
 	function toggleTheatreMode() {

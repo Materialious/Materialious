@@ -23,7 +23,7 @@
 	const replyText: string = comment.replies?.replyCount > 1 ? $_('replies') : $_('reply');
 
 	async function loadReplies(continuation: string) {
-		if (comment.getReplies) {
+		if (comment?.getReplies) {
 			replies = await comment.getReplies();
 		} else {
 			try {

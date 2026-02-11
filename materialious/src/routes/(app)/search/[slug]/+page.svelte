@@ -73,9 +73,12 @@
 
 		const searchCacheItem = $searchCacheStore[data.searchStoreId];
 
-		if (searchCacheItem.getContinuation) {
+		if (searchCacheItem?.getContinuation) {
 			newSearch = await searchCacheItem.getContinuation();
-			searchCacheItem.getContinuation = newSearch.getContinuation;
+
+			if (newSearch.getContinuation) {
+				searchCacheItem.getContinuation = newSearch.getContinuation;
+			}
 		} else {
 			currentPage++;
 			searchOptions = {
@@ -84,6 +87,11 @@
 			};
 
 			newSearch = await getSearch(data.slug, searchOptions);
+
+			// Set the continuation method if it exists
+			if (newSearch.getContinuation) {
+				searchCacheItem.getContinuation = newSearch.getContinuation;
+			}
 		}
 
 		if (newSearch.length === 0) {
@@ -92,7 +100,6 @@
 			searchCacheStore.set({
 				[data.searchStoreId]: [...(searchCacheItem ?? []), ...newSearch]
 			});
-			event.detail.loaded();
 		}
 	}
 </script>

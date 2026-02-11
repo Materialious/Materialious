@@ -314,3 +314,12 @@ export type CommentsOptions = {
 	sort_by?: 'top' | 'new';
 	continuation?: string;
 };
+
+export type ChannelSortBy = 'oldest' | 'newest' | 'popular';
+export type ChannelContentTypes = 'videos' | 'playlists' | 'streams' | 'shorts';
+
+export type ChannelOptions = {
+	type?: ChannelContentTypes;
+	continuation?: string;
+	sortBy?: ChannelSortBy;
+};

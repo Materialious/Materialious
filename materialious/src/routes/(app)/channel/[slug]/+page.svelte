@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {
-		getChannelContent,
-		searchChannelContent,
-		type channelContentTypes,
-		type channelSortBy
-	} from '$lib/api';
-	import type { ChannelContentPlaylists, ChannelContentVideos } from '$lib/api/model';
+	import { getChannelContent, searchChannelContent } from '$lib/api';
+	import type {
+		ChannelContentPlaylists,
+		ChannelContentTypes,
+		ChannelContentVideos,
+		ChannelSortBy
+	} from '$lib/api/model';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
@@ -18,11 +18,12 @@
 	import Author from '$lib/components/Author.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import { isYTBackend } from '$lib/misc';
 
-	let tab: channelContentTypes = $state('videos');
+	let tab: ChannelContentTypes = $state('videos');
 
-	let sortBy: channelSortBy = $state('newest');
-	const sortByOptions: channelSortBy[] = ['newest', 'oldest', 'popular'];
+	let sortBy: ChannelSortBy = $state('newest');
+	const sortByOptions: ChannelSortBy[] = ['newest', 'oldest', 'popular'];
 
 	let showSearch: boolean = $state(false);
 	let channelSearch: string = $state('');
@@ -179,23 +180,25 @@
 				{/each}
 			</nav>
 		</div>
-		<div class="s12 m6 l6">
-			{#if showSearch}
-				<div class="max field suffix prefix small no-margin surface-variant">
-					<i class="front">search</i><input
-						bind:value={channelSearch}
-						oninput={searchChannel}
-						type="text"
-						placeholder={$_('searchPlaceholder')}
-					/>
-				</div>
-			{:else}
-				<nav class="right-align m l">
-					<button onclick={() => (showSearch = true)}><i>search</i></button>
-				</nav>
-				<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
-			{/if}
-		</div>
+		{#if !isYTBackend()}
+			<div class="s12 m6 l6">
+				{#if showSearch}
+					<div class="max field suffix prefix small no-margin surface-variant">
+						<i class="front">search</i><input
+							bind:value={channelSearch}
+							oninput={searchChannel}
+							type="text"
+							placeholder={$_('searchPlaceholder')}
+						/>
+					</div>
+				{:else}
+					<nav class="right-align m l">
+						<button onclick={() => (showSearch = true)}><i>search</i></button>
+					</nav>
+					<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
+				{/if}
+			</div>
+		{/if}
 	</div>
 </div>
 

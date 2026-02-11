@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import type { Image } from './api/model';
 import { instanceStore } from './store';
+import { isYTBackend } from './misc';
 
 export class ImageCache {
 	private cache = new Map<string, HTMLImageElement>();
@@ -52,6 +53,8 @@ export function getBestThumbnail(
 }
 
 export function proxyGoogleImage(source: string): string {
+	if (isYTBackend()) return source;
+
 	if (source.startsWith('//')) source = `https:${source}`;
 
 	let path: string | undefined;

@@ -29,7 +29,8 @@ import type {
 	VideoPlay,
 	SearchOptions,
 	SearchResults,
-	CommentsOptions
+	CommentsOptions,
+	ChannelOptions
 } from './model';
 import { commentsSetDefaults, searchSetDefaults } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
@@ -37,6 +38,7 @@ import { isYTBackend } from '$lib/misc';
 import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
 import { getResolveUrlYTjs } from './youtubejs/misc';
 import { getCommentsYTjs } from './youtubejs/comments';
+import { getChannelContentYTjs, getChannelYTjs } from './youtubejs/channel';
 
 export function buildPath(path: string): URL {
 	return new URL(`${get(instanceStore)}/api/v1/${path}`);
@@ -145,32 +147,32 @@ export async function getChannel(
 	channelId: string,
 	fetchOptions?: RequestInit
 ): Promise<ChannelPage> {
+	if (isYTBackend()) {
+		return getChannelYTjs(channelId);
+	}
 	const resp = await fetchErrorHandle(
 		await fetch(buildPath(`channels/${channelId}`), fetchOptions)
 	);
 	return await resp.json();
 }
 
-export type channelSortBy = 'oldest' | 'newest' | 'popular';
-export type channelContentTypes = 'videos' | 'playlists' | 'streams' | 'shorts';
-
 export async function getChannelContent(
 	channelId: string,
-	parameters: {
-		type?: channelContentTypes;
-		continuation?: string;
-		sortBy?: channelSortBy;
-	},
+	options: ChannelOptions,
 	fetchOptions?: RequestInit
 ): Promise<ChannelContentVideos | ChannelContentPlaylists> {
-	if (typeof parameters.type === 'undefined') parameters.type = 'videos';
+	if (typeof options.type === 'undefined') options.type = 'videos';
 
-	const url = buildPath(`channels/${channelId}/${parameters.type}`);
+	const url = buildPath(`channels/${channelId}/${options.type}`);
 
-	if (typeof parameters.continuation !== 'undefined')
-		url.searchParams.set('continuation', parameters.continuation);
+	if (typeof options.continuation !== 'undefined')
+		url.searchParams.set('continuation', options.continuation);
 
-	if (typeof parameters.sortBy !== 'undefined') url.searchParams.set('sort_by', parameters.sortBy);
+	if (typeof options.sortBy !== 'undefined') url.searchParams.set('sort_by', options.sortBy);
+
+	if (isYTBackend()) {
+		return await getChannelContentYTjs(channelId, options);
+	}
 
 	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
 	return await resp.json();

@@ -1,13 +1,6 @@
 import { YT, YTNodes } from 'youtubei.js';
 import { getInnertube } from '.';
-import type {
-	ChannelContentPlaylists,
-	ChannelContentVideos,
-	ChannelOptions,
-	ChannelPage,
-	Image,
-	Video
-} from '../model';
+import type { ChannelContent, ChannelOptions, ChannelPage, Image, Video } from '../model';
 import { invidiousItemSchema } from './schema';
 
 export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
@@ -43,15 +36,71 @@ export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
 	};
 }
 
+export function invidiousChannelContentSchema(
+	innerResults: YT.Channel | YT.ChannelListContinuation,
+	author: string
+) {
+	const videos: Video[] = [];
+
+	let contents;
+	if (
+		innerResults instanceof YT.Channel &&
+		innerResults.current_tab?.content?.is(YTNodes.RichGrid)
+	) {
+		contents = innerResults.current_tab.content.contents;
+	} else if (
+		innerResults instanceof YT.ChannelListContinuation &&
+		innerResults.contents?.is(YTNodes.AppendContinuationItemsAction)
+	) {
+		contents = innerResults.contents.contents;
+	}
+
+	if (!contents) return videos;
+
+	contents.forEach((item) => {
+		if (item.is(YTNodes.RichItem)) {
+			const invidiousSchema = invidiousItemSchema(item.content);
+			if (invidiousSchema?.type === 'video') {
+				invidiousSchema.author = author;
+				videos.push(invidiousSchema);
+			}
+		}
+	});
+
+	return videos;
+}
+
+async function fetchChannelContentWithContinuation(
+	channelId: string,
+	innerResults: YT.Channel | YT.ChannelListContinuation,
+	author: string
+): Promise<ChannelContent> {
+	const channelContent: ChannelContent = {
+		continuation: innerResults.has_continuation ? 'logicalPlaceholder' : undefined,
+		videos: invidiousChannelContentSchema(innerResults, author)
+	};
+
+	if (channelContent.continuation) {
+		channelContent.getContinuation = async () => {
+			const continuation = await innerResults.getContinuation();
+			return fetchChannelContentWithContinuation(channelId, continuation, author);
+		};
+	}
+
+	return channelContent;
+}
+
 export async function getChannelContentYTjs(
 	channelId: string,
 	options: ChannelOptions
-): Promise<ChannelContentVideos | ChannelContentPlaylists> {
+): Promise<ChannelContent> {
 	const innertube = await getInnertube();
 
 	const channel = await innertube.getChannel(channelId);
 
-	let innerResults: YT.Channel;
+	const author = channel.metadata.title ?? '';
+
+	let innerResults: YT.Channel | YT.ChannelListContinuation;
 	if (options.type === 'videos') {
 		innerResults = await channel.getVideos();
 	} else if (options.type === 'playlists') {
@@ -62,21 +111,5 @@ export async function getChannelContentYTjs(
 		innerResults = await channel.getLiveStreams();
 	}
 
-	const videos: Video[] = [];
-	if (innerResults.current_tab?.content?.is(YTNodes.RichGrid)) {
-		innerResults.current_tab.content.contents.forEach((item) => {
-			if (item.is(YTNodes.RichItem)) {
-				const invidiousSchema = invidiousItemSchema(item.content);
-				if (invidiousSchema?.type === 'video') {
-					invidiousSchema.author = channel.metadata.title ?? '';
-					videos.push(invidiousSchema);
-				}
-			}
-		});
-	}
-
-	return {
-		continuation: '',
-		videos
-	};
+	return fetchChannelContentWithContinuation(channelId, innerResults, author);
 }

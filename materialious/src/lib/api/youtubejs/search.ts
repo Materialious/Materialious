@@ -14,13 +14,17 @@ function invidiousSchema(innerResults: YT.Search): SearchResults {
 	return searchResults;
 }
 
-function setGetContinuation(innerResults: YT.Search) {
-	return async () => {
-		const result = await innerResults.getContinuation();
-		const searchResults = invidiousSchema(result);
-		searchResults.getContinuation = setGetContinuation(result);
-		return searchResults;
-	};
+async function fetchSearchWithContinuation(innerResults: YT.Search): Promise<SearchResults> {
+	const searchResults = invidiousSchema(innerResults);
+
+	if (innerResults.has_continuation) {
+		searchResults.getContinuation = async () => {
+			const continuation = await innerResults.getContinuation();
+			return fetchSearchWithContinuation(continuation);
+		};
+	}
+
+	return searchResults;
 }
 
 export async function getSearchYTjs(
@@ -36,8 +40,5 @@ export async function getSearchYTjs(
 		upload_date: options.date
 	});
 
-	const searchResults = invidiousSchema(innerResults);
-	searchResults.getContinuation = setGetContinuation(innerResults);
-
-	return searchResults;
+	return fetchSearchWithContinuation(innerResults);
 }

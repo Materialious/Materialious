@@ -227,12 +227,14 @@ export interface PlaylistPageVideo extends Omit<PlaylistVideo, 'type'> {
 
 export interface ChannelContentVideos {
 	videos: Video[];
-	continuation: string;
+	continuation?: string;
+	getContinuation?: () => Promise<ChannelContentVideos>;
 }
 
 export interface ChannelContentPlaylists {
 	playlists: PlaylistPage[];
-	continuation: string;
+	continuation?: string;
+	getContinuation?: () => Promise<ChannelContentPlaylists>;
 }
 
 export interface PlaylistPage extends Omit<Playlist, 'videos'> {
@@ -309,6 +311,8 @@ export interface SynciousSaveProgressModel {
 export type SearchResults = (Channel | Video | Playlist | HashTag)[] & {
 	getContinuation?: () => Promise<SearchResults>;
 };
+
+export type ChannelContent = ChannelContentVideos | ChannelContentPlaylists;
 
 export type CommentsOptions = {
 	sort_by?: 'top' | 'new';

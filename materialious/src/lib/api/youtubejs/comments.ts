@@ -61,6 +61,28 @@ function invidiousCommentSchema(innerResults: YT.Comments, videoId: string) {
 	return comment;
 }
 
+async function fetchCommentsWithContinuation(
+	videoId: string,
+	innerResults: YT.Comments,
+	options: CommentsOptions
+): Promise<Comments> {
+	const comments: Comments = {
+		videoId: videoId,
+		comments: invidiousCommentSchema(innerResults, videoId),
+		commentCount: extractNumber(innerResults.header?.comments_count.text ?? '0'),
+		continuation: innerResults.has_continuation ? 'logicalPlaceholder' : undefined
+	};
+
+	if (comments.continuation) {
+		comments.getContinuation = async () => {
+			const continuation = await innerResults.getContinuation();
+			return fetchCommentsWithContinuation(videoId, continuation, options);
+		};
+	}
+
+	return comments;
+}
+
 export async function getCommentsYTjs(
 	videoId: string,
 	options: CommentsOptions
@@ -72,23 +94,5 @@ export async function getCommentsYTjs(
 		options.sort_by === 'top' ? 'TOP_COMMENTS' : 'NEWEST_FIRST'
 	);
 
-	const comments: Comments = {
-		videoId: videoId,
-		comments: invidiousCommentSchema(innerResults, videoId),
-		commentCount: extractNumber(innerResults.header?.comments_count.text ?? '0'),
-		continuation: innerResults.has_continuation ? 'logicalPlaceholder' : undefined
-	};
-
-	if (comments.continuation) {
-		comments.getContinuation = async () => {
-			return {
-				videoId: videoId,
-				comments: invidiousCommentSchema(await innerResults.getContinuation(), videoId),
-				commentCount: extractNumber(innerResults.header?.comments_count.text ?? '0'),
-				continuation: innerResults.has_continuation ? 'logicalPlaceholder' : undefined
-			};
-		};
-	}
-
-	return comments;
+	return fetchCommentsWithContinuation(videoId, innerResults, options);
 }

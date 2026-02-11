@@ -30,7 +30,8 @@ import type {
 	SearchOptions,
 	SearchResults,
 	CommentsOptions,
-	ChannelOptions
+	ChannelOptions,
+	ChannelContent
 } from './model';
 import { commentsSetDefaults, searchSetDefaults } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
@@ -160,7 +161,7 @@ export async function getChannelContent(
 	channelId: string,
 	options: ChannelOptions,
 	fetchOptions?: RequestInit
-): Promise<ChannelContentVideos | ChannelContentPlaylists> {
+): Promise<ChannelContent> {
 	if (typeof options.type === 'undefined') options.type = 'videos';
 
 	const url = buildPath(`channels/${channelId}/${options.type}`);

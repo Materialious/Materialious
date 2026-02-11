@@ -13,6 +13,7 @@ import type { TitleCase } from './letterCasing';
 import { serialize, deserialize } from '@macfja/serializer';
 import type {
 	Channel,
+	ChannelContent,
 	ChannelContentPlaylists,
 	ChannelContentVideos,
 	ChannelPage,
@@ -347,6 +348,6 @@ export const isAndroidTvStore: Writable<boolean> = writable(false);
 export const channelCacheStore: Writable<{
 	[key: string]: {
 		channel: ChannelPage;
-		displayContent: { [key: string]: ChannelContentVideos | ChannelContentPlaylists };
+		displayContent: { [key: string]: ChannelContent };
 	};
 }> = writable({});

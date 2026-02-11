@@ -126,6 +126,8 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	}
 }
 
+// Ignored to match non ytjs version of getfeed.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
 	const channelSubscriptions = await localDb.channelSubscriptions.toArray();
 
@@ -133,20 +135,25 @@ export async function getFeedYTjs(maxResults: number, page: number): Promise<Fee
 	for (const channel of channelSubscriptions) {
 		const lastRSSFetch = new Date(channel.lastRSSFetch);
 		const timeDifference = now.getTime() - lastRSSFetch.getTime();
-		const oneDayInMillis = 6 * 60 * 60 * 1000; // Update channel content every 6 hours
+		const oneDayInMillis = 6 * 60 * 60 * 1000;
 		if (timeDifference > oneDayInMillis) {
 			parseChannelRSS(channel.channelId);
 		}
 	}
 
-	const offset = (page - 1) * maxResults;
+	const videos = await localDb.subscriptionFeed.toArray();
+	videos.sort((a, b) => b.published - a.published);
+
+	// Cull videos if there are more than 1000
+	if (videos.length > 1000) {
+		const videosToDelete = videos.slice(1000);
+		const videoIdsToDelete = videosToDelete.map((video) => video.videoId);
+
+		await localDb.subscriptionFeed.where('id').anyOf(videoIdsToDelete).delete();
+	}
 
 	return {
 		notifications: [],
-		videos: await localDb.subscriptionFeed.toArray().then((videos) => {
-			videos.sort((a, b) => b.published - a.published);
-			const paginatedVideos = videos.slice(offset, offset + maxResults);
-			return paginatedVideos;
-		})
+		videos: videos
 	};
 }

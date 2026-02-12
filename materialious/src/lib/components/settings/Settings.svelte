@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Component } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import ApiExtended from './ApiExtended.svelte';
 	import DeArrow from './DeArrow.svelte';
@@ -7,13 +7,15 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { instanceStore, isAndroidTvStore } from '$lib/store';
+	import { isAndroidTvStore } from '$lib/store';
 	import About from './About.svelte';
+	import Engine from './Engine.svelte';
+	import { Capacitor } from '@capacitor/core';
 
 	let activeTab = $state('interface');
 	const isActive = (id: string) => activeTab === id;
 
-	const tabs = [
+	const tabs: { id: string; label: string; icon: string; component: Component }[] = [
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
 		{ id: 'ryd', label: 'RYD', icon: 'thumb_down', component: Ryd },
@@ -32,6 +34,15 @@
 			component: About
 		}
 	];
+
+	if (Capacitor.isNativePlatform()) {
+		tabs.splice(1, 0, {
+			id: 'engine',
+			label: $_('layout.engine'),
+			icon: 'build',
+			component: Engine
+		});
+	}
 
 	const tabIds = tabs.map((tab) => tab.id);
 

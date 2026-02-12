@@ -14,8 +14,12 @@
 	let playlistPrivacy: 'public' | 'private' | 'unlisted' = 'public';
 	let playlistTitle: string = $state('');
 
-	function onPrivacyChange(event: any) {
-		playlistPrivacy = event.currentTarget.value;
+	function onPrivacyChange(event: Event) {
+		if (!event.currentTarget) return;
+		playlistPrivacy = (event.currentTarget as HTMLInputElement).value as
+			| 'public'
+			| 'private'
+			| 'unlisted';
 	}
 
 	async function removePlaylistItem(playlistId: string) {

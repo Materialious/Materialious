@@ -142,6 +142,7 @@
 	"layout": {
 		"interface": "Interface",
 		"star": "Star us on Github!",
+		"engine": "Backend engine",
 		"syncParty": "Sync party",
 		"about": "About",
 		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
@@ -174,6 +175,9 @@
 		"allowInsecureRequests": "Allow insecure requests",
 		"disableAutoUpdate": "Disable automatic updates",
 		"androidNativeShare": "Use native share",
+		"backendEngine": {
+			"cull": "Max feed items"
+		},
 		"player": {
 			"title": "Player",
 			"autoPlay": "Autoplay video",

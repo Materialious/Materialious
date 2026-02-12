@@ -2,8 +2,10 @@ import { localDb } from '$lib/dexie';
 import { logoutStores } from '$lib/misc';
 import { cleanNumber } from '$lib/numbers';
 import { relativeTimestamp } from '$lib/time';
+import { get } from 'svelte/store';
 import type { Feed, Subscription, Thumbnail, Video } from '../model';
 import { getChannelYTjs } from './channel';
+import { engineCullYTStore } from '$lib/store';
 
 export async function getSubscriptionsYTjs(): Promise<Subscription[]> {
 	const subscriptions: Subscription[] = [];
@@ -150,9 +152,10 @@ export async function getFeedYTjs(maxResults: number, page: number): Promise<Fee
 	const videos = await localDb.subscriptionFeed.toArray();
 	videos.sort((a, b) => b.published - a.published);
 
-	// Cull videos if there are more than 1000
-	if (videos.length > 1000) {
-		const videosToDelete = videos.slice(1000);
+	const cullAfter = get(engineCullYTStore);
+
+	if (videos.length > cullAfter) {
+		const videosToDelete = videos.slice(cullAfter);
 		const videoIdsToDelete = videosToDelete.map((video) => video.videoId);
 
 		await localDb.subscriptionFeed.where('id').anyOf(videoIdsToDelete).delete();

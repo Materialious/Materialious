@@ -12,13 +12,8 @@ import {
 import type { TitleCase } from './letterCasing';
 import { serialize, deserialize } from '@macfja/serializer';
 import type {
-	Channel,
 	ChannelContent,
-	ChannelContentPlaylists,
-	ChannelContentVideos,
 	ChannelPage,
-	HashTag,
-	Playlist,
 	PlaylistPage,
 	PlaylistPageVideo,
 	SearchResults,
@@ -316,6 +311,12 @@ export const deArrowThumbnailInstanceStore = persist(
 	),
 	createStorage(),
 	'deArrowThumbnailInstance'
+);
+
+export const engineCullYTStore: Writable<number> = persist(
+	writable(1000),
+	createStorage(),
+	'engineCullYT'
 );
 
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);

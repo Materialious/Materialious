@@ -184,7 +184,9 @@
 			"exportToInvidious": "Export to Invidious from Materialious",
 			"importToMaterialious": "Import from Invidious to Materialious",
 			"importingToMaterialious": "Importing to Materialious began",
-			"importingToMaterialiousFinished": "Importing to Materialious finished"
+			"importingToMaterialiousFinished": "Importing to Materialious finished",
+			"exportingToInvidious": "Exporting to Invidious began",
+			"exportingToInvidiousFinished": "Exporting to Invidious finished"
 		},
 		"player": {
 			"title": "Player",

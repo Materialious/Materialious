@@ -10,7 +10,7 @@
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
-	import { getSubscriptions } from '$lib/api';
+	import { getSubscriptions, postSubscribe } from '$lib/api';
 	import { postSubscribeYTjs } from '$lib/api/youtubejs/subscriptions';
 	import { addToast } from '../Toast.svelte';
 
@@ -65,6 +65,29 @@
 			}
 		});
 	}
+
+	async function exportMaterialiousSubs() {
+		const subs = await getSubscriptions();
+
+		addToast({
+			data: {
+				text: $_('layout.backendEngine.exportingToInvidious')
+			}
+		});
+
+		const subPromises: Promise<void>[] = [];
+		subs.forEach((sub) => {
+			subPromises.push(postSubscribe(sub.authorId, {}, true));
+		});
+
+		await Promise.all(subPromises);
+
+		addToast({
+			data: {
+				text: $_('layout.backendEngine.exportingToInvidiousFinished')
+			}
+		});
+	}
 </script>
 
 <article class="error-container">
@@ -102,7 +125,7 @@
 		<h6>{$_('layout.backendEngine.importExport')}</h6>
 		<div class="space"></div>
 
-		<button class="surface-container-highest">
+		<button onclick={exportMaterialiousSubs} class="surface-container-highest">
 			<i>upload</i>
 			<div>{$_('layout.backendEngine.exportToInvidious')}</div>
 		</button>

@@ -133,8 +133,10 @@
 					{#each tabs as tab, index (tab)}
 						<a
 							class:active={isActive(tab.id)}
+							class:surface-container-lowest={isActive(tab.id)}
+							class:surface-container-highest={!isActive(tab.id)}
 							aria-selected={isActive(tab.id)}
-							class="button surface-container-highest"
+							class="button"
 							id={`tab-${tab.id}`}
 							aria-controls={`panel-${tab.id}`}
 							tabindex={isActive(tab.id) ? 0 : -1}

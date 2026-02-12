@@ -11,7 +11,7 @@ export default defineConfig({
 				maximumFileSizeToCacheInBytes: 4000000
 			},
 			manifest: {
-				description: 'Modern material design for Invidious.',
+				description: 'Modern material design for YouTube and Invidious.',
 				theme_color: '#8936FF',
 				background_color: '#1e1b1e',
 				icons: [

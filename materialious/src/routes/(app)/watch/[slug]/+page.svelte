@@ -38,7 +38,7 @@
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
-	import { expandSummery } from '$lib/misc';
+	import { expandSummery, isYTBackend } from '$lib/misc';
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time.js';
 	import { getWatchDetails } from '$lib/watch.js';
 	import { page } from '$app/state';
@@ -348,13 +348,26 @@
 			return;
 		}
 
-		const loadedComments = await getComments(data.video.videoId, {
-			continuation: comments?.continuation
-		});
+		let loadedComments: Comments;
 
-		comments.continuation = loadedComments.continuation;
+		try {
+			if (comments.getContinuation) {
+				loadedComments = await comments.getContinuation();
+			} else if (comments.continuation) {
+				loadedComments = await getComments(data.video.videoId, {
+					continuation: comments.continuation
+				});
+			} else {
+				return;
+			}
 
-		comments.comments = [...comments.comments, ...loadedComments.comments];
+			if (loadedComments.comments.length > 0) {
+				comments.continuation = loadedComments.continuation;
+				comments.comments = [...comments.comments, ...loadedComments.comments];
+			}
+		} catch (error) {
+			console.error('Error loading more comments:', error);
+		}
 	}
 
 	function toggleTheatreMode() {
@@ -371,8 +384,6 @@
 			pauseTimerSeconds = 0;
 			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
-
-		ui('#pause-timer');
 	}
 </script>
 
@@ -407,7 +418,7 @@
 					<button
 						onclick={toggleTheatreMode}
 						class="m l"
-						class:border={!$playertheatreModeIsActive}
+						class:surface-container-highest={!$playertheatreModeIsActive}
 					>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
@@ -420,7 +431,7 @@
 								}
 								ui('#pause-timer');
 							}}
-							class:border={pauseTimerSeconds < 1}
+							class:surface-container-highest={pauseTimerSeconds < 1}
 						>
 							<i>snooze</i>
 							<div class="tooltip">{$_('player.pauseTimer')}</div>
@@ -431,14 +442,14 @@
 							(showTranscript = !showTranscript),
 							playertheatreModeIsActive.set(false)
 						)}
-						class:border={!showTranscript}
+						class:surface-container-highest={!showTranscript}
 					>
 						<i>description</i>
 						<div class="tooltip">
 							{$_('transcript')}
 						</div>
 					</button>
-					<button class="border"
+					<button class="surface-container-highest"
 						><i>share</i>
 						<div class="tooltip">
 							{$_('player.share.title')}
@@ -446,7 +457,7 @@
 						<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
 					</button>
 					{#if personalPlaylists && personalPlaylists.length > 0}
-						<button class="border">
+						<button class="surface-container-highest">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
 							<menu class="no-wrap mobile">
@@ -474,10 +485,10 @@
 							</menu>
 						</button>
 					{:else}
-						<button disabled class="border">
+						<button disabled class="surface-container-highest">
 							<i>add</i>
 							<div class="tooltip">
-								{#if $authStore}
+								{#if $authStore || isYTBackend()}
 									{$_('player.noPlaylists')}
 								{:else}
 									{$_('loginRequired')}
@@ -675,21 +686,39 @@
 	{/if}
 </div>
 
-<dialog
-	id="pause-timer"
-	onclose={(event: Event) => {
-		if (pauseTimerSeconds > 0) setPauseTimer();
-		(event.target as HTMLDialogElement).close();
-	}}
->
+<dialog id="pause-timer">
 	<div>
 		<h6>{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</h6>
 
 		<nav class="group">
-			<button onclick={() => (pauseTimerSeconds += 300)} class="left-round">+5 mins</button>
-			<button onclick={() => (pauseTimerSeconds += 1800)} class="no-round">+30 mins</button>
-			<button onclick={() => (pauseTimerSeconds += 3600)} class="no-round">+1 hr</button>
-			<button onclick={() => (pauseTimerSeconds += 7200)} class="right-round">+2 hrs</button>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 300;
+					setPauseTimer();
+				}}
+				class="left-round">+5 mins</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 1800;
+					setPauseTimer();
+				}}
+				class="no-round">+30 mins</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 3600;
+					setPauseTimer();
+				}}
+				class="no-round">+1 hr</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 7200;
+					setPauseTimer();
+				}}
+				class="right-round">+2 hrs</button
+			>
 		</nav>
 
 		<div class="space"></div>

@@ -1,27 +1,33 @@
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { get } from 'svelte/store';
-import { isVideoID } from './misc';
 import { interfaceSearchHistoryEnabled, searchHistoryStore } from './store';
+import { isVideoID } from './misc';
+
+function extractVideoId(url: string): string | null {
+	const urlObj = new URL(url, 'http://example.com'); // Using a base URL in case searchValue is just a query parameter
+	const videoId = urlObj.searchParams.get('v');
+	return videoId;
+}
 
 export function goToSearch(searchValue: string) {
-	const searchTrimed = searchValue.trim();
+	const searchTrimmed = searchValue.trim();
 
-	if (!searchTrimed) return;
+	if (!searchTrimmed) return;
 
-	if (isVideoID(searchTrimed)) {
-		// Go directly to video if Video ID provided
-		goto(resolve('/watch/[videoId]', { videoId: searchTrimed }));
+	const videoIdFromUrl = extractVideoId(searchTrimmed);
+	if (videoIdFromUrl && isVideoID(videoIdFromUrl)) {
+		goto(resolve('/watch/[videoId]', { videoId: videoIdFromUrl }));
 		return;
 	}
 
-	goto(resolve(`/search/[search]`, { search: encodeURIComponent(searchTrimed) }));
+	goto(resolve(`/search/[search]`, { search: encodeURIComponent(searchTrimmed) }));
 
-	if (get(interfaceSearchHistoryEnabled) && !get(searchHistoryStore).includes(searchTrimed)) {
+	if (get(interfaceSearchHistoryEnabled) && !get(searchHistoryStore).includes(searchTrimmed)) {
 		const pastHistory = get(searchHistoryStore);
 		if (pastHistory.length > 15) {
 			pastHistory.pop();
 		}
-		searchHistoryStore.set([searchTrimed, ...pastHistory]);
+		searchHistoryStore.set([searchTrimmed, ...pastHistory]);
 	}
 }

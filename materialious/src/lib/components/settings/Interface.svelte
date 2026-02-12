@@ -11,13 +11,13 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, isMobile } from '../../misc';
+	import { ensureNoTrailingSlash, isMobile, logoutStores } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		authStore,
+		backendInUseStore,
 		darkModeStore,
-		feedCacheStore,
 		instanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
@@ -32,8 +32,6 @@
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		playlistCacheStore,
-		searchCacheStore,
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
@@ -77,6 +75,13 @@
 		}
 	}
 
+	function clearPreviousInstance() {
+		logoutStores();
+		ui('#dialog-settings');
+		goto(resolve('/', {}), { replaceState: true });
+		location.reload();
+	}
+
 	async function setInstance(event: Event) {
 		event.preventDefault();
 
@@ -107,13 +112,14 @@
 		}
 
 		instanceStore.set(instance);
-		authStore.set(null);
-		feedCacheStore.set({});
-		searchCacheStore.set({});
-		playlistCacheStore.set({});
 
-		goto(resolve('/', {}), { replaceState: true });
-		ui('#dialog-settings');
+		clearPreviousInstance();
+	}
+
+	async function setBackend(event: Event) {
+		const select = event.target as HTMLSelectElement;
+		backendInUseStore.set(select.value as 'ivg' | 'yt');
+		clearPreviousInstance();
 	}
 
 	function allowInsecureRequests() {
@@ -147,20 +153,38 @@
 </script>
 
 {#if Capacitor.isNativePlatform()}
-	<form onsubmit={setInstance}>
-		<nav>
-			<div class="field label border max" class:invalid={invalidInstance}>
-				<input tabindex="0" bind:value={invidiousInstance} name="invidious-instance" type="text" />
-				<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
-				{#if invalidInstance}
-					<span class="error">{$_('invalidInstance')}</span>
-				{/if}
-			</div>
-			<button class="square round">
-				<i>done</i>
-			</button>
-		</nav>
-	</form>
+	<div class="field label suffix border">
+		<select name="backend-in-use" onchange={setBackend}>
+			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
+			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube (Experimental)</option>
+		</select>
+		<label for="backend-in-use">{$_('backend')}</label>
+		<i>arrow_drop_down</i>
+	</div>
+
+	{#if $backendInUseStore === 'ivg'}
+		<form onsubmit={setInstance}>
+			<nav>
+				<div class="field label border max" class:invalid={invalidInstance}>
+					<input
+						tabindex="0"
+						bind:value={invidiousInstance}
+						name="invidious-instance"
+						type="text"
+					/>
+					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
+					{#if invalidInstance}
+						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+				</div>
+				<button class="square round">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+	{:else}
+		<div class="space"></div>
+	{/if}
 
 	{#if isMobile()}
 		{#if invalidInstance}
@@ -212,6 +236,7 @@
 			onInput={setColor}
 			position="responsive"
 			isAlpha={false}
+			hex={$themeColorStore}
 			sliderDirection="horizontal"
 		/>
 	</div>
@@ -460,7 +485,7 @@
 		--cp-input-color: var(--surface);
 		--cp-button-hover-color: var(--surface-variant);
 		--slider-width: 50px;
-		--picker-width: 45vw;
+		--picker-width: 500px;
 		width: 100%;
 	}
 

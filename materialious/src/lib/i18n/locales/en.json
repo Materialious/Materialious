@@ -15,6 +15,7 @@
 	"videos": "videos",
 	"cancel": "Cancel",
 	"create": "Create",
+	"backend": "Backend",
 	"filters": {
 		"filters": "Filters",
 		"type": "Type",
@@ -141,6 +142,7 @@
 	"layout": {
 		"interface": "Interface",
 		"star": "Star us on Github!",
+		"engine": "Backend engine",
 		"syncParty": "Sync party",
 		"about": "About",
 		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
@@ -173,6 +175,12 @@
 		"allowInsecureRequests": "Allow insecure requests",
 		"disableAutoUpdate": "Disable automatic updates",
 		"androidNativeShare": "Use native share",
+		"backendEngine": {
+			"warning": "Advanced settings! For experienced users only. Do not change unless you know what you’re doing.",
+			"cull": "Max feed items",
+			"cooldown": "Re-fetch channel hour cooldown",
+			"fallbacks": "Fallbacks"
+		},
 		"player": {
 			"title": "Player",
 			"autoPlay": "Autoplay video",

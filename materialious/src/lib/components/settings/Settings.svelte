@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Component } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import ApiExtended from './ApiExtended.svelte';
 	import DeArrow from './DeArrow.svelte';
@@ -7,13 +7,15 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { instanceStore, isAndroidTvStore } from '$lib/store';
+	import { isAndroidTvStore } from '$lib/store';
 	import About from './About.svelte';
+	import Engine from './Engine.svelte';
+	import { Capacitor } from '@capacitor/core';
 
 	let activeTab = $state('interface');
 	const isActive = (id: string) => activeTab === id;
 
-	const tabs = [
+	const tabs: { id: string; label: string; icon: string; component: Component }[] = [
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
 		{ id: 'ryd', label: 'RYD', icon: 'thumb_down', component: Ryd },
@@ -32,6 +34,15 @@
 			component: About
 		}
 	];
+
+	if (Capacitor.isNativePlatform()) {
+		tabs.splice(1, 0, {
+			id: 'engine',
+			label: $_('layout.engine'),
+			icon: 'build',
+			component: Engine
+		});
+	}
 
 	const tabIds = tabs.map((tab) => tab.id);
 
@@ -89,9 +100,9 @@
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
 	</nav>
 
-	<div>
+	<div style="height: 100%;">
 		<nav class="wrap s">
-			<button class="large small-round secondary max" data-ui="#tab-menu">
+			<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
 				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
 				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
 				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
@@ -111,76 +122,90 @@
 			</button>
 		</nav>
 
-		<nav class="tabbed small m l" style="outline: none" role="tablist" tabindex="0">
-			{#each tabs as tab, index (tab)}
-				<a
-					role="tab"
-					class:active={isActive(tab.id)}
-					aria-selected={isActive(tab.id)}
-					id={`tab-${tab.id}`}
-					aria-controls={`panel-${tab.id}`}
-					tabindex={isActive(tab.id) ? 0 : -1}
-					onclick={() => (activeTab = tab.id)}
-					onkeydown={(event) => onKeydown(event, index)}
-				>
-					<i>{tab.icon}</i>
-					<span>{tab.label}</span>
-				</a>
-			{/each}
-			{#if !$isAndroidTvStore}
-				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href={`${$instanceStore}/preferences`} target="_blank" referrerpolicy="no-referrer">
-					<i>
-						<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-							<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 512 512"
-								><path
-									d="M244.2 502.3c-25.1-1-49.2-5.4-72.6-13.3-77.4-26.1-138-87.1-161.3-162.4C.2 294.1-2.5 258 2.3 222.3c4.7-34.9 17.3-68 37.3-98.2 15.3-23.2 37-46.1 60-63.3 46.9-35.1 109.2-54 168.2-51 32.9 1.7 63.4 8.6 92.9 21.1 10.4 4.4 25.4 12.3 35.2 18.5 18 11.3 28.4 19.7 43.8 35 16.8 16.8 28.1 30.8 38.6 48.1 9.2 15.1 17.9 34.5 23.2 51.3 2 6.5 5.6 20.9 7.2 28.8 3 15.1 3.4 20 3.4 42.3 0 23.5-.6 31-3.7 46.7-11.8 59.6-45.2 112-95.1 149.4-29 21.7-63.5 37.5-99.8 45.5-21.3 4.8-45.1 6.7-69.3 5.8m-44.6-100.1c0-.7-.1-2.6-.2-4.3l-.2-3.1-6-.3c-5.1-.3-6.1-.4-6.8-1-2.6-1.9-1.9-7.7 2.9-23.4 1.1-3.7 4.2-14.4 7-23.8 2.7-9.5 6.6-22.7 8.6-29.3 2-6.7 5.3-18.1 7.4-25.5 2.1-7.3 4.6-15.8 5.5-18.8s4.1-14 7.2-24.5c6.3-21.6 10.4-35.2 11.4-37.9.7-1.8.7-1.8 1.3-1.2.3.3 4.9 9.4 10.1 20.1 5.3 10.7 16.6 33.8 25.3 51.2 21.8 44.1 48.1 97.3 55 111.3l5.8 11.8 14.4-.1c7.9-.1 14.8-.2 15.2-.4.7-.3.7-.4-1.7-5.5-1.4-2.9-10.3-21.1-20-40.5-62.1-125-78-157.4-86.5-176-6-13.1-8.8-18.8-9.8-20-1.1-1.2-2.1-1.4-3-.3-1.5 1.7-5.2 12.8-11.9 35.9-2.6 9-8.3 28.5-12.6 43.3-8.4 28.7-10.8 36.9-18.2 62.1-2.6 8.8-6.1 20.8-7.8 26.6s-5.1 17.5-7.6 26.1c-5.5 18.9-7.8 26.5-9.4 30.8-2.7 7.3-3.3 8-6.3 8.6-1.1.2-3.1.4-4.3.4-2.8 0-4.5.5-5.2 1.4-.5.8-.7 6.2-.2 7 .3.4 3.1.5 29.6.7l10.9.1zm46.7-261.1c5.5-1.2 10.7-6.3 12-11.7.5-2 .4-6.3-.1-8.2-1.1-4-4.2-8-7.7-9.9-4.8-2.6-12-2.6-16.9 0-7.6 4.1-10.4 14.1-6.1 22.1 3.5 6.4 10.7 9.4 18.8 7.7"
-									style="fill:#f0f0f0"
-								/><path
-									d="M2712.8 5196.2c-157.5-82.6-156.2-323.9 3.8-405.2 109.2-55.9 249-20.3 313.7 78.8 73.7 110.5 33 268-85.1 327.7-64.7 33-167.6 33-232.4-1.3z"
-									style="fill:#00b6f0;stroke:#00b6f0;stroke-width:.297;stroke-miterlimit:10"
-									transform="matrix(.0699 0 0 -.0699 44.236 474.48)"
-								/><path
-									d="M2833.5 4483.6c-15.2-20.3-80-210.9-129.6-384.9-38.1-132.1-128.3-444.6-209.6-717.7-25.4-87.6-73.7-252.8-108-368.4-33-115.6-81.3-280.7-108-368.4-25.4-87.6-73.7-252.8-108-368.4-33-115.6-81.3-280.7-108-368.4-25.4-87.6-72.4-247.7-102.9-355.7-74.9-262.9-118.1-379.8-146.1-393.8-12.7-7.6-44.5-12.7-71.1-12.7-92.7 0-106.7-10.2-102.9-68.6l3.8-52.1 289.6-3.8 289.6-2.5-3.8 59.7-3.8 61-92.7 3.8c-83.8 3.8-94 6.4-106.7 34.3-16.5 35.6 0 132.1 47 285.8 16.5 52.1 59.7 198.2 95.3 323.9 35.6 125.8 83.8 292.2 108 368.4 22.9 77.5 71.1 242.6 108 368.4 35.6 125.8 83.8 292.2 108 368.4 22.9 77.5 71.1 242.6 108 368.4 108 377.3 156.2 532.2 166.4 544.9 6.4 6.4 21.6-14 35.6-44.5 12.7-30.5 243.9-499.2 511.9-1040.3s567.8-1145.7 664.3-1343.9l176.6-358.2h213.4c116.9 0 213.4 5.1 213.4 10.2s-95.3 200.7-210.9 434.4C3613.4 2965.6 3129.4 3950 3048.2 4130.4c-36.8 80-87.6 191.8-113.1 247.7-55.9 120.8-73.7 139.8-101.6 105.5"
-									style="fill:#575757"
-									transform="matrix(.0699 0 0 -.0699 44.236 474.48)"
-								/></svg
-							>
-						</svg>
-					</i>
-					<span>{$_('layout.settings')}</span>
-				</a>
-			{/if}
-		</nav>
-		<div class="space"></div>
-		<div class="divider"></div>
-		{#each tabs as tab (tab)}
-			<div
-				class="page padding"
-				id={`panel-${tab.id}`}
-				role="tabpanel"
-				aria-labelledby={`tab-${tab.id}`}
-				hidden={!isActive(tab.id)}
-				inert={!$isAndroidTvStore && !isActive(tab.id)}
-				aria-hidden={!isActive(tab.id)}
-				class:active={isActive(tab.id)}
-			>
-				<tab.component />
+		<div class="s">
+			<div class="space"></div>
+			<div class="divider"></div>
+		</div>
+
+		<div class="grid">
+			<div class="s12 m4 l4 m l">
+				<div class="padding">
+					{#each tabs as tab, index (tab)}
+						<a
+							class:active={isActive(tab.id)}
+							aria-selected={isActive(tab.id)}
+							class="button surface-container-highest"
+							id={`tab-${tab.id}`}
+							aria-controls={`panel-${tab.id}`}
+							tabindex={isActive(tab.id) ? 0 : -1}
+							onclick={() => (activeTab = tab.id)}
+							onkeydown={(event) => onKeydown(event, index)}
+						>
+							<i>{tab.icon}</i>
+							<span>{tab.label}</span>
+						</a>
+						<div class="space"></div>
+					{/each}
+				</div>
 			</div>
-		{/each}
+			<div class="s12 m8 l8">
+				{#each tabs as tab (tab)}
+					<div
+						class="page padding"
+						id={`panel-${tab.id}`}
+						aria-labelledby={`tab-${tab.id}`}
+						hidden={!isActive(tab.id)}
+						inert={!$isAndroidTvStore && !isActive(tab.id)}
+						aria-hidden={!isActive(tab.id)}
+						class:active={isActive(tab.id)}
+					>
+						<tab.component />
+					</div>
+				{/each}
+			</div>
+		</div>
 	</div>
 </dialog>
 
 <style>
-	.tabbed {
-		padding: 0 1em;
-	}
-
-	.tabbed > a {
-		flex: none;
-	}
-
 	#dialog-settings {
-		width: fit-content;
+		width: 800px;
+		height: 800px;
+	}
+
+	.page {
+		max-height: 800px;
+		overflow: scroll;
+	}
+
+	.grid {
+		margin-top: 0 !important;
+		height: 100% !important;
+	}
+
+	.grid .m,
+	.grid .l {
+		border-right: solid 1px var(--secondary);
+		border-radius: 0;
+	}
+
+	dialog {
+		padding: 0;
+	}
+
+	a.button {
+		width: 100%;
+		box-sizing: border-box !important;
+	}
+
+	@media screen and (max-width: 800px) {
+		#dialog-settings {
+			width: 100%;
+			height: 100%;
+		}
+
+		.page {
+			max-height: 100%;
+		}
 	}
 </style>

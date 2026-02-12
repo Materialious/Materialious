@@ -16,8 +16,6 @@
 
 	let { playlist, disabled = false }: Props = $props();
 
-	let loading = $state(true);
-
 	let img: HTMLImageElement | undefined = $state();
 
 	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
@@ -25,25 +23,17 @@
 	onMount(async () => {
 		if (get(interfaceLowBandwidthMode)) return;
 
-		let imgSrc = '';
+		let imgSrc;
 		if (playlist.videos && playlist.videos.length > 0) {
 			imgSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
-		} else if (playlist.playlistThumbnail && playlist.playlistThumbnail.length > 0) {
+		} else if (playlist.playlistThumbnail) {
 			imgSrc = playlist.playlistThumbnail;
 		} else {
 			imgSrc = '';
-			loading = false;
 			return;
 		}
 
 		img = await insecureRequestImageHandler(imgSrc);
-
-		img.onload = () => {
-			loading = false;
-		};
-		img.onerror = () => {
-			loading = false;
-		};
 	});
 </script>
 
@@ -53,18 +43,14 @@
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
 >
-	{#if playlist.videoCount > 0 && !$interfaceLowBandwidthMode}
-		{#if loading}
-			<progress class="circle"></progress>
-		{:else if img && img.src !== ''}
-			<img
-				loading="lazy"
-				class="responsive"
-				style="max-width: 100%;height: 100%;"
-				src={img.src}
-				alt="Thumbnail for playlist"
-			/>
-		{/if}
+	{#if !$interfaceLowBandwidthMode && img}
+		<img
+			loading="lazy"
+			class="responsive"
+			style="max-width: 100%;height: 100%;"
+			src={img.src}
+			alt="Thumbnail for playlist"
+		/>
 	{:else}
 		<h6 style="margin: 3em 0;">No image</h6>
 	{/if}

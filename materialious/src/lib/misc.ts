@@ -1,12 +1,18 @@
-import { pushState } from '$app/navigation';
+import { goto, pushState } from '$app/navigation';
 import { resolve } from '$app/paths';
 import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import {
+	authStore,
+	backendInUseStore,
+	channelCacheStore,
+	feedCacheStore,
 	interfaceAllowInsecureRequests,
 	interfaceAndroidUseNativeShare,
-	isAndroidTvStore
+	isAndroidTvStore,
+	playlistCacheStore,
+	searchCacheStore
 } from './store';
 import type {
 	Channel,
@@ -221,4 +227,22 @@ export function findElementForTime<T>(
 	}
 
 	return null;
+}
+
+export function isYTBackend(): boolean {
+	return get(backendInUseStore) === 'yt' && Capacitor.isNativePlatform();
+}
+
+export function logoutStores() {
+	authStore.set(null);
+	feedCacheStore.set({});
+	searchCacheStore.set({});
+	playlistCacheStore.set({});
+	channelCacheStore.set({});
+}
+
+export function authProtected() {
+	if (!get(authStore) && !isYTBackend()) {
+		goto(resolve('/', {}), { replaceState: true });
+	}
 }

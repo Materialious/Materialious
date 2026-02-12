@@ -12,20 +12,18 @@ import {
 import type { TitleCase } from './letterCasing';
 import { serialize, deserialize } from '@macfja/serializer';
 import type {
-	Channel,
-	ChannelContentPlaylists,
-	ChannelContentVideos,
+	ChannelContent,
 	ChannelPage,
-	HashTag,
-	Playlist,
 	PlaylistPage,
 	PlaylistPageVideo,
+	SearchResults,
 	Video,
 	VideoBase,
 	VideoPlay
 } from './api/model';
-import { ensureNoTrailingSlash } from './misc';
 import type { PhasedDescription } from './description';
+import { ensureNoTrailingSlash } from './misc';
+import type { EngineFallback } from './api/misc';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;
@@ -99,6 +97,12 @@ export const instanceStore: Writable<string> = persist(
 	),
 	createStorage(),
 	'invidiousInstance'
+);
+
+export const backendInUseStore: Writable<'ivg' | 'yt'> = persist(
+	writable('ivg'),
+	createStorage(),
+	'backendInUse'
 );
 
 export const authStore: Writable<null | { username: string; token: string }> = persist(
@@ -310,6 +314,23 @@ export const deArrowThumbnailInstanceStore = persist(
 	'deArrowThumbnailInstance'
 );
 
+export const engineCullYTStore: Writable<number> = persist(
+	writable(1000),
+	createStorage(),
+	'engineCullYT'
+);
+export const engineCooldownYTStore: Writable<number> = persist(
+	writable(6),
+	createStorage(),
+	'engineCooldownYT'
+);
+
+export const engineFallbacksStore: Writable<EngineFallback[]> = persist(
+	writable([]),
+	createStorage(),
+	'engineFallbacks'
+);
+
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
 export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writable();
 
@@ -328,7 +349,7 @@ export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];
 }> = writable({});
 export const searchCacheStore: Writable<{
-	[searchTypeAndQuery: string]: (Channel | Video | Playlist | HashTag)[];
+	[searchTypeAndQuery: string]: SearchResults;
 }> = writable({});
 export const feedLastItemId: Writable<string | undefined> = writable(undefined);
 export const playlistCacheStore: Writable<{
@@ -340,6 +361,6 @@ export const isAndroidTvStore: Writable<boolean> = writable(false);
 export const channelCacheStore: Writable<{
 	[key: string]: {
 		channel: ChannelPage;
-		displayContent: { [key: string]: ChannelContentVideos | ChannelContentPlaylists };
+		displayContent: { [key: string]: ChannelContent };
 	};
 }> = writable({});

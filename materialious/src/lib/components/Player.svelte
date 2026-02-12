@@ -44,7 +44,7 @@
 		synciousStore
 	} from '../store';
 	import { setStatusBarColor } from '../theme';
-	import { getVideoTYjs } from '$lib/api/youtubejs';
+	import { getVideoYTjs } from '$lib/api/youtubejs/video';
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
@@ -58,7 +58,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from './Toast.svelte';
-	import { isMobile, truncate } from '$lib/misc';
+	import { isMobile, isYTBackend, truncate } from '$lib/misc';
 	import {
 		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
@@ -485,7 +485,7 @@
 
 		sabrAdapter = await injectSabr(data.video, player);
 
-		if (data.video.fallbackPatch === 'youtubejs') {
+		if (data.video.fallbackPatch === 'youtubejs' && !isYTBackend()) {
 			addToast({ data: { text: $_('player.youtubeJsFallBack') } });
 		}
 
@@ -624,7 +624,7 @@
 
 	async function reloadVideo() {
 		showVideoRetry = false;
-		data.video = await getVideoTYjs(data.video.videoId);
+		data.video = await getVideoYTjs(data.video.videoId);
 		await loadVideo();
 	}
 
@@ -1332,14 +1332,14 @@
 	{/if}
 	{#if showControls}
 		<div id="mobile-time" transition:fade>
-			<p class="chip inverse-primary s">
+			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
 					{$_('thumbnail.live')}
 				{:else}
 					{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
 				{/if}
 			</p>
-			<p class="chip inverse-primary">
+			<p class="chip surface-container-highest">
 				{playerVideoEndTimePretty}
 			</p>
 		</div>
@@ -1400,7 +1400,7 @@
 						</p>
 					{:else if playerCloestTimestamp}
 						<p class="no-margin" style="padding: 0 0.5rem;">
-							{truncate(playerCloestTimestamp.title, 22)}
+							{truncate(playerCloestTimestamp.title, 20)}
 						</p>
 					{/if}
 					{videoLength(timeInSeconds)}
@@ -1445,7 +1445,7 @@
 			<nav>
 				{#if !$isAndroidTvStore}
 					<nav class="no-wrap">
-						<button class="inverse-primary" onclick={toggleVideoPlaybackStatus}>
+						<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
 							<i>
 								{#if playerCurrentPlaybackState}
 									pause
@@ -1481,7 +1481,7 @@
 					</p>
 					{#if !$isAndroidTvStore}
 						{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-							<button class="inverse-primary">
+							<button class="surface-container-highest">
 								<i>closed_caption</i>
 								<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
 									<li
@@ -1506,7 +1506,7 @@
 								</menu>
 							</button>
 						{/if}
-						<button class="inverse-primary">
+						<button class="surface-container-highest">
 							<i>settings</i>
 							<menu class="no-wrap mobile" id="settings-menu">
 								{#if playerSettings !== 'root'}
@@ -1641,13 +1641,17 @@
 							</menu>
 						</button>
 						{#if playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)}
-							<button class="inverse-primary" onclick={handleAirPlayClick} title="AirPlay">
+							<button
+								class="surface-container-highest"
+								onclick={handleAirPlayClick}
+								title="AirPlay"
+							>
 								<i>airplay</i>
 							</button>
 						{/if}
 						{#if document.pictureInPictureEnabled}
 							<button
-								class="inverse-primary"
+								class="surface-container-highest"
 								onclick={() => {
 									(playerElement as HTMLVideoElement).requestPictureInPicture();
 								}}
@@ -1655,7 +1659,7 @@
 								<i>pip</i>
 							</button>
 						{/if}
-						<button class="inverse-primary" onclick={toggleFullscreen}>
+						<button class="surface-container-highest" onclick={toggleFullscreen}>
 							<i>
 								{#if playerIsFullscreen}
 									fullscreen_exit
@@ -1775,7 +1779,7 @@
 	.player-slider [data-melt-slider-thumb] {
 		position: absolute;
 		border-radius: 1rem;
-		background: var(--inverse-primary);
+		background: var(--primary);
 		left: var(--percentage);
 		top: 50%;
 		width: 5px;
@@ -1889,8 +1893,8 @@
 	}
 
 	.chip {
-		background-color: var(--inverse-primary);
-		color: var(--primary);
+		background-color: var(--surface-container-highest);
+		color: var(--on-surface);
 		border: none;
 	}
 

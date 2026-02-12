@@ -1,5 +1,14 @@
 import type { ApiResponse, Innertube, YT } from 'youtubei.js';
 
+export interface SearchOptions {
+	sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
+	type?: 'video' | 'playlist' | 'channel' | 'all';
+	duration?: 'short' | 'medium' | 'long';
+	date?: 'hour' | 'today' | 'week' | 'month' | 'year';
+	features?: string;
+	page?: string;
+}
+
 export interface Image {
 	url: string;
 	width: number;
@@ -7,7 +16,6 @@ export interface Image {
 }
 
 export interface Thumbnail {
-	quality: string;
 	url: string;
 	width: number;
 	height: number;
@@ -160,6 +168,7 @@ export interface Comment {
 		replyCount: number;
 		continuation: string;
 	};
+	getReplies?: () => Promise<Comments>;
 }
 
 export interface Comments {
@@ -167,6 +176,7 @@ export interface Comments {
 	videoId: string;
 	continuation?: string;
 	comments: Comment[];
+	getContinuation?: () => Promise<Comments>;
 }
 
 export interface Channel {
@@ -217,12 +227,14 @@ export interface PlaylistPageVideo extends Omit<PlaylistVideo, 'type'> {
 
 export interface ChannelContentVideos {
 	videos: Video[];
-	continuation: string;
+	continuation?: string;
+	getContinuation?: () => Promise<ChannelContentVideos>;
 }
 
 export interface ChannelContentPlaylists {
 	playlists: PlaylistPage[];
-	continuation: string;
+	continuation?: string;
+	getContinuation?: () => Promise<ChannelContentPlaylists>;
 }
 
 export interface PlaylistPage extends Omit<Playlist, 'videos'> {
@@ -232,6 +244,7 @@ export interface PlaylistPage extends Omit<Playlist, 'videos'> {
 	updated: number;
 	isListed: boolean;
 	videos: PlaylistPageVideo[];
+	getContinuation?: () => Promise<PlaylistPage>;
 }
 
 export interface ChannelPage extends Channel {
@@ -295,3 +308,23 @@ export interface ApiExntendedProgressModel {
 export interface SynciousSaveProgressModel {
 	time: number;
 }
+
+export type SearchResults = (Channel | Video | Playlist | HashTag)[] & {
+	getContinuation?: () => Promise<SearchResults>;
+};
+
+export type ChannelContent = ChannelContentVideos | ChannelContentPlaylists;
+
+export type CommentsOptions = {
+	sort_by?: 'top' | 'new';
+	continuation?: string;
+};
+
+export type ChannelSortBy = 'oldest' | 'newest' | 'popular';
+export type ChannelContentTypes = 'videos' | 'playlists' | 'streams' | 'shorts';
+
+export type ChannelOptions = {
+	type?: ChannelContentTypes;
+	continuation?: string;
+	sortBy?: ChannelSortBy;
+};

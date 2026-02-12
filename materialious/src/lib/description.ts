@@ -5,7 +5,7 @@ import { convertToSeconds, padTime } from './time';
 export type Timestamp = { title: string; time: number; timePretty: string; endTime: number };
 export type Timestamps = Timestamp[];
 
-export interface PhasedDescription {
+export interface parsedDescription {
 	description: string;
 	timestamps: Timestamps;
 }
@@ -41,11 +41,11 @@ function cleanTimestampTitle(title: string): string {
 	return title.replace(/^[\s\-•|:/\\*#>~]+/, '').trim();
 }
 
-export function phaseDescription(
+export function parseDescription(
 	videoId: string,
 	content: string,
 	fallbackPatch?: 'youtubejs' | 'piped'
-): PhasedDescription {
+): parsedDescription {
 	const timestamps: Timestamps = [];
 	const lines = content.split('\n');
 	const filteredLines: string[] = [];

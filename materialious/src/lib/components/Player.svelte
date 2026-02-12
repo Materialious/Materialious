@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { getBestThumbnail, ImageCache } from '$lib/images';
 	import { videoLength } from '$lib/numbers';
-	import { generateChapterWebVTT, type PhasedDescription, type Timestamp } from '$lib/description';
+	import { generateChapterWebVTT, type parsedDescription, type Timestamp } from '$lib/description';
 	import { SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { Capacitor } from '@capacitor/core';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
@@ -67,7 +67,7 @@
 	} from '$lib/timelineThumbnails';
 
 	interface Props {
-		data: { video: VideoPlay; content: PhasedDescription; playlistId: string | null };
+		data: { video: VideoPlay; content: parsedDescription; playlistId: string | null };
 		currentTime?: number;
 		userManualSeeking?: boolean;
 		isEmbed?: boolean;

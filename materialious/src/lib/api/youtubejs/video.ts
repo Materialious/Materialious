@@ -182,24 +182,16 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 			)
 			?.as(YTNodes.ThumbnailOverlayBadgeView);
 
-		console.log(recommended);
+		const viewCountText = (
+			recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text?.text ?? ''
+		).split(' ')[0];
 
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image.image as Thumbnail[]) || [],
 			videoId: recommended.content_id,
 			title: recommended.metadata.title.toString(),
-			viewCountText: cleanNumber(
-				extractNumber(
-					(
-						recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text ?? ''
-					).toString()
-				)
-			),
-			author:
-				(
-					recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text ?? ''
-				).toString() || '',
-
+			viewCountText,
+			author: recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text?.text ?? '',
 			lengthSeconds: durationOverlay?.badges[0].text
 				? convertToSeconds(durationOverlay?.badges[0].text)
 				: 0,

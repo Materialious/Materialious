@@ -156,7 +156,7 @@
 	<div class="field label suffix border">
 		<select name="backend-in-use" onchange={setBackend}>
 			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
-			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube</option>
+			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube (Experimental)</option>
 		</select>
 		<label for="backend-in-use">{$_('backend')}</label>
 		<i>arrow_drop_down</i>

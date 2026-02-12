@@ -3,7 +3,7 @@ import { logoutStores } from '$lib/misc';
 import { cleanNumber } from '$lib/numbers';
 import { relativeTimestamp } from '$lib/time';
 import { get } from 'svelte/store';
-import type { Feed, Subscription, Thumbnail, Video } from '../model';
+import type { Feed, Subscription, Thumbnail } from '../model';
 import { getChannelYTjs } from './channel';
 import { engineCooldownYTStore, engineCullYTStore } from '$lib/store';
 

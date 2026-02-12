@@ -30,7 +30,8 @@ export type EngineFallback =
 	| 'Channel'
 	| 'ChannelContent'
 	| 'SearchSuggestions'
-	| 'Search';
+	| 'Search'
+	| 'Playlist';
 
 export function useEngineFallback(fallback: EngineFallback): boolean {
 	return get(engineFallbacksStore).includes(fallback) && Capacitor.isNativePlatform();

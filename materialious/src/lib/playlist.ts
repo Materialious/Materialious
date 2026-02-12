@@ -11,43 +11,58 @@ export async function loadEntirePlaylist(
 		return cachedPlaylists[playlistId];
 	}
 
-	let playlistVideos: PlaylistPageVideo[] = [];
-	let playlist: PlaylistPage | undefined = undefined;
+	const playlistVideos: PlaylistPageVideo[] = [];
+	const ignoreVideos = new Set<string>();
 
-	const ignoreVideos: string[] = [];
+	let newPlaylist = await getPlaylist(playlistId, 1);
+	if (newPlaylist.getContinuation) {
+		let firstVideoId: string = '';
 
-	for (let page = 1; page < Infinity; page++) {
-		const newPlaylist = await getPlaylist(playlistId, page);
-		if (page === 1) {
-			playlist = newPlaylist;
+		processVideos(newPlaylist.videos, ignoreVideos, playlistVideos);
+
+		while (newPlaylist.getContinuation) {
+			const continuationResult = await newPlaylist.getContinuation();
+			processVideos(continuationResult.videos, ignoreVideos, playlistVideos);
+
+			if (firstVideoId === continuationResult.videos[0].videoId) break;
+
+			firstVideoId = continuationResult.videos[0].videoId;
 		}
-		let newVideos = newPlaylist.videos;
-		if (newVideos.length === 0) {
-			break;
-		}
+	} else {
+		let page = 1;
+		while (true) {
+			newPlaylist = await getPlaylist(playlistId, page);
 
-		newVideos = newVideos.filter((playlistVideo) => {
-			playlistVideo.type = 'video';
-			return playlistVideo.lengthSeconds > 0 && !ignoreVideos.includes(playlistVideo.videoId);
-		});
-
-		newVideos.forEach((playlistVideo) => {
-			ignoreVideos.push(playlistVideo.videoId);
-		});
-
-		playlistVideos = [...playlistVideos, ...newVideos].sort(
-			(a: PlaylistPageVideo, b: PlaylistPageVideo) => {
-				return a.index < b.index ? -1 : 1;
+			if (newPlaylist.videos.length === 0) {
+				break;
 			}
-		);
+
+			processVideos(newPlaylist.videos, ignoreVideos, playlistVideos);
+
+			page++;
+		}
 	}
 
-	if (typeof playlist === 'undefined') {
-		throw new Error('Unable to fetch playlist');
-	}
-
-	const combined = { videos: playlistVideos, info: playlist };
+	const combined = { videos: playlistVideos, info: newPlaylist };
 	playlistCacheStore.set({ [playlistId]: combined });
 
 	return combined;
+}
+
+function processVideos(
+	videos: PlaylistPageVideo[],
+	ignoreVideos: Set<string>,
+	playlistVideos: PlaylistPageVideo[]
+) {
+	const newVideos = videos.filter((playlistVideo) => {
+		playlistVideo.type = 'video';
+		return playlistVideo.lengthSeconds > 0 && !ignoreVideos.has(playlistVideo.videoId);
+	});
+
+	newVideos.forEach((playlistVideo) => {
+		ignoreVideos.add(playlistVideo.videoId);
+	});
+
+	playlistVideos.push(...newVideos);
+	playlistVideos.sort((a: PlaylistPageVideo, b: PlaylistPageVideo) => a.index - b.index);
 }

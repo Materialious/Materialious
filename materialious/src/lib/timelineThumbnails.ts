@@ -84,8 +84,7 @@ export async function storyboardThumbnails(WebVTT: string): Promise<TimelineThum
 		type: 'vtt'
 	});
 
-	let index = 0;
-	thumbnailsSheets.cues.forEach((cue) => {
+	thumbnailsSheets.cues.forEach((cue, index) => {
 		const urlParts = cue.text.split('#xywh=');
 		const xywh = urlParts[1];
 		const xywhValues = xywh.split(',');
@@ -106,8 +105,6 @@ export async function storyboardThumbnails(WebVTT: string): Promise<TimelineThum
 			xCoord,
 			yCoord
 		});
-
-		index++;
 	});
 
 	return thumbnails;

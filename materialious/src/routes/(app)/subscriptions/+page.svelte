@@ -28,7 +28,7 @@
 </script>
 
 <nav class="right-align">
-	<a class="button outline" href={resolve('/subscriptions/manage', {})}>
+	<a class="button surface-container-highest" href={resolve('/subscriptions/manage', {})}>
 		{$_('subscriptions.manageSubscriptions')}
 	</a>
 </nav>

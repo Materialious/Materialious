@@ -176,7 +176,7 @@
 				{#if !thumbnail}
 					<div class="secondary-container" style="width: 100%;height: {placeholderHeight}px;"></div>
 				{:else}
-					<div class:crop={thumbnail.height > 180}>
+					<div class:crop={thumbnail.height > 300}>
 						<img class="responsive" loading="lazy" src={thumbnail.src} alt="Thumbnail for video" />
 					</div>
 				{/if}

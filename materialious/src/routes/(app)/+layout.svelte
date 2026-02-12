@@ -39,7 +39,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { logoutStores, truncate } from '$lib/misc';
+	import { isYTBackend, logoutStores, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
@@ -282,16 +282,18 @@
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
-			{#if !isLoggedIn}
-				<a onclick={login} href="#login">
-					<i>login</i>
-					<div>{$_('layout.login')}</div>
-				</a>
-			{:else}
-				<a onclick={logout} href="#logout">
-					<i>logout</i>
-					<div>{$_('layout.logout')}</div>
-				</a>
+			{#if !isYTBackend()}
+				{#if !isLoggedIn}
+					<a onclick={login} href="#login">
+						<i>login</i>
+						<div>{$_('layout.login')}</div>
+					</a>
+				{:else}
+					<a onclick={logout} href="#logout">
+						<i>logout</i>
+						<div>{$_('layout.logout')}</div>
+					</a>
+				{/if}
 			{/if}
 		{/if}
 	</nav>
@@ -366,16 +368,18 @@
 					<div class="tooltip bottom">{$_('layout.settings')}</div>
 				</button>
 
-				{#if !isLoggedIn}
-					<button onclick={login} class="circle large transparent">
-						<i>login</i>
-						<div class="tooltip bottom">{$_('layout.login')}</div>
-					</button>
-				{:else}
-					<button onclick={logout} class="circle large transparent">
-						<i>logout</i>
-						<div class="tooltip bottom">{$_('layout.logout')}</div>
-					</button>
+				{#if !isYTBackend()}
+					{#if !isLoggedIn}
+						<button onclick={login} class="circle large transparent">
+							<i>login</i>
+							<div class="tooltip bottom">{$_('layout.login')}</div>
+						</button>
+					{:else}
+						<button onclick={logout} class="circle large transparent">
+							<i>logout</i>
+							<div class="tooltip bottom">{$_('layout.logout')}</div>
+						</button>
+					{/if}
 				{/if}
 			{/if}
 		</nav>

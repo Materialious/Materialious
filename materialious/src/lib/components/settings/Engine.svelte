@@ -12,7 +12,8 @@
 		'ResolveUrl',
 		'Search',
 		'SearchSuggestions',
-		'Video'
+		'Video',
+		'Playlist'
 	];
 
 	function enableFallback(event: Event) {

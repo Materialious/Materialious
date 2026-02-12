@@ -45,6 +45,7 @@ import {
 	getSubscriptionsYTjs,
 	postSubscribeYTjs
 } from './youtubejs/subscriptions';
+import { getPlaylistYTjs } from './youtubejs/playlist';
 
 export function buildPath(path: string): URL {
 	return new URL(`${get(instanceStore)}/api/v1/${path}`);
@@ -85,6 +86,7 @@ export function buildAuthHeaders(): { headers: Record<string, string> } {
 }
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
+	// Doesn't exist in YTjs.
 	if (isYTBackend()) {
 		return [];
 	}
@@ -191,7 +193,14 @@ export async function searchChannelContent(
 	channelId: string,
 	search: string,
 	fetchOptions?: RequestInit
-) {
+): Promise<ChannelContent> {
+	// Not Implemented in YTjs
+	if (isYTBackend()) {
+		return {
+			videos: []
+		};
+	}
+
 	const path = buildPath(`channel/${channelId}/search`);
 	path.search = new URLSearchParams({ q: search }).toString();
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
@@ -213,6 +222,9 @@ export async function getSearchSuggestions(
 }
 
 export async function getHashtag(tag: string, page: number = 0): Promise<{ results: Video[] }> {
+	// TODO: Implement in YTjs
+	if (isYTBackend()) return { results: [] };
+
 	const resp = await fetchErrorHandle(await fetch(buildPath(`hashtag/${tag}?page=${page}`)));
 	return await resp.json();
 }
@@ -255,6 +267,7 @@ export async function getFeed(
 }
 
 export async function notificationsMarkAsRead(fetchOptions: RequestInit = {}) {
+	// Not support functionality of YTjs
 	if (isYTBackend()) return;
 
 	const path = buildPath('auth/notifications');
@@ -324,6 +337,11 @@ export async function getHistory(
 	maxResults: number = 20,
 	fetchOptions: RequestInit = {}
 ): Promise<string[]> {
+	// Not supported functionality of YTjs.
+	if (isYTBackend()) {
+		return [];
+	}
+
 	const resp = await fetchErrorHandle(
 		await fetch(buildPath(`auth/history?page=${page}&max_results=${maxResults}`), {
 			...buildAuthHeaders(),
@@ -337,6 +355,8 @@ export async function deleteHistory(
 	videoId: string | undefined = undefined,
 	fetchOptions: RequestInit = {}
 ) {
+	if (isYTBackend()) return;
+
 	let url = '/api/v1/auth/history';
 	if (typeof videoId !== 'undefined') {
 		url += `/${videoId}`;
@@ -352,6 +372,8 @@ export async function deleteHistory(
 }
 
 export async function postHistory(videoId: string, fetchOptions: RequestInit = {}) {
+	if (isYTBackend()) return;
+
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/history/${videoId}`), {
 			method: 'POST',
@@ -366,6 +388,10 @@ export async function getPlaylist(
 	page: number = 1,
 	fetchOptions: RequestInit = {}
 ): Promise<PlaylistPage> {
+	if (isYTBackend() || useEngineFallback('Playlist')) {
+		return await getPlaylistYTjs(playlistId);
+	}
+
 	let resp;
 
 	if (get(authStore)) {
@@ -383,6 +409,8 @@ export async function getPlaylist(
 export async function getPersonalPlaylists(
 	fetchOptions: RequestInit = {}
 ): Promise<PlaylistPage[]> {
+	if (isYTBackend()) return [];
+
 	const resp = await fetchErrorHandle(
 		await fetch(buildPath('auth/playlists'), { ...buildAuthHeaders(), ...fetchOptions })
 	);
@@ -390,6 +418,8 @@ export async function getPersonalPlaylists(
 }
 
 export async function deletePersonalPlaylist(playlistId: string) {
+	if (isYTBackend()) return;
+
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/playlists/${playlistId}`), {
 			method: 'DELETE',
@@ -403,6 +433,8 @@ export async function postPersonalPlaylist(
 	privacy: 'public' | 'private' | 'unlisted',
 	fetchOptions: RequestInit = {}
 ) {
+	if (isYTBackend()) return;
+
 	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
 	headers['headers']['Content-type'] = 'application/json';
 
@@ -424,6 +456,8 @@ export async function addPlaylistVideo(
 	videoId: string,
 	fetchOptions: RequestInit = {}
 ) {
+	if (isYTBackend()) return;
+
 	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
 	headers['headers']['Content-type'] = 'application/json';
 
@@ -444,6 +478,8 @@ export async function removePlaylistVideo(
 	indexId: string,
 	fetchOptions: RequestInit = {}
 ) {
+	if (isYTBackend()) return;
+
 	await fetchErrorHandle(
 		await fetch(buildPath(`auth/playlists/${playlistId}/videos/${indexId}`), {
 			method: 'DELETE',

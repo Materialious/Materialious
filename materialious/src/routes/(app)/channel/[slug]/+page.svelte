@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { getChannelContent, searchChannelContent } from '$lib/api';
-	import type {
-		ChannelContentPlaylists,
-		ChannelContentTypes,
-		ChannelContentVideos,
-		ChannelSortBy
-	} from '$lib/api/model';
+	import type { ChannelContent, ChannelContentTypes, ChannelSortBy } from '$lib/api/model';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
@@ -28,8 +23,7 @@
 	let showSearch: boolean = $state(false);
 	let channelSearch: string = $state('');
 
-	let displayContent: ChannelContentPlaylists | ChannelContentVideos | undefined =
-		$state(undefined);
+	let displayContent: ChannelContent | undefined = $state(undefined);
 
 	onMount(() => {
 		displayContent = $channelCacheStore[page.params.slug].displayContent.videos;

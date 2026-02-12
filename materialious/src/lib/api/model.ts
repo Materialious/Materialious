@@ -244,6 +244,7 @@ export interface PlaylistPage extends Omit<Playlist, 'videos'> {
 	updated: number;
 	isListed: boolean;
 	videos: PlaylistPageVideo[];
+	getContinuation?: () => Promise<PlaylistPage>;
 }
 
 export interface ChannelPage extends Channel {

@@ -384,8 +384,6 @@
 			pauseTimerSeconds = 0;
 			clearTimeout(pauseTimeout);
 		}, pauseTimerSeconds * 1000);
-
-		ui('#pause-timer');
 	}
 </script>
 
@@ -688,21 +686,39 @@
 	{/if}
 </div>
 
-<dialog
-	id="pause-timer"
-	onclose={(event: Event) => {
-		if (pauseTimerSeconds > 0) setPauseTimer();
-		(event.target as HTMLDialogElement).close();
-	}}
->
+<dialog id="pause-timer">
 	<div>
 		<h6>{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</h6>
 
 		<nav class="group">
-			<button onclick={() => (pauseTimerSeconds += 300)} class="left-round">+5 mins</button>
-			<button onclick={() => (pauseTimerSeconds += 1800)} class="no-round">+30 mins</button>
-			<button onclick={() => (pauseTimerSeconds += 3600)} class="no-round">+1 hr</button>
-			<button onclick={() => (pauseTimerSeconds += 7200)} class="right-round">+2 hrs</button>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 300;
+					setPauseTimer();
+				}}
+				class="left-round">+5 mins</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 1800;
+					setPauseTimer();
+				}}
+				class="no-round">+30 mins</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 3600;
+					setPauseTimer();
+				}}
+				class="no-round">+1 hr</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds += 7200;
+					setPauseTimer();
+				}}
+				class="right-round">+2 hrs</button
+			>
 		</nav>
 
 		<div class="space"></div>

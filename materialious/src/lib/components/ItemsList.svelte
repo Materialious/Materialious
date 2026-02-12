@@ -2,28 +2,17 @@
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { _ } from '$lib/i18n';
 	import { removePlaylistVideo } from '../api';
-	import type {
-		Channel,
-		HashTag,
-		Playlist,
-		PlaylistPage,
-		PlaylistPageVideo,
-		Video,
-		VideoBase
-	} from '../api/model';
 	import { authStore, feedLastItemId, isAndroidTvStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import Mousetrap from 'mousetrap';
-	import { extractUniqueId } from '$lib/misc';
+	import { extractUniqueId, type feedItems } from '$lib/misc';
 	import ChannelThumbnail from './ChannelThumbnail.svelte';
 	import PlaylistThumbnail from './PlaylistThumbnail.svelte';
 	import HashtagThumbnail from './HashtagThumbnail.svelte';
 
 	interface Props {
-		items?:
-			| (VideoBase | Video | PlaylistPageVideo | Channel | Playlist | HashTag)[]
-			| PlaylistPage[];
+		items?: feedItems;
 		playlistId?: string;
 		playlistAuthor?: string;
 		classes?: string;

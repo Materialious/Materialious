@@ -6,7 +6,17 @@ import { isVideoID } from './misc';
 
 function extractVideoId(url: string): string | null {
 	const urlObj = new URL(url, 'http://example.com'); // Using a base URL in case searchValue is just a query parameter
-	const videoId = urlObj.searchParams.get('v');
+
+	let videoId: string | null = null;
+	if (urlObj.hostname === 'youtu.be') {
+		videoId = urlObj.pathname.replace('/', '');
+		if (videoId === '') {
+			videoId = null;
+		}
+	} else {
+		videoId = urlObj.searchParams.get('v');
+	}
+
 	return videoId;
 }
 

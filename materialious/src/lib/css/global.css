@@ -68,7 +68,7 @@ nav.bottom {
 }
 
 dialog {
-	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
+	border-radius: 0.25rem !important;
 }
 
 main.root {
@@ -155,5 +155,9 @@ menu {
 	dialog.right {
 		width: 100% !important;
 		border-radius: 0 !important;
+	}
+
+	dialog {
+		padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
 	}
 }

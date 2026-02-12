@@ -15,7 +15,6 @@ import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
 import { Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
-import { cleanNumber, extractNumber } from '$lib/numbers';
 
 Platform.shim.eval = async (
 	data: Types.BuildScriptResult,
@@ -174,33 +173,31 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 		)
 			return;
 
-		const durationOverlay = recommended.content_image.overlays
-			?.find(
-				(overlay) =>
-					overlay.is(YTNodes.ThumbnailOverlayBadgeView) &&
-					overlay.position === 'THUMBNAIL_OVERLAY_BADGE_POSITION_BOTTOM_END'
-			)
-			?.as(YTNodes.ThumbnailOverlayBadgeView);
+		let lengthSeconds: number = 0;
+		recommended.content_image.overlays.forEach((overlay) => {
+			if (overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
+				overlay.badges.forEach((badge) => {
+					if (
+						badge.is(YTNodes.ThumbnailBadgeView) &&
+						badge.badge_style === 'THUMBNAIL_OVERLAY_BADGE_STYLE_DEFAULT'
+					) {
+						lengthSeconds = convertToSeconds(badge.text);
+					}
+				});
+			}
+		});
+
+		const viewCountText = (
+			recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text?.text ?? ''
+		).split(' ')[0];
 
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image.image as Thumbnail[]) || [],
 			videoId: recommended.content_id,
 			title: recommended.metadata.title.toString(),
-			viewCountText: cleanNumber(
-				extractNumber(
-					(
-						recommended.metadata.metadata.metadata_rows[1]?.metadata_parts?.[0]?.text ?? ''
-					).toString()
-				)
-			),
-			author:
-				(
-					recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text ?? ''
-				).toString() || '',
-
-			lengthSeconds: durationOverlay?.badges[0].text
-				? convertToSeconds(durationOverlay?.badges[0].text)
-				: 0,
+			viewCountText,
+			author: recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text?.text ?? '',
+			lengthSeconds,
 			authorId:
 				recommended.metadata?.image?.renderer_context?.command_context?.on_tap?.payload?.browseId ||
 				'',

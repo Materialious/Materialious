@@ -13,7 +13,7 @@ import {
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
-import { phaseDescription } from '$lib/description';
+import { parseDescription } from '$lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { _ } from './i18n';
@@ -71,7 +71,7 @@ export async function getWatchDetails(videoId: string, url: URL) {
 
 	return {
 		video: video,
-		content: phaseDescription(video.videoId, video.descriptionHtml, video.fallbackPatch),
+		content: parseDescription(video.videoId, video.descriptionHtml, video.fallbackPatch),
 		playlistId: playlistId,
 		streamed: {
 			personalPlaylists: personalPlaylists,

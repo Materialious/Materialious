@@ -9,6 +9,7 @@
 	import CommentSelf from './Comment.svelte';
 	import { insecureRequestImageHandler, truncate } from '$lib/misc';
 	import { _ } from '$lib/i18n';
+	import { extractActualLink } from '$lib/description';
 
 	interface Props {
 		comment: Comment;
@@ -36,15 +37,38 @@
 			}
 		}
 	}
+	function parseComment(html: string): string {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(html, 'text/html');
 
-	function commentTimestamps(html: string): string {
-		const regex =
-			/<a href="([^"]+)" data-onclick="jump_to_time" data-jump-time="(\d+)">([^<]+)<\/a>\s*(.+)/g;
-		const replacement = `<a href=${resolve(`/watch/[videoId]?time=$2`, { videoId: videoId })} data-sveltekit-preload-data="off" class="link">$3 $4</a>`;
+		const links = doc.querySelectorAll('a');
 
-		const processedHtml = html.replace(regex, replacement);
+		links.forEach((link) => {
+			const href = link.getAttribute('href');
+			if (!href) return;
 
-		return processedHtml;
+			const realHref = extractActualLink(href);
+			const dataOnClick = link.getAttribute('data-onclick');
+
+			link.classList.add('link');
+
+			if (dataOnClick === 'jump_to_time' || (realHref && realHref.includes('t='))) {
+				const match = realHref?.match(/t=(\d+)/);
+				const timestamp = match ? match[1] : '';
+
+				const newHref = resolve(`/watch/[videoId]?time=${timestamp}`, { videoId });
+
+				link.setAttribute('href', newHref);
+				link.removeAttribute('data-onclick');
+				link.setAttribute('data-sveltekit-preload-data', 'off');
+			} else {
+				link.setAttribute('href', realHref);
+				link.setAttribute('target', '_blank');
+				link.setAttribute('referrerpolicy', 'no-referrer');
+			}
+		});
+
+		return doc.documentElement.outerHTML;
 	}
 
 	let userPfp = $state('');
@@ -77,7 +101,7 @@
 				</a>
 				<p class="no-margin">
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-					{@html commentTimestamps(comment.contentHtml)}
+					{@html parseComment(comment.contentHtml)}
 					<!-- Comment comes directly from YT so is already sanitized -->
 				</p>
 				<div class="comment-actions">

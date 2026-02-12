@@ -128,9 +128,7 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	}
 }
 
-// Ignored to match non ytjs version of getfeed.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
+export async function getFeedYTjs(): Promise<Feed> {
 	const channelSubscriptions = await localDb.channelSubscriptions.toArray();
 
 	const toUpdatePromises: Promise<void>[] = [];

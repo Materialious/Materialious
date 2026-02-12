@@ -8,7 +8,7 @@
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '../api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { createVideoUrl, insecureRequestImageHandler } from '../misc';
+	import { createVideoUrl, insecureRequestImageHandler, isYTBackend } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
 		authStore,
@@ -248,10 +248,9 @@
 
 				{#if 'published' in video}
 					<div class="max">
-						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)} • {relativeTimestamp(
-							video.published,
-							false
-						)}
+						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+						•
+						{isYTBackend() ? relativeTimestamp(video.published, false) : video.publishedText}
 					</div>
 				{/if}
 			</div>
@@ -270,10 +269,10 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		clip-path: inset(30px 0 30px 0);
+		clip-path: inset(10% 0 10% 0);
 		display: block;
-		transform: translateY(-30px);
-		margin-bottom: -60px;
+		transform: translateY(-15%);
+		margin-bottom: -20%;
 	}
 
 	.thumbnail {

@@ -54,7 +54,9 @@
         "unlisted": "限定公開",
         "playVideos": "動画を再生",
         "shuffleVideos": "シャッフルして動画再生",
-        "loopPlaylist": "再生リストをループ"
+        "loopPlaylist": "再生リストをループ",
+        "next": "次へ",
+        "previous": "前へ"
     },
     "thumbnail": {
         "live": "ライブ",
@@ -80,7 +82,9 @@
             "title": "共有",
             "materialiousLink": "Materialious リンクコピー",
             "invidiousRedirect": "Invidious リンクコピー",
-            "youtubeLink": "YouTube リンクコピー"
+            "youtubeLink": "YouTube リンクコピー",
+            "includeTimestamp": "タイムスタンプ",
+            "copiedSuccess": "クリップボードにコピーされました"
         },
         "download": "ダウンロード",
         "downloadSteps": {
@@ -101,7 +105,18 @@
         "enableYoutubejsTemp": "一度だけ動画への直接接続に切り替え",
         "enableYoutubejsPerm": "常に動画への接続エラーで直接接続を許可",
         "youtubeJsFallBack": "動画接続エラー 直接接続に切替",
-        "youtubeJsLoading": "動画の読み込みに失敗。動画への直接接続に切り替えます。"
+        "youtubeJsLoading": "動画の読み込みに失敗。動画への直接接続に切り替えます。",
+        "premiere": "動画は利用可能です",
+        "controls": {
+            "back": "戻る",
+            "quality": "品質",
+            "auto": "自動",
+            "playbackSpeed": "再生速度",
+            "loop": "ループ",
+            "on": "オン",
+            "off": "オフ",
+            "language": "言語"
+        }
     },
     "layout": {
         "interface": "外観",
@@ -109,7 +124,7 @@
         "syncParty": "同期グループ",
         "syncPartyWarning": "招待したユーザーにはあなたのIPが公開されます。",
         "startSyncParty": "同期グループを開始",
-        "endSyncParty": "動機グループを終了",
+        "endSyncParty": "同期グループを終了",
         "notifications": "通知",
         "settings": "設定",
         "login": "ログイン",
@@ -154,7 +169,8 @@
             "youtubeJsAlways": "常に使用",
             "lockOrientation": "アスペクト比と向きを固定",
             "defaultPlaybackSpeed": "既定の再生速度",
-            "playerStatistics": "最初からプレイヤー統計情報を表示"
+            "playerStatistics": "最初からプレイヤー統計情報を表示",
+            "networkChangePause": "ネットワーク変更時に一時停止"
         },
         "bookmarklet": "ブックマーク",
         "instanceUrl": "インスタンスのURL",
@@ -168,7 +184,10 @@
             "intermissionIntroAnimation": "合間/導入アニメ",
             "credits": "終了画面/クレジット",
             "preViewRecapHook": "予告/あらすじ/冒頭シーン",
-            "tangentJokes": "無関係な談話/冗談"
+            "tangentJokes": "無関係な談話/冗談",
+            "automatic": "自動スキップ",
+            "manual": "手動スキップ",
+            "timeline": "タイムラインのみ"
         },
         "deArrow": {
             "title": "DeArrow",
@@ -177,12 +196,34 @@
         },
         "noNewNotifications": "新着通知なし",
         "customize": "カスタマイズ",
-        "disableAutoUpdate": "自動更新しない"
+        "disableAutoUpdate": "自動更新しない",
+        "about": "Materialious について",
+        "joinSyncParty": "同期グループのURLを入力",
+        "shareURL": "URLを共有",
+        "androidNativeShare": "ネイティブ共有を使用"
     },
     "subscribe": "登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
     "reply": "返信",
     "comments": "コメント",
     "premium": "プレミアムなYouTubeコンテンツはMaterialiousでは視聴できません。",
-    "isUpcoming": "動画はまだ視聴可能ではありません。"
+    "isUpcoming": "動画はまだ視聴可能ではありません。",
+    "popularPageDisabled": "人気ページは管理者によって無効にされています",
+    "filters": {
+        "filters": "フィルター",
+        "type": "種類",
+        "uploadDate": "アップロード日",
+        "duration": "長さ",
+        "sortBy": "並べ替え",
+        "features": "機能"
+    },
+    "skip": "スキップ",
+    "upcomingSegment": "今後の予定 ",
+    "contributors": "寄稿者",
+    "version": "バージョン",
+    "newest": "最新",
+    "oldest": "最古",
+    "popular": "人気",
+    "favouriteChannel": "お気に入りチャンネル",
+    "unfavouriteChannel": "お気に入り解除チャンネル"
 }

@@ -1,9 +1,18 @@
 <script lang="ts">
 	import { isYTBackend } from '$lib/misc';
 	import { _ } from '$lib/i18n';
-	import { engineCooldownYTStore, engineCullYTStore, engineFallbacksStore } from '$lib/store';
+	import {
+		authStore,
+		engineCooldownYTStore,
+		engineCullYTStore,
+		engineFallbacksStore,
+		instanceStore
+	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
+	import { getSubscriptions, postSubscribe } from '$lib/api';
+	import { postSubscribeYTjs } from '$lib/api/youtubejs/subscriptions';
+	import { addToast } from '../Toast.svelte';
 
 	const engineFallbacks: EngineFallback[] = [
 		'Channel',
@@ -33,6 +42,52 @@
 
 		engineFallbacksStore.set(enabledFallbacks);
 	}
+
+	async function importInvidiousSubs() {
+		const importedSubs = await getSubscriptions({}, true);
+
+		addToast({
+			data: {
+				text: $_('layout.backendEngine.importingToMaterialious')
+			}
+		});
+
+		const subPromises: Promise<void>[] = [];
+		importedSubs.forEach((sub) => {
+			subPromises.push(postSubscribeYTjs(sub.authorId, sub.author));
+		});
+
+		await Promise.all(subPromises);
+
+		addToast({
+			data: {
+				text: $_('layout.backendEngine.importingToMaterialiousFinished')
+			}
+		});
+	}
+
+	async function exportMaterialiousSubs() {
+		const subs = await getSubscriptions();
+
+		addToast({
+			data: {
+				text: $_('layout.backendEngine.exportingToInvidious')
+			}
+		});
+
+		const subPromises: Promise<void>[] = [];
+		subs.forEach((sub) => {
+			subPromises.push(postSubscribe(sub.authorId, {}, true));
+		});
+
+		await Promise.all(subPromises);
+
+		addToast({
+			data: {
+				text: $_('layout.backendEngine.exportingToInvidiousFinished')
+			}
+		});
+	}
 </script>
 
 <article class="error-container">
@@ -40,7 +95,7 @@
 </article>
 
 {#if isYTBackend()}
-	<h4>Feed</h4>
+	<h6>Feed</h6>
 	<div class="field label prefix border">
 		<i>view_stream</i>
 		<input
@@ -65,8 +120,25 @@
 		/>
 		<label for="cull">{$_('layout.backendEngine.cooldown')}</label>
 	</div>
+
+	{#if $authStore && $instanceStore}
+		<h6>{$_('layout.backendEngine.importExport')}</h6>
+		<div class="space"></div>
+
+		<button onclick={exportMaterialiousSubs} class="surface-container-highest">
+			<i>upload</i>
+			<div>{$_('layout.backendEngine.exportToInvidious')}</div>
+		</button>
+
+		<div class="space"></div>
+
+		<button onclick={importInvidiousSubs} class="surface-container-highest">
+			<i>download</i>
+			<div>{$_('layout.backendEngine.importToMaterialious')}</div>
+		</button>
+	{/if}
 {:else}
-	<h4>{$_('layout.backendEngine.fallbacks')}</h4>
+	<h6>{$_('layout.backendEngine.fallbacks')}</h6>
 	{#each engineFallbacks as fallback (fallback)}
 		<nav class="no-padding">
 			<div class="max">

@@ -315,7 +315,7 @@ export const deArrowThumbnailInstanceStore = persist(
 );
 
 export const engineCullYTStore: Writable<number> = persist(
-	writable(1000),
+	writable(500),
 	createStorage(),
 	'engineCullYT'
 );

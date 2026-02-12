@@ -233,8 +233,7 @@ export function isYTBackend(): boolean {
 	return get(backendInUseStore) === 'yt' && Capacitor.isNativePlatform();
 }
 
-export function logoutStores() {
-	authStore.set(null);
+export function clearCaches() {
 	feedCacheStore.set({});
 	searchCacheStore.set({});
 	playlistCacheStore.set({});

@@ -274,8 +274,11 @@ export async function notificationsMarkAsRead(fetchOptions: RequestInit = {}) {
 	await fetchErrorHandle(await fetch(path, { ...buildAuthHeaders(), ...fetchOptions }));
 }
 
-export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<Subscription[]> {
-	if (isYTBackend()) {
+export async function getSubscriptions(
+	fetchOptions: RequestInit = {},
+	bypassYTBackend: boolean = false
+): Promise<Subscription[]> {
+	if (isYTBackend() && !bypassYTBackend) {
 		return getSubscriptionsYTjs();
 	}
 	const resp = await fetchErrorHandle(
@@ -304,8 +307,12 @@ export async function amSubscribed(
 	}
 }
 
-export async function postSubscribe(authorId: string, fetchOptions: RequestInit = {}) {
-	if (isYTBackend()) {
+export async function postSubscribe(
+	authorId: string,
+	fetchOptions: RequestInit = {},
+	bypassYTBackend: boolean = false
+) {
+	if (isYTBackend() && !bypassYTBackend) {
 		return postSubscribeYTjs(authorId);
 	}
 

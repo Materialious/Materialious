@@ -11,7 +11,7 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, isMobile, logoutStores } from '../../misc';
+	import { ensureNoTrailingSlash, isMobile, clearCaches } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -75,8 +75,8 @@
 		}
 	}
 
-	function clearPreviousInstance() {
-		logoutStores();
+	function reloadState() {
+		clearCaches();
 		ui('#dialog-settings');
 		goto(resolve('/', {}), { replaceState: true });
 		location.reload();
@@ -113,13 +113,14 @@
 
 		instanceStore.set(instance);
 
-		clearPreviousInstance();
+		reloadState();
+		authStore.set(null);
 	}
 
 	async function setBackend(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
-		clearPreviousInstance();
+		reloadState();
 	}
 
 	function allowInsecureRequests() {

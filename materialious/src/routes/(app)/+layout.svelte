@@ -4,7 +4,7 @@
 
 	import { navigating, page } from '$app/stores';
 	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
-	import { getFeed } from '$lib/api/index';
+	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
 	import Logo from '$lib/components/Logo.svelte';
 	import PageLoading from '$lib/components/PageLoading.svelte';
@@ -184,7 +184,7 @@
 	}
 
 	async function loadNotifications() {
-		const feed = await getFeed(15, 1);
+		const feed = await getFeed(100, 1);
 		notifications = feed.notifications;
 	}
 
@@ -344,7 +344,12 @@
 					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 				</button>
 				{#if isLoggedIn}
-					<button class="circle large transparent" onclick={() => ui('#dialog-notifications')}
+					<button
+						class="circle large transparent"
+						onclick={() => {
+							ui('#dialog-notifications');
+							notificationsMarkAsRead();
+						}}
 						><i>notifications</i>
 						<div class="badge secondary">
 							{#if notifications.length > 99}

@@ -254,6 +254,13 @@ export async function getFeed(
 	return await resp.json();
 }
 
+export async function notificationsMarkAsRead(fetchOptions: RequestInit = {}) {
+	if (isYTBackend()) return;
+
+	const path = buildPath('auth/notifications');
+	await fetchErrorHandle(await fetch(path, { ...buildAuthHeaders(), ...fetchOptions }));
+}
+
 export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<Subscription[]> {
 	if (isYTBackend()) {
 		return getSubscriptionsYTjs();

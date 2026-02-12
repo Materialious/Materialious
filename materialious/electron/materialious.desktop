@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Materialious
-Comment=Modern material design for Invidious.
+Comment=Modern material design for YouTube and Invidious.
 GenericName=Materialious
 Exec=run.sh %u
 Icon=us.materialio.Materialious

@@ -3,7 +3,7 @@
   <br />
   <h1>Materialious</h1>
   <quote>
-    Modern material design for Invidious.
+    Modern material design for YouTube and Invidious.
   </quote>
 </div>
 

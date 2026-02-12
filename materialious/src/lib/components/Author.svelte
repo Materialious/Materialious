@@ -75,8 +75,8 @@
 			<nav class="group split">
 				<button
 					onclick={toggleSubscribed}
-					class:inverse-surface={!subscribed}
-					class:border={subscribed}
+					class:primary={!subscribed}
+					class:surface-container-highest={subscribed}
 				>
 					{#if !subscribed}
 						{$_('subscribe')}
@@ -86,8 +86,8 @@
 				</button>
 				{#if window.indexedDB && subscribed}
 					<button
-						class:inverse-surface={!favoritedChannel}
-						class:border={favoritedChannel}
+						class:primary={!favoritedChannel}
+						class:surface-container-highest={favoritedChannel}
 						onclick={toggleFavourited}
 						class="square"
 					>
@@ -99,7 +99,7 @@
 				{/if}
 			</nav>
 		{:else}
-			<button class="inverse-surface" disabled>
+			<button class="surface-container-highest" disabled>
 				{$_('subscribe')}
 				<div class="tooltip">
 					{$_('loginRequired')}

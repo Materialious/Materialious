@@ -418,7 +418,7 @@
 					<button
 						onclick={toggleTheatreMode}
 						class="m l"
-						class:border={!$playertheatreModeIsActive}
+						class:surface-container-highest={!$playertheatreModeIsActive}
 					>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
@@ -431,7 +431,7 @@
 								}
 								ui('#pause-timer');
 							}}
-							class:border={pauseTimerSeconds < 1}
+							class:surface-container-highest={pauseTimerSeconds < 1}
 						>
 							<i>snooze</i>
 							<div class="tooltip">{$_('player.pauseTimer')}</div>
@@ -442,14 +442,14 @@
 							(showTranscript = !showTranscript),
 							playertheatreModeIsActive.set(false)
 						)}
-						class:border={!showTranscript}
+						class:surface-container-highest={!showTranscript}
 					>
 						<i>description</i>
 						<div class="tooltip">
 							{$_('transcript')}
 						</div>
 					</button>
-					<button class="border"
+					<button class="surface-container-highest"
 						><i>share</i>
 						<div class="tooltip">
 							{$_('player.share.title')}
@@ -457,7 +457,7 @@
 						<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
 					</button>
 					{#if personalPlaylists && personalPlaylists.length > 0}
-						<button class="border">
+						<button class="surface-container-highest">
 							<i>add</i>
 							<div class="tooltip">{$_('player.addToPlaylist')}</div>
 							<menu class="no-wrap mobile">
@@ -485,7 +485,7 @@
 							</menu>
 						</button>
 					{:else}
-						<button disabled class="border">
+						<button disabled class="surface-container-highest">
 							<i>add</i>
 							<div class="tooltip">
 								{#if $authStore || isYTBackend()}

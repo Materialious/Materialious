@@ -16,8 +16,6 @@
 
 	let { playlist, disabled = false }: Props = $props();
 
-	let loading = $state(true);
-
 	let img: HTMLImageElement | undefined = $state();
 
 	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
@@ -32,18 +30,10 @@
 			imgSrc = playlist.playlistThumbnail;
 		} else {
 			imgSrc = '';
-			loading = false;
 			return;
 		}
 
 		img = await insecureRequestImageHandler(imgSrc);
-
-		img.onload = () => {
-			loading = false;
-		};
-		img.onerror = () => {
-			loading = false;
-		};
 	});
 </script>
 

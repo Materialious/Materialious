@@ -38,7 +38,6 @@
 		}
 	}
 	function parseComment(html: string): string {
-		console.log(html);
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(html, 'text/html');
 

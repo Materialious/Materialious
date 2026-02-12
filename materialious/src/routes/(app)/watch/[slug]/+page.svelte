@@ -449,7 +449,9 @@
 							{$_('transcript')}
 						</div>
 					</button>
-					<button class="surface-container-highest"
+					<button
+						class="surface-container-highest"
+						onclick={(event: Event) => event.stopPropagation()}
 						><i>share</i>
 						<div class="tooltip">
 							{$_('player.share.title')}

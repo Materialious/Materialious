@@ -23,6 +23,7 @@ import type {
 } from './api/model';
 import type { PhasedDescription } from './description';
 import { ensureNoTrailingSlash } from './misc';
+import type { EngineFallback } from './api/misc';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;
@@ -317,6 +318,17 @@ export const engineCullYTStore: Writable<number> = persist(
 	writable(1000),
 	createStorage(),
 	'engineCullYT'
+);
+export const engineCooldownYTStore: Writable<number> = persist(
+	writable(6),
+	createStorage(),
+	'engineCooldownYT'
+);
+
+export const engineFallbacksStore: Writable<EngineFallback[]> = persist(
+	writable([]),
+	createStorage(),
+	'engineFallbacks'
 );
 
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);

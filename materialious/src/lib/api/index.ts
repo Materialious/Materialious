@@ -31,7 +31,7 @@ import type {
 	ChannelOptions,
 	ChannelContent
 } from './model';
-import { commentsSetDefaults, searchSetDefaults } from './misc';
+import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
 import { isYTBackend } from '$lib/misc';
 import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
@@ -94,7 +94,7 @@ export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 }
 
 export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
-	if (isYTBackend()) {
+	if (isYTBackend() || useEngineFallback('ResolveUrl')) {
 		return await getResolveUrlYTjs(url);
 	}
 
@@ -107,7 +107,11 @@ export async function getVideo(
 	local: boolean = false,
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
-	if ((get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) || isYTBackend()) {
+	if (
+		(get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) ||
+		isYTBackend() ||
+		useEngineFallback('Video')
+	) {
 		return await getVideoYTjs(videoId);
 	}
 
@@ -138,7 +142,7 @@ export async function getComments(
 ): Promise<Comments> {
 	commentsSetDefaults(options);
 
-	if (isYTBackend()) {
+	if (isYTBackend() || useEngineFallback('Comments')) {
 		return await getCommentsYTjs(videoId, options);
 	}
 
@@ -152,7 +156,7 @@ export async function getChannel(
 	channelId: string,
 	fetchOptions?: RequestInit
 ): Promise<ChannelPage> {
-	if (isYTBackend()) {
+	if (isYTBackend() || useEngineFallback('Channel')) {
 		return getChannelYTjs(channelId);
 	}
 	const resp = await fetchErrorHandle(
@@ -175,7 +179,7 @@ export async function getChannelContent(
 
 	if (typeof options.sortBy !== 'undefined') url.searchParams.set('sort_by', options.sortBy);
 
-	if (isYTBackend()) {
+	if (isYTBackend() || useEngineFallback('ChannelContent')) {
 		return await getChannelContentYTjs(channelId, options);
 	}
 
@@ -198,7 +202,7 @@ export async function getSearchSuggestions(
 	search: string,
 	fetchOptions?: RequestInit
 ): Promise<SearchSuggestion> {
-	if (isYTBackend()) {
+	if (isYTBackend() || useEngineFallback('SearchSuggestions')) {
 		return getSearchSuggestionsYTjs(search);
 	}
 
@@ -220,7 +224,7 @@ export async function getSearch(
 ): Promise<SearchResults> {
 	searchSetDefaults(options);
 
-	if (isYTBackend()) {
+	if (isYTBackend() || useEngineFallback('Search')) {
 		return await getSearchYTjs(search, options);
 	}
 

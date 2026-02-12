@@ -5,7 +5,7 @@ import { relativeTimestamp } from '$lib/time';
 import { get } from 'svelte/store';
 import type { Feed, Subscription, Thumbnail, Video } from '../model';
 import { getChannelYTjs } from './channel';
-import { engineCullYTStore } from '$lib/store';
+import { engineCooldownYTStore, engineCullYTStore } from '$lib/store';
 
 export async function getSubscriptionsYTjs(): Promise<Subscription[]> {
 	const subscriptions: Subscription[] = [];
@@ -139,8 +139,8 @@ export async function getFeedYTjs(maxResults: number, page: number): Promise<Fee
 	for (const channel of channelSubscriptions) {
 		const lastRSSFetch = new Date(channel.lastRSSFetch);
 		const timeDifference = now.getTime() - lastRSSFetch.getTime();
-		const oneDayInMillis = 6 * 60 * 60 * 1000;
-		if (timeDifference > oneDayInMillis) {
+		const cooldownTime = get(engineCooldownYTStore) * 60 * 60 * 1000;
+		if (timeDifference > cooldownTime) {
 			toUpdatePromises.push(parseChannelRSS(channel.channelId));
 		}
 	}

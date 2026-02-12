@@ -176,7 +176,10 @@
 		"disableAutoUpdate": "Disable automatic updates",
 		"androidNativeShare": "Use native share",
 		"backendEngine": {
-			"cull": "Max feed items"
+			"warning": "Advanced settings! For experienced users only. Do not change unless you know what you’re doing.",
+			"cull": "Max feed items",
+			"cooldown": "Re-fetch channel hour cooldown",
+			"fallbacks": "Fallbacks"
 		},
 		"player": {
 			"title": "Player",

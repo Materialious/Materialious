@@ -102,7 +102,7 @@
 
 	<div style="height: 100%;">
 		<nav class="wrap s">
-			<button class="large small-round secondary max" data-ui="#tab-menu">
+			<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
 				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
 				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
 				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
@@ -134,7 +134,7 @@
 						<a
 							class:active={isActive(tab.id)}
 							aria-selected={isActive(tab.id)}
-							class="button secondary"
+							class="button surface-container-highest"
 							id={`tab-${tab.id}`}
 							aria-controls={`panel-${tab.id}`}
 							tabindex={isActive(tab.id) ? 0 : -1}

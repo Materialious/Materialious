@@ -237,7 +237,7 @@
 		setTheme();
 		setAmoledTheme();
 
-		if (isLoggedIn) {
+		if (isLoggedIn && !isYTBackend()) {
 			loadNotifications().catch(() => authStore.set(null));
 		}
 
@@ -344,7 +344,7 @@
 					<i class:primary-text={$syncPartyPeerStore}>group</i>
 					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 				</button>
-				{#if isLoggedIn}
+				{#if isLoggedIn && !isYTBackend()}
 					<button
 						class="circle large transparent"
 						onclick={() => {

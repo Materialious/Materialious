@@ -24,13 +24,19 @@ export async function amSubscribedYTjs(authorId: string): Promise<boolean> {
 	return (await localDb.channelSubscriptions.where('channelId').equals(authorId).count()) > 0;
 }
 
-export async function postSubscribeYTjs(authorId: string) {
-	const channel = await getChannelYTjs(authorId);
+export async function postSubscribeYTjs(
+	authorId: string,
+	authorName: string | undefined = undefined
+) {
+	if (!authorName) {
+		const channel = await getChannelYTjs(authorId);
+		authorName = channel.author;
+	}
 
 	try {
 		await localDb.channelSubscriptions.add({
 			channelId: authorId,
-			channelName: channel.author,
+			channelName: authorName,
 			lastRSSFetch: new Date(0)
 		});
 	} catch {
@@ -147,16 +153,17 @@ export async function getFeedYTjs(): Promise<Feed> {
 		await Promise.all(toUpdatePromises);
 	}
 
-	const videos = await localDb.subscriptionFeed.toArray();
+	let videos = await localDb.subscriptionFeed.toArray();
 	videos.sort((a, b) => b.published - a.published);
 
 	const cullAfter = get(engineCullYTStore);
-
 	if (videos.length > cullAfter) {
 		const videosToDelete = videos.slice(cullAfter);
 		const videoIdsToDelete = videosToDelete.map((video) => video.videoId);
+		await localDb.subscriptionFeed.where('videoId').anyOf(videoIdsToDelete).delete();
 
-		await localDb.subscriptionFeed.where('id').anyOf(videoIdsToDelete).delete();
+		// Don't display culled videos.
+		videos = videos.slice(0, cullAfter);
 	}
 
 	return {

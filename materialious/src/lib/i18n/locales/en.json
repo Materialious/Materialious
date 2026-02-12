@@ -179,7 +179,12 @@
 			"warning": "Advanced settings! For experienced users only. Do not change unless you know what you’re doing.",
 			"cull": "Max feed items",
 			"cooldown": "Re-fetch channel hour cooldown",
-			"fallbacks": "Fallbacks"
+			"fallbacks": "Fallbacks",
+			"importExport": "Import/Export subscriptions",
+			"exportToInvidious": "Export to Invidious from Materialious",
+			"importToMaterialious": "Import from Invidious to Materialious",
+			"importingToMaterialious": "Importing to Materialious began",
+			"importingToMaterialiousFinished": "Importing to Materialious finished"
 		},
 		"player": {
 			"title": "Player",

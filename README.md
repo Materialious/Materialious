@@ -16,6 +16,7 @@
 
 
 # Features
+- Support for using without a Invidious instance (With experimental Youtubejs backend).
 - [Invidious companion support.](./docs/DOCKER.md#invidious-companion-support)
 - [Invidious API extended integration.](https://github.com/Materialious/api-extended)
 - [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.

@@ -129,14 +129,13 @@
 
 		<div class="grid">
 			<div class="s12 m4 l4 m l">
-				<div class="padding">
+				<div class="categories padding">
 					{#each tabs as tab, index (tab)}
-						<a
+						<button
 							class:active={isActive(tab.id)}
 							class:surface-container-lowest={isActive(tab.id)}
 							class:surface-container-highest={!isActive(tab.id)}
 							aria-selected={isActive(tab.id)}
-							class="button"
 							id={`tab-${tab.id}`}
 							aria-controls={`panel-${tab.id}`}
 							tabindex={isActive(tab.id) ? 0 : -1}
@@ -145,25 +144,26 @@
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>
-						</a>
+						</button>
 						<div class="space"></div>
 					{/each}
 				</div>
 			</div>
 			<div class="s12 m8 l8">
-				{#each tabs as tab (tab)}
-					<div
-						class="page padding"
-						id={`panel-${tab.id}`}
-						aria-labelledby={`tab-${tab.id}`}
-						hidden={!isActive(tab.id)}
-						inert={!$isAndroidTvStore && !isActive(tab.id)}
-						aria-hidden={!isActive(tab.id)}
-						class:active={isActive(tab.id)}
-					>
-						<tab.component />
-					</div>
-				{/each}
+				<div class="settings padding">
+					{#each tabs as tab (tab)}
+						<div
+							id={`panel-${tab.id}`}
+							aria-labelledby={`tab-${tab.id}`}
+							hidden={!isActive(tab.id)}
+							inert={!$isAndroidTvStore && !isActive(tab.id)}
+							aria-hidden={!isActive(tab.id)}
+							class:active={isActive(tab.id)}
+						>
+							<tab.component />
+						</div>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
@@ -172,12 +172,20 @@
 <style>
 	#dialog-settings {
 		width: 800px;
-		height: 800px;
 	}
 
-	.page {
-		max-height: 800px;
-		overflow: scroll;
+	.categories {
+		position: sticky;
+		top: 0;
+		height: 100%;
+		overflow: hidden;
+		height: fit-content;
+	}
+
+	.settings {
+		height: 800px;
+		overflow-y: auto;
+		padding-right: 10px;
 	}
 
 	.grid {
@@ -195,7 +203,7 @@
 		padding: 0;
 	}
 
-	a.button {
+	.categories button {
 		width: 100%;
 		box-sizing: border-box !important;
 	}
@@ -206,8 +214,8 @@
 			height: 100%;
 		}
 
-		.page {
-			max-height: 100%;
+		.settings {
+			height: 100%;
 		}
 	}
 </style>

@@ -21,7 +21,7 @@ import type {
 	VideoBase,
 	VideoPlay
 } from './api/model';
-import type { parsedDescription } from './description';
+import type { ParsedDescription } from './description';
 import { ensureNoTrailingSlash } from './misc';
 import type { EngineFallback } from './api/misc';
 
@@ -182,7 +182,7 @@ export const playerAndroidPauseOnNetworkChange = persist(
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
 export interface PlayerState {
-	data: { video: VideoPlay; content: parsedDescription; playlistId: string | null };
+	data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
 	playerElement?: HTMLMediaElement | undefined;
 }
 

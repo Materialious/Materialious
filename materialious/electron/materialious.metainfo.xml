@@ -3,9 +3,9 @@
   <id type="desktop-application">us.materialio.Materialious</id>
   <metadata_license>CC0-1.0</metadata_license>
   <name>Materialious</name>
-  <summary>Materialious is a modern material design frontend for YouTube & Invidious, focused on a clean, privacy-friendly YouTube experience.</summary>
+  <summary>Materialious is a modern material design frontend for YouTube and Invidious, focused on a clean, privacy-friendly YouTube experience.</summary>
   <description>
-    <p>Materialious is a client for Invidious using material design. It lets you browse and watch videos, manage playlists and visit channels.</p>
+    <p>Materialious is a client for Invidious and YouTube using material design. It lets you browse and watch videos, manage playlists and visit channels.</p>
     <p>Features:</p>
     <ul>
         <li>Invidious companion support</li>
@@ -69,7 +69,11 @@
     <content_attribute id="social-contacts">intense</content_attribute>
   </content_rating>
   <releases>
-    <release version="1.14.1" date="2026-2-12">
+    
+    <release version="1.14.2" date="2026-2-12">
+      <url>https://github.com/Materialious/Materialious/releases/tag/1.14.2</url>
+    </release>
+<release version="1.14.1" date="2026-2-12">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.14.1</url>
     </release>
 <release version="1.14.0" date="2026-2-11">

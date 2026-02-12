@@ -1,6 +1,13 @@
 import { YT, YTNodes } from 'youtubei.js';
 import { getInnertube } from '.';
-import type { ChannelContent, ChannelOptions, ChannelPage, Image, Video } from '../model';
+import type {
+	ChannelContent,
+	ChannelContentVideos,
+	ChannelOptions,
+	ChannelPage,
+	Image,
+	Video
+} from '../model';
 import { invidiousItemSchema } from './schema';
 
 export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
@@ -70,6 +77,19 @@ export function invidiousChannelContentSchema(
 	return videos;
 }
 
+function fetchChannelContentVideosWithContinuation(
+	innerResults: YT.ChannelListContinuation,
+	author: string
+): () => Promise<ChannelContentVideos> {
+	return async () => {
+		const continuation = await innerResults.getContinuation();
+		return {
+			videos: invidiousChannelContentSchema(continuation, author),
+			getContinuation: fetchChannelContentVideosWithContinuation(continuation, author)
+		};
+	};
+}
+
 async function fetchChannelContentWithContinuation(
 	channelId: string,
 	innerResults: YT.Channel | YT.ChannelListContinuation,
@@ -81,10 +101,10 @@ async function fetchChannelContentWithContinuation(
 	};
 
 	if (channelContent.continuation) {
-		channelContent.getContinuation = async () => {
-			const continuation = await innerResults.getContinuation();
-			return fetchChannelContentWithContinuation(channelId, continuation, author);
-		};
+		channelContent.getContinuation = fetchChannelContentVideosWithContinuation(
+			innerResults,
+			author
+		);
 	}
 
 	return channelContent;

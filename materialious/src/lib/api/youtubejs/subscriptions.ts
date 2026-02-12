@@ -1,5 +1,5 @@
 import { localDb } from '$lib/dexie';
-import { logoutStores } from '$lib/misc';
+import { clearCaches } from '$lib/misc';
 import { cleanNumber } from '$lib/numbers';
 import { relativeTimestamp } from '$lib/time';
 import { get } from 'svelte/store';
@@ -44,7 +44,7 @@ export async function postSubscribeYTjs(authorId: string) {
 export async function deleteUnsubscribeYTjs(authorId: string) {
 	await localDb.channelSubscriptions.where('channelId').equals(authorId).delete();
 	await localDb.subscriptionFeed.where('authorId').equals(authorId).delete();
-	logoutStores();
+	clearCaches();
 }
 
 export async function parseChannelRSS(channelId: string): Promise<void> {

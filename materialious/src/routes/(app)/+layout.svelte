@@ -39,7 +39,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { isYTBackend, logoutStores, truncate } from '$lib/misc';
+	import { isYTBackend, clearCaches, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 
@@ -179,7 +179,8 @@
 	}
 
 	function logout() {
-		logoutStores();
+		authStore.set(null);
+		clearCaches();
 		goto(resolve('/', {}));
 	}
 
@@ -269,12 +270,10 @@
 			</a>
 		{/if}
 		{#each getPages() as navPage (navPage)}
-			{#if !navPage.requiresAuth || isLoggedIn}
-				<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
-					><i>{navPage.icon}</i>
-					<div>{navPage.name}</div>
-				</a>
-			{/if}
+			<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
+				><i>{navPage.icon}</i>
+				<div>{navPage.name}</div>
+			</a>
 		{/each}
 		{#if $isAndroidTvStore}
 			<div class="divider"></div>
@@ -387,16 +386,14 @@
 
 	<nav class="bottom s">
 		{#each getPages() as navPage (navPage)}
-			{#if !navPage.requiresAuth || isLoggedIn}
-				<a
-					class="round"
-					href={resolve(navPage.href, {})}
-					class:active={$page.url.href.endsWith(navPage.href)}
-					data-sveltekit-preload-data="off"
-					><i>{navPage.icon}</i>
-					<span style="font-size: .8em;">{navPage.name}</span>
-				</a>
-			{/if}
+			<a
+				class="round"
+				href={resolve(navPage.href, {})}
+				class:active={$page.url.href.endsWith(navPage.href)}
+				data-sveltekit-preload-data="off"
+				><i>{navPage.icon}</i>
+				<span style="font-size: .8em;">{navPage.name}</span>
+			</a>
 		{/each}
 	</nav>
 

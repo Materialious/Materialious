@@ -48,7 +48,8 @@
 	)}
 >
 	<nav>
-		<div class="field label border max">
+		<div class="field prefix label border max">
+			<i>link</i>
 			<input
 				tabindex="0"
 				bind:value={sponsorBlockInstance}

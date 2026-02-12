@@ -6,8 +6,14 @@ import { getResolveUrl } from '$lib/api';
 import '$lib/i18n'; // Import to initialize. Important :)
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
-import { authStore, instanceStore, interfaceDefaultPage, isAndroidTvStore } from '$lib/store';
-import { get } from 'svelte/store';
+import {
+	authStore,
+	backendInUseStore,
+	instanceStore,
+	interfaceDefaultPage,
+	isAndroidTvStore
+} from '$lib/store';
+import { get, type Writable } from 'svelte/store';
 import '$lib/android/http/androidRequests';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
@@ -25,14 +31,15 @@ export async function load({ url }) {
 	// Due to race condition with how we set & save persistent store values
 	// we manually set stores like auth & instance before load.
 	if (Capacitor.getPlatform() === 'android') {
-		const instancePreferences = await Preferences.get({ key: 'invidiousInstance' });
-		if (instancePreferences.value !== null) {
-			instanceStore.set(deserialize(instancePreferences.value));
-		}
+		const preferenceKey: Record<string, Writable<any>> = {
+			invidiousInstance: instanceStore,
+			authToken: authStore,
+			backendInUse: backendInUseStore
+		};
 
-		const authPreferences = await Preferences.get({ key: 'authToken' });
-		if (authPreferences.value !== null) {
-			authStore.set(deserialize(authPreferences.value));
+		for (const [key, store] of Object.entries(preferenceKey)) {
+			const result = await Preferences.get({ key: key });
+			if (result.value !== null) store.set(deserialize(result.value));
 		}
 	}
 

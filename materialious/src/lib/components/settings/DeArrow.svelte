@@ -17,7 +17,8 @@
 
 <form onsubmit={preventDefault(() => deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl)))}>
 	<nav>
-		<div class="field label border max">
+		<div class="field prefix label border max">
+			<i>link</i>
 			<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
 			<label for="dearrow-instance">{$_('layout.instanceUrl')}</label>
 		</div>

@@ -165,7 +165,8 @@
 	{#if $backendInUseStore === 'ivg'}
 		<form onsubmit={setInstance}>
 			<nav>
-				<div class="field label border max" class:invalid={invalidInstance}>
+				<div class="field prefix label border max" class:invalid={invalidInstance}>
+					<i>link</i>
 					<input
 						tabindex="0"
 						bind:value={invidiousInstance}

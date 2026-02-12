@@ -30,7 +30,8 @@
 
 <form onsubmit={preventDefault(() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl))}>
 	<nav>
-		<div class="field label border max">
+		<div class="field prefix label border max">
+			<i>link</i>
 			<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
 			<label for="dearrow-thumbnail-instance">{$_('layout.deArrow.thumbnailInstanceUrl')}</label>
 		</div>

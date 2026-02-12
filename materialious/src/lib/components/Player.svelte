@@ -1400,7 +1400,7 @@
 						</p>
 					{:else if playerCloestTimestamp}
 						<p class="no-margin" style="padding: 0 0.5rem;">
-							{truncate(playerCloestTimestamp.title, 22)}
+							{truncate(playerCloestTimestamp.title, 20)}
 						</p>
 					{/if}
 					{videoLength(timeInSeconds)}

@@ -1,4 +1,4 @@
-import { pushState } from '$app/navigation';
+import { goto, pushState } from '$app/navigation';
 import { resolve } from '$app/paths';
 import he from 'he';
 import type Peer from 'peerjs';
@@ -239,4 +239,10 @@ export function logoutStores() {
 	searchCacheStore.set({});
 	playlistCacheStore.set({});
 	channelCacheStore.set({});
+}
+
+export function authProtected() {
+	if (!get(authStore) && !isYTBackend()) {
+		goto(resolve('/', {}), { replaceState: true });
+	}
 }

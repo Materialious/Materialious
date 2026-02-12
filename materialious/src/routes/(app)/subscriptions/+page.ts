@@ -1,7 +1,7 @@
 import { getFeed } from '$lib/api/index';
 import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
 import { localDb } from '$lib/dexie';
-import { excludeDuplicateFeeds } from '$lib/misc';
+import { authProtected, excludeDuplicateFeeds } from '$lib/misc';
 import { feedCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
@@ -35,6 +35,8 @@ async function sortVideosByFavourites(videos: supportedVideos): Promise<supporte
 }
 
 export async function load() {
+	authProtected();
+
 	let videos = get(feedCacheStore).subscription;
 
 	if (!videos) {

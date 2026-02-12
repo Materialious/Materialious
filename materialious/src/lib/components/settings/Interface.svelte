@@ -484,7 +484,7 @@
 		--cp-input-color: var(--surface);
 		--cp-button-hover-color: var(--surface-variant);
 		--slider-width: 50px;
-		--picker-width: 45vw;
+		--picker-width: 500px;
 		width: 100%;
 	}
 

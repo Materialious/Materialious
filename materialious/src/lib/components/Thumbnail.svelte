@@ -270,10 +270,10 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		clip-path: inset(40px 0 40px 0);
+		clip-path: inset(10% 0 10% 0);
 		display: block;
-		transform: translateY(-40px);
-		margin-bottom: -80px;
+		transform: translateY(-15%);
+		margin-bottom: -20%;
 	}
 
 	.thumbnail {

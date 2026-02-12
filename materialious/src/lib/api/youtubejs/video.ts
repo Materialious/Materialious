@@ -182,6 +182,8 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 			)
 			?.as(YTNodes.ThumbnailOverlayBadgeView);
 
+		console.log(recommended);
+
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image.image as Thumbnail[]) || [],
 			videoId: recommended.content_id,

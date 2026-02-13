@@ -1,5 +1,4 @@
 import { getVideoYTjs } from '$lib/api/youtubejs/video';
-import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
 	authStore,
@@ -174,16 +173,16 @@ export async function getChannelContent(
 ): Promise<ChannelContent> {
 	if (typeof options.type === 'undefined') options.type = 'videos';
 
+	if (isYTBackend() || useEngineFallback('ChannelContent')) {
+		return await getChannelContentYTjs(channelId, options);
+	}
+
 	const url = buildPath(`channels/${channelId}/${options.type}`);
 
 	if (typeof options.continuation !== 'undefined')
 		url.searchParams.set('continuation', options.continuation);
 
 	if (typeof options.sortBy !== 'undefined') url.searchParams.set('sort_by', options.sortBy);
-
-	if (isYTBackend() || useEngineFallback('ChannelContent')) {
-		return await getChannelContentYTjs(channelId, options);
-	}
 
 	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
 	return await resp.json();

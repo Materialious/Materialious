@@ -56,6 +56,7 @@
 			});
 
 			completed = displayContent.continuation === newContent.continuation;
+			displayContent.continuation = newContent.continuation;
 		}
 
 		if ('videos' in newContent && 'videos' in displayContent) {
@@ -75,8 +76,6 @@
 
 			displayContent.playlists = [...displayContent.playlists, ...newContent.playlists];
 		}
-
-		displayContent.continuation = newContent.continuation;
 	}
 
 	async function changeTab(newTab: 'videos' | 'playlists' | 'streams' | 'shorts') {

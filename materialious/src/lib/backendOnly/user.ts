@@ -3,16 +3,20 @@ import { Op } from 'sequelize';
 import crypto from 'crypto';
 
 export class User {
-	private id: string;
+	private userId: string;
 
 	constructor(id: string) {
-		this.id = id;
+		this.userId = id;
+	}
+
+	public get id() {
+		return this.userId;
 	}
 
 	private get userWhere() {
 		return {
 			where: {
-				[Op.or]: [{ id: this.id }, { username: this.id }]
+				[Op.or]: [{ id: this.userId }, { username: this.userId }]
 			}
 		};
 	}
@@ -24,7 +28,7 @@ export class User {
 	async subscriptions(): Promise<ChannelSubscriptionModel[]> {
 		const subscriptions = await UserTable.findAll({
 			where: {
-				userId: this.id
+				userId: this.userId
 			}
 		});
 
@@ -40,6 +44,7 @@ export type CreateUser = {
 		hash: string;
 		salt: string;
 	};
+	subscriptionPasswordHash: string;
 };
 
 export async function createUser(user: CreateUser): Promise<User> {
@@ -50,7 +55,8 @@ export async function createUser(user: CreateUser): Promise<User> {
 		username: user.username,
 		passwordHash: user.password.hash,
 		passwordSalt: user.password.salt,
-		created: new Date()
+		created: new Date(),
+		subscriptionPasswordHash: user.subscriptionPasswordHash
 	});
 
 	return new User(id);
@@ -88,13 +94,13 @@ export async function authenticateUser(username: string, passwordHash: string): 
 	// Password is hashed in the browser, so if db is leaked it doesn't matter.
 	// Timing safe equal used to stop timing attacks when comparing strings.
 	if (
-		!crypto.timingSafeEqual(
+		crypto.timingSafeEqual(
 			textEncoder.encode(passwordHash),
 			textEncoder.encode(userModel.passwordHash)
 		)
 	) {
-		throw new Error('User does not exist');
+		return new User(userModel.id);
 	}
 
-	return new User(userModel.id);
+	throw new Error('User does not exist');
 }

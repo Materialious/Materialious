@@ -1,9 +1,9 @@
 import { Sequelize, DataTypes, type Model } from 'sequelize';
-import { DATABASE_CONNECTION_URI } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const sequelize = new Sequelize(
 	// Use sqlite::memory: if not provided.
-	DATABASE_CONNECTION_URI ? DATABASE_CONNECTION_URI : 'sqlite::memory:'
+	env.DATABASE_CONNECTION_URI ? env.DATABASE_CONNECTION_URI : 'sqlite::memory:'
 );
 
 export interface UserTableModel extends Model {
@@ -12,6 +12,7 @@ export interface UserTableModel extends Model {
 	passwordHash: string;
 	passwordSalt: string;
 	created: Date;
+	subscriptionPasswordHash: string;
 }
 
 export const UserTable = sequelize.define('User', {
@@ -35,6 +36,10 @@ export const UserTable = sequelize.define('User', {
 	},
 	created: {
 		type: DataTypes.DATE,
+		allowNull: false
+	},
+	subscriptionPasswordHash: {
+		type: DataTypes.STRING,
 		allowNull: false
 	}
 });

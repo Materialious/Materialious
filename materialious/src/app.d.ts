@@ -1,9 +1,12 @@
+import type { User } from '$lib/backendOnly/user';
 import type { IGetChallengeResponse } from 'youtubei.js';
 
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			userBackend?: User;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}

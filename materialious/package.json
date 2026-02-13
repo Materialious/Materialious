@@ -27,6 +27,7 @@
 		"@types/event-source-polyfill": "^1.0.5",
 		"@types/he": "^1.2.3",
 		"@types/human-number": "^1.0.2",
+		"@types/jsdom": "^27.0.0",
 		"@types/mousetrap": "^1.6.15",
 		"@vite-pwa/sveltekit": "^1.0.0",
 		"altcha-lib": "^1.4.1",

@@ -576,10 +576,10 @@
 			if (data.video.captions) {
 				for (const caption of data.video.captions) {
 					let captionUrl: string;
-					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
+					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE && $instanceStore) {
 						captionUrl = caption.url.startsWith('http')
 							? caption.url
-							: `${new URL(get(instanceStore)).origin}${caption.url}`;
+							: `${new URL($instanceStore).origin}${caption.url}`;
 					} else {
 						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}${caption.url}`;
 					}

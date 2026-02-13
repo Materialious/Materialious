@@ -46,11 +46,19 @@
 			return;
 		}
 
+		let urlConstructed = '';
+
+		if (video.fallbackPatch === 'youtubejs') {
+			urlConstructed = url;
+		} else if ($instanceStore) {
+			urlConstructed = new URL($instanceStore).origin + url;
+		} else {
+			return;
+		}
+
 		isLoading = true;
 		transcript = null;
-		const resp = await fetch(
-			`${!video.fallbackPatch ? new URL(get(instanceStore)).origin : ''}${url}`
-		);
+		const resp = await fetch(urlConstructed);
 		transcript = await parseText(await resp.text(), { strict: false });
 		transcriptCues = transcript.cues;
 

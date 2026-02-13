@@ -2,7 +2,6 @@ import { isOwnBackend } from '$lib/shared';
 import psl from 'psl';
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
-import { verifyCaptcha } from '$lib/server/captcha.js';
 
 const allowedDomains: string[] = [
 	'youtube.com',

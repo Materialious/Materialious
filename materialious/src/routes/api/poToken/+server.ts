@@ -32,8 +32,7 @@ export async function POST({ request, locals }) {
 		{
 			url: youtubeUrl,
 			referrer: youtubeUrl,
-			origin: youtubeUrl,
-			USER_AGENT
+			userAgent: USER_AGENT
 		}
 	);
 

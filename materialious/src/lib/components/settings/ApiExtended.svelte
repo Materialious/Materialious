@@ -15,12 +15,12 @@
 	)}
 >
 	<nav>
-		<div class="field prefix label border max">
+		<div class="field prefix label surface-container-highest max">
 			<i>link</i>
 			<input tabindex="0" bind:value={synciousInstance} name="syncious-instance" type="text" />
 			<label tabindex="-1" for="syncious-instance">{$_('layout.instanceUrl')}</label>
 		</div>
-		<button class="square round">
+		<button class="square">
 			<i>done</i>
 		</button>
 	</nav>

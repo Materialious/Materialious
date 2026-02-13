@@ -86,14 +86,11 @@ function ifNotWebDefault(givenValue: any, defaultValue: any): any {
 	}
 }
 
-export const instanceStore: Writable<string> = persist(
+export const instanceStore: Writable<string | undefined> = persist(
 	writable(
-		ifNotWebDefault(
-			!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
-				? undefined
-				: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE),
-			'https://invidious.materialio.us'
-		)
+		!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
+			? undefined
+			: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE)
 	),
 	createStorage(),
 	'invidiousInstance'

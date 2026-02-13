@@ -11,7 +11,7 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, isMobile, clearCaches, isUnrestrictedPlatform } from '../../misc';
+	import { isMobile, clearCaches, isUnrestrictedPlatform, setInvidiousInstance } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -84,37 +84,8 @@
 
 	async function setInstance(event: Event) {
 		event.preventDefault();
-
-		invalidInstance = false;
-
-		const instance = ensureNoTrailingSlash(invidiousInstance);
-
-		try {
-			new URL(instance);
-		} catch {
-			invalidInstance = true;
-		}
-
-		if (invalidInstance) return;
-
-		let resp;
-		try {
-			resp = await fetch(`${instance}/api/v1/channels/UCH-_hzb2ILSCo9ftVSnrCIQ`);
-		} catch {
-			invalidInstance = true;
-		}
-
-		if (invalidInstance) return;
-
-		if (resp && !resp.ok) {
-			invalidInstance = true;
-			return;
-		}
-
-		instanceStore.set(instance);
-
+		invalidInstance = !(await setInvidiousInstance(invidiousInstance));
 		reloadState();
-		authStore.set(null);
 	}
 
 	async function setBackend(event: Event) {
@@ -154,7 +125,7 @@
 </script>
 
 {#if isUnrestrictedPlatform()}
-	<div class="field label suffix border">
+	<div class="field label suffix surface-container-highest">
 		<select name="backend-in-use" onchange={setBackend}>
 			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
 			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube (Experimental)</option>
@@ -166,7 +137,10 @@
 	{#if $backendInUseStore === 'ivg'}
 		<form onsubmit={setInstance}>
 			<nav>
-				<div class="field prefix label border max" class:invalid={invalidInstance}>
+				<div
+					class="field prefix label surface-container-highest max"
+					class:invalid={invalidInstance}
+				>
 					<i>link</i>
 					<input
 						tabindex="0"
@@ -179,7 +153,7 @@
 						<span class="error">{$_('invalidInstance')}</span>
 					{/if}
 				</div>
-				<button class="square round">
+				<button class="square">
 					<i>done</i>
 				</button>
 			</nav>
@@ -408,7 +382,7 @@
 	</div>
 {/if}
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="region"
@@ -425,7 +399,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="case"
@@ -443,7 +417,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		name="defaultPage"
 		tabindex="0"
@@ -465,6 +439,7 @@
 	<div class="space"></div>
 	<div class="settings">
 		<h6>{$_('layout.bookmarklet')}</h6>
+		<div class="space"></div>
 		<button
 			class="no-margin"
 			onclick={async () => {

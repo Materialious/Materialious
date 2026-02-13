@@ -48,7 +48,7 @@
 	)}
 >
 	<nav>
-		<div class="field prefix label border max">
+		<div class="field prefix label surface-container-highest max">
 			<i>link</i>
 			<input
 				tabindex="0"
@@ -58,7 +58,7 @@
 			/>
 			<label tabindex="-1" for="sponsorblock-instance">{$_('layout.instanceUrl')}</label>
 		</div>
-		<button class="square round">
+		<button class="square">
 			<i>done</i>
 		</button>
 	</nav>
@@ -119,7 +119,7 @@
 			<div class="max">
 				<p>{sponsor.name}</p>
 			</div>
-			<div class="field suffix border">
+			<div class="field suffix surface-container-highest">
 				<select onchange={(event) => onSponsorSet(sponsor.category, event)}>
 					<option selected={currentCatergoryTrigger === undefined} value="disabled"
 						>{$_('disabled')}</option

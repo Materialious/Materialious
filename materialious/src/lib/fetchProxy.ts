@@ -14,6 +14,10 @@ function needsProxying(target: string): boolean {
 	return true;
 }
 
+function encodeUrl(url: string): string {
+	return Capacitor.getPlatform() === 'android' ? url : encodeURIComponent(url);
+}
+
 export const fetchProxied = async (
 	requestInput: string | URL | Request,
 	requestOptions?: RequestInit
@@ -37,10 +41,7 @@ export const fetchProxied = async (
 		requestInput instanceof Request ? requestInput.url : requestInput.toString();
 
 	if (needsProxying(nonProxiedUrl)) {
-		const proxiedURLEncoded =
-			Capacitor.getPlatform() === 'android' ? nonProxiedUrl : encodeURIComponent(nonProxiedUrl);
-
-		const proxiedUrl = corsProxyUrl + proxiedURLEncoded;
+		const proxiedUrl = corsProxyUrl + encodeUrl(nonProxiedUrl);
 
 		if (requestInput instanceof Request) {
 			requestInput = new Request(proxiedUrl, {
@@ -72,7 +73,7 @@ if (isUnrestrictedPlatform() && Capacitor.getPlatform() !== 'electron') {
 
 	XMLHttpRequest.prototype.open = function (...args: any[]): void {
 		if (needsProxying(args[1])) {
-			args[1] = corsProxyUrl + args[1];
+			args[1] = corsProxyUrl + encodeUrl(args[1]);
 		}
 		// @ts-expect-error args have any type
 		return originalXhrOpen.apply(this, args);

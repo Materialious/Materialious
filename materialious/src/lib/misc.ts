@@ -8,6 +8,7 @@ import {
 	backendInUseStore,
 	channelCacheStore,
 	feedCacheStore,
+	instanceStore,
 	interfaceAllowInsecureRequests,
 	interfaceAndroidUseNativeShare,
 	isAndroidTvStore,
@@ -229,8 +230,25 @@ export function findElementForTime<T>(
 	return null;
 }
 
+export type IsOwnBackend = {
+	builtWithBackend: boolean;
+	internalAuth: boolean;
+	requireAuth: boolean;
+	proxyWithoutAuth: boolean;
+};
+export function isOwnBackend(): IsOwnBackend | false {
+	if (import.meta.env.VITE_BUILD_WITH_BACKEND !== 'true') return false;
+
+	return {
+		builtWithBackend: true,
+		internalAuth: import.meta.env.VITE_INTERNAL_AUTH === 'true',
+		requireAuth: import.meta.env.VITE_REQUIRE_AUTH === 'true',
+		proxyWithoutAuth: import.meta.env.VITE_PROXY_WITHOUT_AUTH === 'true'
+	};
+}
+
 export function isUnrestrictedPlatform(): boolean {
-	return import.meta.env.VITE_BUILD_WITH_BACKEND === 'true' || Capacitor.isNativePlatform();
+	return isOwnBackend() !== false || Capacitor.isNativePlatform();
 }
 
 export function isYTBackend(): boolean {
@@ -248,4 +266,42 @@ export function authProtected() {
 	if (!get(authStore) && !isYTBackend()) {
 		goto(resolve('/', {}), { replaceState: true });
 	}
+}
+
+export async function setInvidiousInstance(
+	instanceUrl: string | undefined | null
+): Promise<boolean> {
+	if (typeof instanceUrl !== 'string') {
+		return false;
+	}
+
+	let invalidInstance = false;
+
+	const instance = ensureNoTrailingSlash(instanceUrl);
+
+	try {
+		new URL(instance);
+	} catch {
+		invalidInstance = true;
+	}
+
+	if (invalidInstance) return false;
+
+	let resp;
+	try {
+		resp = await fetch(`${instance}/api/v1/channels/UCH-_hzb2ILSCo9ftVSnrCIQ`);
+	} catch {
+		invalidInstance = true;
+	}
+
+	if (invalidInstance) return false;
+
+	if (resp && !resp.ok) {
+		return false;
+	}
+
+	instanceStore.set(instance);
+	authStore.set(null);
+
+	return true;
 }

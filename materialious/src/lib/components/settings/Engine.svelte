@@ -97,7 +97,7 @@
 
 {#if isYTBackend()}
 	<h6>Feed</h6>
-	<div class="field label prefix border">
+	<div class="field label prefix surface-container-highest">
 		<i>view_stream</i>
 		<input
 			oninput={(event: Event) => {
@@ -109,7 +109,7 @@
 		/>
 		<label for="cull">{$_('layout.backendEngine.cull')}</label>
 	</div>
-	<div class="field label prefix border">
+	<div class="field label prefix surface-container-highest">
 		<i>schedule</i>
 		<input
 			oninput={(event: Event) => {
@@ -121,7 +121,7 @@
 		/>
 		<label for="cooldown">{$_('layout.backendEngine.cooldown')}</label>
 	</div>
-	<div class="field label prefix border">
+	<div class="field label prefix surface-container-highest">
 		<i>pending</i>
 		<input
 			oninput={(event: Event) => {

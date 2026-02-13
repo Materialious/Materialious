@@ -1,15 +1,16 @@
-function copyHeader(header: string, targetHeaders: Headers, sourceHeaders: Headers) {
-	if (sourceHeaders.has(header)) {
-		targetHeaders.set(header, sourceHeaders.get(header)!);
-	}
-}
-
 async function proxyRequest(request: Request, urlToProxy: string): Promise<Response> {
 	let urlToProxyObj: URL;
 	try {
 		urlToProxyObj = new URL(decodeURIComponent(urlToProxy));
 	} catch {
 		return new Response('Invalid URL', { status: 400 });
+	}
+
+	if (urlToProxyObj.pathname.includes('v1/player')) {
+		urlToProxyObj.searchParams.set(
+			'$fields',
+			'playerConfig,captions,playabilityStatus,streamingData,responseContext.mainAppWebResponseContext.datasyncId,videoDetails.isLive,videoDetails.isLiveContent,videoDetails.title,videoDetails.author,playbackTracking'
+		);
 	}
 
 	const requestHeaders = request.headers;
@@ -35,16 +36,8 @@ async function proxyRequest(request: Request, urlToProxy: string): Promise<Respo
 		...(request.body ? { duplex: 'half' } : {})
 	});
 
-	const responseHeaders = new Headers();
-	copyHeader('content-length', requestHeaders, fetchRes.headers);
-	copyHeader('content-type', requestHeaders, fetchRes.headers);
-	copyHeader('content-disposition', requestHeaders, fetchRes.headers);
-	copyHeader('accept-ranges', requestHeaders, fetchRes.headers);
-	copyHeader('content-range', requestHeaders, fetchRes.headers);
-
 	return new Response(fetchRes.body, {
-		status: fetchRes.status,
-		headers: responseHeaders
+		status: fetchRes.status
 	});
 }
 
@@ -65,10 +58,4 @@ export async function PUT({ request, params }) {
 
 export async function POST({ request, params }) {
 	return await proxyRequest(request, params.urlToProxy);
-}
-
-export async function OPTIONS() {
-	return new Response('', {
-		status: 200
-	});
 }

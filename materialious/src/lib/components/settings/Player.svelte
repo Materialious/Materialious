@@ -66,7 +66,7 @@
 </script>
 
 <div class="margin"></div>
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="case"
@@ -84,7 +84,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="quality"
@@ -106,7 +106,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="quality"
@@ -123,7 +123,7 @@
 </div>
 
 {#if isUnrestrictedPlatform() && !isYTBackend()}
-	<div class="field suffix border label">
+	<div class="field suffix surface-container-highest label">
 		<select
 			tabindex="0"
 			name="ytfallback"

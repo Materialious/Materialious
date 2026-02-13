@@ -17,6 +17,7 @@ import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
+import { isYTBackend } from '$lib/misc.js';
 
 export const ssr = false;
 
@@ -40,6 +41,10 @@ export async function load({ url }) {
 			const result = await Preferences.get({ key: key });
 			if (result.value !== null) store.set(deserialize(result.value));
 		}
+	}
+
+	if (!get(instanceStore) && !isYTBackend() && !url.pathname.startsWith('/setup')) {
+		goto(resolve('/setup', {}), { replaceState: true });
 	}
 
 	const resolvedRoot = resolve('/', {});

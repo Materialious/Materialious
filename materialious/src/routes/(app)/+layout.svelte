@@ -256,7 +256,13 @@
 		setAmoledTheme();
 
 		if (isLoggedIn && !isYTBackend()) {
-			loadNotifications().catch(() => authStore.set(null));
+			loadNotifications().catch(() => logout());
+		}
+
+		if ($rawMasterKeyStore) {
+			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' }).catch(() => {
+				logout();
+			});
 		}
 
 		resetScroll();

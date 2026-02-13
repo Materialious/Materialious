@@ -33,11 +33,18 @@ export function goToSearch(searchValue: string) {
 
 	goto(resolve(`/search/[search]`, { search: encodeURIComponent(searchTrimmed) }));
 
-	if (get(interfaceSearchHistoryEnabled) && !get(searchHistoryStore).includes(searchTrimmed)) {
+	if (get(interfaceSearchHistoryEnabled)) {
 		const pastHistory = get(searchHistoryStore);
-		if (pastHistory.length > 15) {
+
+		const index = pastHistory.indexOf(searchTrimmed);
+		if (index !== -1) {
+			pastHistory.splice(index, 1);
+		}
+
+		if (pastHistory.length >= 15) {
 			pastHistory.pop();
 		}
+
 		searchHistoryStore.set([searchTrimmed, ...pastHistory]);
 	}
 }

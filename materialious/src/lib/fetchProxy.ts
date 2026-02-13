@@ -1,7 +1,7 @@
 import { isUnrestrictedPlatform, timeout } from '$lib/misc';
 import { Capacitor } from '@capacitor/core';
 
-const originalFetch = window.fetch;
+export const originalFetch = window.fetch;
 const corsProxyUrl =
 	Capacitor.getPlatform() === 'android'
 		? 'http://localhost:3000/'

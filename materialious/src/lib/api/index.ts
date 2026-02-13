@@ -8,6 +8,7 @@ import {
 	interfaceRegionStore,
 	playerYouTubeJsAlways,
 	playerYouTubeJsFallback,
+	rawMasterKeyStore,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
 } from '../store';
@@ -45,6 +46,13 @@ import {
 	postSubscribeYTjs
 } from './youtubejs/subscriptions';
 import { getPlaylistYTjs } from './youtubejs/playlist';
+import { isOwnBackend } from '$lib/shared';
+import {
+	amSubscribedBackend,
+	deleteUnsubscribeBackend,
+	getSubscriptionsBackend,
+	postSubscribeBackend
+} from './backend';
 
 export function buildPath(path: string): URL {
 	return new URL(`${get(instanceStore)}/api/v1/${path}`);
@@ -278,6 +286,15 @@ export async function getSubscriptions(
 	bypassYTBackend: boolean = false
 ): Promise<Subscription[]> {
 	if (isYTBackend() && !bypassYTBackend) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			return (await getSubscriptionsBackend()).map((sub) => {
+				return {
+					author: sub.channelName,
+					authorId: sub.channelId
+				};
+			});
+		}
+
 		return getSubscriptionsYTjs();
 	}
 	const resp = await fetchErrorHandle(
@@ -291,6 +308,10 @@ export async function amSubscribed(
 	fetchOptions: RequestInit = {}
 ): Promise<boolean> {
 	if (isYTBackend()) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			return amSubscribedBackend(authorId);
+		}
+
 		return amSubscribedYTjs(authorId);
 	}
 
@@ -312,6 +333,10 @@ export async function postSubscribe(
 	bypassYTBackend: boolean = false
 ) {
 	if (isYTBackend() && !bypassYTBackend) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			return postSubscribeBackend(authorId);
+		}
+
 		return postSubscribeYTjs(authorId);
 	}
 
@@ -326,6 +351,12 @@ export async function postSubscribe(
 
 export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestInit = {}) {
 	if (isYTBackend()) {
+		// deleteUnsubscribeYTjs still should run
+		// as cleans feeds of that channel.
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			deleteUnsubscribeBackend(authorId);
+		}
+
 		return deleteUnsubscribeYTjs(authorId);
 	}
 

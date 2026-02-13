@@ -32,7 +32,7 @@
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		rawSubscriptionKeyStore,
+		rawMasterKeyStore,
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
@@ -92,7 +92,7 @@
 
 	async function setBackend(event: Event) {
 		if (isOwnBackend()?.internalAuth) {
-			rawSubscriptionKeyStore.set(undefined);
+			rawMasterKeyStore.set(undefined);
 			fetch('/api/user/logout', { method: 'DELETE' });
 		}
 

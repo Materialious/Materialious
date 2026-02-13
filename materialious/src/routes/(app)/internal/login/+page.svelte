@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { createUserBackend, loginUserBackend } from '$lib/backend';
+	import { createUserBackend, loginUserBackend } from '$lib/api/backend';
 	import { _ } from '$lib/i18n';
 
 	let needToRegister = $state(false);

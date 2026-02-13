@@ -38,10 +38,22 @@ export class User {
 		await UserTable.destroy(this.userWhere);
 	}
 
+	async subscriptionRssUpdated(id: string) {
+		await ChannelSubscriptionTable.update(
+			{ lastRSSFetch: new Date() },
+			{
+				where: {
+					id: id,
+					UserId: this.id
+				}
+			}
+		);
+	}
+
 	async addSubscription(subscription: Omit<ChannelSubscriptionModel, 'userId'>) {
 		await ChannelSubscriptionTable.create({
 			...subscription,
-			userId: this.id
+			UserId: this.id
 		});
 	}
 
@@ -64,7 +76,7 @@ export class User {
 	}
 
 	async subscriptions(): Promise<ChannelSubscriptionModel[]> {
-		const subscriptions = await UserTable.findAll({
+		const subscriptions = await ChannelSubscriptionTable.findAll({
 			where: {
 				userId: this.data.id
 			}
@@ -90,7 +102,7 @@ export type CreateUser = {
 };
 
 export async function createUser(user: CreateUser): Promise<User> {
-	const id = crypto.randomUUID();
+	const id = crypto.randomUUID().toString();
 
 	const createdUser = {
 		id,
@@ -155,7 +167,7 @@ export async function authenticateUser(username: string, passwordHash: string): 
 			textEncoder.encode(userModel.passwordHash)
 		)
 	) {
-		return new User(userModel as UserTableModel);
+		return new User(userModel);
 	}
 
 	throw error(404);

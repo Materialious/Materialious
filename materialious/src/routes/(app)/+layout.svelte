@@ -25,7 +25,7 @@
 		isAndroidTvStore,
 		playerState,
 		playertheatreModeIsActive,
-		rawSubscriptionKeyStore,
+		rawMasterKeyStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -40,7 +40,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { isYTBackend, clearCaches, truncate } from '$lib/misc';
+	import { isYTBackend, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
@@ -189,12 +189,11 @@
 
 	function logout() {
 		if (isOwnBackend()?.internalAuth && isYTBackend()) {
-			rawSubscriptionKeyStore.set(undefined);
+			rawMasterKeyStore.set(undefined);
 			fetch('/api/user/logout', { method: 'DELETE' });
 		}
 
 		authStore.set(null);
-		clearCaches();
 		goto(resolve('/', {}));
 	}
 
@@ -273,7 +272,7 @@
 		class:hide={$playertheatreModeIsActive}
 	>
 		<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
-			<a href={resolve($interfaceDefaultPage, {})}>
+			<a href={resolve($interfaceDefaultPage, {})} data-sveltekit-preload-data="off">
 				<Logo />
 			</a>
 		</header>
@@ -382,7 +381,7 @@
 				</button>
 
 				{#if showLogin}
-					{#if !isLoggedIn && !$rawSubscriptionKeyStore}
+					{#if !isLoggedIn && !$rawMasterKeyStore}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>

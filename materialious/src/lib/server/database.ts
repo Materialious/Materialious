@@ -17,42 +17,54 @@ export interface UserTableModel extends Model {
 	masterKeyNonce: string;
 }
 
-export const UserTable = sequelize.define('User', {
-	id: {
-		type: DataTypes.UUIDV4,
-		allowNull: false,
-		primaryKey: true
+export const UserTable = sequelize.define(
+	'User',
+	{
+		id: {
+			type: DataTypes.UUIDV4,
+			allowNull: false,
+			primaryKey: true,
+			unique: true
+		},
+		username: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			unique: true
+		},
+		passwordHash: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		passwordSalt: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		created: {
+			type: DataTypes.DATE,
+			allowNull: false
+		},
+		decryptionKeySalt: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		masterKeyCipher: {
+			type: DataTypes.STRING,
+			allowNull: false
+		},
+		masterKeyNonce: {
+			type: DataTypes.STRING,
+			allowNull: false
+		}
 	},
-	username: {
-		type: DataTypes.STRING,
-		allowNull: false,
-		unique: true
-	},
-	passwordHash: {
-		type: DataTypes.STRING,
-		allowNull: false
-	},
-	passwordSalt: {
-		type: DataTypes.STRING,
-		allowNull: false
-	},
-	created: {
-		type: DataTypes.DATE,
-		allowNull: false
-	},
-	decryptionKeySalt: {
-		type: DataTypes.STRING,
-		allowNull: false
-	},
-	masterKeyCipher: {
-		type: DataTypes.STRING,
-		allowNull: false
-	},
-	masterKeyNonce: {
-		type: DataTypes.STRING,
-		allowNull: false
+	{
+		indexes: [
+			{
+				unique: true,
+				fields: ['id', 'username']
+			}
+		]
 	}
-});
+);
 
 export interface ChannelSubscriptionModel {
 	id: string; // Hashed authId with subscription key on client.
@@ -89,13 +101,7 @@ export const ChannelSubscriptionTable = sequelize.define('Subscriptions', {
 	lastRSSFetch: {
 		type: DataTypes.DATE,
 		allowNull: false
-	},
-	userId: {
-		type: DataTypes.UUIDV4,
-		references: {
-			model: 'User',
-			key: 'id'
-		},
-		allowNull: false
 	}
 });
+
+UserTable.hasMany(ChannelSubscriptionTable);

@@ -1,9 +1,8 @@
 import { authenticateUser } from '$lib/server/user';
 import { error, json } from '@sveltejs/kit';
 import z from 'zod';
-import { env } from '$env/dynamic/private';
-import { sign } from 'cookie-signature';
 import { isOwnBackend } from '$lib/shared';
+import { setAuthCookie } from '$lib/server/misc';
 
 const zUserLogin = z.object({
 	username: z.string(),
@@ -12,7 +11,7 @@ const zUserLogin = z.object({
 
 export async function POST({ request, cookies }) {
 	if (!isOwnBackend()?.internalAuth) {
-		return new Response('', { status: 500 });
+		throw error(500);
 	}
 
 	const userLogin = zUserLogin.safeParse(await request.json());
@@ -21,11 +20,7 @@ export async function POST({ request, cookies }) {
 
 	const userModel = await authenticateUser(userLogin.data.username, userLogin.data.passwordHash);
 
-	cookies.set('userid', sign(userModel.id, env.COOKIE_SECRET), {
-		httpOnly: true,
-		path: '/api/user',
-		maxAge: 60 * 60 * 24 * 60 // 60 days
-	});
+	setAuthCookie(userModel.id, cookies);
 
 	return json({
 		masterKeyCipher: userModel.data.masterKeyCipher,

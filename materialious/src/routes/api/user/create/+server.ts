@@ -2,9 +2,10 @@ import { isOwnBackend } from '$lib/shared';
 import { createUser } from '$lib/server/user.js';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
+import { setAuthCookie } from '$lib/server/misc.js';
 
 const zUserCreate = z.object({
-	username: z.string().min(3).max(32),
+	username: z.string().min(3).max(18),
 	password: z.object({
 		hash: z.string().max(255),
 		salt: z.string().max(255)
@@ -16,16 +17,16 @@ const zUserCreate = z.object({
 	})
 });
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
 	if (!isOwnBackend()?.internalAuth || !isOwnBackend()?.registrationAllowed) {
-		return new Response('', { status: 500 });
+		throw error(500);
 	}
 
 	const userToCreate = zUserCreate.safeParse(await request.json());
 
 	if (!userToCreate.success) throw error(400);
 
-	await createUser({
+	const createdUser = await createUser({
 		username: userToCreate.data.username,
 		password: {
 			hash: userToCreate.data.password.hash,
@@ -37,6 +38,8 @@ export async function POST({ request }) {
 			nonce: userToCreate.data.masterKey.nonce
 		}
 	});
+
+	setAuthCookie(createdUser.id, cookies);
 
 	return new Response('');
 }

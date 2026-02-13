@@ -12,7 +12,7 @@ import {
 	instanceStore,
 	interfaceDefaultPage,
 	isAndroidTvStore,
-	rawSubscriptionKeyStore
+	rawMasterKeyStore
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
@@ -36,7 +36,7 @@ export async function load({ url }) {
 			invidiousInstance: instanceStore,
 			authToken: authStore,
 			backendInUse: backendInUseStore,
-			rawSubscriptionKey: rawSubscriptionKeyStore
+			rawMasterKey: rawMasterKeyStore
 		};
 
 		for (const [key, store] of Object.entries(preferenceKey)) {

@@ -333,10 +333,10 @@ export const engineFallbacksStore: Writable<EngineFallback[]> = persist(
 	'engineFallbacks'
 );
 
-export const rawSubscriptionKeyStore: Writable<string | undefined> = persist(
+export const rawMasterKeyStore: Writable<string | undefined> = persist(
 	writable(),
 	createStorage(),
-	'rawSubscriptionKey'
+	'rawMasterKey'
 );
 
 export const syncPartyPeerStore: Writable<Peer | null> = writable(null);

@@ -5,11 +5,6 @@ export async function webPoTokenMinter(
 	visitorData: string,
 	challenge: IGetChallengeResponse
 ): Promise<string> {
-	console.log({
-		requestKey,
-		visitorData,
-		challenge
-	});
 	const resp = await fetch('/api/poToken/', {
 		body: JSON.stringify({
 			requestKey,
@@ -25,7 +20,7 @@ export async function webPoTokenMinter(
 			errorMsg = (await resp.json()).message;
 		} catch {
 			// Ignore error
-        }
+		}
 
 		throw new Error(errorMsg);
 	}

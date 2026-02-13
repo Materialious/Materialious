@@ -14,14 +14,7 @@ export async function POST({ request, cookies }) {
 
 	if (!userLogin.success) throw error(401);
 
-	let userModel: User | undefined;
-	try {
-		userModel = await authenticateUser(userLogin.data.username, userLogin.data.passwordHash);
-	} catch {
-		// Handle outside of catch
-	}
-
-	if (!userModel) throw error(401);
+	const userModel = await authenticateUser(userLogin.data.username, userLogin.data.passwordHash);
 
 	cookies.set('userid', sign(userModel.id, env.COOKIE_SECRET), {
 		httpOnly: true,

@@ -12,7 +12,7 @@ export interface UserTableModel extends Model {
 	passwordHash: string;
 	passwordSalt: string;
 	created: Date;
-	subscriptionPasswordHash: string;
+	subscriptionPasswordSalt: string;
 }
 
 export const UserTable = sequelize.define('User', {
@@ -38,7 +38,7 @@ export const UserTable = sequelize.define('User', {
 		type: DataTypes.DATE,
 		allowNull: false
 	},
-	subscriptionPasswordHash: {
+	subscriptionPasswordSalt: {
 		type: DataTypes.STRING,
 		allowNull: false
 	}

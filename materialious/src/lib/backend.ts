@@ -15,3 +15,5 @@ export function isOwnBackend(): IsOwnBackend | null {
 		registrationAllowed: import.meta.env.VITE_REGISTRATION_ALLOWED === 'true'
 	};
 }
+
+async function backendLogin(username: string, password: string) {}

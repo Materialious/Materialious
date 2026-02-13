@@ -2,7 +2,6 @@ import { isOwnBackend } from '$lib/backend';
 import { sequelize } from '$lib/backendOnly/database';
 import { unsign } from 'cookie-signature';
 import { env } from '$env/dynamic/private';
-import { User } from '$lib/backendOnly/user';
 
 let sequelizeAuthenticated = false;
 export async function handle({ event, resolve }) {
@@ -23,7 +22,7 @@ export async function handle({ event, resolve }) {
 	if (signedUserId) {
 		const userId = unsign(signedUserId, env.COOKIE_SECRET);
 		if (userId) {
-			event.locals.userBackend = new User(userId);
+			event.locals.userId = userId;
 		}
 	}
 

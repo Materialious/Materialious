@@ -1,22 +1,30 @@
 import { UserTable, type ChannelSubscriptionModel, type UserTableModel } from './database';
 import { Op } from 'sequelize';
 import crypto from 'crypto';
+import { error } from '@sveltejs/kit';
 
 export class User {
-	private userId: string;
+	private user: UserTableModel;
 
-	constructor(id: string) {
-		this.userId = id;
+	constructor(user: UserTableModel) {
+		this.user = user;
 	}
 
 	public get id() {
-		return this.userId;
+		return this.user.id;
+	}
+
+	public get publicPasswordSalts() {
+		return {
+			subscriptionPasswordSalt: this.user.subscriptionPasswordSalt,
+			passwordSalt: this.user.passwordSalt
+		};
 	}
 
 	private get userWhere() {
 		return {
 			where: {
-				[Op.or]: [{ id: this.userId }, { username: this.userId }]
+				[Op.or]: [{ id: this.user.id }, { username: this.user.username }]
 			}
 		};
 	}
@@ -28,7 +36,7 @@ export class User {
 	async subscriptions(): Promise<ChannelSubscriptionModel[]> {
 		const subscriptions = await UserTable.findAll({
 			where: {
-				userId: this.userId
+				userId: this.user.id
 			}
 		});
 
@@ -44,22 +52,24 @@ export type CreateUser = {
 		hash: string;
 		salt: string;
 	};
-	subscriptionPasswordHash: string;
+	subscriptionPasswordSalt: string;
 };
 
 export async function createUser(user: CreateUser): Promise<User> {
 	const id = crypto.randomUUID();
 
-	await UserTable.create({
+	const createdUser = {
 		id,
 		username: user.username,
 		passwordHash: user.password.hash,
 		passwordSalt: user.password.salt,
 		created: new Date(),
-		subscriptionPasswordHash: user.subscriptionPasswordHash
-	});
+		subscriptionPasswordSalt: user.subscriptionPasswordSalt
+	};
 
-	return new User(id);
+	await UserTable.create(createdUser);
+
+	return new User(createdUser as UserTableModel);
 }
 
 export async function getUser(identifier: string): Promise<User> {
@@ -70,10 +80,10 @@ export async function getUser(identifier: string): Promise<User> {
 	});
 
 	if (!user) {
-		throw new Error('User does not exist');
+		throw error(404);
 	}
 
-	return new User((user as UserTableModel).id);
+	return new User(user as UserTableModel);
 }
 
 export async function authenticateUser(username: string, passwordHash: string): Promise<User> {
@@ -84,7 +94,7 @@ export async function authenticateUser(username: string, passwordHash: string): 
 	});
 
 	if (!user) {
-		throw new Error('User does not exist');
+		throw error(404);
 	}
 
 	const userModel = user as UserTableModel;
@@ -99,8 +109,8 @@ export async function authenticateUser(username: string, passwordHash: string): 
 			textEncoder.encode(userModel.passwordHash)
 		)
 	) {
-		return new User(userModel.id);
+		return new User(userModel as UserTableModel);
 	}
 
-	throw new Error('User does not exist');
+	throw error(404);
 }

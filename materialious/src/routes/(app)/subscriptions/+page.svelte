@@ -6,16 +6,13 @@
 	import ItemsList from '$lib/components/ItemsList.svelte';
 	import { resolve } from '$app/paths';
 	import { _ } from '$lib/i18n';
-	import { isYTBackend } from '$lib/misc';
 
 	let currentPage = 1;
 	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state($feedCacheStore.subscription);
 
 	async function loadMore(event: InfiniteEvent) {
-		// Not supported or needed on YT backend
-		if (isYTBackend()) return;
-
 		currentPage++;
+
 		const feed = await getFeed(100, currentPage);
 		if (feed.videos.length === 0) {
 			event.detail.complete();

@@ -6,6 +6,7 @@
 		engineCooldownYTStore,
 		engineCullYTStore,
 		engineFallbacksStore,
+		engineMaxConcurrentChannelsStore,
 		instanceStore
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
@@ -115,10 +116,22 @@
 				engineCooldownYTStore.set(Number((event.target as HTMLInputElement).value));
 			}}
 			value={$engineCooldownYTStore}
-			name="cull"
+			name="cooldown"
 			type="number"
 		/>
-		<label for="cull">{$_('layout.backendEngine.cooldown')}</label>
+		<label for="cooldown">{$_('layout.backendEngine.cooldown')}</label>
+	</div>
+	<div class="field label prefix border">
+		<i>pending</i>
+		<input
+			oninput={(event: Event) => {
+				engineMaxConcurrentChannelsStore.set(Number((event.target as HTMLInputElement).value));
+			}}
+			value={$engineMaxConcurrentChannelsStore}
+			name="concurrent"
+			type="number"
+		/>
+		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>
 
 	{#if $authStore && $instanceStore}

@@ -3,6 +3,7 @@ export type IsOwnBackend = {
 	internalAuth: boolean;
 	requireAuth: boolean;
 	registrationAllowed: boolean;
+	allowAnyProxy: boolean;
 };
 
 export function isOwnBackend(): IsOwnBackend | null {
@@ -12,6 +13,7 @@ export function isOwnBackend(): IsOwnBackend | null {
 		builtWithBackend: true,
 		internalAuth: import.meta.env.VITE_INTERNAL_AUTH !== 'false',
 		requireAuth: import.meta.env.VITE_REQUIRE_AUTH !== 'false',
-		registrationAllowed: import.meta.env.VITE_REGISTRATION_ALLOWED === 'true'
+		registrationAllowed: import.meta.env.VITE_REGISTRATION_ALLOWED === 'true',
+		allowAnyProxy: import.meta.env.VITE_ALLOW_ANY_PROXY === 'true'
 	};
 }

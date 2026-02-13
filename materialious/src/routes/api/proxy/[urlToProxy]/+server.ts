@@ -1,6 +1,7 @@
 import { isOwnBackend } from '$lib/shared';
 import psl from 'psl';
 import { env } from '$env/dynamic/private';
+import { error } from '@sveltejs/kit';
 
 const allowedDomains: string[] = [
 	'youtube.com',
@@ -27,26 +28,40 @@ dynamicAllowDomains.forEach((domain) => {
 	}
 });
 
-async function proxyRequest(request: Request, urlToProxy: string): Promise<Response> {
+async function proxyRequest(
+	request: Request,
+	urlToProxy: string,
+	userId: string | undefined = undefined
+): Promise<Response> {
 	const backendRestrictions = isOwnBackend();
 	if (!backendRestrictions) {
 		// Shouldn't be possible.
-		return new Response('How did you get here?', { status: 400 });
+		throw error(400, 'How did you get here?');
 	}
 
-	if (backendRestrictions.requireAuth) {
-		return new Response('Auth required', { status: 401 });
+	if (backendRestrictions.requireAuth && !userId) {
+		throw error(401, 'Auth required');
 	}
 
 	let urlToProxyObj: URL;
 	try {
 		urlToProxyObj = new URL(decodeURIComponent(urlToProxy));
 	} catch {
-		return new Response('Invalid URL', { status: 400 });
+		throw error(400, 'Invalid URL');
 	}
 
 	if (!allowedDomains.includes(psl.parse(urlToProxyObj.host).domain)) {
-		return new Response('Invalid URL', { status: 400 });
+		// allowAnyProxy allows a instance owner to bypass the whitelist.
+		// BUT is extremely strict.
+		// AND I still don't recommend this.
+		if (
+			!backendRestrictions.allowAnyProxy ||
+			!backendRestrictions.requireAuth ||
+			backendRestrictions.registrationAllowed ||
+			!userId
+		) {
+			throw error(400, 'Invalid URL');
+		}
 	}
 
 	if (urlToProxyObj.pathname.includes('v1/player')) {
@@ -84,21 +99,21 @@ async function proxyRequest(request: Request, urlToProxy: string): Promise<Respo
 	});
 }
 
-export async function GET({ request, params }) {
-	return await proxyRequest(request, params.urlToProxy);
+export async function GET({ request, params, locals }) {
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
-export async function PATCH({ request, params }) {
-	return await proxyRequest(request, params.urlToProxy);
-}
-
-export async function DELETE({ request, params }) {
-	return await proxyRequest(request, params.urlToProxy);
+export async function PATCH({ request, params, locals }) {
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
-export async function PUT({ request, params }) {
-	return await proxyRequest(request, params.urlToProxy);
+export async function DELETE({ request, params, locals }) {
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
-export async function POST({ request, params }) {
-	return await proxyRequest(request, params.urlToProxy);
+export async function PUT({ request, params, locals }) {
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
+}
+
+export async function POST({ request, params, locals }) {
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }

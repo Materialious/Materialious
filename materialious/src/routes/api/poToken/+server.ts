@@ -3,6 +3,7 @@ import type { IGetChallengeResponse } from 'youtubei.js';
 import BG, { buildURL, GOOG_API_KEY, USER_AGENT, type WebPoSignalOutput } from 'bgutils-js';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
+import { isOwnBackend } from '$lib/shared/index.js';
 
 const zPoTokenGenSchema = z.object({
 	requestKey: z.string(),
@@ -10,7 +11,11 @@ const zPoTokenGenSchema = z.object({
 	challenge: z.record(z.any(), z.any())
 });
 
-export async function POST({ request }) {
+export async function POST({ request, locals }) {
+	if (isOwnBackend()?.requireAuth && !locals.userId) {
+		throw error(401);
+	}
+
 	const data = zPoTokenGenSchema.safeParse(await request.json());
 
 	if (!data.success) {

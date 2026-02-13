@@ -25,6 +25,7 @@
 		isAndroidTvStore,
 		playerState,
 		playertheatreModeIsActive,
+		rawSubscriptionKeyStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -186,6 +187,11 @@
 	}
 
 	function logout() {
+		if (isOwnBackend()?.internalAuth) {
+			rawSubscriptionKeyStore.set(undefined);
+			fetch('/api/user/logout');
+		}
+
 		authStore.set(null);
 		clearCaches();
 		goto(resolve('/', {}));

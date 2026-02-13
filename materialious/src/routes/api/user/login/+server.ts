@@ -23,7 +23,7 @@ export async function POST({ request, cookies }) {
 
 	cookies.set('userid', sign(userModel.id, env.COOKIE_SECRET), {
 		httpOnly: true,
-		path: '/',
+		path: '/api/user',
 		maxAge: 60 * 60 * 24 * 60 // 60 days
 	});
 

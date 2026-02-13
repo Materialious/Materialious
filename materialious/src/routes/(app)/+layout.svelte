@@ -42,7 +42,6 @@
 	import { isYTBackend, clearCaches, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import { createUserBackend } from '$lib/backend';
 	import { isOwnBackend } from '$lib/shared';
 
 	let { children } = $props();
@@ -117,7 +116,6 @@
 
 	async function login() {
 		if (isOwnBackend()?.internalAuth) {
-			await createUserBackend('ward', 'password123');
 			return;
 		}
 

@@ -1,4 +1,4 @@
-import { isOwnBackend } from '$lib/backend';
+import { isOwnBackend } from '$lib/shared';
 import psl from 'psl';
 import { env } from '$env/dynamic/private';
 

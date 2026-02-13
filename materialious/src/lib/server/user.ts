@@ -67,7 +67,17 @@ export async function createUser(user: CreateUser): Promise<User> {
 		subscriptionPasswordSalt: user.subscriptionPasswordSalt
 	};
 
-	await UserTable.create(createdUser);
+	let userCreated = false;
+	try {
+		await UserTable.create(createdUser);
+		userCreated = true;
+	} catch {
+		userCreated = false;
+	}
+
+	if (!userCreated) {
+		throw error(400);
+	}
 
 	return new User(createdUser as UserTableModel);
 }

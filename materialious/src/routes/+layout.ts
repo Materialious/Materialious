@@ -11,7 +11,8 @@ import {
 	backendInUseStore,
 	instanceStore,
 	interfaceDefaultPage,
-	isAndroidTvStore
+	isAndroidTvStore,
+	rawSubscriptionKeyStore
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
@@ -28,13 +29,14 @@ export async function load({ url }) {
 
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
 
-	// Due to race condition with how we set & save persistent store values
-	// we manually set stores like auth & instance before load.
 	if (Capacitor.getPlatform() === 'android') {
+		// Due to race condition with how we set & save persistent store values
+		// we manually set stores like auth & instance before load.
 		const preferenceKey: Record<string, Writable<any>> = {
 			invidiousInstance: instanceStore,
 			authToken: authStore,
-			backendInUse: backendInUseStore
+			backendInUse: backendInUseStore,
+			rawSubscriptionKey: rawSubscriptionKeyStore
 		};
 
 		for (const [key, store] of Object.entries(preferenceKey)) {

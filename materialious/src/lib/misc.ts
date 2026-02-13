@@ -28,7 +28,7 @@ import { page } from '$app/state';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
-import { isOwnBackend } from './backend';
+import { isOwnBackend } from './shared';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;

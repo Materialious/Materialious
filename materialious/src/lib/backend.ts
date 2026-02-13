@@ -1,28 +1,55 @@
 import sodium from 'libsodium-wrappers-sumo';
+import { rawSubscriptionKeyStore } from './store';
 
-export type IsOwnBackend = {
-	builtWithBackend: boolean;
-	internalAuth: boolean;
-	requireAuth: boolean;
-	registrationAllowed: boolean;
-};
+export async function createUserBackend(username: string, rawPassword: string): Promise<boolean> {
+	await sodium.ready;
 
-export function isOwnBackend(): IsOwnBackend | null {
-	if (import.meta.env.VITE_BUILD_WITH_BACKEND !== 'true') return null;
+	const passwordSalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
 
-	return {
-		builtWithBackend: true,
-		internalAuth: import.meta.env.VITE_INTERNAL_AUTH !== 'false',
-		requireAuth: import.meta.env.VITE_REQUIRE_AUTH !== 'false',
-		registrationAllowed: import.meta.env.VITE_REGISTRATION_ALLOWED === 'true'
-	};
+	const loginHash = sodium.crypto_pwhash(
+		32,
+		rawPassword,
+		passwordSalt,
+		sodium.crypto_pwhash_OPSLIMIT_SENSITIVE,
+		sodium.crypto_pwhash_MEMLIMIT_SENSITIVE,
+		sodium.crypto_pwhash_ALG_DEFAULT
+	);
+
+	const subscriptionPasswordSalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
+
+	const userCreateResp = await fetch('/api/user/create', {
+		method: 'POST',
+		body: JSON.stringify({
+			username: username,
+			password: {
+				hash: sodium.to_base64(loginHash),
+				salt: sodium.to_base64(passwordSalt)
+			},
+			subscriptionPasswordSalt: sodium.to_base64(subscriptionPasswordSalt)
+		})
+	});
+
+	if (!userCreateResp.ok) return false;
+
+	const subscriptionRawKey = sodium.crypto_pwhash(
+		32,
+		rawPassword,
+		passwordSalt,
+		sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+		sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+		sodium.crypto_pwhash_ALG_DEFAULT
+	);
+
+	rawSubscriptionKeyStore.set(sodium.to_base64(subscriptionRawKey));
+
+	return true;
 }
 
-export async function backendLogin(username: string, rawPassword: string) {
+export async function loginUserBackend(username: string, rawPassword: string): Promise<boolean> {
 	await sodium.ready;
 
 	const passwordSaltsResp = await fetch(`/api/user/${username}/public`);
-	if (!passwordSaltsResp.ok) return;
+	if (!passwordSaltsResp.ok) return false;
 
 	const passwordSalts = await passwordSaltsResp.json();
 
@@ -39,11 +66,11 @@ export async function backendLogin(username: string, rawPassword: string) {
 		method: 'POST',
 		body: JSON.stringify({
 			username,
-			passwordHash: loginHash
+			passwordHash: sodium.to_base64(loginHash)
 		})
 	});
 
-	if (!loginResp.ok) return;
+	if (!loginResp.ok) return false;
 
 	const subscriptionRawKey = sodium.crypto_pwhash(
 		32,
@@ -53,4 +80,8 @@ export async function backendLogin(username: string, rawPassword: string) {
 		sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
 		sodium.crypto_pwhash_ALG_DEFAULT
 	);
+
+	rawSubscriptionKeyStore.set(sodium.to_base64(subscriptionRawKey));
+
+	return true;
 }

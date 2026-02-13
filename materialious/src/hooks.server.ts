@@ -1,5 +1,5 @@
-import { isOwnBackend } from '$lib/backend';
-import { sequelize } from '$lib/backendOnly/database';
+import { isOwnBackend } from '$lib/shared';
+import { sequelize } from '$lib/server/database';
 import { unsign } from 'cookie-signature';
 import { env } from '$env/dynamic/private';
 
@@ -10,6 +10,7 @@ export async function handle({ event, resolve }) {
 	}
 
 	if (!sequelizeAuthenticated) {
+		await sequelize.sync();
 		await sequelize.authenticate();
 		sequelizeAuthenticated = true;
 	}

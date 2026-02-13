@@ -1,10 +1,18 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, DataTypes, type Model } from 'sequelize';
 import { DATABASE_CONNECTION_URI } from '$env/static/private';
 
 export const sequelize = new Sequelize(
 	// Use sqlite::memory: if not provided.
 	DATABASE_CONNECTION_URI ? DATABASE_CONNECTION_URI : 'sqlite::memory:'
 );
+
+export interface UserTableModel extends Model {
+	id: string;
+	username: string;
+	passwordHash: string;
+	passwordSalt: string;
+	created: Date;
+}
 
 export const UserTable = sequelize.define('User', {
 	id: {
@@ -14,24 +22,46 @@ export const UserTable = sequelize.define('User', {
 	},
 	username: {
 		type: DataTypes.STRING,
-		allowNull: false
+		allowNull: false,
+		unique: true
 	},
 	passwordHash: {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
-	create: {
+	passwordSalt: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	created: {
 		type: DataTypes.DATE,
 		allowNull: false
 	}
 });
 
+export interface ChannelSubscriptionModel {
+	channelIdCipher: string;
+	channelIdSalt: string;
+	channelNameCipher: string;
+	channelNameSalt: string;
+	lastRSSFetch: Date;
+	userId: string;
+}
+
 export const ChannelSubscriptionTable = sequelize.define('Subscriptions', {
-	channelId: {
+	channelIdCipher: {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
-	channelName: {
+	channelIdSalt: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	channelNameCipher: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	channelNameSalt: {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
@@ -44,6 +74,7 @@ export const ChannelSubscriptionTable = sequelize.define('Subscriptions', {
 		references: {
 			model: 'User',
 			key: 'id'
-		}
+		},
+		allowNull: false
 	}
 });

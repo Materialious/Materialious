@@ -190,7 +190,7 @@
 	function logout() {
 		if (isOwnBackend()?.internalAuth) {
 			rawSubscriptionKeyStore.set(undefined);
-			fetch('/api/user/logout');
+			fetch('/api/user/logout', { method: 'DELETE' });
 		}
 
 		authStore.set(null);
@@ -382,7 +382,7 @@
 				</button>
 
 				{#if showLogin}
-					{#if !isLoggedIn}
+					{#if !isLoggedIn && !$rawSubscriptionKeyStore}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>

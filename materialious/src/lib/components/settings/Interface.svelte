@@ -32,11 +32,13 @@
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
+		rawSubscriptionKeyStore,
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';
 	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
+	import { isOwnBackend } from '$lib/shared';
 
 	let invidiousInstance = $state(get(instanceStore));
 	let region = $state(get(interfaceRegionStore));
@@ -89,6 +91,11 @@
 	}
 
 	async function setBackend(event: Event) {
+		if (isOwnBackend()?.internalAuth) {
+			rawSubscriptionKeyStore.set(undefined);
+			fetch('/api/user/logout', { method: 'DELETE' });
+		}
+
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
 		reloadState();

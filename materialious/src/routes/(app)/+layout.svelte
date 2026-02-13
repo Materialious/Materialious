@@ -116,7 +116,7 @@
 	});
 
 	async function login() {
-		if (isOwnBackend()?.internalAuth) {
+		if (isOwnBackend()?.internalAuth && isYTBackend()) {
 			goto(resolve('/internal/login', {}));
 			return;
 		}
@@ -188,7 +188,7 @@
 	}
 
 	function logout() {
-		if (isOwnBackend()?.internalAuth) {
+		if (isOwnBackend()?.internalAuth && isYTBackend()) {
 			rawSubscriptionKeyStore.set(undefined);
 			fetch('/api/user/logout', { method: 'DELETE' });
 		}

@@ -1,8 +1,12 @@
-import { timeout } from '$lib/misc';
+import { isUnrestrictedPlatform, timeout } from '$lib/misc';
 import { Capacitor } from '@capacitor/core';
 
 const originalFetch = window.fetch;
-const corsProxyUrl: string = 'http://localhost:3000/';
+const corsProxyUrl =
+	Capacitor.getPlatform() === 'android'
+		? 'http://localhost:3000/'
+		: `${location.origin}/api/proxy/`;
+
 let mobileNodeLoaded = false;
 
 function needsProxying(target: string): boolean {
@@ -10,11 +14,11 @@ function needsProxying(target: string): boolean {
 	return true;
 }
 
-export const androidFetch = async (
+export const fetchProxied = async (
 	requestInput: string | URL | Request,
 	requestOptions?: RequestInit
 ): Promise<Response> => {
-	if (!mobileNodeLoaded) {
+	if (!mobileNodeLoaded && Capacitor.getPlatform() === 'android') {
 		let mobileNodeResp: Response | undefined;
 
 		while (!mobileNodeResp || !mobileNodeResp.ok) {
@@ -29,11 +33,17 @@ export const androidFetch = async (
 		mobileNodeLoaded = true;
 	}
 
-	const uri = requestInput instanceof Request ? requestInput.url : requestInput.toString();
+	const nonProxiedUrl =
+		requestInput instanceof Request ? requestInput.url : requestInput.toString();
 
-	if (needsProxying(uri)) {
+	if (needsProxying(nonProxiedUrl)) {
+		const proxiedURLEncoded =
+			Capacitor.getPlatform() === 'android' ? nonProxiedUrl : encodeURIComponent(nonProxiedUrl);
+
+		const proxiedUrl = corsProxyUrl + proxiedURLEncoded;
+
 		if (requestInput instanceof Request) {
-			requestInput = new Request(corsProxyUrl + uri, {
+			requestInput = new Request(proxiedUrl, {
 				method: requestInput.method,
 				headers: requestInput.headers,
 				body: requestInput.body,
@@ -47,7 +57,7 @@ export const androidFetch = async (
 				...(requestInput.body ? { duplex: 'half' } : {})
 			});
 		} else {
-			requestInput = corsProxyUrl + uri;
+			requestInput = proxiedUrl;
 		}
 	}
 
@@ -55,8 +65,8 @@ export const androidFetch = async (
 	return originalFetch(requestInput, requestOptions);
 };
 
-if (Capacitor.getPlatform() === 'android') {
-	window.fetch = androidFetch;
+if (isUnrestrictedPlatform() && Capacitor.getPlatform() !== 'electron') {
+	window.fetch = fetchProxied;
 
 	const originalXhrOpen = XMLHttpRequest.prototype.open;
 

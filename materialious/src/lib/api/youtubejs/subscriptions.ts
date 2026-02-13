@@ -142,6 +142,10 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	}
 }
 
+export async function clearFeedYTjs() {
+	await localDb.subscriptionFeed.clear();
+}
+
 export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
 	let channelSubscriptions: ChannelSubscriptions[];
 

@@ -44,6 +44,7 @@
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import { clearFeedYTjs } from '$lib/api/youtubejs/subscriptions';
 
 	let { children } = $props();
 
@@ -187,10 +188,14 @@
 		loginError = true;
 	}
 
-	function logout() {
-		if (isOwnBackend()?.internalAuth && isYTBackend()) {
-			rawMasterKeyStore.set(undefined);
-			fetch('/api/user/logout', { method: 'DELETE' });
+	async function logout() {
+		if (isYTBackend()) {
+			await clearFeedYTjs();
+
+			if (isOwnBackend()?.internalAuth) {
+				rawMasterKeyStore.set(undefined);
+				fetch('/api/user/logout', { method: 'DELETE' });
+			}
 		}
 
 		authStore.set(null);

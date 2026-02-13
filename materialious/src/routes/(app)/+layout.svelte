@@ -117,6 +117,7 @@
 
 	async function login() {
 		if (isOwnBackend()?.internalAuth) {
+			goto(resolve('/internal/login', {}));
 			return;
 		}
 
@@ -499,11 +500,11 @@
 	<form onsubmit={usernamePasswordLogin}>
 		<div class="field label border" class:invalid={loginError}>
 			<input id="username" bind:value={rawUsername} name="username" type="text" />
-			<label for="username">Username</label>
+			<label for="username">{$_('username')}</label>
 		</div>
 		<div class="field label border" class:invalid={loginError}>
 			<input bind:value={rawPassword} name="password" type="password" />
-			<label for="password">Password</label>
+			<label for="password">{$_('password')}</label>
 		</div>
 
 		<nav class="right-align no-space">

@@ -1,24 +1,3 @@
-const ALLOWED_HEADERS = [
-	'Origin',
-	'X-Requested-With',
-	'Content-Type',
-	'Accept',
-	'Authorization',
-	'x-goog-visitor-id',
-	'x-goog-api-key',
-	'x-origin',
-	'x-youtube-client-version',
-	'x-youtube-client-name',
-	'x-goog-api-format-version',
-	'x-goog-authuser',
-	'x-user-agent',
-	'Accept-Language',
-	'X-Goog-FieldMask',
-	'Range',
-	'Referer',
-	'Cookie'
-].join(', ');
-
 function copyHeader(header: string, targetHeaders: Headers, sourceHeaders: Headers) {
 	if (sourceHeaders.has(header)) {
 		targetHeaders.set(header, sourceHeaders.get(header)!);
@@ -88,15 +67,8 @@ export async function POST({ request, params }) {
 	return await proxyRequest(request, params.urlToProxy);
 }
 
-export async function OPTIONS({ request }) {
+export async function OPTIONS() {
 	return new Response('', {
-		status: 200,
-		headers: {
-			'Access-Control-Allow-Origin': request.headers.get('origin') || '',
-			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-			'Access-Control-Allow-Headers': ALLOWED_HEADERS,
-			'Access-Control-Max-Age': '86400',
-			'Access-Control-Allow-Credentials': 'true'
-		}
+		status: 200
 	});
 }

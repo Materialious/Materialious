@@ -1,8 +1,39 @@
+import psl from 'psl';
+
+const allowedDomains: string[] = [
+	'youtube.com',
+	'ytimg.com',
+	'googlevideo.com',
+	'returnyoutubedislike.com',
+	'sponsor.ajay.app',
+	'dearrow-thumb.ajay.app',
+	'materialio.us'
+];
+
+const dynamicAllowDomains = [
+	process.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
+	process.env.VITE_DEFAULT_DEARROW_INSTANCE,
+	process.env.VITE_DEFAULT_INVIDIOUS_INSTANCE,
+	process.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+	process.env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
+	process.env.VITE_DEFAULT_SYNCIOUS_INSTANCE
+];
+
+dynamicAllowDomains.forEach((domain) => {
+	if (domain) {
+		allowedDomains.push(domain);
+	}
+});
+
 async function proxyRequest(request: Request, urlToProxy: string): Promise<Response> {
 	let urlToProxyObj: URL;
 	try {
 		urlToProxyObj = new URL(decodeURIComponent(urlToProxy));
 	} catch {
+		return new Response('Invalid URL', { status: 400 });
+	}
+
+	if (!allowedDomains.includes(psl.parse(urlToProxyObj.host).domain)) {
 		return new Response('Invalid URL', { status: 400 });
 	}
 

@@ -234,16 +234,14 @@ export type IsOwnBackend = {
 	builtWithBackend: boolean;
 	internalAuth: boolean;
 	requireAuth: boolean;
-	proxyWithoutAuth: boolean;
 };
 export function isOwnBackend(): IsOwnBackend | false {
 	if (import.meta.env.VITE_BUILD_WITH_BACKEND !== 'true') return false;
 
 	return {
 		builtWithBackend: true,
-		internalAuth: import.meta.env.VITE_INTERNAL_AUTH === 'true',
-		requireAuth: import.meta.env.VITE_REQUIRE_AUTH === 'true',
-		proxyWithoutAuth: import.meta.env.VITE_PROXY_WITHOUT_AUTH === 'true'
+		internalAuth: import.meta.env.VITE_INTERNAL_AUTH === 'false',
+		requireAuth: import.meta.env.VITE_REQUIRE_AUTH === 'false'
 	};
 }
 

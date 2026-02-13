@@ -39,7 +39,7 @@
 		tabs.splice(1, 0, {
 			id: 'engine',
 			label: $_('layout.engine'),
-			icon: 'build',
+			icon: 'rocket_launch',
 			component: Engine
 		});
 	}

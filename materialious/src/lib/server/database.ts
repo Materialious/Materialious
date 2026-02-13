@@ -12,7 +12,9 @@ export interface UserTableModel extends Model {
 	passwordHash: string;
 	passwordSalt: string;
 	created: Date;
-	subscriptionPasswordSalt: string;
+	decryptionKeySalt: string;
+	masterKeyCipher: string;
+	masterKeyNonce: string;
 }
 
 export const UserTable = sequelize.define('User', {
@@ -38,27 +40,41 @@ export const UserTable = sequelize.define('User', {
 		type: DataTypes.DATE,
 		allowNull: false
 	},
-	subscriptionPasswordSalt: {
+	decryptionKeySalt: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	masterKeyCipher: {
+		type: DataTypes.STRING,
+		allowNull: false
+	},
+	masterKeyNonce: {
 		type: DataTypes.STRING,
 		allowNull: false
 	}
 });
 
 export interface ChannelSubscriptionModel {
+	id: string; // Hashed authId with subscription key on client.
 	channelIdCipher: string;
-	channelIdSalt: string;
+	channelIdNonce: string;
 	channelNameCipher: string;
-	channelNameSalt: string;
+	channelNameNonce: string;
 	lastRSSFetch: Date;
 	userId: string;
 }
 
 export const ChannelSubscriptionTable = sequelize.define('Subscriptions', {
+	id: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		primaryKey: true
+	},
 	channelIdCipher: {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
-	channelIdSalt: {
+	channelIdNonce: {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
@@ -66,7 +82,7 @@ export const ChannelSubscriptionTable = sequelize.define('Subscriptions', {
 		type: DataTypes.STRING,
 		allowNull: false
 	},
-	channelNameSalt: {
+	channelNameNonce: {
 		type: DataTypes.STRING,
 		allowNull: false
 	},

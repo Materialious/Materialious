@@ -1,5 +1,5 @@
 import { authenticateUser } from '$lib/server/user';
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 import { env } from '$env/dynamic/private';
 import { sign } from 'cookie-signature';
@@ -27,5 +27,8 @@ export async function POST({ request, cookies }) {
 		maxAge: 60 * 60 * 24 * 60 // 60 days
 	});
 
-	return new Response();
+	return json({
+		masterKeyCipher: userModel.data.masterKeyCipher,
+		masterKeyNonce: userModel.data.masterKeyNonce
+	});
 }

@@ -1,30 +1,35 @@
-import { UserTable, type ChannelSubscriptionModel, type UserTableModel } from './database';
+import {
+	ChannelSubscriptionTable,
+	UserTable,
+	type ChannelSubscriptionModel,
+	type UserTableModel
+} from './database';
 import { Op } from 'sequelize';
 import crypto from 'crypto';
 import { error } from '@sveltejs/kit';
 
 export class User {
-	private user: UserTableModel;
+	data: UserTableModel;
 
-	constructor(user: UserTableModel) {
-		this.user = user;
+	constructor(data: UserTableModel) {
+		this.data = data;
 	}
 
 	public get id() {
-		return this.user.id;
+		return this.data.id;
 	}
 
 	public get publicPasswordSalts() {
 		return {
-			subscriptionPasswordSalt: this.user.subscriptionPasswordSalt,
-			passwordSalt: this.user.passwordSalt
+			decryptionKeySalt: this.data.decryptionKeySalt,
+			passwordSalt: this.data.passwordSalt
 		};
 	}
 
 	private get userWhere() {
 		return {
 			where: {
-				[Op.or]: [{ id: this.user.id }, { username: this.user.username }]
+				[Op.or]: [{ id: this.data.id }, { username: this.data.username }]
 			}
 		};
 	}
@@ -33,10 +38,35 @@ export class User {
 		await UserTable.destroy(this.userWhere);
 	}
 
+	async addSubscription(subscription: Omit<ChannelSubscriptionModel, 'userId'>) {
+		await ChannelSubscriptionTable.create({
+			...subscription,
+			userId: this.id
+		});
+	}
+
+	async removeSubscription(id: string) {
+		await ChannelSubscriptionTable.destroy({
+			where: {
+				id
+			}
+		});
+	}
+
+	async amSubscribed(id: string): Promise<boolean> {
+		return (
+			(await ChannelSubscriptionTable.count({
+				where: {
+					id
+				}
+			})) > 0
+		);
+	}
+
 	async subscriptions(): Promise<ChannelSubscriptionModel[]> {
 		const subscriptions = await UserTable.findAll({
 			where: {
-				userId: this.user.id
+				userId: this.data.id
 			}
 		});
 
@@ -52,7 +82,11 @@ export type CreateUser = {
 		hash: string;
 		salt: string;
 	};
-	subscriptionPasswordSalt: string;
+	decryptionKeySalt: string;
+	masterKey: {
+		cipher: string;
+		nonce: string;
+	};
 };
 
 export async function createUser(user: CreateUser): Promise<User> {
@@ -64,7 +98,9 @@ export async function createUser(user: CreateUser): Promise<User> {
 		passwordHash: user.password.hash,
 		passwordSalt: user.password.salt,
 		created: new Date(),
-		subscriptionPasswordSalt: user.subscriptionPasswordSalt
+		decryptionKeySalt: user.decryptionKeySalt,
+		masterKeyCipher: user.masterKey.cipher,
+		masterKeyNonce: user.masterKey.nonce
 	};
 
 	let userCreated = false;

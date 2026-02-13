@@ -9,7 +9,11 @@ const zUserCreate = z.object({
 		hash: z.string().max(255),
 		salt: z.string().max(255)
 	}),
-	subscriptionPasswordSalt: z.string().max(255)
+	decryptionKeySalt: z.string().max(255),
+	masterKey: z.object({
+		cipher: z.string().max(255),
+		nonce: z.string().max(255)
+	})
 });
 
 export async function POST({ request }) {
@@ -27,7 +31,11 @@ export async function POST({ request }) {
 			hash: userToCreate.data.password.hash,
 			salt: userToCreate.data.password.salt
 		},
-		subscriptionPasswordSalt: userToCreate.data.subscriptionPasswordSalt
+		decryptionKeySalt: userToCreate.data.decryptionKeySalt,
+		masterKey: {
+			cipher: userToCreate.data.masterKey.cipher,
+			nonce: userToCreate.data.masterKey.nonce
+		}
 	});
 
 	return new Response('');

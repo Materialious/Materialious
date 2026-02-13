@@ -22,7 +22,7 @@
 		playerYouTubeJsFallback
 	} from '../../store';
 	import { playbackRates } from '$lib/player';
-	import { isYTBackend } from '$lib/misc';
+	import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 
@@ -122,7 +122,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-{#if Capacitor.isNativePlatform() && !isYTBackend()}
+{#if isUnrestrictedPlatform() && !isYTBackend()}
 	<div class="field suffix border label">
 		<select
 			tabindex="0"
@@ -243,7 +243,7 @@
 	</div>
 {/if}
 
-{#if Capacitor.isNativePlatform()}
+{#if isUnrestrictedPlatform()}
 	<div class="field no-margin">
 		<nav class="no-padding">
 			<div class="max">

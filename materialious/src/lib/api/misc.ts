@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 import type { CommentsOptions, SearchOptions } from './model';
 import { engineFallbacksStore } from '$lib/store';
 import { Capacitor } from '@capacitor/core';
+import { isUnrestrictedPlatform } from '$lib/misc';
 
 export function searchSetDefaults(options: SearchOptions) {
 	if (typeof options.sort_by === 'undefined') {
@@ -34,5 +35,5 @@ export type EngineFallback =
 	| 'Playlist';
 
 export function useEngineFallback(fallback: EngineFallback): boolean {
-	return get(engineFallbacksStore).includes(fallback) && Capacitor.isNativePlatform();
+	return get(engineFallbacksStore).includes(fallback) && isUnrestrictedPlatform();
 }

@@ -229,8 +229,12 @@ export function findElementForTime<T>(
 	return null;
 }
 
+export function isUnrestrictedPlatform(): boolean {
+	return import.meta.env.VITE_BUILD_WITH_BACKEND === 'true' || Capacitor.isNativePlatform();
+}
+
 export function isYTBackend(): boolean {
-	return get(backendInUseStore) === 'yt' && Capacitor.isNativePlatform();
+	return get(backendInUseStore) === 'yt' && isUnrestrictedPlatform();
 }
 
 export function clearCaches() {

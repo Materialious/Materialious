@@ -33,7 +33,7 @@ import type {
 } from './model';
 import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
-import { isYTBackend } from '$lib/misc';
+import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
 import { getResolveUrlYTjs } from './youtubejs/misc';
 import { getCommentsYTjs } from './youtubejs/comments';
@@ -110,7 +110,7 @@ export async function getVideo(
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
 	if (
-		(get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) ||
+		(get(playerYouTubeJsAlways) && isUnrestrictedPlatform()) ||
 		isYTBackend() ||
 		useEngineFallback('Video')
 	) {
@@ -119,7 +119,7 @@ export async function getVideo(
 
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
 
-	if (!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform()) {
+	if (!resp.ok && get(playerYouTubeJsFallback) && isUnrestrictedPlatform()) {
 		return await getVideoYTjs(videoId);
 	} else {
 		await fetchErrorHandle(resp);

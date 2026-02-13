@@ -5,7 +5,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { shareURL } from '$lib/misc';
+	import { isUnrestrictedPlatform, shareURL } from '$lib/misc';
 	import { addToast } from './Toast.svelte';
 
 	interface Props {
@@ -45,7 +45,7 @@
 		class="row"
 		role="presentation"
 		onclick={async () => {
-			if (Capacitor.isNativePlatform()) {
+			if (isUnrestrictedPlatform()) {
 				shareVideo(`${get(instanceStore)}/watch/${video.videoId}`);
 			} else {
 				shareVideo(

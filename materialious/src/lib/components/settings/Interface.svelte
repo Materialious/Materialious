@@ -11,7 +11,7 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, isMobile, clearCaches } from '../../misc';
+	import { ensureNoTrailingSlash, isMobile, clearCaches, isUnrestrictedPlatform } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -153,7 +153,7 @@
 	});
 </script>
 
-{#if Capacitor.isNativePlatform()}
+{#if isUnrestrictedPlatform()}
 	<div class="field label suffix border">
 		<select name="backend-in-use" onchange={setBackend}>
 			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>

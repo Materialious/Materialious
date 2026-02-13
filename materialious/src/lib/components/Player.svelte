@@ -58,7 +58,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from './Toast.svelte';
-	import { isMobile, isYTBackend, truncate } from '$lib/misc';
+	import { isMobile, isUnrestrictedPlatform, isYTBackend, truncate } from '$lib/misc';
 	import {
 		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
@@ -524,7 +524,7 @@
 				dashUrl = data.video.dashUrl;
 			}
 
-			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || $playerProxyVideosStore)) {
+			if (!data.video.fallbackPatch && (!isUnrestrictedPlatform() || $playerProxyVideosStore)) {
 				dashUrl += '?local=true';
 			}
 
@@ -1035,7 +1035,7 @@
 			console.error(error);
 
 			if (
-				!Capacitor.isNativePlatform() ||
+				!isUnrestrictedPlatform() ||
 				data.video.fallbackPatch === 'youtubejs' ||
 				(error as shaka.extern.Error).code !== 1001
 			)

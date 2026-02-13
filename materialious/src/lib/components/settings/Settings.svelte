@@ -11,6 +11,7 @@
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
 	import { Capacitor } from '@capacitor/core';
+	import { isUnrestrictedPlatform } from '$lib/misc';
 
 	let activeTab = $state('interface');
 	const isActive = (id: string) => activeTab === id;
@@ -35,7 +36,7 @@
 		}
 	];
 
-	if (Capacitor.isNativePlatform()) {
+	if (isUnrestrictedPlatform()) {
 		tabs.splice(1, 0, {
 			id: 'engine',
 			label: $_('layout.engine'),

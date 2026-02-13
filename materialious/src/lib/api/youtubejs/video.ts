@@ -15,6 +15,7 @@ import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
 import { Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
+import { isUnrestrictedPlatform } from '$lib/misc';
 
 Platform.shim.eval = async (
 	data: Types.BuildScriptResult,
@@ -36,7 +37,7 @@ Platform.shim.eval = async (
 };
 
 export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
-	if (!Capacitor.isNativePlatform()) {
+	if (!isUnrestrictedPlatform()) {
 		throw new Error('Platform not supported');
 	}
 

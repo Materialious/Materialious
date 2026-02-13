@@ -133,11 +133,11 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 		}
 
 		if (!get(rawMasterKeyStore)) {
-			await localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
+			localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
 				lastRSSFetch: new Date()
 			});
 		} else {
-			await updateRSSLastUpdated(authorId);
+			updateRSSLastUpdated(authorId);
 		}
 	}
 }

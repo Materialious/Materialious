@@ -42,8 +42,11 @@
 	import { isYTBackend, clearCaches, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
+	import { isOwnBackend } from '$lib/backend';
 
 	let { children } = $props();
+
+	const showLogin = !isYTBackend() || isOwnBackend()?.internalAuth;
 
 	let mobileSearchShow = $state(false);
 
@@ -112,6 +115,10 @@
 	});
 
 	async function login() {
+		if (isOwnBackend()?.internalAuth) {
+			return;
+		}
+
 		if (!$isAndroidTvStore) {
 			// eslint-disable-next-line svelte/prefer-svelte-reactivity
 			const path = new URL(`${get(instanceStore)}/authorize_token`);
@@ -281,7 +288,7 @@
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
-			{#if !isYTBackend()}
+			{#if showLogin}
 				{#if !isLoggedIn}
 					<a onclick={login} href="#login">
 						<i>login</i>
@@ -367,7 +374,7 @@
 					<div class="tooltip bottom">{$_('layout.settings')}</div>
 				</button>
 
-				{#if !isYTBackend()}
+				{#if showLogin}
 					{#if !isLoggedIn}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>

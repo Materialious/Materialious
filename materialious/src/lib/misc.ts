@@ -28,6 +28,7 @@ import { page } from '$app/state';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
+import { isOwnBackend } from './backend';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
@@ -230,23 +231,8 @@ export function findElementForTime<T>(
 	return null;
 }
 
-export type IsOwnBackend = {
-	builtWithBackend: boolean;
-	internalAuth: boolean;
-	requireAuth: boolean;
-};
-export function isOwnBackend(): IsOwnBackend | false {
-	if (import.meta.env.VITE_BUILD_WITH_BACKEND !== 'true') return false;
-
-	return {
-		builtWithBackend: true,
-		internalAuth: import.meta.env.VITE_INTERNAL_AUTH === 'false',
-		requireAuth: import.meta.env.VITE_REQUIRE_AUTH === 'false'
-	};
-}
-
 export function isUnrestrictedPlatform(): boolean {
-	return isOwnBackend() !== false || Capacitor.isNativePlatform();
+	return isOwnBackend() !== null || Capacitor.isNativePlatform();
 }
 
 export function isYTBackend(): boolean {

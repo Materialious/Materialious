@@ -1,3 +1,4 @@
+import { isOwnBackend } from '$lib/backend';
 import psl from 'psl';
 
 const allowedDomains: string[] = [
@@ -26,6 +27,16 @@ dynamicAllowDomains.forEach((domain) => {
 });
 
 async function proxyRequest(request: Request, urlToProxy: string): Promise<Response> {
+	const backendRestrictions = isOwnBackend();
+	if (!backendRestrictions) {
+		// Shouldn't be possible.
+		return new Response('How did you get here?', { status: 400 });
+	}
+
+	if (backendRestrictions.requireAuth) {
+		return new Response('Auth required', { status: 401 });
+	}
+
 	let urlToProxyObj: URL;
 	try {
 		urlToProxyObj = new URL(decodeURIComponent(urlToProxy));

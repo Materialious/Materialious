@@ -3,20 +3,22 @@
 	import { resolve } from '$app/paths';
 	import { createUserBackend, loginUserBackend } from '$lib/api/backend';
 	import { _ } from '$lib/i18n';
+	import 'altcha';
 
 	let needToRegister = $state(false);
 
 	let username = $state('');
 	let rawPassword = $state('');
+	let captchaPayload = $state('');
 
 	let failed = $state(false);
 	async function onLogin(event: Event) {
 		event.preventDefault();
 
 		if (needToRegister) {
-			failed = !(await createUserBackend(username, rawPassword));
+			failed = !(await createUserBackend(username, rawPassword, captchaPayload));
 		} else {
-			failed = !(await loginUserBackend(username, rawPassword));
+			failed = !(await loginUserBackend(username, rawPassword, captchaPayload));
 		}
 
 		if (!failed) {
@@ -26,7 +28,7 @@
 </script>
 
 <nav class="center-align">
-	<article class="padding">
+	<article class="padding left-align">
 		<h3>{$_(needToRegister ? 'createAccount' : 'login')}</h3>
 		<p class="no-margin">{$_(needToRegister ? 'materialiousCreate' : 'materialiousLogin')}</p>
 
@@ -53,6 +55,23 @@
 					<output class="invalid">{$_('invalidPassword')}</output>
 				{/if}
 			</div>
+
+			<article
+				class="surface-container-highest no-padding"
+				style="width: 100%;height: fit-content;"
+			>
+				<altcha-widget
+					challengeurl="/api/captcha"
+					hidelogo
+					hidefooter
+					onstatechange={(ev) => {
+						const { payload, state } = ev.detail;
+						if (state === 'verified' && payload) {
+							captchaPayload = payload;
+						}
+					}}
+				></altcha-widget>
+			</article>
 
 			<nav class="right-align">
 				<button

@@ -3,6 +3,7 @@ import { createUser } from '$lib/server/user.js';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { setAuthCookie } from '$lib/server/misc.js';
+import { verifyCaptcha } from '$lib/server/captcha';
 
 const zUserCreate = z.object({
 	username: z.string().min(3).max(18),
@@ -14,10 +15,11 @@ const zUserCreate = z.object({
 	masterKey: z.object({
 		cipher: z.string().max(255),
 		nonce: z.string().max(255)
-	})
+	}),
+	captchaPayload: z.string()
 });
 
-export async function POST({ request, cookies }) {
+export async function POST({ request, cookies, locals }) {
 	if (!isOwnBackend()?.internalAuth || !isOwnBackend()?.registrationAllowed) {
 		throw error(500);
 	}
@@ -25,6 +27,8 @@ export async function POST({ request, cookies }) {
 	const userToCreate = zUserCreate.safeParse(await request.json());
 
 	if (!userToCreate.success) throw error(400);
+
+	await verifyCaptcha(userToCreate.data.captchaPayload, locals.captchaKey, 1);
 
 	const createdUser = await createUser({
 		username: userToCreate.data.username,

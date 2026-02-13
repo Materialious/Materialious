@@ -105,3 +105,15 @@ export const ChannelSubscriptionTable = sequelize.define('Subscriptions', {
 });
 
 UserTable.hasMany(ChannelSubscriptionTable);
+
+export const CaptchaTable = sequelize.define('Captchas', {
+	signature: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		primaryKey: true
+	},
+	created: {
+		type: DataTypes.DATE,
+		allowNull: false
+	}
+});

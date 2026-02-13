@@ -111,7 +111,11 @@ export async function postSubscribeBackend(authorId: string) {
 	if (resp.ok) parseChannelRSS(authorId);
 }
 
-export async function createUserBackend(username: string, rawPassword: string): Promise<boolean> {
+export async function createUserBackend(
+	username: string,
+	rawPassword: string,
+	captchaPayload: string
+): Promise<boolean> {
 	await sodium.ready;
 
 	const passwordSalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
@@ -155,7 +159,8 @@ export async function createUserBackend(username: string, rawPassword: string): 
 			masterKey: {
 				cipher: sodium.to_base64(masterKeyCipher),
 				nonce: sodium.to_base64(decryptionMasterKeyNonce)
-			}
+			},
+			captchaPayload
 		}),
 		credentials: 'same-origin'
 	});
@@ -167,7 +172,11 @@ export async function createUserBackend(username: string, rawPassword: string): 
 	return true;
 }
 
-export async function loginUserBackend(username: string, rawPassword: string): Promise<boolean> {
+export async function loginUserBackend(
+	username: string,
+	rawPassword: string,
+	captchaPayload: string
+): Promise<boolean> {
 	await sodium.ready;
 
 	const passwordSaltsResp = await fetch(`/api/user/${username}/public`);
@@ -188,7 +197,8 @@ export async function loginUserBackend(username: string, rawPassword: string): P
 		method: 'POST',
 		body: JSON.stringify({
 			username,
-			passwordHash: sodium.to_base64(loginHash)
+			passwordHash: sodium.to_base64(loginHash),
+			captchaPayload
 		}),
 		credentials: 'same-origin'
 	});

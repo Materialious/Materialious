@@ -129,6 +129,10 @@ menu {
 	color: var(--on-surface) !important;
 }
 
+.altcha {
+	border: none !important;
+}
+
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;

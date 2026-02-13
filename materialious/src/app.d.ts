@@ -5,6 +5,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			userId: string;
+			captchaKey: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

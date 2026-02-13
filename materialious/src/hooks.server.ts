@@ -2,9 +2,17 @@ import { isOwnBackend } from '$lib/shared';
 import { sequelize } from '$lib/server/database';
 import { unsign } from 'cookie-signature';
 import { env } from '$env/dynamic/private';
+import sodium from 'libsodium-wrappers-sumo';
+
+let captchaKey = '';
+sodium.ready.then(() => {
+	captchaKey = sodium.to_base64(sodium.randombytes_buf(32));
+});
 
 let sequelizeAuthenticated = false;
 export async function handle({ event, resolve }) {
+	event.locals.captchaKey = captchaKey;
+
 	if (!isOwnBackend()?.internalAuth) {
 		return await resolve(event);
 	}

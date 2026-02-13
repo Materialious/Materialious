@@ -2,6 +2,7 @@ import { isOwnBackend } from '$lib/shared';
 import psl from 'psl';
 import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
+import { verifyCaptcha } from '$lib/server/captcha.js';
 
 const allowedDomains: string[] = [
 	'youtube.com',
@@ -31,6 +32,7 @@ dynamicAllowDomains.forEach((domain) => {
 async function proxyRequest(
 	request: Request,
 	urlToProxy: string,
+	captchaKey: string,
 	userId: string | undefined = undefined
 ): Promise<Response> {
 	const backendRestrictions = isOwnBackend();
@@ -100,20 +102,20 @@ async function proxyRequest(
 }
 
 export async function GET({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
 }
 export async function PATCH({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
 }
 
 export async function DELETE({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
 }
 
 export async function PUT({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
 }
 
 export async function POST({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
 }

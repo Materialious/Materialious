@@ -21,7 +21,6 @@ export async function POST({ request, locals }) {
 	if (!data.success) {
 		throw error(400, data.error.message);
 	}
-
 	const challenge = data.data.challenge as IGetChallengeResponse;
 	const requestKey = data.data.requestKey;
 	const visitorData = data.data.visitorData;

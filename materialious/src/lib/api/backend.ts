@@ -111,22 +111,19 @@ export async function postSubscribeBackend(authorId: string) {
 	if (resp.ok) parseChannelRSS(authorId);
 }
 
+export type DerivePassword = (rawPassword: string, passwordSalt: Uint8Array) => Promise<Uint8Array>;
+
 export async function createUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: string
+	captchaPayload: string,
+	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;
 
 	const passwordSalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
-	const loginHash = sodium.crypto_pwhash(
-		32,
-		rawPassword,
-		passwordSalt,
-		sodium.crypto_pwhash_OPSLIMIT_SENSITIVE,
-		sodium.crypto_pwhash_MEMLIMIT_SENSITIVE,
-		sodium.crypto_pwhash_ALG_DEFAULT
-	);
+
+	const loginHash = await derivePassword(rawPassword, passwordSalt);
 
 	const decryptionKeySalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
 	const rawDecryptionKey = sodium.crypto_pwhash(
@@ -175,7 +172,8 @@ export async function createUserBackend(
 export async function loginUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: string
+	captchaPayload: string,
+	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;
 
@@ -184,13 +182,9 @@ export async function loginUserBackend(
 
 	const passwordSalts = await passwordSaltsResp.json();
 
-	const loginHash = sodium.crypto_pwhash(
-		32,
+	const loginHash = await derivePassword(
 		rawPassword,
-		sodium.from_base64(passwordSalts.passwordSalt),
-		sodium.crypto_pwhash_OPSLIMIT_SENSITIVE,
-		sodium.crypto_pwhash_MEMLIMIT_SENSITIVE,
-		sodium.crypto_pwhash_ALG_DEFAULT
+		sodium.from_base64(passwordSalts.passwordSalt)
 	);
 
 	const loginResp = await fetch('/api/user/login', {

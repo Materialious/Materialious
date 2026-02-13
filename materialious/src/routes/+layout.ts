@@ -14,7 +14,6 @@ import {
 	isAndroidTvStore
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
-import '$lib/android/http/androidRequests';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';

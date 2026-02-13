@@ -36,7 +36,7 @@ export default defineConfig({
 		sveltekit()
 	],
 	ssr: {
-		noExternal: ['beercss']
+		noExternal: ['beercss', 'capacitor-music-controls-plugin']
 	},
 	define: {
 		'import.meta.env.APP_VERSION': JSON.stringify(pkg.version)

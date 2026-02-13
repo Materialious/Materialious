@@ -73,7 +73,7 @@
 
 		const searchCacheItem = $searchCacheStore[data.searchStoreId];
 
-		if (searchCacheItem?.getContinuation) {
+		if (searchCacheItem.getContinuation) {
 			newSearch = await searchCacheItem.getContinuation();
 
 			if (newSearch.getContinuation) {
@@ -87,11 +87,6 @@
 			};
 
 			newSearch = await getSearch(data.slug, searchOptions);
-
-			// Set the continuation method if it exists
-			if (newSearch.getContinuation) {
-				searchCacheItem.getContinuation = newSearch.getContinuation;
-			}
 		}
 
 		if (newSearch.length === 0) {

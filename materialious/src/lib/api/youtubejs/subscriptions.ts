@@ -5,7 +5,11 @@ import { relativeTimestamp } from '$lib/time';
 import { get } from 'svelte/store';
 import type { Feed, Subscription, Thumbnail } from '../model';
 import { getChannelYTjs } from './channel';
-import { engineCooldownYTStore, engineCullYTStore } from '$lib/store';
+import {
+	engineCooldownYTStore,
+	engineCullYTStore,
+	engineMaxConcurrentChannelsStore
+} from '$lib/store';
 
 export async function getSubscriptionsYTjs(): Promise<Subscription[]> {
 	const subscriptions: Subscription[] = [];
@@ -134,19 +138,28 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	}
 }
 
-export async function getFeedYTjs(): Promise<Feed> {
+export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
 	const channelSubscriptions = await localDb.channelSubscriptions.toArray();
 
 	const toUpdatePromises: Promise<void>[] = [];
 
 	const now = new Date();
+
+	let totalChannelsToParse = 0;
 	for (const channel of channelSubscriptions) {
 		const lastRSSFetch = new Date(channel.lastRSSFetch);
 		const timeDifference = now.getTime() - lastRSSFetch.getTime();
 		const cooldownTime = get(engineCooldownYTStore) * 60 * 60 * 1000;
+
 		if (timeDifference > cooldownTime) {
-			toUpdatePromises.push(parseChannelRSS(channel.channelId));
+			if (totalChannelsToParse < get(engineMaxConcurrentChannelsStore)) {
+				toUpdatePromises.push(parseChannelRSS(channel.channelId));
+			} else {
+				parseChannelRSS(channel.channelId);
+			}
 		}
+
+		totalChannelsToParse++;
 	}
 
 	if (toUpdatePromises) {
@@ -166,8 +179,11 @@ export async function getFeedYTjs(): Promise<Feed> {
 		videos = videos.slice(0, cullAfter);
 	}
 
+	const start = (page - 1) * maxResults;
+	const end = start + maxResults;
+
 	return {
 		notifications: [],
-		videos: videos
+		videos: videos.slice(start, end)
 	};
 }

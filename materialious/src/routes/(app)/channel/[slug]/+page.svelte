@@ -36,32 +36,46 @@
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
 
-		if (typeof displayContent.continuation === 'undefined') {
-			event.detail.complete();
-			return;
+		let completed = false;
+		let newContent: ChannelContent;
+		if (displayContent.getContinuation) {
+			newContent = await displayContent.getContinuation();
+			displayContent.getContinuation = newContent.getContinuation;
+
+			completed = newContent.getContinuation === undefined;
+		} else {
+			if (typeof displayContent.continuation === 'undefined') {
+				event.detail.complete();
+				return;
+			}
+
+			newContent = await getChannelContent(page.params.slug, {
+				type: tab,
+				continuation: displayContent.continuation,
+				sortBy: sortBy
+			});
+
+			completed = displayContent.continuation === newContent.continuation;
+			displayContent.continuation = newContent.continuation;
 		}
 
-		const newContent = await getChannelContent(page.params.slug, {
-			type: tab,
-			continuation: displayContent.continuation,
-			sortBy: sortBy
-		});
 		if ('videos' in newContent && 'videos' in displayContent) {
-			if (displayContent.continuation === newContent.continuation) {
+			if (completed) {
 				event.detail.complete();
 			} else {
 				event.detail.loaded();
 			}
+
 			displayContent.videos = [...displayContent.videos, ...newContent.videos];
 		} else if ('playlists' in displayContent && 'playlists' in newContent) {
-			if (displayContent.continuation === newContent.continuation) {
+			if (completed) {
 				event.detail.complete();
 			} else {
 				event.detail.loaded();
 			}
+
 			displayContent.playlists = [...displayContent.playlists, ...newContent.playlists];
 		}
-		displayContent.continuation = newContent.continuation;
 	}
 
 	async function changeTab(newTab: 'videos' | 'playlists' | 'streams' | 'shorts') {

@@ -179,6 +179,7 @@
 			"warning": "Advanced settings! For experienced users only. Do not change unless you know what you’re doing.",
 			"cull": "Max feed items",
 			"cooldown": "Re-fetch channel hour cooldown",
+			"concurrent": "Max amount of channels to parse before feed return",
 			"fallbacks": "Fallbacks",
 			"importExport": "Import/Export subscriptions",
 			"exportToInvidious": "Export to Invidious from Materialious",

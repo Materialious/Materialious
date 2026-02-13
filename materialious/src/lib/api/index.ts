@@ -252,7 +252,7 @@ export async function getFeed(
 	fetchOptions: RequestInit = {}
 ): Promise<Feed> {
 	if (isYTBackend()) {
-		return getFeedYTjs();
+		return getFeedYTjs(maxResults, page);
 	}
 
 	const path = buildPath('auth/feed');

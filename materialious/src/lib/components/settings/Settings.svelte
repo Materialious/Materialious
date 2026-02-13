@@ -18,7 +18,7 @@
 	const tabs: { id: string; label: string; icon: string; component: Component }[] = [
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
-		{ id: 'ryd', label: 'RYD', icon: 'thumb_down', component: Ryd },
+		{ id: 'ryd', label: 'Return YT Dislike', icon: 'thumb_down', component: Ryd },
 		{ id: 'api extended', label: 'API Extended', icon: 'sync', component: ApiExtended },
 		{ id: 'sponsorblock', label: 'Sponsorblock', icon: 'block', component: SponsorBlock },
 		{
@@ -39,7 +39,7 @@
 		tabs.splice(1, 0, {
 			id: 'engine',
 			label: $_('layout.engine'),
-			icon: 'build',
+			icon: 'rocket_launch',
 			component: Engine
 		});
 	}

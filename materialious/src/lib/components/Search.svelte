@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -151,31 +150,31 @@
 				</div>
 				{#if $interfaceSearchSuggestionsStore}
 					{#each suggestionsForSearch as suggestion, index (index)}
-						<li>
-							<a
+						<li class="no-padding">
+							<button
 								onclick={() => {
 									search = suggestion;
 									onSubmit();
 								}}
+								class="transparent suggestion"
 								class:selected={index === selectedSuggestionIndex}
-								href={resolve(`/search/[search]`, { search: encodeURIComponent(suggestion) })}
 							>
 								<div>{suggestion}</div>
-							</a>
+							</button>
 						</li>
 					{/each}
 				{/if}
 				{#if !suggestionsForSearch.length && $interfaceSearchHistoryEnabled}
 					{#each $searchHistoryStore as history (history)}
-						<li>
-							<a
+						<li class="no-padding">
+							<button
 								onclick={() => {
 									search = history;
 								}}
-								href={resolve(`/search/[search]`, { search: encodeURIComponent(history) })}
+								class="transparent suggestion"
 							>
 								<div>{history}</div>
-							</a>
+							</button>
 						</li>
 					{/each}
 				{/if}
@@ -192,6 +191,17 @@
 	.selected {
 		background-color: var(--surface-variant);
 	}
+
+	button.suggestion {
+		width: 100%;
+		box-sizing: content-box;
+		justify-content: flex-start;
+	}
+
+	li:hover {
+		background-color: transparent;
+	}
+
 	@media screen and (max-width: 1140px) {
 		.search {
 			width: 100%;

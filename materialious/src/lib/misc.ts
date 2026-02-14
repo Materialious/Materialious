@@ -13,6 +13,7 @@ import {
 	interfaceAndroidUseNativeShare,
 	isAndroidTvStore,
 	playlistCacheStore,
+	rawMasterKeyStore,
 	searchCacheStore
 } from './store';
 import type {
@@ -29,6 +30,8 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
 import { isOwnBackend } from './shared';
+import { Browser } from '@capacitor/browser';
+import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
@@ -288,4 +291,36 @@ export async function setInvidiousInstance(
 	authStore.set(null);
 
 	return true;
+}
+
+export async function goToInvidiousLogin() {
+	if (!get(instanceStore)) return;
+	const path = new URL(`${get(instanceStore)}/authorize_token`);
+	const searchParams = new URLSearchParams({
+		scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
+	});
+	if (Capacitor.getPlatform() === 'android') {
+		searchParams.set('callback_url', 'materialious-auth://');
+		path.search = searchParams.toString();
+		await Browser.open({ url: path.toString() });
+	} else {
+		searchParams.set('callback_url', `${location.origin}${resolve('/auth', {})}`);
+		path.search = searchParams.toString();
+		document.location.href = path.toString();
+	}
+}
+
+export async function logout() {
+	if (isYTBackend()) {
+		await clearFeedYTjs();
+	}
+
+	if (isOwnBackend()?.internalAuth) {
+		fetch('/api/user/logout', { method: 'DELETE' });
+		rawMasterKeyStore.set(undefined);
+	} else {
+		authStore.set(null);
+	}
+
+	goto(resolve('/', {}));
 }

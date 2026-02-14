@@ -40,11 +40,10 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { isYTBackend, truncate } from '$lib/misc';
+	import { goToInvidiousLogin, isYTBackend, logout, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
-	import { clearFeedYTjs } from '$lib/api/youtubejs/subscriptions';
 
 	let { children } = $props();
 
@@ -52,14 +51,19 @@
 
 	let mobileSearchShow = $state(false);
 
-	let isLoggedIn = $state(false);
-	authStore.subscribe((value) => {
-		isLoggedIn = value !== null;
-	});
-
 	let notifications: Notification[] = $state([]);
 
 	let playerIsPip: boolean = $state(false);
+
+	let pages = $state(getPages());
+
+	authStore.subscribe(() => {
+		pages = getPages();
+	});
+
+	rawMasterKeyStore.subscribe(() => {
+		pages = getPages();
+	});
 
 	page.subscribe((pageData) => {
 		playerIsPip = !pageData.url.pathname.includes('/watch');
@@ -117,27 +121,13 @@
 	});
 
 	async function login() {
-		if (isOwnBackend()?.internalAuth && isYTBackend()) {
+		if (isOwnBackend()?.internalAuth) {
 			goto(resolve('/internal/login', {}));
 			return;
 		}
 
 		if (!$isAndroidTvStore) {
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			const path = new URL(`${get(instanceStore)}/authorize_token`);
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			const searchParams = new URLSearchParams({
-				scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
-			});
-			if (Capacitor.getPlatform() === 'android') {
-				searchParams.set('callback_url', 'materialious-auth://');
-				path.search = searchParams.toString();
-				await Browser.open({ url: path.toString() });
-			} else {
-				searchParams.set('callback_url', `${location.origin}${resolve('/auth', {})}`);
-				path.search = searchParams.toString();
-				document.location.href = path.toString();
-			}
+			await goToInvidiousLogin();
 		} else {
 			await ui('#tv-login');
 			document.getElementById('username')?.focus();
@@ -186,20 +176,6 @@
 		}
 
 		loginError = true;
-	}
-
-	async function logout() {
-		if (isYTBackend()) {
-			await clearFeedYTjs();
-		}
-
-		if (isOwnBackend()?.internalAuth) {
-			fetch('/api/user/logout', { method: 'DELETE' });
-		}
-
-		rawMasterKeyStore.set(undefined);
-		authStore.set(null);
-		goto(resolve('/', {}));
 	}
 
 	async function loadNotifications() {
@@ -255,7 +231,7 @@
 		setTheme();
 		setAmoledTheme();
 
-		if (isLoggedIn && !isYTBackend()) {
+		if ($authStore && !isYTBackend()) {
 			loadNotifications().catch(() => logout());
 		}
 
@@ -295,7 +271,7 @@
 				<div>{$_('searchPlaceholder')}</div>
 			</a>
 		{/if}
-		{#each getPages() as navPage (navPage)}
+		{#each pages as navPage (navPage)}
 			<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
@@ -308,7 +284,7 @@
 				<div>{$_('layout.settings')}</div>
 			</a>
 			{#if showLogin}
-				{#if !isLoggedIn}
+				{#if (!$authStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
 					<a onclick={login} href="#login">
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
@@ -370,7 +346,7 @@
 					<i class:primary-text={$syncPartyPeerStore}>group</i>
 					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 				</button>
-				{#if isLoggedIn && !isYTBackend()}
+				{#if (!$authStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
 					<button
 						class="circle large transparent"
 						onclick={() => {
@@ -394,7 +370,7 @@
 				</button>
 
 				{#if showLogin}
-					{#if !isLoggedIn && !$rawMasterKeyStore}
+					{#if (!$authStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>
@@ -411,7 +387,7 @@
 	{/if}
 
 	<nav class="bottom s">
-		{#each getPages() as navPage (navPage)}
+		{#each pages as navPage (navPage)}
 			<a
 				class="round"
 				href={resolve(navPage.href, {})}

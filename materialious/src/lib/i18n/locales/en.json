@@ -11,6 +11,8 @@
 	"password": "Password",
 	"invalidPassword": "Invalid password",
 	"usernameTaken": "Username taken",
+	"linkInvidious": "Link Invidious account",
+	"unlinkInvidious": "Unlink Invidious account",
 	"createAccount": "Create account",
 	"needRegister": "I need to register",
 	"registrationDisabled": "Registration currently disabled, contact instance owner.",

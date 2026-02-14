@@ -11,7 +11,13 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { isMobile, clearCaches, isUnrestrictedPlatform, setInvidiousInstance } from '../../misc';
+	import {
+		isMobile,
+		clearCaches,
+		isUnrestrictedPlatform,
+		setInvidiousInstance,
+		goToInvidiousLogin
+	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -91,11 +97,6 @@
 	}
 
 	async function setBackend(event: Event) {
-		if (isOwnBackend()?.internalAuth) {
-			rawMasterKeyStore.set(undefined);
-			fetch('/api/user/logout', { method: 'DELETE' });
-		}
-
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
 		reloadState();
@@ -165,14 +166,31 @@
 				</button>
 			</nav>
 		</form>
+		{#if isOwnBackend()?.internalAuth}
+			{#if !$authStore}
+				<button onclick={goToInvidiousLogin}>
+					<i>link</i>
+					<span>{$_('linkInvidious')}</span>
+				</button>
+			{:else}
+				<button
+					onclick={() => {
+						authStore.set(null);
+						goto(resolve('/', {}));
+					}}
+				>
+					<i>link_off</i>
+					<span>{$_('unlinkInvidious')}</span>
+				</button>
+			{/if}
+			<div class="space"></div>
+		{/if}
 	{:else}
 		<div class="space"></div>
 	{/if}
 
-	{#if isMobile()}
-		{#if invalidInstance}
-			<div style="margin-bottom: 6em;"></div>
-		{/if}
+	{#if isMobile() && invalidInstance}
+		<div style="margin-bottom: 6em;"></div>
 	{/if}
 
 	{#if Capacitor.isNativePlatform() && (invalidInstance || $interfaceAllowInsecureRequests)}

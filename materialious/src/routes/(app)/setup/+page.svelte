@@ -7,20 +7,24 @@
 	import { isOwnBackend } from '$lib/shared';
 	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '$lib/store';
 
-	let usingInvidious: boolean = $state(false);
-	let invidiousInstanceValid: boolean = $state(false);
-	let invidiousInstance: string = $state(
-		!isOwnBackend() ? 'https://invidious.materialio.us' : ($invidiousInstanceStore ?? '')
-	);
+	const defaultInstance = !isOwnBackend()
+		? 'https://invidious.materialio.us'
+		: $invidiousInstanceStore;
 
-	function setupCompleted() {
+	let usingInvidious: boolean = $state(false);
+	let invidiousInstanceValid: boolean = $state(true);
+	let invidiousInstance: string = $state(defaultInstance ?? '');
+
+	async function setupCompleted() {
+		invidiousInstanceValid = await setInvidiousInstance(invidiousInstance);
+
+		if (!invidiousInstanceValid) {
+			return;
+		}
+
 		clearCaches();
 		goto(resolve('/', {}), { replaceState: true });
 		location.reload();
-	}
-
-	async function setInvidiousBackend() {
-		invidiousInstanceValid = await setInvidiousInstance(invidiousInstance);
 	}
 
 	function setYTBackend() {
@@ -30,100 +34,95 @@
 	}
 </script>
 
-<div>
-	{#if !isUnrestrictedPlatform()}
-		<p>
-			<code>VITE_DEFAULT_INVIDIOUS_INSTANCE</code> has not been provided.
-		</p>
-		<p>
-			Please read our <a
-				href="https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md"
-				referrerpolicy="no-referrer"
-				class="link"
-			>
-				Docker guide
-			</a>
-			for configuring Materialious as a Invidious frontend.
-		</p>
-		<p>
-			You will be required to reverse proxy Invidious & configure CORS too for Materialious to work.
-		</p>
-	{:else}
-		<h3 class="center-align">{$_('initalSetup.required')}</h3>
-		<div class="space"></div>
-		<div class="divider"></div>
-		<div class="space"></div>
-
-		<Question
-			question={$_('initalSetup.useInvidious')}
-			answers={[
-				{
-					text: $_('initalSetup.yes'),
-					action: () => {
-						usingInvidious = true;
-					}
-				},
-				{
-					text: $_('initalSetup.no'),
-					action: setYTBackend
-				},
-				{
-					text: $_('initalSetup.unsure'),
-					action: setYTBackend
-				}
-			]}
-			info={$_('initalSetup.invidiousInfo')}
-		/>
-
-		{#if usingInvidious}
+<nav class="center-align">
+	<div class="setup">
+		{#if !isUnrestrictedPlatform()}
+			<p>
+				<code>VITE_DEFAULT_INVIDIOUS_INSTANCE</code> has not been provided.
+			</p>
+			<p>
+				Please read our <a
+					href="https://github.com/Materialious/Materialious/blob/main/docs/DOCKER.md"
+					referrerpolicy="no-referrer"
+					class="link"
+				>
+					Docker guide
+				</a>
+				for configuring Materialious as a Invidious frontend.
+			</p>
+			<p>
+				You will be required to reverse proxy Invidious & configure CORS too for Materialious to
+				work.
+			</p>
+		{:else}
+			<h3 class="center-align">{$_('initalSetup.required')}</h3>
+			<div class="space"></div>
+			<div class="divider"></div>
 			<div class="space"></div>
 
 			<Question
-				question={$_('initalSetup.useLocalFallback')}
+				question={$_('initalSetup.useInvidious')}
 				answers={[
 					{
 						text: $_('initalSetup.yes'),
 						action: () => {
-							playerYouTubeJsFallback.set(true);
+							usingInvidious = true;
 						}
 					},
 					{
 						text: $_('initalSetup.no'),
-						action: () => {
-							playerYouTubeJsFallback.set(false);
-						}
+						action: setYTBackend
 					},
 					{
 						text: $_('initalSetup.unsure'),
-						action: () => {
-							playerYouTubeJsFallback.set(true);
-						}
+						action: setYTBackend
 					}
 				]}
-				info={$_('initalSetup.localFallbackInfo')}
+				info={$_('initalSetup.invidiousInfo')}
 			/>
 
-			<div class="space"></div>
-			<h3>{$_('initalSetup.configureInstance')}</h3>
-			<div
-				class="field label prefix surface-container-highest"
-				class:invalid={!invidiousInstanceValid && invidiousInstance !== ''}
-			>
-				<i>link</i>
-				<input
-					bind:value={invidiousInstance}
-					oninput={setInvidiousBackend}
-					name="instanceUrl"
-					type="text"
-					tabindex="0"
-				/>
-				<label for="instanceUrl" tabindex="-1">{$_('layout.instanceUrl')}</label>
-				{#if !invidiousInstanceValid && invidiousInstance !== ''}
-					<span class="error">{$_('invalidInstance')}</span>
-				{/if}
-			</div>
+			{#if usingInvidious}
+				<div class="space"></div>
 
-			{#if invidiousInstanceValid}
+				<Question
+					question={$_('initalSetup.useLocalFallback')}
+					answers={[
+						{
+							text: $_('initalSetup.yes'),
+							action: () => {
+								playerYouTubeJsFallback.set(true);
+							}
+						},
+						{
+							text: $_('initalSetup.no'),
+							action: () => {
+								playerYouTubeJsFallback.set(false);
+							}
+						},
+						{
+							text: $_('initalSetup.unsure'),
+							action: () => {
+								playerYouTubeJsFallback.set(true);
+							}
+						}
+					]}
+					info={$_('initalSetup.localFallbackInfo')}
+				/>
+
+				<div class="space"></div>
+				<h3>{$_('initalSetup.configureInstance')}</h3>
+				<div
+					class="field label prefix surface-container-highest"
+					class:invalid={!invidiousInstanceValid && invidiousInstance !== ''}
+				>
+					<i>link</i>
+					<input bind:value={invidiousInstance} name="instanceUrl" type="text" tabindex="0" />
+					<label for="instanceUrl" tabindex="-1">{$_('layout.instanceUrl')}</label>
+					{#if !invidiousInstanceValid && invidiousInstance !== ''}
+						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+				</div>
+
 				<div class="space"></div>
 
 				<button onclick={setupCompleted}>
@@ -132,5 +131,17 @@
 				</button>
 			{/if}
 		{/if}
-	{/if}
-</div>
+	</div>
+</nav>
+
+<style>
+	.setup {
+		width: 600px;
+	}
+
+	@media screen and (max-width: 600px) {
+		.setup {
+			width: 100%;
+		}
+	}
+</style>

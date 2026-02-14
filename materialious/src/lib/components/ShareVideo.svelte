@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { instanceStore } from '$lib/store';
+	import { invidiousInstanceStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
@@ -45,7 +45,7 @@
 		role="presentation"
 		onclick={async () => {
 			if (isUnrestrictedPlatform()) {
-				shareVideo(`${get(instanceStore)}/watch/${video.videoId}`);
+				shareVideo(`${get(invidiousInstanceStore)}/watch/${video.videoId}`);
 			} else {
 				shareVideo(
 					`${location.origin}${resolve('/watch/[videoId]', { videoId: video.videoId })}`,

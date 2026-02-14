@@ -86,7 +86,7 @@ function ifNotWebDefault(givenValue: any, defaultValue: any): any {
 	}
 }
 
-export const instanceStore: Writable<string | undefined> = persist(
+export const invidiousInstanceStore: Writable<string | undefined> = persist(
 	writable(
 		!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
 			? undefined

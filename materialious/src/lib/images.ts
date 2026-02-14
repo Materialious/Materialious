@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import type { Image } from './api/model';
-import { instanceStore } from './store';
+import { invidiousInstanceStore } from './store';
 import { isYTBackend } from './misc';
 
 export class ImageCache {
@@ -66,5 +66,5 @@ export function proxyGoogleImage(source: string): string {
 
 	if (typeof path === 'undefined') return '';
 
-	return `${get(instanceStore)}/ggpht${path}`;
+	return `${get(invidiousInstanceStore)}/ggpht${path}`;
 }

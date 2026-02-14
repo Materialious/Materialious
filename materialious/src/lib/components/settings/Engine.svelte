@@ -7,7 +7,7 @@
 		engineCullYTStore,
 		engineFallbacksStore,
 		engineMaxConcurrentChannelsStore,
-		instanceStore
+		invidiousInstanceStore
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
@@ -134,7 +134,7 @@
 		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>
 
-	{#if $invidiousAuthStore && $instanceStore}
+	{#if $invidiousAuthStore && $invidiousInstanceStore}
 		<h6>{$_('layout.backendEngine.importExport')}</h6>
 		<div class="space"></div>
 

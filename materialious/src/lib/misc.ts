@@ -8,7 +8,7 @@ import {
 	backendInUseStore,
 	channelCacheStore,
 	feedCacheStore,
-	instanceStore,
+	invidiousInstanceStore,
 	interfaceAllowInsecureRequests,
 	interfaceAndroidUseNativeShare,
 	isAndroidTvStore,
@@ -287,15 +287,15 @@ export async function setInvidiousInstance(
 		return false;
 	}
 
-	instanceStore.set(instance);
+	invidiousInstanceStore.set(instance);
 	invidiousAuthStore.set(null);
 
 	return true;
 }
 
 export async function goToInvidiousLogin() {
-	if (!get(instanceStore)) return;
-	const path = new URL(`${get(instanceStore)}/authorize_token`);
+	if (!get(invidiousInstanceStore)) return;
+	const path = new URL(`${get(invidiousInstanceStore)}/authorize_token`);
 	const searchParams = new URLSearchParams({
 		scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
 	});

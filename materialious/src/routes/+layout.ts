@@ -9,7 +9,7 @@ import { getPages } from '$lib/navPages';
 import {
 	invidiousAuthStore,
 	backendInUseStore,
-	instanceStore,
+	invidiousInstanceStore,
 	interfaceDefaultPage,
 	isAndroidTvStore,
 	rawMasterKeyStore
@@ -35,7 +35,7 @@ export async function load({ url }) {
 		// Due to race condition with how we set & save persistent store values
 		// we manually set stores like auth & instance before load.
 		const preferenceKey: Record<string, Writable<any>> = {
-			invidiousInstance: instanceStore,
+			invidiousInstance: invidiousInstanceStore,
 			authToken: invidiousAuthStore,
 			backendInUse: backendInUseStore,
 			rawMasterKey: rawMasterKeyStore
@@ -84,7 +84,7 @@ export async function load({ url }) {
 
 		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
 			goto(resolve('/internal/login', {}), { replaceState: true });
-		} else if (!get(instanceStore) && !isYTBackend() && !isSetupPage) {
+		} else if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {
 			goto(resolve('/setup', {}), { replaceState: true });
 		}
 	}

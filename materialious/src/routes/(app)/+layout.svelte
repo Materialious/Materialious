@@ -19,7 +19,7 @@
 	import {
 		invidiousAuthStore,
 		darkModeStore,
-		instanceStore,
+		invidiousInstanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
@@ -149,7 +149,7 @@
 		body.append('password', rawPassword);
 		body.append('action', 'signin');
 
-		const response = await fetch(`${$instanceStore}/login?type=invidious`, {
+		const response = await fetch(`${$invidiousInstanceStore}/login?type=invidious`, {
 			method: 'POST',
 			body: body,
 			headers: {

@@ -5,7 +5,7 @@
 	import { _ } from '$lib/i18n';
 	import type { VideoPlay } from '../api/model';
 	import { decodeHtmlCharCodes } from '../misc';
-	import { instanceStore } from '../store';
+	import { invidiousInstanceStore } from '../store';
 
 	interface Props {
 		video: VideoPlay;
@@ -49,8 +49,8 @@
 
 		if (video.fallbackPatch === 'youtubejs') {
 			urlConstructed = url;
-		} else if ($instanceStore) {
-			urlConstructed = new URL($instanceStore).origin + url;
+		} else if ($invidiousInstanceStore) {
+			urlConstructed = new URL($invidiousInstanceStore).origin + url;
 		} else {
 			return;
 		}

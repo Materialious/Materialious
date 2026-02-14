@@ -4,7 +4,7 @@ import {
 	invidiousAuthStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
-	instanceStore,
+	invidiousInstanceStore,
 	interfaceRegionStore,
 	playerYouTubeJsAlways,
 	playerYouTubeJsFallback,
@@ -55,7 +55,7 @@ import {
 } from './backend';
 
 export function buildPath(path: string): URL {
-	return new URL(`${get(instanceStore)}/api/v1/${path}`);
+	return new URL(`${get(invidiousInstanceStore)}/api/v1/${path}`);
 }
 
 export function setRegion(url: URL): URL {

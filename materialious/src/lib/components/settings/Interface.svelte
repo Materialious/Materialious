@@ -24,7 +24,7 @@
 		invidiousAuthStore,
 		backendInUseStore,
 		darkModeStore,
-		instanceStore,
+		invidiousInstanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
 		interfaceAndroidUseNativeShare,
@@ -46,7 +46,7 @@
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
 
-	let invidiousInstance = $state(get(instanceStore));
+	let invidiousInstance = $state(get(invidiousInstanceStore));
 	let region = $state(get(interfaceRegionStore));
 	let forceCase = $state(get(interfaceForceCase));
 	let defaultPage = $state(get(interfaceDefaultPage));

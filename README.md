@@ -45,7 +45,7 @@
 [Please read the guide here](./docs/DOCKER-FULL.md)
 
 # Legacy Docker deployment, Invidious only.
-This version of Materialious is still **fully** supported, but is purely just a Invidious frontend without any fancy bells and whistles.
+This version of Materialious is still **fully** supported, but is purely just a Invidious frontend without any fancy bells and whistles, this version is harder to deploy...
 
 [Please read the guide here](./docs/DOCKER.md)
 

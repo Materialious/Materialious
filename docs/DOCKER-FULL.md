@@ -135,7 +135,7 @@ Add these additional environment variables to Materialious.
 VITE_DEFAULT_API_EXTENDED_INSTANCE: "https://syncious.example.com"
 ```
 
-## Step 6 (Optional): Self-host PeerJS
+## Step 4 (Optional): Self-host PeerJS
 [Read the official guide.](https://github.com/peers/peerjs-server?tab=readme-ov-file#docker)
 
 Add these additional environment variables to Materialious.

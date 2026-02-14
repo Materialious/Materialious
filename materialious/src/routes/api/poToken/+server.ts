@@ -3,7 +3,7 @@ import type { IGetChallengeResponse } from 'youtubei.js';
 import BG, { buildURL, GOOG_API_KEY, USER_AGENT, type WebPoSignalOutput } from 'bgutils-js';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { isOwnBackend } from '$lib/shared/index.js';
+import { isOwnBackend } from '$lib/shared/index';
 
 const zPoTokenGenSchema = z.object({
 	requestKey: z.string(),

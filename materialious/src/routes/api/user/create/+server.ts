@@ -1,8 +1,8 @@
 import { isOwnBackend } from '$lib/shared';
-import { createUser } from '$lib/server/user.js';
+import { createUser } from '$lib/server/user';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { setAuthCookie } from '$lib/server/misc.js';
+import { setAuthCookie } from '$lib/server/misc';
 import { verifyCaptcha } from '$lib/server/captcha';
 
 const zUserCreate = z.object({

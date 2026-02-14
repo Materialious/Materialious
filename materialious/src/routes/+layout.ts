@@ -18,8 +18,8 @@ import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
-import { isYTBackend } from '$lib/misc.js';
-import { isOwnBackend } from '$lib/shared/index.js';
+import { isYTBackend } from '$lib/misc';
+import { isOwnBackend } from '$lib/shared/index';
 
 export const ssr = false;
 export const prerender = false;

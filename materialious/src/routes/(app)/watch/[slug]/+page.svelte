@@ -39,8 +39,8 @@
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery, isYTBackend } from '$lib/misc';
-	import { humanizeSeconds, relativeTimestamp } from '$lib/time.js';
-	import { getWatchDetails } from '$lib/watch.js';
+	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
+	import { getWatchDetails } from '$lib/watch';
 	import { page } from '$app/state';
 
 	let { data = $bindable() } = $props();

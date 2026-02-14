@@ -1,4 +1,4 @@
-import { getUser } from '$lib/server/user.js';
+import { getUser } from '$lib/server/user';
 import { error } from '@sveltejs/kit';
 
 export async function GET({ locals }) {

@@ -3,7 +3,7 @@ import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 import { isOwnBackend } from '$lib/shared';
 import { setAuthCookie } from '$lib/server/misc';
-import { verifyCaptcha } from '$lib/server/captcha.js';
+import { verifyCaptcha } from '$lib/server/captcha';
 
 const zUserLogin = z.object({
 	username: z.string(),

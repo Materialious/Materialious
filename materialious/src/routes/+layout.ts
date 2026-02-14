@@ -62,6 +62,7 @@ export async function load({ url }) {
 	}
 
 	const isLoginPage = url.pathname.endsWith('/internal/login');
+	const isSetupPage = url.pathname.endsWith('/setup');
 
 	if (!isLoginPage) {
 		const defaultPage = get(interfaceDefaultPage);
@@ -71,7 +72,8 @@ export async function load({ url }) {
 			defaultPage !== '/' &&
 			defaultPage.startsWith('/') &&
 			url.pathname === resolvedRoot &&
-			window.history.length < 3
+			window.history.length < 3 &&
+			!isSetupPage
 		) {
 			getPages().forEach((page) => {
 				if (page.href === defaultPage && (!page.requiresAuth || get(authStore))) {
@@ -82,7 +84,7 @@ export async function load({ url }) {
 
 		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
 			goto(resolve('/internal/login', {}), { replaceState: true });
-		} else if (!get(instanceStore) && !isYTBackend() && !url.pathname.endsWith('/setup')) {
+		} else if (!get(instanceStore) && !isYTBackend() && !isSetupPage) {
 			goto(resolve('/setup', {}), { replaceState: true });
 		}
 	}

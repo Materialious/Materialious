@@ -1,9 +1,9 @@
 import { browser } from '$app/environment';
-import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
+import { redirect } from '@sveltejs/kit';
 import androidTv from '$lib/android/plugins/androidTv';
 import { getResolveUrl } from '$lib/api';
-import '$lib/i18n'; // Import to initialize. Important :)
+import '$lib/i18n';
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
 import {
@@ -32,8 +32,6 @@ export async function load({ url }) {
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
 
 	if (Capacitor.getPlatform() === 'android') {
-		// Due to race condition with how we set & save persistent store values
-		// we manually set stores like auth & instance before load.
 		const preferenceKey: Record<string, Writable<any>> = {
 			invidiousInstance: invidiousInstanceStore,
 			authToken: invidiousAuthStore,
@@ -42,22 +40,30 @@ export async function load({ url }) {
 		};
 
 		for (const [key, store] of Object.entries(preferenceKey)) {
-			const result = await Preferences.get({ key: key });
-			if (result.value !== null) store.set(deserialize(result.value));
+			const result = await Preferences.get({ key });
+			if (result.value !== null) {
+				store.set(deserialize(result.value));
+			}
 		}
 	}
 
 	const resolvedRoot = resolve('/', {});
+
 	if (url.pathname.startsWith(resolvedRoot + '@')) {
 		const username = url.pathname.substring(resolvedRoot.length).split('/')[0];
 
 		try {
 			const resolvedUrl = await getResolveUrl(`www.youtube.com/${username}`);
 			if (resolvedUrl.pageType === 'WEB_PAGE_TYPE_CHANNEL') {
-				goto(resolve(`/channel/[authorId]`, { authorId: resolvedUrl.ucid }));
+				throw redirect(
+					302,
+					resolve(`/channel/[authorId]`, {
+						authorId: resolvedUrl.ucid
+					})
+				);
 			}
 		} catch {
-			// continue regardless of error
+			// ignore errors
 		}
 	}
 
@@ -70,11 +76,11 @@ export async function load({ url }) {
 		url.pathname === resolvedRoot &&
 		window.history.length < 3
 	) {
-		getPages().forEach((page) => {
+		for (const page of getPages()) {
 			if (page.href === defaultPage && (!page.requiresAuth || get(invidiousAuthStore))) {
-				goto(resolve(defaultPage, {}));
+				throw redirect(302, resolve(defaultPage, {}));
 			}
-		});
+		}
 	}
 
 	const isLoginPage = url.pathname.endsWith('/internal/login');
@@ -82,9 +88,13 @@ export async function load({ url }) {
 
 	if (!isLoginPage) {
 		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
-			goto(resolve('/internal/login', {}), { replaceState: true });
-		} else if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {
-			goto(resolve('/setup', {}), { replaceState: true });
+			throw redirect(302, resolve('/internal/login', {}));
+		}
+
+		if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {
+			throw redirect(302, resolve('/setup', {}));
 		}
 	}
+
+	return {};
 }

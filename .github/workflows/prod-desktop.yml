@@ -42,10 +42,10 @@ jobs:
                   node-version: ${{ matrix.node-version }}
 
             - name: Install modules
-              run: cd ./materialious && npm install
+              run: cd ./materialious && npm ci
 
             - name: Build package
-              run: cd ./materialious && npm run build
+              run: cd ./materialious && npm run build && npm prune --omit=dev
 
             - name: Sync electron package
               run: cd ./materialious && npx cap sync @capacitor-community/electron
@@ -54,7 +54,7 @@ jobs:
               run: cd ./materialious/electron && python patch_capacitor_plugin.py
 
             - name: Install electron modules
-              run: cd ./materialious/electron && npm install
+              run: cd ./materialious/electron && npm ci
 
             - name: Set up environment variables
               run: echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV

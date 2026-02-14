@@ -28,7 +28,11 @@ RUN echo "VITE_DEFAULT_INVIDIOUS_INSTANCE=VITE_DEFAULT_INVIDIOUS_INSTANCE_PLACEH
     echo "VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE=VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE_PLACEHOLDER" >> .env
 
 # Install dependencies and build the project
-RUN npm install && npm run build
+
+RUN npm ci
+
+RUN npm run build
+RUN npm prune --omit=dev
 
 FROM nginx:alpine
 

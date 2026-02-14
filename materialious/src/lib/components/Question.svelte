@@ -27,19 +27,25 @@
 <div class="grid">
 	{#each answers as answer (answer)}
 		<div class={`s12 m${coloumSize} l${coloumSize}`}>
-			<article
-				style="cursor: pointer;"
-				role="presentation"
-				tabindex="-1"
+			<button
 				onclick={() => selectAnswer(answer)}
 				class:primary={selectedAnswer === answer.text}
 				class:surface-container-highest={selectedAnswer !== answer.text}
 			>
 				<h6>{answer.text}</h6>
-			</article>
+			</button>
 		</div>
 	{/each}
 </div>
+
 {#if info}
 	<p><i>info</i> {info}</p>
 {/if}
+
+<style>
+	button {
+		width: 100%;
+		box-sizing: border-box;
+		height: 4rem;
+	}
+</style>

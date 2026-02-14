@@ -16,11 +16,17 @@
 
 
 # Features
-- Use in local mode without relying on a Invidious instance.
-- [Invidious companion support.](./docs/DOCKER.md#invidious-companion-support)
+- Internal account system (Optional).
+  * Subscriptions are end-to-end encrypted.
+  * [Proof-of-work Captcha](https://github.com/altcha-org/altcha).
+- Subscription importing/exporting
+  * Automatically import/export Invidious/Materialious.
+- Invidious is optional.
+  * Enjoy Materialious without a Invidious instance via our YouTube backend.
+- Invidious companion support.
 - [Invidious API extended integration.](https://github.com/Materialious/api-extended)
-- [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos.
-- Android TV support
+- Local video fallback if Invidious fails loading videos.
+- Android TV support.
 - Support for disabling certificate validation for homelab users.
 - Sync your watch progress between Invidious sessions.
 - Watch sync parties.
@@ -42,6 +48,8 @@
 - YT path redirects (So your redirect plugins should still work!)
 
 # Docker deployment
+This version of Materialious is feature rich, has its own account system (optional) & is easier to setup.
+
 [Please read the guide here](./docs/DOCKER-FULL.md)
 
 # Legacy Docker deployment, Invidious only.
@@ -170,6 +178,9 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 
 ## Android TV Player
 ![Preview of player on Android TV](./previews/android-tv-player.png)
+
+## Login
+![Preview of Login page](./previews/login-previews.png)
 
 ## Player
 ![Preview of player](./previews/player-preview.png)

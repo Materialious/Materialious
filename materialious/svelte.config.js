@@ -6,7 +6,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const useSsr = process.env.VITE_BUILD_WITH_BACKEND === 'true';
 
 const adapter = useSsr
-	? adapterNode()
+	? adapterNode({ out: 'build', precompress: true })
 	: adapterStatic({
 			fallback: 'index.html'
 		});

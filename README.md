@@ -19,7 +19,7 @@
 - Use in local mode without relying on a Invidious instance.
 - [Invidious companion support.](./docs/DOCKER.md#invidious-companion-support)
 - [Invidious API extended integration.](https://github.com/Materialious/api-extended)
-- [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos for Desktop & Android.
+- [YouTube.js](https://github.com/LuanRT/YouTube.js) fallback if Invidious fails loading videos.
 - Android TV support
 - Support for disabling certificate validation for homelab users.
 - Sync your watch progress between Invidious sessions.
@@ -41,14 +41,12 @@
 - PWA support.
 - YT path redirects (So your redirect plugins should still work!)
 
-# Support table
-|         | Dash | HLS | Local video fallback | API-Extended | Dearrow | RYD | Watch Parties |
-|---------|------|-----|----------------------|--------------|---------|-----|----------------|
-| Web     | ✅    | ✅   | ❌                    | ✅            | ✅       | ✅   | ✅              |
-| Desktop | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   | ❌              |
-| Android | ✅    | ✅   | ✅                    | ✅            | ✅       | ✅   | ❌              |
+# Docker deployment
+[Please read the guide here](./docs/DOCKER-FULL.md)
 
-# Deploying as a website via docker
+# Legacy Docker deployment, Invidious only.
+This version of Materialious is still **fully** supported, but is purely just a Invidious frontend without any fancy bells and whistles.
+
 [Please read the guide here](./docs/DOCKER.md)
 
 # Installing as a app

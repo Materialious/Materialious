@@ -11,11 +11,11 @@ sodium.ready.then(() => {
 
 let sequelizeAuthenticated = false;
 export async function handle({ event, resolve }) {
-	event.locals.captchaKey = captchaKey;
-
 	if (!isOwnBackend()?.internalAuth) {
 		return await resolve(event);
 	}
+
+	event.locals.captchaKey = captchaKey;
 
 	const sequelize = getSequelize();
 	if (!sequelizeAuthenticated) {
@@ -26,6 +26,10 @@ export async function handle({ event, resolve }) {
 
 	if (!env.COOKIE_SECRET) {
 		throw new Error('Cookie secret must be set');
+	}
+
+	if (env.COOKIE_SECRET.length < 16) {
+		throw new Error('COOKIE_SECRET must be at least 16 characters long');
 	}
 
 	const signedUserId = event.cookies.get('userid');

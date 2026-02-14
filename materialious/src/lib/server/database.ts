@@ -23,11 +23,11 @@ export function getSequelize(): {
 		};
 	}
 
-	sequelizeInstance = new Sequelize(
-		env.DATABASE_CONNECTION_URI ? env.DATABASE_CONNECTION_URI : 'sqlite::memory:'
-	);
+	if (!env.DATABASE_CONNECTION_URI) {
+		throw new Error('DATABASE_CONNECTION_URI must be set');
+	}
 
-	console.log('sequelizeInstance');
+	sequelizeInstance = new Sequelize(env.DATABASE_CONNECTION_URI);
 
 	UserTable = sequelizeInstance.define(
 		'User',

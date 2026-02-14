@@ -1,3 +1,5 @@
+# This is the docker file for legacy deployment wardpearce/materialious
+
 FROM node:latest AS builder
 
 # Set the working directory

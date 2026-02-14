@@ -191,13 +191,13 @@
 	async function logout() {
 		if (isYTBackend()) {
 			await clearFeedYTjs();
-
-			if (isOwnBackend()?.internalAuth) {
-				rawMasterKeyStore.set(undefined);
-				fetch('/api/user/logout', { method: 'DELETE' });
-			}
 		}
 
+		if (isOwnBackend()?.internalAuth) {
+			fetch('/api/user/logout', { method: 'DELETE' });
+		}
+
+		rawMasterKeyStore.set(undefined);
 		authStore.set(null);
 		goto(resolve('/', {}));
 	}
@@ -260,9 +260,11 @@
 		}
 
 		if ($rawMasterKeyStore) {
-			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' }).catch(() => {
-				logout();
-			});
+			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' })
+				.then((resp) => {
+					if (!resp.ok) logout();
+				})
+				.catch(logout);
 		}
 
 		resetScroll();

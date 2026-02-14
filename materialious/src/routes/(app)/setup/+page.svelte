@@ -8,7 +8,7 @@
 
 	let usingInvidious: boolean = $state(false);
 	let invidiousInstanceValid: boolean = $state(false);
-	let invidiousInstance: string = $state('');
+	let invidiousInstance: string = $state('https://invidious.materialio.us');
 
 	function setupCompleted() {
 		clearCaches();
@@ -55,7 +55,7 @@
 			question={$_('initalSetup.useInvidious')}
 			answers={[
 				{
-					text: $_('initalSetup.invidiousYes'),
+					text: $_('initalSetup.yes'),
 					action: () => {
 						usingInvidious = true;
 					}

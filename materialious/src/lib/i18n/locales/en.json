@@ -42,7 +42,6 @@
 		"yes": "Yes",
 		"no": "No",
 		"unsure": "Unsure",
-		"invidiousYes": "Yes, I have a instance",
 		"required": "Setup Required",
 		"invidiousInfo": "Invidious is an Self-hostable YouTube interface.",
 		"localFallbackInfo": "When a video fails loading from Invidious, Materialious loads it locally.",

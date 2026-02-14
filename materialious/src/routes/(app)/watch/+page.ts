@@ -1,6 +1,7 @@
-import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { error } from '@sveltejs/kit';
+
+import { redirect } from '@sveltejs/kit';
 
 export async function load({ url }) {
 	const videoId = url.searchParams.get('v');
@@ -18,8 +19,7 @@ export async function load({ url }) {
 			goToUrl.searchParams.set('time', timestamp);
 		}
 
-		// eslint-disable-next-line svelte/no-navigation-without-resolve
-		goto(goToUrl);
+		throw redirect(302, goToUrl);
 	} else {
 		error(404);
 	}

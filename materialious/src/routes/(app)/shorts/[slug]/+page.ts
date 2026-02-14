@@ -1,6 +1,6 @@
-import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
+import { redirect } from '@sveltejs/kit';
 
 export async function load({ params }) {
-	goto(resolve('/watch/[videoId]', { videoId: params.slug }));
+	throw redirect(302, resolve('/watch/[videoId]', { videoId: params.slug }));
 }

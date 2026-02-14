@@ -346,7 +346,7 @@
 					<i class:primary-text={$syncPartyPeerStore}>group</i>
 					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 				</button>
-				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
+				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"
 						onclick={() => {

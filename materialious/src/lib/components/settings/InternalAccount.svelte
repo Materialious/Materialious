@@ -21,8 +21,6 @@
 	}
 </script>
 
-<h6>Passsword reset</h6>
-
 <h6>Delete account</h6>
 <div class="space"></div>
 <button class="tertiary" onclick={deleteAccount}>

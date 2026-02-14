@@ -20,7 +20,7 @@ services:
       # Not required if VITE_INTERNAL_AUTH is false
       # postgresql, mysql2, mariadb & sqlite supported
       # guide here for URL structure https://docs.preset.io/docs/uri-connection-strings
-      DATABASE_CONNECTION_URI: "sqlite://materialious.db"
+      DATABASE_CONNECTION_URI: "sqlite:///materialious-data/materialious.db"
 
       # Use Materialious account system.
       PUBLIC_INTERNAL_AUTH: "true"
@@ -67,7 +67,7 @@ services:
       PUBLIC_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
 
     volumes:
-      - materialious-data:/materialious.db
+      - materialious-data:/materialious-data
 
 volumes:
   materialious-data: 

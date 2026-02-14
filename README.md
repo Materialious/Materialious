@@ -16,6 +16,9 @@
 
 
 # Features
+- Internal account system (Optional).
+  * Subscriptions are end-to-end encrypted.
+  * [Proof-of-work Captcha](https://github.com/altcha-org/altcha).
 - Use in local mode without relying on a Invidious instance.
 - [Invidious companion support.](./docs/DOCKER.md#invidious-companion-support)
 - [Invidious API extended integration.](https://github.com/Materialious/api-extended)
@@ -170,6 +173,9 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 
 ## Android TV Player
 ![Preview of player on Android TV](./previews/android-tv-player.png)
+
+## Login
+![Preview of Login page](./previews/login-previews.png)
 
 ## Player
 ![Preview of player](./previews/player-preview.png)

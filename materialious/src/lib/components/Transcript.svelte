@@ -3,10 +3,9 @@
 	import Fuse from 'fuse.js';
 	import { type VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from '$lib/i18n';
-	import { get } from 'svelte/store';
 	import type { VideoPlay } from '../api/model';
 	import { decodeHtmlCharCodes } from '../misc';
-	import { instanceStore } from '../store';
+	import { invidiousInstanceStore } from '../store';
 
 	interface Props {
 		video: VideoPlay;
@@ -46,11 +45,19 @@
 			return;
 		}
 
+		let urlConstructed = '';
+
+		if (video.fallbackPatch === 'youtubejs') {
+			urlConstructed = url;
+		} else if ($invidiousInstanceStore) {
+			urlConstructed = new URL($invidiousInstanceStore).origin + url;
+		} else {
+			return;
+		}
+
 		isLoading = true;
 		transcript = null;
-		const resp = await fetch(
-			`${!video.fallbackPatch ? new URL(get(instanceStore)).origin : ''}${url}`
-		);
+		const resp = await fetch(urlConstructed);
 		transcript = await parseText(await resp.text(), { strict: false });
 		transcriptCues = transcript.cues;
 

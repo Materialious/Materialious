@@ -17,14 +17,15 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
 	import {
-		authStore,
+		invidiousAuthStore,
 		darkModeStore,
-		instanceStore,
+		invidiousInstanceStore,
 		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
 		playerState,
 		playertheatreModeIsActive,
+		rawMasterKeyStore,
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
@@ -39,22 +40,30 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { pwaInfo } from 'virtual:pwa-info';
-	import { isYTBackend, clearCaches, truncate } from '$lib/misc';
+	import { goToInvidiousLogin, isYTBackend, logout, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
+	import { isOwnBackend } from '$lib/shared';
 
 	let { children } = $props();
 
-	let mobileSearchShow = $state(false);
+	const showLogin = !isYTBackend() || isOwnBackend()?.internalAuth;
 
-	let isLoggedIn = $state(false);
-	authStore.subscribe((value) => {
-		isLoggedIn = value !== null;
-	});
+	let mobileSearchShow = $state(false);
 
 	let notifications: Notification[] = $state([]);
 
 	let playerIsPip: boolean = $state(false);
+
+	let pages = $state(getPages());
+
+	invidiousAuthStore.subscribe(() => {
+		pages = getPages();
+	});
+
+	rawMasterKeyStore.subscribe(() => {
+		pages = getPages();
+	});
 
 	page.subscribe((pageData) => {
 		playerIsPip = !pageData.url.pathname.includes('/watch');
@@ -103,7 +112,7 @@
 			const token = url.searchParams.get('token');
 
 			if (username && token) {
-				authStore.set({
+				invidiousAuthStore.set({
 					username: username,
 					token: token
 				});
@@ -112,22 +121,13 @@
 	});
 
 	async function login() {
+		if (isOwnBackend()?.internalAuth) {
+			goto(resolve('/internal/login', {}));
+			return;
+		}
+
 		if (!$isAndroidTvStore) {
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			const path = new URL(`${get(instanceStore)}/authorize_token`);
-			// eslint-disable-next-line svelte/prefer-svelte-reactivity
-			const searchParams = new URLSearchParams({
-				scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
-			});
-			if (Capacitor.getPlatform() === 'android') {
-				searchParams.set('callback_url', 'materialious-auth://');
-				path.search = searchParams.toString();
-				await Browser.open({ url: path.toString() });
-			} else {
-				searchParams.set('callback_url', `${location.origin}${resolve('/auth', {})}`);
-				path.search = searchParams.toString();
-				document.location.href = path.toString();
-			}
+			await goToInvidiousLogin();
 		} else {
 			await ui('#tv-login');
 			document.getElementById('username')?.focus();
@@ -149,7 +149,7 @@
 		body.append('password', rawPassword);
 		body.append('action', 'signin');
 
-		const response = await fetch(`${$instanceStore}/login?type=invidious`, {
+		const response = await fetch(`${$invidiousInstanceStore}/login?type=invidious`, {
 			method: 'POST',
 			body: body,
 			headers: {
@@ -167,7 +167,7 @@
 
 				if (sid) {
 					console.log(sid);
-					authStore.set({ username: rawUsername, token: sid });
+					invidiousAuthStore.set({ username: rawUsername, token: sid });
 					await ui('#tv-login');
 					goto(resolve('/', {}), { replaceState: true });
 					return;
@@ -176,12 +176,6 @@
 		}
 
 		loginError = true;
-	}
-
-	function logout() {
-		authStore.set(null);
-		clearCaches();
-		goto(resolve('/', {}));
 	}
 
 	async function loadNotifications() {
@@ -237,8 +231,16 @@
 		setTheme();
 		setAmoledTheme();
 
-		if (isLoggedIn && !isYTBackend()) {
-			loadNotifications().catch(() => authStore.set(null));
+		if ($invidiousAuthStore && !isYTBackend()) {
+			loadNotifications().catch(() => logout());
+		}
+
+		if ($rawMasterKeyStore) {
+			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' })
+				.then((resp) => {
+					if (!resp.ok) logout();
+				})
+				.catch(logout);
 		}
 
 		resetScroll();
@@ -259,7 +261,7 @@
 		class:hide={$playertheatreModeIsActive}
 	>
 		<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
-			<a href={resolve($interfaceDefaultPage, {})}>
+			<a href={resolve($interfaceDefaultPage, {})} data-sveltekit-preload-data="off">
 				<Logo />
 			</a>
 		</header>
@@ -269,7 +271,7 @@
 				<div>{$_('searchPlaceholder')}</div>
 			</a>
 		{/if}
-		{#each getPages() as navPage (navPage)}
+		{#each pages as navPage (navPage)}
 			<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
@@ -281,8 +283,8 @@
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
-			{#if !isYTBackend()}
-				{#if !isLoggedIn}
+			{#if showLogin}
+				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
 					<a onclick={login} href="#login">
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
@@ -344,7 +346,7 @@
 					<i class:primary-text={$syncPartyPeerStore}>group</i>
 					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 				</button>
-				{#if isLoggedIn && !isYTBackend()}
+				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"
 						onclick={() => {
@@ -367,8 +369,8 @@
 					<div class="tooltip bottom">{$_('layout.settings')}</div>
 				</button>
 
-				{#if !isYTBackend()}
-					{#if !isLoggedIn}
+				{#if showLogin}
+					{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>
@@ -385,7 +387,7 @@
 	{/if}
 
 	<nav class="bottom s">
-		{#each getPages() as navPage (navPage)}
+		{#each pages as navPage (navPage)}
 			<a
 				class="round"
 				href={resolve(navPage.href, {})}
@@ -486,11 +488,11 @@
 	<form onsubmit={usernamePasswordLogin}>
 		<div class="field label border" class:invalid={loginError}>
 			<input id="username" bind:value={rawUsername} name="username" type="text" />
-			<label for="username">Username</label>
+			<label for="username">{$_('username')}</label>
 		</div>
 		<div class="field label border" class:invalid={loginError}>
 			<input bind:value={rawPassword} name="password" type="password" />
-			<label for="password">Password</label>
+			<label for="password">{$_('password')}</label>
 		</div>
 
 		<nav class="right-align no-space">

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { instanceStore } from '$lib/store';
-	import { Capacitor } from '@capacitor/core';
+	import { invidiousInstanceStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { shareURL } from '$lib/misc';
+	import { isUnrestrictedPlatform, shareURL } from '$lib/misc';
 	import { addToast } from './Toast.svelte';
 
 	interface Props {
@@ -45,8 +44,8 @@
 		class="row"
 		role="presentation"
 		onclick={async () => {
-			if (Capacitor.isNativePlatform()) {
-				shareVideo(`${get(instanceStore)}/watch/${video.videoId}`);
+			if (isUnrestrictedPlatform()) {
+				shareVideo(`${get(invidiousInstanceStore)}/watch/${video.videoId}`);
 			} else {
 				shareVideo(
 					`${location.origin}${resolve('/watch/[videoId]', { videoId: video.videoId })}`,

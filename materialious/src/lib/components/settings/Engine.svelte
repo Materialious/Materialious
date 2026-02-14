@@ -2,12 +2,12 @@
 	import { isYTBackend } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 	import {
-		authStore,
+		invidiousAuthStore,
 		engineCooldownYTStore,
 		engineCullYTStore,
 		engineFallbacksStore,
 		engineMaxConcurrentChannelsStore,
-		instanceStore
+		invidiousInstanceStore
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
@@ -97,7 +97,7 @@
 
 {#if isYTBackend()}
 	<h6>Feed</h6>
-	<div class="field label prefix border">
+	<div class="field label prefix surface-container-highest">
 		<i>view_stream</i>
 		<input
 			oninput={(event: Event) => {
@@ -109,7 +109,7 @@
 		/>
 		<label for="cull">{$_('layout.backendEngine.cull')}</label>
 	</div>
-	<div class="field label prefix border">
+	<div class="field label prefix surface-container-highest">
 		<i>schedule</i>
 		<input
 			oninput={(event: Event) => {
@@ -121,7 +121,7 @@
 		/>
 		<label for="cooldown">{$_('layout.backendEngine.cooldown')}</label>
 	</div>
-	<div class="field label prefix border">
+	<div class="field label prefix surface-container-highest">
 		<i>pending</i>
 		<input
 			oninput={(event: Event) => {
@@ -134,7 +134,7 @@
 		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>
 
-	{#if $authStore && $instanceStore}
+	{#if $invidiousAuthStore && $invidiousInstanceStore}
 		<h6>{$_('layout.backendEngine.importExport')}</h6>
 		<div class="space"></div>
 

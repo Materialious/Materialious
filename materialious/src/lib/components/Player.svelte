@@ -19,8 +19,8 @@
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
 	import {
-		authStore,
-		instanceStore,
+		invidiousAuthStore,
+		invidiousInstanceStore,
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
@@ -45,6 +45,7 @@
 	} from '../store';
 	import { setStatusBarColor } from '../theme';
 	import { getVideoYTjs } from '$lib/api/youtubejs/video';
+	import { env } from '$env/dynamic/public';
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
@@ -58,7 +59,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from './Toast.svelte';
-	import { isMobile, isYTBackend, truncate } from '$lib/misc';
+	import { isMobile, isUnrestrictedPlatform, isYTBackend, truncate } from '$lib/misc';
 	import {
 		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
@@ -515,8 +516,11 @@
 			// Due to CORs issues with redirects, hosted instances of Materialious
 			// dirctly provide the companion instance
 			// while clients can just use the reirect provided by Invidious' API
-			if (import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
-				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
+			if (
+				import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE ||
+				env.PUBLIC_DEFAULT_COMPANION_INSTANCE
+			) {
+				dashUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE || env.PUBLIC_DEFAULT_COMPANION_INSTANCE}/api/manifest/dash/id/${data.video.videoId}`;
 			} else {
 				if (!data.video.dashUrl) {
 					error(500, 'No dash manifest found');
@@ -524,7 +528,7 @@
 				dashUrl = data.video.dashUrl;
 			}
 
-			if (!data.video.fallbackPatch && (!Capacitor.isNativePlatform() || $playerProxyVideosStore)) {
+			if (!data.video.fallbackPatch && (!isUnrestrictedPlatform() || $playerProxyVideosStore)) {
 				dashUrl += '?local=true';
 			}
 
@@ -547,7 +551,9 @@
 						playerMaxKnownTime
 					);
 				} else if (!data.video.fallbackPatch) {
-					const thumbnailVTTResp = await fetch(`${$instanceStore}${selectedStoryboard.url}`);
+					const thumbnailVTTResp = await fetch(
+						`${$invidiousInstanceStore}${selectedStoryboard.url}`
+					);
 					if (thumbnailVTTResp.ok) thumbnailVTT = await thumbnailVTTResp.text();
 				}
 
@@ -576,12 +582,16 @@
 			if (data.video.captions) {
 				for (const caption of data.video.captions) {
 					let captionUrl: string;
-					if (!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE) {
+					if (
+						!import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE &&
+						!env.PUBLIC_DEFAULT_COMPANION_INSTANCE &&
+						$invidiousInstanceStore
+					) {
 						captionUrl = caption.url.startsWith('http')
 							? caption.url
-							: `${new URL(get(instanceStore)).origin}${caption.url}`;
+							: `${new URL($invidiousInstanceStore).origin}${caption.url}`;
 					} else {
-						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE}${caption.url}`;
+						captionUrl = `${import.meta.env.VITE_DEFAULT_COMPANION_INSTANCE || env.PUBLIC_DEFAULT_COMPANION_INSTANCE}${caption.url}`;
 					}
 
 					await player.addTextTrackAsync(
@@ -1035,7 +1045,7 @@
 			console.error(error);
 
 			if (
-				!Capacitor.isNativePlatform() ||
+				!isUnrestrictedPlatform() ||
 				data.video.fallbackPatch === 'youtubejs' ||
 				(error as shaka.extern.Error).code !== 1001
 			)
@@ -1079,7 +1089,7 @@
 			// Continue regardless of error
 		}
 
-		if ($synciousStore && $synciousInstanceStore && $authStore) {
+		if ($synciousStore && $synciousInstanceStore && $invidiousAuthStore) {
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
 			} catch {
@@ -1093,7 +1103,7 @@
 	function savePlayerPos() {
 		if (data.video.liveNow) return;
 
-		const synciousEnabled = $synciousStore && $synciousInstanceStore && $authStore;
+		const synciousEnabled = $synciousStore && $synciousInstanceStore && $invidiousAuthStore;
 
 		if ($playerSavePlaybackPositionStore && playerElement) {
 			if (

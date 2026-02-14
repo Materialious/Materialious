@@ -1,7 +1,7 @@
 import { _ } from '$lib/i18n';
 import { get } from 'svelte/store';
 import { isYTBackend } from './misc';
-import { authStore } from './store';
+import { invidiousAuthStore } from './store';
 
 export type Pages = { icon: string; href: string; name: string; requiresAuth: boolean }[];
 
@@ -29,7 +29,7 @@ export function getPages(): Pages {
 	];
 
 	pages = pages.filter((page) => {
-		return !page.requiresAuth || (get(authStore) && !isYTBackend());
+		return !page.requiresAuth || (get(invidiousAuthStore) && !isYTBackend());
 	});
 
 	return pages;

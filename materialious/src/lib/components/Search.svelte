@@ -39,6 +39,7 @@
 	}
 
 	function onSubmit(event: Event | undefined = undefined) {
+		clearTimeout(debounceTimer);
 		event?.preventDefault();
 
 		goToSearch(search);
@@ -51,6 +52,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
 			event.preventDefault();
+
 			const direction = event.key === 'ArrowUp' ? -1 : 1;
 			const container = document.querySelector('.suggestions-container');
 			if (container) {
@@ -73,12 +75,18 @@
 				}
 			}
 		} else if (event.key === 'Enter' && selectedSuggestionIndex !== -1) {
+			event.preventDefault();
+
 			search = suggestionsForSearch[selectedSuggestionIndex];
 			onSubmit();
 		} else if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+			event.preventDefault();
+
 			resetSearch();
 			event.preventDefault();
 		} else if (event.key === 'Escape') {
+			event.preventDefault();
+
 			resetSearch();
 		}
 	}
@@ -139,6 +147,7 @@
 						bind:value={search}
 						onkeydown={handleKeyDown}
 						onkeyup={(event) => {
+							event.preventDefault();
 							if (event.key === 'Enter') {
 								onSubmit();
 							} else {
@@ -156,6 +165,7 @@
 									search = suggestion;
 									onSubmit();
 								}}
+								type="reset"
 								class="transparent suggestion"
 								class:selected={index === selectedSuggestionIndex}
 							>
@@ -171,6 +181,7 @@
 								onclick={() => {
 									search = history;
 								}}
+								type="reset"
 								class="transparent suggestion"
 							>
 								<div>{history}</div>

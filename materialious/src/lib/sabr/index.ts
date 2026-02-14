@@ -1,5 +1,4 @@
 import type { VideoPlay } from '$lib/api/model';
-import { Capacitor } from '@capacitor/core';
 import { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import { ShakaPlayerAdapter } from './ShakaPlayerAdapter';
@@ -7,12 +6,13 @@ import { Constants, YT } from 'youtubei.js';
 import { get } from 'svelte/store';
 import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
+import { isUnrestrictedPlatform } from '$lib/misc';
 
 export async function injectSabr(
 	video: VideoPlay,
 	player: shaka.Player
 ): Promise<SabrStreamingAdapter | null> {
-	if (!video.ytjs || !Capacitor.isNativePlatform()) return null;
+	if (!video.ytjs || !isUnrestrictedPlatform()) return null;
 
 	const sabrAdapter = new SabrStreamingAdapter({
 		playerAdapter: new ShakaPlayerAdapter(),

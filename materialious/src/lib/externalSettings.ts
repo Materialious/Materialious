@@ -2,6 +2,8 @@ import { page } from '$app/state';
 import { get, type Writable } from 'svelte/store';
 import { z } from 'zod';
 
+import { env } from '$env/dynamic/public';
+
 import {
 	darkModeStore,
 	deArrowEnabledStore,
@@ -269,9 +271,13 @@ function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
 }
 
 export function loadSettingsFromEnv() {
-	if (typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'string') return;
+	if (
+		typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'string' &&
+		typeof env.PUBLIC_DEFAULT_SETTINGS !== 'string'
+	)
+		return;
 
-	let raw = import.meta.env.VITE_DEFAULT_SETTINGS;
+	let raw = import.meta.env.VITE_DEFAULT_SETTINGS || env.PUBLIC_DEFAULT_SETTINGS;
 
 	// Docker wraps env vars in quotes
 	if (raw.startsWith('"')) raw = raw.slice(1);

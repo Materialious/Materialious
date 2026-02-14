@@ -7,7 +7,7 @@ import {
 } from '$lib/api/index';
 import { loadEntirePlaylist } from '$lib/playlist';
 import {
-	authStore,
+	invidiousAuthStore,
 	playerProxyVideosStore,
 	playerState,
 	returnYTDislikesInstanceStore,
@@ -38,7 +38,7 @@ export async function getWatchDetails(videoId: string, url: URL) {
 	}
 
 	let personalPlaylists;
-	if (get(authStore)) {
+	if (get(invidiousAuthStore)) {
 		postHistory(video.videoId);
 		personalPlaylists = getPersonalPlaylists({ priority: 'low' });
 	} else {

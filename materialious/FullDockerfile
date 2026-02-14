@@ -1,0 +1,28 @@
+FROM node:24-alpine AS builder
+WORKDIR /app
+
+COPY . .
+
+RUN npm ci
+
+# Tell SvelteKit to use node adapter.
+ENV PUBLIC_BUILD_WITH_BACKEND="true"
+
+RUN npm run build
+RUN npm prune --omit=dev
+
+FROM node:24-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/build build/
+COPY --from=builder /app/node_modules node_modules/
+
+COPY package.json .
+EXPOSE 3000
+ENV NODE_ENV=production
+
+# Tell the front end backend is in use.
+ENV PUBLIC_BUILD_WITH_BACKEND="true"
+
+CMD ["node", "build"]

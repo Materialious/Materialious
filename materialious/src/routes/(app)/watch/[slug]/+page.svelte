@@ -15,7 +15,7 @@
 	import { cleanNumber, numberWithCommas } from '$lib/numbers';
 	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player';
 	import {
-		authStore,
+		invidiousAuthStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		playerMiniplayerEnabled,
@@ -39,8 +39,8 @@
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery, isYTBackend } from '$lib/misc';
-	import { humanizeSeconds, relativeTimestamp } from '$lib/time.js';
-	import { getWatchDetails } from '$lib/watch.js';
+	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
+	import { getWatchDetails } from '$lib/watch';
 	import { page } from '$app/state';
 
 	let { data = $bindable() } = $props();
@@ -490,7 +490,7 @@
 						<button disabled class="surface-container-highest">
 							<i>add</i>
 							<div class="tooltip">
-								{#if $authStore || isYTBackend()}
+								{#if $invidiousAuthStore || isYTBackend()}
 									{$_('player.noPlaylists')}
 								{:else}
 									{$_('loginRequired')}

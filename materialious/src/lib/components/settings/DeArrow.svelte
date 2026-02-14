@@ -17,12 +17,12 @@
 
 <form onsubmit={preventDefault(() => deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl)))}>
 	<nav>
-		<div class="field prefix label border max">
+		<div class="field prefix label surface-container-highest max">
 			<i>link</i>
 			<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
 			<label for="dearrow-instance">{$_('layout.instanceUrl')}</label>
 		</div>
-		<button class="square round">
+		<button class="square">
 			<i>done</i>
 		</button>
 	</nav>
@@ -30,12 +30,12 @@
 
 <form onsubmit={preventDefault(() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl))}>
 	<nav>
-		<div class="field prefix label border max">
+		<div class="field prefix label surface-container-highest max">
 			<i>link</i>
 			<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
 			<label for="dearrow-thumbnail-instance">{$_('layout.deArrow.thumbnailInstanceUrl')}</label>
 		</div>
-		<button class="square round">
+		<button class="square">
 			<i>done</i>
 		</button>
 	</nav>

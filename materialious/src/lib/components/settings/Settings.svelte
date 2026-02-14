@@ -7,15 +7,17 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { isAndroidTvStore } from '$lib/store';
+	import { isAndroidTvStore, rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
-	import { Capacitor } from '@capacitor/core';
+	import { isUnrestrictedPlatform } from '$lib/misc';
+	import { isOwnBackend } from '$lib/shared';
+	import InternalAccount from './InternalAccount.svelte';
 
 	let activeTab = $state('interface');
 	const isActive = (id: string) => activeTab === id;
 
-	const tabs: { id: string; label: string; icon: string; component: Component }[] = [
+	let tabs: { id: string; label: string; icon: string; component: Component }[] = $state([
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
 		{ id: 'ryd', label: 'Return YT Dislike', icon: 'thumb_down', component: Ryd },
@@ -33,9 +35,13 @@
 			icon: 'info',
 			component: About
 		}
-	];
+	]);
 
-	if (Capacitor.isNativePlatform()) {
+	let tabIds: string[] = $state([]);
+
+	setTabIds();
+
+	if (isUnrestrictedPlatform()) {
 		tabs.splice(1, 0, {
 			id: 'engine',
 			label: $_('layout.engine'),
@@ -44,7 +50,28 @@
 		});
 	}
 
-	const tabIds = tabs.map((tab) => tab.id);
+	function setTabIds() {
+		tabs.forEach((tab) => {
+			tabIds.push(tab.id);
+		});
+	}
+
+	rawMasterKeyStore.subscribe((value) => {
+		if (isOwnBackend()?.internalAuth && value) {
+			tabs.splice(1, 0, {
+				id: 'account',
+				label: $_('layout.materialiousAccount'),
+				icon: 'person',
+				component: InternalAccount
+			});
+		} else {
+			tabs = tabs.filter((tab) => {
+				return tab.id !== 'account';
+			});
+		}
+
+		setTabIds();
+	});
 
 	let dialogType = $state('');
 
@@ -102,24 +129,26 @@
 
 	<div style="height: 100%;">
 		<nav class="wrap s">
-			<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
-				<i>{tabs[tabIds.indexOf(activeTab)].icon}</i>
-				<span>{tabs[tabIds.indexOf(activeTab)].label}</span>
-				<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
-					{#each tabs as tab (tab)}
-						<li
-							onclick={() => {
-								activeTab = tab.id;
-							}}
-							role="presentation"
-							data-ui="#tab-menu"
-						>
-							<i>{tab.icon}</i>
-							<span>{tab.label}</span>
-						</li>
-					{/each}
-				</menu>
-			</button>
+			{#if tabIds}
+				<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
+					<i>{tabs[tabIds.indexOf(activeTab)]?.icon}</i>
+					<span>{tabs[tabIds.indexOf(activeTab)]?.label}</span>
+					<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
+						{#each tabs as tab (tab)}
+							<li
+								onclick={() => {
+									activeTab = tab.id;
+								}}
+								role="presentation"
+								data-ui="#tab-menu"
+							>
+								<i>{tab.icon}</i>
+								<span>{tab.label}</span>
+							</li>
+						{/each}
+					</menu>
+				</button>
+			{/if}
 		</nav>
 
 		<div class="s">

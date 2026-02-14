@@ -11,14 +11,20 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash, isMobile, clearCaches } from '../../misc';
+	import {
+		isMobile,
+		clearCaches,
+		isUnrestrictedPlatform,
+		setInvidiousInstance,
+		goToInvidiousLogin
+	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
-		authStore,
+		invidiousAuthStore,
 		backendInUseStore,
 		darkModeStore,
-		instanceStore,
+		invidiousInstanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAmoledTheme,
 		interfaceAndroidUseNativeShare,
@@ -37,8 +43,9 @@
 	} from '../../store';
 	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
+	import { isOwnBackend } from '$lib/shared';
 
-	let invidiousInstance = $state(get(instanceStore));
+	let invidiousInstance = $state(get(invidiousInstanceStore));
 	let region = $state(get(interfaceRegionStore));
 	let forceCase = $state(get(interfaceForceCase));
 	let defaultPage = $state(get(interfaceDefaultPage));
@@ -84,37 +91,8 @@
 
 	async function setInstance(event: Event) {
 		event.preventDefault();
-
-		invalidInstance = false;
-
-		const instance = ensureNoTrailingSlash(invidiousInstance);
-
-		try {
-			new URL(instance);
-		} catch {
-			invalidInstance = true;
-		}
-
-		if (invalidInstance) return;
-
-		let resp;
-		try {
-			resp = await fetch(`${instance}/api/v1/channels/UCH-_hzb2ILSCo9ftVSnrCIQ`);
-		} catch {
-			invalidInstance = true;
-		}
-
-		if (invalidInstance) return;
-
-		if (resp && !resp.ok) {
-			invalidInstance = true;
-			return;
-		}
-
-		instanceStore.set(instance);
-
+		invalidInstance = !(await setInvidiousInstance(invidiousInstance));
 		reloadState();
-		authStore.set(null);
 	}
 
 	async function setBackend(event: Event) {
@@ -148,13 +126,13 @@
 	}
 
 	let pages: Pages = $state([]);
-	authStore.subscribe(() => {
+	invidiousAuthStore.subscribe(() => {
 		pages = getPages();
 	});
 </script>
 
-{#if Capacitor.isNativePlatform()}
-	<div class="field label suffix border">
+{#if isUnrestrictedPlatform()}
+	<div class="field label suffix surface-container-highest">
 		<select name="backend-in-use" onchange={setBackend}>
 			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
 			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube (Experimental)</option>
@@ -166,7 +144,10 @@
 	{#if $backendInUseStore === 'ivg'}
 		<form onsubmit={setInstance}>
 			<nav>
-				<div class="field prefix label border max" class:invalid={invalidInstance}>
+				<div
+					class="field prefix label surface-container-highest max"
+					class:invalid={invalidInstance}
+				>
 					<i>link</i>
 					<input
 						tabindex="0"
@@ -179,19 +160,36 @@
 						<span class="error">{$_('invalidInstance')}</span>
 					{/if}
 				</div>
-				<button class="square round">
+				<button class="square">
 					<i>done</i>
 				</button>
 			</nav>
 		</form>
+		{#if isOwnBackend()?.internalAuth}
+			{#if !$invidiousAuthStore}
+				<button onclick={goToInvidiousLogin}>
+					<i>link</i>
+					<span>{$_('linkInvidious')}</span>
+				</button>
+			{:else}
+				<button
+					onclick={() => {
+						invidiousAuthStore.set(null);
+						goto(resolve('/', {}));
+					}}
+				>
+					<i>link_off</i>
+					<span>{$_('unlinkInvidious')}</span>
+				</button>
+			{/if}
+			<div class="space"></div>
+		{/if}
 	{:else}
 		<div class="space"></div>
 	{/if}
 
-	{#if isMobile()}
-		{#if invalidInstance}
-			<div style="margin-bottom: 6em;"></div>
-		{/if}
+	{#if isMobile() && invalidInstance}
+		<div style="margin-bottom: 6em;"></div>
 	{/if}
 
 	{#if Capacitor.isNativePlatform() && (invalidInstance || $interfaceAllowInsecureRequests)}
@@ -408,7 +406,7 @@
 	</div>
 {/if}
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="region"
@@ -425,7 +423,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="case"
@@ -443,7 +441,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		name="defaultPage"
 		tabindex="0"
@@ -451,7 +449,7 @@
 		onchange={() => interfaceDefaultPage.set(defaultPage)}
 	>
 		{#each pages as page (page)}
-			{#if !page.requiresAuth || get(authStore)}
+			{#if !page.requiresAuth || get(invidiousAuthStore)}
 				<option selected={$interfaceDefaultPage === page.href} value={page.href}>{page.name}</option
 				>
 			{/if}
@@ -465,6 +463,7 @@
 	<div class="space"></div>
 	<div class="settings">
 		<h6>{$_('layout.bookmarklet')}</h6>
+		<div class="space"></div>
 		<button
 			class="no-margin"
 			onclick={async () => {

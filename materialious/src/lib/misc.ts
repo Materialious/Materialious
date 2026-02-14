@@ -3,15 +3,18 @@ import { resolve } from '$app/paths';
 import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
+import { env } from '$env/dynamic/public';
 import {
-	authStore,
+	invidiousAuthStore,
 	backendInUseStore,
 	channelCacheStore,
 	feedCacheStore,
+	invidiousInstanceStore,
 	interfaceAllowInsecureRequests,
 	interfaceAndroidUseNativeShare,
 	isAndroidTvStore,
 	playlistCacheStore,
+	rawMasterKeyStore,
 	searchCacheStore
 } from './store';
 import type {
@@ -27,6 +30,9 @@ import { page } from '$app/state';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
+import { isOwnBackend } from './shared';
+import { Browser } from '@capacitor/browser';
+import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
@@ -80,9 +86,10 @@ export interface PeerInstance {
 
 export function determinePeerJsInstance(): PeerInstance {
 	return {
-		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
-		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
-		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || 443
+		host:
+			import.meta.env.VITE_DEFAULT_PEERJS_HOST || env.PUBLIC_DEFAULT_PEERJS_HOST || '0.peerjs.com',
+		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || env.PUBLIC_DEFAULT_PEERJS_PATH || '/',
+		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || env.PUBLIC_DEFAULT_PEERJS_PORT || 443
 	};
 }
 
@@ -229,8 +236,12 @@ export function findElementForTime<T>(
 	return null;
 }
 
+export function isUnrestrictedPlatform(): boolean {
+	return isOwnBackend() !== null || Capacitor.isNativePlatform();
+}
+
 export function isYTBackend(): boolean {
-	return get(backendInUseStore) === 'yt' && Capacitor.isNativePlatform();
+	return get(backendInUseStore) === 'yt' && isUnrestrictedPlatform();
 }
 
 export function clearCaches() {
@@ -241,7 +252,77 @@ export function clearCaches() {
 }
 
 export function authProtected() {
-	if (!get(authStore) && !isYTBackend()) {
+	if (!get(invidiousAuthStore) && !isYTBackend()) {
 		goto(resolve('/', {}), { replaceState: true });
 	}
+}
+
+export async function setInvidiousInstance(
+	instanceUrl: string | undefined | null
+): Promise<boolean> {
+	if (typeof instanceUrl !== 'string') {
+		return false;
+	}
+
+	let invalidInstance = false;
+
+	const instance = ensureNoTrailingSlash(instanceUrl);
+
+	try {
+		new URL(instance);
+	} catch {
+		invalidInstance = true;
+	}
+
+	if (invalidInstance) return false;
+
+	let resp;
+	try {
+		resp = await fetch(`${instance}/api/v1/channels/UCH-_hzb2ILSCo9ftVSnrCIQ`);
+	} catch {
+		invalidInstance = true;
+	}
+
+	if (invalidInstance) return false;
+
+	if (resp && !resp.ok) {
+		return false;
+	}
+
+	invidiousInstanceStore.set(instance);
+	invidiousAuthStore.set(null);
+
+	return true;
+}
+
+export async function goToInvidiousLogin() {
+	if (!get(invidiousInstanceStore)) return;
+	const path = new URL(`${get(invidiousInstanceStore)}/authorize_token`);
+	const searchParams = new URLSearchParams({
+		scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
+	});
+	if (Capacitor.getPlatform() === 'android') {
+		searchParams.set('callback_url', 'materialious-auth://');
+		path.search = searchParams.toString();
+		await Browser.open({ url: path.toString() });
+	} else {
+		searchParams.set('callback_url', `${location.origin}${resolve('/auth', {})}`);
+		path.search = searchParams.toString();
+		document.location.href = path.toString();
+	}
+}
+
+export async function logout() {
+	if (isYTBackend()) {
+		await clearFeedYTjs();
+	}
+
+	if (isOwnBackend()?.internalAuth) {
+		fetch('/api/user/logout', { method: 'DELETE' });
+		rawMasterKeyStore.set(undefined);
+	} else {
+		invidiousAuthStore.set(null);
+	}
+
+	goto(resolve('/', {}));
 }

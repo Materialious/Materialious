@@ -1,14 +1,14 @@
 import { getVideoYTjs } from '$lib/api/youtubejs/video';
-import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import {
-	authStore,
+	invidiousAuthStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
-	instanceStore,
+	invidiousInstanceStore,
 	interfaceRegionStore,
 	playerYouTubeJsAlways,
 	playerYouTubeJsFallback,
+	rawMasterKeyStore,
 	returnYTDislikesInstanceStore,
 	synciousInstanceStore
 } from '../store';
@@ -33,7 +33,7 @@ import type {
 } from './model';
 import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
-import { isYTBackend } from '$lib/misc';
+import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
 import { getResolveUrlYTjs } from './youtubejs/misc';
 import { getCommentsYTjs } from './youtubejs/comments';
@@ -46,9 +46,16 @@ import {
 	postSubscribeYTjs
 } from './youtubejs/subscriptions';
 import { getPlaylistYTjs } from './youtubejs/playlist';
+import { isOwnBackend } from '$lib/shared';
+import {
+	amSubscribedBackend,
+	deleteUnsubscribeBackend,
+	getSubscriptionsBackend,
+	postSubscribeBackend
+} from './backend';
 
 export function buildPath(path: string): URL {
-	return new URL(`${get(instanceStore)}/api/v1/${path}`);
+	return new URL(`${get(invidiousInstanceStore)}/api/v1/${path}`);
 }
 
 export function setRegion(url: URL): URL {
@@ -77,7 +84,7 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 }
 
 export function buildAuthHeaders(): { headers: Record<string, string> } {
-	const authToken = get(authStore)?.token ?? '';
+	const authToken = get(invidiousAuthStore)?.token ?? '';
 	if (authToken.startsWith('SID=')) {
 		return { headers: { __sid_auth: authToken } };
 	} else {
@@ -110,7 +117,7 @@ export async function getVideo(
 	fetchOptions?: RequestInit
 ): Promise<VideoPlay> {
 	if (
-		(get(playerYouTubeJsAlways) && Capacitor.isNativePlatform()) ||
+		(get(playerYouTubeJsAlways) && isUnrestrictedPlatform()) ||
 		isYTBackend() ||
 		useEngineFallback('Video')
 	) {
@@ -119,7 +126,7 @@ export async function getVideo(
 
 	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
 
-	if (!resp.ok && get(playerYouTubeJsFallback) && Capacitor.isNativePlatform()) {
+	if (!resp.ok && get(playerYouTubeJsFallback) && isUnrestrictedPlatform()) {
 		return await getVideoYTjs(videoId);
 	} else {
 		await fetchErrorHandle(resp);
@@ -174,16 +181,16 @@ export async function getChannelContent(
 ): Promise<ChannelContent> {
 	if (typeof options.type === 'undefined') options.type = 'videos';
 
+	if (isYTBackend() || useEngineFallback('ChannelContent')) {
+		return await getChannelContentYTjs(channelId, options);
+	}
+
 	const url = buildPath(`channels/${channelId}/${options.type}`);
 
 	if (typeof options.continuation !== 'undefined')
 		url.searchParams.set('continuation', options.continuation);
 
 	if (typeof options.sortBy !== 'undefined') url.searchParams.set('sort_by', options.sortBy);
-
-	if (isYTBackend() || useEngineFallback('ChannelContent')) {
-		return await getChannelContentYTjs(channelId, options);
-	}
 
 	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
 	return await resp.json();
@@ -279,6 +286,15 @@ export async function getSubscriptions(
 	bypassYTBackend: boolean = false
 ): Promise<Subscription[]> {
 	if (isYTBackend() && !bypassYTBackend) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			return (await getSubscriptionsBackend()).map((sub) => {
+				return {
+					author: sub.channelName,
+					authorId: sub.channelId
+				};
+			});
+		}
+
 		return getSubscriptionsYTjs();
 	}
 	const resp = await fetchErrorHandle(
@@ -292,10 +308,14 @@ export async function amSubscribed(
 	fetchOptions: RequestInit = {}
 ): Promise<boolean> {
 	if (isYTBackend()) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			return amSubscribedBackend(authorId);
+		}
+
 		return amSubscribedYTjs(authorId);
 	}
 
-	if (!get(authStore)) return false;
+	if (!get(invidiousAuthStore)) return false;
 
 	try {
 		const subscriptions = (await getSubscriptions(fetchOptions)).filter(
@@ -313,6 +333,10 @@ export async function postSubscribe(
 	bypassYTBackend: boolean = false
 ) {
 	if (isYTBackend() && !bypassYTBackend) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			return postSubscribeBackend(authorId);
+		}
+
 		return postSubscribeYTjs(authorId);
 	}
 
@@ -327,6 +351,12 @@ export async function postSubscribe(
 
 export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestInit = {}) {
 	if (isYTBackend()) {
+		// deleteUnsubscribeYTjs still should run
+		// as cleans feeds of that channel.
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+			deleteUnsubscribeBackend(authorId);
+		}
+
 		return deleteUnsubscribeYTjs(authorId);
 	}
 
@@ -401,7 +431,7 @@ export async function getPlaylist(
 
 	let resp;
 
-	if (get(authStore)) {
+	if (get(invidiousAuthStore)) {
 		resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), {
 			...buildAuthHeaders(),
 			...fetchOptions
@@ -518,7 +548,7 @@ export async function getThumbnail(
 }
 
 function buildApiExtendedAuthHeaders(): Record<string, Record<string, string>> {
-	const authToken = get(authStore)?.token ?? '';
+	const authToken = get(invidiousAuthStore)?.token ?? '';
 	return { headers: { Authorization: `Bearer ${authToken.replace('SID=', '')}` } };
 }
 

@@ -13,8 +13,10 @@ import { convertToSeconds } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
-import { Utils, YT, YTNodes, Platform } from 'youtubei.js';
+import { Utils, YT, YTNodes, Platform, type IGetChallengeResponse } from 'youtubei.js';
 import { getInnertube } from '.';
+import { isUnrestrictedPlatform } from '$lib/misc';
+import { webPoTokenMinter } from '$lib/web/youtube/minter';
 
 Platform.shim.eval = async (
 	data: Types.BuildScriptResult,
@@ -36,7 +38,7 @@ Platform.shim.eval = async (
 };
 
 export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
-	if (!Capacitor.isNativePlatform()) {
+	if (!isUnrestrictedPlatform()) {
 		throw new Error('Platform not supported');
 	}
 
@@ -44,10 +46,23 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 
 	const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
-	const platformMinter =
-		Capacitor.getPlatform() === 'android'
-			? androidPoTokenMinter
-			: window.electronAPI.generatePoToken;
+	let platformMinter: (
+		requestKey: string,
+		visitorData: string,
+		challenge: IGetChallengeResponse
+	) => Promise<string>;
+
+	switch (Capacitor.getPlatform()) {
+		case 'electron':
+			platformMinter = window.electronAPI.generatePoToken;
+			break;
+		case 'android':
+			platformMinter = androidPoTokenMinter;
+			break;
+		default:
+			platformMinter = webPoTokenMinter;
+			break;
+	}
 
 	const clientPlaybackNonce = Utils.generateRandomString(16);
 

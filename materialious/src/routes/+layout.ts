@@ -7,19 +7,22 @@ import '$lib/i18n'; // Import to initialize. Important :)
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
 import {
-	authStore,
+	invidiousAuthStore,
 	backendInUseStore,
-	instanceStore,
+	invidiousInstanceStore,
 	interfaceDefaultPage,
-	isAndroidTvStore
+	isAndroidTvStore,
+	rawMasterKeyStore
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
-import '$lib/android/http/androidRequests';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
+import { isYTBackend } from '$lib/misc';
+import { isOwnBackend } from '$lib/shared/index';
 
 export const ssr = false;
+export const prerender = false;
 
 export async function load({ url }) {
 	if (browser) {
@@ -28,13 +31,14 @@ export async function load({ url }) {
 
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
 
-	// Due to race condition with how we set & save persistent store values
-	// we manually set stores like auth & instance before load.
 	if (Capacitor.getPlatform() === 'android') {
+		// Due to race condition with how we set & save persistent store values
+		// we manually set stores like auth & instance before load.
 		const preferenceKey: Record<string, Writable<any>> = {
-			invidiousInstance: instanceStore,
-			authToken: authStore,
-			backendInUse: backendInUseStore
+			invidiousInstance: invidiousInstanceStore,
+			authToken: invidiousAuthStore,
+			backendInUse: backendInUseStore,
+			rawMasterKey: rawMasterKeyStore
 		};
 
 		for (const [key, store] of Object.entries(preferenceKey)) {
@@ -67,9 +71,20 @@ export async function load({ url }) {
 		window.history.length < 3
 	) {
 		getPages().forEach((page) => {
-			if (page.href === defaultPage && (!page.requiresAuth || get(authStore))) {
+			if (page.href === defaultPage && (!page.requiresAuth || get(invidiousAuthStore))) {
 				goto(resolve(defaultPage, {}));
 			}
 		});
+	}
+
+	const isLoginPage = url.pathname.endsWith('/internal/login');
+	const isSetupPage = url.pathname.endsWith('/setup');
+
+	if (!isLoginPage) {
+		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
+			goto(resolve('/internal/login', {}), { replaceState: true });
+		} else if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {
+			goto(resolve('/setup', {}), { replaceState: true });
+		}
 	}
 }

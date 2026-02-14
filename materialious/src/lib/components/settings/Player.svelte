@@ -22,7 +22,7 @@
 		playerYouTubeJsFallback
 	} from '../../store';
 	import { playbackRates } from '$lib/player';
-	import { isYTBackend } from '$lib/misc';
+	import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 
@@ -66,7 +66,7 @@
 </script>
 
 <div class="margin"></div>
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="case"
@@ -84,7 +84,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="quality"
@@ -106,7 +106,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-<div class="field label suffix border">
+<div class="field label suffix surface-container-highest">
 	<select
 		tabindex="0"
 		name="quality"
@@ -122,8 +122,8 @@
 	<i>arrow_drop_down</i>
 </div>
 
-{#if Capacitor.isNativePlatform() && !isYTBackend()}
-	<div class="field suffix border label">
+{#if isUnrestrictedPlatform() && !isYTBackend()}
+	<div class="field suffix surface-container-highest label">
 		<select
 			tabindex="0"
 			name="ytfallback"
@@ -243,7 +243,7 @@
 	</div>
 {/if}
 
-{#if Capacitor.isNativePlatform()}
+{#if isUnrestrictedPlatform()}
 	<div class="field no-margin">
 		<nav class="no-padding">
 			<div class="max">

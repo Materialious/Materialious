@@ -1,5 +1,4 @@
-import { localDb } from '$lib/dexie';
-import { clearCaches } from '$lib/misc';
+import { localDb, type ChannelSubscriptions } from '$lib/dexie';
 import { cleanNumber } from '$lib/numbers';
 import { relativeTimestamp } from '$lib/time';
 import { get } from 'svelte/store';
@@ -8,8 +7,10 @@ import { getChannelYTjs } from './channel';
 import {
 	engineCooldownYTStore,
 	engineCullYTStore,
-	engineMaxConcurrentChannelsStore
+	engineMaxConcurrentChannelsStore,
+	rawMasterKeyStore
 } from '$lib/store';
+import { getSubscriptionsBackend, updateRSSLastUpdated } from '../backend';
 
 export async function getSubscriptionsYTjs(): Promise<Subscription[]> {
 	const subscriptions: Subscription[] = [];
@@ -54,7 +55,6 @@ export async function postSubscribeYTjs(
 export async function deleteUnsubscribeYTjs(authorId: string) {
 	await localDb.channelSubscriptions.where('channelId').equals(authorId).delete();
 	await localDb.subscriptionFeed.where('authorId').equals(authorId).delete();
-	clearCaches();
 }
 
 export async function parseChannelRSS(channelId: string): Promise<void> {
@@ -132,14 +132,28 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 			// Continue regardless of error
 		}
 
-		await localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
-			lastRSSFetch: new Date()
-		});
+		if (!get(rawMasterKeyStore)) {
+			localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
+				lastRSSFetch: new Date()
+			});
+		} else {
+			updateRSSLastUpdated(authorId);
+		}
 	}
 }
 
+export async function clearFeedYTjs() {
+	await localDb.subscriptionFeed.clear();
+}
+
 export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
-	const channelSubscriptions = await localDb.channelSubscriptions.toArray();
+	let channelSubscriptions: ChannelSubscriptions[];
+
+	if (!get(rawMasterKeyStore)) {
+		channelSubscriptions = await localDb.channelSubscriptions.toArray();
+	} else {
+		channelSubscriptions = await getSubscriptionsBackend();
+	}
 
 	const toUpdatePromises: Promise<void>[] = [];
 

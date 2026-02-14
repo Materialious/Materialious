@@ -1,5 +1,7 @@
 # Setup
 
+This Guide is for the docker image `wardpearce/materialious` **NOT** `wardpearce/materialious-full`
+
 ### CORS
 To assure browsers they are allowed to access your Materialious instance
 despite their default [same-origin policy][wp-sop], the instance's webserver

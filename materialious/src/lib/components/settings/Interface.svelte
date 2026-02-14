@@ -38,7 +38,6 @@
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		rawMasterKeyStore,
 		searchHistoryStore,
 		themeColorStore
 	} from '../../store';

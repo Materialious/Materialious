@@ -170,6 +170,7 @@
 		"engine": "Backend engine",
 		"syncParty": "Sync party",
 		"about": "About",
+		"materialiousAccount": "Account",
 		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
 		"startSyncParty": "Start sync party",
 		"endSyncParty": "End sync party",
@@ -185,6 +186,8 @@
 		"displayThumbnailAvatars": "Thumbnail avatars (Slow)",
 		"searchHistory": "Search history",
 		"companionUrl": "Companion URL",
+		"deleteAccount": "Delete account",
+		"clickXmoreTimesToDelete": "Click {{clicksTillDelete}} more time(s) to delete",
 		"theme": {
 			"theme": "Theme",
 			"darkMode": "Dark mode",

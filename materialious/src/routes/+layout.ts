@@ -61,27 +61,26 @@ export async function load({ url }) {
 		}
 	}
 
+	const defaultPage = get(interfaceDefaultPage);
+
+	if (
+		defaultPage &&
+		defaultPage !== '/' &&
+		defaultPage.startsWith('/') &&
+		url.pathname === resolvedRoot &&
+		window.history.length < 3
+	) {
+		getPages().forEach((page) => {
+			if (page.href === defaultPage && (!page.requiresAuth || get(invidiousAuthStore))) {
+				goto(resolve(defaultPage, {}));
+			}
+		});
+	}
+
 	const isLoginPage = url.pathname.endsWith('/internal/login');
 	const isSetupPage = url.pathname.endsWith('/setup');
 
 	if (!isLoginPage) {
-		const defaultPage = get(interfaceDefaultPage);
-
-		if (
-			defaultPage &&
-			defaultPage !== '/' &&
-			defaultPage.startsWith('/') &&
-			url.pathname === resolvedRoot &&
-			window.history.length < 3 &&
-			!isSetupPage
-		) {
-			getPages().forEach((page) => {
-				if (page.href === defaultPage && (!page.requiresAuth || get(invidiousAuthStore))) {
-					goto(resolve(defaultPage, {}));
-				}
-			});
-		}
-
 		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
 			goto(resolve('/internal/login', {}), { replaceState: true });
 		} else if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {

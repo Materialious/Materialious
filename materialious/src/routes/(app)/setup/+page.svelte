@@ -24,7 +24,6 @@
 
 		clearCaches();
 		goto(resolve('/', {}), { replaceState: true });
-		location.reload();
 	}
 
 	function setYTBackend() {

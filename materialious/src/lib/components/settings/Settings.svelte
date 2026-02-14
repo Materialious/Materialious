@@ -37,22 +37,12 @@
 		}
 	]);
 
-	let tabIds: string[] = $state([]);
-
-	setTabIds();
-
 	if (isUnrestrictedPlatform()) {
 		tabs.splice(1, 0, {
 			id: 'engine',
 			label: $_('layout.engine'),
 			icon: 'rocket_launch',
 			component: Engine
-		});
-	}
-
-	function setTabIds() {
-		tabs.forEach((tab) => {
-			tabIds.push(tab.id);
 		});
 	}
 
@@ -69,8 +59,6 @@
 				return tab.id !== 'account';
 			});
 		}
-
-		setTabIds();
 	});
 
 	let dialogType = $state('');
@@ -129,25 +117,29 @@
 
 	<div style="height: 100%;">
 		<nav class="wrap s">
-			{#if tabIds}
-				<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
-					<i>{tabs[tabIds.indexOf(activeTab)]?.icon}</i>
-					<span>{tabs[tabIds.indexOf(activeTab)]?.label}</span>
-					<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
-						{#each tabs as tab (tab)}
-							<li
-								onclick={() => {
-									activeTab = tab.id;
-								}}
-								role="presentation"
-								data-ui="#tab-menu"
-							>
-								<i>{tab.icon}</i>
-								<span>{tab.label}</span>
-							</li>
-						{/each}
-					</menu>
-				</button>
+			{#if tabs}
+				{@const currentTab = tabs.find((tab) => tab.id === activeTab)}
+
+				{#if currentTab}
+					<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
+						<i>{currentTab.icon}</i>
+						<span>{currentTab.label}</span>
+						<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
+							{#each tabs as tab (tab)}
+								<li
+									onclick={() => {
+										activeTab = tab.id;
+									}}
+									role="presentation"
+									data-ui="#tab-menu"
+								>
+									<i>{tab.icon}</i>
+									<span>{tab.label}</span>
+								</li>
+							{/each}
+						</menu>
+					</button>
+				{/if}
 			{/if}
 		</nav>
 

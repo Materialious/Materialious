@@ -22,6 +22,7 @@ import { isYTBackend } from '$lib/misc.js';
 import { isOwnBackend } from '$lib/shared/index.js';
 
 export const ssr = false;
+export const prerender = false;
 
 export async function load({ url }) {
 	if (browser) {
@@ -44,18 +45,6 @@ export async function load({ url }) {
 			const result = await Preferences.get({ key: key });
 			if (result.value !== null) store.set(deserialize(result.value));
 		}
-	}
-
-	if (!get(instanceStore) && !isYTBackend() && !url.pathname.endsWith('/setup')) {
-		goto(resolve('/setup', {}), { replaceState: true });
-	}
-
-	if (
-		isOwnBackend()?.requireAuth &&
-		!get(rawMasterKeyStore) &&
-		!url.pathname.endsWith('/internal/login')
-	) {
-		goto(resolve('/internal/login', {}), { replaceState: true });
 	}
 
 	const resolvedRoot = resolve('/', {});
@@ -86,5 +75,15 @@ export async function load({ url }) {
 				goto(resolve(defaultPage, {}));
 			}
 		});
+	}
+
+	const isLoginPage = url.pathname.endsWith('/internal/login');
+
+	if (!isLoginPage) {
+		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
+			goto(resolve('/internal/login', {}), { replaceState: true });
+		} else if (!get(instanceStore) && !isYTBackend() && !url.pathname.endsWith('/setup')) {
+			goto(resolve('/setup', {}), { replaceState: true });
+		}
 	}
 }

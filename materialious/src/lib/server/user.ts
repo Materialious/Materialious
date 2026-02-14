@@ -1,9 +1,4 @@
-import {
-	ChannelSubscriptionTable,
-	UserTable,
-	type ChannelSubscriptionModel,
-	type UserTableModel
-} from './database';
+import { getSequelize, type ChannelSubscriptionModel, type UserTableModel } from './database';
 import { Op } from 'sequelize';
 import crypto from 'crypto';
 import { error } from '@sveltejs/kit';
@@ -35,11 +30,11 @@ export class User {
 	}
 
 	async delete() {
-		await UserTable.destroy(this.userWhere);
+		await getSequelize().UserTable.destroy(this.userWhere);
 	}
 
 	async subscriptionRssUpdated(id: string) {
-		await ChannelSubscriptionTable.update(
+		await getSequelize().ChannelSubscriptionTable.update(
 			{ lastRSSFetch: new Date() },
 			{
 				where: {
@@ -51,14 +46,14 @@ export class User {
 	}
 
 	async addSubscription(subscription: Omit<ChannelSubscriptionModel, 'userId'>) {
-		await ChannelSubscriptionTable.create({
+		await getSequelize().ChannelSubscriptionTable.create({
 			...subscription,
 			UserId: this.id
 		});
 	}
 
 	async removeSubscription(id: string) {
-		await ChannelSubscriptionTable.destroy({
+		await getSequelize().ChannelSubscriptionTable.destroy({
 			where: {
 				id
 			}
@@ -67,7 +62,7 @@ export class User {
 
 	async amSubscribed(id: string): Promise<boolean> {
 		return (
-			(await ChannelSubscriptionTable.count({
+			(await getSequelize().ChannelSubscriptionTable.count({
 				where: {
 					id
 				}
@@ -76,7 +71,7 @@ export class User {
 	}
 
 	async subscriptions(): Promise<ChannelSubscriptionModel[]> {
-		const subscriptions = await ChannelSubscriptionTable.findAll({
+		const subscriptions = await getSequelize().ChannelSubscriptionTable.findAll({
 			where: {
 				userId: this.data.id
 			}
@@ -117,7 +112,7 @@ export async function createUser(user: CreateUser): Promise<User> {
 
 	let userCreated = false;
 	try {
-		await UserTable.create(createdUser);
+		await getSequelize().UserTable.create(createdUser);
 		userCreated = true;
 	} catch {
 		userCreated = false;
@@ -131,7 +126,7 @@ export async function createUser(user: CreateUser): Promise<User> {
 }
 
 export async function getUser(identifier: string): Promise<User> {
-	const user = await UserTable.findOne({
+	const user = await getSequelize().UserTable.findOne({
 		where: {
 			[Op.or]: [{ id: identifier }, { username: identifier }]
 		}
@@ -145,7 +140,7 @@ export async function getUser(identifier: string): Promise<User> {
 }
 
 export async function authenticateUser(username: string, passwordHash: string): Promise<User> {
-	const user = await UserTable.findOne({
+	const user = await getSequelize().UserTable.findOne({
 		where: {
 			username
 		}

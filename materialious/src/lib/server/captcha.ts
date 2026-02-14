@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { verifySolution } from 'altcha-lib';
-import { CaptchaTable } from './database';
+import { getSequelize } from './database';
 
 export async function verifyCaptcha(payload: string, key: string, maxUses: number = -1) {
 	const passedCaptcha = await verifySolution(payload, key, true);
@@ -22,11 +22,14 @@ export async function verifyCaptcha(payload: string, key: string, maxUses: numbe
 	}
 
 	if (maxUses !== -1) {
-		if ((await CaptchaTable.count({ where: { signature: captchaSignature } })) >= maxUses) {
+		if (
+			(await getSequelize().CaptchaTable.count({ where: { signature: captchaSignature } })) >=
+			maxUses
+		) {
 			throw error(400, 'Unsupported payload');
 		}
 
-		await CaptchaTable.create({
+		await getSequelize().CaptchaTable.create({
 			signature: captchaSignature,
 			created: new Date()
 		});

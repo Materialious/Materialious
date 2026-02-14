@@ -1,5 +1,5 @@
 import { isOwnBackend } from '$lib/shared';
-import { sequelize } from '$lib/server/database';
+import { getSequelize } from '$lib/server/database';
 import { unsign } from 'cookie-signature';
 import { env } from '$env/dynamic/private';
 import sodium from 'libsodium-wrappers-sumo';
@@ -17,9 +17,10 @@ export async function handle({ event, resolve }) {
 		return await resolve(event);
 	}
 
+	const sequelize = getSequelize();
 	if (!sequelizeAuthenticated) {
-		await sequelize.sync();
-		await sequelize.authenticate();
+		await sequelize.sequelize.sync();
+		await sequelize.sequelize.authenticate();
 		sequelizeAuthenticated = true;
 	}
 

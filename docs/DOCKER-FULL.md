@@ -42,11 +42,7 @@ services:
 
       # Optionally set a default Invidious instance
       # This will also whitelist this instance in the proxy.
-      PUBLIC_DEFAULT_INVIDIOUS_INSTANCE: "https://invidious.materialio.us"
-
-      # URL Companion instance
-      # This will also whitelist this instance in the proxy.
-      PUBLIC_DEFAULT_COMPANION_INSTANCE: "https://companion.materialio.us"
+      PUBLIC_DEFAULT_INVIDIOUS_INSTANCE: ""
 
       # URL TO RYD (Return YouTube Dislike / https://github.com/Anarios/return-youtube-dislike)
       # Leave blank to disable completely.

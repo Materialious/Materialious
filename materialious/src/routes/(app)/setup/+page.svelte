@@ -120,7 +120,6 @@
 
 						<button type="submit">
 							<i>done_all</i>
-							<span>{$_('initalSetup.done')}</span>
 						</button>
 					</nav>
 				</form>

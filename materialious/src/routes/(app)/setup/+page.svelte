@@ -4,11 +4,14 @@
 	import Question from '$lib/components/Question.svelte';
 	import { _ } from '$lib/i18n';
 	import { clearCaches, isUnrestrictedPlatform, setInvidiousInstance } from '$lib/misc';
-	import { backendInUseStore, playerYouTubeJsFallback } from '$lib/store';
+	import { isOwnBackend } from '$lib/shared';
+	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '$lib/store';
 
 	let usingInvidious: boolean = $state(false);
 	let invidiousInstanceValid: boolean = $state(false);
-	let invidiousInstance: string = $state('https://invidious.materialio.us');
+	let invidiousInstance: string = $state(
+		!isOwnBackend() ? 'https://invidious.materialio.us' : ($invidiousInstanceStore ?? '')
+	);
 
 	function setupCompleted() {
 		clearCaches();
@@ -27,7 +30,7 @@
 	}
 </script>
 
-<main class="responsive">
+<div>
 	{#if !isUnrestrictedPlatform()}
 		<p>
 			<code>VITE_DEFAULT_INVIDIOUS_INSTANCE</code> has not been provided.
@@ -130,4 +133,4 @@
 			{/if}
 		{/if}
 	{/if}
-</main>
+</div>

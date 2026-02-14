@@ -14,7 +14,7 @@ export async function load() {
 
 	if (!get(invidiousInstanceStore)) {
 		return {
-			popularDisabled: false
+			popularDisabled: true
 		};
 	}
 

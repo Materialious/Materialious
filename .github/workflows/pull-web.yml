@@ -17,10 +17,10 @@ jobs:
               with:
                   node-version: latest
             - name: Install modules
-              run: npm install
+              run: npm ci
             - name: Run svelte checks
               run: npm run check
             - name: Check linting
               run: npm run eslint
             - name: Attempt to build codebase
-              run: npm run build
+              run: npm run build && npm prune --omit=dev

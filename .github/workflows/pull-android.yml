@@ -22,13 +22,13 @@ jobs:
                   node-version: latest
 
             - name: Install modules
-              run: cd ../ && npm install
+              run: cd ../ && npm ci
 
             - name: Build android nodejs packages
-              run: cd ../static/nodejsAndroid && npm install
+              run: cd ../static/nodejsAndroid && npm ci
 
             - name: Build package
-              run: cd ../ && npm run build
+              run: cd ../ && npm run build && npm prune --omit=dev
 
             - name: Sync package
               run: cd ../ && npx cap sync

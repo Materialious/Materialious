@@ -34,7 +34,7 @@ jobs:
               uses: docker/build-push-action@v6
               with:
                   context: ./materialious
-                  file: FullDockerfile
+                  file: ./FullDockerfile
                   platforms: linux/amd64,linux/arm64
                   push: true
                   tags: |

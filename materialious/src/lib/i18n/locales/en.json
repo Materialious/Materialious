@@ -13,6 +13,7 @@
 	"usernameTaken": "Username taken",
 	"createAccount": "Create account",
 	"needRegister": "I need to register",
+	"registrationDisabled": "Registration currently disabled, contact instance owner.",
 	"needLogin": "I need to login",
 	"recommendedVideos": "Recommended Videos",
 	"playlistVideos": "Playlist Videos",

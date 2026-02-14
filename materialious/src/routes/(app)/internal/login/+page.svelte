@@ -4,6 +4,7 @@
 	import { createUserBackend, loginUserBackend, type DerivePassword } from '$lib/api/backend';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { _ } from '$lib/i18n';
+	import { isOwnBackend } from '$lib/shared';
 	import 'altcha';
 	import * as comlink from 'comlink';
 	import { onMount } from 'svelte';
@@ -101,11 +102,15 @@
 					<button
 						type="button"
 						class="secondary"
+						disabled={!isOwnBackend()?.registrationAllowed}
 						onclick={() => {
 							needToRegister = !needToRegister;
 							failed = false;
 						}}
 					>
+						{#if !isOwnBackend()?.registrationAllowed}
+							<div class="tooltip bottom">{$_('registrationDisabled')}</div>
+						{/if}
 						<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
 					</button>
 

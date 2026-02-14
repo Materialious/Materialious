@@ -87,6 +87,15 @@ async function proxyRequest(
 		requestHeaders.delete(key);
 	}
 
+	const cookieHeader = requestHeaders.get('cookie');
+	if (cookieHeader) {
+		const modifiedCookies = cookieHeader
+			.split(';')
+			.filter((cookie) => !cookie.trim().startsWith('userid='))
+			.join('; ');
+		requestHeaders.set('cookie', modifiedCookies);
+	}
+
 	const fetchRes = await fetch(urlToProxy.toString(), {
 		method: request.method,
 		headers: requestHeaders,
@@ -96,7 +105,9 @@ async function proxyRequest(
 	});
 
 	return new Response(fetchRes.body, {
-		status: fetchRes.status
+		status: fetchRes.status,
+		statusText: fetchRes.statusText,
+		...(request.body ? { duplex: 'half' } : {})
 	});
 }
 

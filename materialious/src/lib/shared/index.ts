@@ -14,6 +14,6 @@ export function isOwnBackend(): IsOwnBackend | null {
 		internalAuth: import.meta.env.VITE_INTERNAL_AUTH !== 'false',
 		requireAuth: import.meta.env.VITE_REQUIRE_AUTH !== 'false',
 		registrationAllowed: import.meta.env.VITE_REGISTRATION_ALLOWED === 'true',
-		allowAnyProxy: import.meta.env.VITE_ALLOW_ANY_PROXY === 'true'
+		allowAnyProxy: import.meta.env.VITE_DANGEROUS_ALLOW_ANY_PROXY === 'true'
 	};
 }

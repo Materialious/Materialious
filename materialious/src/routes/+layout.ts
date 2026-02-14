@@ -19,6 +19,7 @@ import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
 import { isYTBackend } from '$lib/misc.js';
+import { isOwnBackend } from '$lib/shared/index.js';
 
 export const ssr = false;
 
@@ -45,8 +46,16 @@ export async function load({ url }) {
 		}
 	}
 
-	if (!get(instanceStore) && !isYTBackend() && !url.pathname.startsWith('/setup')) {
+	if (!get(instanceStore) && !isYTBackend() && !url.pathname.endsWith('/setup')) {
 		goto(resolve('/setup', {}), { replaceState: true });
+	}
+
+	if (
+		isOwnBackend()?.requireAuth &&
+		!get(rawMasterKeyStore) &&
+		!url.pathname.endsWith('/internal/login')
+	) {
+		goto(resolve('/internal/login', {}), { replaceState: true });
 	}
 
 	const resolvedRoot = resolve('/', {});

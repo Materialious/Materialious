@@ -10,7 +10,6 @@
 	import { isAndroidTvStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
-	import { Capacitor } from '@capacitor/core';
 	import { isUnrestrictedPlatform } from '$lib/misc';
 
 	let activeTab = $state('interface');

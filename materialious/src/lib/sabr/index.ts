@@ -1,5 +1,4 @@
 import type { VideoPlay } from '$lib/api/model';
-import { Capacitor } from '@capacitor/core';
 import { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import { ShakaPlayerAdapter } from './ShakaPlayerAdapter';

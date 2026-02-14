@@ -2,7 +2,6 @@ import sodium from 'libsodium-wrappers-sumo';
 import { rawMasterKeyStore } from '../store';
 import { get } from 'svelte/store';
 import { parseChannelRSS } from './youtubejs/subscriptions';
-import type { Subscription } from './model';
 import { getChannelYTjs } from './youtubejs/channel';
 import type { ChannelSubscriptions } from '$lib/dexie';
 

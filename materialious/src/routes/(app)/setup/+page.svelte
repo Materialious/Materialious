@@ -56,11 +56,6 @@
 				work.
 			</p>
 		{:else}
-			<h3 class="center-align">{$_('initalSetup.required')}</h3>
-			<div class="space"></div>
-			<div class="divider"></div>
-			<div class="space"></div>
-
 			<Question
 				question={$_('initalSetup.useInvidious')}
 				answers={[

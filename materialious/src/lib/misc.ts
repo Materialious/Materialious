@@ -3,6 +3,7 @@ import { resolve } from '$app/paths';
 import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
+import { env } from '$env/dynamic/public';
 import {
 	invidiousAuthStore,
 	backendInUseStore,
@@ -85,9 +86,10 @@ export interface PeerInstance {
 
 export function determinePeerJsInstance(): PeerInstance {
 	return {
-		host: import.meta.env.VITE_DEFAULT_PEERJS_HOST || '0.peerjs.com',
-		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || '/',
-		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || 443
+		host:
+			import.meta.env.VITE_DEFAULT_PEERJS_HOST || env.PUBLIC_DEFAULT_PEERJS_HOST || '0.peerjs.com',
+		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || env.PUBLIC_DEFAULT_PEERJS_PATH || '/',
+		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || env.PUBLIC_DEFAULT_PEERJS_PORT || 443
 	};
 }
 

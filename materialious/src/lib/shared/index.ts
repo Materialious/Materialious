@@ -1,3 +1,5 @@
+import { env } from '$env/dynamic/public';
+
 export type IsOwnBackend = {
 	builtWithBackend: boolean;
 	internalAuth: boolean;
@@ -7,13 +9,13 @@ export type IsOwnBackend = {
 };
 
 export function isOwnBackend(): IsOwnBackend | null {
-	if (import.meta.env.VITE_BUILD_WITH_BACKEND !== 'true') return null;
+	if (env.PUBLIC_BUILD_WITH_BACKEND !== 'true') return null;
 
 	return {
 		builtWithBackend: true,
-		internalAuth: import.meta.env.VITE_INTERNAL_AUTH !== 'false',
-		requireAuth: import.meta.env.VITE_REQUIRE_AUTH !== 'false',
-		registrationAllowed: import.meta.env.VITE_REGISTRATION_ALLOWED === 'true',
-		allowAnyProxy: import.meta.env.VITE_DANGEROUS_ALLOW_ANY_PROXY === 'true'
+		internalAuth: env.PUBLIC_INTERNAL_AUTH !== 'false',
+		requireAuth: env.PUBLIC_REQUIRE_AUTH !== 'false',
+		registrationAllowed: env.PUBLIC_REGISTRATION_ALLOWED === 'true',
+		allowAnyProxy: env.PUBLIC_DANGEROUS_ALLOW_ANY_PROXY === 'true'
 	};
 }

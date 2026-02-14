@@ -3,6 +3,7 @@ import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { writable, type Writable } from 'svelte/store';
 import { Preferences } from '@capacitor/preferences';
+import { env } from '$env/dynamic/public';
 import {
 	persist,
 	createLocalStorage,
@@ -88,9 +89,11 @@ function ifNotWebDefault(givenValue: any, defaultValue: any): any {
 
 export const invidiousInstanceStore: Writable<string | undefined> = persist(
 	writable(
-		!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE
+		!import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE || !env.PUBLIC_DEFAULT_INVIDIOUS_INSTANCE
 			? undefined
-			: ensureNoTrailingSlash(import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE)
+			: ensureNoTrailingSlash(
+					import.meta.env.VITE_DEFAULT_INVIDIOUS_INSTANCE || env.PUBLIC_DEFAULT_INVIDIOUS_INSTANCE
+				)
 	),
 	createStorage(),
 	'invidiousInstance'
@@ -190,7 +193,8 @@ export const returnYtDislikesStore = persist(writable(false), createStorage(), '
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persist(
 	writable(
 		ifNotWebDefault(
-			import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+			import.meta.env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE ||
+				env.PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE,
 			'https://ryd-proxy.materialio.us'
 		)
 	),
@@ -203,7 +207,8 @@ export const synciousInstanceStore: Writable<string | null | undefined> = persis
 	writable(
 		ifNotWebDefault(
 			import.meta.env.VITE_DEFAULT_SYNCIOUS_INSTANCE ||
-				import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
+				import.meta.env.VITE_DEFAULT_API_EXTENDED_INSTANCE ||
+				env.PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE,
 			'https://extended-api.materialio.us'
 		)
 	),
@@ -276,7 +281,11 @@ export const interfaceAndroidUseNativeShare = persist(
 
 export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist(
-	writable(import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE || 'https://sponsor.ajay.app'),
+	writable(
+		import.meta.env.VITE_DEFAULT_SPONSERBLOCK_INSTANCE ||
+			env.PUBLIC_DEFAULT_SPONSERBLOCK_INSTANCE ||
+			'https://sponsor.ajay.app'
+	),
 	createStorage(),
 	'sponsorBlockUrl'
 );
@@ -297,7 +306,11 @@ export const sponsorBlockTimelineStore: Writable<boolean> = persist(
 );
 
 export const deArrowInstanceStore = persist(
-	writable(import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE || 'https://sponsor.ajay.app'),
+	writable(
+		import.meta.env.VITE_DEFAULT_DEARROW_INSTANCE ||
+			env.PUBLIC_DEFAULT_DEARROW_INSTANCE ||
+			'https://sponsor.ajay.app'
+	),
 	createStorage(),
 	'deArrowInstance'
 );
@@ -305,7 +318,9 @@ export const deArrowEnabledStore = persist(writable(false), createStorage(), 'de
 export const deArrowTitlesOnly = persist(writable(true), createStorage(), 'deArrowTitlesOnly');
 export const deArrowThumbnailInstanceStore = persist(
 	writable(
-		import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE || 'https://dearrow-thumb.ajay.app'
+		import.meta.env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE ||
+			env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE ||
+			'https://dearrow-thumb.ajay.app'
 	),
 	createStorage(),
 	'deArrowThumbnailInstance'

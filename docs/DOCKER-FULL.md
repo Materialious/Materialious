@@ -23,14 +23,14 @@ services:
       DATABASE_CONNECTION_URI: "sqlite://materialious.db"
 
       # Use Materialious account system.
-      VITE_INTERNAL_AUTH: "true"
+      PUBLIC_INTERNAL_AUTH: "true"
 
       # If Auth is required to use this instance.
       # Should be left as true, otherwise anyone can use Materialious proxy.
-      VITE_REQUIRE_AUTH: "true"
+      PUBLIC_REQUIRE_AUTH: "true"
 
       # Allow anyone to register
-      VITE_REGISTRATION_ALLOWED: "false"
+      PUBLIC_REGISTRATION_ALLOWED: "false"
       
       # Allow any domain in proxy
       # This shouldn't be used unless you KNOW what your doing
@@ -38,37 +38,37 @@ services:
       # VITE_REQUIRE_AUTH to be true
       # VITE_INTERNAL_AUTH to be true
       # to take effect.
-      VITE_DANGEROUS_ALLOW_ANY_PROXY: "false"
+      PUBLIC_DANGEROUS_ALLOW_ANY_PROXY: "false"
 
       # Optionally set a default Invidious instance
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_INVIDIOUS_INSTANCE: "https://invidious.materialio.us"
+      PUBLIC_DEFAULT_INVIDIOUS_INSTANCE: "https://invidious.materialio.us"
 
       # URL Companion instance
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_COMPANION_INSTANCE: "https://companion.materialio.us"
+      PUBLIC_DEFAULT_COMPANION_INSTANCE: "https://companion.materialio.us"
 
       # URL TO RYD (Return YouTube Dislike / https://github.com/Anarios/return-youtube-dislike)
       # Leave blank to disable completely.
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
+      PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE: "https://returnyoutubedislikeapi.com"
 
       # URL to Sponsorblock
       # Leave blank to completely disable sponsorblock.
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"
+      PUBLIC_DEFAULT_SPONSERBLOCK_INSTANCE: "https://sponsor.ajay.app"
 
       # URL to DeArrow
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_DEARROW_INSTANCE: "https://sponsor.ajay.app"
+      PUBLIC_DEFAULT_DEARROW_INSTANCE: "https://sponsor.ajay.app"
 
       # URL to DeArrow thumbnail instance
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
+      PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE: "https://dearrow-thumb.ajay.app"
 
       # Look at "Overwriting Materialious defaults" for all the accepted values.
       # This will also whitelist this instance in the proxy.
-      VITE_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
+      PUBLIC_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
 
     volumes:
       - materialious-data:/materialious.db

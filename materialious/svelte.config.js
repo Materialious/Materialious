@@ -3,7 +3,7 @@ import adapterNode from '@sveltejs/adapter-node';
 
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-const useSsr = process.env.VITE_BUILD_WITH_BACKEND === 'true';
+const useSsr = process.env.PUBLIC_BUILD_WITH_BACKEND === 'true';
 
 const adapter = useSsr
 	? adapterNode({ out: 'build', precompress: true })

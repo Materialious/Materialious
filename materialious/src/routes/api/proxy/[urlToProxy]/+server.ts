@@ -1,6 +1,7 @@
 import { isOwnBackend } from '$lib/shared';
 import psl from 'psl';
-import { env } from '$env/dynamic/private';
+import { env } from '$env/dynamic/public';
+
 import { error } from '@sveltejs/kit';
 
 const allowedDomains: string[] = [
@@ -14,13 +15,13 @@ const allowedDomains: string[] = [
 ];
 
 const dynamicAllowDomains = [
-	env.VITE_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
-	env.VITE_DEFAULT_DEARROW_INSTANCE,
-	env.VITE_DEFAULT_INVIDIOUS_INSTANCE,
-	env.VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE,
-	env.VITE_DEFAULT_API_EXTENDED_INSTANCE,
-	env.VITE_DEFAULT_SYNCIOUS_INSTANCE,
-	env.VITE_DEFAULT_COMPANION_INSTANCE
+	env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
+	env.PUBLIC_DEFAULT_DEARROW_INSTANCE,
+	env.PUBLIC_DEFAULT_INVIDIOUS_INSTANCE,
+	env.PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+	env.PUBLIC_DEFAULT_API_EXTENDED_INSTANCE,
+	env.PUBLIC_DEFAULT_SYNCIOUS_INSTANCE,
+	env.PUBLIC_DEFAULT_COMPANION_INSTANCE
 ];
 
 dynamicAllowDomains.forEach((domain) => {

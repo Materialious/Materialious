@@ -6,7 +6,7 @@ COPY . .
 RUN npm ci
 
 # Tell SvelteKit to use node adapter.
-ENV VITE_BUILD_WITH_BACKEND="true"
+ENV PUBLIC_BUILD_WITH_BACKEND="true"
 
 RUN npm run build
 RUN npm prune --omit=dev
@@ -21,5 +21,8 @@ COPY --from=builder /app/node_modules node_modules/
 COPY package.json .
 EXPOSE 3000
 ENV NODE_ENV=production
+
+# Tell the front end backend is in use.
+ENV PUBLIC_BUILD_WITH_BACKEND="true"
 
 CMD ["node", "build"]

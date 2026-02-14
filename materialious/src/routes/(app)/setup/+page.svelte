@@ -15,7 +15,9 @@
 	let invidiousInstanceValid: boolean = $state(true);
 	let invidiousInstance: string = $state(defaultInstance ?? '');
 
-	async function setupCompleted() {
+	async function setupCompleted(event?: Event) {
+		event?.preventDefault();
+
 		invidiousInstanceValid = await setInvidiousInstance(invidiousInstance);
 
 		if (!invidiousInstanceValid) {
@@ -110,28 +112,29 @@
 
 				<div class="space"></div>
 				<h3>{$_('initalSetup.configureInstance')}</h3>
-				<div
-					class="field label prefix surface-container-highest"
-					class:invalid={!invidiousInstanceValid && invidiousInstance !== ''}
-				>
-					<i>link</i>
-					<input bind:value={invidiousInstance} name="instanceUrl" type="text" tabindex="0" />
-					<label for="instanceUrl" tabindex="-1">{$_('layout.instanceUrl')}</label>
-					{#if !invidiousInstanceValid && invidiousInstance !== ''}
-						<span class="error">{$_('invalidInstance')}</span>
-					{/if}
-				</div>
+				<form onsubmit={setupCompleted}>
+					<nav class="center-align">
+						<div
+							class="field label prefix surface-container-highest"
+							class:invalid={!invidiousInstanceValid && invidiousInstance !== ''}
+						>
+							<i>link</i>
+							<input bind:value={invidiousInstance} name="instanceUrl" type="text" tabindex="0" />
+							<label for="instanceUrl" tabindex="-1">{$_('layout.instanceUrl')}</label>
+						</div>
 
-				<div class="space"></div>
-
-				<button onclick={setupCompleted}>
-					<i>done_all</i>
-					<span>{$_('initalSetup.done')}</span>
-				</button>
+						<button type="submit">
+							<i>done_all</i>
+							<span>{$_('initalSetup.done')}</span>
+						</button>
+					</nav>
+				</form>
 			{/if}
 		{/if}
 	</div>
 </nav>
+
+<div style="margin-bottom: 20rem;"></div>
 
 <style>
 	.setup {

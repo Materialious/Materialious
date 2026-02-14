@@ -11,7 +11,7 @@
 	import { createVideoUrl, insecureRequestImageHandler, isYTBackend } from '../misc';
 	import type { PlayerEvents } from '../player';
 	import {
-		authStore,
+		invidiousAuthStore,
 		deArrowEnabledStore,
 		interfaceLowBandwidthMode,
 		isAndroidTvStore,
@@ -108,7 +108,7 @@
 			thumbnail = img;
 		};
 
-		if (get(synciousStore) && get(synciousInstanceStore) && get(authStore)) {
+		if (get(synciousStore) && get(synciousInstanceStore) && get(invidiousAuthStore)) {
 			try {
 				progress = (await queueGetWatchProgress(video.videoId))?.time?.toString() ?? undefined;
 			} catch {

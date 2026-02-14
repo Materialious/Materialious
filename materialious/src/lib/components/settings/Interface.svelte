@@ -21,7 +21,7 @@
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
-		authStore,
+		invidiousAuthStore,
 		backendInUseStore,
 		darkModeStore,
 		instanceStore,
@@ -127,7 +127,7 @@
 	}
 
 	let pages: Pages = $state([]);
-	authStore.subscribe(() => {
+	invidiousAuthStore.subscribe(() => {
 		pages = getPages();
 	});
 </script>
@@ -167,7 +167,7 @@
 			</nav>
 		</form>
 		{#if isOwnBackend()?.internalAuth}
-			{#if !$authStore}
+			{#if !$invidiousAuthStore}
 				<button onclick={goToInvidiousLogin}>
 					<i>link</i>
 					<span>{$_('linkInvidious')}</span>
@@ -175,7 +175,7 @@
 			{:else}
 				<button
 					onclick={() => {
-						authStore.set(null);
+						invidiousAuthStore.set(null);
 						goto(resolve('/', {}));
 					}}
 				>
@@ -450,7 +450,7 @@
 		onchange={() => interfaceDefaultPage.set(defaultPage)}
 	>
 		{#each pages as page (page)}
-			{#if !page.requiresAuth || get(authStore)}
+			{#if !page.requiresAuth || get(invidiousAuthStore)}
 				<option selected={$interfaceDefaultPage === page.href} value={page.href}>{page.name}</option
 				>
 			{/if}

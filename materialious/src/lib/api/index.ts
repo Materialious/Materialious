@@ -1,7 +1,7 @@
 import { getVideoYTjs } from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
 import {
-	authStore,
+	invidiousAuthStore,
 	deArrowInstanceStore,
 	deArrowThumbnailInstanceStore,
 	instanceStore,
@@ -84,7 +84,7 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 }
 
 export function buildAuthHeaders(): { headers: Record<string, string> } {
-	const authToken = get(authStore)?.token ?? '';
+	const authToken = get(invidiousAuthStore)?.token ?? '';
 	if (authToken.startsWith('SID=')) {
 		return { headers: { __sid_auth: authToken } };
 	} else {
@@ -315,7 +315,7 @@ export async function amSubscribed(
 		return amSubscribedYTjs(authorId);
 	}
 
-	if (!get(authStore)) return false;
+	if (!get(invidiousAuthStore)) return false;
 
 	try {
 		const subscriptions = (await getSubscriptions(fetchOptions)).filter(
@@ -431,7 +431,7 @@ export async function getPlaylist(
 
 	let resp;
 
-	if (get(authStore)) {
+	if (get(invidiousAuthStore)) {
 		resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), {
 			...buildAuthHeaders(),
 			...fetchOptions
@@ -548,7 +548,7 @@ export async function getThumbnail(
 }
 
 function buildApiExtendedAuthHeaders(): Record<string, Record<string, string>> {
-	const authToken = get(authStore)?.token ?? '';
+	const authToken = get(invidiousAuthStore)?.token ?? '';
 	return { headers: { Authorization: `Bearer ${authToken.replace('SID=', '')}` } };
 }
 

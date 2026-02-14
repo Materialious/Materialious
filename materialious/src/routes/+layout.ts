@@ -7,7 +7,7 @@ import '$lib/i18n'; // Import to initialize. Important :)
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
 import {
-	authStore,
+	invidiousAuthStore,
 	backendInUseStore,
 	instanceStore,
 	interfaceDefaultPage,
@@ -36,7 +36,7 @@ export async function load({ url }) {
 		// we manually set stores like auth & instance before load.
 		const preferenceKey: Record<string, Writable<any>> = {
 			invidiousInstance: instanceStore,
-			authToken: authStore,
+			authToken: invidiousAuthStore,
 			backendInUse: backendInUseStore,
 			rawMasterKey: rawMasterKeyStore
 		};
@@ -76,7 +76,7 @@ export async function load({ url }) {
 			!isSetupPage
 		) {
 			getPages().forEach((page) => {
-				if (page.href === defaultPage && (!page.requiresAuth || get(authStore))) {
+				if (page.href === defaultPage && (!page.requiresAuth || get(invidiousAuthStore))) {
 					goto(resolve(defaultPage, {}));
 				}
 			});

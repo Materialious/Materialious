@@ -15,7 +15,7 @@
 	import { cleanNumber, numberWithCommas } from '$lib/numbers';
 	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player';
 	import {
-		authStore,
+		invidiousAuthStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		playerMiniplayerEnabled,
@@ -490,7 +490,7 @@
 						<button disabled class="surface-container-highest">
 							<i>add</i>
 							<div class="tooltip">
-								{#if $authStore || isYTBackend()}
+								{#if $invidiousAuthStore || isYTBackend()}
 									{$_('player.noPlaylists')}
 								{:else}
 									{$_('loginRequired')}

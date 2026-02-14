@@ -2,7 +2,7 @@
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { _ } from '$lib/i18n';
 	import { removePlaylistVideo } from '../api';
-	import { authStore, feedLastItemId, isAndroidTvStore } from '../store';
+	import { invidiousAuthStore, feedLastItemId, isAndroidTvStore } from '../store';
 	import ContentColumn from './ContentColumn.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import Mousetrap from 'mousetrap';
@@ -260,7 +260,7 @@
 						{#key item.videoId}
 							<Thumbnail video={item} {playlistId} />
 						{/key}
-						{#if $authStore && decodeURIComponent($authStore.username) === playlistAuthor && 'indexId' in item}
+						{#if $invidiousAuthStore && decodeURIComponent($invidiousAuthStore.username) === playlistAuthor && 'indexId' in item}
 							<div class="right-align" style="margin: 1em .5em;">
 								<button
 									onclick={async () => removePlaylistItem(item.indexId)}

@@ -4,7 +4,7 @@
 	import type { Image } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { isYTBackend, truncate } from '$lib/misc';
-	import { authStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
+	import { invidiousAuthStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { localDb } from '$lib/dexie';
 	import { onMount } from 'svelte';
@@ -71,7 +71,7 @@
 		</nav>
 	</a>
 	{#if !hideSubscribe}
-		{#if $authStore || isYTBackend()}
+		{#if $invidiousAuthStore || isYTBackend()}
 			<nav class="group split">
 				<button
 					onclick={toggleSubscribed}

@@ -17,7 +17,7 @@
 	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
 	import {
-		authStore,
+		invidiousAuthStore,
 		darkModeStore,
 		instanceStore,
 		interfaceAmoledTheme,
@@ -57,7 +57,7 @@
 
 	let pages = $state(getPages());
 
-	authStore.subscribe(() => {
+	invidiousAuthStore.subscribe(() => {
 		pages = getPages();
 	});
 
@@ -112,7 +112,7 @@
 			const token = url.searchParams.get('token');
 
 			if (username && token) {
-				authStore.set({
+				invidiousAuthStore.set({
 					username: username,
 					token: token
 				});
@@ -167,7 +167,7 @@
 
 				if (sid) {
 					console.log(sid);
-					authStore.set({ username: rawUsername, token: sid });
+					invidiousAuthStore.set({ username: rawUsername, token: sid });
 					await ui('#tv-login');
 					goto(resolve('/', {}), { replaceState: true });
 					return;
@@ -231,7 +231,7 @@
 		setTheme();
 		setAmoledTheme();
 
-		if ($authStore && !isYTBackend()) {
+		if ($invidiousAuthStore && !isYTBackend()) {
 			loadNotifications().catch(() => logout());
 		}
 
@@ -284,7 +284,7 @@
 				<div>{$_('layout.settings')}</div>
 			</a>
 			{#if showLogin}
-				{#if (!$authStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
+				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
 					<a onclick={login} href="#login">
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
@@ -346,7 +346,7 @@
 					<i class:primary-text={$syncPartyPeerStore}>group</i>
 					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
 				</button>
-				{#if (!$authStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
+				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
 					<button
 						class="circle large transparent"
 						onclick={() => {
@@ -370,7 +370,7 @@
 				</button>
 
 				{#if showLogin}
-					{#if (!$authStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
+					{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>

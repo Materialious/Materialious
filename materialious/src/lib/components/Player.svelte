@@ -19,7 +19,7 @@
 	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
 	import type { VideoPlay } from '../api/model';
 	import {
-		authStore,
+		invidiousAuthStore,
 		instanceStore,
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
@@ -1079,7 +1079,7 @@
 			// Continue regardless of error
 		}
 
-		if ($synciousStore && $synciousInstanceStore && $authStore) {
+		if ($synciousStore && $synciousInstanceStore && $invidiousAuthStore) {
 			try {
 				toSetTime = (await getVideoProgress(data.video.videoId))[0].time;
 			} catch {
@@ -1093,7 +1093,7 @@
 	function savePlayerPos() {
 		if (data.video.liveNow) return;
 
-		const synciousEnabled = $synciousStore && $synciousInstanceStore && $authStore;
+		const synciousEnabled = $synciousStore && $synciousInstanceStore && $invidiousAuthStore;
 
 		if ($playerSavePlaybackPositionStore && playerElement) {
 			if (

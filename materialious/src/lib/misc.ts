@@ -4,7 +4,7 @@ import he from 'he';
 import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import {
-	authStore,
+	invidiousAuthStore,
 	backendInUseStore,
 	channelCacheStore,
 	feedCacheStore,
@@ -250,7 +250,7 @@ export function clearCaches() {
 }
 
 export function authProtected() {
-	if (!get(authStore) && !isYTBackend()) {
+	if (!get(invidiousAuthStore) && !isYTBackend()) {
 		goto(resolve('/', {}), { replaceState: true });
 	}
 }
@@ -288,7 +288,7 @@ export async function setInvidiousInstance(
 	}
 
 	instanceStore.set(instance);
-	authStore.set(null);
+	invidiousAuthStore.set(null);
 
 	return true;
 }
@@ -319,7 +319,7 @@ export async function logout() {
 		fetch('/api/user/logout', { method: 'DELETE' });
 		rawMasterKeyStore.set(undefined);
 	} else {
-		authStore.set(null);
+		invidiousAuthStore.set(null);
 	}
 
 	goto(resolve('/', {}));

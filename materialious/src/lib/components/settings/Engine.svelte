@@ -2,7 +2,7 @@
 	import { isYTBackend } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 	import {
-		authStore,
+		invidiousAuthStore,
 		engineCooldownYTStore,
 		engineCullYTStore,
 		engineFallbacksStore,
@@ -134,7 +134,7 @@
 		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>
 
-	{#if $authStore && $instanceStore}
+	{#if $invidiousAuthStore && $instanceStore}
 		<h6>{$_('layout.backendEngine.importExport')}</h6>
 		<div class="space"></div>
 

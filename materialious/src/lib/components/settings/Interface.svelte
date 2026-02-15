@@ -86,7 +86,6 @@
 		clearCaches();
 		ui('#dialog-settings');
 		goto(resolve('/', {}), { replaceState: true });
-		location.reload();
 	}
 
 	async function setInstance(event: Event) {
@@ -165,7 +164,7 @@
 				</button>
 			</nav>
 		</form>
-		{#if isOwnBackend()?.internalAuth}
+		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
 				<button onclick={goToInvidiousLogin}>
 					<i>link</i>

@@ -4,6 +4,7 @@ import { env } from '$env/dynamic/private';
 let UserTable: ModelCtor<Model<any, any>>;
 let ChannelSubscriptionTable: ModelCtor<Model<any, any>>;
 let CaptchaTable: ModelCtor<Model<any, any>>;
+let UserKeyValueTable: ModelCtor<Model<any, any>>;
 
 let sequelizeInstance: Sequelize | null = null;
 
@@ -13,13 +14,15 @@ export function getSequelize(): {
 	UserTable: ModelCtor<Model<any, any>>;
 	ChannelSubscriptionTable: ModelCtor<Model<any, any>>;
 	CaptchaTable: ModelCtor<Model<any, any>>;
+	UserKeyValueTable: ModelCtor<Model<any, any>>;
 } {
 	if (sequelizeInstance) {
 		return {
 			sequelize: sequelizeInstance,
 			UserTable,
 			ChannelSubscriptionTable,
-			CaptchaTable
+			CaptchaTable,
+			UserKeyValueTable
 		};
 	}
 
@@ -78,6 +81,32 @@ export function getSequelize(): {
 		}
 	);
 
+	UserKeyValueTable = sequelizeInstance.define(
+		'UserKeyValue',
+		{
+			key: {
+				type: DataTypes.STRING,
+				allowNull: false
+			},
+			valueCipher: {
+				type: DataTypes.STRING,
+				allowNull: false
+			},
+			valueNonce: {
+				type: DataTypes.STRING,
+				allowNull: false
+			}
+		},
+		{
+			indexes: [
+				{
+					unique: true,
+					fields: ['UserId', 'key']
+				}
+			]
+		}
+	);
+
 	ChannelSubscriptionTable = sequelizeInstance.define('Subscriptions', {
 		id: {
 			type: DataTypes.STRING,
@@ -119,12 +148,14 @@ export function getSequelize(): {
 	});
 
 	UserTable.hasMany(ChannelSubscriptionTable);
+	UserTable.hasMany(UserKeyValueTable);
 
 	return {
 		sequelize: sequelizeInstance,
 		UserTable,
 		ChannelSubscriptionTable,
-		CaptchaTable
+		CaptchaTable,
+		UserKeyValueTable
 	};
 }
 
@@ -138,7 +169,7 @@ export interface ChannelSubscriptionModel {
 	userId: string;
 }
 
-export interface UserTableModel extends Model {
+export interface UserTableModel {
 	id: string;
 	username: string;
 	passwordHash: string;
@@ -147,4 +178,10 @@ export interface UserTableModel extends Model {
 	decryptionKeySalt: string;
 	masterKeyCipher: string;
 	masterKeyNonce: string;
+}
+
+export interface UserKeyStoreModel {
+	key: string;
+	valueCipher: string;
+	valueNonce: string;
 }

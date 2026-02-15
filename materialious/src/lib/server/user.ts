@@ -1,4 +1,9 @@
-import { getSequelize, type ChannelSubscriptionModel, type UserTableModel } from './database';
+import {
+	getSequelize,
+	type ChannelSubscriptionModel,
+	type UserKeyStoreModel,
+	type UserTableModel
+} from './database';
 import { Op } from 'sequelize';
 import crypto from 'crypto';
 import { error } from '@sveltejs/kit';
@@ -80,6 +85,59 @@ export class User {
 		if (!subscriptions) return [];
 
 		return subscriptions as unknown as ChannelSubscriptionModel[];
+	}
+
+	async getKeyValue(key: string): Promise<UserKeyStoreModel> {
+		const keyStore = await getSequelize().UserKeyValueTable.findOne({
+			where: {
+				UserId: this.id,
+				key
+			}
+		});
+
+		if (!keyStore) {
+			throw error(404);
+		}
+
+		const keyStoreModel = keyStore as unknown as UserKeyStoreModel;
+
+		return {
+			key: keyStoreModel.key,
+			valueCipher: keyStoreModel.valueCipher,
+			valueNonce: keyStoreModel.valueNonce
+		};
+	}
+
+	async addOrUpdateKeyValue(key: string, valueCipher: string, valueNonce: string) {
+		const keyStore = await getSequelize().UserKeyValueTable.findOne({
+			where: {
+				UserId: this.id,
+				key
+			}
+		});
+
+		if (keyStore) {
+			await keyStore.update({
+				valueCipher,
+				valueNonce
+			});
+		} else {
+			await getSequelize().UserKeyValueTable.create({
+				key,
+				valueCipher,
+				valueNonce,
+				UserId: this.id
+			});
+		}
+	}
+
+	async deleteKeyValue(key: string) {
+		await getSequelize().UserKeyValueTable.destroy({
+			where: {
+				UserId: this.id,
+				key
+			}
+		});
 	}
 }
 

@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.15.3",
+	"version": "1.15.4",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -86,7 +86,6 @@
 		"peerjs": "^1.5.5",
 		"pg": "^8.18.0",
 		"pg-hstore": "^2.3.4",
-		"psl": "^1.15.0",
 		"sequelize": "^6.37.7",
 		"shaka-player": "^4.16.14",
 		"sponsorblock-api": "^0.2.4",

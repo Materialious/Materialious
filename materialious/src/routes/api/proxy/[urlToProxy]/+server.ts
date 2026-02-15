@@ -1,5 +1,4 @@
 import { isOwnBackend } from '$lib/shared';
-import psl from 'psl';
 import { env } from '$env/dynamic/public';
 
 import { error } from '@sveltejs/kit';
@@ -11,7 +10,7 @@ const allowedDomains: string[] = [
 	'returnyoutubedislike.com',
 	'sponsor.ajay.app',
 	'dearrow-thumb.ajay.app',
-	'materialio.us'
+	'ryd-proxy.materialio.us'
 ];
 
 const dynamicAllowDomains = [
@@ -24,16 +23,15 @@ const dynamicAllowDomains = [
 	env.PUBLIC_DEFAULT_COMPANION_INSTANCE
 ];
 
-dynamicAllowDomains.forEach((domain) => {
-	if (domain) {
-		allowedDomains.push(domain);
+for (const dynamicDomain of dynamicAllowDomains) {
+	if (dynamicDomain) {
+		allowedDomains.push(dynamicDomain.replace(/^https?:\/\//, ''));
 	}
-});
+}
 
 async function proxyRequest(
 	request: Request,
 	urlToProxy: string,
-	captchaKey: string,
 	userId: string | undefined = undefined
 ): Promise<Response> {
 	const backendRestrictions = isOwnBackend();
@@ -53,7 +51,7 @@ async function proxyRequest(
 		throw error(400, 'Invalid URL');
 	}
 
-	if (!allowedDomains.includes(psl.parse(urlToProxyObj.host).domain)) {
+	if (!allowedDomains.includes(urlToProxyObj.host)) {
 		// allowAnyProxy allows a instance owner to bypass the whitelist.
 		// BUT is extremely strict.
 		// AND I still don't recommend this.
@@ -63,7 +61,7 @@ async function proxyRequest(
 			backendRestrictions.registrationAllowed ||
 			!userId
 		) {
-			throw error(400, 'Invalid URL');
+			throw error(400, 'URL not whitelisted');
 		}
 	}
 
@@ -114,20 +112,20 @@ async function proxyRequest(
 }
 
 export async function GET({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 export async function PATCH({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
 export async function DELETE({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
 export async function PUT({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
 export async function POST({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }

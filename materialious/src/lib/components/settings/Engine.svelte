@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isYTBackend } from '$lib/misc';
+	import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 	import {
 		invidiousAuthStore,
@@ -7,7 +7,8 @@
 		engineCullYTStore,
 		engineFallbacksStore,
 		engineMaxConcurrentChannelsStore,
-		invidiousInstanceStore
+		invidiousInstanceStore,
+		backendInUseStore
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
@@ -95,7 +96,7 @@
 	<p>{$_('layout.backendEngine.warning')}</p>
 </article>
 
-{#if isYTBackend()}
+{#if $backendInUseStore === 'yt'}
 	<h6>Feed</h6>
 	<div class="field label prefix surface-container-highest">
 		<i>view_stream</i>

@@ -2,18 +2,18 @@ import { isOwnBackend } from '$lib/shared';
 import { env } from '$env/dynamic/public';
 
 import { error } from '@sveltejs/kit';
+import { parse as tldParse } from 'tldts';
 
-const allowedDomains: string[] = [
+const allowedBaseDomains: string[] = [
 	'youtube.com',
 	'ytimg.com',
 	'googlevideo.com',
 	'returnyoutubedislike.com',
 	'sponsor.ajay.app',
-	'dearrow-thumb.ajay.app',
-	'ryd-proxy.materialio.us'
+	'dearrow-thumb.ajay.app'
 ];
 
-const dynamicAllowDomains = [
+const dynamicAllowDomainsEnvVars = [
 	env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
 	env.PUBLIC_DEFAULT_DEARROW_INSTANCE,
 	env.PUBLIC_DEFAULT_INVIDIOUS_INSTANCE,
@@ -23,9 +23,11 @@ const dynamicAllowDomains = [
 	env.PUBLIC_DEFAULT_COMPANION_INSTANCE
 ];
 
-for (const dynamicDomain of dynamicAllowDomains) {
+const dynamicAllowDomains: string[] = [];
+
+for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
 	if (dynamicDomain) {
-		allowedDomains.push(dynamicDomain.replace(/^https?:\/\//, ''));
+		dynamicAllowDomains.push(dynamicDomain.replace(/^https?:\/\//, ''));
 	}
 }
 
@@ -51,7 +53,12 @@ async function proxyRequest(
 		throw error(400, 'Invalid URL');
 	}
 
-	if (!allowedDomains.includes(urlToProxyObj.host)) {
+	const baseDomain = tldParse(urlToProxyObj.host).domain;
+
+	if (
+		!dynamicAllowDomains.includes(urlToProxyObj.host) &&
+		(!baseDomain || !allowedBaseDomains.includes(baseDomain))
+	) {
 		// allowAnyProxy allows a instance owner to bypass the whitelist.
 		// BUT is extremely strict.
 		// AND I still don't recommend this.

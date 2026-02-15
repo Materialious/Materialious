@@ -25,6 +25,8 @@ export async function syncSettingsToBackend() {
 
 			let initalLoad = true;
 			store.store.subscribe((value) => {
+				if (!get(rawMasterKeyStore)) return;
+
 				if (initalLoad) {
 					initalLoad = false;
 					return;

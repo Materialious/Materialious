@@ -23,7 +23,8 @@
 		playertheatreModeIsActive,
 		rawMasterKeyStore,
 		syncPartyPeerStore,
-		themeColorStore
+		themeColorStore,
+		backendInUseStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
@@ -49,6 +50,9 @@
 		pages = getPages();
 	});
 	rawMasterKeyStore.subscribe(() => {
+		pages = getPages();
+	});
+	backendInUseStore.subscribe(() => {
 		pages = getPages();
 	});
 

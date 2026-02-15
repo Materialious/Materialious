@@ -30,6 +30,7 @@
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
+		playerPreferredVolumeStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
@@ -112,7 +113,7 @@
 	let playerCurrentPlaybackState = $state(false);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(true);
-	let playerVolume = $state(0);
+	let playerVolume = $state($playerPreferredVolumeStore);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
@@ -125,7 +126,6 @@
 	let playerCloestSponsor: Segment | undefined = $state();
 	let playerSliderElement: HTMLElement | undefined = $state();
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
-	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
 	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
 	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
@@ -184,7 +184,6 @@
 	let clickCounterTimeout: ReturnType<typeof setTimeout>;
 
 	let seekDirection: 'forwards' | 'backwards' | undefined = $state();
-	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	playertheatreModeIsActive.subscribe(async () => {
 		await tick();
@@ -247,15 +246,13 @@
 	function saveVolumePreference() {
 		if (!playerElement) return;
 		playerVolume = playerElement.volume;
-		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
+		playerPreferredVolumeStore.set(playerElement.volume);
 	}
 
 	function restoreVolumePreference() {
-		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
-		if (savedVolume && playerElement) {
-			playerElement.volume = parseFloat(savedVolume);
-			playerVolume = playerElement.volume;
-		}
+		if (!playerElement) return;
+		playerElement.volume = $playerPreferredVolumeStore;
+		playerVolume = playerElement.volume;
 	}
 
 	function restoreQualityPreference() {
@@ -365,51 +362,52 @@
 
 	async function setupSponsorSkip() {
 		if (!$sponsorBlockUrlStore || !$sponsorBlockCategoriesStore || !$sponsorBlockStore) return;
+		const sponsorBlock = new SponsorBlock('', { baseURL: $sponsorBlockUrlStore });
 
-		if ($sponsorBlockCategoriesStore && $sponsorBlockUrlStore && $sponsorBlockUrlStore !== '') {
-			const sponsorBlock = new SponsorBlock('', { baseURL: $sponsorBlockUrlStore });
+		const sponsorBlockCategoryKeys = Object.keys($sponsorBlockCategoriesStore);
 
-			try {
-				segments = await sponsorBlock.getSegments(
-					data.video.videoId,
-					Object.keys($sponsorBlockCategoriesStore) as Category[]
-				);
-			} catch (error) {
-				console.error('Sponsorskip errored with:', error);
-			}
+		if (sponsorBlockCategoryKeys.length === 0) return;
 
-			if (segments.length === 0) return;
-
-			playerElement?.addEventListener('timeupdate', () => {
-				segments.forEach((segment) => {
-					if (!playerElement) return;
-
-					if (
-						playerElement.currentTime >= segment.startTime &&
-						playerElement.currentTime <= segment.endTime
-					) {
-						const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
-
-						if (segmentTrigger === 'automatic') {
-							skipSegment(segment);
-						} else if (segmentTrigger === 'manual') {
-							if (!segmentManualSkip) {
-								addToast({
-									data: {
-										text: `${$_('upcomingSegment')} ${segment.category}`,
-										action: {
-											action: () => skipSegment(segment),
-											text: $_('skip')
-										}
-									}
-								});
-							}
-							segmentManualSkip = segment;
-						}
-					}
-				});
-			});
+		try {
+			segments = await sponsorBlock.getSegments(
+				data.video.videoId,
+				sponsorBlockCategoryKeys as Category[]
+			);
+		} catch (error) {
+			console.error('Sponsorskip errored with:', error);
 		}
+
+		if (segments.length === 0) return;
+
+		playerElement?.addEventListener('timeupdate', () => {
+			segments.forEach((segment) => {
+				if (!playerElement) return;
+
+				if (
+					playerElement.currentTime >= segment.startTime &&
+					playerElement.currentTime <= segment.endTime
+				) {
+					const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
+
+					if (segmentTrigger === 'automatic') {
+						skipSegment(segment);
+					} else if (segmentTrigger === 'manual') {
+						if (!segmentManualSkip) {
+							addToast({
+								data: {
+									text: `${$_('upcomingSegment')} ${segment.category}`,
+									action: {
+										action: () => skipSegment(segment),
+										text: $_('skip')
+									}
+								}
+							});
+						}
+						segmentManualSkip = segment;
+					}
+				}
+			});
+		});
 	}
 
 	function loadTimeFromUrl(page: Page): boolean {
@@ -967,17 +965,6 @@
 			showPlayerUI();
 		});
 
-		playerVolumeElement?.addEventListener('mousewheel', (event) => {
-			event.preventDefault();
-			const delta = Math.sign((event as any).deltaY);
-			const newVolume = Math.max(
-				0,
-				Math.min(1, (playerElement as HTMLMediaElement).volume - delta * 0.05)
-			);
-			(playerElement as HTMLMediaElement).volume = newVolume;
-			playerVolume = newVolume;
-		});
-
 		playerElement?.addEventListener('pause', async () => {
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
@@ -1465,11 +1452,7 @@
 							</i>
 						</button>
 						{#if !isMobile()}
-							<div
-								bind:this={playerVolumeElement}
-								class="player-slider volume m l"
-								{...playerVolumeSlider.root}
-							>
+							<div class="player-slider volume m l" {...playerVolumeSlider.root}>
 								<div class="track">
 									<div class="range"></div>
 									<div {...playerVolumeSlider.thumb}></div>

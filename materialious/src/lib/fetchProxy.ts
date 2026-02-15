@@ -1,5 +1,7 @@
 import { isUnrestrictedPlatform, timeout } from '$lib/misc';
 import { Capacitor } from '@capacitor/core';
+import sodium from 'libsodium-wrappers-sumo';
+import { isOwnBackend } from './shared';
 
 export const originalFetch = window.fetch;
 const corsProxyUrl =
@@ -59,6 +61,22 @@ export const fetchProxied = async (
 			});
 		} else {
 			requestInput = proxiedUrl;
+		}
+	}
+
+	if (isOwnBackend() && Capacitor.getPlatform() === 'web' && requestOptions?.body) {
+		if (requestOptions.body instanceof ArrayBuffer) {
+			requestOptions.body = new Uint8Array(requestOptions?.body);
+		}
+
+		if (requestOptions.body instanceof Uint8Array) {
+			await sodium.ready;
+			requestOptions.body = sodium.to_base64(requestOptions.body);
+
+			requestOptions.headers = {
+				...requestOptions.headers,
+				__is_base64_encoded: 'true'
+			};
 		}
 	}
 

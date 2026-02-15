@@ -179,6 +179,11 @@ export const playerAndroidPauseOnNetworkChange = persist(
 	createStorage(),
 	'pauseOnNetworkChange'
 );
+export const playerPreferredVolumeStore: Writable<number> = persist(
+	writable(0.5),
+	createStorage(),
+	'preferredVolume'
+);
 export const playerPlaylistHistory: Writable<string[]> = writable([]);
 
 export interface PlayerState {

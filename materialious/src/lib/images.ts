@@ -13,7 +13,6 @@ export class ImageCache {
 
 		return new Promise((resolve, reject) => {
 			const img = new Image();
-			img.crossOrigin = 'anonymous';
 			img.onload = () => {
 				this.cache.set(src, img);
 				resolve(img);

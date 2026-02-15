@@ -9,8 +9,7 @@ const allowedBaseDomains: string[] = [
 	'ytimg.com',
 	'googlevideo.com',
 	'returnyoutubedislike.com',
-	'sponsor.ajay.app',
-	'dearrow-thumb.ajay.app'
+	'ajay.app'
 ];
 
 const dynamicAllowDomainsEnvVars = [

@@ -30,6 +30,7 @@
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
+		playerPreferredVolume,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
@@ -184,7 +185,6 @@
 	let clickCounterTimeout: ReturnType<typeof setTimeout>;
 
 	let seekDirection: 'forwards' | 'backwards' | undefined = $state();
-	const STORAGE_KEY_VOLUME = 'shaka-preferred-volume';
 
 	playertheatreModeIsActive.subscribe(async () => {
 		await tick();
@@ -246,16 +246,12 @@
 
 	function saveVolumePreference() {
 		if (!playerElement) return;
-		playerVolume = playerElement.volume;
-		localStorage.setItem(STORAGE_KEY_VOLUME, playerElement.volume.toString());
+		playerPreferredVolume.set(playerElement.volume);
 	}
 
 	function restoreVolumePreference() {
-		const savedVolume = localStorage.getItem(STORAGE_KEY_VOLUME);
-		if (savedVolume && playerElement) {
-			playerElement.volume = parseFloat(savedVolume);
-			playerVolume = playerElement.volume;
-		}
+		if (!playerElement) return;
+		playerElement.volume = $playerPreferredVolume;
 	}
 
 	function restoreQualityPreference() {
@@ -365,51 +361,52 @@
 
 	async function setupSponsorSkip() {
 		if (!$sponsorBlockUrlStore || !$sponsorBlockCategoriesStore || !$sponsorBlockStore) return;
+		const sponsorBlock = new SponsorBlock('', { baseURL: $sponsorBlockUrlStore });
 
-		if ($sponsorBlockCategoriesStore && $sponsorBlockUrlStore && $sponsorBlockUrlStore !== '') {
-			const sponsorBlock = new SponsorBlock('', { baseURL: $sponsorBlockUrlStore });
+		const sponsorBlockCategoryKeys = Object.keys($sponsorBlockCategoriesStore);
 
-			try {
-				segments = await sponsorBlock.getSegments(
-					data.video.videoId,
-					Object.keys($sponsorBlockCategoriesStore) as Category[]
-				);
-			} catch (error) {
-				console.error('Sponsorskip errored with:', error);
-			}
+		if (sponsorBlockCategoryKeys.length === 0) return;
 
-			if (segments.length === 0) return;
-
-			playerElement?.addEventListener('timeupdate', () => {
-				segments.forEach((segment) => {
-					if (!playerElement) return;
-
-					if (
-						playerElement.currentTime >= segment.startTime &&
-						playerElement.currentTime <= segment.endTime
-					) {
-						const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
-
-						if (segmentTrigger === 'automatic') {
-							skipSegment(segment);
-						} else if (segmentTrigger === 'manual') {
-							if (!segmentManualSkip) {
-								addToast({
-									data: {
-										text: `${$_('upcomingSegment')} ${segment.category}`,
-										action: {
-											action: () => skipSegment(segment),
-											text: $_('skip')
-										}
-									}
-								});
-							}
-							segmentManualSkip = segment;
-						}
-					}
-				});
-			});
+		try {
+			segments = await sponsorBlock.getSegments(
+				data.video.videoId,
+				sponsorBlockCategoryKeys as Category[]
+			);
+		} catch (error) {
+			console.error('Sponsorskip errored with:', error);
 		}
+
+		if (segments.length === 0) return;
+
+		playerElement?.addEventListener('timeupdate', () => {
+			segments.forEach((segment) => {
+				if (!playerElement) return;
+
+				if (
+					playerElement.currentTime >= segment.startTime &&
+					playerElement.currentTime <= segment.endTime
+				) {
+					const segmentTrigger = $sponsorBlockCategoriesStore[segment.category];
+
+					if (segmentTrigger === 'automatic') {
+						skipSegment(segment);
+					} else if (segmentTrigger === 'manual') {
+						if (!segmentManualSkip) {
+							addToast({
+								data: {
+									text: `${$_('upcomingSegment')} ${segment.category}`,
+									action: {
+										action: () => skipSegment(segment),
+										text: $_('skip')
+									}
+								}
+							});
+						}
+						segmentManualSkip = segment;
+					}
+				}
+			});
+		});
 	}
 
 	function loadTimeFromUrl(page: Page): boolean {

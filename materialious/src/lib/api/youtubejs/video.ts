@@ -71,9 +71,6 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 		contentCheckOk: true,
 		racyCheckOk: true,
 		playbackContext: {
-			adPlaybackContext: {
-				pyv: true
-			},
 			contentPlaybackContext: {
 				signatureTimestamp: innertube.session.player?.signature_timestamp
 			}

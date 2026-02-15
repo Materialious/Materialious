@@ -3,6 +3,8 @@ import { env } from '$env/dynamic/public';
 
 import { error } from '@sveltejs/kit';
 import { parse as tldParse } from 'tldts';
+import { USER_AGENT } from 'bgutils-js';
+import sodium from 'libsodium-wrappers-sumo';
 
 const allowedBaseDomains: string[] = [
 	'youtube.com',
@@ -27,6 +29,13 @@ const dynamicAllowDomains: string[] = [];
 for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
 	if (dynamicDomain) {
 		dynamicAllowDomains.push(dynamicDomain.replace(/^https?:\/\//, ''));
+	}
+}
+
+function copyHeader(headerName: string, to: Headers, from: Headers) {
+	const hdrVal = from.get(headerName);
+	if (hdrVal) {
+		to.set(headerName, hdrVal);
 	}
 }
 
@@ -71,49 +80,38 @@ async function proxyRequest(
 		}
 	}
 
-	if (urlToProxyObj.pathname.includes('v1/player')) {
-		urlToProxyObj.searchParams.set(
-			'$fields',
-			'playerConfig,captions,playabilityStatus,streamingData,responseContext.mainAppWebResponseContext.datasyncId,videoDetails.isLive,videoDetails.isLiveContent,videoDetails.title,videoDetails.author,playbackTracking'
-		);
-	}
-
-	const requestHeaders = request.headers;
+	const requestHeaders = new Headers();
 	requestHeaders.set('host', urlToProxyObj.host);
 	requestHeaders.set('origin', urlToProxyObj.origin);
+	requestHeaders.set('user-agent', USER_AGENT);
 
-	for (const key of [
-		'referer',
-		'x-forwarded-for',
-		'x-requested-with',
-		'sec-ch-ua-mobile',
-		'sec-ch-ua',
-		'sec-ch-ua-platform'
-	]) {
-		requestHeaders.delete(key);
-	}
+	copyHeader('range', requestHeaders, request.headers);
 
-	const cookieHeader = requestHeaders.get('cookie');
-	if (cookieHeader) {
-		const modifiedCookies = cookieHeader
-			.split(';')
-			.filter((cookie) => !cookie.trim().startsWith('userid='))
-			.join('; ');
-		requestHeaders.set('cookie', modifiedCookies);
-	}
-
-	const fetchRes = await fetch(urlToProxy.toString(), {
+	const requestOptions: RequestInit = {
 		method: request.method,
 		headers: requestHeaders,
-		body: request.body,
 		credentials: 'same-origin',
 		...(request.body ? { duplex: 'half' } : {})
-	});
+	};
 
-	return new Response(fetchRes.body, {
-		status: fetchRes.status,
-		statusText: fetchRes.statusText,
-		...(request.body ? { duplex: 'half' } : {})
+	let body;
+	if (request.body && request.headers.has('__is_base64_encoded')) {
+		request.headers.delete('__is_base64_encoded');
+
+		await sodium.ready;
+		body = Uint8Array.from(sodium.from_base64(await request.text()));
+	} else {
+		body = request.body;
+	}
+
+	const response = await fetch(urlToProxy, { ...requestOptions, body });
+
+	const responseHeaders = new Headers();
+	const responseBody = await response.blob();
+
+	return new Response(responseBody, {
+		status: response.status,
+		headers: responseHeaders
 	});
 }
 

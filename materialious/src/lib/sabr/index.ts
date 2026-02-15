@@ -43,9 +43,6 @@ export async function injectSabr(
 			contentCheckOk: true,
 			racyCheckOk: true,
 			playbackContext: {
-				adPlaybackContext: {
-					pyv: true
-				},
 				contentPlaybackContext: {
 					signatureTimestamp: video.ytjs.innertube.session.player?.signature_timestamp
 				},

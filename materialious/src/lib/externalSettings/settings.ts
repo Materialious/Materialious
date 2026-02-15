@@ -52,7 +52,8 @@ import {
 	playerAndroidLockOrientation,
 	playerYouTubeJsFallback,
 	playerYouTubeJsAlways,
-	interfaceSearchHistoryEnabled
+	interfaceSearchHistoryEnabled,
+	playerPreferredVolume
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 
@@ -66,6 +67,7 @@ type PersistedStore<T> = {
 
 const zBoolean = z.coerce.boolean();
 const zNumber = z.coerce.number();
+const zFloat = z.coerce.number().min(0).max(1);
 const zString = z.string();
 const zArray = z.array(z.string());
 const zChapterMode = z.enum(['automatic', 'manual', 'timeline']);
@@ -255,6 +257,11 @@ export const persistedStores: PersistedStore<any>[] = [
 		name: 'miniplayerEnabled',
 		store: playerMiniplayerEnabled,
 		schema: zBoolean
+	},
+	{
+		name: 'preferredVolume',
+		store: playerPreferredVolume,
+		schema: zFloat
 	},
 	{
 		name: 'sponsorBlockCategoriesv2',

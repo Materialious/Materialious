@@ -24,7 +24,6 @@
 		loadSettingsFromEnv,
 		syncSettingsToBackend
 	} from '$lib/externalSettings';
-	import { timeout } from '$lib/misc';
 
 	let { children } = $props();
 

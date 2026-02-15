@@ -53,7 +53,7 @@ import {
 	playerYouTubeJsFallback,
 	playerYouTubeJsAlways,
 	interfaceSearchHistoryEnabled,
-	playerPreferredVolume
+	playerPreferredVolumeStore
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 
@@ -260,7 +260,7 @@ export const persistedStores: PersistedStore<any>[] = [
 	},
 	{
 		name: 'preferredVolume',
-		store: playerPreferredVolume,
+		store: playerPreferredVolumeStore,
 		schema: zFloat
 	},
 	{

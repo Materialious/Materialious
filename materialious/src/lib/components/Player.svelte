@@ -30,7 +30,7 @@
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
-		playerPreferredVolume,
+		playerPreferredVolumeStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
@@ -113,7 +113,7 @@
 	let playerCurrentPlaybackState = $state(false);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(true);
-	let playerVolume = $state(0);
+	let playerVolume = $state($playerPreferredVolumeStore);
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
@@ -126,7 +126,6 @@
 	let playerCloestSponsor: Segment | undefined = $state();
 	let playerSliderElement: HTMLElement | undefined = $state();
 	let playerSliderDebounce: ReturnType<typeof setTimeout>;
-	let playerVolumeElement: HTMLElement | undefined = $state();
 	let playerIsFullscreen: boolean = $state(false);
 	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
 	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
@@ -246,12 +245,14 @@
 
 	function saveVolumePreference() {
 		if (!playerElement) return;
-		playerPreferredVolume.set(playerElement.volume);
+		playerVolume = playerElement.volume;
+		playerPreferredVolumeStore.set(playerElement.volume);
 	}
 
 	function restoreVolumePreference() {
 		if (!playerElement) return;
-		playerElement.volume = $playerPreferredVolume;
+		playerElement.volume = $playerPreferredVolumeStore;
+		playerVolume = playerElement.volume;
 	}
 
 	function restoreQualityPreference() {
@@ -964,17 +965,6 @@
 			showPlayerUI();
 		});
 
-		playerVolumeElement?.addEventListener('mousewheel', (event) => {
-			event.preventDefault();
-			const delta = Math.sign((event as any).deltaY);
-			const newVolume = Math.max(
-				0,
-				Math.min(1, (playerElement as HTMLMediaElement).volume - delta * 0.05)
-			);
-			(playerElement as HTMLMediaElement).volume = newVolume;
-			playerVolume = newVolume;
-		});
-
 		playerElement?.addEventListener('pause', async () => {
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
@@ -1462,11 +1452,7 @@
 							</i>
 						</button>
 						{#if !isMobile()}
-							<div
-								bind:this={playerVolumeElement}
-								class="player-slider volume m l"
-								{...playerVolumeSlider.root}
-							>
+							<div class="player-slider volume m l" {...playerVolumeSlider.root}>
 								<div class="track">
 									<div class="range"></div>
 									<div {...playerVolumeSlider.thumb}></div>

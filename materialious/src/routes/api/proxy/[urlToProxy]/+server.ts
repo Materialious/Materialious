@@ -105,13 +105,10 @@ async function proxyRequest(
 	}
 
 	const response = await fetch(urlToProxy, { ...requestOptions, body });
-
-	const responseHeaders = new Headers();
 	const responseBody = await response.blob();
 
 	return new Response(responseBody, {
-		status: response.status,
-		headers: responseHeaders
+		status: response.status
 	});
 }
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 	import {
 		invidiousAuthStore,

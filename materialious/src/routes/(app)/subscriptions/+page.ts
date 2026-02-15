@@ -48,8 +48,8 @@ export async function load() {
 				videos = await sortVideosByFavourites([...feed.notifications, ...feed.videos]);
 				feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
 			})
-			.catch((error) => {
-				error(500, error);
+			.catch((errorMsg) => {
+				error(500, errorMsg);
 			})
 			.finally(() => {
 				feedLoadingStore.set(false);

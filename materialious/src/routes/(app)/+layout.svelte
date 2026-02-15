@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/stores';
-	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
 	import Logo from '$lib/components/Logo.svelte';
@@ -14,13 +13,10 @@
 	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import Player from '$lib/components/Player.svelte';
 	import '$lib/css/global.css';
-	import { bookmarkletLoadFromUrl, loadSettingsFromEnv } from '$lib/externalSettings';
 	import { getPages } from '$lib/navPages';
 	import {
 		invidiousAuthStore,
-		darkModeStore,
 		invidiousInstanceStore,
-		interfaceAmoledTheme,
 		interfaceDefaultPage,
 		isAndroidTvStore,
 		playerState,
@@ -29,17 +25,12 @@
 		syncPartyPeerStore,
 		themeColorStore
 	} from '$lib/store';
-	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
-	import { App } from '@capacitor/app';
-	import { Browser } from '@capacitor/browser';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
 	import ui from 'beercss';
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import { get } from 'svelte/store';
-	import { pwaInfo } from 'virtual:pwa-info';
 	import { goToInvidiousLogin, isYTBackend, logout, truncate } from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -50,17 +41,13 @@
 	const showLogin = !isYTBackend() || isOwnBackend()?.internalAuth;
 
 	let mobileSearchShow = $state(false);
-
 	let notifications: Notification[] = $state([]);
-
 	let playerIsPip: boolean = $state(false);
 
 	let pages = $state(getPages());
-
 	invidiousAuthStore.subscribe(() => {
 		pages = getPages();
 	});
-
 	rawMasterKeyStore.subscribe(() => {
 		pages = getPages();
 	});
@@ -72,52 +59,6 @@
 
 	playerState.subscribe(() => {
 		requestAnimationFrame(() => resetScroll());
-	});
-
-	interfaceAmoledTheme.subscribe(async () => {
-		setAmoledTheme();
-
-		await setStatusBarColor();
-	});
-
-	darkModeStore.subscribe(async () => {
-		setTheme();
-		setAmoledTheme();
-
-		await setStatusBarColor();
-	});
-
-	App.addListener('appUrlOpen', (data) => {
-		const url = new URL(data.url);
-
-		// Handle youtube deeplinks
-		if (url.protocol !== 'materialious-auth:') {
-			let videoId = url.searchParams.get('v');
-			if (!videoId) {
-				videoId = url.pathname.split('/')[1];
-			}
-
-			if (videoId === 'shorts') {
-				videoId = url.pathname.split('/')[2];
-			}
-
-			if (!videoId) {
-				return;
-			}
-
-			goto(resolve(`/watch/[videoId]`, { videoId: videoId }));
-		} else {
-			// Auth response handling for Mobile
-			const username = url.searchParams.get('username');
-			const token = url.searchParams.get('token');
-
-			if (username && token) {
-				invidiousAuthStore.set({
-					username: username,
-					token: token
-				});
-			}
-		}
 	});
 
 	async function login() {
@@ -166,7 +107,6 @@
 				);
 
 				if (sid) {
-					console.log(sid);
 					invidiousAuthStore.set({ username: rawUsername, token: sid });
 					await ui('#tv-login');
 					goto(resolve('/', {}), { replaceState: true });
@@ -196,41 +136,6 @@
 	}
 
 	onMount(async () => {
-		ui();
-
-		let themeHex = get(themeColorStore);
-		if (Capacitor.getPlatform() === 'android' && !themeHex) {
-			try {
-				const colorPalette = await colorTheme.getColorPalette();
-				themeHex = convertToHexColorCode(colorPalette.primary);
-				await ui('theme', themeHex);
-			} catch {
-				// Continue regardless of error
-			}
-		}
-
-		if (Capacitor.getPlatform() === 'android') {
-			document.addEventListener('click', async (event: MouseEvent) => {
-				// Handles opening links in browser for android.
-				const link = (event.target as HTMLElement).closest('a');
-
-				if (link && link.href && link.href.startsWith('http') && link.target === '_blank') {
-					event.preventDefault();
-					await Browser.open({ url: link.href });
-				}
-			});
-		}
-
-		loadSettingsFromEnv();
-		// Should always be loaded after env settings
-		// So user preferences overwrite instance preferences.
-		bookmarkletLoadFromUrl();
-
-		await setStatusBarColor();
-
-		setTheme();
-		setAmoledTheme();
-
 		if ($invidiousAuthStore && !isYTBackend()) {
 			loadNotifications().catch(() => logout());
 		}
@@ -245,14 +150,7 @@
 
 		resetScroll();
 	});
-
-	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
 </script>
-
-<svelte:head>
-	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-	{@html webManifestLink}
-</svelte:head>
 
 <div>
 	<nav

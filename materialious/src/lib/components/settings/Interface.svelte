@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { bookmarkletSaveToUrl } from '$lib/externalSettings';
+	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
 	import { letterCase, titleCases } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
 	import { Clipboard } from '@capacitor/clipboard';
@@ -13,7 +13,6 @@
 	import { get } from 'svelte/store';
 	import {
 		isMobile,
-		clearCaches,
 		isUnrestrictedPlatform,
 		setInvidiousInstance,
 		goToInvidiousLogin
@@ -82,23 +81,15 @@
 		}
 	}
 
-	function reloadState() {
-		clearCaches();
-		ui('#dialog-settings');
-		goto(resolve('/', {}), { replaceState: true });
-		location.reload();
-	}
-
 	async function setInstance(event: Event) {
 		event.preventDefault();
 		invalidInstance = !(await setInvidiousInstance(invidiousInstance));
-		reloadState();
+		goto(resolve('/', {}), { replaceState: true });
 	}
 
 	async function setBackend(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
-		reloadState();
 	}
 
 	function allowInsecureRequests() {
@@ -165,7 +156,7 @@
 				</button>
 			</nav>
 		</form>
-		{#if isOwnBackend()?.internalAuth}
+		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
 				<button onclick={goToInvidiousLogin}>
 					<i>link</i>

@@ -15,8 +15,13 @@
 	let invidiousInstanceValid: boolean = $state(true);
 	let invidiousInstance: string = $state(defaultInstance ?? '');
 
-	async function setupCompleted(event?: Event) {
-		event?.preventDefault();
+	async function setupCompleted() {
+		clearCaches();
+		goto(resolve('/', {}), { replaceState: true });
+	}
+
+	async function setInvidious(event: Event) {
+		event.preventDefault();
 
 		invidiousInstanceValid = await setInvidiousInstance(invidiousInstance);
 
@@ -24,8 +29,7 @@
 			return;
 		}
 
-		clearCaches();
-		goto(resolve('/', {}), { replaceState: true });
+		setupCompleted();
 	}
 
 	function setYTBackend() {
@@ -107,7 +111,7 @@
 
 				<div class="space"></div>
 				<h3>{$_('initalSetup.configureInstance')}</h3>
-				<form onsubmit={setupCompleted}>
+				<form onsubmit={setInvidious}>
 					<nav class="center-align">
 						<div
 							class="field label prefix surface-container-highest"

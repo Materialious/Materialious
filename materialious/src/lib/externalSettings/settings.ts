@@ -1,8 +1,5 @@
-import { page } from '$app/state';
-import { get, type Writable } from 'svelte/store';
 import { z } from 'zod';
-
-import { env } from '$env/dynamic/public';
+import { type Writable } from 'svelte/store';
 
 import {
 	darkModeStore,
@@ -40,8 +37,24 @@ import {
 	playerDefaultPlaybackSpeed,
 	playerCCByDefault,
 	playerMiniplayerEnabled,
-	sponsorBlockCategoriesStore
+	sponsorBlockCategoriesStore,
+	invidiousAuthStore,
+	backendInUseStore,
+	invidiousInstanceStore,
+	engineFallbacksStore,
+	engineMaxConcurrentChannelsStore,
+	engineCooldownYTStore,
+	engineCullYTStore,
+	interfaceAllowInsecureRequests,
+	interfaceDisableAutoUpdate,
+	interfaceAndroidUseNativeShare,
+	playerAndroidPauseOnNetworkChange,
+	playerAndroidLockOrientation,
+	playerYouTubeJsFallback,
+	playerYouTubeJsAlways,
+	interfaceSearchHistoryEnabled
 } from '$lib/store';
+import { isOwnBackend } from '$lib/shared';
 
 type PersistedStore<T> = {
 	name: string;
@@ -50,29 +63,18 @@ type PersistedStore<T> = {
 	serialize?: (value: T) => string;
 };
 
-function parseWithSchema<T>(schema: z.ZodType<T>, raw: unknown): T | undefined {
-	try {
-		if (typeof raw === 'string') {
-			// Try JSON first (records / objects)
-			try {
-				return schema.parse(JSON.parse(raw));
-			} catch {
-				return schema.parse(raw);
-			}
-		}
-		return schema.parse(raw);
-	} catch {
-		return undefined;
-	}
-}
-
 const zBoolean = z.coerce.boolean();
 const zNumber = z.coerce.number();
 const zString = z.string();
+const zArray = z.array(z.string());
 const zChapterMode = z.enum(['automatic', 'manual', 'timeline']);
 const zChapterModeRecord = z.record(z.string(), zChapterMode.optional());
+const zAuth = z.object({
+	username: z.string(),
+	token: z.string()
+});
 
-const persistedStores: PersistedStore<any>[] = [
+export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'returnYTDislikesInstance',
 		store: returnYTDislikesInstanceStore,
@@ -126,6 +128,11 @@ const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'searchSuggestions',
 		store: interfaceSearchSuggestionsStore,
+		schema: zBoolean
+	},
+	{
+		name: 'searchHistoryEnabled',
+		store: interfaceSearchHistoryEnabled,
 		schema: zBoolean
 	},
 	{
@@ -256,72 +263,79 @@ const persistedStores: PersistedStore<any>[] = [
 	}
 ];
 
-function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
-	if (!overwriteExisting) return;
-
-	for (const { name, store, schema } of persistedStores) {
-		const raw = toSet[name];
-		if (raw === undefined) continue;
-
-		const parsed = parseWithSchema(schema, raw);
-		if (parsed !== undefined) {
-			store.set(parsed);
-		}
-	}
-}
-
-export function loadSettingsFromEnv() {
-	if (
-		typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'string' &&
-		typeof env.PUBLIC_DEFAULT_SETTINGS !== 'string'
-	)
-		return;
-
-	let raw = import.meta.env.VITE_DEFAULT_SETTINGS || env.PUBLIC_DEFAULT_SETTINGS;
-
-	// Docker wraps env vars in quotes
-	if (raw.startsWith('"')) raw = raw.slice(1);
-	if (raw.endsWith('"')) raw = raw.slice(0, -1);
-
-	let isInitialLoad = false;
-	try {
-		if (localStorage.getItem('initialLoadState') === null) {
-			isInitialLoad = true;
-			localStorage.setItem('initialLoadState', '0');
-		}
-	} catch {
-		isInitialLoad = true;
-	}
-
-	try {
-		const parsed = JSON.parse(raw);
-		setStores(parsed, isInitialLoad);
-	} catch (err) {
-		console.error(err);
-	}
-}
-
-export function bookmarkletSaveToUrl(): string {
-	const url = new URL(location.origin);
-
-	for (const { name, store, serialize } of persistedStores) {
-		const value = get(store);
-		const encoded = serialize ? serialize(value) : value?.toString();
-
-		if (encoded !== undefined) {
-			url.searchParams.set(name, encoded);
-		}
-	}
-
-	return url.toString();
-}
-
-export function bookmarkletLoadFromUrl() {
-	const toSet: Record<string, string> = {};
-
-	page.url.searchParams.forEach((value, key) => {
-		toSet[key] = value;
+// If using own backend with can support more externalSettings.
+if (isOwnBackend()) {
+	persistedStores.push({
+		name: 'authToken',
+		store: invidiousAuthStore,
+		schema: zAuth,
+		serialize: JSON.stringify
 	});
-
-	setStores(toSet, true);
+	persistedStores.push({
+		name: 'backendInUse',
+		store: backendInUseStore,
+		schema: zString
+	});
+	persistedStores.push({
+		name: 'invidiousInstance',
+		store: invidiousInstanceStore,
+		schema: zString
+	});
+	persistedStores.push({
+		name: 'engineFallbacks',
+		store: engineFallbacksStore,
+		schema: zArray
+	});
+	persistedStores.push({
+		name: 'engineMaxConcurrentChannels',
+		store: engineMaxConcurrentChannelsStore,
+		schema: zNumber
+	});
+	persistedStores.push({
+		name: 'engineCooldownYT',
+		store: engineCooldownYTStore,
+		schema: zNumber
+	});
+	persistedStores.push({
+		name: 'engineCullYT',
+		store: engineCullYTStore,
+		schema: zNumber
+	});
+	persistedStores.push({
+		name: 'allowInsecureRequests',
+		store: interfaceAllowInsecureRequests,
+		schema: zString
+	});
+	persistedStores.push({
+		name: 'disableAutoUpdate',
+		store: interfaceDisableAutoUpdate,
+		schema: zString
+	});
+	persistedStores.push({
+		name: 'androidUseNativeShare',
+		store: interfaceAndroidUseNativeShare,
+		schema: zString
+	});
+	persistedStores.push({
+		name: 'pauseOnNetworkChange',
+		store: playerAndroidPauseOnNetworkChange,
+		schema: zBoolean
+	});
+	persistedStores.push({
+		name: 'androidLockOrientation',
+		store: playerAndroidLockOrientation,
+		schema: zBoolean
+	});
+	persistedStores.push({
+		name: 'youTubeJsFallback',
+		store: playerYouTubeJsFallback,
+		schema: zBoolean
+	});
+	persistedStores.push({
+		name: 'youTubeJsAlways',
+		store: playerYouTubeJsAlways,
+		schema: zBoolean
+	});
 }
+
+export const persistedStoreKeys = persistedStores.map((store) => store.name);

@@ -20,6 +20,7 @@ import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
 import { isYTBackend } from '$lib/misc';
 import { isOwnBackend } from '$lib/shared/index';
+import '$lib/fetchProxy';
 
 export const ssr = false;
 export const prerender = false;

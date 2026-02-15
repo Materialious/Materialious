@@ -9,7 +9,6 @@
 	} from '$lib/store';
 	import ui from 'beercss';
 	import { App } from '@capacitor/app';
-	import '$lib/fetchProxy';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';

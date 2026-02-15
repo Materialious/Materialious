@@ -107,7 +107,6 @@
 				);
 
 				if (sid) {
-					console.log(sid);
 					invidiousAuthStore.set({ username: rawUsername, token: sid });
 					await ui('#tv-login');
 					goto(resolve('/', {}), { replaceState: true });

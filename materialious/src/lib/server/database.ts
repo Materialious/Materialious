@@ -169,7 +169,7 @@ export interface ChannelSubscriptionModel {
 	userId: string;
 }
 
-export interface UserTableModel {
+export interface UserTableModel extends Model {
 	id: string;
 	username: string;
 	passwordHash: string;

@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { getFeed } from '$lib/api/index';
 	import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
-	import { feedCacheStore } from '$lib/store';
+	import { feedCacheStore, feedLoadingStore } from '$lib/store';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/ItemsList.svelte';
 	import { resolve } from '$app/paths';
 	import { _ } from '$lib/i18n';
+	import PageLoading from '$lib/components/PageLoading.svelte';
 
 	let currentPage = 1;
-	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $state($feedCacheStore.subscription);
+	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $derived($feedCacheStore.subscription);
 
 	async function loadMore(event: InfiniteEvent) {
 		currentPage++;
@@ -31,6 +32,9 @@
 </nav>
 <div class="space"></div>
 
-<ItemsList items={videos ?? []} />
-
-<InfiniteLoading on:infinite={loadMore} />
+{#if !$feedLoadingStore}
+	<ItemsList items={videos ?? []} />
+	<InfiniteLoading on:infinite={loadMore} />
+{:else}
+	<PageLoading />
+{/if}

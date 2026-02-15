@@ -368,6 +368,7 @@ export const searchHistoryStore: Writable<string[]> = persist(
 	'searchHistory'
 );
 
+export const feedLoadingStore: Writable<boolean> = writable(false);
 export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];
 }> = writable({});

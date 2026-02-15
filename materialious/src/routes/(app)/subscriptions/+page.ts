@@ -2,7 +2,7 @@ import { getFeed } from '$lib/api/index';
 import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
 import { localDb } from '$lib/dexie';
 import { authProtected, excludeDuplicateFeeds } from '$lib/misc';
-import { feedCacheStore } from '$lib/store';
+import { feedCacheStore, feedLoadingStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
@@ -40,17 +40,23 @@ export async function load() {
 	let videos = get(feedCacheStore).subscription;
 
 	if (!videos) {
-		let feeds;
-		try {
-			feeds = await getFeed(100, 1);
-		} catch (errorMessage: any) {
-			error(500, errorMessage);
-		}
+		feedCacheStore.set({ ...get(feedCacheStore), subscription: [] });
 
-		videos = await sortVideosByFavourites([...feeds.notifications, ...feeds.videos]);
-
-		feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
+		feedLoadingStore.set(true);
+		getFeed(100, 1)
+			.then(async (feed) => {
+				videos = await sortVideosByFavourites([...feed.notifications, ...feed.videos]);
+				feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
+			})
+			.catch((errorMsg) => {
+				error(500, errorMsg);
+			})
+			.finally(() => {
+				feedLoadingStore.set(false);
+			});
 	} else {
+		feedLoadingStore.set(false);
+
 		await getFeed(100, 1).then(async (feeds) => {
 			const newVideos = await sortVideosByFavourites([
 				...feeds.notifications,

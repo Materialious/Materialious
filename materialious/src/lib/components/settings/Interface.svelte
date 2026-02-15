@@ -11,12 +11,7 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import {
-		isMobile,
-		isUnrestrictedPlatform,
-		setInvidiousInstance,
-		goToInvidiousLogin
-	} from '../../misc';
+	import { isUnrestrictedPlatform, setInvidiousInstance, goToInvidiousLogin } from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -177,10 +172,6 @@
 		{/if}
 	{:else}
 		<div class="space"></div>
-	{/if}
-
-	{#if isMobile() && invalidInstance}
-		<div style="margin-bottom: 6em;"></div>
 	{/if}
 
 	{#if Capacitor.isNativePlatform() && (invalidInstance || $interfaceAllowInsecureRequests)}

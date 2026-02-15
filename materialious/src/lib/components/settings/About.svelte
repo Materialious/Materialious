@@ -52,7 +52,7 @@
 		{#if contributor.type === 'User'}
 			<div class="s12 m4 l4">
 				<article>
-					<img class="circle" src={contributor.avatar_url} alt={contributor.login} />
+					<img class="circle" loading="lazy" src={contributor.avatar_url} alt={contributor.login} />
 					<p>{contributor.login}</p>
 				</article>
 			</div>

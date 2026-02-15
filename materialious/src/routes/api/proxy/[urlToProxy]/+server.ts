@@ -1,20 +1,18 @@
 import { isOwnBackend } from '$lib/shared';
-import psl from 'psl';
 import { env } from '$env/dynamic/public';
 
 import { error } from '@sveltejs/kit';
+import { parse as tldParse } from 'tldts';
 
-const allowedDomains: string[] = [
+const allowedBaseDomains: string[] = [
 	'youtube.com',
 	'ytimg.com',
 	'googlevideo.com',
 	'returnyoutubedislike.com',
-	'sponsor.ajay.app',
-	'dearrow-thumb.ajay.app',
-	'materialio.us'
+	'ajay.app'
 ];
 
-const dynamicAllowDomains = [
+const dynamicAllowDomainsEnvVars = [
 	env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
 	env.PUBLIC_DEFAULT_DEARROW_INSTANCE,
 	env.PUBLIC_DEFAULT_INVIDIOUS_INSTANCE,
@@ -24,16 +22,17 @@ const dynamicAllowDomains = [
 	env.PUBLIC_DEFAULT_COMPANION_INSTANCE
 ];
 
-dynamicAllowDomains.forEach((domain) => {
-	if (domain) {
-		allowedDomains.push(domain);
+const dynamicAllowDomains: string[] = [];
+
+for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
+	if (dynamicDomain) {
+		dynamicAllowDomains.push(dynamicDomain.replace(/^https?:\/\//, ''));
 	}
-});
+}
 
 async function proxyRequest(
 	request: Request,
 	urlToProxy: string,
-	captchaKey: string,
 	userId: string | undefined = undefined
 ): Promise<Response> {
 	const backendRestrictions = isOwnBackend();
@@ -53,7 +52,12 @@ async function proxyRequest(
 		throw error(400, 'Invalid URL');
 	}
 
-	if (!allowedDomains.includes(psl.parse(urlToProxyObj.host).domain)) {
+	const baseDomain = tldParse(urlToProxyObj.host).domain;
+
+	if (
+		!dynamicAllowDomains.includes(urlToProxyObj.host) &&
+		(!baseDomain || !allowedBaseDomains.includes(baseDomain))
+	) {
 		// allowAnyProxy allows a instance owner to bypass the whitelist.
 		// BUT is extremely strict.
 		// AND I still don't recommend this.
@@ -63,7 +67,7 @@ async function proxyRequest(
 			backendRestrictions.registrationAllowed ||
 			!userId
 		) {
-			throw error(400, 'Invalid URL');
+			throw error(400, 'URL not whitelisted');
 		}
 	}
 
@@ -114,20 +118,20 @@ async function proxyRequest(
 }
 
 export async function GET({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 export async function PATCH({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
 export async function DELETE({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
 export async function PUT({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }
 
 export async function POST({ request, params, locals }) {
-	return await proxyRequest(request, params.urlToProxy, locals.captchaKey, locals.userId);
+	return await proxyRequest(request, params.urlToProxy, locals.userId);
 }

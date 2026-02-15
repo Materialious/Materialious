@@ -61,6 +61,7 @@ type PersistedStore<T> = {
 	store: Writable<T>;
 	schema: z.ZodType<T>;
 	serialize?: (value: T) => string;
+	excludeFromBookmarklet?: boolean; // Won't be include in bookmarklet
 };
 
 const zBoolean = z.coerce.boolean();
@@ -269,7 +270,8 @@ if (isOwnBackend()) {
 		name: 'authToken',
 		store: invidiousAuthStore,
 		schema: zAuth,
-		serialize: JSON.stringify
+		serialize: JSON.stringify,
+		excludeFromBookmarklet: true
 	});
 	persistedStores.push({
 		name: 'backendInUse',
@@ -304,27 +306,32 @@ if (isOwnBackend()) {
 	persistedStores.push({
 		name: 'allowInsecureRequests',
 		store: interfaceAllowInsecureRequests,
-		schema: zString
+		schema: zString,
+		excludeFromBookmarklet: true
 	});
 	persistedStores.push({
 		name: 'disableAutoUpdate',
 		store: interfaceDisableAutoUpdate,
-		schema: zString
+		schema: zString,
+		excludeFromBookmarklet: true
 	});
 	persistedStores.push({
 		name: 'androidUseNativeShare',
 		store: interfaceAndroidUseNativeShare,
-		schema: zString
+		schema: zString,
+		excludeFromBookmarklet: true
 	});
 	persistedStores.push({
 		name: 'pauseOnNetworkChange',
 		store: playerAndroidPauseOnNetworkChange,
-		schema: zBoolean
+		schema: zBoolean,
+		excludeFromBookmarklet: true
 	});
 	persistedStores.push({
 		name: 'androidLockOrientation',
 		store: playerAndroidLockOrientation,
-		schema: zBoolean
+		schema: zBoolean,
+		excludeFromBookmarklet: true
 	});
 	persistedStores.push({
 		name: 'youTubeJsFallback',

@@ -17,6 +17,8 @@
 	let activeTab = $state('interface');
 	const isActive = (id: string) => activeTab === id;
 
+	let mobileCategoriesButton: HTMLElement | undefined = $state();
+
 	let tabs: { id: string; label: string; icon: string; component: Component }[] = $state([
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
@@ -121,17 +123,21 @@
 				{@const currentTab = tabs.find((tab) => tab.id === activeTab)}
 
 				{#if currentTab}
-					<button class="large small-round surface-container-highest max" data-ui="#tab-menu">
+					<button
+						bind:this={mobileCategoriesButton}
+						class="large small-round surface-container-highest max"
+						data-ui="#tab-menu"
+					>
 						<i>{currentTab.icon}</i>
 						<span>{currentTab.label}</span>
 						<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
 							{#each tabs as tab (tab)}
 								<li
+									role="presentation"
 									onclick={() => {
 										activeTab = tab.id;
+										mobileCategoriesButton?.click();
 									}}
-									role="presentation"
-									data-ui="#tab-menu"
 								>
 									<i>{tab.icon}</i>
 									<span>{tab.label}</span>

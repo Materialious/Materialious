@@ -6,7 +6,7 @@
 	import ContentColumn from './ContentColumn.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import Mousetrap from 'mousetrap';
-	import { extractUniqueId, type feedItems } from '$lib/misc';
+	import { extractUniqueId, timeout, type feedItems } from '$lib/misc';
 	import ChannelThumbnail from './ChannelThumbnail.svelte';
 	import PlaylistThumbnail from './PlaylistThumbnail.svelte';
 	import HashtagThumbnail from './HashtagThumbnail.svelte';
@@ -185,15 +185,16 @@
 		} else if ($feedLastItemId) {
 			const element = document.getElementById($feedLastItemId);
 
-			feedLastItemId.set(undefined);
-
 			if (element) {
+				await timeout(100);
 				element.scrollIntoView({
 					behavior: 'instant',
 					block: 'start',
 					inline: 'nearest'
 				});
 			}
+
+			feedLastItemId.set(undefined);
 		}
 	});
 

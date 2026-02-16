@@ -85,6 +85,10 @@
 		}
 	}
 
+	async function logout() {
+		await ($rawMasterKeyStore ? materialiousLogout : invidiousLogout)();
+	}
+
 	let loginError: boolean = $state(false);
 	let rawUsername: string = $state('');
 	let rawPassword: string = $state('');
@@ -284,10 +288,7 @@
 							<div class="tooltip bottom">{$_('layout.login')}</div>
 						</button>
 					{:else}
-						<button
-							onclick={$rawMasterKeyStore ? materialiousLogout : invidiousLogout}
-							class="circle large transparent"
-						>
+						<button onclick={logout} class="circle large transparent">
 							<i>logout</i>
 							<div class="tooltip bottom">{$_('layout.logout')}</div>
 						</button>

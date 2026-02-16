@@ -32,7 +32,13 @@
 	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import { goToInvidiousLogin, isYTBackend, logout, truncate } from '$lib/misc';
+	import {
+		goToInvidiousLogin,
+		invidiousLogout,
+		isYTBackend,
+		materialiousLogout,
+		truncate
+	} from '$lib/misc';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
@@ -77,6 +83,10 @@
 			await ui('#tv-login');
 			document.getElementById('username')?.focus();
 		}
+	}
+
+	async function logout() {
+		await ($rawMasterKeyStore ? materialiousLogout : invidiousLogout)();
 	}
 
 	let loginError: boolean = $state(false);
@@ -141,15 +151,15 @@
 
 	onMount(async () => {
 		if ($invidiousAuthStore && !isYTBackend()) {
-			loadNotifications().catch(() => logout());
+			loadNotifications().catch(() => invidiousLogout());
 		}
 
 		if ($rawMasterKeyStore) {
 			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' })
 				.then((resp) => {
-					if (!resp.ok) logout();
+					if (!resp.ok) materialiousLogout();
 				})
-				.catch(logout);
+				.catch(materialiousLogout);
 		}
 
 		resetScroll();

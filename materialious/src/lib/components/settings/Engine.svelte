@@ -7,13 +7,16 @@
 		engineFallbacksStore,
 		engineMaxConcurrentChannelsStore,
 		invidiousInstanceStore,
-		backendInUseStore
+		backendInUseStore,
+		rawMasterKeyStore
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
 	import { getSubscriptions, postSubscribe } from '$lib/api';
 	import { postSubscribeYTjs } from '$lib/api/youtubejs/subscriptions';
 	import { addToast } from '../Toast.svelte';
+	import { isOwnBackend } from '$lib/shared';
+	import { postSubscribeBackend } from '$lib/api/backend';
 
 	const engineFallbacks: EngineFallback[] = [
 		'Channel',
@@ -53,9 +56,17 @@
 			}
 		});
 
+		let subscribeFunction: (id: string, name: string) => Promise<void>;
+
+		if (isOwnBackend()?.internalAuth && $rawMasterKeyStore) {
+			subscribeFunction = postSubscribeBackend;
+		} else {
+			subscribeFunction = postSubscribeYTjs;
+		}
+
 		const subPromises: Promise<void>[] = [];
 		importedSubs.forEach((sub) => {
-			subPromises.push(postSubscribeYTjs(sub.authorId, sub.author));
+			subPromises.push(subscribeFunction(sub.authorId, sub.author));
 		});
 
 		await Promise.all(subPromises);

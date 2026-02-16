@@ -11,7 +11,12 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { isUnrestrictedPlatform, setInvidiousInstance, goToInvidiousLogin } from '../../misc';
+	import {
+		isUnrestrictedPlatform,
+		setInvidiousInstance,
+		goToInvidiousLogin,
+		invidiousLogout
+	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -158,12 +163,7 @@
 					<span>{$_('linkInvidious')}</span>
 				</button>
 			{:else}
-				<button
-					onclick={() => {
-						invidiousAuthStore.set(null);
-						goto(resolve('/', {}));
-					}}
-				>
+				<button onclick={invidiousLogout}>
 					<i>link_off</i>
 					<span>{$_('unlinkInvidious')}</span>
 				</button>

@@ -32,13 +32,6 @@ for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
 	}
 }
 
-function copyHeader(headerName: string, to: Headers, from: Headers) {
-	const hdrVal = from.get(headerName);
-	if (hdrVal) {
-		to.set(headerName, hdrVal);
-	}
-}
-
 async function proxyRequest(
 	request: Request,
 	urlToProxy: string,
@@ -80,12 +73,22 @@ async function proxyRequest(
 		}
 	}
 
-	const requestHeaders = new Headers();
+	const requestHeaders = new Headers(request.headers);
+	for (const key of [
+		'referer',
+		'x-forwarded-for',
+		'x-requested-with',
+		'sec-ch-ua-mobile',
+		'sec-ch-ua',
+		'sec-ch-ua-platform',
+		'content-length'
+	]) {
+		requestHeaders.delete(key);
+	}
+
 	requestHeaders.set('host', urlToProxyObj.host);
 	requestHeaders.set('origin', urlToProxyObj.origin);
 	requestHeaders.set('user-agent', USER_AGENT);
-
-	copyHeader('range', requestHeaders, request.headers);
 
 	const requestOptions: RequestInit = {
 		method: request.method,
@@ -104,11 +107,21 @@ async function proxyRequest(
 		body = request.body;
 	}
 
-	const response = await fetch(urlToProxy, { ...requestOptions, body });
-	const responseBody = await response.blob();
+	const response = await fetch(urlToProxyObj.toString(), {
+		...requestOptions,
+		body,
+		signal: AbortSignal.timeout(10000)
+	});
 
-	return new Response(responseBody, {
-		status: response.status
+	const responseHeaders = new Headers(response.headers);
+	responseHeaders.set('transfer-encoding', 'chunked');
+	responseHeaders.delete('content-encoding');
+	responseHeaders.set('access-control-allow-origin', request.headers.get('origin') ?? '');
+	responseHeaders.set('timing-allow-origin', request.headers.get('origin') ?? '');
+
+	return new Response(response.body, {
+		status: response.status,
+		headers: responseHeaders
 	});
 }
 

@@ -85,16 +85,22 @@ export async function deleteUnsubscribeBackend(authorId: string) {
 	});
 }
 
-export async function postSubscribeBackend(authorId: string) {
+export async function postSubscribeBackend(
+	authorId: string,
+	authorName: string | undefined = undefined
+) {
 	const rawKey = await getRawKey();
 	if (!rawKey) return;
 
 	const internalAuthorId = await getInternalAuthorId(authorId, rawKey);
 
-	const channel = await getChannelYTjs(authorId);
+	if (!authorName) {
+		const channel = await getChannelYTjs(authorId);
+		authorName = channel.author;
+	}
 
 	const channelId = await encryptWithMasterKey(authorId);
-	const channelName = await encryptWithMasterKey(channel.author);
+	const channelName = await encryptWithMasterKey(authorName);
 
 	const resp = await fetch(`/api/user/subscriptions/${internalAuthorId}`, {
 		method: 'POST',

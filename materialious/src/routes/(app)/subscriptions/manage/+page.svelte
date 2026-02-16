@@ -3,6 +3,7 @@
 	import { deleteUnsubscribe } from '$lib/api';
 	import Fuse from 'fuse.js';
 	import { _ } from '$lib/i18n';
+	import NoResults from '$lib/components/NoResults.svelte';
 
 	let { data } = $props();
 
@@ -34,30 +35,35 @@
 	}
 </script>
 
-<div class="padding">
-	<div class="max field suffix prefix small no-margin surface-variant">
-		<i class="front">search</i><input
-			bind:value={search}
-			oninput={searchSubs}
-			type="text"
-			placeholder={$_('searchPlaceholder')}
-		/>
-	</div>
+{#if subscriptions.length > 0}
+	<div class="padding">
+		<div class="max field suffix prefix small no-margin surface-variant">
+			<i class="front">search</i><input
+				bind:value={search}
+				oninput={searchSubs}
+				type="text"
+				placeholder={$_('searchPlaceholder')}
+			/>
+		</div>
 
-	{#each subscriptions as sub (sub.authorId)}
-		<article>
-			<nav>
-				<a href={resolve(`/channel/[authorId]`, { authorId: sub.authorId })}
-					><h6>
-						{sub.author}
-					</h6></a
-				>
-				<div class="max"></div>
-				<button onclick={async () => unsubscribe(sub.authorId)} class="border">Unsubscribe</button>
-			</nav>
-		</article>
-	{/each}
-</div>
+		{#each subscriptions as sub (sub.authorId)}
+			<article>
+				<nav>
+					<a href={resolve(`/channel/[authorId]`, { authorId: sub.authorId })}
+						><h6>
+							{sub.author}
+						</h6></a
+					>
+					<div class="max"></div>
+					<button onclick={async () => unsubscribe(sub.authorId)} class="border">Unsubscribe</button
+					>
+				</nav>
+			</article>
+		{/each}
+	</div>
+{:else}
+	<NoResults />
+{/if}
 
 <style>
 	@media screen and (max-width: 590px) {

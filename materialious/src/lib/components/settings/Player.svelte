@@ -5,6 +5,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import {
+		backendInUseStore,
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
@@ -22,7 +23,7 @@
 		playerYouTubeJsFallback
 	} from '../../store';
 	import { playbackRates } from '$lib/player';
-	import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
+	import { isUnrestrictedPlatform } from '$lib/misc';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 
@@ -122,7 +123,7 @@
 	<i>arrow_drop_down</i>
 </div>
 
-{#if isUnrestrictedPlatform() && !isYTBackend()}
+{#if isUnrestrictedPlatform() && $backendInUseStore === 'ivg'}
 	<div class="field suffix surface-container-highest label">
 		<select
 			tabindex="0"

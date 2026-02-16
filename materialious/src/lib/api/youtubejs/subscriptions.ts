@@ -10,7 +10,7 @@ import {
 	engineMaxConcurrentChannelsStore,
 	rawMasterKeyStore
 } from '$lib/store';
-import { getSubscriptionsBackend, updateRSSLastUpdated } from '../backend';
+import { getSubscriptionsBackend } from '../backend';
 
 export async function getSubscriptionsYTjs(): Promise<Subscription[]> {
 	const subscriptions: Subscription[] = [];
@@ -69,6 +69,8 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	const xmlDoc = parser.parseFromString(text, 'text/xml');
 	const entries = xmlDoc.getElementsByTagName('entry');
 
+	let channelName: string | undefined;
+
 	for (const entry of entries) {
 		const videoId = entry.getElementsByTagName('yt:videoId')[0]?.textContent || '';
 		const title = entry.getElementsByTagName('title')[0]?.textContent || 'Untitled';
@@ -80,7 +82,7 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 		);
 		const published = publishedAt.getTime();
 		const publishedText = relativeTimestamp(published, false);
-		const author =
+		channelName =
 			entry.getElementsByTagName('author')[0]?.getElementsByTagName('name')[0]?.textContent ||
 			'Unknown Author';
 		const authorId =
@@ -115,7 +117,7 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 				videoId,
 				title,
 				videoThumbnails,
-				author,
+				author: channelName,
 				authorId,
 				description,
 				descriptionHtml,
@@ -133,15 +135,29 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 		} catch {
 			// Continue regardless of error
 		}
-
-		if (!get(rawMasterKeyStore)) {
-			localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
-				lastRSSFetch: new Date()
-			});
-		} else {
-			updateRSSLastUpdated(authorId);
-		}
 	}
+
+	updateLastRssFetch(channelId, channelName ?? 'Unknown');
+}
+
+async function updateLastRssFetch(channelId: string, channelName: string) {
+	localDb.channelSubscriptions
+		.where('channelId')
+		.equals(channelId)
+		.first()
+		.then((subscription) => {
+			if (subscription) {
+				localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
+					lastRSSFetch: new Date()
+				});
+			} else {
+				localDb.channelSubscriptions.add({
+					channelId: channelId,
+					channelName: channelName,
+					lastRSSFetch: new Date()
+				});
+			}
+		});
 }
 
 export async function clearFeedYTjs() {
@@ -163,7 +179,23 @@ export async function getFeedYTjs(maxResults: number, page: number): Promise<Fee
 
 	let totalChannelsToParse = 0;
 	for (const channel of channelSubscriptions) {
-		const lastRSSFetch = new Date(channel.lastRSSFetch);
+		let lastRSSFetch = new Date(channel.lastRSSFetch);
+
+		// If using our own backend we still need to keep
+		// RSS feed updates per device.
+		if (get(rawMasterKeyStore)) {
+			const localSub = await localDb.channelSubscriptions
+				.where('channelId')
+				.equals(channel.channelId)
+				.first();
+
+			if (!localSub) {
+				lastRSSFetch = new Date(0);
+			} else {
+				lastRSSFetch = new Date(localSub.lastRSSFetch);
+			}
+		}
+
 		const timeDifference = now.getTime() - lastRSSFetch.getTime();
 		const cooldownTime = get(engineCooldownYTStore) * 60 * 60 * 1000;
 

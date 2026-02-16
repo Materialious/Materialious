@@ -107,11 +107,21 @@ async function proxyRequest(
 		body = request.body;
 	}
 
-	const response = await fetch(urlToProxyObj.toString(), {
-		...requestOptions,
-		body,
-		signal: AbortSignal.timeout(10000)
-	});
+	let response: Response | undefined;
+	let errorMsg = '';
+	try {
+		response = await fetch(urlToProxyObj.toString(), {
+			...requestOptions,
+			body,
+			signal: AbortSignal.timeout(10000)
+		});
+	} catch (err) {
+		errorMsg = (err as any).toString();
+	}
+
+	if (!response || errorMsg) {
+		throw error(500, errorMsg);
+	}
 
 	const responseHeaders = new Headers(response.headers);
 	responseHeaders.set('transfer-encoding', 'chunked');

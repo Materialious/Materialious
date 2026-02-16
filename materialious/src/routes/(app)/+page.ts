@@ -22,13 +22,18 @@ export async function load() {
 	let popularDisabled: boolean = false;
 
 	if (!popular) {
+		let errorMsg: Error | undefined;
 		try {
 			popular = await getPopular();
-		} catch (errorMessage: any) {
-			if (errorMessage.toString() === 'Error: Administrator has disabled this endpoint.') {
+		} catch (popularError) {
+			errorMsg = popularError as Error;
+		}
+
+		if (errorMsg) {
+			if (errorMsg.toString() === 'Error: Administrator has disabled this endpoint.') {
 				popularDisabled = true;
 			} else {
-				error(500, errorMessage);
+				throw error(500, errorMsg);
 			}
 		}
 

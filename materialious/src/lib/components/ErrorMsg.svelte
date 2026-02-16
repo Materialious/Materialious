@@ -14,8 +14,8 @@
 	>
 
 	{#if page.error}
-		<article>
-			<code style="white-space: pre-line;word-wrap: break-word;">{page.error.message}</code>
+		<article style="white-space: pre-line;word-wrap: break-word;">
+			<article class="surface-container-highest"><p>{page.error.message}</p></article>
 		</article>
 	{/if}
 </div>

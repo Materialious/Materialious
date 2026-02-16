@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
 	import { letterCase, titleCases } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
@@ -15,8 +13,7 @@
 		isUnrestrictedPlatform,
 		setInvidiousInstance,
 		goToInvidiousLogin,
-		invidiousLogout,
-		clearCaches
+		invidiousLogout
 	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
@@ -44,8 +41,6 @@
 	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
-	import { invalidate } from '$app/navigation';
-	import { page } from '$app/state';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 	let region = $state(get(interfaceRegionStore));

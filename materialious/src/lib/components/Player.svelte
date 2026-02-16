@@ -52,8 +52,8 @@
 		goToPreviousVideo,
 		playbackRates,
 		playerDoubleTapSeek
-	} from '$lib/player';
-	import { dashManifestDomainInclusion } from '$lib/android/youtube/dash';
+	} from '$lib/player/index';
+	import { manifestDomainInclusion } from '$lib/player/manifest';
 	import { injectSabr } from '$lib/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { SvelteSet } from 'svelte/reactivity';
@@ -67,6 +67,7 @@
 		storyboardThumbnails,
 		type TimelineThumbnail
 	} from '$lib/timelineThumbnails';
+	import { isOwnBackend } from '$lib/shared';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -567,11 +568,12 @@
 			}
 
 			if (
-				Capacitor.getPlatform() === 'android' &&
+				(Capacitor.getPlatform() === 'android' ||
+					(isOwnBackend() && Capacitor.getPlatform() === 'web')) &&
 				$playerProxyVideosStore &&
 				!data.video.fallbackPatch
 			) {
-				const manifest = await dashManifestDomainInclusion(dashUrl);
+				const manifest = await manifestDomainInclusion(dashUrl);
 				await player.load(manifest, await getLastPlayPos());
 			} else {
 				await player.load(dashUrl, await getLastPlayPos());

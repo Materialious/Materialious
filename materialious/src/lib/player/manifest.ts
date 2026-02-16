@@ -1,23 +1,19 @@
-export async function dashManifestDomainInclusion(manifestUrl: string): Promise<string> {
-	/* If on android, must manually format dash manifest to include URL. */
-
-	// Must fetch the headers of the request
-	// using our custom android proxy logic
+export async function manifestDomainInclusion(manifestUrl: string): Promise<string> {
 	const respIvg = await fetch(manifestUrl, {
 		method: 'GET',
 		headers: {
-			__custom_return: 'json-headers',
+			// Required for our custom android backend.
 			__redirect: 'manual'
-		}
+		},
+		referrerPolicy: 'no-referrer'
 	});
 
 	if (!respIvg.ok) {
 		throw Error('Unable to make request to Invidious');
 	}
 
-	const ivgHeaders = await respIvg.json();
 	// If location isn't present, then use base manifest URL.
-	const companionUrl = 'location' in ivgHeaders ? ivgHeaders['location'] : manifestUrl;
+	const companionUrl = respIvg.headers.get('location') ?? manifestUrl;
 
 	const respCompanion = await fetch(companionUrl, {
 		method: 'GET'

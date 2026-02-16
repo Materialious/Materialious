@@ -9,7 +9,7 @@
 		setWindowQueryFlag,
 		shareURL
 	} from '$lib/misc';
-	import type { PlayerEvents } from '$lib/player';
+	import type { PlayerEvents } from '$lib/player/index';
 	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';

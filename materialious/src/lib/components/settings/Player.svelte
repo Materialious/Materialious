@@ -22,7 +22,7 @@
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
 	} from '../../store';
-	import { playbackRates } from '$lib/player';
+	import { playbackRates } from '$lib/player/index';
 	import { isUnrestrictedPlatform } from '$lib/misc';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));

@@ -1,16 +1,16 @@
 import { get } from 'svelte/store';
-import type { PlaylistPageVideo, VideoPlay } from './api/model';
+import type { PlaylistPageVideo, VideoPlay } from '$lib/api/model';
 import {
 	isAndroidTvStore,
 	playerAutoplayNextByDefaultStore,
 	playerPlaylistHistory,
 	playlistSettingsStore,
 	syncPartyConnectionsStore
-} from './store';
+} from '$lib/store';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { loadEntirePlaylist } from './playlist';
-import { unsafeRandomItem } from './misc';
+import { loadEntirePlaylist } from '$lib/playlist';
+import { unsafeRandomItem } from '$lib/misc';
 
 export interface PlayerEvent {
 	type: 'pause' | 'seek' | 'change-video' | 'play' | 'playlist' | 'goto';

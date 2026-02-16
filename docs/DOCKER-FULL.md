@@ -2,6 +2,16 @@
 
 This Guide is for the docker image `wardpearce/materialious-full` **NOT** `wardpearce/materialious`
 
+### Invidious Companion support
+`public_url` **MUST** be set in Invidious under **invidious_companion** for companion to work with Materialious.
+
+e.g.
+```yml
+invidious_companion:
+  - private_url: "http://companion:8282/companion"
+    public_url:  "http://companion.example.com/companion"
+```
+
 ### Docker Compose
 
 ```yaml

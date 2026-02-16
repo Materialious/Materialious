@@ -13,7 +13,7 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, numberWithCommas } from '$lib/numbers';
-	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player';
+	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player/index';
 	import {
 		invidiousAuthStore,
 		interfaceAutoExpandChapters,

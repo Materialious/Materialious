@@ -15,7 +15,8 @@
 		isUnrestrictedPlatform,
 		setInvidiousInstance,
 		goToInvidiousLogin,
-		invidiousLogout
+		invidiousLogout,
+		clearCaches
 	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
@@ -43,6 +44,8 @@
 	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import { invalidate } from '$app/navigation';
+	import { page } from '$app/state';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 	let region = $state(get(interfaceRegionStore));
@@ -84,12 +87,13 @@
 	async function setInstance(event: Event) {
 		event.preventDefault();
 		invalidInstance = !(await setInvidiousInstance(invidiousInstance));
-		goto(resolve('/', {}), { replaceState: true });
+		location.reload();
 	}
 
 	async function setBackend(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
+		location.reload();
 	}
 
 	function allowInsecureRequests() {
@@ -136,7 +140,7 @@
 		<form onsubmit={setInstance}>
 			<nav>
 				<div
-					class="field prefix label surface-container-highest max"
+					class="field prefix suffix label surface-container-highest max"
 					class:invalid={invalidInstance}
 				>
 					<i>link</i>
@@ -149,6 +153,17 @@
 					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
 					{#if invalidInstance}
 						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+					{#if $invidiousInstanceStore}
+						<i
+							role="presentation"
+							class="front"
+							onclick={() => {
+								invidiousInstanceStore.set(undefined);
+								invidiousInstance = undefined;
+								invidiousLogout();
+							}}>close</i
+						>
 					{/if}
 				</div>
 				<button class="square">

@@ -29,10 +29,12 @@ export async function load() {
 			errorMsg = popularError as Error;
 		}
 
-		if (errorMsg && errorMsg.toString() === 'Error: Administrator has disabled this endpoint.') {
-			popularDisabled = true;
-		} else {
-			throw error(500, errorMsg);
+		if (errorMsg) {
+			if (errorMsg.toString() === 'Error: Administrator has disabled this endpoint.') {
+				popularDisabled = true;
+			} else {
+				throw error(500, errorMsg);
+			}
 		}
 
 		feedCacheStore.set({ ...get(feedCacheStore), popular });

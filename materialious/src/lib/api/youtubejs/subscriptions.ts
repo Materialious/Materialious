@@ -61,6 +61,8 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
 	const response = await fetch(feedUrl);
+	if (!response.ok) return;
+
 	const text = await response.text();
 
 	const parser = new DOMParser();

@@ -284,7 +284,10 @@
 							<div class="tooltip bottom">{$_('layout.login')}</div>
 						</button>
 					{:else}
-						<button onclick={logout} class="circle large transparent">
+						<button
+							onclick={$rawMasterKeyStore ? materialiousLogout : invidiousLogout}
+							class="circle large transparent"
+						>
 							<i>logout</i>
 							<div class="tooltip bottom">{$_('layout.logout')}</div>
 						</button>

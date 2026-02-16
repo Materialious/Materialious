@@ -45,8 +45,8 @@ jobs:
                   METAINFO_URL="https://raw.githubusercontent.com/Materialious/Materialious/${{ github.sha }}/materialious/electron/materialious.metainfo.xml"
                   CHECKSUM=$(curl -L $METAINFO_URL | sha256sum | awk '{ print $1 }')
 
-                  echo "metainfo_url=$METAINFO_URL" >> "$GITHUB_ENV"
-                  echo "metainfo_sha256=$CHECKSUM" >> "$GITHUB_ENV"
+                  echo "metainfo_url=$METAINFO_URL" >> "$GITHUB_OUTPUT"
+                  echo "metainfo_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
             - name: Update manifest file with new urls and checksums
               run: |

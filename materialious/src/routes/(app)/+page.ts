@@ -22,14 +22,17 @@ export async function load() {
 	let popularDisabled: boolean = false;
 
 	if (!popular) {
+		let errorMsg: Error | undefined;
 		try {
 			popular = await getPopular();
-		} catch (errorMessage: any) {
-			if (errorMessage.toString() === 'Error: Administrator has disabled this endpoint.') {
-				popularDisabled = true;
-			} else {
-				error(500, errorMessage);
-			}
+		} catch (popularError) {
+			errorMsg = popularError as Error;
+		}
+
+		if (errorMsg && errorMsg.toString() === 'Error: Administrator has disabled this endpoint.') {
+			popularDisabled = true;
+		} else {
+			throw error(500, errorMsg);
 		}
 
 		feedCacheStore.set({ ...get(feedCacheStore), popular });

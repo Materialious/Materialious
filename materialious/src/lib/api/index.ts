@@ -71,13 +71,18 @@ export function setRegion(url: URL): URL {
 export async function fetchErrorHandle(response: Response): Promise<Response> {
 	if (!response.ok) {
 		let message = 'Internal error';
+
+		// Attempt to parse error.
 		try {
 			const json = await response.json();
-			message = 'errorBacktrace' in json ? json.errorBacktrace : json.error;
+			message = json.errorBacktrace || json.error || json.message;
 		} catch {
 			// Continue regardless of error
 		}
-		throw Error(message);
+
+		throw Error(
+			`${response.status} - ${response.statusText}\n${decodeURIComponent(response.url)}\n${message}`
+		);
 	}
 
 	return response;

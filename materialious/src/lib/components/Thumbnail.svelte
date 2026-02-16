@@ -230,6 +230,7 @@
 						tabindex="-1"
 						class:author={!sideways}
 						href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
+						data-sveltekit-preload-data="off"
 						>{video.author}
 					</a>
 				{:else}

@@ -107,7 +107,11 @@ async function proxyRequest(
 		body = request.body;
 	}
 
-	const response = await fetch(urlToProxyObj.toString(), { ...requestOptions, body });
+	const response = await fetch(urlToProxyObj.toString(), {
+		...requestOptions,
+		body,
+		signal: AbortSignal.timeout(10000)
+	});
 
 	const responseHeaders = new Headers(response.headers);
 	responseHeaders.set('transfer-encoding', 'chunked');

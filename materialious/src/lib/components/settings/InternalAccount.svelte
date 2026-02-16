@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import { logout } from '$lib/misc';
+	import { materialiousLogout } from '$lib/misc';
 
 	let clickCount = $state(0);
 	const clicksToDelte = 3;
@@ -16,7 +16,7 @@
 
 		if (clicksToDelte - clickCount === 0) {
 			await fetch('/api/user/delete', { method: 'DELETE' });
-			logout();
+			materialiousLogout();
 		}
 	}
 </script>

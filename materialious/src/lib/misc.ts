@@ -312,7 +312,12 @@ export async function goToInvidiousLogin() {
 	}
 }
 
-export async function logout() {
+export async function invidiousLogout() {
+	invidiousAuthStore.set(null);
+	goto(resolve('/', {}));
+}
+
+export async function materialiousLogout() {
 	if (isYTBackend()) {
 		await clearFeedYTjs();
 	}
@@ -320,8 +325,6 @@ export async function logout() {
 	if (isOwnBackend()?.internalAuth) {
 		fetch('/api/user/logout', { method: 'DELETE' });
 		rawMasterKeyStore.set(undefined);
-	} else {
-		invidiousAuthStore.set(null);
 	}
 
 	goto(resolve('/', {}));

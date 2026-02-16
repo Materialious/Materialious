@@ -1,79 +1,84 @@
 name: Update Flathub PR
 
 on:
-  workflow_run:
-    workflows: ["Build desktop"]
-    types:
-      - completed
+    workflow_run:
+        workflows: ["Build desktop"]
+        types:
+            - completed
 
 jobs:
-  flathub-create-pr:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the flathub/us.materialio.Materialious repository
-        uses: actions/checkout@v4
-        with:
-          repository: flathub/us.materialio.Materialious
-          token: ${{ secrets.FLATHUB_TOKEN }}
+    flathub-create-pr:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the flathub/us.materialio.Materialious repository
+              uses: actions/checkout@v4
+              with:
+                  repository: flathub/us.materialio.Materialious
+                  token: ${{ secrets.FLATHUB_TOKEN }}
 
-      - name: Retrieve latest release version and assets
-        id: get_release
-        run: |
-          RELEASE_DATA=$(curl --silent "https://api.github.com/repos/Materialious/Materialious/releases/latest")
-          VERSION=$(echo $RELEASE_DATA | jq -r .tag_name)
-          X86_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-x64.zip")) | .browser_download_url')
-          AARCH64_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-arm64.zip")) | .browser_download_url')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "x86_url=$X86_URL" >> "$GITHUB_OUTPUT"
-          echo "aarch64_url=$AARCH64_URL" >> "$GITHUB_OUTPUT"
+            - name: Retrieve latest release version and assets
+              id: get_release
+              run: |
+                  RELEASE_DATA=$(curl --silent "https://api.github.com/repos/Materialious/Materialious/releases/latest")
+                  VERSION=$(echo $RELEASE_DATA | jq -r .tag_name)
+                  X86_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-x64.zip")) | .browser_download_url')
+                  AARCH64_URL=$(echo $RELEASE_DATA | jq -r '.assets[] | select(.name | contains("linux-arm64.zip")) | .browser_download_url')
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  echo "x86_url=$X86_URL" >> "$GITHUB_OUTPUT"
+                  echo "aarch64_url=$AARCH64_URL" >> "$GITHUB_OUTPUT"
 
-      - name: Generate SHA256 checksum for x86_64 release
-        id: sha256_x86
-        run: |
-          CHECKSUM=$(curl -L ${{ steps.get_release.outputs.x86_url }} | sha256sum | awk '{ print $1 }')
-          echo "x86_64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
+            - name: Generate SHA256 checksum for x86_64 release
+              id: sha256_x86
+              run: |
+                  CHECKSUM=$(curl -L ${{ steps.get_release.outputs.x86_url }} | sha256sum | awk '{ print $1 }')
+                  echo "x86_64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
-      - name: Generate SHA256 checksum for aarch64 release
-        id: sha256_arm
-        run: |
-          CHECKSUM=$(curl -L ${{ steps.get_release.outputs.aarch64_url }} | sha256sum | awk '{ print $1 }')
-          echo "aarch64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
+            - name: Generate SHA256 checksum for aarch64 release
+              id: sha256_arm
+              run: |
+                  CHECKSUM=$(curl -L ${{ steps.get_release.outputs.aarch64_url }} | sha256sum | awk '{ print $1 }')
+                  echo "aarch64_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
 
-      - name: Generate SHA256 checksum for materialious.metainfo.xml
-        id: sha256_metainfo
-        run: |
-          METAINFO_URL="https://raw.githubusercontent.com/Materialious/Materialious/main/materialious/electron/materialious.metainfo.xml"
-          CHECKSUM=$(curl -L $METAINFO_URL | sha256sum | awk '{ print $1 }')
-          echo "metainfo_sha256=$CHECKSUM" >> "$GITHUB_OUTPUT"
+            - name: Generate SHA256 checksum for materialious.metainfo.xml
+              id: sha256_metainfo
+              run: |
+                  METAINFO_URL="https://raw.githubusercontent.com/Materialious/Materialious/${{ github.sha }}/materialious/electron/materialious.metainfo.xml"
+                  CHECKSUM=$(curl -L $METAINFO_URL | sha256sum | awk '{ print $1 }')
 
-      - name: Update manifest file with new urls and checksums
-        run: |
-          MANIFEST_FILE="us.materialio.Materialious.yml"
-          yq eval -i ".modules[0].sources[0].url = \"${{ steps.get_release.outputs.x86_url }}\"" $MANIFEST_FILE
-          yq eval -i ".modules[0].sources[0].sha256 = \"${{ steps.sha256_x86.outputs.x86_64_sha256 }}\"" $MANIFEST_FILE
-          yq eval -i ".modules[0].sources[1].url = \"${{ steps.get_release.outputs.aarch64_url }}\"" $MANIFEST_FILE
-          yq eval -i ".modules[0].sources[1].sha256 = \"${{ steps.sha256_arm.outputs.aarch64_sha256 }}\"" $MANIFEST_FILE
-          yq eval -i ".modules[0].sources[5].sha256 = \"${{ steps.sha256_metainfo.outputs.metainfo_sha256 }}\"" $MANIFEST_FILE
+                  echo "metainfo_url=$METAINFO_URL" >> "$GITHUB_ENV"
+                  echo "metainfo_sha256=$CHECKSUM" >> "$GITHUB_ENV"
 
-      - name: Set Git user identity
-        run: |
-            git config --global user.name "WardPearce"
-            git config --global user.email "wardpearce@pm.me"
+            - name: Update manifest file with new urls and checksums
+              run: |
+                  MANIFEST_FILE="us.materialio.Materialious.yml"
+                  yq eval -i ".modules[0].sources[0].url = \"${{ steps.get_release.outputs.x86_url }}\"" $MANIFEST_FILE
+                  yq eval -i ".modules[0].sources[0].sha256 = \"${{ steps.sha256_x86.outputs.x86_64_sha256 }}\"" $MANIFEST_FILE
 
-      - name: Create Release Branch
-        run: |
-          git checkout -b release-v${{ steps.get_release.outputs.version }}
-          git push --set-upstream origin release-v${{ steps.get_release.outputs.version }}
+                  yq eval -i ".modules[0].sources[1].url = \"${{ steps.get_release.outputs.aarch64_url }}\"" $MANIFEST_FILE
+                  yq eval -i ".modules[0].sources[1].sha256 = \"${{ steps.sha256_arm.outputs.aarch64_sha256 }}\"" $MANIFEST_FILE
 
-      - name: Commit changes
-        run: |
-          git add us.materialio.Materialious.yml
-          git commit -m "Update manifest for v${{ steps.get_release.outputs.version }} release"
-          git push
+                  yq eval -i ".modules[0].sources[5].url = \"${{ steps.sha256_metainfo.outputs.metainfo_url }}\"" $MANIFEST_FILE
+                  yq eval -i ".modules[0].sources[5].sha256 = \"${{ steps.sha256_metainfo.outputs.metainfo_sha256 }}\"" $MANIFEST_FILE
 
-      - name: Create Pull Request
-        run: |
-          echo ${{ secrets.FLATHUB_TOKEN }} >> auth.txt
-          gh auth login --with-token < auth.txt
-          rm auth.txt
-          gh pr create --title "Release v${{ steps.get_release.outputs.version }}" --body "This is an automated PR for the v${{ steps.get_release.outputs.version }} release. This PR will be updated and merged once testing is complete." --repo flathub/us.materialio.Materialious
+            - name: Set Git user identity
+              run: |
+                  git config --global user.name "WardPearce"
+                  git config --global user.email "wardpearce@pm.me"
+
+            - name: Create Release Branch
+              run: |
+                  git checkout -b release-v${{ steps.get_release.outputs.version }}
+                  git push --set-upstream origin release-v${{ steps.get_release.outputs.version }}
+
+            - name: Commit changes
+              run: |
+                  git add us.materialio.Materialious.yml
+                  git commit -m "Update manifest for v${{ steps.get_release.outputs.version }} release"
+                  git push
+
+            - name: Create Pull Request
+              run: |
+                  echo ${{ secrets.FLATHUB_TOKEN }} >> auth.txt
+                  gh auth login --with-token < auth.txt
+                  rm auth.txt
+                  gh pr create --title "Release v${{ steps.get_release.outputs.version }}" --body "This is an automated PR for the v${{ steps.get_release.outputs.version }} release. This PR will be updated and merged once testing is complete." --repo flathub/us.materialio.Materialious

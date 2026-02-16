@@ -23,7 +23,7 @@
 		playerYouTubeJsFallback
 	} from '../../store';
 	import { playbackRates } from '$lib/player';
-	import { isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
+	import { isUnrestrictedPlatform } from '$lib/misc';
 
 	let defaultLanguage = $state(get(playerDefaultLanguage));
 

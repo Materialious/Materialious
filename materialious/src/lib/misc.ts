@@ -38,13 +38,10 @@ export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
 
 	const hasTouchSupport = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-	const isSmallScreen = window.innerWidth < 768;
 	const isUserAgentMobile =
 		/Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 
-	return (
-		(hasTouchSupport && isSmallScreen && isUserAgentMobile) || Capacitor.getPlatform() === 'android'
-	);
+	return (hasTouchSupport && isUserAgentMobile) || Capacitor.getPlatform() === 'android';
 }
 
 export function isVideoID(videoId: string): boolean {

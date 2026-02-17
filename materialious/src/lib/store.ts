@@ -3,7 +3,6 @@ import type Peer from 'peerjs';
 import type { DataConnection } from 'peerjs';
 import { writable, type Writable } from 'svelte/store';
 import { Preferences } from '@capacitor/preferences';
-import { env } from '$env/dynamic/public';
 import {
 	persist,
 	createLocalStorage,

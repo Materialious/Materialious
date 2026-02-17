@@ -3,7 +3,7 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { videoLength } from '$lib/numbers';
 	import { generateChapterWebVTT, type ParsedDescription } from '$lib/description';
-	import { Capacitor } from '@capacitor/core';
+	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { error, type Page } from '@sveltejs/kit';
 	import Mousetrap from 'mousetrap';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
@@ -20,6 +20,8 @@
 		invidiousInstanceStore,
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
+		playerAndroidLockOrientation,
+		playerAndroidPauseOnNetworkChange,
 		playerAutoPlayStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
@@ -59,9 +61,10 @@
 	import Airplay from './settings/Airplay.svelte';
 	import Pip from './settings/Pip.svelte';
 	import FullscreenToggle from './settings/FullscreenToggle.svelte';
-	import { AndroidPlayer } from '$lib/player/android';
 	import Timeline from './Timeline.svelte';
 	import TouchControls from './TouchControls.svelte';
+	import { Network, type ConnectionStatus } from '@capacitor/network';
+	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -86,10 +89,11 @@
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let showVideoRetry = $state(false);
 
-	let androidPlayer: AndroidPlayer;
-
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
+
+	let androidInitialNetworkStatus: ConnectionStatus | undefined;
+	let androidOriginalOrigination: ScreenOrientationResult | undefined;
 
 	let playerContainer: HTMLElement;
 	let playerCurrentPlaybackState = $state(false);
@@ -369,6 +373,58 @@
 		}, 5000);
 	}
 
+	async function onAndroidFullscreenChange() {
+		const videoFormats = data.video.adaptiveFormats.filter((format) =>
+			format.type.startsWith('video/')
+		);
+
+		const isFullScreen = !!document.fullscreenElement;
+
+		if (isFullScreen) {
+			// Ensure bar color is black while in fullscreen
+			await SystemBars.setStyle({ style: SystemBarsStyle.Light });
+			await SystemBars.hide({
+				bar: SystemBarType.NavigationBar
+			});
+			await SystemBars.hide({
+				bar: SystemBarType.StatusBar
+			});
+		} else {
+			await setStatusBarColor();
+		}
+
+		if (!$playerAndroidLockOrientation) return;
+
+		if (isFullScreen && videoFormats[0].resolution) {
+			const widthHeight = videoFormats[0].resolution.split('x');
+
+			if (widthHeight.length !== 2) return;
+
+			if (Number(widthHeight[0]) > Number(widthHeight[1])) {
+				await ScreenOrientation.lock({ orientation: 'landscape' });
+			} else {
+				await ScreenOrientation.lock({ orientation: 'portrait' });
+			}
+		} else {
+			await ScreenOrientation.lock({
+				orientation: (androidOriginalOrigination as ScreenOrientationResult).type
+			});
+		}
+	}
+
+	async function androidHandleRotate() {
+		if (
+			Capacitor.getPlatform() !== 'android' ||
+			data.video.adaptiveFormats.length === 0 ||
+			$isAndroidTvStore
+		)
+			return;
+
+		androidOriginalOrigination = await ScreenOrientation.orientation();
+
+		document.addEventListener('fullscreenchange', onAndroidFullscreenChange);
+	}
+
 	onMount(async () => {
 		shaka.polyfill.installAll();
 		if (!shaka.Player.isBrowserSupported()) {
@@ -417,8 +473,6 @@
 		window.addEventListener('resize', updateVideoPlayerHeight);
 		updateVideoPlayerHeight();
 
-		androidPlayer = new AndroidPlayer(data.video, playerElement);
-
 		await player.attach(playerElement);
 
 		player?.addEventListener('error', (event) => {
@@ -454,6 +508,19 @@
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
 		if (Capacitor.getPlatform() === 'android') {
+			await androidHandleRotate();
+
+			androidInitialNetworkStatus = await Network.getStatus();
+
+			Network.addListener('networkStatusChange', (networkStatus) => {
+				if (
+					androidInitialNetworkStatus?.connectionType !== networkStatus.connectionType &&
+					$playerAndroidPauseOnNetworkChange
+				) {
+					playerElement?.pause();
+				}
+			});
+
 			await CapacitorMusicControls.create({
 				track: data.video.title,
 				artist: data.video.author,
@@ -778,7 +845,16 @@
 		if (Capacitor.getPlatform() === 'android') {
 			await setStatusBarColor();
 			await CapacitorMusicControls.destroy();
-			await androidPlayer.destroy();
+
+			if ($isAndroidTvStore) {
+				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
+			}
+
+			if (androidOriginalOrigination) {
+				await ScreenOrientation.lock({
+					orientation: androidOriginalOrigination.type
+				});
+			}
 		}
 
 		try {

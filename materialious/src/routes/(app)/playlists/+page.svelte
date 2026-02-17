@@ -2,8 +2,8 @@
 	import { preventDefault } from 'svelte/legacy';
 
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
-	import ContentColumn from '$lib/components/ContentColumn.svelte';
-	import PlaylistThumbnail from '$lib/components/PlaylistThumbnail.svelte';
+	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
+	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import { ui } from 'beercss';
 	import { _ } from '$lib/i18n';
 

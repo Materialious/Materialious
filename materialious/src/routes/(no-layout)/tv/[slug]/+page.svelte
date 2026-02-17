@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ContentColumn from '$lib/components/ContentColumn.svelte';
+	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import Player from '$lib/components/player/Player.svelte';
 	import Author from '$lib/components/Author.svelte';
 	import Description from '$lib/components/watch/Description.svelte';

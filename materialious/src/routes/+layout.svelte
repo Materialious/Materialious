@@ -81,19 +81,20 @@
 	});
 
 	onMount(async () => {
-		ui();
-
-		if (Capacitor.getPlatform() === 'android' && $themeColorStore) {
-			try {
-				const colorPalette = await colorTheme.getColorPalette();
-				themeColorStore.set(convertToHexColorCode(colorPalette.primary));
-				await ui('theme', $themeColorStore);
-			} catch {
-				// Continue regardless of error
-			}
-		}
+		await ui();
 
 		if (Capacitor.getPlatform() === 'android') {
+			if (!$themeColorStore) {
+				try {
+					const colorPalette = await colorTheme.getColorPalette();
+					const colorAsHex = convertToHexColorCode(colorPalette.primary);
+					themeColorStore.set(colorAsHex);
+					await ui('theme', colorAsHex);
+				} catch {
+					// Continue regardless of error
+				}
+			}
+
 			document.addEventListener('click', async (event: MouseEvent) => {
 				// Handles opening links in browser for android.
 				const link = (event.target as HTMLElement).closest('a');

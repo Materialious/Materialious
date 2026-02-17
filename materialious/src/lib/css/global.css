@@ -133,6 +133,55 @@ menu {
 	border: none !important;
 }
 
+menu.player-settings {
+	transform: scale(1) translateY(-40%) translateX(0) !important;
+	width: 300px !important;
+	height: 200px !important;
+}
+
+.player-slider {
+	height: var(--player-timeline-height);
+	margin: 0 auto;
+	border-radius: 0.25rem;
+}
+
+.player-slider.full-width {
+	width: 100%;
+}
+
+.player-slider.volume {
+	width: 200px;
+}
+
+.player-slider .track {
+	background: var(--secondary-container);
+	height: 100%;
+	position: relative;
+	border-radius: 0.25rem;
+}
+
+.player-slider .range {
+	position: absolute;
+	background: var(--inverse-primary);
+	inset: 0;
+	right: var(--percentage-inv);
+	border-radius: 0.25rem;
+	opacity: 0.5;
+}
+
+.player-slider [data-melt-slider-thumb] {
+	position: absolute;
+	border-radius: 1rem;
+	background: var(--primary);
+	left: var(--percentage);
+	top: 50%;
+	width: 5px;
+	height: 35px;
+	z-index: 3;
+	cursor: grab;
+	transform: translate(-50%, -50%);
+}
+
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;

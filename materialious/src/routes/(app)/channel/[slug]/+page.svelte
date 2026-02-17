@@ -5,15 +5,15 @@
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
 	import { channelCacheStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
-	import { Clipboard } from '@capacitor/clipboard';
-	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import ItemsList from '$lib/components/ItemsList.svelte';
+	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Author from '$lib/components/Author.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { isYTBackend } from '$lib/misc';
+	import Share from '$lib/components/Share.svelte';
+	import { resolve } from '$app/paths';
 
 	let tab: ChannelContentTypes = $state('videos');
 
@@ -108,37 +108,29 @@
 			</p>
 		</div>
 		{#if !$isAndroidTvStore}
-			<button class="border">
-				<i>share</i>
-				<span>{$_('player.share.title')}</span>
-				<menu class="no-wrap mobile">
-					{#if !Capacitor.isNativePlatform()}
-						<li
-							class="row"
-							role="presentation"
-							onclick={async () => {
-								await Clipboard.write({ string: location.href });
-								(document.activeElement as HTMLElement)?.blur();
-							}}
-						>
-							{$_('player.share.materialiousLink')}
-						</li>
-					{/if}
-
-					<li
-						class="row"
-						role="presentation"
-						onclick={async () => {
-							await Clipboard.write({
-								string: `https://www.youtube.com/channel/${page.params.slug}`
-							});
-							(document.activeElement as HTMLElement)?.blur();
-						}}
-					>
-						{$_('player.share.youtubeLink')}
-					</li>
-				</menu>
-			</button>
+			<Share
+				iconOnly={false}
+				shares={[
+					{
+						type: 'materialious',
+						path: resolve('/channel/[channelId]', {
+							channelId: page.params.slug
+						})
+					},
+					{
+						type: 'youtube',
+						path: `/channel/${page.params.slug}`
+					},
+					{
+						type: 'invidious',
+						path: `/channel/${page.params.slug}`
+					},
+					{
+						type: 'invidious redirect',
+						path: `/channel/${page.params.slug}`
+					}
+				]}
+			/>
 		{/if}
 	</div>
 

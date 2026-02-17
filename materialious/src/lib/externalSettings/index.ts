@@ -26,7 +26,6 @@ export async function syncSettingsToBackend() {
 			let initalLoad = true;
 			store.store.subscribe((value) => {
 				if (!get(rawMasterKeyStore)) return;
-
 				if (initalLoad) {
 					initalLoad = false;
 					return;
@@ -115,6 +114,19 @@ export function bookmarkletSaveToUrl(): string {
 	}
 
 	return url.toString();
+}
+
+export function settingsToJson(): string {
+	const settings: Record<string, string> = {};
+
+	for (const { name, store, excludeFromBookmarklet } of persistedStores) {
+		const value = get(store);
+		if (!excludeFromBookmarklet) {
+			settings[name] = value;
+		}
+	}
+
+	return JSON.stringify(settings);
 }
 
 export function bookmarkletLoadFromUrl() {

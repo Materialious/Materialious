@@ -3,10 +3,10 @@
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
 	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
-	import { Clipboard } from '@capacitor/clipboard';
-	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
-	import ItemsList from '$lib/components/ItemsList.svelte';
+	import ItemsList from '$lib/components/layout/ItemsList.svelte';
+	import Share from '$lib/components/Share.svelte';
+	import { page } from '$app/state';
 
 	let { data } = $props();
 </script>
@@ -44,7 +44,7 @@
 					playlistSettingsStore.set({
 						[data.playlist.info.playlistId]: { shuffle: true, loop: false }
 					})}
-				class="button circle extra no-margin border"
+				class="button circle extra no-margin surface-container-highest"
 			>
 				<i>shuffle</i>
 				<div class="tooltip bottom">
@@ -68,36 +68,29 @@
 	<div class="space"></div>
 
 	{#if !$isAndroidTvStore}
-		<button class="border no-margin">
-			<i>share</i>
-			<span>{$_('player.share.title')}</span>
-			<menu class="no-wrap mobile">
-				{#if !Capacitor.isNativePlatform()}
-					<li
-						class="row"
-						role="presentation"
-						onclick={async () => {
-							await Clipboard.write({ string: location.href });
-							(document.activeElement as HTMLElement)?.blur();
-						}}
-					>
-						{$_('player.share.materialiousLink')}
-					</li>
-				{/if}
-				<li
-					class="row"
-					role="presentation"
-					onclick={async () => {
-						await Clipboard.write({
-							string: `https://www.youtube.com/playlist?list=${data.playlist.info.playlistId}`
-						});
-						(document.activeElement as HTMLElement)?.blur();
-					}}
-				>
-					{$_('player.share.youtubeLink')}
-				</li>
-			</menu>
-		</button>
+		<nav class="right-align">
+			<Share
+				iconOnly={false}
+				shares={[
+					{
+						type: 'materialious',
+						path: resolve('/playlist/[playlistId]', { playlistId: page.params.slug })
+					},
+					{
+						type: 'invidious',
+						path: `/playlist?list=${page.params.slug}`
+					},
+					{
+						type: 'invidious redirect',
+						path: `/playlist?list=${page.params.slug}`
+					},
+					{
+						type: 'youtube',
+						path: `/playlist?list=${page.params.slug}`
+					}
+				]}
+			/>
+		</nav>
 	{/if}
 </article>
 

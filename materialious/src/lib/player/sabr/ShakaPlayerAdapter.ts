@@ -23,7 +23,7 @@ import {
 	createRecoverableError,
 	headersToGenericObject,
 	makeResponse
-} from '$lib/sabr/helpers';
+} from '$lib/player/sabr/helpers';
 
 interface ShakaResponseArgs {
 	uri: string;
@@ -317,7 +317,6 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 				}
 
 				if (result) {
-					abortController.abort();
 					return this.createShakaResponse({
 						uri,
 						request,

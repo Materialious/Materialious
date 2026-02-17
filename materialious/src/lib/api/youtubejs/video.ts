@@ -100,8 +100,6 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 		video.streaming_data.adaptive_formats = video.streaming_data.adaptive_formats.filter(
 			(format) => format.xtags !== 'CgcKAnZiEgEx'
 		);
-	} else {
-		throw new Error('Video did not provide streaming data.');
 	}
 
 	const adaptiveFormats: AdaptiveFormats[] = [];

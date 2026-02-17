@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ItemsList from '$lib/components/ItemsList.svelte';
+	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import { _ } from '$lib/i18n/index';
 	import { feedCacheStore } from '$lib/store';
 

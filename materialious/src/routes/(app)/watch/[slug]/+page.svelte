@@ -7,13 +7,11 @@
 		removePlaylistVideo
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
-	import ShareVideo from '$lib/components/ShareVideo.svelte';
-	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import Transcript from '$lib/components/Transcript.svelte';
+	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
+	import Transcript from '$lib/components/watch/Transcript.svelte';
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { cleanNumber, numberWithCommas } from '$lib/numbers';
-	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player/index';
+	import { numberWithCommas } from '$lib/numbers';
 	import {
 		invidiousAuthStore,
 		interfaceAutoExpandChapters,
@@ -24,7 +22,6 @@
 		playerTheatreModeByDefaultStore,
 		playertheatreModeIsActive,
 		playlistCacheStore,
-		playlistSettingsStore,
 		syncPartyConnectionsStore,
 		type PlayerState
 	} from '$lib/store';
@@ -42,6 +39,9 @@
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
 	import { getWatchDetails } from '$lib/watch';
 	import { page } from '$app/state';
+	import Share from '$lib/components/Share.svelte';
+	import Playlist from '$lib/components/watch/Playlist.svelte';
+	import type { PlayerEvents } from '$lib/player/index.js';
 
 	let { data = $bindable() } = $props();
 
@@ -54,9 +54,6 @@
 
 	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
-
-	let loopPlaylist: boolean = $state(false);
-	let shufflePlaylist: boolean = $state(false);
 
 	playertheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
@@ -81,14 +78,6 @@
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {
 			expandSummery('comment-section');
-		}
-	});
-
-	playlistSettingsStore.subscribe((playlistSetting) => {
-		if (!data.playlistId) return;
-		if (data.playlistId in playlistSetting) {
-			loopPlaylist = playlistSetting[data.playlistId].loop;
-			shufflePlaylist = playlistSetting[data.playlistId].shuffle;
 		}
 	});
 
@@ -449,15 +438,44 @@
 							{$_('transcript')}
 						</div>
 					</button>
-					<button
-						class="surface-container-highest"
-						onclick={(event: Event) => event.stopPropagation()}
-						><i>share</i>
-						<div class="tooltip">
-							{$_('player.share.title')}
-						</div>
-						<ShareVideo bind:currentTime={playerCurrentTime} video={data.video} />
-					</button>
+					<Share
+						includePromptText={$_('player.share.includeTimestamp')}
+						shares={[
+							{
+								type: 'materialious',
+								path: resolve('/watch/[videoId]', { videoId: data.video.videoId }),
+								param: {
+									key: 'time',
+									value: () => Math.round(playerCurrentTime)
+								}
+							},
+							{
+								type: 'invidious',
+								path: `/watch?=${data.video.videoId}`,
+								param: {
+									key: 'v',
+									value: () => Math.round(playerCurrentTime)
+								}
+							},
+							{
+								type: 'invidious redirect',
+								path: `/watch?=${data.video.videoId}`,
+								param: {
+									key: 'v',
+									value: () => Math.round(playerCurrentTime)
+								}
+							},
+							{
+								type: 'youtube',
+								path: `/watch?=${data.video.videoId}`,
+								param: {
+									key: 'v',
+									value: () => Math.round(playerCurrentTime)
+								}
+							}
+						]}
+						iconOnly={true}
+					/>
 					{#if personalPlaylists && personalPlaylists.length > 0}
 						<button class="surface-container-highest">
 							<i>add</i>
@@ -581,100 +599,7 @@
 				<Transcript video={data.video} bind:playerElement />
 			{/if}
 			{#if data.playlistId && data.playlistId in $playlistCacheStore}
-				<article
-					style="height: 85vh; position: relative;scrollbar-width: none;"
-					id="playlist"
-					class="scroll no-padding surface-container border"
-				>
-					<article class="no-elevate border" style="position: sticky; top: 0; z-index: 3;">
-						<h6>{$playlistCacheStore[data.playlistId].info.title}</h6>
-						<p>
-							{cleanNumber($playlistCacheStore[data.playlistId].info.viewCount)}
-							{$_('views')} • {$playlistCacheStore[data.playlistId].info.videoCount}
-							{$_('videos')}
-						</p>
-						<p>
-							{#if $playlistCacheStore[data.playlistId].info.authorId}
-								<a
-									href={resolve(`/channel/[authorId]`, {
-										authorId: $playlistCacheStore[data.playlistId].info.authorId
-									})}>{$playlistCacheStore[data.playlistId].info.author}</a
-								>
-							{:else}
-								{$playlistCacheStore[data.playlistId].info.author}
-							{/if}
-						</p>
-						<nav>
-							<button
-								onclick={() => {
-									loopPlaylist = !loopPlaylist;
-									playlistSettingsStore.set({
-										[data.playlistId as string]: { loop: loopPlaylist, shuffle: shufflePlaylist }
-									});
-								}}
-								class="circle"
-								class:fill={!loopPlaylist}
-							>
-								<i>loop</i>
-								<div class="tooltip bottom">
-									{$_('playlist.loopPlaylist')}
-								</div>
-							</button>
-							<button
-								onclick={() => {
-									shufflePlaylist = !shufflePlaylist;
-									playlistSettingsStore.set({
-										[data.playlistId as string]: { loop: loopPlaylist, shuffle: shufflePlaylist }
-									});
-								}}
-								class="circle"
-								class:fill={!shufflePlaylist}
-							>
-								<i>shuffle</i>
-								<div class="tooltip bottom">
-									{$_('playlist.shuffleVideos')}
-								</div>
-							</button>
-							<button class="circle fill" onclick={() => goToPreviousVideo(data.playlistId)}>
-								<i>skip_previous</i>
-								<div class="tooltip bottom">
-									{$_('playlist.previous')}
-								</div>
-							</button>
-							<button
-								class="circle fill"
-								onclick={async () => await goToNextVideo(data.video, data.playlistId)}
-							>
-								<i>skip_next</i>
-								<div class="tooltip bottom">
-									{$_('playlist.next')}
-								</div>
-							</button>
-						</nav>
-
-						<div class="space"></div>
-						<div class="divider"></div>
-					</article>
-
-					<div class="space"></div>
-
-					{#each $playlistCacheStore[data.playlistId].videos as playlistVideo (playlistVideo.videoId)}
-						<article
-							class="no-padding border"
-							style="margin: .7em;"
-							id={playlistVideo.videoId}
-							class:primary-border={playlistVideo.videoId === data.video.videoId}
-						>
-							{#key playlistVideo.videoId}
-								<Thumbnail
-									video={playlistVideo}
-									sideways={true}
-									playlistId={data.playlistId || undefined}
-								/>
-							{/key}
-						</article>
-					{/each}
-				</article>
+				<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />
 			{:else if data.video.recommendedVideos}
 				{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
 					<article class="no-padding border">

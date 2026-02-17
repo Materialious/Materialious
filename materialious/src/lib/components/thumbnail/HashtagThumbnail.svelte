@@ -2,8 +2,8 @@
 	import { resolve } from '$app/paths';
 	import { cleanNumber } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
-	import type { HashTag } from '../api/model';
-	import { truncate } from '../misc';
+	import type { HashTag } from '$lib/api/model';
+	import { truncate } from '$lib/misc';
 
 	interface Props {
 		hashtag: HashTag;

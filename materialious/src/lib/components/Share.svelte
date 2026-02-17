@@ -3,7 +3,7 @@
 	import { _ } from '$lib/i18n';
 	import { invidiousInstanceStore } from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
-	import { titleCase } from '$lib/letterCasing';
+	import { sentenceCase } from '$lib/letterCasing';
 
 	type ShareLink = {
 		type: 'invidious' | 'youtube' | 'materialious' | 'invidious redirect';
@@ -75,7 +75,7 @@
 				>
 					<div class="min">
 						{$_('player.share.copyXLink', {
-							linkType: titleCase(share.type)
+							linkType: sentenceCase(share.type)
 						})}
 					</div>
 				</li>

@@ -33,6 +33,8 @@ import { Clipboard } from '@capacitor/clipboard';
 import { isOwnBackend } from './shared';
 import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
+import { addToast } from './components/Toast.svelte';
+import { _ } from './i18n';
 
 export function getPublicEnv(envName: string): string | undefined {
 	return env[`PUBLIC_${envName}`] ?? import.meta.env[`VITE_${envName}`];
@@ -114,6 +116,12 @@ export async function shareURL(url: string) {
 	} else {
 		await Clipboard.write({ string: url });
 	}
+
+	addToast({
+		data: {
+			text: get(_)('player.share.copiedSuccess')
+		}
+	});
 }
 
 export function ensureNoTrailingSlash(url: any): string {

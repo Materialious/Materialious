@@ -16,7 +16,7 @@
 {#if playerTextTracks && playerTextTracks.length > 0 && !video.liveNow}
 	<button class="surface-container-highest">
 		<i>closed_caption</i>
-		<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
+		<menu class="no-wrap mobile player-settings" id="cc-menu" data-ui="#cc-menu">
 			<li
 				role="presentation"
 				data-ui="#cc-menu"

@@ -126,9 +126,7 @@
 		"chapters": "Chapters",
 		"share": {
 			"title": "Share",
-			"materialiousLink": "Copy Materialious link",
-			"invidiousRedirect": "Copy Invidious redirect link",
-			"youtubeLink": "Copy Youtube link",
+			"copyXLink": "Copy {{linkType}} link",
 			"includeTimestamp": "Timestamped",
 			"copiedSuccess": "Copied to clipboard"
 		},

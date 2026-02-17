@@ -86,7 +86,7 @@
 <article class="scroll border no-padding" style="height: 75vh;" id="transcript">
 	<article class="no-elevate padding" style="position: sticky; top: 0; z-index: 3;">
 		<h6>{$_('transcript')}</h6>
-		<div class="field label suffix border">
+		<div class="field label suffix surface-container-highest">
 			<select bind:value={url} onchange={loadTranscript} name="captions">
 				<option selected={true} value={null}>{$_('selectLang')}</option>
 				{#each video.captions as caption (caption)}
@@ -97,7 +97,8 @@
 			<i>arrow_drop_down</i>
 		</div>
 		{#if transcriptCues.length > 0}
-			<div class="max field round suffix prefix small no-margin surface-variant">
+			<div class="space"></div>
+			<div class="max field suffix prefix small no-margin surface-container-highest">
 				<i class="front">search</i><input
 					bind:value={search}
 					oninput={searchTranscript}
@@ -127,7 +128,8 @@
 						class="transcript-line"
 						role="presentation"
 						onclick={() => (playerElement.currentTime = cue.startTime)}
-						class:secondary-container={currentTime >= cue.startTime && currentTime <= cue.endTime}
+						class:surface-container-highest={currentTime >= cue.startTime &&
+							currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
 						<p class="transcript-text">{decodeHtmlCharCodes(cue.text.replace(/<[^>]+>/g, ''))}</p>

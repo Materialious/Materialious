@@ -6,6 +6,7 @@ import {
 	playerDefaultLanguage,
 	playerDefaultQualityStore,
 	playerPlaylistHistory,
+	playerState,
 	playlistSettingsStore,
 	syncPartyConnectionsStore
 } from '$lib/store';
@@ -34,6 +35,8 @@ export const playbackRates = [
 export const playerDoubleTapSeek = 10.0;
 
 export function goToPreviousVideo(playlistId: string | null) {
+	playerState.set(undefined);
+
 	const previousVideos = get(playerPlaylistHistory);
 	if (previousVideos.length > 1) {
 		goto(
@@ -47,6 +50,8 @@ export function goToPreviousVideo(playlistId: string | null) {
 }
 
 export async function goToNextVideo(video: VideoPlay, playlistId: string | null) {
+	playerState.set(undefined);
+
 	const isAndroidTv = get(isAndroidTvStore);
 
 	if (!playlistId) {

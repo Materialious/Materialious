@@ -133,6 +133,12 @@ menu {
 	border: none !important;
 }
 
+menu.player-settings {
+	transform: scale(1) translateY(-40%) translateX(0) !important;
+	width: 300px !important;
+	height: 200px !important;
+}
+
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;

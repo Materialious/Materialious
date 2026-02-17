@@ -3,11 +3,8 @@
 	import { getBestThumbnail, ImageCache } from '$lib/images';
 	import { videoLength } from '$lib/numbers';
 	import { generateChapterWebVTT, type ParsedDescription, type Timestamp } from '$lib/description';
-	import { SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { Capacitor } from '@capacitor/core';
-	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import { error, type Page } from '@sveltejs/kit';
-	import ISO6391 from 'iso-639-1';
 	import Mousetrap from 'mousetrap';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
@@ -23,13 +20,10 @@
 		invidiousInstanceStore,
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
-		playerAndroidLockOrientation,
-		playerAndroidPauseOnNetworkChange,
 		playerAutoPlayStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
-		playerDefaultQualityStore,
 		playerPreferredVolumeStore,
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
@@ -49,14 +43,14 @@
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
-		playbackRates,
-		playerDoubleTapSeek
+		playerDoubleTapSeek,
+		restoreDefaultLanguage,
+		restoreQualityPreference,
+		toggleSubtitles
 	} from '$lib/player/index';
 	import { manifestDomainInclusion } from '$lib/player/manifest';
 	import { injectSabr } from '$lib/player/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
-	import { SvelteSet } from 'svelte/reactivity';
-	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend, truncate } from '$lib/misc';
@@ -67,6 +61,12 @@
 		type TimelineThumbnail
 	} from '$lib/player/thumbnails';
 	import { isOwnBackend } from '$lib/shared';
+	import Settings from './settings/Settings.svelte';
+	import CaptionSettings from './settings/CaptionSettings.svelte';
+	import Airplay from './settings/Airplay.svelte';
+	import Pip from './settings/Pip.svelte';
+	import FullscreenToggle from './settings/FullscreenToggle.svelte';
+	import { AndroidPlayer } from '$lib/player/android';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -99,11 +99,10 @@
 		music_offtopic: $_('layout.sponsors.musicOffTopic')
 	};
 
-	let originalOrigination: ScreenOrientationResult | undefined;
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let showVideoRetry = $state(false);
 
-	let androidInitialNetworkStatus: ConnectionStatus | undefined;
+	let androidPlayer: AndroidPlayer;
 
 	let player: shaka.Player;
 	let sabrAdapter: SabrStreamingAdapter | null;
@@ -114,11 +113,6 @@
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(true);
 	let playerVolume = $state($playerPreferredVolumeStore);
-	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
-	let playerTextTracks: shaka.extern.TextTrack[] | undefined = $state(undefined);
-	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
-	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
-	let playerLoop = $state($playerAlwaysLoopStore);
 	let playerTimelineTimeHover: number = $state(0);
 	let playerVideoEndTimePretty: string = $state('');
 	let playerBufferedTo: number = $state(0);
@@ -206,43 +200,6 @@
 		return `${percent}%`;
 	}
 
-	function restoreDefaultLanguage() {
-		if (!$playerDefaultLanguage || $playerDefaultLanguage === 'original') {
-			const languageAndRole = player
-				.getAudioLanguagesAndRoles()
-				.find(({ role }) => role === 'main');
-			if (languageAndRole !== undefined) {
-				player.selectAudioLanguage(languageAndRole.language);
-				return;
-			}
-		} else if ($playerDefaultLanguage) {
-			const audioLanguages = player.getAudioLanguages();
-			const langCode = ISO6391.getCode($playerDefaultLanguage);
-
-			for (const audioLanguage of audioLanguages) {
-				if (audioLanguage.startsWith(langCode)) {
-					player.selectAudioLanguage(audioLanguage);
-					break;
-				}
-			}
-		}
-	}
-
-	function filterUniqueAudioTracks(tracks: shaka.extern.AudioTrack[]): shaka.extern.AudioTrack[] {
-		const uniqueTracks: shaka.extern.AudioTrack[] = [];
-		const seen = new SvelteSet<string>();
-
-		for (const track of tracks) {
-			const identifier = `${track.language}-${track.label || 'No Label'}`;
-			if (!seen.has(identifier)) {
-				seen.add(identifier);
-				uniqueTracks.push(track);
-			}
-		}
-
-		return uniqueTracks;
-	}
-
 	function saveVolumePreference() {
 		if (!playerElement) return;
 		playerVolume = playerElement.volume;
@@ -253,93 +210,6 @@
 		if (!playerElement) return;
 		playerElement.volume = $playerPreferredVolumeStore;
 		playerVolume = playerElement.volume;
-	}
-
-	function restoreQualityPreference() {
-		const numericValue = parseInt($playerDefaultQualityStore, 10);
-
-		if (isNaN(numericValue)) {
-			player.configure({ abr: { enabled: true } });
-			return;
-		}
-
-		// Get video-only variant tracks
-		const tracks = player.getVariantTracks().filter((t) => t.height !== null);
-
-		// Sort by resolution descending
-		const sortedTracks = tracks.sort((a, b) => (b.height as number) - (a.height as number));
-
-		// Try exact match
-		let selectedTrack = sortedTracks.find((t) => t.height === numericValue);
-
-		// Try next best (lower than target)
-		if (!selectedTrack) {
-			selectedTrack = sortedTracks.find((t) => (t.height as number) < numericValue);
-		}
-
-		// Try next higher
-		if (!selectedTrack) {
-			selectedTrack = sortedTracks.find((t) => (t.height as number) > numericValue);
-		}
-
-		if (selectedTrack) {
-			player.configure({ abr: { enabled: false } });
-			player.selectVariantTrack(selectedTrack, true);
-		} else {
-			player.configure({ abr: { enabled: true } });
-		}
-	}
-
-	async function onAndroidFullscreenChange() {
-		const videoFormats = data.video.adaptiveFormats.filter((format) =>
-			format.type.startsWith('video/')
-		);
-
-		const isFullScreen = !!document.fullscreenElement;
-
-		if (isFullScreen) {
-			// Ensure bar color is black while in fullscreen
-			await SystemBars.setStyle({ style: SystemBarsStyle.Light });
-			await SystemBars.hide({
-				bar: SystemBarType.NavigationBar
-			});
-			await SystemBars.hide({
-				bar: SystemBarType.StatusBar
-			});
-		} else {
-			await setStatusBarColor();
-		}
-
-		if (!$playerAndroidLockOrientation) return;
-
-		if (isFullScreen && videoFormats[0].resolution) {
-			const widthHeight = videoFormats[0].resolution.split('x');
-
-			if (widthHeight.length !== 2) return;
-
-			if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-				await ScreenOrientation.lock({ orientation: 'landscape' });
-			} else {
-				await ScreenOrientation.lock({ orientation: 'portrait' });
-			}
-		} else {
-			await ScreenOrientation.lock({
-				orientation: (originalOrigination as ScreenOrientationResult).type
-			});
-		}
-	}
-
-	async function androidHandleRotate() {
-		if (
-			Capacitor.getPlatform() !== 'android' ||
-			data.video.adaptiveFormats.length === 0 ||
-			$isAndroidTvStore
-		)
-			return;
-
-		originalOrigination = await ScreenOrientation.orientation();
-
-		document.addEventListener('fullscreenchange', onAndroidFullscreenChange);
 	}
 
 	function skipSegment(segment: Segment) {
@@ -423,49 +293,7 @@
 		return false;
 	}
 
-	function toggleSubtitles() {
-		const isVisible = player.isTextTrackVisible();
-		if (isVisible) {
-			player.setTextTrackVisibility(false);
-		} else {
-			let langCode: string;
-			if ($playerDefaultLanguage === 'original') {
-				const languageAndRole = player
-					.getAudioLanguagesAndRoles()
-					.find(({ role }) => role === 'main');
-
-				if (!languageAndRole) {
-					return;
-				}
-
-				langCode = languageAndRole.language;
-			} else {
-				const defaultLanguage = get(playerDefaultLanguage);
-				langCode = ISO6391.getCode(defaultLanguage);
-			}
-
-			const tracks = player.getTextTracks();
-
-			const subtitleTrack = tracks.find((track) => track.language === langCode);
-
-			if (subtitleTrack) {
-				player.selectTextTrack(subtitleTrack);
-				player.setTextTrackVisibility(true);
-			}
-		}
-	}
-
 	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
-
-	function setActiveVideoTrack() {
-		const videoTracks = player.getVideoTracks();
-		playerCurrentVideoTrack = videoTracks.find((track) => track.active);
-	}
-
-	function setActiveAudioTrack() {
-		const audioTracks = player.getAudioTracks();
-		playerCurrentAudioTrack = audioTracks.find((track) => track.active);
-	}
 
 	function toggleFullscreen() {
 		if (document.fullscreenElement) {
@@ -491,14 +319,12 @@
 		setupSponsorSkip();
 
 		player.addEventListener('loaded', () => {
-			restoreQualityPreference();
-			restoreDefaultLanguage();
-			setActiveVideoTrack();
-			setActiveAudioTrack();
+			restoreQualityPreference(player);
+			restoreDefaultLanguage(player);
 			updateVideoPlayerHeight();
 
 			if ($playerCCByDefault) {
-				toggleSubtitles();
+				toggleSubtitles(player);
 			}
 		});
 
@@ -696,12 +522,7 @@
 		});
 		playerElement = document.getElementById('player') as HTMLMediaElement;
 
-		// Enable AirPlay if supported
-		if (hasWebkitShowPlaybackTargetPicker(playerElement)) {
-			playerElement.setAttribute('x-webkit-airplay', 'allow');
-		}
-
-		playerElement.loop = playerLoop;
+		playerElement.loop = $playerAlwaysLoopStore;
 
 		if ($playerState) {
 			playerState.set({ ...$playerState, playerElement: playerElement });
@@ -715,13 +536,14 @@
 		window.addEventListener('resize', updateVideoPlayerHeight);
 		updateVideoPlayerHeight();
 
+		androidPlayer = new AndroidPlayer(data.video, playerElement);
+
 		await player.attach(playerElement);
 
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
 		});
-
 		player.getNetworkingEngine()?.registerResponseFilter((type, response) => {
 			if (
 				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
@@ -750,20 +572,7 @@
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
-		await androidHandleRotate();
-
 		if (Capacitor.getPlatform() === 'android') {
-			androidInitialNetworkStatus = await Network.getStatus();
-
-			Network.addListener('networkStatusChange', (networkStatus) => {
-				if (
-					androidInitialNetworkStatus?.connectionType !== networkStatus.connectionType &&
-					$playerAndroidPauseOnNetworkChange
-				) {
-					playerElement?.pause();
-				}
-			});
-
 			await CapacitorMusicControls.create({
 				track: data.video.title,
 				artist: data.video.author,
@@ -914,7 +723,7 @@
 		}
 
 		Mousetrap.bind('c', () => {
-			toggleSubtitles();
+			toggleSubtitles(player);
 			showPlayerUI();
 			return false;
 		});
@@ -1040,21 +849,7 @@
 
 		// Update video player height again on video loaded.
 		updateVideoPlayerHeight();
-
-		playerTextTracks = player.getTextTracks();
 	});
-
-	function hasWebkitShowPlaybackTargetPicker(
-		el: HTMLMediaElement
-	): el is HTMLMediaElement & { webkitShowPlaybackTargetPicker: () => void } {
-		return typeof (el as any).webkitShowPlaybackTargetPicker === 'function';
-	}
-
-	function handleAirPlayClick() {
-		if (playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)) {
-			playerElement.webkitShowPlaybackTargetPicker();
-		}
-	}
 
 	async function getLastPlayPos(): Promise<number> {
 		if (loadTimeFromUrl($page) || !$playerSavePlaybackPositionStore) return 0;
@@ -1252,21 +1047,9 @@
 
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android') {
-			if (!$isAndroidTvStore) {
-				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
-
-				if (originalOrigination) {
-					await ScreenOrientation.lock({
-						orientation: originalOrigination.type
-					});
-				}
-			}
-
-			await Network.removeAllListeners();
-
 			await setStatusBarColor();
-
 			await CapacitorMusicControls.destroy();
+			await androidPlayer.destroy();
 		}
 
 		try {
@@ -1467,194 +1250,11 @@
 						{/if}
 					</p>
 					{#if !$isAndroidTvStore}
-						{#if playerTextTracks && playerTextTracks.length > 0 && !data.video.liveNow}
-							<button class="surface-container-highest">
-								<i>closed_caption</i>
-								<menu class="no-wrap mobile" id="cc-menu" data-ui="#cc-menu">
-									<li
-										role="presentation"
-										data-ui="#cc-menu"
-										onclick={() => player.setTextTrackVisibility(false)}
-									>
-										{$_('player.controls.off')}
-									</li>
-									{#each playerTextTracks as track (track)}
-										<li
-											role="presentation"
-											data-ui="#cc-menu"
-											onclick={() => {
-												player.selectTextTrack(track);
-												player.setTextTrackVisibility(true);
-											}}
-										>
-											{track.label}
-										</li>
-									{/each}
-								</menu>
-							</button>
-						{/if}
-						<button class="surface-container-highest">
-							<i>settings</i>
-							<menu class="no-wrap mobile" id="settings-menu">
-								{#if playerSettings !== 'root'}
-									<li role="presentation" onclick={() => (playerSettings = 'root')}>
-										<i>arrow_back</i>
-										{$_('player.controls.back')}
-									</li>
-								{/if}
-								{#if playerSettings === 'root'}
-									<li role="presentation" onclick={() => (playerSettings = 'quality')}>
-										<nav class="no-wrap" style="width: 100%;">
-											<i>high_quality</i>
-											{$_('player.controls.quality')}
-
-											<div class="max"></div>
-
-											<span class="chip">
-												{#if playerCurrentVideoTrack}
-													{playerCurrentVideoTrack.height}p
-												{:else}
-													{$_('player.controls.auto')}
-												{/if}
-											</span>
-										</nav>
-									</li>
-									<li role="presentation" onclick={() => (playerSettings = 'speed')}>
-										<nav class="no-wrap" style="width: 100%;">
-											<i>speed</i>
-											{$_('player.controls.playbackSpeed')}
-
-											<div class="max"></div>
-
-											<span class="chip">
-												{playerElement?.playbackRate}x
-											</span>
-										</nav>
-									</li>
-									{#if playerCurrentAudioTrack && playerCurrentAudioTrack.label !== null}
-										<li role="presentation" onclick={() => (playerSettings = 'language')}>
-											<nav class="no-wrap" style="width: 100%;">
-												<i>language</i>
-												{$_('player.controls.language')}
-
-												<div class="max"></div>
-
-												<span class="chip">
-													{#if playerCurrentAudioTrack}
-														{playerCurrentAudioTrack.language !== 'und'
-															? ISO6391.getName(playerCurrentAudioTrack.language)
-															: playerCurrentAudioTrack.label}
-													{/if}
-												</span>
-											</nav>
-										</li>
-									{/if}
-									<li
-										role="presentation"
-										onclick={() => {
-											if (playerElement) playerElement.loop = !playerLoop;
-											playerLoop = !playerLoop;
-										}}
-									>
-										<nav class="no-wrap" style="width: 100%;">
-											<i>all_inclusive</i>
-											{$_('player.controls.loop')}
-
-											<div class="max"></div>
-
-											<span class="chip">
-												{playerLoop ? $_('player.controls.on') : $_('player.controls.off')}
-											</span>
-										</nav>
-									</li>
-								{:else if playerSettings === 'quality'}
-									<li
-										role="presentation"
-										onclick={() => {
-											playerSettings = 'root';
-											player.configure({ abr: true });
-											playerCurrentVideoTrack = undefined;
-										}}
-									>
-										{$_('player.controls.auto')}
-									</li>
-									{#each player.getVideoTracks().sort((a, b) => {
-										const heightA = a.height || 0;
-										const heightB = b.height || 0;
-										const widthA = a.width || 0;
-										const widthB = b.width || 0;
-										return heightB - heightA || widthB - widthA;
-									}) as track (track)}
-										<li
-											role="presentation"
-											onclick={() => {
-												playerSettings = 'root';
-												player.selectVideoTrack(track, true);
-												setActiveVideoTrack();
-											}}
-										>
-											{track.height}p
-										</li>
-									{/each}
-								{:else if playerSettings === 'speed'}
-									{#each playbackRates as playbackRate (playbackRate)}
-										<li
-											role="presentation"
-											onclick={() => {
-												playerSettings = 'root';
-												if (playerElement) playerElement.playbackRate = playbackRate;
-											}}
-										>
-											{playbackRate}
-										</li>
-									{/each}
-								{:else if playerSettings === 'language'}
-									{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
-										<li
-											role="presentation"
-											onclick={() => {
-												playerSettings = 'root';
-												player.selectAudioTrack(track);
-												setActiveAudioTrack();
-											}}
-										>
-											{#if track.language !== 'und'}
-												{ISO6391.getName(track.language)} -
-											{/if}
-											{track.label}
-										</li>
-									{/each}
-								{/if}
-							</menu>
-						</button>
-						{#if playerElement && hasWebkitShowPlaybackTargetPicker(playerElement)}
-							<button
-								class="surface-container-highest"
-								onclick={handleAirPlayClick}
-								title="AirPlay"
-							>
-								<i>airplay</i>
-							</button>
-						{/if}
-						{#if document.pictureInPictureEnabled}
-							<button
-								class="surface-container-highest"
-								onclick={() => {
-									(playerElement as HTMLVideoElement).requestPictureInPicture();
-								}}
-							>
-								<i>pip</i>
-							</button>
-						{/if}
-						<button class="surface-container-highest" onclick={toggleFullscreen}>
-							<i>
-								{#if playerIsFullscreen}
-									fullscreen_exit
-								{:else}
-									fullscreen
-								{/if}
-							</i>
-						</button>
+						<CaptionSettings {player} video={data.video} />
+						<Settings {player} {playerElement} />
+						<Airplay {playerElement} />
+						<Pip {playerElement} />
+						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
 					{/if}
 				</nav>
 			</nav>
@@ -1698,10 +1298,6 @@
 		left: 0;
 		right: 0;
 		padding: 10px;
-	}
-
-	#player-controls span {
-		clip-path: none;
 	}
 
 	#player-tap-controls-area {
@@ -1833,12 +1429,6 @@
 	.disable-tv {
 		pointer-events: none;
 		cursor: not-allowed;
-	}
-
-	menu.mobile {
-		transform: scale(1) translateY(-40%) translateX(0);
-		width: 300px;
-		height: 200px;
 	}
 
 	.contain-video {

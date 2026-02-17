@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { getBestThumbnail, ImageCache } from '$lib/images';
+	import { getBestThumbnail } from '$lib/images';
 	import { videoLength } from '$lib/numbers';
-	import { generateChapterWebVTT, type ParsedDescription, type Timestamp } from '$lib/description';
+	import { generateChapterWebVTT, type ParsedDescription } from '$lib/description';
 	import { Capacitor } from '@capacitor/core';
 	import { error, type Page } from '@sveltejs/kit';
 	import Mousetrap from 'mousetrap';
@@ -33,7 +33,6 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
-		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore
@@ -53,13 +52,7 @@
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '$lib/components/Toast.svelte';
-	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend, truncate } from '$lib/misc';
-	import {
-		generateThumbnailWebVTT,
-		drawTimelineThumbnail,
-		storyboardThumbnails,
-		type TimelineThumbnail
-	} from '$lib/player/thumbnails';
+	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 	import { isOwnBackend } from '$lib/shared';
 	import Settings from './settings/Settings.svelte';
 	import CaptionSettings from './settings/CaptionSettings.svelte';
@@ -67,6 +60,7 @@
 	import Pip from './settings/Pip.svelte';
 	import FullscreenToggle from './settings/FullscreenToggle.svelte';
 	import { AndroidPlayer } from '$lib/player/android';
+	import Timeline from './Timeline.svelte';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -88,17 +82,6 @@
 
 	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
-	const sponsorSegments = {
-		sponsor: $_('layout.sponsors.sponsor'),
-		selfpromo: $_('layout.sponsors.unpaidSelfPromotion'),
-		interaction: $_('layout.sponsors.interactionReminder'),
-		intro: $_('layout.sponsors.intermissionIntroAnimation'),
-		outro: $_('layout.sponsors.credits'),
-		preview: $_('layout.sponsors.preViewRecapHook'),
-		filler: $_('layout.sponsors.tangentJokes'),
-		music_offtopic: $_('layout.sponsors.musicOffTopic')
-	};
-
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let showVideoRetry = $state(false);
 
@@ -108,59 +91,13 @@
 	let sabrAdapter: SabrStreamingAdapter | null;
 
 	let playerContainer: HTMLElement;
-	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerCurrentPlaybackState = $state(false);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
 	let playerIsBuffering = $state(true);
 	let playerVolume = $state($playerPreferredVolumeStore);
-	let playerTimelineTimeHover: number = $state(0);
 	let playerVideoEndTimePretty: string = $state('');
-	let playerBufferedTo: number = $state(0);
-	let playerCloestTimestamp: Timestamp | undefined = $state();
-	let playerCloestSponsor: Segment | undefined = $state();
-	let playerSliderElement: HTMLElement | undefined = $state();
-	let playerSliderDebounce: ReturnType<typeof setTimeout>;
-	let playerIsFullscreen: boolean = $state(false);
-	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
-	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
-	let playerTimelineThumbnailsCache = new ImageCache();
-	let playerTimelineThumbnailCanvas: {
-		timeline?: HTMLCanvasElement;
-		thumb?: HTMLCanvasElement;
-	} = $state({});
+	let playerIsFullscreen = $state(false);
 	let playerInitalInteract = true;
-	let playerSliderInteracted = $state(false);
-	let playerShowTimelineThumbnail = $state(true);
-
-	const playerTimelineSlider = new Slider({
-		min: 0,
-		step: 0.1,
-		value: () => currentTime,
-		onValueChange: async (timeToSet) => {
-			playerSliderInteracted = true;
-			userManualSeeking = true;
-			currentTime = timeToSet;
-
-			showPlayerUI();
-			setPlayerTimelineChapters(currentTime);
-
-			if (playerTimelineThumbnailCanvas.thumb) {
-				await setPlayerTimelineThumbnails(currentTime, playerTimelineThumbnailCanvas.thumb);
-			}
-
-			if (playerSliderDebounce) clearTimeout(playerSliderDebounce);
-
-			playerSliderDebounce = setTimeout(() => {
-				if (playerElement) {
-					playerElement.currentTime = currentTime;
-					userManualSeeking = false;
-					playerSliderInteracted = false;
-					playerShowTimelineThumbnail = false;
-				}
-			}, 300);
-		},
-		max: () => playerMaxKnownTime
-	});
 
 	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
@@ -183,22 +120,6 @@
 		await tick();
 		updateVideoPlayerHeight();
 	});
-
-	const markerGapSize = 0.1;
-	const minVisiblePercent = 0.05;
-	function timelineMarkerWidth(startTime: number, endTime: number): string {
-		const ratio = (endTime - startTime) / playerMaxKnownTime;
-		if (ratio <= 0) return `0%`;
-
-		let percent = ratio * 100;
-		if (percent - markerGapSize >= minVisiblePercent) {
-			percent = percent - markerGapSize;
-		} else {
-			percent = minVisiblePercent;
-		}
-
-		return `${percent}%`;
-	}
 
 	function saveVolumePreference() {
 		if (!playerElement) return;
@@ -351,42 +272,6 @@
 
 			if (!data.video.fallbackPatch && (!isUnrestrictedPlatform() || $playerProxyVideosStore)) {
 				dashUrl += '?local=true';
-			}
-
-			if (data.video.storyboards && data.video.storyboards.length > 2) {
-				let thumbnailVTT: string | undefined;
-
-				const selectedStoryboard = data.video.storyboards[2];
-
-				if (
-					data.video.fallbackPatch === 'youtubejs' &&
-					typeof selectedStoryboard.rows !== 'undefined' &&
-					typeof selectedStoryboard.columns !== 'undefined'
-				) {
-					thumbnailVTT = generateThumbnailWebVTT(
-						{
-							...selectedStoryboard,
-							rows: selectedStoryboard.rows,
-							columns: selectedStoryboard.columns
-						},
-						playerMaxKnownTime
-					);
-				} else if (!data.video.fallbackPatch) {
-					const thumbnailVTTResp = await fetch(
-						`${$invidiousInstanceStore}${selectedStoryboard.url}`
-					);
-					if (thumbnailVTTResp.ok) thumbnailVTT = await thumbnailVTTResp.text();
-				}
-
-				if (thumbnailVTT) {
-					try {
-						storyboardThumbnails(thumbnailVTT).then((thumbnails) => {
-							playerTimelineThumbnails = thumbnails;
-						});
-					} catch {
-						// Continue regardless of error.
-					}
-				}
 			}
 
 			if (
@@ -811,22 +696,6 @@
 				minute: '2-digit',
 				hour12: true
 			});
-
-			const buffered = playerElement.buffered;
-
-			if (buffered.length > 0 && playerBufferBar) {
-				playerBufferedTo = buffered.end(0);
-
-				const bufferedPercent = (playerBufferedTo / playerMaxKnownTime) * 100;
-				const progressPercent = (currentTime / playerMaxKnownTime) * 100;
-
-				const bufferAhead = Math.max(0, bufferedPercent - progressPercent);
-
-				const effectiveWidth = Math.min(bufferAhead, 100 - progressPercent);
-
-				playerBufferBar.style.left = progressPercent + '%';
-				playerBufferBar.style.width = effectiveWidth + '%';
-			}
 		});
 
 		try {
@@ -909,102 +778,10 @@
 		}
 	}
 
-	function setPlayerTimelineChapters(currentTime: number) {
-		if (data.content.timestamps.length > 0) {
-			playerCloestTimestamp = data.content.timestamps.find((chapter, chapterIndex) => {
-				let endTime: number;
-				if (chapterIndex === data.content.timestamps.length - 1) {
-					endTime = data.video.lengthSeconds;
-				} else {
-					endTime = data.content.timestamps[chapterIndex + 1].time;
-				}
-				return currentTime >= chapter.time && currentTime < endTime;
-			});
-		}
-
-		if (segments.length > 0) {
-			playerCloestSponsor = segments.find((segment) => {
-				return currentTime >= segment.startTime && currentTime < segment.endTime;
-			});
-		}
-	}
-
-	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
-		const canvasContext = canvas.getContext('2d');
-
-		if (canvasContext) {
-			await drawTimelineThumbnail(
-				canvasContext,
-				playerTimelineThumbnailsCache,
-				playerTimelineThumbnails,
-				time
-			);
-		}
-	}
-
-	let requestAnimationTooltip: number | undefined;
-	let latestMouseX: number | undefined;
-
-	function timelineMouseMove(event: MouseEvent) {
-		latestMouseX = event.clientX;
-
-		if (!requestAnimationTooltip) {
-			requestAnimationTooltip = requestAnimationFrame(updateTooltip);
-		}
-	}
-
-	async function updateTooltip() {
-		if (!playerSliderElement || latestMouseX === undefined) {
-			requestAnimationTooltip = undefined;
-			return;
-		}
-
-		playerShowTimelineThumbnail = true;
-
-		const rect = playerSliderElement.getBoundingClientRect();
-		const percent = Math.min(Math.max((latestMouseX - rect.left) / rect.width, 0), 1);
-
-		playerTimelineTimeHover = percent * (data.video.lengthSeconds ?? 0);
-		setPlayerTimelineChapters(playerTimelineTimeHover);
-
-		if (playerTimelineThumbnailCanvas.timeline) {
-			await setPlayerTimelineThumbnails(
-				playerTimelineTimeHover,
-				playerTimelineThumbnailCanvas.timeline
-			);
-		}
-
-		if (playerTimelineTooltip) {
-			const tooltipWidth = playerTimelineTooltip.offsetWidth;
-			const tooltipHeight = playerTimelineTooltip.offsetHeight;
-			const sliderWidth = playerSliderElement.clientWidth;
-
-			let left = percent * sliderWidth;
-			left = Math.min(Math.max(left, tooltipWidth / 2), sliderWidth - tooltipWidth / 2);
-			playerTimelineTooltip.style.transform = `translateX(${left - tooltipWidth / 2}px)`;
-
-			playerTimelineTooltip.style.top = `${-tooltipHeight - 5}px`;
-		}
-
-		requestAnimationTooltip = undefined;
-	}
-
-	function onVideoClick(
-		event: MouseEvent & {
-			currentTarget: EventTarget & HTMLDivElement;
-		}
-	) {
-		event.preventDefault();
+	function onVideoClick(type: 'pause' | 'seekLeft' | 'seekRight') {
 		seekDirection = undefined;
 
-		if (
-			!event.target ||
-			!(event.target instanceof HTMLElement) ||
-			event.target.id !== 'player-tap-controls-area' ||
-			!playerElement
-		) {
-			return;
-		}
+		if (!playerElement) return;
 
 		if (isMobile() && playerInitalInteract) {
 			showPlayerUI();
@@ -1014,11 +791,6 @@
 		}
 
 		clickCount++;
-
-		const container = event.currentTarget;
-		const rect = container.getBoundingClientRect();
-		const clickX = event.clientX - rect.left;
-		const width = rect.width;
 
 		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 
@@ -1031,10 +803,10 @@
 
 		if (clickCount < 2) return;
 
-		if (clickX < width / 3) {
+		if (type === 'seekLeft') {
 			seekDirection = 'backwards';
 			playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
-		} else if (clickX < (2 * width) / 3) {
+		} else if (type === 'pause') {
 			toggleFullscreen();
 		} else {
 			seekDirection = 'forwards';
@@ -1057,8 +829,6 @@
 		} catch {
 			// Continue regardless of error
 		}
-
-		playerTimelineThumbnailsCache.clear();
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
@@ -1083,7 +853,6 @@
 	class:hide={showVideoRetry}
 	class:hide-cursor={!showControls}
 	role="presentation"
-	onclick={onVideoClick}
 	onmouseenter={showPlayerUI}
 	onmousemove={showPlayerUI}
 	onscroll={showPlayerUI}
@@ -1120,32 +889,24 @@
 	{/if}
 	<div id="player-center">
 		<div class="grid">
-			<div class="s4 m4 l4" id="player-tap-controls-area">
+			<div class="s4 m4 l4" onclick={() => onVideoClick('seekLeft')} role="presentation">
 				{#if clickCount > 1 && seekDirection === 'backwards'}
-					<div
-						class="seek-double-click"
-						class:buffer-left={seekDirection === 'backwards'}
-						id="player-tap-controls-area"
-					>
-						<h4 id="player-tap-controls-area">-{(clickCount - 1) * playerDoubleTapSeek}</h4>
+					<div class="seek-double-click" class:buffer-left={seekDirection === 'backwards'}>
+						<h4>-{(clickCount - 1) * playerDoubleTapSeek}</h4>
 					</div>
 				{/if}
 			</div>
-			<div class="s4 m4 l4">
-				<div class="player-status" id="player-tap-controls-area">
+			<div class="s4 m4 l4" onclick={() => onVideoClick('pause')} role="presentation">
+				<div class="player-status">
 					{#if playerIsBuffering}
 						<progress class="circle large indeterminate" value="50" max="100"></progress>
 					{/if}
 				</div>
 			</div>
-			<div class="s4 m4 l4" id="player-tap-controls-area">
+			<div class="s4 m4 l4" onclick={() => onVideoClick('seekRight')} role="presentation">
 				{#if clickCount > 1 && seekDirection === 'forwards'}
-					<div
-						class="seek-double-click"
-						class:buffer-right={seekDirection === 'forwards'}
-						id="player-tap-controls-area"
-					>
-						<h4 id="player-tap-controls-area">+{(clickCount - 1) * playerDoubleTapSeek}</h4>
+					<div class="seek-double-click" class:buffer-right={seekDirection === 'forwards'}>
+						<h4>+{(clickCount - 1) * playerDoubleTapSeek}</h4>
 					</div>
 				{/if}
 			</div>
@@ -1153,69 +914,16 @@
 	</div>
 	{#if showControls}
 		<div id="player-controls" transition:fade>
-			<div
-				class="player-slider full-width"
-				class:disable-tv={$isAndroidTvStore}
-				{...playerTimelineSlider.root}
-				onmousemove={timelineMouseMove}
-				bind:this={playerSliderElement}
-			>
-				{#snippet timelineTooltip(key: 'thumb' | 'timeline', timeInSeconds: number)}
-					{#if playerTimelineThumbnails.length > 0}
-						<canvas
-							bind:this={playerTimelineThumbnailCanvas[key]}
-							width={playerTimelineThumbnails[0].width}
-							height={playerTimelineThumbnails[0].height}
-						></canvas>
-					{/if}
-					{#if playerCloestSponsor}
-						<p class="no-margin" style="padding: 0 0.5rem;">
-							{sponsorSegments[playerCloestSponsor.category]}
-						</p>
-					{:else if playerCloestTimestamp}
-						<p class="no-margin" style="padding: 0 0.5rem;">
-							{truncate(playerCloestTimestamp.title, 20)}
-						</p>
-					{/if}
-					{videoLength(timeInSeconds)}
-				{/snippet}
-				<div class="track">
-					{#if !userManualSeeking && playerShowTimelineThumbnail}
-						<div bind:this={playerTimelineTooltip} class="timeline tooltip">
-							{@render timelineTooltip('timeline', playerTimelineTimeHover)}
-						</div>
-					{/if}
-					<div class="range"></div>
-					<div {...playerTimelineSlider.thumb}>
-						{#if playerSliderInteracted}
-							<div class="tooltip thumb">
-								{@render timelineTooltip('thumb', currentTime)}
-							</div>
-						{/if}
-					</div>
-				</div>
-				<div bind:this={playerBufferBar} class="buffered-bar" class:hide={userManualSeeking}></div>
-				{#each data.content.timestamps as chapter, index (chapter)}
-					<div
-						class="chapter-marker"
-						style:left="{(chapter.time / playerMaxKnownTime) * 100}%"
-						style:width={timelineMarkerWidth(
-							chapter.time,
-							data.content.timestamps[index + 1]?.time || playerMaxKnownTime // Next chapter time or end of video
-						)}
-					></div>
-				{/each}
-				{#if !$sponsorBlockTimelineStore}
-					{#each segments as segment (segment)}
-						<div
-							class="chapter-marker segment-marker"
-							style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
-							style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
-						></div>
-					{/each}
-				{/if}
-			</div>
-
+			<Timeline
+				{playerElement}
+				{currentTime}
+				{showPlayerUI}
+				{segments}
+				video={data.video}
+				content={data.content}
+				bind:userManualSeeking
+				bind:playerMaxKnownTime
+			/>
 			<nav>
 				{#if !$isAndroidTvStore}
 					<nav class="no-wrap">
@@ -1283,10 +991,6 @@
 {/if}
 
 <style>
-	:root {
-		--player-timeline-height: 1.1rem;
-	}
-
 	#player-container {
 		position: relative;
 		width: 100%;
@@ -1298,10 +1002,6 @@
 		left: 0;
 		right: 0;
 		padding: 10px;
-	}
-
-	#player-tap-controls-area {
-		touch-action: manipulation;
 	}
 
 	#player-center {
@@ -1329,49 +1029,6 @@
 		margin: 0;
 	}
 
-	.player-slider {
-		height: var(--player-timeline-height);
-		margin: 0 auto;
-		border-radius: 0.25rem;
-	}
-
-	.player-slider.full-width {
-		width: 100%;
-	}
-
-	.player-slider.volume {
-		width: 200px;
-	}
-
-	.player-slider .track {
-		background: var(--secondary-container);
-		height: 100%;
-		position: relative;
-		border-radius: 0.25rem;
-	}
-
-	.player-slider .range {
-		position: absolute;
-		background: var(--inverse-primary);
-		inset: 0;
-		right: var(--percentage-inv);
-		border-radius: 0.25rem;
-		opacity: 0.5;
-	}
-
-	.player-slider [data-melt-slider-thumb] {
-		position: absolute;
-		border-radius: 1rem;
-		background: var(--primary);
-		left: var(--percentage);
-		top: 50%;
-		width: 5px;
-		height: 35px;
-		z-index: 3;
-		cursor: grab;
-		transform: translate(-50%, -50%);
-	}
-
 	.seek-double-click {
 		background-color: var(--secondary-container);
 		height: var(--video-player-height);
@@ -1393,42 +1050,6 @@
 	.seek-double-click.buffer-left {
 		border-top-right-radius: 0.25rem;
 		border-bottom-right-radius: 0.25rem;
-	}
-
-	.buffered-bar {
-		position: absolute;
-		height: var(--player-timeline-height);
-		background: var(--secondary);
-		top: 50%;
-		left: 0;
-		transform: translateY(-50%);
-		z-index: 1;
-		pointer-events: none;
-		border-top-right-radius: 0.25rem;
-		border-bottom-right-radius: 0.25rem;
-		opacity: 0.5;
-	}
-
-	.chapter-marker {
-		position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
-		left: 0;
-		height: var(--player-timeline-height);
-		background-color: var(--secondary);
-		border-radius: 0.25rem;
-		z-index: 2;
-		pointer-events: none;
-		opacity: 0.5;
-	}
-
-	.segment-marker {
-		background-color: var(--tertiary);
-	}
-
-	.disable-tv {
-		pointer-events: none;
-		cursor: not-allowed;
 	}
 
 	.contain-video {
@@ -1477,30 +1098,5 @@
 
 	.hide-cursor {
 		cursor: none;
-	}
-
-	.timeline.tooltip {
-		position: absolute;
-		left: 0;
-		transform: translateX(0%);
-		transition: none;
-		pointer-events: none;
-		will-change: transform;
-		padding: 0;
-		display: block;
-	}
-
-	.timeline.tooltip canvas,
-	.tooltip.thumb canvas {
-		display: block;
-		margin-bottom: 0.1rem;
-		height: 100px;
-		border-radius: 0.25rem;
-	}
-
-	.tooltip.thumb {
-		left: var(--percentage);
-		display: block;
-		padding: 0;
 	}
 </style>

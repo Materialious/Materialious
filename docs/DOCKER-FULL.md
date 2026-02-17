@@ -48,6 +48,11 @@ services:
       # Disable POW Captcha
       PUBLIC_CAPTCHA_DISABLED: "false"
       
+      # Allows you to whitelist additional domains in proxy.
+      # Should be comma separated and be the base domain
+      # e.g. "youtube.com,google.com" NOT "https://youtube.com,https://videos.google.com"
+      WHITELIST_BASE_DOMAIN: ""
+
       # Allow any domain in proxy
       # This shouldn't be used unless you KNOW what your doing
       # requires VITE_REGISTRATION_ALLOWED to be false

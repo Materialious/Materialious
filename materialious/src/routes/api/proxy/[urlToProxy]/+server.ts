@@ -1,5 +1,6 @@
 import { isOwnBackend } from '$lib/shared';
 import { env } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
 
 import { error } from '@sveltejs/kit';
 import { parse as tldParse } from 'tldts';
@@ -13,6 +14,12 @@ const allowedBaseDomains: string[] = [
 	'returnyoutubedislike.com',
 	'ajay.app'
 ];
+
+if (privateEnv.WHITELIST_BASE_DOMAIN) {
+	for (const baseDomain of privateEnv.WHITELIST_BASE_DOMAIN.split(',')) {
+		if (baseDomain) allowedBaseDomains.push(baseDomain);
+	}
+}
 
 const dynamicAllowDomainsEnvVars = [
 	env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,

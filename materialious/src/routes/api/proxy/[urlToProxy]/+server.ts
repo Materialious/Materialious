@@ -133,6 +133,7 @@ async function proxyRequest(
 		});
 	} catch (err) {
 		errorMsg = (err as any).toString();
+		console.warn('Proxy failed with error: ', errorMsg);
 	}
 
 	if (!response || errorMsg) {

@@ -216,7 +216,6 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 		// If it is not supported, returning the whole segment when
 		// it's ready (as xhr)
 		if (!response.body) {
-			console.log('NOT STREAMING');
 			const arrayBuffer = await response.arrayBuffer();
 			const currentTime = Date.now();
 
@@ -318,7 +317,6 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 				}
 
 				if (result) {
-					abortController.abort();
 					return this.createShakaResponse({
 						uri,
 						request,

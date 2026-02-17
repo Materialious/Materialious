@@ -11,8 +11,7 @@
 	import Transcript from '$lib/components/watch/Transcript.svelte';
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
-	import { cleanNumber, numberWithCommas } from '$lib/numbers';
-	import { goToNextVideo, goToPreviousVideo, type PlayerEvents } from '$lib/player/index';
+	import { numberWithCommas } from '$lib/numbers';
 	import {
 		invidiousAuthStore,
 		interfaceAutoExpandChapters,
@@ -23,7 +22,6 @@
 		playerTheatreModeByDefaultStore,
 		playertheatreModeIsActive,
 		playlistCacheStore,
-		playlistSettingsStore,
 		syncPartyConnectionsStore,
 		type PlayerState
 	} from '$lib/store';

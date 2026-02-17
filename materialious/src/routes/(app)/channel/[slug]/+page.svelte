@@ -5,8 +5,6 @@
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
 	import { channelCacheStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
-	import { Clipboard } from '@capacitor/clipboard';
-	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';

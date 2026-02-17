@@ -12,6 +12,9 @@ invidious_companion:
     public_url:  "http://companion.example.com/companion"
 ```
 
+### Proof-of-work Captcha
+Will only work while using HTTPS. If in HTTP set `PUBLIC_CAPTCHA_DISABLED` to `true`
+
 ### Docker Compose
 
 ```yaml
@@ -41,6 +44,9 @@ services:
 
       # Allow anyone to register
       PUBLIC_REGISTRATION_ALLOWED: "false"
+      
+      # Disable POW Captcha
+      PUBLIC_CAPTCHA_DISABLED: "false"
       
       # Allow any domain in proxy
       # This shouldn't be used unless you KNOW what your doing

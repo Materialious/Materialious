@@ -81,22 +81,24 @@
 					{/if}
 				</div>
 
-				<article
-					class="surface-container-highest no-padding"
-					style="width: 100%;height: fit-content;"
-				>
-					<altcha-widget
-						challengeurl="/api/captcha"
-						hidelogo
-						hidefooter
-						onstatechange={(ev) => {
-							const { payload, state } = ev.detail;
-							if (state === 'verified' && payload) {
-								captchaPayload = payload;
-							}
-						}}
-					></altcha-widget>
-				</article>
+				{#if !isOwnBackend()?.captchaDisabled}
+					<article
+						class="surface-container-highest no-padding"
+						style="width: 100%;height: fit-content;"
+					>
+						<altcha-widget
+							challengeurl="/api/captcha"
+							hidelogo
+							hidefooter
+							onstatechange={(ev) => {
+								const { payload, state } = ev.detail;
+								if (state === 'verified' && payload) {
+									captchaPayload = payload;
+								}
+							}}
+						></altcha-widget>
+					</article>
+				{/if}
 
 				<nav class="right-align">
 					<button

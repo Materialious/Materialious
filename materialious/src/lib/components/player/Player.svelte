@@ -61,6 +61,7 @@
 	import FullscreenToggle from './settings/FullscreenToggle.svelte';
 	import { AndroidPlayer } from '$lib/player/android';
 	import Timeline from './Timeline.svelte';
+	import TouchControls from './TouchControls.svelte';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -97,7 +98,7 @@
 	let playerVolume = $state($playerPreferredVolumeStore);
 	let playerVideoEndTimePretty: string = $state('');
 	let playerIsFullscreen = $state(false);
-	let playerInitalInteract = true;
+	let playerInitalInteract = $state(true);
 
 	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
@@ -110,11 +111,6 @@
 		min: 0,
 		step: 0.01
 	});
-
-	let clickCount = $state(0);
-	let clickCounterTimeout: ReturnType<typeof setTimeout>;
-
-	let seekDirection: 'forwards' | 'backwards' | undefined = $state();
 
 	playertheatreModeIsActive.subscribe(async () => {
 		await tick();
@@ -778,45 +774,6 @@
 		}
 	}
 
-	function onVideoClick(type: 'pause' | 'seekLeft' | 'seekRight') {
-		seekDirection = undefined;
-
-		if (!playerElement) return;
-
-		if (isMobile() && playerInitalInteract) {
-			showPlayerUI();
-			playerInitalInteract = false;
-			clickCount = 0;
-			return;
-		}
-
-		clickCount++;
-
-		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
-
-		clickCounterTimeout = setTimeout(() => {
-			if (clickCount == 1) {
-				toggleVideoPlaybackStatus();
-			}
-			clickCount = 0;
-		}, 200);
-
-		if (clickCount < 2) return;
-
-		if (type === 'seekLeft') {
-			seekDirection = 'backwards';
-			playerElement.currentTime = Math.max(0, playerElement.currentTime - playerDoubleTapSeek);
-		} else if (type === 'pause') {
-			toggleFullscreen();
-		} else {
-			seekDirection = 'forwards';
-			playerElement.currentTime = Math.min(
-				playerMaxKnownTime,
-				playerElement.currentTime + playerDoubleTapSeek
-			);
-		}
-	}
-
 	onDestroy(async () => {
 		if (Capacitor.getPlatform() === 'android') {
 			await setStatusBarColor();
@@ -836,7 +793,6 @@
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
 		if (sabrAdapter) sabrAdapter.dispose();
-		if (clickCounterTimeout) clearTimeout(clickCounterTimeout);
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		if (player) {
@@ -887,31 +843,15 @@
 			</p>
 		</div>
 	{/if}
-	<div id="player-center">
-		<div class="grid">
-			<div class="s4 m4 l4" onclick={() => onVideoClick('seekLeft')} role="presentation">
-				{#if clickCount > 1 && seekDirection === 'backwards'}
-					<div class="seek-double-click" class:buffer-left={seekDirection === 'backwards'}>
-						<h4>-{(clickCount - 1) * playerDoubleTapSeek}</h4>
-					</div>
-				{/if}
-			</div>
-			<div class="s4 m4 l4" onclick={() => onVideoClick('pause')} role="presentation">
-				<div class="player-status">
-					{#if playerIsBuffering}
-						<progress class="circle large indeterminate" value="50" max="100"></progress>
-					{/if}
-				</div>
-			</div>
-			<div class="s4 m4 l4" onclick={() => onVideoClick('seekRight')} role="presentation">
-				{#if clickCount > 1 && seekDirection === 'forwards'}
-					<div class="seek-double-click" class:buffer-right={seekDirection === 'forwards'}>
-						<h4>+{(clickCount - 1) * playerDoubleTapSeek}</h4>
-					</div>
-				{/if}
-			</div>
-		</div>
-	</div>
+	<TouchControls
+		{playerElement}
+		{showPlayerUI}
+		{toggleVideoPlaybackStatus}
+		{toggleFullscreen}
+		bind:playerInitalInteract
+		bind:playerMaxKnownTime
+		bind:playerIsBuffering
+	/>
 	{#if showControls}
 		<div id="player-controls" transition:fade>
 			<Timeline
@@ -1004,19 +944,6 @@
 		padding: 10px;
 	}
 
-	#player-center {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-
-	.player-status {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: var(--video-player-height);
-	}
-
 	#mobile-time {
 		position: absolute;
 		top: 0;
@@ -1027,29 +954,6 @@
 	#mobile-time .chip {
 		border: none;
 		margin: 0;
-	}
-
-	.seek-double-click {
-		background-color: var(--secondary-container);
-		height: var(--video-player-height);
-		color: var(--secondary);
-		width: 100%;
-		opacity: 0.8;
-		padding: 1em;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		user-select: none;
-	}
-
-	.seek-double-click.buffer-right {
-		border-top-left-radius: 0.25rem;
-		border-bottom-left-radius: 0.25rem;
-	}
-
-	.seek-double-click.buffer-left {
-		border-top-right-radius: 0.25rem;
-		border-bottom-right-radius: 0.25rem;
 	}
 
 	.contain-video {

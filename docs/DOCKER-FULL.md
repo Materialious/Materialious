@@ -95,7 +95,7 @@ volumes:
 ```
 
 ### Overwriting Materialious defaults
-Materialious allows you to overwrite the default values using `VITE_DEFAULT_SETTINGS`, see [SETTINGS](./SETTINGS.md) for more details.
+Materialious lets you customize the default settings by overriding them with `VITE_DEFAULT_SETTINGS`. To configure this easily, go to **Settings** → **Interface** and click "Export to JSON." For more details, check the [SETTINGS](./SETTINGS.md) page.
 
 **Please note:** These overwrites only apply on 1st load & won't replace existing configuration stored in browser local storage.
 

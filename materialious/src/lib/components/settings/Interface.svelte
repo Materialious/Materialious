@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
+	import { bookmarkletSaveToUrl, settingsToJson } from '$lib/externalSettings/index';
 	import { letterCase, titleCases } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
 	import { Clipboard } from '@capacitor/clipboard';
@@ -14,7 +14,8 @@
 		setInvidiousInstance,
 		goToInvidiousLogin,
 		invidiousLogout,
-		timeout
+		timeout,
+		shareURL
 	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
@@ -464,14 +465,32 @@
 		<button
 			class="no-margin"
 			onclick={async () => {
-				await Clipboard.write({ string: bookmarkletSaveToUrl() });
+				await shareURL(bookmarkletSaveToUrl());
+			}}
+		>
+			<i>content_copy</i>
+			<span>{$_('copyUrl')}</span>
+		</button>
+	</div>
+	<div class="space"></div>
+	<div class="settings">
+		<h6>{$_('layout.exportToJson')}</h6>
+		<div class="space"></div>
+		<button
+			class="no-margin"
+			onclick={async () => {
+				await Clipboard.write({ string: settingsToJson() });
+
 				addToast({
 					data: {
-						text: $_('player.share.copiedSuccess')
+						text: get(_)('player.share.copiedSuccess')
 					}
 				});
-			}}>{$_('copyUrl')}</button
+			}}
 		>
+			<i>content_copy</i>
+			<span>{$_('copy')}</span>
+		</button>
 	</div>
 {/if}
 

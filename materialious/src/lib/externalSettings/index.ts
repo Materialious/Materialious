@@ -117,6 +117,19 @@ export function bookmarkletSaveToUrl(): string {
 	return url.toString();
 }
 
+export function settingsToJson(): string {
+	const settings: Record<string, string> = {};
+
+	for (const { name, store, excludeFromBookmarklet } of persistedStores) {
+		const value = get(store);
+		if (!excludeFromBookmarklet) {
+			settings[name] = value;
+		}
+	}
+
+	return JSON.stringify(settings);
+}
+
 export function bookmarkletLoadFromUrl() {
 	const toSet: Record<string, string> = {};
 

@@ -4,6 +4,7 @@
 	"popularPageDisabled": "Popular page has been disabled by Admins",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
 	"copyUrl": "Copy URL",
+	"copy": "Copy JSON",
 	"loadMore": "Load more",
 	"views": "views",
 	"login": "Login",
@@ -237,6 +238,7 @@
 			"playerStatistics": "Show player statistics by default"
 		},
 		"bookmarklet": "Bookmarklet",
+		"exportToJson": "Export to JSON",
 		"instanceUrl": "Instance URL",
 		"sponsors": {
 			"sponsor": "Sponsor",

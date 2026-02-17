@@ -16,7 +16,7 @@ const zUserCreate = z.object({
 		cipher: z.string().max(255),
 		nonce: z.string().max(255)
 	}),
-	captchaPayload: z.string()
+	captchaPayload: z.string().optional()
 });
 
 export async function POST({ request, cookies, locals }) {
@@ -28,7 +28,7 @@ export async function POST({ request, cookies, locals }) {
 
 	if (!userToCreate.success) throw error(400);
 
-	await verifyCaptcha(userToCreate.data.captchaPayload, locals.captchaKey, 1);
+	await verifyCaptcha(userToCreate.data.captchaPayload ?? '', locals.captchaKey, 1);
 
 	const createdUser = await createUser({
 		username: userToCreate.data.username,

@@ -1,8 +1,11 @@
 import { error } from '@sveltejs/kit';
 import { verifySolution } from 'altcha-lib';
 import { getSequelize } from './database';
+import { isOwnBackend } from '$lib/shared';
 
 export async function verifyCaptcha(payload: string, key: string, maxUses: number = -1) {
+	if (isOwnBackend()?.captchaDisabled) return;
+
 	const passedCaptcha = await verifySolution(payload, key, true);
 	if (!passedCaptcha) {
 		throw error(400, 'Unsupported payload');

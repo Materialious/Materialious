@@ -137,27 +137,25 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 		}
 	}
 
-	updateLastRssFetch(channelId, channelName ?? 'Unknown');
+	await updateLastRssFetch(channelId, channelName ?? 'Unknown');
 }
 
 async function updateLastRssFetch(channelId: string, channelName: string) {
-	localDb.channelSubscriptions
+	const subscription = await localDb.channelSubscriptions
 		.where('channelId')
 		.equals(channelId)
-		.first()
-		.then((subscription) => {
-			if (subscription) {
-				localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
-					lastRSSFetch: new Date()
-				});
-			} else {
-				localDb.channelSubscriptions.add({
-					channelId: channelId,
-					channelName: channelName,
-					lastRSSFetch: new Date()
-				});
-			}
+		.first();
+	if (subscription) {
+		await localDb.channelSubscriptions.where('channelId').equals(channelId).modify({
+			lastRSSFetch: new Date()
 		});
+	} else {
+		await localDb.channelSubscriptions.add({
+			channelId: channelId,
+			channelName: channelName,
+			lastRSSFetch: new Date()
+		});
+	}
 }
 
 export async function clearFeedYTjs() {

@@ -1,5 +1,6 @@
 import { isOwnBackend } from '$lib/shared';
 import { env } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
 
 import { error } from '@sveltejs/kit';
 import { parse as tldParse } from 'tldts';
@@ -13,6 +14,12 @@ const allowedBaseDomains: string[] = [
 	'returnyoutubedislike.com',
 	'ajay.app'
 ];
+
+if (privateEnv.WHITELIST_BASE_DOMAIN) {
+	for (const baseDomain of privateEnv.WHITELIST_BASE_DOMAIN.split(',')) {
+		if (baseDomain) allowedBaseDomains.push(baseDomain);
+	}
+}
 
 const dynamicAllowDomainsEnvVars = [
 	env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
@@ -73,18 +80,7 @@ async function proxyRequest(
 		}
 	}
 
-	const requestHeaders = new Headers(request.headers);
-	for (const key of [
-		'referer',
-		'x-forwarded-for',
-		'x-requested-with',
-		'sec-ch-ua-mobile',
-		'sec-ch-ua',
-		'sec-ch-ua-platform',
-		'content-length'
-	]) {
-		requestHeaders.delete(key);
-	}
+	const requestHeaders = new Headers();
 
 	requestHeaders.set('host', urlToProxyObj.host);
 	requestHeaders.set('origin', urlToProxyObj.origin);
@@ -123,7 +119,7 @@ async function proxyRequest(
 		throw error(500, errorMsg);
 	}
 
-	const responseHeaders = new Headers(response.headers);
+	const responseHeaders = new Headers();
 	responseHeaders.set('transfer-encoding', 'chunked');
 	responseHeaders.delete('content-encoding');
 	responseHeaders.set('access-control-allow-origin', request.headers.get('origin') ?? '');

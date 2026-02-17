@@ -46,7 +46,6 @@
 	} from '../store';
 	import { setStatusBarColor } from '../theme';
 	import { getVideoYTjs } from '$lib/api/youtubejs/video';
-	import { env } from '$env/dynamic/public';
 	import {
 		goToNextVideo,
 		goToPreviousVideo,

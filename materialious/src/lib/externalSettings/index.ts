@@ -2,7 +2,6 @@ import { page } from '$app/state';
 import { get } from 'svelte/store';
 import { z } from 'zod';
 
-import { env } from '$env/dynamic/public';
 import { persistedStores } from './settings';
 
 import { isOwnBackend } from '$lib/shared';
@@ -75,9 +74,11 @@ function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
 }
 
 export function loadSettingsFromEnv() {
-	if (typeof getPublicEnv('DEFAULT_SETTINGS') !== 'string') return;
+	const defaultSettings = getPublicEnv('DEFAULT_SETTINGS');
 
-	let raw = getPublicEnv('DEFAULT_SETTINGS');
+	if (typeof defaultSettings !== 'string') return;
+
+	let raw = defaultSettings;
 
 	// Docker wraps env vars in quotes
 	if (raw.startsWith('"')) raw = raw.slice(1);

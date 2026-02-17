@@ -106,6 +106,11 @@ async function proxyRequest(
 	requestHeaders.set('origin', urlToProxyObj.origin);
 	requestHeaders.set('user-agent', USER_AGENT);
 
+	const authHeader = request.headers.get('Authorization');
+	if (authHeader) {
+		requestHeaders.set('Authorization', authHeader);
+	}
+
 	const requestOptions: RequestInit = {
 		method: request.method,
 		headers: requestHeaders,

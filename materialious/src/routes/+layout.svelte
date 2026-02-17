@@ -83,11 +83,12 @@
 	onMount(async () => {
 		ui();
 
-		if (Capacitor.getPlatform() === 'android' && $themeColorStore) {
+		if (Capacitor.getPlatform() === 'android' && !$themeColorStore) {
 			try {
 				const colorPalette = await colorTheme.getColorPalette();
-				themeColorStore.set(convertToHexColorCode(colorPalette.primary));
-				await ui('theme', $themeColorStore);
+				const colorAsHex = convertToHexColorCode(colorPalette.primary);
+				themeColorStore.set(colorAsHex);
+				await ui('theme', colorAsHex);
 			} catch {
 				// Continue regardless of error
 			}

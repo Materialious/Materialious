@@ -314,7 +314,7 @@ export async function goToInvidiousLogin() {
 		path.search = searchParams.toString();
 		await Browser.open({ url: path.toString() });
 	} else {
-		searchParams.set('callback_url', `${location.origin}${resolve('/auth', {})}`);
+		searchParams.set('callback_url', `${location.origin}${resolve('/invidious/auth', {})}`);
 		path.search = searchParams.toString();
 		document.location.href = path.toString();
 	}

@@ -54,7 +54,7 @@
 		"@capacitor/network": "^8.0.0",
 		"@capacitor/preferences": "^8.0.0",
 		"@capacitor/screen-orientation": "^8.0.0",
-		"@capacitor/share": "^8.0.0",
+		"@capacitor/share": "^8.0.1",
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"altcha": "^2.3.0",

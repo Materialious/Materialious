@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Player from '$lib/components/Player.svelte';
+	import Player from '$lib/components/player/Player.svelte';
 
 	let { data } = $props();
 </script>

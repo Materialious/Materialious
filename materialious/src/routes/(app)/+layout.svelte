@@ -10,8 +10,8 @@
 	import Search from '$lib/components/Search.svelte';
 	import Settings from '$lib/components/settings/Settings.svelte';
 	import SyncParty from '$lib/components/SyncParty.svelte';
-	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import Player from '$lib/components/Player.svelte';
+	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
+	import Player from '$lib/components/player/Player.svelte';
 	import '$lib/css/global.css';
 	import { getPages } from '$lib/navPages';
 	import {

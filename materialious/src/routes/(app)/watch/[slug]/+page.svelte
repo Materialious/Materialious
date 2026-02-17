@@ -8,8 +8,8 @@
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
 	import ShareVideo from '$lib/components/ShareVideo.svelte';
-	import Thumbnail from '$lib/components/Thumbnail.svelte';
-	import Transcript from '$lib/components/Transcript.svelte';
+	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
+	import Transcript from '$lib/components/watch/Transcript.svelte';
 	import { getBestThumbnail } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, numberWithCommas } from '$lib/numbers';

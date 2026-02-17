@@ -23,7 +23,7 @@ import {
 	createRecoverableError,
 	headersToGenericObject,
 	makeResponse
-} from '$lib/sabr/helpers';
+} from '$lib/player/sabr/helpers';
 
 interface ShakaResponseArgs {
 	uri: string;
@@ -216,6 +216,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 		// If it is not supported, returning the whole segment when
 		// it's ready (as xhr)
 		if (!response.body) {
+			console.log('NOT STREAMING');
 			const arrayBuffer = await response.arrayBuffer();
 			const currentTime = Date.now();
 

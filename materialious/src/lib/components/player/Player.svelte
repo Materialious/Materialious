@@ -16,8 +16,8 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { Slider } from 'melt/builders';
-	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '../api';
-	import type { VideoPlay } from '../api/model';
+	import { deleteVideoProgress, getVideoProgress, saveVideoProgress } from '$lib/api';
+	import type { VideoPlay } from '$lib/api/model';
 	import {
 		invidiousAuthStore,
 		invidiousInstanceStore,
@@ -43,8 +43,8 @@
 		sponsorBlockUrlStore,
 		synciousInstanceStore,
 		synciousStore
-	} from '../store';
-	import { setStatusBarColor } from '../theme';
+	} from '$lib/store';
+	import { setStatusBarColor } from '$lib/theme';
 	import { getVideoYTjs } from '$lib/api/youtubejs/video';
 	import {
 		goToNextVideo,
@@ -53,19 +53,19 @@
 		playerDoubleTapSeek
 	} from '$lib/player/index';
 	import { manifestDomainInclusion } from '$lib/player/manifest';
-	import { injectSabr } from '$lib/sabr';
+	import { injectSabr } from '$lib/player/sabr';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { fade } from 'svelte/transition';
-	import { addToast } from './Toast.svelte';
+	import { addToast } from '$lib/components/Toast.svelte';
 	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend, truncate } from '$lib/misc';
 	import {
 		generateThumbnailWebVTT,
 		drawTimelineThumbnail,
 		storyboardThumbnails,
 		type TimelineThumbnail
-	} from '$lib/timelineThumbnails';
+	} from '$lib/player/thumbnails';
 	import { isOwnBackend } from '$lib/shared';
 
 	interface Props {

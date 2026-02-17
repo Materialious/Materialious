@@ -6,7 +6,7 @@
 	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '$lib/i18n';
-	import ItemsList from '$lib/components/ItemsList.svelte';
+	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 
 	let { data } = $props();
 </script>

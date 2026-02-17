@@ -4,7 +4,7 @@
 	import { searchCacheStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import ItemsList from '$lib/components/ItemsList.svelte';
+	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import type { SearchOptions, SearchResults } from '$lib/api/model';
 
 	let { data } = $props();

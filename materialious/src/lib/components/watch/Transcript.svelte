@@ -3,9 +3,9 @@
 	import Fuse from 'fuse.js';
 	import { type VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
 	import { _ } from '$lib/i18n';
-	import type { VideoPlay } from '../api/model';
-	import { decodeHtmlCharCodes } from '../misc';
-	import { invidiousInstanceStore } from '../store';
+	import type { VideoPlay } from '$lib/api/model';
+	import { decodeHtmlCharCodes } from '$lib/misc';
+	import { invidiousInstanceStore } from '$lib/store';
 
 	interface Props {
 		video: VideoPlay;
@@ -57,8 +57,11 @@
 
 		isLoading = true;
 		transcript = null;
+
 		const resp = await fetch(urlConstructed);
+		if (!resp.ok) return;
 		transcript = await parseText(await resp.text(), { strict: false });
+
 		transcriptCues = transcript.cues;
 
 		isLoading = false;

@@ -1,16 +1,16 @@
 <script lang="ts">
-	import Thumbnail from '$lib/components/Thumbnail.svelte';
 	import { _ } from '$lib/i18n';
-	import { removePlaylistVideo } from '../api';
-	import { invidiousAuthStore, feedLastItemId, isAndroidTvStore } from '../store';
-	import ContentColumn from './ContentColumn.svelte';
+	import { removePlaylistVideo } from '$lib/api';
+	import { invidiousAuthStore, feedLastItemId, isAndroidTvStore } from '$lib/store';
+	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount, onDestroy, tick } from 'svelte';
 	import Mousetrap from 'mousetrap';
+	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, timeout, type feedItems } from '$lib/misc';
-	import ChannelThumbnail from './ChannelThumbnail.svelte';
-	import PlaylistThumbnail from './PlaylistThumbnail.svelte';
-	import HashtagThumbnail from './HashtagThumbnail.svelte';
-	import NoResults from './NoResults.svelte';
+	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
+	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
+	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
+	import NoResults from '$lib/components/NoResults.svelte';
 
 	interface Props {
 		items?: feedItems;

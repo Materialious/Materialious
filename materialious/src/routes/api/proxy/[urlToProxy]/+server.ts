@@ -7,6 +7,27 @@ import { parse as tldParse } from 'tldts';
 import { USER_AGENT } from 'bgutils-js';
 import sodium from 'libsodium-wrappers-sumo';
 
+const ALLOWED_HEADERS = [
+	'Origin',
+	'X-Requested-With',
+	'Content-Type',
+	'Accept',
+	'Authorization',
+	'x-goog-visitor-id',
+	'x-goog-api-key',
+	'x-origin',
+	'x-youtube-client-version',
+	'x-youtube-client-name',
+	'x-goog-api-format-version',
+	'x-goog-authuser',
+	'x-user-agent',
+	'Accept-Language',
+	'X-Goog-FieldMask',
+	'Range',
+	'Referer',
+	'Cookie'
+].join(', ');
+
 const allowedBaseDomains: string[] = [
 	'youtube.com',
 	'ytimg.com',
@@ -81,7 +102,6 @@ async function proxyRequest(
 	}
 
 	const requestHeaders = new Headers();
-
 	requestHeaders.set('host', urlToProxyObj.host);
 	requestHeaders.set('origin', urlToProxyObj.origin);
 	requestHeaders.set('user-agent', USER_AGENT);
@@ -119,11 +139,11 @@ async function proxyRequest(
 		throw error(500, errorMsg);
 	}
 
-	const responseHeaders = new Headers();
+	const responseHeaders = new Headers(response.headers);
 	responseHeaders.set('transfer-encoding', 'chunked');
 	responseHeaders.delete('content-encoding');
-	responseHeaders.set('access-control-allow-origin', request.headers.get('origin') ?? '');
-	responseHeaders.set('timing-allow-origin', request.headers.get('origin') ?? '');
+	responseHeaders.delete('access-control-allow-origin');
+	responseHeaders.delete('timing-allow-origin');
 
 	return new Response(response.body, {
 		status: response.status,
@@ -148,4 +168,17 @@ export async function PUT({ request, params, locals }) {
 
 export async function POST({ request, params, locals }) {
 	return await proxyRequest(request, params.urlToProxy, locals.userId);
+}
+
+export async function OPTIONS({ request }) {
+	return new Response('', {
+		status: 200,
+		headers: new Headers({
+			'Access-Control-Allow-Origin': request.headers.get('origin') || '',
+			'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, OPTIONS',
+			'Access-Control-Allow-Headers': ALLOWED_HEADERS,
+			'Access-Control-Max-Age': '86400',
+			'Access-Control-Allow-Credentials': 'true'
+		})
+	});
 }

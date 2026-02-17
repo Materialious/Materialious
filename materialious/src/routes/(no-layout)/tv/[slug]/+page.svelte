@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ContentColumn from '$lib/components/ContentColumn.svelte';
-	import Player from '$lib/components/Player.svelte';
+	import Player from '$lib/components/player/Player.svelte';
 	import Author from '$lib/components/Author.svelte';
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
@@ -10,7 +10,7 @@
 	import { _ } from '$lib/i18n';
 	import { playlistCacheStore } from '$lib/store';
 	import { fade } from 'svelte/transition';
-	import ItemsList from '$lib/components/ItemsList.svelte';
+	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 
 	let { data } = $props();
 

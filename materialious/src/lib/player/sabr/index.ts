@@ -34,8 +34,6 @@ export async function injectSabr(
 	});
 
 	sabrAdapter.onReloadPlayerResponse(async (reloadContext) => {
-		console.log('[SABR]', 'Reloading player response...');
-
 		if (!video.ytjs) return;
 
 		const reloadedInfo = await video.ytjs.innertube.actions.execute('/player', {

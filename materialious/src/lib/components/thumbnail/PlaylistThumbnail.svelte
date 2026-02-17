@@ -5,9 +5,9 @@
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import type { Playlist, PlaylistPage } from '../api/model';
-	import { insecureRequestImageHandler, truncate } from '../misc';
-	import { interfaceLowBandwidthMode } from '../store';
+	import type { Playlist, PlaylistPage } from '$lib/api/model';
+	import { insecureRequestImageHandler, truncate } from '$lib/misc';
+	import { interfaceLowBandwidthMode } from '$lib/store';
 
 	interface Props {
 		playlist: Playlist | PlaylistPage;

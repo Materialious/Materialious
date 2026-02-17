@@ -6,10 +6,10 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { getDeArrow, getThumbnail } from '../api';
-	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '../api/model';
-	import { createVideoUrl, insecureRequestImageHandler, isYTBackend } from '../misc';
-	import type { PlayerEvents } from '../player';
+	import { getDeArrow, getThumbnail } from '$lib/api';
+	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
+	import { createVideoUrl, insecureRequestImageHandler, isYTBackend } from '$lib/misc';
+	import type { PlayerEvents } from '$lib/player';
 	import {
 		invidiousAuthStore,
 		deArrowEnabledStore,
@@ -21,7 +21,7 @@
 		syncPartyPeerStore,
 		synciousInstanceStore,
 		synciousStore
-	} from '../store';
+	} from '$lib/store';
 	import { queueGetWatchProgress } from '$lib/api/apiExtended';
 	import { relativeTimestamp } from '$lib/time';
 

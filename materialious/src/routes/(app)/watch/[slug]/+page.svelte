@@ -41,6 +41,7 @@
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
+	import type { PlayerEvents } from '$lib/player/index.js';
 
 	let { data = $bindable() } = $props();
 

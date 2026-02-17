@@ -8,6 +8,7 @@ import { persistedStores } from './settings';
 import { isOwnBackend } from '$lib/shared';
 import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend';
 import { rawMasterKeyStore } from '$lib/store';
+import { getPublicEnv } from '$lib/misc';
 
 export async function syncSettingsToBackend() {
 	if (!isOwnBackend() || !get(rawMasterKeyStore)) return;
@@ -74,13 +75,9 @@ function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
 }
 
 export function loadSettingsFromEnv() {
-	if (
-		typeof import.meta.env.VITE_DEFAULT_SETTINGS !== 'string' &&
-		typeof env.PUBLIC_DEFAULT_SETTINGS !== 'string'
-	)
-		return;
+	if (typeof getPublicEnv('DEFAULT_SETTINGS') !== 'string') return;
 
-	let raw = import.meta.env.VITE_DEFAULT_SETTINGS || env.PUBLIC_DEFAULT_SETTINGS;
+	let raw = getPublicEnv('DEFAULT_SETTINGS');
 
 	// Docker wraps env vars in quotes
 	if (raw.startsWith('"')) raw = raw.slice(1);

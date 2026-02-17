@@ -34,6 +34,10 @@ import { isOwnBackend } from './shared';
 import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 
+export function getPublicEnv(envName: string): string | undefined {
+	return env[`PUBLIC_${envName}`] ?? import.meta.env[`VITE_${envName}`];
+}
+
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
 
@@ -83,10 +87,9 @@ export interface PeerInstance {
 
 export function determinePeerJsInstance(): PeerInstance {
 	return {
-		host:
-			import.meta.env.VITE_DEFAULT_PEERJS_HOST || env.PUBLIC_DEFAULT_PEERJS_HOST || '0.peerjs.com',
-		path: import.meta.env.VITE_DEFAULT_PEERJS_PATH || env.PUBLIC_DEFAULT_PEERJS_PATH || '/',
-		port: import.meta.env.VITE_DEFAULT_PEERJS_PORT || env.PUBLIC_DEFAULT_PEERJS_PORT || 443
+		host: getPublicEnv('DEFAULT_PEERJS_HOST') || '0.peerjs.com',
+		path: getPublicEnv('DEFAULT_PEERJS_PATH') || '/',
+		port: getPublicEnv('DEFAULT_PEERJS_PORT') ? Number(getPublicEnv('DEFAULT_PEERJS_PORT')) : 443
 	};
 }
 

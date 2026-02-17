@@ -13,7 +13,8 @@
 		isUnrestrictedPlatform,
 		setInvidiousInstance,
 		goToInvidiousLogin,
-		invidiousLogout
+		invidiousLogout,
+		timeout
 	} from '../../misc';
 	import { getPages, type Pages } from '../../navPages';
 	import ColorPicker from 'svelte-awesome-color-picker';
@@ -82,12 +83,16 @@
 	async function setInstance(event: Event) {
 		event.preventDefault();
 		invalidInstance = !(await setInvidiousInstance(invidiousInstance));
+
+		await timeout(100);
 		location.reload();
 	}
 
 	async function setBackend(event: Event) {
 		const select = event.target as HTMLSelectElement;
 		backendInUseStore.set(select.value as 'ivg' | 'yt');
+
+		await timeout(100);
 		location.reload();
 	}
 

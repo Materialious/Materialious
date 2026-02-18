@@ -4,14 +4,10 @@
 
 	const captionTracks: Record<string, string> = {};
 
-	// Configurable settings for captions
 	let captionFontSize: string = $state('1em');
 	let captionColor: string = $state('white');
 	let captionBackgroundColor: string = $state('rgba(0, 0, 0, 0.7)');
 	let captionOpacity: number = $state(1);
-
-	let captionBorderThickness: string = $state('0.1px');
-	let captionBorderColor: string = $state('black');
 
 	export function setTextTrackVisibility(visible: boolean = true) {
 		trackVisible = visible;
@@ -22,23 +18,17 @@
 		fontSize,
 		color,
 		backgroundColor,
-		opacity,
-		borderThickness,
-		borderColor
+		opacity
 	}: {
 		fontSize?: string;
 		color?: string;
 		backgroundColor?: string;
 		opacity?: number;
-		borderThickness?: string;
-		borderColor?: string;
 	}) {
 		if (fontSize) captionFontSize = fontSize;
 		if (color) captionColor = color;
 		if (backgroundColor) captionBackgroundColor = backgroundColor;
 		if (opacity !== undefined) captionOpacity = opacity;
-		if (borderThickness) captionBorderThickness = borderThickness;
-		if (borderColor) captionBorderColor = borderColor;
 	}
 
 	// Fetch caption data for a selected language
@@ -52,18 +42,17 @@
 			});
 		}
 
-		captionsCues = (await parseText(await resp.text(), { strict: false })).cues;
+		captionsCues = (await parseText(await resp.text(), { strict: true, type: 'vtt' })).cues;
 	}
 </script>
 
 <script lang="ts">
-	import { draggable, bounds, BoundsFrom, touchAction } from '@neodrag/svelte';
 	import type { VideoPlay } from '$lib/api/model';
-	import { findElementForTime, getPublicEnv } from '$lib/misc';
+	import { decodeHtmlCharCodes, findElementForTime, getPublicEnv } from '$lib/misc';
 	import { invidiousInstanceStore } from '$lib/store';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { addToast } from '../Toast.svelte';
-	import { parseText, VTTCue } from 'media-captions';
+	import { parseText, type VTTCue } from 'media-captions';
 
 	let {
 		video,
@@ -75,7 +64,31 @@
 		showControls: boolean;
 	} = $props();
 
+	let captionElement: HTMLElement | undefined = $state();
+	let captionContainerHeight: number = $state(0);
+
+	let currentCaption: VTTCue | null = $state(null);
+
+	function updateCaptionHeight() {
+		if (captionElement) {
+			captionContainerHeight = captionElement.offsetHeight;
+		}
+	}
+
+	$effect(() => {
+		updateCaptionHeight();
+
+		currentCaption = findElementForTime(
+			captionsCues,
+			currentTime,
+			(cue: VTTCue) => cue.startTime,
+			(cue: VTTCue) => cue.endTime
+		);
+	});
+
 	onMount(async () => {
+		window.addEventListener('resize', updateCaptionHeight);
+
 		if (video.captions) {
 			for (const caption of video.captions) {
 				let captionUrl: string;
@@ -92,39 +105,49 @@
 		}
 	});
 
-	function removeTags(input: string): string {
-		return input.replace(/<[^>]+>/g, '').replace(/&[a-zA-Z0-9#]+;/g, '');
-	}
+	onDestroy(() => {
+		window.removeEventListener('resize', updateCaptionHeight);
+	});
 </script>
 
 {#if trackVisible && captionsCues.length > 0}
-	{@const currentCaption = findElementForTime(
-		captionsCues,
-		currentTime,
-		(cue: VTTCue) => cue.startTime,
-		(cue: VTTCue) => cue.endTime
-	)}
-	<div
-		{@attach draggable(() => [bounds(BoundsFrom.viewport()), touchAction('manipulation')])}
-		style="z-index: 5;cursor: grab;"
-	>
-		{#if currentCaption?.text}
-			<p
-				style="
-                    font-size: {captionFontSize};
-                    color: {captionColor};
-                    background-color: {captionBackgroundColor};
-                    opacity: {captionOpacity};
-                    padding: 5px;
-                    width: fit-content;
-                    border-radius: 0.25rem;
-                    user-select: none;
-                    -webkit-text-fill-color: {captionColor};
-                    -webkit-text-stroke: {captionBorderThickness} {captionBorderColor};
-                "
-			>
-				{removeTags(currentCaption.text)}
-			</p>
-		{/if}
-	</div>
+	{#if currentCaption && currentTime <= currentCaption.endTime && currentTime >= currentCaption.startTime}
+		<div
+			class="caption-container"
+			bind:this={captionElement}
+			style:top={`calc(${showControls ? 'var(--video-player-height) * 0.85' : 'var(--video-player-height) * 0.98'} - ${captionContainerHeight}px)`}
+		>
+			{#if currentCaption?.text}
+				<p
+					style="
+					font-size: {captionFontSize};
+					color: {captionColor};
+					background-color: {captionBackgroundColor};
+					opacity: {captionOpacity};
+					padding: 5px;
+					border-radius: 0.25rem;
+					user-select: none;
+				"
+				>
+					{decodeHtmlCharCodes(currentCaption.text)}
+				</p>
+			{/if}
+		</div>
+	{/if}
 {/if}
+
+<style>
+	.caption-container {
+		position: absolute;
+		z-index: 5;
+		left: 50%;
+		transform: translateX(-50%);
+		width: fit-content;
+	}
+
+	@media screen and (max-width: 1000px) {
+		.caption-container {
+			width: 100%;
+		}
+	}
+</style>

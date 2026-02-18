@@ -17,7 +17,6 @@
 	import type { VideoPlay } from '$lib/api/model';
 	import {
 		invidiousAuthStore,
-		invidiousInstanceStore,
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
@@ -457,31 +456,6 @@
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
-		});
-		player.getNetworkingEngine()?.registerResponseFilter((type, response) => {
-			if (
-				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
-				!response.uri.includes('/api/timedtext')
-			) {
-				return;
-			}
-
-			const url = new URL(response.uri);
-
-			// Fix positioning for auto-generated subtitles
-			// Credit to Freetube!
-			if (
-				url.hostname.endsWith('.youtube.com') &&
-				url.pathname === '/api/timedtext' &&
-				url.searchParams.get('caps') === 'asr' &&
-				url.searchParams.get('kind') === 'asr' &&
-				url.searchParams.get('fmt') === 'vtt'
-			) {
-				const stringBody = new TextDecoder().decode(response.data);
-				// position:0% for LTR text and position:100% for RTL text
-				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
-				response.data = new TextEncoder().encode(cleaned).buffer;
-			}
 		});
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);

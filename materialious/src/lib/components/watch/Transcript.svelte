@@ -121,7 +121,7 @@
 					<div
 						class="transcript-line"
 						role="presentation"
-						onclick={() => (playerElement.currentTime = cue.startTime)}
+						onclick={() => (currentTime = cue.startTime)}
 						class:surface-container-highest={currentTime >= cue.startTime &&
 							currentTime <= cue.endTime}
 					>

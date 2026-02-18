@@ -873,7 +873,7 @@
 	}}
 	bind:this={playerContainer}
 >
-	<ClosedCaptions video={data.video} {playerContainer} bind:currentTime bind:showControls />
+	<ClosedCaptions video={data.video} bind:currentTime bind:showControls />
 
 	<video
 		controls={false}

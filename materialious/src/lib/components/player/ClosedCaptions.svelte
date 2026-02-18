@@ -5,7 +5,7 @@
 	const captionTracks: Record<string, string> = {};
 
 	// Configurable settings for captions
-	let captionFontSize: string = $state('16px');
+	let captionFontSize: string = $state('1em');
 	let captionColor: string = $state('white');
 	let captionBackgroundColor: string = $state('rgba(0, 0, 0, 0.7)');
 	let captionOpacity: number = $state(1);
@@ -67,14 +67,12 @@
 
 	let {
 		video,
-		playerContainer,
 		currentTime = $bindable(),
 		showControls = $bindable()
 	}: {
 		video: VideoPlay;
 		currentTime: number;
 		showControls: boolean;
-		playerContainer: HTMLElement;
 	} = $props();
 
 	onMount(async () => {
@@ -107,10 +105,7 @@
 		(cue: VTTCue) => cue.endTime
 	)}
 	<div
-		{@attach draggable(() => [
-			bounds(BoundsFrom.element(playerContainer)),
-			touchAction('manipulation')
-		])}
+		{@attach draggable(() => [bounds(BoundsFrom.viewport()), touchAction('manipulation')])}
 		style="z-index: 5;cursor: grab;"
 	>
 		{#if currentCaption?.text}

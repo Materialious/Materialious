@@ -80,8 +80,8 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 		const publishedAt = new Date(
 			entry.getElementsByTagName('published')[0]?.textContent || new Date()
 		);
-		const published = publishedAt.getTime();
-		const publishedText = relativeTimestamp(published, false);
+		const published = publishedAt.getTime() / 1000;
+		const publishedText = relativeTimestamp(published * 1000, false);
 		channelName =
 			entry.getElementsByTagName('author')[0]?.getElementsByTagName('name')[0]?.textContent ||
 			'Unknown Author';

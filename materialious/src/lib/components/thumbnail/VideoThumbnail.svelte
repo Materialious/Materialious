@@ -8,7 +8,7 @@
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '$lib/api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
-	import { createVideoUrl, insecureRequestImageHandler, isYTBackend } from '$lib/misc';
+	import { createVideoUrl, insecureRequestImageHandler } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		invidiousAuthStore,
@@ -251,8 +251,8 @@
 					<div class="max">
 						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
 						•
-						{isYTBackend() && video.published !== 0
-							? relativeTimestamp(video.published, false)
+						{video.published && video.published !== 0
+							? relativeTimestamp(video.published * 1000, false)
 							: video.publishedText}
 					</div>
 				{/if}

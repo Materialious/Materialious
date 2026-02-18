@@ -180,6 +180,7 @@
 							<button
 								onclick={() => {
 									search = history;
+									onSubmit();
 								}}
 								type="reset"
 								class="transparent suggestion"

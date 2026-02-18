@@ -6,9 +6,10 @@
 
 	interface Props {
 		classes?: string;
+		size?: string;
 	}
 
-	let { classes = '' }: Props = $props();
+	let { classes = '', size = '70px' }: Props = $props();
 
 	let fillColor = $state('');
 
@@ -35,8 +36,8 @@
 <svg
 	version="1.1"
 	class={classes}
-	height="100%"
-	width="70px"
+	height={size}
+	width={size}
 	xml:space="preserve"
 	xmlns="http://www.w3.org/2000/svg"
 	viewBox="50.17 104.37 109.67 88.27"

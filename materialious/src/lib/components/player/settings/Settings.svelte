@@ -20,6 +20,11 @@
 			setActiveVideoTrack();
 			setActiveAudioTrack();
 		});
+
+		player.addEventListener('trackschanged', () => {
+			setActiveVideoTrack();
+			setActiveAudioTrack();
+		});
 	});
 
 	function setActiveVideoTrack() {

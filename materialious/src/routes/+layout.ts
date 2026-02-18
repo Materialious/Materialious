@@ -12,7 +12,8 @@ import {
 	invidiousInstanceStore,
 	interfaceDefaultPage,
 	isAndroidTvStore,
-	rawMasterKeyStore
+	rawMasterKeyStore,
+	hideSearchStore
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';

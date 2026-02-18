@@ -24,7 +24,8 @@
 		rawMasterKeyStore,
 		syncPartyPeerStore,
 		themeColorStore,
-		backendInUseStore
+		backendInUseStore,
+		hideSearchStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
@@ -237,10 +238,11 @@
 
 			<div class="max m l"></div>
 
-			<div class="m l">
-				<Search />
-			</div>
-
+			{#if !$hideSearchStore}
+				<div class="m l">
+					<Search />
+				</div>
+			{/if}
 			{#if !mobileSearchShow}
 				<div class="max"></div>
 			{/if}

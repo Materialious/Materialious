@@ -27,9 +27,13 @@
 	let search: string = $state('');
 
 	$effect(() => {
+		// currentTime must be referenced to update effect
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		currentTime;
+
 		if (autoScroll) {
 			const currentTranscriptLine = document.querySelector(
-				'.transcript-line.secondary-container'
+				'.transcript-line.current-line'
 			) as HTMLElement;
 			const transcriptScrollable = document.getElementById('transcript');
 
@@ -118,12 +122,13 @@
 		{#if transcript.cues.length > 0}
 			{#if transcriptCues.length > 0}
 				{#each transcriptCues as cue (cue)}
+					{@const isCurrent = currentTime >= cue.startTime && currentTime <= cue.endTime}
 					<div
 						class="transcript-line"
 						role="presentation"
 						onclick={() => (currentTime = cue.startTime)}
-						class:surface-container-highest={currentTime >= cue.startTime &&
-							currentTime <= cue.endTime}
+						class:current-line={isCurrent}
+						class:surface-container-highest={isCurrent}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
 						<p class="transcript-text">

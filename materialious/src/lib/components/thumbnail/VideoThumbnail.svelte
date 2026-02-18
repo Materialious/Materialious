@@ -8,7 +8,7 @@
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '$lib/api';
 	import type { Notification, PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
-	import { createVideoUrl, insecureRequestImageHandler, isYTBackend } from '$lib/misc';
+	import { createVideoUrl, insecureRequestImageHandler } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		invidiousAuthStore,

@@ -10,6 +10,7 @@
 	"login": "Login",
 	"username": "Username",
 	"password": "Password",
+	"captionStyle": "Caption styles",
 	"invalidPassword": "Invalid password",
 	"usernameTaken": "Username taken",
 	"linkInvidious": "Link Invidious account",

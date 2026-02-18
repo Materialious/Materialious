@@ -98,6 +98,8 @@ export interface Ytjs {
 	rawApiResponse: ApiResponse;
 }
 
+export type FallbackPatches = 'youtubejs' | 'piped';
+
 export interface VideoPlay extends Video {
 	keywords: string[];
 	likeCount: number;
@@ -120,7 +122,7 @@ export interface VideoPlay extends Video {
 	captions: Captions[];
 	storyboards?: StoryBoard[];
 	ytjs?: Ytjs;
-	fallbackPatch?: 'youtubejs' | 'piped';
+	fallbackPatch?: FallbackPatches;
 }
 
 export interface StoryBoard {

@@ -10,7 +10,7 @@
 	let { player, playerElement }: { player: shaka.Player; playerElement: HTMLMediaElement } =
 		$props();
 
-	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
+	let playerSettings: 'quality' | 'speed' | 'language' | 'caption' | 'root' = $state('root');
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
 	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
 	let playerLoop = $state($playerAlwaysLoopStore);

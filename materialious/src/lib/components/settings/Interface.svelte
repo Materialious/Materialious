@@ -508,7 +508,7 @@
 
 	@media screen and (max-width: 640px) {
 		.color-picker {
-			--picker-width: 85vw;
+			--picker-width: 95vw;
 		}
 	}
 </style>

@@ -9,13 +9,15 @@ import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend';
 import { rawMasterKeyStore } from '$lib/store';
 import { getPublicEnv } from '$lib/misc';
 
+const allowNullOverwrite = ['authToken'];
+
 export async function syncSettingsToBackend() {
 	if (!isOwnBackend() || !get(rawMasterKeyStore)) return;
 
 	await Promise.all(
 		persistedStores.map(async (store) => {
 			getKeyValue(store.name).then((currentKeyValue) => {
-				if (currentKeyValue !== null) {
+				if (currentKeyValue !== null || allowNullOverwrite.includes(store.name)) {
 					const currentKeyValueParsed = parseWithSchema(store.schema, currentKeyValue);
 					if (currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) {
 						store.store.set(currentKeyValueParsed);

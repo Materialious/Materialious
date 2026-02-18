@@ -17,7 +17,6 @@
 	import type { VideoPlay } from '$lib/api/model';
 	import {
 		invidiousAuthStore,
-		invidiousInstanceStore,
 		isAndroidTvStore,
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
@@ -65,6 +64,7 @@
 	import TouchControls from './TouchControls.svelte';
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
+	import ClosedCaptions from './ClosedCaptions.svelte';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -286,28 +286,6 @@
 				await player.load(dashUrl, await getLastPlayPos());
 			}
 
-			if (data.video.captions) {
-				for (const caption of data.video.captions) {
-					let captionUrl: string;
-					if (!getPublicEnv('DEFAULT_COMPANION_INSTANCE') && $invidiousInstanceStore) {
-						captionUrl = caption.url.startsWith('http')
-							? caption.url
-							: `${new URL($invidiousInstanceStore).origin}${caption.url}`;
-					} else {
-						captionUrl = `${getPublicEnv('DEFAULT_COMPANION_INSTANCE')}${caption.url}`;
-					}
-
-					await player.addTextTrackAsync(
-						captionUrl,
-						caption.language_code,
-						'captions',
-						undefined,
-						undefined,
-						caption.label
-					);
-				}
-			}
-
 			if (data.content.timestamps) {
 				try {
 					player.addChaptersTrack(
@@ -478,31 +456,6 @@
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
 			console.error('Player error:', error);
-		});
-		player.getNetworkingEngine()?.registerResponseFilter((type, response) => {
-			if (
-				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
-				!response.uri.includes('/api/timedtext')
-			) {
-				return;
-			}
-
-			const url = new URL(response.uri);
-
-			// Fix positioning for auto-generated subtitles
-			// Credit to Freetube!
-			if (
-				url.hostname.endsWith('.youtube.com') &&
-				url.pathname === '/api/timedtext' &&
-				url.searchParams.get('caps') === 'asr' &&
-				url.searchParams.get('kind') === 'asr' &&
-				url.searchParams.get('fmt') === 'vtt'
-			) {
-				const stringBody = new TextDecoder().decode(response.data);
-				// position:0% for LTR text and position:100% for RTL text
-				const cleaned = stringBody.replaceAll(/ align:start position:(?:10)?0%$/gm, '');
-				response.data = new TextEncoder().encode(cleaned).buffer;
-			}
 		});
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
@@ -894,6 +847,8 @@
 	}}
 	bind:this={playerContainer}
 >
+	<ClosedCaptions video={data.video} bind:currentTime bind:showControls />
+
 	<video
 		controls={false}
 		autoplay={$playerAutoPlayStore}
@@ -905,6 +860,7 @@
 			{data.video.title}
 		</div>
 	{/if}
+
 	{#if showControls}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
@@ -974,7 +930,7 @@
 						{/if}
 					</p>
 					{#if !$isAndroidTvStore}
-						<CaptionSettings {player} video={data.video} />
+						<CaptionSettings video={data.video} />
 						{#if playerElement}
 							<Settings {player} {playerElement} />
 							<Airplay {playerElement} />

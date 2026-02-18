@@ -132,7 +132,10 @@ export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
 		return await getResolveUrlYTjs(url);
 	}
 
-	const resp = await fetchErrorHandle(await fetch(`${buildPath('resolveurl')}?url=${url}`));
+	const path = buildPath('resolveurl');
+	path.searchParams.set('url', url);
+
+	const resp = await fetchErrorHandle(await fetch(path));
 	return await resp.json();
 }
 
@@ -149,7 +152,10 @@ export async function getVideo(
 		return await getVideoYTjs(videoId);
 	}
 
-	const resp = await fetch(buildPath(`videos/${videoId}?local=${local}`), fetchOptions);
+	const path = buildPath(`videos/${videoId}`);
+	path.searchParams.set('local', local.toString());
+
+	const resp = await fetch(path, fetchOptions);
 
 	if (!resp.ok && get(playerYouTubeJsFallback) && isUnrestrictedPlatform()) {
 		return await getVideoYTjs(videoId);
@@ -261,7 +267,10 @@ export async function getHashtag(tag: string, page: number = 0): Promise<{ resul
 	// TODO: Implement in YTjs
 	if (isYTBackend()) return { results: [] };
 
-	const resp = await fetchErrorHandle(await fetch(buildPath(`hashtag/${tag}?page=${page}`)));
+	const path = buildPath(`hashtag/${tag}`);
+	path.searchParams.set('page', page.toString());
+
+	const resp = await fetchErrorHandle(await fetch(path));
 	return await resp.json();
 }
 
@@ -414,8 +423,12 @@ export async function getHistory(
 		return [];
 	}
 
+	const path = buildPath(`auth/history`);
+	path.searchParams.set('page', page.toString());
+	path.searchParams.set('max_results', maxResults.toString());
+
 	const resp = await fetchErrorHandle(
-		await fetch(buildPath(`auth/history?page=${page}&max_results=${maxResults}`), {
+		await fetch(path, {
 			...buildAuthHeaders(),
 			...fetchOptions
 		})
@@ -466,13 +479,16 @@ export async function getPlaylist(
 
 	let resp;
 
+	const path = buildPath(`${get(invidiousAuthStore) ? 'auth/' : ''}playlists/${playlistId}`);
+	path.searchParams.set('page', page.toString());
+
 	if (get(invidiousAuthStore)) {
-		resp = await fetch(buildPath(`auth/playlists/${playlistId}?page=${page}`), {
+		resp = await fetch(path, {
 			...buildAuthHeaders(),
 			...fetchOptions
 		});
 	} else {
-		resp = await fetch(buildPath(`playlists/${playlistId}?page=${page}`), fetchOptions);
+		resp = await fetch(path, fetchOptions);
 	}
 	await fetchErrorHandle(resp);
 	return await resp.json();

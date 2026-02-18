@@ -148,7 +148,9 @@
 
 	onMount(async () => {
 		if ($invidiousAuthStore && !isYTBackend()) {
-			loadNotifications().catch(() => invidiousLogout());
+			loadNotifications().catch(() => {
+				invidiousLogout();
+			});
 		}
 
 		if ($rawMasterKeyStore) {

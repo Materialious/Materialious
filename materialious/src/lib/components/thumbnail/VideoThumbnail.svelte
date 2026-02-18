@@ -251,8 +251,8 @@
 					<div class="max">
 						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
 						•
-						{isYTBackend() && video.published !== 0
-							? relativeTimestamp(video.published, false)
+						{video.published && video.published !== 0
+							? relativeTimestamp(video.published * 1000, false)
 							: video.publishedText}
 					</div>
 				{/if}

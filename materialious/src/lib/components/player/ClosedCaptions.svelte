@@ -2,7 +2,7 @@
 	let trackVisible: boolean = $state(false);
 	let captionsCues: VTTCue[] = $state([]);
 
-	const captionTracks: Record<string, string> = {};
+	let captionTracks: Record<string, string> = {};
 
 	export function setTextTrackVisibility(visible: boolean) {
 		trackVisible = visible;
@@ -25,7 +25,6 @@
 
 <script lang="ts">
 	import type { VideoPlay } from '$lib/api/model';
-	import { findElementForTime } from '$lib/misc';
 	import { onDestroy, onMount } from 'svelte';
 	import { addToast } from '../Toast.svelte';
 	import { parseText, renderVTTCueString, type VTTCue } from 'media-captions';
@@ -44,8 +43,6 @@
 	let captionElement: HTMLElement | undefined = $state();
 	let captionContainerHeight: number = $state(0);
 
-	let currentCaption: VTTCue | null = $state(null);
-
 	function updateCaptionHeight() {
 		if (captionElement) {
 			captionContainerHeight = captionElement.offsetHeight;
@@ -54,13 +51,6 @@
 
 	$effect(() => {
 		updateCaptionHeight();
-
-		currentCaption = findElementForTime(
-			captionsCues,
-			currentTime,
-			(cue: VTTCue) => cue.startTime,
-			(cue: VTTCue) => cue.endTime
-		);
 	});
 
 	onMount(async () => {
@@ -79,27 +69,34 @@
 
 	onDestroy(() => {
 		window.removeEventListener('resize', updateCaptionHeight);
+
+		captionTracks = {};
+		captionsCues = [];
+		trackVisible = false;
 	});
 </script>
 
 {#if trackVisible && captionsCues.length > 0}
-	{#if currentCaption}
-		<div
-			class="caption-container"
-			bind:this={captionElement}
-			style:top={`calc(${showControls ? 'var(--video-player-height) * 0.85' : 'var(--video-player-height) * 0.98'} - ${captionContainerHeight}px)`}
-		>
-			{#if currentCaption}
-				<p>
-					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-					{@html renderVTTCueString(currentCaption, currentTime)}
-				</p>
-			{/if}
-		</div>
-	{/if}
+	<div
+		class="caption-container"
+		bind:this={captionElement}
+		style:top={`calc(${showControls ? 'var(--video-player-height) * var(--top-percentage-controls-shown)' : 'var(--video-player-height) * var(--top-percentage-controls-hidden)'} - ${captionContainerHeight}px)`}
+	>
+		{#each captionsCues as cue (cue)}
+			<p class:hide={currentTime <= cue.startTime || currentTime >= cue.endTime}>
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html renderVTTCueString(cue, currentTime)}
+			</p>
+		{/each}
+	</div>
 {/if}
 
 <style>
+	:root {
+		--top-percentage-controls-shown: 0.85;
+		--top-percentage-controls-hidden: 0.98;
+	}
+
 	.caption-container {
 		position: absolute;
 		z-index: 5;
@@ -118,6 +115,10 @@
 	}
 
 	@media screen and (max-width: 1000px) {
+		:root {
+			--top-percentage-controls-shown: 0;
+		}
+
 		.caption-container {
 			width: 100%;
 		}

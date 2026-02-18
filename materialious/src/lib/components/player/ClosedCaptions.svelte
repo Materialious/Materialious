@@ -48,11 +48,12 @@
 
 <script lang="ts">
 	import type { VideoPlay } from '$lib/api/model';
-	import { decodeHtmlCharCodes, findElementForTime, getPublicEnv } from '$lib/misc';
+	import { decodeHtmlCharCodes, findElementForTime, getPublicEnv, isYTBackend } from '$lib/misc';
 	import { invidiousInstanceStore } from '$lib/store';
 	import { onDestroy, onMount } from 'svelte';
 	import { addToast } from '../Toast.svelte';
-	import { parseText, type VTTCue } from 'media-captions';
+	import { parseText, renderVTTCueString, type VTTCue } from 'media-captions';
+	import { getCaptionUrl } from '$lib/player/captions';
 
 	let {
 		video,
@@ -91,14 +92,9 @@
 
 		if (video.captions) {
 			for (const caption of video.captions) {
-				let captionUrl: string;
-				if (!getPublicEnv('DEFAULT_COMPANION_INSTANCE') && $invidiousInstanceStore) {
-					captionUrl = caption.url.startsWith('http')
-						? caption.url
-						: `${new URL($invidiousInstanceStore).origin}${caption.url}`;
-				} else {
-					captionUrl = `${getPublicEnv('DEFAULT_COMPANION_INSTANCE')}${caption.url}`;
-				}
+				const captionUrl = getCaptionUrl(caption, video.fallbackPatch);
+
+				if (!captionUrl) continue;
 
 				captionTracks[caption.language_code] = captionUrl;
 			}
@@ -111,13 +107,13 @@
 </script>
 
 {#if trackVisible && captionsCues.length > 0}
-	{#if currentCaption && currentTime <= currentCaption.endTime && currentTime >= currentCaption.startTime}
+	{#if currentCaption}
 		<div
 			class="caption-container"
 			bind:this={captionElement}
 			style:top={`calc(${showControls ? 'var(--video-player-height) * 0.85' : 'var(--video-player-height) * 0.98'} - ${captionContainerHeight}px)`}
 		>
-			{#if currentCaption?.text}
+			{#if currentCaption}
 				<p
 					style="
 					font-size: {captionFontSize};
@@ -129,7 +125,8 @@
 					user-select: none;
 				"
 				>
-					{decodeHtmlCharCodes(currentCaption.text)}
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+					{@html renderVTTCueString(currentCaption, currentTime)}
 				</p>
 			{/if}
 		</div>

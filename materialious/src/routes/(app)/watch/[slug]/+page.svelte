@@ -595,8 +595,8 @@
 	</div>
 	{#if !$playertheatreModeIsActive}
 		<div class="s12 m12 l3 recommended">
-			{#if showTranscript && playerElement}
-				<Transcript video={data.video} bind:playerElement />
+			{#if showTranscript}
+				<Transcript video={data.video} bind:currentTime={playerCurrentTime} />
 			{/if}
 			{#if data.playlistId && data.playlistId in $playlistCacheStore}
 				<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />

@@ -1,31 +1,32 @@
 <script lang="ts">
 	import { videoLength } from '$lib/numbers';
 	import Fuse from 'fuse.js';
-	import { type VTTCue, parseText, type ParsedCaptionsResult } from 'media-captions';
+	import {
+		type VTTCue,
+		parseText,
+		type ParsedCaptionsResult,
+		renderVTTCueString
+	} from 'media-captions';
 	import { _ } from '$lib/i18n';
-	import type { VideoPlay } from '$lib/api/model';
-	import { decodeHtmlCharCodes } from '$lib/misc';
-	import { invidiousInstanceStore } from '$lib/store';
+	import type { Captions, VideoPlay } from '$lib/api/model';
+	import { getCaptionUrl } from '$lib/player/captions';
 
 	interface Props {
 		video: VideoPlay;
-		playerElement: HTMLMediaElement;
+		currentTime: number;
 	}
 
-	let { video, playerElement = $bindable() }: Props = $props();
+	let { video, currentTime = $bindable() }: Props = $props();
 
-	let url: string | null = $state(null);
+	let selectedCaption: Captions | undefined = $state();
 	let autoScroll: boolean = $state(true);
 
 	let transcript: ParsedCaptionsResult | null = $state(null);
 	let transcriptCues: VTTCue[] = $state([]);
 	let isLoading = $state(false);
-	let currentTime = $state(0);
 	let search: string = $state('');
 
-	playerElement.addEventListener('timeupdate', () => {
-		currentTime = playerElement.currentTime;
-
+	$effect(() => {
 		if (autoScroll) {
 			const currentTranscriptLine = document.querySelector(
 				'.transcript-line.secondary-container'
@@ -40,28 +41,21 @@
 	});
 
 	async function loadTranscript() {
-		if (!url) {
+		if (!selectedCaption) {
 			transcript = null;
 			return;
 		}
-
-		let urlConstructed = '';
-
-		if (video.fallbackPatch === 'youtubejs') {
-			urlConstructed = url;
-		} else if ($invidiousInstanceStore) {
-			urlConstructed = new URL($invidiousInstanceStore).origin + url;
-		} else {
-			return;
-		}
-
 		isLoading = true;
 		transcript = null;
 
-		const resp = await fetch(urlConstructed);
-		if (!resp.ok) return;
-		transcript = await parseText(await resp.text(), { strict: false });
+		const captionUrl = getCaptionUrl(selectedCaption, video.fallbackPatch);
 
+		if (!captionUrl) return;
+
+		const resp = await fetch(captionUrl);
+		if (!resp.ok) return;
+
+		transcript = await parseText(await resp.text(), { strict: false });
 		transcriptCues = transcript.cues;
 
 		isLoading = false;
@@ -87,10 +81,10 @@
 	<article class="no-elevate padding" style="position: sticky; top: 0; z-index: 3;">
 		<h6>{$_('transcript')}</h6>
 		<div class="field label suffix surface-container-highest">
-			<select bind:value={url} onchange={loadTranscript} name="captions">
+			<select bind:value={selectedCaption} onchange={loadTranscript} name="captions">
 				<option selected={true} value={null}>{$_('selectLang')}</option>
 				{#each video.captions as caption (caption)}
-					<option value={caption.url}>{caption.label}</option>
+					<option value={caption}>{caption.label}</option>
 				{/each}
 			</select>
 			<label for="captions">{$_('language')}</label>
@@ -132,7 +126,10 @@
 							currentTime <= cue.endTime}
 					>
 						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
-						<p class="transcript-text">{decodeHtmlCharCodes(cue.text.replace(/<[^>]+>/g, ''))}</p>
+						<p class="transcript-text">
+							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+							{@html renderVTTCueString(cue, currentTime)}
+						</p>
 					</div>
 				{/each}
 			{:else}

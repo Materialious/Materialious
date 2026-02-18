@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { playerElement }: { playerElement: HTMLMediaElement | undefined } = $props();
+	let { playerElement }: { playerElement: HTMLMediaElement } = $props();
 </script>
 
 {#if document.pictureInPictureEnabled}

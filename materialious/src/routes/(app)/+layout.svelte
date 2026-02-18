@@ -67,10 +67,6 @@
 		requestAnimationFrame(() => resetScroll());
 	});
 
-	playerState.subscribe(() => {
-		requestAnimationFrame(() => resetScroll());
-	});
-
 	async function login() {
 		if (isOwnBackend()?.internalAuth) {
 			goto(resolve('/internal/login', {}));

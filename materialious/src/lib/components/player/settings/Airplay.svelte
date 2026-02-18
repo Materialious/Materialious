@@ -1,5 +1,7 @@
 <script lang="ts">
-	let { playerElement }: { playerElement: HTMLMediaElement | undefined } = $props();
+	import { onMount } from 'svelte';
+
+	let { playerElement }: { playerElement: HTMLMediaElement } = $props();
 
 	function hasWebkitShowPlaybackTargetPicker(
 		el: HTMLMediaElement
@@ -13,8 +15,8 @@
 		}
 	}
 
-	$effect(() => {
-		if (!playerElement || playerElement.hasAttribute('x-webkit-airplay')) return;
+	onMount(() => {
+		if (playerElement.hasAttribute('x-webkit-airplay')) return;
 
 		if (hasWebkitShowPlaybackTargetPicker(playerElement)) {
 			playerElement.setAttribute('x-webkit-airplay', 'allow');

@@ -975,9 +975,11 @@
 					</p>
 					{#if !$isAndroidTvStore}
 						<CaptionSettings {player} video={data.video} />
-						<Settings {player} {playerElement} />
-						<Airplay {playerElement} />
-						<Pip {playerElement} />
+						{#if playerElement}
+							<Settings {player} {playerElement} />
+							<Airplay {playerElement} />
+							<Pip {playerElement} />
+						{/if}
 						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
 					{/if}
 				</nav>

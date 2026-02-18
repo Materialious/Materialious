@@ -7,10 +7,8 @@
 	import { playbackRates } from '$lib/player/index';
 	import { onMount } from 'svelte';
 
-	let {
-		player,
-		playerElement
-	}: { player: shaka.Player; playerElement: HTMLMediaElement | undefined } = $props();
+	let { player, playerElement }: { player: shaka.Player; playerElement: HTMLMediaElement } =
+		$props();
 
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
@@ -19,6 +17,11 @@
 
 	onMount(() => {
 		player.addEventListener('loaded', () => {
+			setActiveVideoTrack();
+			setActiveAudioTrack();
+		});
+
+		player.addEventListener('trackschanged', () => {
 			setActiveVideoTrack();
 			setActiveAudioTrack();
 		});

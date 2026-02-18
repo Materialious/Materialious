@@ -24,7 +24,8 @@
 		rawMasterKeyStore,
 		syncPartyPeerStore,
 		themeColorStore,
-		backendInUseStore
+		backendInUseStore,
+		hideSearchStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import 'beercss';
@@ -64,10 +65,6 @@
 
 	page.subscribe((pageData) => {
 		playerIsPip = !pageData.url.pathname.includes('/watch');
-		requestAnimationFrame(() => resetScroll());
-	});
-
-	playerState.subscribe(() => {
 		requestAnimationFrame(() => resetScroll());
 	});
 
@@ -241,10 +238,11 @@
 
 			<div class="max m l"></div>
 
-			<div class="m l">
-				<Search />
-			</div>
-
+			{#if !$hideSearchStore}
+				<div class="m l">
+					<Search />
+				</div>
+			{/if}
 			{#if !mobileSearchShow}
 				<div class="max"></div>
 			{/if}

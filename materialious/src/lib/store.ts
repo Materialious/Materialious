@@ -375,3 +375,5 @@ export const channelCacheStore: Writable<{
 		displayContent: { [key: string]: ChannelContent };
 	};
 }> = writable({});
+
+export const hideSearchStore: Writable<boolean> = writable(false);

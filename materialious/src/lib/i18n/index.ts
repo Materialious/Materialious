@@ -72,6 +72,7 @@ export async function initI18n(selectedLocale: string = getUserLocale()): Promis
 	await i18next.init(options);
 
 	locale.set(langToLoad);
+
 	_.set(i18next.t.bind(i18next));
 
 	await loadDayjsLocale(selectedLocale);

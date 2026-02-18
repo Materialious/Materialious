@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { getPopular } from '$lib/api/index';
+import { getPopular, HTTPError } from '$lib/api/index';
 import { isYTBackend } from '$lib/misc';
 import { feedCacheStore, invidiousInstanceStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
@@ -22,18 +22,18 @@ export async function load() {
 	let popularDisabled: boolean = false;
 
 	if (!popular) {
-		let errorMsg: Error | undefined;
+		let errorObj: HTTPError | undefined;
 		try {
 			popular = await getPopular();
 		} catch (popularError) {
-			errorMsg = popularError as Error;
+			if (popularError instanceof HTTPError) errorObj = popularError;
 		}
 
-		if (errorMsg) {
-			if (errorMsg.toString() === 'Error: Administrator has disabled this endpoint.') {
+		if (errorObj) {
+			if (errorObj.response.status === 403) {
 				popularDisabled = true;
 			} else {
-				throw error(500, errorMsg);
+				throw error(500, errorObj.toString());
 			}
 		}
 

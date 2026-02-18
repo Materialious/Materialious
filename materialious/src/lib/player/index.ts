@@ -35,10 +35,10 @@ export const playbackRates = [
 export const playerDoubleTapSeek = 10.0;
 
 export function goToPreviousVideo(playlistId: string | null) {
-	playerState.set(undefined);
-
 	const previousVideos = get(playerPlaylistHistory);
 	if (previousVideos.length > 1) {
+		playerState.set(undefined);
+
 		goto(
 			resolve('/watch/[videoId]?playlist=[playlistId]', {
 				videoId: previousVideos[1],
@@ -50,8 +50,6 @@ export function goToPreviousVideo(playlistId: string | null) {
 }
 
 export async function goToNextVideo(video: VideoPlay, playlistId: string | null) {
-	playerState.set(undefined);
-
 	const isAndroidTv = get(isAndroidTvStore);
 
 	if (!playlistId) {
@@ -67,6 +65,8 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 		}
 		return;
 	}
+
+	playerState.set(undefined);
 
 	const playlist = await loadEntirePlaylist(playlistId);
 	const playlistVideoIds = playlist.videos.map((value) => {

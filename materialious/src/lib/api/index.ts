@@ -68,6 +68,20 @@ export function setRegion(url: URL): URL {
 	return url;
 }
 
+export class HTTPError {
+	msg: string;
+	response: Response;
+
+	constructor(msg: string, response: Response) {
+		this.msg = msg;
+		this.response = response;
+	}
+
+	toString() {
+		return this.msg;
+	}
+}
+
 export async function fetchErrorHandle(response: Response): Promise<Response> {
 	if (!response.ok) {
 		let message = 'Internal error';
@@ -80,8 +94,9 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 			// Continue regardless of error
 		}
 
-		throw Error(
-			`${response.status} - ${response.statusText}\n${decodeURIComponent(response.url)}\n${message}`
+		throw new HTTPError(
+			`${response.status} - ${response.statusText}\n${decodeURIComponent(response.url)}\n${message}`,
+			response
 		);
 	}
 

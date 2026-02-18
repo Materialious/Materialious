@@ -4,31 +4,8 @@
 
 	const captionTracks: Record<string, string> = {};
 
-	let captionFontSize: string = $state('1em');
-	let captionColor: string = $state('white');
-	let captionBackgroundColor: string = $state('rgba(0, 0, 0, 0.7)');
-	let captionOpacity: number = $state(1);
-
-	export function setTextTrackVisibility(visible: boolean = true) {
+	export function setTextTrackVisibility(visible: boolean) {
 		trackVisible = visible;
-	}
-
-	// Function to update caption style settings
-	export function updateCaptionStyles({
-		fontSize,
-		color,
-		backgroundColor,
-		opacity
-	}: {
-		fontSize?: string;
-		color?: string;
-		backgroundColor?: string;
-		opacity?: number;
-	}) {
-		if (fontSize) captionFontSize = fontSize;
-		if (color) captionColor = color;
-		if (backgroundColor) captionBackgroundColor = backgroundColor;
-		if (opacity !== undefined) captionOpacity = opacity;
 	}
 
 	// Fetch caption data for a selected language
@@ -48,8 +25,7 @@
 
 <script lang="ts">
 	import type { VideoPlay } from '$lib/api/model';
-	import { decodeHtmlCharCodes, findElementForTime, getPublicEnv, isYTBackend } from '$lib/misc';
-	import { invidiousInstanceStore } from '$lib/store';
+	import { findElementForTime } from '$lib/misc';
 	import { onDestroy, onMount } from 'svelte';
 	import { addToast } from '../Toast.svelte';
 	import { parseText, renderVTTCueString, type VTTCue } from 'media-captions';
@@ -114,17 +90,7 @@
 			style:top={`calc(${showControls ? 'var(--video-player-height) * 0.85' : 'var(--video-player-height) * 0.98'} - ${captionContainerHeight}px)`}
 		>
 			{#if currentCaption}
-				<p
-					style="
-					font-size: {captionFontSize};
-					color: {captionColor};
-					background-color: {captionBackgroundColor};
-					opacity: {captionOpacity};
-					padding: 5px;
-					border-radius: 0.25rem;
-					user-select: none;
-				"
-				>
+				<p>
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 					{@html renderVTTCueString(currentCaption, currentTime)}
 				</p>
@@ -142,9 +108,22 @@
 		width: fit-content;
 	}
 
+	p {
+		padding: 5px;
+		border-radius: 0.25rem;
+		user-select: none;
+		font-size: 1.5rem;
+		color: #fff !important;
+		background-color: rgb(0, 0, 0, 0.7);
+	}
+
 	@media screen and (max-width: 1000px) {
 		.caption-container {
 			width: 100%;
+		}
+
+		p {
+			font-size: 1rem;
 		}
 	}
 </style>

@@ -53,17 +53,22 @@ import {
 	getSubscriptionsBackend,
 	postSubscribeBackend
 } from './backend';
+import { getUserLocale } from '$lib/i18n';
 
 export function buildPath(path: string): URL {
-	return new URL(`${get(invidiousInstanceStore)}/api/v1/${path}`);
+	return setLocale(new URL(`${get(invidiousInstanceStore)}/api/v1/${path}`));
 }
 
-export function setRegion(url: URL): URL {
+export function setLocale(url: URL): URL {
 	const region = get(interfaceRegionStore);
 
 	if (region) {
 		url.searchParams.set('region', region);
 	}
+
+	const locale = getUserLocale();
+
+	url.searchParams.set('hl', locale);
 
 	return url;
 }
@@ -144,7 +149,7 @@ export async function getVideo(
 		return await getVideoYTjs(videoId);
 	}
 
-	const resp = await fetch(setRegion(buildPath(`videos/${videoId}?local=${local}`)), fetchOptions);
+	const resp = await fetch(buildPath(`videos/${videoId}?local=${local}`), fetchOptions);
 
 	if (!resp.ok && get(playerYouTubeJsFallback) && isUnrestrictedPlatform()) {
 		return await getVideoYTjs(videoId);
@@ -176,7 +181,9 @@ export async function getComments(
 	}
 
 	const path = buildPath(`comments/${videoId}`);
-	path.search = new URLSearchParams(options).toString();
+	if (options.continuation) path.searchParams.set('continuation', options.continuation);
+	if (options.sort_by) path.searchParams.set('sort_by', options.sort_by);
+
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
@@ -229,7 +236,8 @@ export async function searchChannelContent(
 	}
 
 	const path = buildPath(`channel/${channelId}/search`);
-	path.search = new URLSearchParams({ q: search }).toString();
+	path.searchParams.set('q', search);
+
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
@@ -243,7 +251,8 @@ export async function getSearchSuggestions(
 	}
 
 	const path = buildPath('search/suggestions');
-	path.search = new URLSearchParams({ q: search }).toString();
+	path.searchParams.set('q', search);
+
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
@@ -268,8 +277,16 @@ export async function getSearch(
 	}
 
 	const path = buildPath('search');
-	path.search = new URLSearchParams({ ...options, q: search }).toString();
-	const resp = await fetchErrorHandle(await fetch(setRegion(path), fetchOptions));
+	path.searchParams.set('q', search);
+
+	if (options.date) path.searchParams.set('date', options.date);
+	if (options.duration) path.searchParams.set('duration', options.duration);
+	if (options.features) path.searchParams.set('features', options.features);
+	if (options.page) path.searchParams.set('page', options.page);
+	if (options.sort_by) path.searchParams.set('sort_by', options.sort_by);
+	if (options.type) path.searchParams.set('type', options.type);
+
+	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
 	return await resp.json();
 }
 
@@ -283,10 +300,8 @@ export async function getFeed(
 	}
 
 	const path = buildPath('auth/feed');
-	path.search = new URLSearchParams({
-		max_results: maxResults.toString(),
-		page: page.toString()
-	}).toString();
+	path.searchParams.set('max_results', maxResults.toString());
+	path.searchParams.set('page', page.toString());
 	const resp = await fetchErrorHandle(
 		await fetch(path, { ...buildAuthHeaders(), ...fetchOptions })
 	);

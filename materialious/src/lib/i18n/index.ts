@@ -26,7 +26,7 @@ const resources: Record<string, () => Promise<Record<string, any>>> = {
 	'hu-HU': () => import('./locales/hu.json')
 };
 
-function getUserLocale(): string {
+export function getUserLocale(): string {
 	if (typeof navigator !== 'undefined') {
 		for (const lang of navigator.languages) {
 			if (resources[lang]) {

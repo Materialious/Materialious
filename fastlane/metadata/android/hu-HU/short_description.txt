@@ -1,1 +1,1 @@
-Modern és anyagszerű megjelenés az Invidious előtétprogramhoz
+Modern és anyagszerű megjelenés a Youtube és Invidious számára.

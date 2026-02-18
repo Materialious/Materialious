@@ -23,29 +23,28 @@
   * Automatically import/export Invidious/Materialious.
 - Invidious is optional.
   * Enjoy Materialious without a Invidious instance via our YouTube backend.
+  * Local video fallback if Invidious fails loading videos.
 - Invidious companion support.
 - [Invidious API extended integration.](https://github.com/Materialious/api-extended)
-- Local video fallback if Invidious fails loading videos.
 - Android TV support.
 - Support for disabling certificate validation for homelab users.
 - Sync your watch progress between Invidious sessions.
 - Watch sync parties.
 - Sponsorblock built-in.
 - [Return YouTube Dislike](https://github.com/Anarios/return-youtube-dislike) (RYD) built-in.
-- [DeArrow](https://github.com/ajayyy/DeArrow) built-in (With local processing fallback).
+- [DeArrow](https://github.com/ajayyy/DeArrow) built-in.
 - No ads.
 - No tracking.
 - Light/Dark themes.
 - Custom colour themes.
-- Integrates with Invidious subscriptions, watch history & more.
+- Integrates with Invidious subscriptions.
 - Live stream support.
 - Dash support.
 - Chapters.
-- Audio only mode.
 - Mini player (PIP.)
 - Playlists.
 - PWA support.
-- YT path redirects (So your redirect plugins should still work!)
+- YT path redirects.
 
 # Docker deployment
 This version of Materialious is feature rich, has its own account system (optional) & is easier to setup.

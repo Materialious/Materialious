@@ -25,7 +25,7 @@
     "hideReplies": "Ocultar respostas",
     "hideVideo": "Ocultar vídeo",
     "syncParty": {
-        "userJoined": "Usuário adicionado à sua sala de cinema.",
+        "userJoined": "Usuário entrou na sua sala de cinema.",
         "userLeft": "Usuário deixou sua sala de cinema.",
         "userOnPrivatePage": "O usuário está visualizando uma página privada, a sincronização será retomada em breve."
     },
@@ -38,7 +38,7 @@
         "streams": "Ao vivo"
     },
     "subscriptions": {
-        "manageSubscriptions": "Gerenciar assinaturas"
+        "manageSubscriptions": "Gerenciar inscrições"
     },
     "playlist": {
         "createPlaylist": "Criar lista de reprodução",
@@ -47,7 +47,9 @@
         "private": "Privada",
         "playVideos": "Reproduzir vídeos",
         "shuffleVideos": "Aleatorizar reprodução",
-        "loopPlaylist": "Repetir reprodução"
+        "loopPlaylist": "Repetir reprodução",
+        "next": "Próximo",
+        "previous": "Anterior"
     },
     "thumbnail": {
         "live": "AO VIVO",
@@ -55,7 +57,7 @@
     },
     "pages": {
         "home": "Início",
-        "trending": "Popular",
+        "trending": "Em alta",
         "subscriptions": "Inscrições",
         "history": "Histórico",
         "playlists": "Listas de reprodução"
@@ -72,7 +74,8 @@
             "title": "Compartilhar",
             "materialiousLink": "Copiar link Materialious",
             "invidiousRedirect": "Copiar link de redirecionamento Invidious",
-            "youtubeLink": "Copiar link do Youtube"
+            "youtubeLink": "Copiar link do Youtube",
+            "copiedSuccess": "Copiado para área de transfêrencia"
         },
         "download": "Baixar",
         "downloadSteps": {
@@ -88,7 +91,25 @@
         "noPlaylists": "Sem listas de reprodução",
         "unableToLoadComments": "Incapaz de carregar os comentários",
         "addToPlaylist": "Adicionar à lista de reprodução",
-        "youtubeJsFallBack": "Fallback de vídeo local sendo usado"
+        "youtubeJsFallBack": "Fallback de vídeo local sendo usado",
+        "preferredQuality": "Qualidade preferida",
+        "premiere": "Vídeo vai estar disponível",
+        "chapters": "Capítulos",
+        "defaultLanguage": "Linguagem Padrão",
+        "youtubeJsLoading": "Falha ao carregar vídeo, tentando recarregar com fallback de vídeo local.",
+        "retryText": "Falha ao carregar vídeo, como você gostaria de prosseguir?",
+        "enableYoutubejsTemp": "Usar fallback de vídeo local uma vez",
+        "enableYoutubejsPerm": "Sempre permitir fallback de vídeo local",
+        "controls": {
+            "back": "Voltar",
+            "quality": "Qualidade",
+            "auto": "Auto",
+            "playbackSpeed": "Velocidade de reprodução",
+            "loop": "Repetir",
+            "on": "On",
+            "off": "Off",
+            "language": "Idioma"
+        }
     },
     "layout": {
         "interface": "Interface",
@@ -154,7 +175,58 @@
             "title": "DeArrow",
             "thumbnailInstanceUrl": "URL da instância de miniatura",
             "titleOnly": "Somente títulos"
-        }
+        },
+        "about": "Sobre",
+        "materialiousAccount": "Conta"
     },
-    "subscribe": "Inscrever-se"
+    "subscribe": "Inscrever-se",
+    "disabled": "Desativado",
+    "popularPageDisabled": "Página popular foi desativada por Administradores",
+    "premium": "Conteúdo premium do youtube não podem ser assistidos no Materialious.",
+    "copy": "Copiar JSON",
+    "login": "Login",
+    "username": "Nome de usuário",
+    "password": "Senha",
+    "captionStyle": "Estilos de legenda",
+    "invalidPassword": "Senha Inválida",
+    "usernameTaken": "Nome de usuário existente",
+    "createAccount": "Criar conta",
+    "needRegister": "Eu preciso me cadastrar",
+    "registrationDisabled": "Cadastro atualmente desativado, contate o dono da instância.",
+    "needLogin": "Eu preciso me logar",
+    "recommendedVideos": "Vídeos Recomendados",
+    "invidiousLogin": "Por favor logue com sua conta Invidious.",
+    "materialiousLogin": "Por favor logue com sua conta Materialious.",
+    "materialiousCreate": "Por favor crie sua conta Materialious.",
+    "invalidInstance": "Por favor verifique a URL. Se está correta, a instância pode estar fora do ar ou talvez não suporte clientes de terceiros.",
+    "backend": "Backend",
+    "filters": {
+        "filters": "Filtros",
+        "type": "Tipo",
+        "uploadDate": "Data de envio",
+        "duration": "Duração",
+        "sortBy": "Ordenar por",
+        "features": "características"
+    },
+    "initalSetup": {
+        "useInvidious": "Eu quero usar Invidious",
+        "yes": "Sim",
+        "no": "Não",
+        "unsure": "Incerto",
+        "required": "Configuração necessária",
+        "invidiousInfo": "Invidious é uma interface do youtube auto-hospedável.",
+        "localFallbackInfo": "Quando um vídeo não consegue ser carregado a partir do Invidious, Materialious carrega-o localmente.",
+        "configureInstance": "Configurar Instância",
+        "done": "Feito"
+    },
+    "skip": "Pular",
+    "upcomingSegment": "Próximo ",
+    "comments": "comentários",
+    "reply": "responder",
+    "contributors": "Contribuidores",
+    "version": "Versão",
+    "defaultPage": "Página padrão",
+    "newest": "Mais recente",
+    "oldest": "Mais antigos",
+    "popular": "Popular"
 }

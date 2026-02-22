@@ -30,7 +30,7 @@
 		"@types/jsdom": "^27.0.0",
 		"@types/mousetrap": "^1.6.15",
 		"@vite-pwa/sveltekit": "^1.0.0",
-		"eslint": "^9.39.1",
+		"eslint": "^10.0.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.0",
 		"patch-package": "^8.0.1",

@@ -146,12 +146,17 @@ async function proxyRequest(
 	}
 
 	const responseHeaders = new Headers(response.headers);
-	responseHeaders.set('transfer-encoding', 'chunked');
+	responseHeaders.delete('transfer-encoding');
 	responseHeaders.delete('content-encoding');
 	responseHeaders.delete('access-control-allow-origin');
 	responseHeaders.delete('timing-allow-origin');
 
-	return new Response(response.body, {
+	const responseBody = await response.blob();
+
+	responseHeaders.set('content-length', responseBody.size.toString());
+	responseHeaders.set('content-type', responseBody.type);
+
+	return new Response(responseBody, {
 		status: response.status,
 		headers: responseHeaders
 	});

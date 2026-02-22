@@ -2,7 +2,15 @@
 
 This Guide is for the docker image `wardpearce/materialious-full` **NOT** `wardpearce/materialious`
 
-### Invidious Companion support
+### Invidious configuration (If using Invidious)
+#### Configuration
+The following Invidious values must be set in your config.
+
+- `domain:` - The reverse proxied domain of your Invidious instance.
+- `https_only: true` - Must be set if you are using HTTPS.
+- `external_port: 443` - Must be set if you are using HTTPS.
+
+#### Companion support
 `public_url` **MUST** be set in Invidious under **invidious_companion** for companion to work with Materialious.
 
 e.g.

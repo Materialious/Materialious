@@ -1,41 +1,32 @@
+<script lang="ts" module>
+	import type shaka from 'shaka-player/dist/shaka-player.ui';
+
+	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
+	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
+
+	export function setActiveVideoTrack(player: shaka.Player) {
+		const videoTracks = player.getVideoTracks();
+		playerCurrentVideoTrack = videoTracks.find((track) => track.active);
+	}
+
+	export function setActiveAudioTrack(player: shaka.Player) {
+		const audioTracks = player.getAudioTracks();
+		playerCurrentAudioTrack = audioTracks.find((track) => track.active);
+	}
+</script>
+
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import type shaka from 'shaka-player/dist/shaka-player.ui';
 	import { SvelteSet } from 'svelte/reactivity';
 	import ISO6391 from 'iso-639-1';
 	import { playerAlwaysLoopStore } from '$lib/store';
 	import { playbackRates } from '$lib/player/index';
-	import { onMount } from 'svelte';
 
 	let { player, playerElement }: { player: shaka.Player; playerElement: HTMLMediaElement } =
 		$props();
 
 	let playerSettings: 'quality' | 'speed' | 'language' | 'caption' | 'root' = $state('root');
-	let playerCurrentVideoTrack: shaka.extern.VideoTrack | undefined = $state(undefined);
-	let playerCurrentAudioTrack: shaka.extern.AudioTrack | undefined = $state(undefined);
 	let playerLoop = $state($playerAlwaysLoopStore);
-
-	onMount(() => {
-		player.addEventListener('loaded', () => {
-			setActiveVideoTrack();
-			setActiveAudioTrack();
-		});
-
-		player.addEventListener('trackschanged', () => {
-			setActiveVideoTrack();
-			setActiveAudioTrack();
-		});
-	});
-
-	function setActiveVideoTrack() {
-		const videoTracks = player.getVideoTracks();
-		playerCurrentVideoTrack = videoTracks.find((track) => track.active);
-	}
-
-	function setActiveAudioTrack() {
-		const audioTracks = player.getAudioTracks();
-		playerCurrentAudioTrack = audioTracks.find((track) => track.active);
-	}
 
 	function filterUniqueAudioTracks(tracks: shaka.extern.AudioTrack[]): shaka.extern.AudioTrack[] {
 		const uniqueTracks: shaka.extern.AudioTrack[] = [];

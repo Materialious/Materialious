@@ -55,7 +55,7 @@
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 	import { isOwnBackend } from '$lib/shared';
-	import Settings from './settings/Settings.svelte';
+	import Settings, { setActiveAudioTrack, setActiveVideoTrack } from './settings/Settings.svelte';
 	import CaptionSettings from './settings/CaptionSettings.svelte';
 	import Airplay from './settings/Airplay.svelte';
 	import Pip from './settings/Pip.svelte';
@@ -243,6 +243,9 @@
 			restoreQualityPreference(player);
 			restoreDefaultLanguage(player);
 			updateVideoPlayerHeight();
+
+			setActiveAudioTrack(player);
+			setActiveVideoTrack(player);
 
 			if ($playerCCByDefault) {
 				toggleSubtitles(player);

@@ -141,7 +141,7 @@
 					onclick={() => {
 						playerSettings = 'root';
 						player.selectVideoTrack(track, true);
-						setActiveVideoTrack();
+						setActiveVideoTrack(player);
 					}}
 				>
 					{track.height}p
@@ -166,7 +166,7 @@
 					onclick={() => {
 						playerSettings = 'root';
 						player.selectAudioTrack(track);
-						setActiveAudioTrack();
+						setActiveAudioTrack(player);
 					}}
 				>
 					{#if track.language !== 'und'}

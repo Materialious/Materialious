@@ -135,7 +135,8 @@
             "exportingToInvidious": "Az Invidiousba történő exportálás megkezdve",
             "exportingToInvidiousFinished": "Az Invidiousba történő exportálás befejezve"
         },
-        "exportToJson": "Exportálás JSON-ba"
+        "exportToJson": "Exportálás JSON-ba",
+        "historyEnabled": "Megtekintési előzmények mentése"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",

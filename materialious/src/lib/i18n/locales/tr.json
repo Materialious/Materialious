@@ -173,22 +173,43 @@
     "invalidInstance": "Lütfen URL' yi kontrol edin. Eğer doğruysa, sunucu kapalı olabilir veya üçüncü taraf istemcileri desteklemiyor olabilir.",
     "disabled": "Devre dışı",
     "invidiousBlockWarning": "Invidious şu anda Google tarafından engellenmiş durumda. Eğer bu sunucu çalışmıyorsa, bunu aşmak için lütfen Materialous {android} ve {masaüstü} sunucusunu kullanın.",
-    "donate": "Bağış",
+    "donate": "Bağış yap",
     "comments": "yorumlar",
     "reply": "cevapla",
     "login": "Giriş",
-    "invidiousLogin": "Lütfen Invidious hesabınız ile giriş yapınız",
+    "invidiousLogin": "Lütfen Invidious hesabınız ile giriş yapınız.",
     "popularPageDisabled": "Popüler sayfası Yöneticiler tarafından devre dışı bırakıldı",
     "filters": {
         "filters": "Filtreler",
         "type": "Tür",
         "uploadDate": "Yüklenme tarihi",
         "duration": "Uzunluk",
-        "features": "Özellikler"
+        "features": "Özellikler",
+        "sortBy": "Sırala"
     },
     "contributors": "Katkıda bulunanlar",
     "version": "Sürüm",
     "newest": "En yeni",
     "oldest": "En eski",
-    "popular": "Popüler"
+    "popular": "Popüler",
+    "username": "Kullanıcı ismi",
+    "password": "Parola",
+    "captionStyle": "Altyazı stilleri",
+    "invalidPassword": "Geçersiz parola",
+    "linkInvidious": "Invidious hesabını bağla",
+    "unlinkInvidious": "Invidious hesabını ayır",
+    "createAccount": "Hesap oluştur",
+    "needLogin": "Giriş yapmam gerek",
+    "materialiousLogin": "Lütfen Materialious hesabınız ile giriş yapınız.",
+    "materialiousCreate": "Lütfen Materialious heabınızı oluşturun.",
+    "backend": "Backend",
+    "initalSetup": {
+        "useInvidious": "Invidious kullanmak istiyorum",
+        "yes": "Evet",
+        "no": "Hayır",
+        "unsure": "Emin değilim",
+        "required": "Kurulum gerekli",
+        "invidiousInfo": "Invidious, kendi sunucunuzda barındırabileceğiniz bir YouTube arayüzüdür.",
+        "localFallbackInfo": "Bir video Invidious'dan yüklenemediği vakit, Materialious videoyu yerel olarak yükler."
+    }
 }

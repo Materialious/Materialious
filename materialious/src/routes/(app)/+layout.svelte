@@ -192,7 +192,7 @@
 				<div>{$_('layout.settings')}</div>
 			</a>
 			{#if showLogin}
-				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
+				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
 					<a onclick={login} href="#login">
 						<i>login</i>
 						<div>{$_('layout.login')}</div>

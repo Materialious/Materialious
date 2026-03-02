@@ -1,15 +1,13 @@
-import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { getPopular, HTTPError } from '$lib/api/index';
 import { isYTBackend } from '$lib/misc';
-import { feedCacheStore, invidiousInstanceStore } from '$lib/store';
-import { error } from '@sveltejs/kit';
+import { feedCacheStore, invidiousInstanceStore, isAndroidTvStore } from '$lib/store';
+import { error, redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
 export async function load() {
 	if (isYTBackend()) {
-		goto(resolve('/subscriptions', {}), { replaceState: true });
-		return;
+		throw redirect(307, resolve('/subscriptions', {}));
 	}
 
 	if (!get(invidiousInstanceStore)) {
@@ -42,6 +40,10 @@ export async function load() {
 		getPopular().then((newPopular) =>
 			feedCacheStore.set({ ...get(feedCacheStore), popular: newPopular })
 		);
+	}
+
+	if (popularDisabled && get(isAndroidTvStore)) {
+		throw redirect(307, resolve('/search', {}));
 	}
 
 	return {

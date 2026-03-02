@@ -27,7 +27,9 @@
 
 	const tabCategories: Tabs<TabCategories> = new Tabs({
 		value: 'interface',
-		orientation: 'vertical'
+		orientation: 'vertical',
+		loop: true,
+		selectWhenFocused: true
 	});
 
 	const isActive = (id: string) => tabCategories.value === id;
@@ -148,7 +150,7 @@
 							class:active={isActive(tab.id)}
 							class:surface-container-lowest={isActive(tab.id)}
 							class:surface-container-highest={!isActive(tab.id)}
-							{...tabCategories.getTrigger(tab.id)}
+							{...mergeAttrs(tabCategories.getTrigger(tab.id), { id: tab.id })}
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>

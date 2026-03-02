@@ -102,7 +102,8 @@
         "clickXmoreTimesToDelete": "Klick {{clicksTillDelete}} wiiteri Mal zum Lösche",
         "backendEngine": {
             "warning": "Erwiterti Iistellige! Nur für erfahreni Nutzer. Ändere sie nöd, usser du weisch, was du machsch."
-        }
+        },
+        "historyEnabled": "Wiedergabeverlauf speichere"
     },
     "videos": "Videos",
     "cancel": "Abbreche",

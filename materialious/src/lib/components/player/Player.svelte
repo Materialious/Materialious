@@ -601,20 +601,6 @@
 		});
 
 		if (!$isAndroidTvStore) {
-			Mousetrap.bind('right', () => {
-				if (!playerElement) return;
-				playerElement.currentTime = playerElement.currentTime + playerDoubleTapSeek;
-				showPlayerUI();
-				return false;
-			});
-
-			Mousetrap.bind('left', () => {
-				if (!playerElement) return;
-				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
-				showPlayerUI();
-				return false;
-			});
-
 			Mousetrap.bind('enter', () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
@@ -804,7 +790,7 @@
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
-		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
+		Mousetrap.unbind(['space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
 		if (sabrAdapter) sabrAdapter.dispose();

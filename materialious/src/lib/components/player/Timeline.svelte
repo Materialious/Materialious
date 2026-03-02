@@ -15,6 +15,8 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { videoLength } from '$lib/numbers';
 	import { truncate } from '$lib/misc';
+	import { mergeAttrs } from 'melt';
+	import Mousetrap from 'mousetrap';
 
 	let {
 		playerElement,
@@ -37,7 +39,7 @@
 	} = $props();
 
 	let playerSliderInteracted = $state(false);
-	let playerShowTimelineThumbnail = $state(true);
+	let playerShowTimelineThumbnail = $state(false);
 	let playerCloestTimestamp: Timestamp | undefined = $state();
 	let playerCloestSponsor: Segment | undefined = $state();
 	let playerSliderElement: HTMLElement | undefined = $state();
@@ -45,6 +47,7 @@
 	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
 	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
 	let playerTimelineThumbnailsCache = new ImageCache();
+	let playerTimelineThumbnailLoaded = $state(false);
 	let playerTimelineThumbnailCanvas: {
 		timeline?: HTMLCanvasElement;
 		thumb?: HTMLCanvasElement;
@@ -52,6 +55,14 @@
 	let playerTimelineTimeHover = $state(0);
 	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerBufferedTo: number = $state(0);
+	let playerScrubbingHoldTime = 0;
+	let playerScrubbingDirection: 1 | -1 = 1;
+	let playerScrubbingIsActive = false;
+	let playerScrubbingLastTimestamp: number | null = null;
+	let playerScrubbingPlaybackState: 'paused' | 'playing' | undefined;
+
+	const playerScrubbingBaseSpeed = 0.05;
+	const playerScrubbingAcceleration = 0.002;
 
 	const sponsorSegments = {
 		sponsor: $_('layout.sponsors.sponsor'),
@@ -71,6 +82,7 @@
 		onValueChange: async (timeToSet) => {
 			playerSliderInteracted = true;
 			userManualSeeking = true;
+			playerShowTimelineThumbnail = true;
 			currentTime = timeToSet;
 
 			showPlayerUI();
@@ -95,6 +107,11 @@
 	});
 
 	onMount(async () => {
+		Mousetrap.bind('right', () => playerScrubbingStart(1));
+		Mousetrap.bind('left', () => playerScrubbingStart(-1));
+		Mousetrap.bind('right', playerScrubbingStop, 'keyup');
+		Mousetrap.bind('left', playerScrubbingStop, 'keyup');
+
 		playerElement?.addEventListener('timeupdate', () => {
 			const buffered = playerElement.buffered;
 
@@ -150,7 +167,67 @@
 
 	onDestroy(() => {
 		playerTimelineThumbnailsCache.clear();
+
+		Mousetrap.unbind(['left', 'right']);
 	});
+
+	async function playerScrubbingFrame(timestamp: number) {
+		if (!playerScrubbingIsActive || !playerElement || !playerSliderElement) return;
+
+		if (!playerScrubbingPlaybackState)
+			playerScrubbingPlaybackState = playerElement.paused ? 'paused' : 'playing';
+
+		playerElement.pause();
+		showPlayerUI();
+
+		if (playerScrubbingLastTimestamp === null) playerScrubbingLastTimestamp = timestamp;
+		const delta = timestamp - playerScrubbingLastTimestamp;
+
+		playerScrubbingLastTimestamp = timestamp;
+		playerScrubbingHoldTime += delta;
+
+		// Progressive acceleration
+		const speed = playerScrubbingBaseSpeed + playerScrubbingHoldTime * playerScrubbingAcceleration;
+		currentTime += speed * playerScrubbingDirection;
+
+		// Clamp to video duration
+		if (currentTime < 0) currentTime = 0;
+		if (currentTime > playerMaxKnownTime) currentTime = playerMaxKnownTime;
+
+		playerShowTimelineThumbnail = true;
+		userManualSeeking = false;
+		playerTimelineTimeHover = currentTime;
+
+		await renderTimelineTooltip(currentTime / playerMaxKnownTime);
+
+		requestAnimationFrame(playerScrubbingFrame);
+	}
+
+	function playerScrubbingStart(dir: 1 | -1) {
+		if (playerScrubbingIsActive) return;
+
+		playerScrubbingDirection = dir;
+		playerScrubbingHoldTime = 0;
+		playerScrubbingLastTimestamp = null;
+		playerScrubbingIsActive = true;
+
+		requestAnimationFrame(playerScrubbingFrame);
+	}
+
+	function playerScrubbingStop() {
+		if (!playerScrubbingIsActive || !playerElement) return;
+
+		playerScrubbingIsActive = false;
+		playerScrubbingHoldTime = 0;
+		playerScrubbingLastTimestamp = null;
+		playerShowTimelineThumbnail = false;
+
+		playerElement.currentTime = currentTime;
+
+		if (playerScrubbingPlaybackState === 'playing') playerElement?.play();
+
+		playerScrubbingPlaybackState = undefined;
+	}
 
 	const markerGapSize = 0.1;
 	const minVisiblePercent = 0.05;
@@ -189,10 +266,11 @@
 	}
 
 	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
+		playerTimelineThumbnailLoaded = false;
 		const canvasContext = canvas.getContext('2d');
 
 		if (canvasContext) {
-			await drawTimelineThumbnail(
+			playerTimelineThumbnailLoaded = await drawTimelineThumbnail(
 				canvasContext,
 				playerTimelineThumbnailsCache,
 				playerTimelineThumbnails,
@@ -202,25 +280,24 @@
 	}
 
 	let requestAnimationTooltip: number | undefined;
-	let latestMouseX: number | undefined;
+	let timelineMouseXPosition: number | undefined;
 
 	function timelineMouseMove(event: MouseEvent) {
-		latestMouseX = event.clientX;
+		if (!playerSliderElement) return;
+		timelineMouseXPosition = event.clientX;
 
 		if (!requestAnimationTooltip) {
-			requestAnimationTooltip = requestAnimationFrame(updateTooltip);
+			const rect = playerSliderElement.getBoundingClientRect();
+			const percent = Math.min(Math.max((timelineMouseXPosition - rect.left) / rect.width, 0), 1);
+
+			playerTimelineTimeHover = percent * (playerMaxKnownTime ?? 0);
+			requestAnimationTooltip = requestAnimationFrame(() => renderTimelineTooltip(percent));
 		}
 	}
 
-	async function updateTooltip() {
-		if (!playerSliderElement || latestMouseX === undefined) {
-			requestAnimationTooltip = undefined;
-			return;
-		}
-		const rect = playerSliderElement.getBoundingClientRect();
-		const percent = Math.min(Math.max((latestMouseX - rect.left) / rect.width, 0), 1);
+	async function renderTimelineTooltip(percent: number) {
+		if (!playerSliderElement) return;
 
-		playerTimelineTimeHover = percent * (video.lengthSeconds ?? 0);
 		setPlayerTimelineChapters(playerTimelineTimeHover);
 
 		if (playerTimelineThumbnailCanvas.timeline) {
@@ -250,7 +327,10 @@
 <div
 	class="player-slider full-width"
 	class:disable-tv={$isAndroidTvStore}
-	{...playerTimelineSlider.root}
+	{...mergeAttrs(playerTimelineSlider.root, {
+		tabindex: -1
+	})}
+	onmouseleave={() => (playerShowTimelineThumbnail = false)}
 	onmousemove={timelineMouseMove}
 	bind:this={playerSliderElement}
 >
@@ -275,14 +355,18 @@
 	{/snippet}
 	<div class="track">
 		{#if !userManualSeeking && playerShowTimelineThumbnail}
-			<div bind:this={playerTimelineTooltip} class="timeline tooltip">
+			<div
+				bind:this={playerTimelineTooltip}
+				class="timeline tooltip"
+				class:tooltip-hide={!playerTimelineThumbnailLoaded}
+			>
 				{@render timelineTooltip('timeline', playerTimelineTimeHover)}
 			</div>
 		{/if}
 		<div class="range"></div>
 		<div {...playerTimelineSlider.thumb}>
-			{#if playerSliderInteracted}
-				<div class="tooltip thumb">
+			{#if playerSliderInteracted && playerShowTimelineThumbnail}
+				<div class="tooltip thumb" class:tooltip-hide={!playerTimelineThumbnailLoaded}>
 					{@render timelineTooltip('thumb', currentTime)}
 				</div>
 			{/if}
@@ -327,12 +411,19 @@
 		position: absolute;
 		left: 0;
 		transform: translateX(0%);
-		transition: none;
 		pointer-events: none;
 		will-change: transform;
 		padding: 0;
 		display: block;
 		border-radius: var(--border-radius);
+		visibility: visible;
+		opacity: 1;
+		transition: opacity 0.5s ease;
+	}
+
+	.timeline.tooltip.tooltip-hide {
+		opacity: 0;
+		pointer-events: none;
 	}
 
 	.tooltip.thumb {

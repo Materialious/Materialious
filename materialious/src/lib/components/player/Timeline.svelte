@@ -61,9 +61,6 @@
 	let playerScrubbingLastTimestamp: number | null = null;
 	let playerScrubbingPlaybackState: 'paused' | 'playing' | undefined;
 
-	const playerScrubbingBaseSpeed = 0.05;
-	const playerScrubbingAcceleration = 0.002;
-
 	const sponsorSegments = {
 		sponsor: $_('layout.sponsors.sponsor'),
 		selfpromo: $_('layout.sponsors.unpaidSelfPromotion'),
@@ -171,7 +168,16 @@
 		Mousetrap.unbind(['left', 'right']);
 	});
 
-	async function playerScrubbingFrame(timestamp: number) {
+	function getScrubbingSpeeds(duration: number) {
+		const baseVelocity = duration * 0.001;
+		const maxVelocity = duration * 0.1;
+		let rampTime = duration * 0.5;
+		rampTime = Math.max(800, 10000);
+
+		return { baseVelocity, maxVelocity, rampTime };
+	}
+
+	async function playerScrubbingFrame(duration: number) {
 		if (!playerScrubbingIsActive || !playerElement || !playerSliderElement) return;
 
 		if (!playerScrubbingPlaybackState)
@@ -180,15 +186,23 @@
 		playerElement.pause();
 		showPlayerUI();
 
-		if (playerScrubbingLastTimestamp === null) playerScrubbingLastTimestamp = timestamp;
-		const delta = timestamp - playerScrubbingLastTimestamp;
+		if (playerScrubbingLastTimestamp === null) playerScrubbingLastTimestamp = duration;
+		const delta = duration - playerScrubbingLastTimestamp;
 
-		playerScrubbingLastTimestamp = timestamp;
+		playerScrubbingLastTimestamp = duration;
 		playerScrubbingHoldTime += delta;
 
-		// Progressive acceleration
-		const speed = playerScrubbingBaseSpeed + playerScrubbingHoldTime * playerScrubbingAcceleration;
-		currentTime += speed * playerScrubbingDirection;
+		const { baseVelocity, maxVelocity, rampTime } = getScrubbingSpeeds(playerMaxKnownTime);
+
+		const rampRatio = Math.min(playerScrubbingHoldTime / rampTime, 1);
+		const rampFactor = rampRatio * rampRatio;
+
+		const velocity = baseVelocity + (maxVelocity - baseVelocity) * rampFactor;
+
+		// Convert velocity (per second) into frame movement
+		const movementMs = (velocity * delta) / 1000;
+
+		currentTime += movementMs * playerScrubbingDirection;
 
 		// Clamp to video duration
 		if (currentTime < 0) currentTime = 0;

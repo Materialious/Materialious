@@ -340,6 +340,7 @@
 				bind:this={playerTimelineThumbnailCanvas[key]}
 				width={playerTimelineThumbnails[0].width}
 				height={playerTimelineThumbnails[0].height}
+				style="border-radius: var(--border-radius);"
 			></canvas>
 		{/if}
 		{#if playerCloestSponsor}

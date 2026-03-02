@@ -40,7 +40,6 @@
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
-		playerDoubleTapSeek,
 		restoreDefaultLanguage,
 		restoreQualityPreference,
 		toggleSubtitles

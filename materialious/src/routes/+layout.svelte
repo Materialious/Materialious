@@ -137,8 +137,13 @@
 
 	{#if $isAndroidTvStore}
 		<style>
-			:focus {
-				outline: 4px solid var(--primary);
+			not(.item-select):focus {
+				outline: 2px solid var(--primary);
+				box-shadow: none !important;
+			}
+
+			.item-select:focus {
+				outline: none !important;
 				box-shadow: none !important;
 			}
 		</style>

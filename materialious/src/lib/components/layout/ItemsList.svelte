@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
 	import { removePlaylistVideo } from '$lib/api';
-	import { invidiousAuthStore, feedLastItemId } from '$lib/store';
+	import { invidiousAuthStore, feedLastItemId, isAndroidTvStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
@@ -12,6 +12,7 @@
 	import NoResults from '$lib/components/NoResults.svelte';
 	import { SpatialMenu } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
+	import { Capacitor } from '@capacitor/core';
 
 	interface Props {
 		items?: feedItems;
@@ -27,17 +28,12 @@
 		classes = 'page right active'
 	}: Props = $props();
 
-	let gridElement: HTMLElement | undefined = $state();
-
 	async function removePlaylistItem(indexId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
 	}
 
 	onMount(async () => {
-		const first = gridElement?.querySelector('[tabindex="0"]') as HTMLElement;
-		first?.focus();
-
 		if (!$feedLastItemId) return;
 
 		const element = document.getElementById($feedLastItemId);
@@ -67,14 +63,21 @@
 		}
 	}
 
-	const spatialMenu = new SpatialMenu({ wrap: false, crossAxis: true, scrollBehavior: 'smooth' });
+	const spatialMenu = new SpatialMenu({
+		wrap: false,
+		crossAxis: false,
+		scrollBehavior: 'instant'
+	});
 </script>
 
-<div class={classes + ' item-container'}>
+<div
+	class={classes}
+	class:item-container={Capacitor.getPlatform() !== 'android' || $isAndroidTvStore}
+>
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
-	<div class="grid" bind:this={gridElement} {...spatialMenu.root}>
+	<div class="grid" {...spatialMenu.root} onkeyup={onKeyup}>
 		{#each items as item, index (index)}
 			{@const uniqueItemId = extractUniqueId(item)}
 			{@const spatialItem = spatialMenu.getItem(item, { onSelect: () => goToItem(uniqueItemId) })}
@@ -121,7 +124,7 @@
 		padding: 0 1em;
 	}
 
-	.android-tv-item {
+	.item-select {
 		transition:
 			transform 0.15s ease,
 			box-shadow 0.15s ease;
@@ -133,5 +136,10 @@
 		z-index: 10;
 		position: relative;
 		outline: 1px solid var(--primary);
+	}
+
+	.grid:focus {
+		outline: none !important;
+		box-shadow: none !important;
 	}
 </style>

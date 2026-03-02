@@ -164,6 +164,7 @@
 
 <div>
 	<nav
+		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
 		class:hide={$playertheatreModeIsActive}
@@ -326,7 +327,7 @@
 		{/if}
 	</dialog>
 
-	<main id="main-content" class="responsive max root">
+	<main id="main-content" tabindex="0" class="responsive max root">
 		{#if $playerState}
 			<div class="grid">
 				<div

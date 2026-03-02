@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, disableScrollHandling, goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/stores';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
@@ -171,8 +171,8 @@
 		class:tv-nav={$isAndroidTvStore}
 		class:hide={$playertheatreModeIsActive}
 	>
-		<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
-			<a href={resolve($interfaceDefaultPage, {})} data-sveltekit-preload-data="off">
+		<header class="small-padding">
+			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
 				<Logo />
 			</a>
 		</header>
@@ -329,7 +329,7 @@
 		{/if}
 	</dialog>
 
-	<main id="main-content" class="responsive max root" tabindex="0" role="region">
+	<main id="main-content" class="responsive max root">
 		{#if $playerState}
 			<div class="grid">
 				<div
@@ -385,7 +385,9 @@
 		{#if $navigating}
 			<PageLoading />
 		{:else}
-			{@render children?.()}
+			<div tabindex="0">
+				{@render children?.()}
+			</div>
 		{/if}
 
 		<SyncParty />

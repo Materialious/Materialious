@@ -27,23 +27,6 @@ export class ImageCache {
 	}
 }
 
-export async function insecureRequestImageHandler(source: string): Promise<HTMLImageElement> {
-	const img = new Image();
-	if (get(interfaceAllowInsecureRequests)) {
-		const imgResp = await fetch(source);
-		if (!imgResp.ok) {
-			img.src = '';
-			return img;
-		}
-
-		img.src = URL.createObjectURL(await imgResp.blob());
-	} else {
-		img.src = source;
-	}
-
-	return img;
-}
-
 export function getBestThumbnail(
 	images: Image[] | null,
 	maxWidthDimension: number = 480,

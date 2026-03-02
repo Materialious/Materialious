@@ -13,7 +13,6 @@ import {
 	interfaceDefaultPage,
 	interfaceDisplayThumbnailAvatars,
 	interfaceForceCase,
-	interfaceLowBandwidthMode,
 	interfaceRegionStore,
 	interfaceSearchSuggestionsStore,
 	playerAlwaysLoopStore,
@@ -201,11 +200,6 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'showWarning',
 		store: showWarningStore,
-		schema: zBoolean
-	},
-	{
-		name: 'lowBandwidthMode',
-		store: interfaceLowBandwidthMode,
 		schema: zBoolean
 	},
 	{

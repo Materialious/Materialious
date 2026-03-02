@@ -2,14 +2,14 @@
 	import { resolve } from '$app/paths';
 	import { getComments } from '$lib/api';
 	import { type Comment, type Comments } from '$lib/api/model';
-	import { getBestThumbnail, insecureRequestImageHandler, proxyGoogleImage } from '$lib/images';
+	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { numberWithCommas } from '$lib/numbers';
-	import { interfaceLowBandwidthMode } from '$lib/store';
-	import { onMount } from 'svelte';
 	import CommentSelf from './Comment.svelte';
 	import { truncate } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 	import { extractActualLink } from '$lib/description';
+	import { Avatar } from 'melt/builders';
+	import { mergeAttrs } from 'melt';
 
 	interface Props {
 		comment: Comment;
@@ -71,59 +71,49 @@
 		return doc.documentElement.outerHTML;
 	}
 
-	let userPfp = $state('');
-	onMount(async () => {
-		if ($interfaceLowBandwidthMode) return;
-		const img = await insecureRequestImageHandler(
-			proxyGoogleImage(getBestThumbnail(comment.authorThumbnails))
-		);
-
-		img.onload = () => {
-			userPfp = img.src;
-		};
-	});
+	const avatar = new Avatar({ src: proxyGoogleImage(getBestThumbnail(comment.authorThumbnails)) });
 </script>
 
 <article class="comment" class:border={!isSubComp}>
-	{#if !$interfaceLowBandwidthMode}
-		<div class="comment-header">
-			{#if userPfp}
-				<img loading="lazy" class="circle small" src={userPfp} alt="comment profile" />
-			{:else}
-				<progress class="circle"></progress>
-			{/if}
-			<div class="comment-info">
-				<a href={resolve(`/channel/[authorId]`, { authorId: comment.authorId })} class="author">
-					<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>
-						{truncate(comment.author, 12)}
-					</span>
-					<span class="secondary-text">{comment.publishedText}</span>
-				</a>
-				<p class="no-margin">
-					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-					{@html parseComment(comment.contentHtml)}
-					<!-- Comment comes directly from YT so is already sanitized -->
-				</p>
-				<div class="comment-actions">
-					<p class="no-margin no-padding"><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
-					{#if comment.replies && !replies}
-						<button
-							onclick={async () => loadReplies(comment.replies.continuation)}
-							class="transparent replies"
-						>
-							<i>expand_more</i>
-							<span>{comment.replies.replyCount} {replyText}</span>
-						</button>
-					{:else if replies}
-						<button onclick={() => (replies = undefined)} class="transparent replies">
-							<i>expand_less</i>
-							<span>Hide {replyText}</span>
-						</button>
-					{/if}
-				</div>
+	<div class="comment-header">
+		<img {...avatar.image} loading="lazy" class="circle small" alt="comment profile" />
+		<button
+			class="secondary-container"
+			{...mergeAttrs(avatar.fallback, {
+				style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
+			})}>{comment.author[1]}</button
+		>
+		<div class="comment-info">
+			<a href={resolve(`/channel/[authorId]`, { authorId: comment.authorId })} class="author">
+				<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>
+					{truncate(comment.author, 12)}
+				</span>
+				<span class="secondary-text">{comment.publishedText}</span>
+			</a>
+			<p class="no-margin">
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html parseComment(comment.contentHtml)}
+				<!-- Comment comes directly from YT so is already sanitized -->
+			</p>
+			<div class="comment-actions">
+				<p class="no-margin no-padding"><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
+				{#if comment.replies && !replies}
+					<button
+						onclick={async () => loadReplies(comment.replies.continuation)}
+						class="transparent replies"
+					>
+						<i>expand_more</i>
+						<span>{comment.replies.replyCount} {replyText}</span>
+					</button>
+				{:else if replies}
+					<button onclick={() => (replies = undefined)} class="transparent replies">
+						<i>expand_less</i>
+						<span>Hide {replyText}</span>
+					</button>
+				{/if}
 			</div>
 		</div>
-	{/if}
+	</div>
 
 	{#if replies}
 		{#each replies.comments as reply (reply)}

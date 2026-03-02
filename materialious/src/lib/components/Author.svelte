@@ -4,10 +4,12 @@
 	import type { Image } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { isYTBackend, truncate } from '$lib/misc';
-	import { invidiousAuthStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
+	import { invidiousAuthStore, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { localDb } from '$lib/dexie';
 	import { onMount } from 'svelte';
+	import { Avatar } from 'melt/builders';
+	import { mergeAttrs } from 'melt';
 
 	let {
 		channel,
@@ -49,19 +51,21 @@
 			favoritedChannel = true;
 		}
 	}
+
+	const avatar = new Avatar({ src: proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)) });
+	console.log(avatar.src);
 </script>
 
 <nav>
 	<a href={resolve(`/channel/[authorId]`, { authorId: channel.authorId })}>
 		<nav style="gap: 0.5em;">
-			{#if !$interfaceLowBandwidthMode}
-				<img
-					loading="lazy"
-					class="circle large"
-					src={proxyGoogleImage(getBestThumbnail(channel.authorThumbnails))}
-					alt="Channel profile"
-				/>
-			{/if}
+			<img class="circle large" {...avatar.image} alt="Channel profile" />
+			<button
+				class="large secondary-container"
+				{...mergeAttrs(avatar.fallback, {
+					style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
+				})}>{channel.author[0]}</button
+			>
 			<div>
 				<p style="margin: 0;" class="bold">
 					{$isAndroidTvStore ? channel.author : truncate(channel.author, 16)}

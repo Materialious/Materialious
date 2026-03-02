@@ -33,7 +33,6 @@
 		interfaceDefaultPage,
 		interfaceDisableAutoUpdate,
 		interfaceForceCase,
-		interfaceLowBandwidthMode,
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
@@ -273,23 +272,6 @@
 					interfaceSearchHistoryEnabled.set(!$interfaceSearchHistoryEnabled);
 					searchHistoryStore.set([]);
 				}}
-				role="switch"
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.lowBandwidthMode')}</div>
-		</div>
-		<label class="switch" tabindex="0">
-			<input
-				type="checkbox"
-				bind:checked={$interfaceLowBandwidthMode}
-				onclick={() => interfaceLowBandwidthMode.set(!$interfaceLowBandwidthMode)}
 				role="switch"
 			/>
 			<span></span>

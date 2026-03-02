@@ -234,11 +234,6 @@ export const interfaceAutoExpandChapters: Writable<boolean> = persist(
 	'autoExpandChapters'
 );
 export const interfaceAmoledTheme = persist(writable(false), createStorage(), 'amoledTheme');
-export const interfaceLowBandwidthMode = persist(
-	writable(false),
-	createStorage(),
-	'lowBandwidthMode'
-);
 export const interfaceDisplayThumbnailAvatars = persist(
 	writable(false),
 	createStorage(),

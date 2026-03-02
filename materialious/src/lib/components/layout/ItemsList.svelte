@@ -77,7 +77,7 @@
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
-	<div class="grid" {...spatialMenu.root} onkeyup={onKeyup}>
+	<div class="grid" {...spatialMenu.root}>
 		{#each items as item, index (index)}
 			{@const uniqueItemId = extractUniqueId(item)}
 			{@const spatialItem = spatialMenu.getItem(item, { onSelect: () => goToItem(uniqueItemId) })}

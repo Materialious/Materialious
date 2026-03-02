@@ -8,7 +8,7 @@
 	let smallCol = $state('12');
 	let mediumCol = $state('6');
 
-	async function checkWidth() {
+	function checkWidth() {
 		if ($isAndroidTvStore) {
 			mediumCol = '3';
 		} else if (innerWidth <= 1750) {
@@ -18,8 +18,8 @@
 		}
 	}
 
-	onMount(async () => {
-		await checkWidth();
+	onMount(() => {
+		checkWidth();
 
 		addEventListener('resize', () => checkWidth());
 	});

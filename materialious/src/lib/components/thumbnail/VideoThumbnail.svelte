@@ -19,7 +19,6 @@
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		deArrowEnabledStore,
-		isAndroidTvStore,
 		playerSavePlaybackPositionStore,
 		playerState,
 		rawMasterKeyStore,

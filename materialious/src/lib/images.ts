@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import type { Image } from './api/model';
-import { interfaceAllowInsecureRequests, invidiousInstanceStore } from './store';
+import { invidiousInstanceStore } from './store';
 import { isYTBackend } from './misc';
 
 export class ImageCache {

@@ -437,7 +437,7 @@
 			}
 		});
 
-		playerElement.loop = $playerAlwaysLoopStore;
+		if (playerElement) playerElement.loop = $playerAlwaysLoopStore;
 
 		if ($playerState) {
 			playerState.set({ ...$playerState, playerElement: playerElement });
@@ -451,7 +451,7 @@
 		window.addEventListener('resize', updateVideoPlayerHeight);
 		updateVideoPlayerHeight();
 
-		await player.attach(playerElement);
+		if (playerElement) await player.attach(playerElement);
 
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;

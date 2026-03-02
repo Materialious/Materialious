@@ -150,7 +150,7 @@
 							class:active={isActive(tab.id)}
 							class:surface-container-lowest={isActive(tab.id)}
 							class:surface-container-highest={!isActive(tab.id)}
-							{...mergeAttrs(tabCategories.getTrigger(tab.id), { id: tab.id })}
+							{...tabCategories.getTrigger(tab.id)}
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>

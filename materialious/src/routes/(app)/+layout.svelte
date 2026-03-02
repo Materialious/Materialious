@@ -382,9 +382,7 @@
 		{#if $navigating}
 			<PageLoading />
 		{:else}
-			<div tabindex="0">
-				{@render children?.()}
-			</div>
+			{@render children?.()}
 		{/if}
 
 		<SyncParty />

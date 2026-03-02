@@ -82,7 +82,7 @@
 				<article
 					{...mergeAttrs(spatialItem.attrs, {
 						onclick: () => goToItem(uniqueItemId),
-						id: `item-${index}`
+						id: uniqueItemId
 					})}
 					class="no-padding item-select border"
 					class:item-select-focused={spatialItem.highlighted}

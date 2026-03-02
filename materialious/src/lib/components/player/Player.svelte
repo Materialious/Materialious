@@ -436,7 +436,6 @@
 				}
 			}
 		});
-		playerElement = document.getElementById('player') as HTMLMediaElement;
 
 		playerElement.loop = $playerAlwaysLoopStore;
 
@@ -839,7 +838,7 @@
 	<video
 		controls={false}
 		autoplay={$playerAutoPlayStore}
-		id="player"
+		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
 	{#if isEmbed && !$isAndroidTvStore}

@@ -40,12 +40,17 @@
 
 		if (element) {
 			await timeout(100);
-			element.focus();
+
 			element.scrollIntoView({
 				behavior: 'instant',
 				block: 'start',
 				inline: 'nearest'
 			});
+
+			const lastItem = items.find((item) => extractUniqueId(item) === $feedLastItemId);
+			if (lastItem) {
+				spatialMenu.highlighted = lastItem;
+			}
 		}
 
 		feedLastItemId.set(undefined);

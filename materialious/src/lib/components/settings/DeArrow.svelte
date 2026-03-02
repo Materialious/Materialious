@@ -22,7 +22,7 @@
 			<input bind:value={deArrowUrl} name="dearrow-instance" type="text" />
 			<label for="dearrow-instance">{$_('layout.instanceUrl')}</label>
 		</div>
-		<button>
+		<button class="circle">
 			<i>done</i>
 		</button>
 	</nav>
@@ -35,7 +35,7 @@
 			<input bind:value={deArrowThumbnailUrl} name="dearrow-thumbnail-instance" type="text" />
 			<label for="dearrow-thumbnail-instance">{$_('layout.deArrow.thumbnailInstanceUrl')}</label>
 		</div>
-		<button>
+		<button class="circle">
 			<i>done</i>
 		</button>
 	</nav>

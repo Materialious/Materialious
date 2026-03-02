@@ -12,13 +12,29 @@
 	import { isUnrestrictedPlatform } from '$lib/misc';
 	import { isOwnBackend } from '$lib/shared';
 	import InternalAccount from './InternalAccount.svelte';
+	import { Tabs } from 'melt/builders';
+	import { mergeAttrs } from 'melt';
 
-	let activeTab = $state('interface');
-	const isActive = (id: string) => activeTab === id;
+	type TabCategories =
+		| 'interface'
+		| 'player'
+		| 'ryd'
+		| 'sponsorblock'
+		| 'dearrow'
+		| 'about'
+		| 'engine'
+		| 'account';
+
+	const tabCategories: Tabs<TabCategories> = new Tabs({
+		value: 'interface',
+		orientation: 'vertical'
+	});
+
+	const isActive = (id: string) => tabCategories.value === id;
 
 	let mobileCategoriesButton: HTMLElement | undefined = $state();
 
-	let tabs: { id: string; label: string; icon: string; component: Component }[] = $state([
+	let tabs: { id: TabCategories; label: string; icon: string; component: Component }[] = $state([
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
 		{ id: 'ryd', label: 'Return YT Dislike', icon: 'thumb_down', component: Ryd },
@@ -71,41 +87,9 @@
 		}
 	}
 
-	function onKeydown(event: KeyboardEvent, idx: number) {
-		const keys = ['ArrowRight', 'ArrowLeft', 'Home', 'End'] as const;
-		if (!keys.includes(event.key as (typeof keys)[number])) return;
-
-		event.preventDefault();
-
-		let next = idx;
-		switch (event.key) {
-			case 'ArrowRight':
-				next = (idx + 1) % tabs.length;
-				break;
-			case 'ArrowLeft':
-				next = (idx - 1 + tabs.length) % tabs.length;
-				break;
-			case 'Home':
-				next = 0;
-				break;
-			case 'End':
-				next = tabs.length - 1;
-				break;
-		}
-
-		activeTab = tabs[next].id;
-
-		const els = document.querySelectorAll<HTMLElement>('[role="tab"]');
-		els[next]?.focus();
-	}
-
 	onMount(() => {
 		checkWidth();
-
 		addEventListener('resize', () => checkWidth());
-		if ($isAndroidTvStore) {
-			document.getElementById(`tab-${activeTab}`)?.focus();
-		}
 	});
 </script>
 
@@ -118,7 +102,7 @@
 	<div style="height: 100%;">
 		<nav class="wrap s">
 			{#if tabs}
-				{@const currentTab = tabs.find((tab) => tab.id === activeTab)}
+				{@const currentTab = tabs.find((tab) => tab.id === tabCategories.value)}
 
 				{#if currentTab}
 					<button
@@ -128,14 +112,19 @@
 					>
 						<i>{currentTab.icon}</i>
 						<span>{currentTab.label}</span>
-						<menu style="width: 100%;" data-ui="#tab-menu" id="tab-menu">
+						<menu
+							style="width: 100%;"
+							data-ui="#tab-menu"
+							id="tab-menu"
+							{...tabCategories.triggerList}
+						>
 							{#each tabs as tab (tab)}
 								<li
-									role="presentation"
-									onclick={() => {
-										activeTab = tab.id;
-										mobileCategoriesButton?.click();
-									}}
+									{...mergeAttrs(tabCategories.getTrigger(tab.id), {
+										onclick: () => {
+											mobileCategoriesButton?.click();
+										}
+									})}
 								>
 									<i>{tab.icon}</i>
 									<span>{tab.label}</span>
@@ -154,18 +143,13 @@
 
 		<div class="grid">
 			<div class="s12 m4 l4 m l">
-				<div class="categories padding">
-					{#each tabs as tab, index (tab)}
+				<div class="categories padding" {...tabCategories.triggerList}>
+					{#each tabs as tab (tab)}
 						<button
 							class:active={isActive(tab.id)}
 							class:surface-container-lowest={isActive(tab.id)}
 							class:surface-container-highest={!isActive(tab.id)}
-							aria-selected={isActive(tab.id)}
-							id={`tab-${tab.id}`}
-							aria-controls={`panel-${tab.id}`}
-							tabindex={isActive(tab.id) ? 0 : -1}
-							onclick={() => (activeTab = tab.id)}
-							onkeydown={(event) => onKeydown(event, index)}
+							{...tabCategories.getTrigger(tab.id)}
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>
@@ -177,14 +161,7 @@
 			<div class="s12 m8 l8">
 				<div class="settings padding">
 					{#each tabs as tab (tab)}
-						<div
-							id={`panel-${tab.id}`}
-							aria-labelledby={`tab-${tab.id}`}
-							hidden={!isActive(tab.id)}
-							inert={!$isAndroidTvStore && !isActive(tab.id)}
-							aria-hidden={!isActive(tab.id)}
-							class:active={isActive(tab.id)}
-						>
+						<div {...tabCategories.getContent(tab.id)}>
 							<tab.component />
 						</div>
 					{/each}

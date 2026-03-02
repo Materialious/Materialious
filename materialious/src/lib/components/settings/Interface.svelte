@@ -166,7 +166,7 @@
 						>
 					{/if}
 				</div>
-				<button>
+				<button class="circle">
 					<i>done</i>
 				</button>
 			</nav>

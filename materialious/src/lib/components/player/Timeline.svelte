@@ -47,7 +47,6 @@
 	let playerTimelineTooltip: HTMLDivElement | undefined = $state();
 	let playerTimelineThumbnails: TimelineThumbnail[] = $state([]);
 	let playerTimelineThumbnailsCache = new ImageCache();
-	let playerTimelineThumbnailLoaded = $state(false);
 	let playerTimelineThumbnailCanvas: {
 		timeline?: HTMLCanvasElement;
 		thumb?: HTMLCanvasElement;
@@ -280,11 +279,10 @@
 	}
 
 	async function setPlayerTimelineThumbnails(time: number, canvas: HTMLCanvasElement) {
-		playerTimelineThumbnailLoaded = false;
 		const canvasContext = canvas.getContext('2d');
 
 		if (canvasContext) {
-			playerTimelineThumbnailLoaded = await drawTimelineThumbnail(
+			await drawTimelineThumbnail(
 				canvasContext,
 				playerTimelineThumbnailsCache,
 				playerTimelineThumbnails,
@@ -370,18 +368,14 @@
 	{/snippet}
 	<div class="track">
 		{#if !userManualSeeking && playerShowTimelineThumbnail}
-			<div
-				bind:this={playerTimelineTooltip}
-				class="timeline tooltip"
-				class:tooltip-hide={!playerTimelineThumbnailLoaded}
-			>
+			<div bind:this={playerTimelineTooltip} class="timeline tooltip">
 				{@render timelineTooltip('timeline', playerTimelineTimeHover)}
 			</div>
 		{/if}
 		<div class="range"></div>
 		<div {...playerTimelineSlider.thumb}>
 			{#if playerSliderInteracted && playerShowTimelineThumbnail}
-				<div class="tooltip thumb" class:tooltip-hide={!playerTimelineThumbnailLoaded}>
+				<div class="tooltip thumb">
 					{@render timelineTooltip('thumb', currentTime)}
 				</div>
 			{/if}
@@ -433,12 +427,7 @@
 		border-radius: var(--border-radius);
 		visibility: visible;
 		opacity: 1;
-		transition: opacity 0.5s ease;
-	}
-
-	.timeline.tooltip.tooltip-hide {
-		opacity: 0;
-		pointer-events: none;
+		transition: none !important;
 	}
 
 	.tooltip.thumb {

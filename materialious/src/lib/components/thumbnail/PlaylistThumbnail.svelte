@@ -15,8 +15,6 @@
 
 	let { playlist, disabled = false }: Props = $props();
 
-	let img: HTMLImageElement | undefined = $state();
-
 	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
 
 	let thumbnailSrc = '';

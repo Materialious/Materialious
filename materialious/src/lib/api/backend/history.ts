@@ -75,7 +75,11 @@ export async function getVideoWatchHistory(
 }
 
 export async function getWatchHistory(
-	options: { page?: number; videoIds?: string[] } = { page: undefined, videoIds: undefined }
+	options: { page?: number; videoIds?: string[]; fetchOptions?: RequestInit } = {
+		page: undefined,
+		videoIds: undefined,
+		fetchOptions: undefined
+	}
 ): Promise<VideoWatchHistory[]> {
 	await sodium.ready;
 	const rawKey = await getRawKey();
@@ -98,7 +102,7 @@ export async function getWatchHistory(
 		params.set('videoHashes', videoHashes.join(','));
 	}
 
-	const resp = await fetch(`/api/user/history?${params.toString()}`);
+	const resp = await fetch(`/api/user/history?${params.toString()}`, options.fetchOptions);
 	if (!resp.ok) return [];
 
 	const rawHistory = await resp.json();

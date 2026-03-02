@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { afterNavigate, disableScrollHandling, goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/stores';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
@@ -12,7 +12,6 @@
 	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import Player from '$lib/components/player/Player.svelte';
-	import '$lib/css/global.css';
 	import { getPages } from '$lib/navPages';
 	import {
 		invidiousAuthStore,
@@ -28,9 +27,7 @@
 		hideSearchStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
-	import 'beercss';
 	import ui from 'beercss';
-	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import {

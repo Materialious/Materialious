@@ -843,7 +843,10 @@
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
 	{#if isEmbed && !$isAndroidTvStore}
-		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
+		<div
+			class="chip surface-container-highest"
+			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
+		>
 			{data.video.title}
 		</div>
 	{/if}

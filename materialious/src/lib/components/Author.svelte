@@ -53,7 +53,6 @@
 	}
 
 	const avatar = new Avatar({ src: proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)) });
-	console.log(avatar.src);
 </script>
 
 <nav>

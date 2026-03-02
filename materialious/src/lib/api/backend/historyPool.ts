@@ -18,7 +18,10 @@ async function processBatches(): Promise<void> {
 	const results: VideoWatchHistory[] = [];
 
 	for (const batch of batches) {
-		const res: VideoWatchHistory[] = await getWatchHistory({ videoIds: batch });
+		const res: VideoWatchHistory[] = await getWatchHistory({
+			videoIds: batch,
+			fetchOptions: { priority: 'low' }
+		});
 		results.push(...res);
 
 		// Resolve pending promises for this batch

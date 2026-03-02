@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getBestThumbnail } from '$lib/images';
+	import { getBestThumbnail, insecureRequestImageHandler } from '$lib/images';
 	import { resolve } from '$app/paths';
 	import { letterCase } from '$lib/letterCasing';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Playlist, PlaylistPage } from '$lib/api/model';
-	import { insecureRequestImageHandler, truncate } from '$lib/misc';
+	import { truncate } from '$lib/misc';
 	import { interfaceLowBandwidthMode } from '$lib/store';
 
 	interface Props {

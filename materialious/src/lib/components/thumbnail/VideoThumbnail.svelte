@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestThumbnail } from '$lib/images';
+	import { getBestThumbnail, insecureRequestImageHandler } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
@@ -14,7 +14,7 @@
 		VideoBase,
 		VideoWatchHistory
 	} from '$lib/api/model';
-	import { createVideoUrl, insecureRequestImageHandler } from '$lib/misc';
+	import { createVideoUrl } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		deArrowEnabledStore,

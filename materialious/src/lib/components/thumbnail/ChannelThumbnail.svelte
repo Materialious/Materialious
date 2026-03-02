@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { getBestThumbnail, insecureRequestImageHandler, proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import type { Channel } from '$lib/api/model';
-	import { insecureRequestImageHandler, truncate } from '$lib/misc';
+	import { truncate } from '$lib/misc';
 	import { interfaceLowBandwidthMode } from '$lib/store';
 
 	interface Props {

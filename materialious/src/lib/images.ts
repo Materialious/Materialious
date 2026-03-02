@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import type { Image } from './api/model';
-import { invidiousInstanceStore } from './store';
+import { interfaceAllowInsecureRequests, invidiousInstanceStore } from './store';
 import { isYTBackend } from './misc';
 
 export class ImageCache {
@@ -25,6 +25,23 @@ export class ImageCache {
 	clear() {
 		this.cache.clear();
 	}
+}
+
+export async function insecureRequestImageHandler(source: string): Promise<HTMLImageElement> {
+	const img = new Image();
+	if (get(interfaceAllowInsecureRequests)) {
+		const imgResp = await fetch(source);
+		if (!imgResp.ok) {
+			img.src = '';
+			return img;
+		}
+
+		img.src = URL.createObjectURL(await imgResp.blob());
+	} else {
+		img.src = source;
+	}
+
+	return img;
 }
 
 export function getBestThumbnail(

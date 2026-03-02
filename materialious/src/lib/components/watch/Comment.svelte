@@ -2,12 +2,12 @@
 	import { resolve } from '$app/paths';
 	import { getComments } from '$lib/api';
 	import { type Comment, type Comments } from '$lib/api/model';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
+	import { getBestThumbnail, insecureRequestImageHandler, proxyGoogleImage } from '$lib/images';
 	import { numberWithCommas } from '$lib/numbers';
 	import { interfaceLowBandwidthMode } from '$lib/store';
 	import { onMount } from 'svelte';
 	import CommentSelf from './Comment.svelte';
-	import { insecureRequestImageHandler, truncate } from '$lib/misc';
+	import { truncate } from '$lib/misc';
 	import { _ } from '$lib/i18n';
 	import { extractActualLink } from '$lib/description';
 

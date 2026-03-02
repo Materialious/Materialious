@@ -134,7 +134,9 @@
             "importingToMaterialiousFinished": "A Materialiousba történő importálás befejezve",
             "exportingToInvidious": "Az Invidiousba történő exportálás megkezdve",
             "exportingToInvidiousFinished": "Az Invidiousba történő exportálás befejezve"
-        }
+        },
+        "exportToJson": "Exportálás JSON-ba",
+        "historyEnabled": "Megtekintési előzmények mentése"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",
@@ -149,7 +151,8 @@
             "materialiousLink": "Materialious-hivatkozás megosztása",
             "youtubeLink": "Youtube-hivatkozás másolása",
             "invidiousRedirect": "Invidious átirányítási hivatkozás másolása",
-            "copiedSuccess": "Vágólapra másolva"
+            "copiedSuccess": "Vágólapra másolva",
+            "copyXLink": "{{linkType}} hivatkozás másolása"
         },
         "audioOnly": "Csak hang",
         "theatreMode": "Szélesvásznú mód",
@@ -269,5 +272,7 @@
         "localFallbackInfo": "Ha egy videó betöltése sikertelen az Invidiousról, a Materialious helyileg tölti be.",
         "configureInstance": "Példány konfigurálása",
         "done": "Kész"
-    }
+    },
+    "copy": "JSON másolása",
+    "captionStyle": "Feliratstílusok"
 }

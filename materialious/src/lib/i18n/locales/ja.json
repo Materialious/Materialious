@@ -5,7 +5,7 @@
     "loadMore": "もっと表示",
     "login": "ログイン",
     "recommendedVideos": "おすすめの動画",
-    "invidiousLogin": "Invidious アカウントでログインしてください",
+    "invidiousLogin": "Invidious アカウントでログインしてください。",
     "views": "回再生",
     "playlistVideos": "再生リストの動画",
     "invalidInstance": "URLを確認してください。間違いがなければ、サーバーがダウンしているか、第三者製のクライアントに対応していない可能性があります。",
@@ -84,7 +84,8 @@
             "invidiousRedirect": "Invidious リンクコピー",
             "youtubeLink": "YouTube リンクコピー",
             "includeTimestamp": "タイムスタンプ",
-            "copiedSuccess": "クリップボードにコピーされました"
+            "copiedSuccess": "クリップボードにコピーされました",
+            "copyXLink": "{{linkType}} リンクをコピー"
         },
         "download": "ダウンロード",
         "downloadSteps": {
@@ -187,7 +188,8 @@
             "tangentJokes": "無関係な談話/冗談",
             "automatic": "自動スキップ",
             "manual": "手動スキップ",
-            "timeline": "タイムラインのみ"
+            "timeline": "タイムラインのみ",
+            "musicOffTopic": "非音楽セグメント"
         },
         "deArrow": {
             "title": "DeArrow",
@@ -200,7 +202,26 @@
         "about": "Materialious について",
         "joinSyncParty": "同期グループのURLを入力",
         "shareURL": "URLを共有",
-        "androidNativeShare": "ネイティブ共有を使用"
+        "androidNativeShare": "ネイティブ共有を使用",
+        "engine": "バックエンドエンジン",
+        "materialiousAccount": "アカウント",
+        "deleteAccount": "アカウントを削除",
+        "clickXmoreTimesToDelete": "削除するにはあと {{clicksTillDelete}} 回クリックしてください",
+        "backendEngine": {
+            "warning": "詳細設定！経験豊富なユーザーのみ対象です。操作方法をよく理解していない場合は、変更しないでください。",
+            "cull": "最大フィード項目数",
+            "cooldown": "チャンネル時間制限の再取得",
+            "concurrent": "フィードが返される前に解析する最大チャンネル数",
+            "fallbacks": "フォールバック",
+            "importExport": "サブスクリプションのインポート/エクスポート",
+            "exportToInvidious": "MaterialiousからInvidiousにエクスポート",
+            "importToMaterialious": "Invidious から Materialious へのインポート",
+            "importingToMaterialious": "マテリアルへのインポートを開始しました",
+            "importingToMaterialiousFinished": "マテリアルへのインポートが終了しました",
+            "exportingToInvidious": "Invidiousへのエクスポートを開始しました",
+            "exportingToInvidiousFinished": "Invidiousへのエクスポートが終了しました"
+        },
+        "exportToJson": "JSON にエクスポート"
     },
     "subscribe": "登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
@@ -225,5 +246,32 @@
     "oldest": "最古",
     "popular": "人気",
     "favouriteChannel": "お気に入りチャンネル",
-    "unfavouriteChannel": "お気に入り解除チャンネル"
+    "unfavouriteChannel": "お気に入り解除チャンネル",
+    "copy": "JSON をコピー",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "captionStyle": "見出しのスタイル",
+    "invalidPassword": "無効なパスワード",
+    "usernameTaken": "ユーザー名は既に使用されています",
+    "linkInvidious": "Invidiousアカウントのリンク",
+    "unlinkInvidious": "Invidiousアカウントのリンクを解除",
+    "createAccount": "アカウントの作成",
+    "needRegister": "登録が必要です",
+    "registrationDisabled": "現在登録は無効になっています。インスタンス所有者に問い合わせてください。",
+    "needLogin": "ログインする必要があります",
+    "materialiousLogin": "Materialious アカウントでログインしてください。",
+    "materialiousCreate": "Materialious アカウントを作成してください。",
+    "backend": "バックエンド",
+    "initalSetup": {
+        "useInvidious": "Invidiousを使いたい",
+        "useLocalFallback": "ローカルビデオフォールバックを使用したい",
+        "yes": "はい",
+        "no": "いいえ",
+        "unsure": "不明",
+        "required": "セットアップが必要です",
+        "invidiousInfo": "Invidious は自己ホスト可能な YouTube インターフェースです。",
+        "localFallbackInfo": "Invidious からのビデオの読み込みに失敗した場合、Materialious はそれをローカルに読み込みます。",
+        "configureInstance": "インスタンスの構成",
+        "done": "完了"
+    }
 }

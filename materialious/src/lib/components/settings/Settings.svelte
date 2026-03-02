@@ -6,7 +6,7 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { isAndroidTvStore, rawMasterKeyStore } from '$lib/store';
+	import { rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
 	import { isUnrestrictedPlatform } from '$lib/misc';
@@ -78,7 +78,6 @@
 	});
 
 	let dialogType = $state('');
-
 	function checkWidth() {
 		if (innerWidth <= 1320) {
 			dialogType = 'right';

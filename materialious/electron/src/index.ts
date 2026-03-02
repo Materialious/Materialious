@@ -85,7 +85,6 @@ ipcMain.handle(
 			{
 				url: youtubeUrl,
 				referrer: youtubeUrl,
-				userAgent: USER_AGENT
 			}
 		);
 

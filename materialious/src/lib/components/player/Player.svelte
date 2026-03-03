@@ -449,8 +449,6 @@
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
 
-		playerContainer = document.getElementById('player-container') as HTMLElement;
-
 		window.addEventListener('resize', updateVideoPlayerHeight);
 		updateVideoPlayerHeight();
 

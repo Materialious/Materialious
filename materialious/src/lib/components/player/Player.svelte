@@ -739,7 +739,7 @@
 
 		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 			const watchHistory = await getVideoWatchHistory(data.video.videoId);
-			if (watchHistory) toSetTime = watchHistory.progress;
+			if (watchHistory && watchHistory.progress > toSetTime) toSetTime = watchHistory.progress;
 		}
 
 		return toSetTime;
@@ -762,7 +762,7 @@
 			}
 		}
 
-		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore) && playerElement.currentTime > 10) {
 			updateWatchHistory(data.video.videoId, playerElement.currentTime);
 		}
 	}

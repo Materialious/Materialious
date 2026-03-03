@@ -18,7 +18,7 @@
 		interfaceDefaultPage,
 		isAndroidTvStore,
 		playerState,
-		playertheatreModeIsActive,
+		playerTheatreModeIsActive,
 		rawMasterKeyStore,
 		themeColorStore,
 		backendInUseStore,
@@ -160,7 +160,7 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
-		class:hide={$playertheatreModeIsActive}
+		class:hide={$playerTheatreModeIsActive}
 	>
 		<header class="small-padding">
 			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
@@ -202,7 +202,7 @@
 	</nav>
 	{#if !$isAndroidTvStore}
 		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
-			{#if $playertheatreModeIsActive}
+			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
 						<Logo />
@@ -323,8 +323,8 @@
 					class:pip={playerIsPip}
 					class:s12={!playerIsPip}
 					class:m12={!playerIsPip}
-					class:l12={$playertheatreModeIsActive && !playerIsPip}
-					class:l9={!$playertheatreModeIsActive && !playerIsPip}
+					class:l12={$playerTheatreModeIsActive && !playerIsPip}
+					class:l9={!$playerTheatreModeIsActive && !playerIsPip}
 				>
 					<div class="pip-info">
 						{#if playerIsPip}

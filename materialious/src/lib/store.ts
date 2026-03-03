@@ -187,7 +187,7 @@ export interface PlayerState {
 }
 
 export const playerState: Writable<PlayerState | undefined> = writable(undefined);
-export const playertheatreModeIsActive = writable(false);
+export const playerTheatreModeIsActive = writable(false);
 
 export const returnYtDislikesStore = persist(writable(false), createStorage(), 'returnYtDislikes');
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persist(

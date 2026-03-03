@@ -20,7 +20,7 @@
 		playerPlaylistHistory,
 		playerState,
 		playerTheatreModeByDefaultStore,
-		playertheatreModeIsActive,
+		playerTheatreModeIsActive,
 		playlistCacheStore,
 		type PlayerState
 	} from '$lib/store';
@@ -51,7 +51,7 @@
 	let personalPlaylists: PlaylistPage[] | null = $state(null);
 	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
 
-	playertheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
+	playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
 	let pauseTimerSeconds: number = $state(-1);
 
@@ -151,7 +151,7 @@
 			playerState.set(undefined);
 		}
 
-		playertheatreModeIsActive.set(false);
+		playerTheatreModeIsActive.set(false);
 	});
 
 	async function goToCurrentPlaylistItem() {
@@ -219,7 +219,7 @@
 	}
 
 	function toggleTheatreMode() {
-		playertheatreModeIsActive.set(!$playertheatreModeIsActive);
+		playerTheatreModeIsActive.set(!$playerTheatreModeIsActive);
 	}
 
 	let pauseTimeout: ReturnType<typeof setTimeout> | undefined = $state();
@@ -240,7 +240,7 @@
 </svelte:head>
 
 <div class="grid no-padding">
-	<div class={`s12 m12 l${$playertheatreModeIsActive ? '12' : '9'}`}>
+	<div class={`s12 m12 l${$playerTheatreModeIsActive ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#if data.video.premiereTimestamp}
 				<article class="video-placeholder">
@@ -266,7 +266,7 @@
 					<button
 						onclick={toggleTheatreMode}
 						class="m l"
-						class:surface-container-highest={!$playertheatreModeIsActive}
+						class:surface-container-highest={!$playerTheatreModeIsActive}
 					>
 						<i>width_wide</i>
 						<div class="tooltip">{$_('player.theatreMode')}</div>
@@ -288,13 +288,19 @@
 					<button
 						onclick={() => (
 							(showTranscript = !showTranscript),
-							playertheatreModeIsActive.set(false)
+							playerTheatreModeIsActive.set(false)
 						)}
 						class:surface-container-highest={!showTranscript}
 					>
 						<i>description</i>
 						<div class="tooltip">
 							{$_('transcript')}
+						</div>
+					</button>
+					<button class="surface-container-highest">
+						<i>sync</i>
+						<div class="tooltip">
+							{$_('watchParty.start')}
 						</div>
 					</button>
 					<Share
@@ -452,7 +458,7 @@
 			</article>
 		{/if}
 	</div>
-	{#if !$playertheatreModeIsActive}
+	{#if !$playerTheatreModeIsActive}
 		<div class="s12 m12 l3 recommended">
 			{#if showTranscript}
 				<Transcript video={data.video} bind:currentTime={playerCurrentTime} />

@@ -27,7 +27,7 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
-		playertheatreModeIsActive,
+		playerTheatreModeIsActive,
 		playerYouTubeJsFallback,
 		rawMasterKeyStore,
 		sponsorBlockCategoriesStore,
@@ -113,7 +113,7 @@
 		step: 0.01
 	});
 
-	playertheatreModeIsActive.subscribe(async () => {
+	playerTheatreModeIsActive.subscribe(async () => {
 		await tick();
 		updateVideoPlayerHeight();
 	});

@@ -170,8 +170,7 @@
 	function getScrubbingSpeeds(duration: number) {
 		const baseVelocity = duration * 0.001;
 		const maxVelocity = duration * 0.1;
-		let rampTime = duration * 0.5;
-		rampTime = Math.max(800, 10000);
+		const rampTime = duration * 0.2;
 
 		return { baseVelocity, maxVelocity, rampTime };
 	}

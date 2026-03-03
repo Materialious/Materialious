@@ -37,7 +37,7 @@
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
 
-		let completed = false;
+		let completed: boolean;
 		let newContent: ChannelContent;
 		if (displayContent.getContinuation) {
 			newContent = await displayContent.getContinuation();

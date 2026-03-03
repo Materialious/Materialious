@@ -168,7 +168,7 @@ export async function createUser(user: CreateUser): Promise<User> {
 		masterKeyNonce: user.masterKey.nonce
 	};
 
-	let userCreated = false;
+	let userCreated: boolean;
 	try {
 		await getSequelize().UserTable.create(createdUser);
 		userCreated = true;

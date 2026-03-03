@@ -28,7 +28,6 @@ export default defineConfig({
 						type: 'image/png'
 					}
 				],
-				orientation: 'any',
 				display: 'standalone',
 				name: 'Materialious'
 			}

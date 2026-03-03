@@ -297,12 +297,6 @@
 							{$_('transcript')}
 						</div>
 					</button>
-					<button class="surface-container-highest">
-						<i>sync</i>
-						<div class="tooltip">
-							{$_('watchParty.start')}
-						</div>
-					</button>
 					<Share
 						includePromptText={$_('player.share.includeTimestamp')}
 						shares={[

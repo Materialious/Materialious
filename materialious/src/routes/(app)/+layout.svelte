@@ -33,6 +33,7 @@
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import WatchParty from '$lib/components/WatchParty.svelte';
 
 	let { children } = $props();
 
@@ -41,6 +42,7 @@
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);
 	let playerIsPip: boolean = $state(false);
+	let showWatchParty = $state(false);
 
 	let pages = $state(getPages());
 	invidiousAuthStore.subscribe(() => {
@@ -245,6 +247,10 @@
 					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 				</div>
 			{:else}
+				<button onclick={() => (showWatchParty = !showWatchParty)} class="circle large transparent">
+					<i>groups</i>
+					<div class="tooltip bottom">{$_('watchParty.start')}</div>
+				</button>
 				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"
@@ -317,6 +323,10 @@
 	</dialog>
 
 	<main id="main-content" tabindex="0" class="responsive max root">
+		{#if showWatchParty}
+			<WatchParty />
+		{/if}
+
 		{#if $playerState}
 			<div class="grid">
 				<div

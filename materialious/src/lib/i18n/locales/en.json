@@ -86,7 +86,10 @@
 		"streams": "Streams"
 	},
 	"watchParty": {
-		"start": "Start a watch party"
+		"start": "Start a watch party",
+		"header": "Watch party",
+		"createRoom": "Create room",
+		"joinRoom": "Join room"
 	},
 	"subscriptions": {
 		"manageSubscriptions": "Manage subscriptions"

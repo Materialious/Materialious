@@ -15,10 +15,10 @@
 		VideoBase,
 		VideoWatchHistory
 	} from '$lib/api/model';
-	import { createVideoUrl } from '$lib/misc';
 	import type { PlayerEvents } from '$lib/player';
 	import {
 		deArrowEnabledStore,
+		isAndroidTvStore,
 		playerSavePlaybackPositionStore,
 		playerState,
 		rawMasterKeyStore,
@@ -38,7 +38,14 @@
 
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
 
-	let watchUrl = createVideoUrl(video.videoId, playlistId);
+	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
+		videoId: video.videoId
+	});
+	const watchUrl = new URL(`${location.origin}${watchPath}`);
+
+	if (playlistId !== '') {
+		watchUrl.searchParams.set('playlist', playlistId);
+	}
 
 	let beenWatched: boolean = $state(false);
 

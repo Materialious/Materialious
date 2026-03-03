@@ -30,14 +30,14 @@
 		classes = 'page right active'
 	}: Props = $props();
 
+	items = filterByBlocklist(items);
+
 	async function removePlaylistItem(indexId: string) {
 		if (!playlistId) return;
 		await removePlaylistVideo(playlistId, indexId);
 	}
 
 	onMount(async () => {
-		items = filterByBlocklist(items);
-
 		if (!$feedLastItemId) return;
 
 		const element = document.getElementById($feedLastItemId);

@@ -23,6 +23,10 @@ invidious_companion:
 ### Proof-of-work Captcha
 Will only work while using HTTPS. If in HTTP set `PUBLIC_CAPTCHA_DISABLED` to `true`
 
+### Request to Invidious/RYD/DeArrow fails at proxy level.
+Ensure the environmental variable for the relavent service is set or whitelist addtional domains using `WHITELIST_BASE_DOMAIN`, what should be comma separated and be the base domain
+e.g. `"youtube.com,google.com"` NOT `"https://youtube.com,https://videos.google.com"`
+
 ### Docker Compose
 
 ```yaml

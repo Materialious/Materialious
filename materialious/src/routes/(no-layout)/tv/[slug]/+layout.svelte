@@ -14,7 +14,7 @@
 	</style>
 </svelte:head>
 
-{#await navigating.completed}
+{#await navigating.complete}
 	<PageLoading />
 	<!-- eslint-disable-next-line  @typescript-eslint/no-unused-vars -->
 {:then _}

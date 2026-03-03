@@ -4,7 +4,7 @@
 	import { videoLength } from '$lib/numbers';
 	import { generateChapterWebVTT, type ParsedDescription } from '$lib/description';
 	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
-	import { error, type Page } from '@sveltejs/kit';
+	import { error } from '@sveltejs/kit';
 	import Mousetrap from 'mousetrap';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 	import shaka from 'shaka-player/dist/shaka-player.ui';

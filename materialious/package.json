@@ -87,6 +87,7 @@
 		"mysql2": "^3.18.2",
 		"pg": "^8.19.0",
 		"pg-hstore": "^2.3.4",
+		"safe-regex2": "^5.0.0",
 		"sequelize": "^6.37.7",
 		"shaka-player": "^4.16.14",
 		"sponsorblock-api": "^0.2.4",

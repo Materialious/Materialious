@@ -14,7 +14,6 @@ import { Capacitor } from '@capacitor/core';
 import { isOwnBackend } from './shared';
 import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
-import { _ } from './i18n';
 import { ensureNoTrailingSlash, isYTBackend } from './misc';
 
 export function clearCaches() {

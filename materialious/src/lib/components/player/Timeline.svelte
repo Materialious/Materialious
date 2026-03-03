@@ -463,7 +463,11 @@
 	}
 
 	.segment-marker {
-		background-color: var(--tertiary);
+		background: repeating-linear-gradient(
+			-45deg,
+			var(--inverse-primary) 0 10px,
+			var(--primary) 10px 15px
+		);
 	}
 
 	.disable-tv {

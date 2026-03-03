@@ -5,7 +5,8 @@
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
-	import { extractUniqueId, timeout, type feedItems } from '$lib/misc';
+	import { extractUniqueId, type FeedItems } from '$lib/feed';
+	import { timeout } from '$lib/misc';
 	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
@@ -15,7 +16,7 @@
 	import { Capacitor } from '@capacitor/core';
 
 	interface Props {
-		items?: feedItems;
+		items?: FeedItems;
 		playlistId?: string;
 		playlistAuthor?: string;
 		classes?: string;

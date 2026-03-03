@@ -14,16 +14,6 @@ import {
 	rawMasterKeyStore,
 	searchCacheStore
 } from './store';
-import type {
-	Channel,
-	HashTag,
-	Playlist,
-	PlaylistPage,
-	PlaylistPageVideo,
-	Video,
-	VideoBase,
-	VideoWatchHistory
-} from './api/model';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
@@ -87,47 +77,6 @@ export function ensureNoTrailingSlash(url: any): string {
 	if (typeof url !== 'string') return '';
 
 	return url.endsWith('/') ? url.slice(0, -1) : url;
-}
-
-export type feedItem =
-	| VideoBase
-	| Video
-	| PlaylistPageVideo
-	| Channel
-	| Video
-	| Playlist
-	| HashTag
-	| PlaylistPage
-	| VideoWatchHistory;
-export type feedItems = feedItem[];
-
-export function extractUniqueId(item: feedItem): string {
-	if ('videoId' in item) {
-		return item.videoId;
-	} else if ('playlistId' in item) {
-		return item.playlistId;
-	} else if ('authorId' in item) {
-		return item.authorId;
-	} else {
-		return item.title;
-	}
-}
-
-export function excludeDuplicateFeeds(currentItems: feedItems, newItems: feedItems): feedItems {
-	const existingIds: string[] = [];
-
-	currentItems.forEach((item) => {
-		existingIds.push(extractUniqueId(item));
-	});
-
-	const nonDuplicatedNewItems: feedItems = [];
-	newItems.forEach((item) => {
-		if (!existingIds.includes(extractUniqueId(item))) {
-			nonDuplicatedNewItems.push(item);
-		}
-	});
-
-	return [...nonDuplicatedNewItems, ...currentItems];
 }
 
 export function expandSummery(id: string) {

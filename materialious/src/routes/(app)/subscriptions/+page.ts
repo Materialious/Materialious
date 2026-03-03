@@ -1,7 +1,8 @@
 import { getFeed } from '$lib/api/index';
 import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
 import { localDb } from '$lib/dexie';
-import { authProtected, excludeDuplicateFeeds } from '$lib/misc';
+import { excludeDuplicateFeeds } from '$lib/feed';
+import { authProtected } from '$lib/misc';
 import { feedCacheStore, feedLoadingStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';

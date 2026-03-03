@@ -9,7 +9,6 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import Settings from '$lib/components/settings/Settings.svelte';
-	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import Player from '$lib/components/player/Player.svelte';
 	import { getPages } from '$lib/navPages';
@@ -21,7 +20,6 @@
 		playerState,
 		playertheatreModeIsActive,
 		rawMasterKeyStore,
-		syncPartyPeerStore,
 		themeColorStore,
 		backendInUseStore,
 		hideSearchStore
@@ -252,10 +250,6 @@
 					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 				</div>
 			{:else}
-				<button data-ui="#sync-party" class="circle large transparent">
-					<i class:primary-text={$syncPartyPeerStore}>group</i>
-					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-				</button>
 				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"
@@ -386,7 +380,6 @@
 			{@render children?.()}
 		{/if}
 
-		<SyncParty />
 		<Toast />
 	</main>
 </div>

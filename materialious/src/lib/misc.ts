@@ -1,7 +1,6 @@
-import { goto, pushState } from '$app/navigation';
+import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import he from 'he';
-import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import { env } from '$env/dynamic/public';
 import {
@@ -11,7 +10,6 @@ import {
 	feedCacheStore,
 	invidiousInstanceStore,
 	interfaceAndroidUseNativeShare,
-	isAndroidTvStore,
 	playlistCacheStore,
 	rawMasterKeyStore,
 	searchCacheStore
@@ -26,7 +24,6 @@ import type {
 	VideoBase,
 	VideoWatchHistory
 } from './api/model';
-import { page } from '$app/state';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
@@ -66,44 +63,6 @@ export function decodeHtmlCharCodes(str: string): string {
 
 export function unsafeRandomItem(array: any[]): any {
 	return array[Math.floor(Math.random() * array.length)];
-}
-
-export function setWindowQueryFlag(key: string, value: string) {
-	page.url.searchParams.set(key, value);
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	pushState(page.url, page.state);
-}
-
-export function removeWindowQueryFlag(key: string) {
-	page.url.searchParams.delete(key);
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	pushState(page.url, page.state);
-}
-
-let PeerInstance: typeof Peer;
-export interface PeerInstance {
-	host: string;
-	path: string;
-	port: number;
-}
-
-export function determinePeerJsInstance(): PeerInstance {
-	return {
-		host: getPublicEnv('DEFAULT_PEERJS_HOST') || '0.peerjs.com',
-		path: getPublicEnv('DEFAULT_PEERJS_PATH') || '/',
-		port: getPublicEnv('DEFAULT_PEERJS_PORT') ? Number(getPublicEnv('DEFAULT_PEERJS_PORT')) : 443
-	};
-}
-
-export async function peerJs(
-	id: string,
-	instance: PeerInstance = determinePeerJsInstance()
-): Promise<Peer> {
-	// https://github.com/peers/peerjs/issues/819
-	if (typeof PeerInstance === 'undefined') {
-		PeerInstance = (await import('peerjs')).Peer;
-	}
-	return new PeerInstance(id, instance);
 }
 
 export async function shareURL(url: string) {

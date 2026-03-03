@@ -15,15 +15,12 @@
 		VideoBase,
 		VideoWatchHistory
 	} from '$lib/api/model';
-	import type { PlayerEvents } from '$lib/player';
 	import {
 		deArrowEnabledStore,
 		isAndroidTvStore,
 		playerSavePlaybackPositionStore,
 		playerState,
-		rawMasterKeyStore,
-		syncPartyConnectionsStore,
-		syncPartyPeerStore
+		rawMasterKeyStore
 	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
 	import { queueGetWatchHistory } from '$lib/api/backend/historyPool';
@@ -48,12 +45,6 @@
 	}
 
 	let beenWatched: boolean = $state(false);
-
-	syncPartyPeerStore.subscribe((peer) => {
-		if (peer) {
-			watchUrl.searchParams.set('sync', peer.id);
-		}
-	});
 
 	let progress: string | undefined = $state();
 	if (get(playerSavePlaybackPositionStore)) {
@@ -136,22 +127,6 @@
 
 	function onVideoSelected() {
 		playerState.set(undefined);
-
-		if ($syncPartyConnectionsStore) {
-			const events = {
-				events: [{ type: 'change-video', videoId: video.videoId }]
-			} as PlayerEvents;
-
-			if (playlistId) {
-				events.events.unshift({
-					type: 'playlist',
-					playlistId: playlistId
-				});
-			}
-			$syncPartyConnectionsStore.forEach((conn) => {
-				conn.send(events);
-			});
-		}
 	}
 </script>
 

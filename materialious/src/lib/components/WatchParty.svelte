@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, pushState } from '$app/navigation';
+	import { pushState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { _ } from '$lib/i18n';
 	import { playerState } from '$lib/store';

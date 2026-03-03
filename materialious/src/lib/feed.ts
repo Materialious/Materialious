@@ -14,7 +14,6 @@ export type FeedItem =
 	| Video
 	| PlaylistPageVideo
 	| Channel
-	| Video
 	| Playlist
 	| HashTag
 	| PlaylistPage

@@ -14,6 +14,7 @@
 	import { SpatialMenu } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 	import { Capacitor } from '@capacitor/core';
+	import { filterByBlocklist } from '$lib/filtering';
 
 	interface Props {
 		items?: FeedItems;
@@ -35,6 +36,8 @@
 	}
 
 	onMount(async () => {
+		items = filterByBlocklist(items);
+
 		if (!$feedLastItemId) return;
 
 		const element = document.getElementById($feedLastItemId);

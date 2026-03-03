@@ -22,6 +22,8 @@ import type {
 import type { ParsedDescription } from './description';
 import { ensureNoTrailingSlash, getPublicEnv } from './misc';
 import type { EngineFallback } from './api/misc';
+import type z from 'zod';
+import type { zBlockListSchema } from './filtering';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;
@@ -337,6 +339,12 @@ export const searchHistoryStore: Writable<string[]> = persist(
 	writable([]),
 	createStorage(),
 	'searchHistory'
+);
+
+export const blocklistStore: Writable<z.infer<typeof zBlockListSchema> | undefined> = persist(
+	writable(),
+	createStorage(),
+	'blocklist'
 );
 
 export const feedLoadingStore: Writable<boolean> = writable(false);

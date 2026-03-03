@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import type { FeedItem } from './feed';
 import isSafeRegex from 'safe-regex2';
+import { blocklistStore } from './store';
+import { get } from 'svelte/store';
 
 const zFilterOperatorEnum = z.enum([
 	'equals', // equal to
@@ -31,15 +33,23 @@ const zFilterGroup = z.object({
 	operator: z.enum(['AND', 'OR']).optional() // Logical grouping of conditions
 });
 
-const zBlockListSchema = z.array(zFilterGroup);
+export const zBlockListSchema = z.array(zFilterGroup);
 
-export function filterByBlocklist<T extends FeedItem>(
-	data: T[],
-	blocklist: z.infer<typeof zBlockListSchema>
-): T[] {
+const zBlocklistRootSchema = z.object({
+	version: z.literal('v1'),
+	for: z.literal('materialious'),
+	blocklist: zBlockListSchema
+});
+
+export function filterByBlocklist<T extends FeedItem>(data: T[]): T[] {
+	const blocklist = get(blocklistStore);
+	if (!blocklist) return data;
+
 	return data.filter((item) => {
 		return blocklist.every((filterGroup) => {
 			return filterGroup.conditions.every((condition) => {
+				if (!(condition.field in item)) return false;
+
 				const fieldValue = item[condition.field as keyof T];
 
 				switch (condition.operator) {
@@ -76,4 +86,24 @@ export function filterByBlocklist<T extends FeedItem>(
 			});
 		});
 	});
+}
+
+export async function loadBlockListFromRemote(url: string) {
+	const resp = await fetch(url, { method: 'GET', credentials: 'omit' });
+	if (!resp.ok) throw new Error('Response status code');
+
+	let respJson;
+	try {
+		respJson = await resp.json();
+	} catch {
+		// Handled outside of catch
+	}
+
+	if (!respJson) throw new Error('Invalid JSON');
+
+	const parsedBlocklist = zBlocklistRootSchema.safeParse(respJson);
+
+	if (!parsedBlocklist.success) throw new Error(parsedBlocklist.error.message);
+
+	blocklistStore.set(parsedBlocklist.data.blocklist);
 }

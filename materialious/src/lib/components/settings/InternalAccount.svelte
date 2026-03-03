@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import { materialiousLogout } from '$lib/misc';
+	import { materialiousLogout } from '$lib/auth';
 	import { watchHistoryEnabledStore } from '$lib/store';
 
 	let clickCount = $state(0);

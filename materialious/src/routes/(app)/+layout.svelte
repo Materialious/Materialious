@@ -28,13 +28,8 @@
 	import ui from 'beercss';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import {
-		goToInvidiousLogin,
-		invidiousLogout,
-		isYTBackend,
-		materialiousLogout,
-		truncate
-	} from '$lib/misc';
+	import { isYTBackend, truncate } from '$lib/misc';
+	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';

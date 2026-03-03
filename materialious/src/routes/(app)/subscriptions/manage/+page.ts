@@ -1,5 +1,5 @@
 import { getSubscriptions } from '$lib/api';
-import { authProtected } from '$lib/misc';
+import { authProtected } from '$lib/auth';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

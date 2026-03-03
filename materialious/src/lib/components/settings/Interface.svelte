@@ -9,15 +9,9 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import {
-		isUnrestrictedPlatform,
-		setInvidiousInstance,
-		goToInvidiousLogin,
-		invidiousLogout,
-		timeout,
-		shareURL
-	} from '../../misc';
-	import { getPages, type Pages } from '../../navPages';
+	import { isUnrestrictedPlatform, timeout, shareURL } from '$lib/misc';
+	import { getPages, type Pages } from '$lib/navPages';
+	import { setInvidiousInstance, goToInvidiousLogin, invidiousLogout } from '$lib/auth';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		invidiousAuthStore,

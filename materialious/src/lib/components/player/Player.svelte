@@ -247,6 +247,8 @@
 			if ($playerCCByDefault) {
 				toggleSubtitles(player);
 			}
+
+			if ($playerAutoPlayStore) playerElement?.play();
 		});
 
 		if (!data.video.liveNow) {
@@ -822,7 +824,6 @@
 
 	<video
 		controls={false}
-		autoplay={$playerAutoPlayStore}
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>

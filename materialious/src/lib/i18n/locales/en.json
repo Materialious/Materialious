@@ -89,7 +89,10 @@
 		"start": "Start a watch party",
 		"header": "Watch party",
 		"createRoom": "Create room",
-		"joinRoom": "Join room"
+		"joinRoom": "Join room",
+		"roomID": "Room ID",
+		"shareRoom": "Share room",
+		"leaveRoom": "Leave room"
 	},
 	"subscriptions": {
 		"manageSubscriptions": "Manage subscriptions"

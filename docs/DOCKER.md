@@ -277,14 +277,3 @@ http:
 
 ### Step 3:
 Modify/add `VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.
-
-## Step 5 (Optional): Self-host PeerJS
-[Read the official guide.](https://github.com/peers/peerjs-server?tab=readme-ov-file#docker)
-
-Add these additional environment variables to Materialious.
-```yaml
-# Will differ depending on how you self-host peerjs.
-VITE_DEFAULT_PEERJS_HOST: "peerjs.example.com"
-VITE_DEFAULT_PEERJS_PATH: "/"
-VITE_DEFAULT_PEERJS_PORT: 443
-```

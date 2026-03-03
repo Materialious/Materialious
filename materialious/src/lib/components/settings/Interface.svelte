@@ -9,15 +9,9 @@
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import {
-		isUnrestrictedPlatform,
-		setInvidiousInstance,
-		goToInvidiousLogin,
-		invidiousLogout,
-		timeout,
-		shareURL
-	} from '../../misc';
-	import { getPages, type Pages } from '../../navPages';
+	import { isUnrestrictedPlatform, timeout, shareURL } from '$lib/misc';
+	import { getPages, type Pages } from '$lib/navPages';
+	import { setInvidiousInstance, goToInvidiousLogin, invidiousLogout } from '$lib/auth';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		invidiousAuthStore,
@@ -33,7 +27,6 @@
 		interfaceDefaultPage,
 		interfaceDisableAutoUpdate,
 		interfaceForceCase,
-		interfaceLowBandwidthMode,
 		interfaceRegionStore,
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
@@ -167,7 +160,7 @@
 						>
 					{/if}
 				</div>
-				<button>
+				<button class="circle">
 					<i>done</i>
 				</button>
 			</nav>
@@ -234,6 +227,7 @@
 			onInput={setColor}
 			position="responsive"
 			isAlpha={false}
+			hex={get(themeColorStore)}
 			sliderDirection="horizontal"
 		/>
 	</div>
@@ -273,23 +267,6 @@
 					interfaceSearchHistoryEnabled.set(!$interfaceSearchHistoryEnabled);
 					searchHistoryStore.set([]);
 				}}
-				role="switch"
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.lowBandwidthMode')}</div>
-		</div>
-		<label class="switch" tabindex="0">
-			<input
-				type="checkbox"
-				bind:checked={$interfaceLowBandwidthMode}
-				onclick={() => interfaceLowBandwidthMode.set(!$interfaceLowBandwidthMode)}
 				role="switch"
 			/>
 			<span></span>

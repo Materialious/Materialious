@@ -22,15 +22,12 @@
 		playerTheatreModeByDefaultStore,
 		playertheatreModeIsActive,
 		playlistCacheStore,
-		syncPartyConnectionsStore,
 		type PlayerState
 	} from '$lib/store';
 	import ui from 'beercss';
-	import type { DataConnection } from 'peerjs';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { loadEntirePlaylist } from '$lib/playlist';
 	import Author from '$lib/components/Author.svelte';
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
@@ -41,7 +38,6 @@
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
-	import type { PlayerEvents } from '$lib/player/index';
 
 	let { data = $bindable() } = $props();
 
@@ -81,137 +77,6 @@
 		}
 	});
 
-	function playerSyncEvents(conn: DataConnection) {
-		if (playerElement) {
-			conn.send({
-				events: [{ type: 'seek', time: playerElement.currentTime }]
-			} as PlayerEvents);
-		}
-
-		if (data.playlistId) {
-			conn.send({
-				events: [
-					{
-						type: 'playlist',
-						playlistId: data.playlistId
-					}
-				]
-			} as PlayerEvents);
-		}
-
-		conn.on('data', (rawData) => {
-			const events = rawData as PlayerEvents;
-
-			events.events.forEach(async (event) => {
-				if (!playerElement) return;
-
-				if (event.type === 'pause') {
-					playerElement.pause();
-				} else if (event.type === 'play') {
-					playerElement.play();
-				} else if (event.type === 'seek' && event.time) {
-					const timeDiff = playerElement.currentTime - event.time;
-
-					if (timeDiff > 5 || timeDiff < -5) {
-						playerElement.currentTime = event.time;
-					}
-				} else if (
-					event.type === 'playlist' &&
-					event.playlistId &&
-					event.playlistId !== data.playlistId
-				) {
-					data.playlistId = event.playlistId;
-					await loadEntirePlaylist(event.playlistId);
-					goToCurrentPlaylistItem();
-				}
-			});
-		});
-
-		if (!playerElement) return;
-
-		playerElement.addEventListener('error', () => {
-			if (!playerElement) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: playerElement.currentTime
-					},
-					{
-						type: 'play'
-					}
-				]
-			} as PlayerEvents);
-		});
-
-		playerElement.addEventListener('pause', () => {
-			conn.send({
-				events: [
-					{
-						type: 'pause'
-					}
-				]
-			} as PlayerEvents);
-		});
-
-		playerElement.addEventListener('playing', () => {
-			if (!playerElement) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: playerElement.currentTime
-					},
-					{
-						type: 'play'
-					}
-				]
-			} as PlayerEvents);
-		});
-
-		playerElement.addEventListener('play', () => {
-			if (!playerElement) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: playerElement.currentTime
-					},
-					{
-						type: 'play'
-					}
-				]
-			} as PlayerEvents);
-		});
-
-		playerElement.addEventListener('waiting', () => {
-			conn.send({
-				events: [
-					{
-						type: 'pause'
-					}
-				]
-			} as PlayerEvents);
-		});
-
-		playerElement.addEventListener('seeked', () => {
-			if (!playerElement) return;
-			conn.send({
-				events: [
-					{
-						type: 'seek',
-						time: playerElement.currentTime
-					}
-				]
-			} as PlayerEvents);
-		});
-	}
-
-	syncPartyConnectionsStore.subscribe((connections) => {
-		if (!connections || !playerElement) return;
-		playerSyncEvents(connections[connections.length - 1]);
-	});
-
 	async function load(state: PlayerState) {
 		playerElement = state.playerElement;
 
@@ -222,12 +87,6 @@
 
 		if ($interfaceAutoExpandChapters) {
 			expandSummery('chapter-section');
-		}
-
-		if ($syncPartyConnectionsStore) {
-			$syncPartyConnectionsStore.forEach((conn) => {
-				playerSyncEvents(conn);
-			});
 		}
 
 		if (playerElement) {

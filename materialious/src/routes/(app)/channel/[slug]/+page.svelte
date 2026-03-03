@@ -4,7 +4,7 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
-	import { channelCacheStore, interfaceLowBandwidthMode, isAndroidTvStore } from '$lib/store';
+	import { channelCacheStore, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
@@ -14,6 +14,7 @@
 	import { isYTBackend } from '$lib/misc';
 	import Share from '$lib/components/Share.svelte';
 	import { resolve } from '$app/paths';
+	import { Avatar } from 'melt/builders';
 
 	let tab: ChannelContentTypes = $state('videos');
 
@@ -36,7 +37,7 @@
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
 
-		let completed = false;
+		let completed: boolean;
 		let newContent: ChannelContent;
 		if (displayContent.getContinuation) {
 			newContent = await displayContent.getContinuation();
@@ -83,17 +84,14 @@
 		displayContent = undefined;
 		displayContent = await getChannelContent(page.params.slug, { type: tab });
 	}
+
+	const banner = new Avatar({
+		src: proxyGoogleImage($channelCacheStore[page.params.slug].channel.authorBanners[0].url)
+	});
 </script>
 
 <div class="padding">
-	{#if $channelCacheStore[page.params.slug].channel.authorBanners.length > 0 && !$interfaceLowBandwidthMode}
-		<img
-			loading="lazy"
-			src={proxyGoogleImage($channelCacheStore[page.params.slug].channel.authorBanners[0].url)}
-			width="100%"
-			alt="Channel banner"
-		/>
-	{/if}
+	<img {...banner.image} width="100%" alt="Channel banner" />
 	<div class="description">
 		<div>
 			<Author

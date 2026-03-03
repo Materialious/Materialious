@@ -40,7 +40,6 @@
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
-		playerDoubleTapSeek,
 		restoreDefaultLanguage,
 		restoreQualityPreference,
 		toggleSubtitles
@@ -248,6 +247,8 @@
 			if ($playerCCByDefault) {
 				toggleSubtitles(player);
 			}
+
+			if ($playerAutoPlayStore) playerElement?.play();
 		});
 
 		if (!data.video.liveNow) {
@@ -436,9 +437,8 @@
 				}
 			}
 		});
-		playerElement = document.getElementById('player') as HTMLMediaElement;
 
-		playerElement.loop = $playerAlwaysLoopStore;
+		if (playerElement) playerElement.loop = $playerAlwaysLoopStore;
 
 		if ($playerState) {
 			playerState.set({ ...$playerState, playerElement: playerElement });
@@ -452,7 +452,7 @@
 		window.addEventListener('resize', updateVideoPlayerHeight);
 		updateVideoPlayerHeight();
 
-		await player.attach(playerElement);
+		if (playerElement) await player.attach(playerElement);
 
 		player?.addEventListener('error', (event) => {
 			const error = (event as CustomEvent).detail as shaka.util.Error;
@@ -602,20 +602,6 @@
 		});
 
 		if (!$isAndroidTvStore) {
-			Mousetrap.bind('right', () => {
-				if (!playerElement) return;
-				playerElement.currentTime = playerElement.currentTime + playerDoubleTapSeek;
-				showPlayerUI();
-				return false;
-			});
-
-			Mousetrap.bind('left', () => {
-				if (!playerElement) return;
-				playerElement.currentTime = playerElement.currentTime - playerDoubleTapSeek;
-				showPlayerUI();
-				return false;
-			});
-
 			Mousetrap.bind('enter', () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
@@ -805,7 +791,7 @@
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
-		Mousetrap.unbind(['left', 'right', 'space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
+		Mousetrap.unbind(['space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
 		if (sabrAdapter) sabrAdapter.dispose();
@@ -838,12 +824,14 @@
 
 	<video
 		controls={false}
-		autoplay={$playerAutoPlayStore}
-		id="player"
+		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
 	{#if isEmbed && !$isAndroidTvStore}
-		<div class="chip blur embed" style="position: absolute;top: 10px;left: 10px;font-size: 18px;">
+		<div
+			class="chip surface-container-highest"
+			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
+		>
 			{data.video.title}
 		</div>
 	{/if}

@@ -1,6 +1,4 @@
 import { Capacitor } from '@capacitor/core';
-import type Peer from 'peerjs';
-import type { DataConnection } from 'peerjs';
 import { writable, type Writable } from 'svelte/store';
 import { Preferences } from '@capacitor/preferences';
 import {
@@ -234,11 +232,6 @@ export const interfaceAutoExpandChapters: Writable<boolean> = persist(
 	'autoExpandChapters'
 );
 export const interfaceAmoledTheme = persist(writable(false), createStorage(), 'amoledTheme');
-export const interfaceLowBandwidthMode = persist(
-	writable(false),
-	createStorage(),
-	'lowBandwidthMode'
-);
 export const interfaceDisplayThumbnailAvatars = persist(
 	writable(false),
 	createStorage(),
@@ -334,9 +327,6 @@ export const watchHistoryEnabledStore: Writable<boolean> = persist(
 	createStorage(),
 	'watchHistoryEnabled'
 );
-
-export const syncPartyPeerStore: Writable<Peer | null> = writable(null);
-export const syncPartyConnectionsStore: Writable<DataConnection[] | null> = writable();
 
 export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean }>> =
 	writable({});

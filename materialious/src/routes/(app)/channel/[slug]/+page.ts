@@ -1,6 +1,6 @@
 import { getChannel, getChannelContent } from '$lib/api/index';
 import type { ChannelContentVideos, Video } from '$lib/api/model';
-import { excludeDuplicateFeeds } from '$lib/misc';
+import { excludeDuplicateFeeds } from '$lib/feed';
 import { channelCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';

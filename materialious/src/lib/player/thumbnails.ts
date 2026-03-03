@@ -115,8 +115,8 @@ export async function drawTimelineThumbnail(
 	imageCache: ImageCache,
 	thumbnails: TimelineThumbnail[],
 	currentTime: number
-): Promise<void> {
-	if (!thumbnails.length) return;
+): Promise<boolean> {
+	if (!thumbnails.length) return false;
 
 	const thumbnail = findElementForTime(
 		thumbnails,
@@ -125,11 +125,11 @@ export async function drawTimelineThumbnail(
 		(thumbnail: TimelineThumbnail) => thumbnail.endTime
 	);
 
-	if (!thumbnail) return;
+	if (!thumbnail) return false;
 
 	const img = await imageCache.load(thumbnail.url);
 	if (!img) {
-		return;
+		return false;
 	}
 
 	const thumbWidth = thumbnail.width;
@@ -147,4 +147,6 @@ export async function drawTimelineThumbnail(
 		thumbWidth,
 		thumbHeight
 	);
+
+	return true;
 }

@@ -2,3 +2,7 @@
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
+android/
+electron/
+node_modules/
+.svelte-kit/

@@ -7,8 +7,7 @@ import {
 	playerDefaultQualityStore,
 	playerPlaylistHistory,
 	playerState,
-	playlistSettingsStore,
-	syncPartyConnectionsStore
+	playlistSettingsStore
 } from '$lib/store';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
@@ -16,18 +15,6 @@ import { loadEntirePlaylist } from '$lib/playlist';
 import { unsafeRandomItem } from '$lib/misc';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';
-
-export interface PlayerEvent {
-	type: 'pause' | 'seek' | 'change-video' | 'play' | 'playlist' | 'goto';
-	path?: string;
-	time?: number;
-	videoId?: string;
-	playlistId?: string;
-}
-
-export interface PlayerEvents {
-	events: PlayerEvent[];
-}
 
 export const playbackRates = [
 	0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4
@@ -92,17 +79,6 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 	}
 
 	if (typeof goToVideo !== 'undefined') {
-		get(syncPartyConnectionsStore)?.forEach((conn) => {
-			if (typeof goToVideo === 'undefined') return;
-
-			conn.send({
-				events: [
-					{ type: 'change-video', videoId: goToVideo.videoId },
-					{ type: 'playlist', playlistId: playlistId }
-				]
-			} as PlayerEvents);
-		});
-
 		goto(
 			resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]?playlist=${playlistId}`, {
 				videoId: goToVideo.videoId

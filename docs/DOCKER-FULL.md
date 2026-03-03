@@ -23,6 +23,10 @@ invidious_companion:
 ### Proof-of-work Captcha
 Will only work while using HTTPS. If in HTTP set `PUBLIC_CAPTCHA_DISABLED` to `true`
 
+### Request to Invidious/RYD/DeArrow fails at proxy level.
+Ensure the environmental variable for the relavent service is set or whitelist addtional domains using `WHITELIST_BASE_DOMAIN`, what should be comma separated and be the base domain
+e.g. `"youtube.com,google.com"` NOT `"https://youtube.com,https://videos.google.com"`
+
 ### Docker Compose
 
 ```yaml
@@ -34,11 +38,11 @@ services:
       - 3000:3000
     environment:
       # Secure secret for signing cookies
-      # Not required if VITE_INTERNAL_AUTH is false
+      # Not required if PUBLIC_INTERNAL_AUTH is false
       COOKIE_SECRET: ""
 
       # Database connectiong URI
-      # Not required if VITE_INTERNAL_AUTH is false
+      # Not required if PUBLIC_INTERNAL_AUTH is false
       # postgresql, mysql2, mariadb & sqlite supported
       # guide here for URL structure https://docs.preset.io/docs/uri-connection-strings
       DATABASE_CONNECTION_URI: "sqlite:///materialious-data/materialious.db"
@@ -63,9 +67,9 @@ services:
 
       # Allow any domain in proxy
       # This shouldn't be used unless you KNOW what your doing
-      # requires VITE_REGISTRATION_ALLOWED to be false
-      # VITE_REQUIRE_AUTH to be true
-      # VITE_INTERNAL_AUTH to be true
+      # requires PUBLIC_REGISTRATION_ALLOWED to be false
+      # PUBLIC_REQUIRE_AUTH to be true
+      # PUBLIC_INTERNAL_AUTH to be true
       # to take effect.
       PUBLIC_DANGEROUS_ALLOW_ANY_PROXY: "false"
 
@@ -103,7 +107,7 @@ volumes:
 ```
 
 ### Overwriting Materialious defaults
-Materialious lets you customize the default settings by overriding them with `VITE_DEFAULT_SETTINGS`. To configure this easily, go to **Settings** → **Interface** and click "Export to JSON." For more details, check the [SETTINGS](./SETTINGS.md) page.
+Materialious lets you customize the default settings by overriding them with `PUBLIC_DEFAULT_SETTINGS`. To configure this easily, go to **Settings** → **Interface** and click "Export to JSON." For more details, check the [SETTINGS](./SETTINGS.md) page.
 
 **Please note:** These overwrites only apply on 1st load & won't replace existing configuration stored in browser local storage.
 
@@ -135,4 +139,4 @@ ryd-proxy:
     - 3003:3000
 ```
 
-Modify/add `VITE_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.
+Modify/add `PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.

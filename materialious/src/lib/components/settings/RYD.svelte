@@ -20,7 +20,7 @@
 			<input tabindex="0" bind:value={returnYTInstance} name="returnyt-instance" type="text" />
 			<label tabindex="-1" for="returnyt-instance">{$_('layout.instanceUrl')}</label>
 		</div>
-		<button>
+		<button class="circle">
 			<i>done</i>
 		</button>
 	</nav>

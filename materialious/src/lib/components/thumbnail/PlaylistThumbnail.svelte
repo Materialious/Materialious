@@ -2,12 +2,11 @@
 	import { getBestThumbnail } from '$lib/images';
 	import { resolve } from '$app/paths';
 	import { letterCase } from '$lib/letterCasing';
-	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import { get } from 'svelte/store';
 	import type { Playlist, PlaylistPage } from '$lib/api/model';
-	import { insecureRequestImageHandler, truncate } from '$lib/misc';
-	import { interfaceLowBandwidthMode } from '$lib/store';
+	import { truncate } from '$lib/misc';
+	import { Avatar } from 'melt/builders';
+	import { mergeAttrs } from 'melt';
 
 	interface Props {
 		playlist: Playlist | PlaylistPage;
@@ -16,25 +15,16 @@
 
 	let { playlist, disabled = false }: Props = $props();
 
-	let img: HTMLImageElement | undefined = $state();
-
 	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
 
-	onMount(async () => {
-		if (get(interfaceLowBandwidthMode)) return;
+	let thumbnailSrc = '';
+	if (playlist.videos && playlist.videos.length > 0) {
+		thumbnailSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
+	} else if (playlist.playlistThumbnail) {
+		thumbnailSrc = playlist.playlistThumbnail;
+	}
 
-		let imgSrc;
-		if (playlist.videos && playlist.videos.length > 0) {
-			imgSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
-		} else if (playlist.playlistThumbnail) {
-			imgSrc = playlist.playlistThumbnail;
-		} else {
-			imgSrc = '';
-			return;
-		}
-
-		img = await insecureRequestImageHandler(imgSrc);
-	});
+	const thumbnail = new Avatar({ src: thumbnailSrc });
 </script>
 
 <a
@@ -43,17 +33,15 @@
 	style="width: 100%; overflow: hidden;min-height:100px;"
 	class="wave"
 >
-	{#if !$interfaceLowBandwidthMode && img}
-		<img
-			loading="lazy"
-			class="responsive"
-			style="max-width: 100%;height: 100%;"
-			src={img.src}
-			alt="Thumbnail for playlist"
-		/>
-	{:else}
-		<h6 style="margin: 3em 0;">No image</h6>
-	{/if}
+	<img
+		class="responsive"
+		{...mergeAttrs(thumbnail.image, {
+			style: 'max-width: 100%;height: 100%;'
+		})}
+		alt="Thumbnail for playlist"
+	/>
+	<div {...thumbnail.fallback} class="secondary-container responsive" style="height: 200px;"></div>
+
 	<div class="absolute right bottom small-margin black white-text small-text thumbnail-corner">
 		{playlist.videoCount}
 		{$_('videos')}

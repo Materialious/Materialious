@@ -29,7 +29,6 @@
 - Android TV support.
 - Support for disabling certificate validation for homelab users.
 - Sync your watch progress between Invidious sessions.
-- Watch sync parties.
 - Sponsorblock built-in.
 - [Return YouTube Dislike](https://github.com/Anarios/return-youtube-dislike) (RYD) built-in.
 - [DeArrow](https://github.com/ajayyy/DeArrow) built-in.

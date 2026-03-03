@@ -11,6 +11,10 @@
 	import { App } from '@capacitor/app';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import '$lib/css/global.css';
+	import 'beercss';
+	import 'material-dynamic-colors';
+
 	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
 
 	import { pwaInfo } from 'virtual:pwa-info';
@@ -133,8 +137,13 @@
 
 	{#if $isAndroidTvStore}
 		<style>
-			:focus {
-				outline: 4px solid var(--primary);
+			not(.item-select):focus {
+				outline: 2px solid var(--primary);
+				box-shadow: none !important;
+			}
+
+			.item-select:focus {
+				outline: none !important;
 				box-shadow: none !important;
 			}
 		</style>

@@ -58,7 +58,7 @@
 			/>
 			<label tabindex="-1" for="sponsorblock-instance">{$_('layout.instanceUrl')}</label>
 		</div>
-		<button>
+		<button class="circle">
 			<i>done</i>
 		</button>
 	</nav>

@@ -1,39 +1,11 @@
-import { goto, pushState } from '$app/navigation';
-import { resolve } from '$app/paths';
 import he from 'he';
-import type Peer from 'peerjs';
 import { get } from 'svelte/store';
 import { env } from '$env/dynamic/public';
-import {
-	invidiousAuthStore,
-	backendInUseStore,
-	channelCacheStore,
-	feedCacheStore,
-	invidiousInstanceStore,
-	interfaceAllowInsecureRequests,
-	interfaceAndroidUseNativeShare,
-	isAndroidTvStore,
-	playlistCacheStore,
-	rawMasterKeyStore,
-	searchCacheStore
-} from './store';
-import type {
-	Channel,
-	HashTag,
-	Playlist,
-	PlaylistPage,
-	PlaylistPageVideo,
-	Video,
-	VideoBase,
-	VideoWatchHistory
-} from './api/model';
-import { page } from '$app/state';
+import { backendInUseStore, interfaceAndroidUseNativeShare } from './store';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
 import { isOwnBackend } from './shared';
-import { Browser } from '@capacitor/browser';
-import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 import { addToast } from './components/Toast.svelte';
 import { _ } from './i18n';
 
@@ -69,44 +41,6 @@ export function unsafeRandomItem(array: any[]): any {
 	return array[Math.floor(Math.random() * array.length)];
 }
 
-export function setWindowQueryFlag(key: string, value: string) {
-	page.url.searchParams.set(key, value);
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	pushState(page.url, page.state);
-}
-
-export function removeWindowQueryFlag(key: string) {
-	page.url.searchParams.delete(key);
-	// eslint-disable-next-line svelte/no-navigation-without-resolve
-	pushState(page.url, page.state);
-}
-
-let PeerInstance: typeof Peer;
-export interface PeerInstance {
-	host: string;
-	path: string;
-	port: number;
-}
-
-export function determinePeerJsInstance(): PeerInstance {
-	return {
-		host: getPublicEnv('DEFAULT_PEERJS_HOST') || '0.peerjs.com',
-		path: getPublicEnv('DEFAULT_PEERJS_PATH') || '/',
-		port: getPublicEnv('DEFAULT_PEERJS_PORT') ? Number(getPublicEnv('DEFAULT_PEERJS_PORT')) : 443
-	};
-}
-
-export async function peerJs(
-	id: string,
-	instance: PeerInstance = determinePeerJsInstance()
-): Promise<Peer> {
-	// https://github.com/peers/peerjs/issues/819
-	if (typeof PeerInstance === 'undefined') {
-		PeerInstance = (await import('peerjs')).Peer;
-	}
-	return new PeerInstance(id, instance);
-}
-
 export async function shareURL(url: string) {
 	if (
 		Capacitor.getPlatform() === 'android' &&
@@ -131,82 +65,11 @@ export function ensureNoTrailingSlash(url: any): string {
 	return url.endsWith('/') ? url.slice(0, -1) : url;
 }
 
-export async function insecureRequestImageHandler(source: string): Promise<HTMLImageElement> {
-	const img = new Image();
-	if (get(interfaceAllowInsecureRequests)) {
-		const imgResp = await fetch(source);
-		if (!imgResp.ok) {
-			img.src = '';
-			return img;
-		}
-
-		img.src = URL.createObjectURL(await imgResp.blob());
-	} else {
-		img.src = source;
-	}
-
-	return img;
-}
-
-export type feedItem =
-	| VideoBase
-	| Video
-	| PlaylistPageVideo
-	| Channel
-	| Video
-	| Playlist
-	| HashTag
-	| PlaylistPage
-	| VideoWatchHistory;
-export type feedItems = feedItem[];
-
-export function extractUniqueId(item: feedItem): string {
-	if ('videoId' in item) {
-		return item.videoId;
-	} else if ('playlistId' in item) {
-		return item.playlistId;
-	} else if ('authorId' in item) {
-		return item.authorId;
-	} else {
-		return item.title;
-	}
-}
-
-export function excludeDuplicateFeeds(currentItems: feedItems, newItems: feedItems): feedItems {
-	const existingIds: string[] = [];
-
-	currentItems.forEach((item) => {
-		existingIds.push(extractUniqueId(item));
-	});
-
-	const nonDuplicatedNewItems: feedItems = [];
-	newItems.forEach((item) => {
-		if (!existingIds.includes(extractUniqueId(item))) {
-			nonDuplicatedNewItems.push(item);
-		}
-	});
-
-	return [...nonDuplicatedNewItems, ...currentItems];
-}
-
 export function expandSummery(id: string) {
 	const element = document.getElementById(id);
 	if (element) {
 		element.click();
 	}
-}
-
-export function createVideoUrl(videoId: string, playlistId: string): URL {
-	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
-		videoId: videoId
-	});
-	const watchUrl = new URL(`${location.origin}${watchPath}`);
-
-	if (playlistId !== '') {
-		watchUrl.searchParams.set('playlist', playlistId);
-	}
-
-	return watchUrl;
 }
 
 export function timeout(ms: number) {
@@ -252,90 +115,4 @@ export function isUnrestrictedPlatform(): boolean {
 
 export function isYTBackend(): boolean {
 	return get(backendInUseStore) === 'yt' && isUnrestrictedPlatform();
-}
-
-export function clearCaches() {
-	feedCacheStore.set({});
-	searchCacheStore.set({});
-	playlistCacheStore.set({});
-	channelCacheStore.set({});
-}
-
-export function authProtected() {
-	if (!get(invidiousAuthStore) && !isYTBackend()) {
-		goto(resolve('/', {}), { replaceState: true });
-	}
-}
-
-export async function setInvidiousInstance(
-	instanceUrl: string | undefined | null
-): Promise<boolean> {
-	if (typeof instanceUrl !== 'string') {
-		return false;
-	}
-
-	let invalidInstance = false;
-
-	const instance = ensureNoTrailingSlash(instanceUrl);
-
-	try {
-		new URL(instance);
-	} catch {
-		invalidInstance = true;
-	}
-
-	if (invalidInstance) return false;
-
-	let resp;
-	try {
-		resp = await fetch(`${instance}/api/v1/channels/UCH-_hzb2ILSCo9ftVSnrCIQ`);
-	} catch {
-		invalidInstance = true;
-	}
-
-	if (invalidInstance) return false;
-
-	if (resp && !resp.ok) {
-		return false;
-	}
-
-	invidiousInstanceStore.set(instance);
-	invidiousAuthStore.set(null);
-
-	return true;
-}
-
-export async function goToInvidiousLogin() {
-	if (!get(invidiousInstanceStore)) return;
-	const path = new URL(`${get(invidiousInstanceStore)}/authorize_token`);
-	const searchParams = new URLSearchParams({
-		scopes: ':feed,:subscriptions*,:playlists*,:history*,:notifications*'
-	});
-	if (Capacitor.getPlatform() === 'android') {
-		searchParams.set('callback_url', 'materialious-auth://');
-		path.search = searchParams.toString();
-		await Browser.open({ url: path.toString() });
-	} else {
-		searchParams.set('callback_url', `${location.origin}${resolve('/invidious/auth', {})}`);
-		path.search = searchParams.toString();
-		document.location.href = path.toString();
-	}
-}
-
-export async function invidiousLogout() {
-	invidiousAuthStore.set(null);
-	goto(resolve('/', {}));
-}
-
-export async function materialiousLogout() {
-	if (isYTBackend()) {
-		await clearFeedYTjs();
-	}
-
-	if (isOwnBackend()?.internalAuth) {
-		fetch('/api/user/logout', { method: 'DELETE' });
-		rawMasterKeyStore.set(undefined);
-	}
-
-	goto(resolve('/', {}));
 }

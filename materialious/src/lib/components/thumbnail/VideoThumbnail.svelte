@@ -7,6 +7,7 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { getDeArrow, getThumbnail } from '$lib/api';
+	import { Avatar } from 'melt/builders';
 	import type {
 		Notification,
 		PlaylistPageVideo,
@@ -14,17 +15,12 @@
 		VideoBase,
 		VideoWatchHistory
 	} from '$lib/api/model';
-	import { createVideoUrl, insecureRequestImageHandler } from '$lib/misc';
-	import type { PlayerEvents } from '$lib/player';
 	import {
 		deArrowEnabledStore,
-		interfaceLowBandwidthMode,
 		isAndroidTvStore,
 		playerSavePlaybackPositionStore,
 		playerState,
-		rawMasterKeyStore,
-		syncPartyConnectionsStore,
-		syncPartyPeerStore
+		rawMasterKeyStore
 	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
 	import { queueGetWatchHistory } from '$lib/api/backend/historyPool';
@@ -39,19 +35,16 @@
 
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
 
-	let placeholderHeight: number = $state(0);
+	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
+		videoId: video.videoId
+	});
+	const watchUrl = new URL(`${location.origin}${watchPath}`);
 
-	let watchUrl = createVideoUrl(video.videoId, playlistId);
+	if (playlistId !== '') {
+		watchUrl.searchParams.set('playlist', playlistId);
+	}
 
 	let beenWatched: boolean = $state(false);
-
-	syncPartyPeerStore.subscribe((peer) => {
-		if (peer) {
-			watchUrl.searchParams.set('sync', peer.id);
-		}
-	});
-
-	let thumbnail: HTMLImageElement | undefined = $state();
 
 	let progress: string | undefined = $state();
 	if (get(playerSavePlaybackPositionStore)) {
@@ -63,6 +56,39 @@
 	} else {
 		progress = undefined;
 	}
+
+	let thumbnailSrc = $state(
+		'thumbnail' in video ? video.thumbnail : (getBestThumbnail(video.videoThumbnails) as string)
+	);
+
+	if (get(deArrowEnabledStore)) {
+		try {
+			getDeArrow(video.videoId, { priority: 'low' }).then(async (deArrow) => {
+				for (const title of deArrow.titles) {
+					if (title.locked || title.votes > 0) {
+						video.title = title.title.replace('>', '');
+						break;
+					}
+				}
+
+				for (const thumbnail of deArrow.thumbnails) {
+					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
+						if (thumbnail.timestamp !== null) {
+							thumbnailSrc = await getThumbnail(video.videoId, thumbnail.timestamp, {
+								priority: 'low'
+							});
+						}
+						break;
+					}
+				}
+			});
+		} catch {
+			// Continue regardless of error
+		}
+	}
+
+	const thumbnail = new Avatar({ src: () => thumbnailSrc });
+	let thumbnailHTMLElement: HTMLImageElement | undefined = $state();
 
 	let startedSideways = sideways === true;
 	function disableSideways() {
@@ -78,16 +104,8 @@
 	}
 
 	onMount(async () => {
-		calcThumbnailPlaceholderHeight();
-
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
-
-		addEventListener('resize', () => {
-			disableSideways();
-			calcThumbnailPlaceholderHeight();
-		});
-
 		checkIfWatched();
 
 		if (
@@ -101,39 +119,6 @@
 					checkIfWatched();
 				}
 			});
-
-		if (get(interfaceLowBandwidthMode)) return;
-
-		let imageSrc =
-			'thumbnail' in video ? video.thumbnail : (getBestThumbnail(video.videoThumbnails) as string);
-
-		if (get(deArrowEnabledStore)) {
-			try {
-				const deArrow = await getDeArrow(video.videoId);
-				for (const title of deArrow.titles) {
-					if (title.locked || title.votes > 0) {
-						video.title = title.title.replace('>', '');
-						break;
-					}
-				}
-
-				for (const thumbnail of deArrow.thumbnails) {
-					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
-						if (thumbnail.timestamp !== null) {
-							imageSrc = await getThumbnail(video.videoId, thumbnail.timestamp);
-						}
-						break;
-					}
-				}
-			} catch {
-				// Continue regardless of error
-			}
-		}
-
-		const img = await insecureRequestImageHandler(imageSrc);
-		img.onload = () => {
-			thumbnail = img;
-		};
 	});
 
 	onDestroy(() => {
@@ -142,42 +127,6 @@
 
 	function onVideoSelected() {
 		playerState.set(undefined);
-
-		if ($syncPartyConnectionsStore) {
-			const events = {
-				events: [{ type: 'change-video', videoId: video.videoId }]
-			} as PlayerEvents;
-
-			if (playlistId) {
-				events.events.unshift({
-					type: 'playlist',
-					playlistId: playlistId
-				});
-			}
-			$syncPartyConnectionsStore.forEach((conn) => {
-				conn.send(events);
-			});
-		}
-	}
-
-	function calcThumbnailPlaceholderHeight() {
-		if ($isAndroidTvStore) {
-			placeholderHeight = 100;
-			return;
-		}
-		if (!sideways) {
-			if (innerWidth < 1000) {
-				if (innerWidth < 600) {
-					placeholderHeight = innerWidth / 2;
-				} else {
-					placeholderHeight = innerWidth / 4;
-				}
-			} else {
-				placeholderHeight = innerWidth / 12;
-			}
-		} else {
-			placeholderHeight = 100;
-		}
 	}
 </script>
 
@@ -191,32 +140,28 @@
 			data-sveltekit-preload-data="off"
 			onclick={onVideoSelected}
 		>
-			{#if !$interfaceLowBandwidthMode}
-				<div class="thumbnail-image">
-					{#if !thumbnail}
-						<div
-							class="secondary-container"
-							style="width: 100%;height: {placeholderHeight}px;"
-						></div>
-					{:else}
-						<div class:crop={thumbnail.height > 300}>
-							<img
-								class="responsive"
-								class:watched={beenWatched}
-								loading="lazy"
-								src={thumbnail.src}
-								alt="Thumbnail for video"
-							/>
-						</div>
-					{/if}
-
-					{#if beenWatched}
-						<div class="chip surface-container-highest">
-							<i>check</i>
-						</div>
-					{/if}
+			<div class="thumbnail-image">
+				<div class:crop={thumbnailHTMLElement ? thumbnailHTMLElement.height > 300 : false}>
+					<img
+						class="responsive"
+						class:watched={beenWatched}
+						{...thumbnail.image}
+						bind:this={thumbnailHTMLElement}
+						alt="Thumbnail for video"
+					/>
 				</div>
-			{/if}
+				<div
+					{...thumbnail.fallback}
+					class="secondary-container responsive"
+					style="height: 200px;"
+				></div>
+
+				{#if beenWatched}
+					<div class="chip surface-container-highest">
+						<i>check</i>
+					</div>
+				{/if}
+			</div>
 			{#if progress}
 				<progress
 					class="absolute right bottom"
@@ -227,15 +172,11 @@
 			{/if}
 			{#if !('liveVideo' in video) || !video.liveVideo}
 				{#if video.lengthSeconds !== 0}
-					{#if !$interfaceLowBandwidthMode}
-						<div
-							class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
-						>
-							&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
-						</div>
-					{:else}
-						<h3>{videoLength(video.lengthSeconds)}</h3>
-					{/if}
+					<div
+						class="absolute right bottom small-margin black white-text small-text thumbnail-corner"
+					>
+						&nbsp;{videoLength(video.lengthSeconds)}&nbsp;
+					</div>
 				{/if}
 			{:else if video.lengthSeconds !== 0}
 				<div class="absolute right bottom small-margin red white-text small-text thumbnail-corner">

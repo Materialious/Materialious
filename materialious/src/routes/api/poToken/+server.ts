@@ -31,8 +31,7 @@ export async function POST({ request, locals }) {
 		'<!DOCTYPE html><html lang="en"><head><title>YouTube</title></head><body></body></html>',
 		{
 			url: youtubeUrl,
-			referrer: youtubeUrl,
-			userAgent: USER_AGENT
+			referrer: youtubeUrl
 		}
 	);
 

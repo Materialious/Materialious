@@ -1,6 +1,6 @@
 import { getSearch } from '$lib/api/index';
 import type { Channel, HashTag, Playlist, Video } from '$lib/api/model';
-import { excludeDuplicateFeeds } from '$lib/misc';
+import { excludeDuplicateFeeds } from '$lib/feed';
 import { searchCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';

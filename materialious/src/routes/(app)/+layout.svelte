@@ -9,10 +9,8 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import Search from '$lib/components/Search.svelte';
 	import Settings from '$lib/components/settings/Settings.svelte';
-	import SyncParty from '$lib/components/SyncParty.svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import Player from '$lib/components/player/Player.svelte';
-	import '$lib/css/global.css';
 	import { getPages } from '$lib/navPages';
 	import {
 		invidiousAuthStore,
@@ -22,24 +20,16 @@
 		playerState,
 		playertheatreModeIsActive,
 		rawMasterKeyStore,
-		syncPartyPeerStore,
 		themeColorStore,
 		backendInUseStore,
 		hideSearchStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
-	import 'beercss';
 	import ui from 'beercss';
-	import 'material-dynamic-colors';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
-	import {
-		goToInvidiousLogin,
-		invidiousLogout,
-		isYTBackend,
-		materialiousLogout,
-		truncate
-	} from '$lib/misc';
+	import { isYTBackend, truncate } from '$lib/misc';
+	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
@@ -167,12 +157,13 @@
 
 <div>
 	<nav
+		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
 		class:hide={$playertheatreModeIsActive}
 	>
-		<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
-			<a href={resolve($interfaceDefaultPage, {})} data-sveltekit-preload-data="off">
+		<header class="small-padding">
+			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
 				<Logo />
 			</a>
 		</header>
@@ -195,7 +186,7 @@
 				<div>{$_('layout.settings')}</div>
 			</a>
 			{#if showLogin}
-				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || !$rawMasterKeyStore}
+				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
 					<a onclick={login} href="#login">
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
@@ -254,10 +245,6 @@
 					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 				</div>
 			{:else}
-				<button data-ui="#sync-party" class="circle large transparent">
-					<i class:primary-text={$syncPartyPeerStore}>group</i>
-					<div class="tooltip bottom">{$_('layout.syncParty')}</div>
-				</button>
 				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"
@@ -329,7 +316,7 @@
 		{/if}
 	</dialog>
 
-	<main id="main-content" class="responsive max root" tabindex="0" role="region">
+	<main id="main-content" tabindex="0" class="responsive max root">
 		{#if $playerState}
 			<div class="grid">
 				<div
@@ -388,7 +375,6 @@
 			{@render children?.()}
 		{/if}
 
-		<SyncParty />
 		<Toast />
 	</main>
 </div>

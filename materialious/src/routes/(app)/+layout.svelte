@@ -247,10 +247,16 @@
 					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 				</div>
 			{:else}
-				<button onclick={() => (showWatchParty = !showWatchParty)} class="circle large transparent">
-					<i>groups</i>
-					<div class="tooltip bottom">{$_('watchParty.start')}</div>
-				</button>
+				<!-- Watch parties only work in HTTPS environments -->
+				{#if page.url.protocol === 'https:'}
+					<button
+						onclick={() => (showWatchParty = !showWatchParty)}
+						class="circle large transparent"
+					>
+						<i>groups</i>
+						<div class="tooltip bottom">{$_('watchParty.start')}</div>
+					</button>
+				{/if}
 				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"

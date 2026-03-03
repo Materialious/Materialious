@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getBestThumbnail } from '$lib/images';
 	import { videoLength } from '$lib/numbers';
 	import { generateChapterWebVTT, type ParsedDescription } from '$lib/description';
@@ -198,7 +198,7 @@
 		});
 	}
 
-	function loadTimeFromUrl(page: Page): boolean {
+	function loadTimeFromUrl(): boolean {
 		if (player) {
 			const timeGivenUrl = page.url.searchParams.get('time');
 			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
@@ -211,7 +211,9 @@
 		return false;
 	}
 
-	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
+	$effect(() => {
+		loadTimeFromUrl();
+	});
 
 	function toggleFullscreen() {
 		if (document.fullscreenElement) {
@@ -724,7 +726,7 @@
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
-		if (loadTimeFromUrl($page) || !$playerSavePlaybackPositionStore) return 0;
+		if (loadTimeFromUrl() || !$playerSavePlaybackPositionStore) return 0;
 
 		let toSetTime = 0;
 

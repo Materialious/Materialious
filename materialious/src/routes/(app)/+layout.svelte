@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 
-	import { navigating, page } from '$app/stores';
+	import { navigating, page } from '$app/state';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
 	import Logo from '$lib/components/Logo.svelte';
@@ -41,7 +41,7 @@
 
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);
-	let playerIsPip: boolean = $state(false);
+	let playerIsPip = $state(false);
 	let showWatchParty = $state(false);
 
 	let pages = $state(getPages());
@@ -55,8 +55,8 @@
 		pages = getPages();
 	});
 
-	page.subscribe((pageData) => {
-		playerIsPip = !pageData.url.pathname.includes('/watch');
+	$effect(() => {
+		playerIsPip = !page.url.pathname.includes('/watch');
 		requestAnimationFrame(() => resetScroll());
 	});
 
@@ -170,13 +170,13 @@
 			</a>
 		</header>
 		{#if $isAndroidTvStore}
-			<a href={resolve('/search', {})} class:active={$page.url.href.endsWith('/search')}>
+			<a href={resolve('/search', {})} class:active={page.url.href.endsWith('/search')}>
 				<i>search</i>
 				<div>{$_('searchPlaceholder')}</div>
 			</a>
 		{/if}
 		{#each pages as navPage (navPage)}
-			<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
+			<a href={resolve(navPage.href, {})} class:active={page.url.href.endsWith(navPage.href)}
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
 			</a>
@@ -296,7 +296,7 @@
 			<a
 				class="round"
 				href={resolve(navPage.href, {})}
-				class:active={$page.url.href.endsWith(navPage.href)}
+				class:active={page.url.href.endsWith(navPage.href)}
 				data-sveltekit-preload-data="off"
 				><i>{navPage.icon}</i>
 				<span style="font-size: .8em;">{navPage.name}</span>
@@ -379,11 +379,12 @@
 			</div>
 		{/if}
 
-		{#if $navigating}
+		{#await navigating.complete}
 			<PageLoading />
-		{:else}
+			<!-- eslint-disable-next-line  @typescript-eslint/no-unused-vars -->
+		{:then _}
 			{@render children?.()}
-		{/if}
+		{/await}
 
 		<Toast />
 	</main>

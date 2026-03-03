@@ -14,7 +14,7 @@
 	import { SpatialMenu } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 	import { Capacitor } from '@capacitor/core';
-	import { filterByBlocklist } from '$lib/filtering';
+	import { isItemFiltered } from '$lib/filtering';
 
 	interface Props {
 		items?: FeedItems;
@@ -29,8 +29,6 @@
 		playlistAuthor = '',
 		classes = 'page right active'
 	}: Props = $props();
-
-	items = filterByBlocklist(items);
 
 	async function removePlaylistItem(indexId: string) {
 		if (!playlistId) return;
@@ -88,42 +86,44 @@
 	{/if}
 	<div class="grid" {...spatialMenu.root}>
 		{#each items as item, index (index)}
-			{@const uniqueItemId = extractUniqueId(item)}
-			{@const spatialItem = spatialMenu.getItem(item, { onSelect: () => goToItem(uniqueItemId) })}
-			<ContentColumn>
-				<article
-					{...mergeAttrs(spatialItem.attrs, {
-						onclick: () => goToItem(uniqueItemId),
-						id: uniqueItemId
-					})}
-					class="no-padding item-select border"
-					class:item-select-focused={spatialItem.highlighted}
-					style="height: 100%;"
-				>
-					{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream' || item.type === 'historyVideo'}
-						{#key item.videoId}
-							<Thumbnail video={item} {playlistId} />
-						{/key}
-						{#if $invidiousAuthStore && decodeURIComponent($invidiousAuthStore.username) === playlistAuthor && 'indexId' in item}
-							<div class="right-align" style="margin: 1em .5em;">
-								<button
-									onclick={async () => removePlaylistItem(item.indexId)}
-									class="tertiary circle small"
-								>
-									<i>delete</i>
-									<div class="tooltip">{$_('delete')}</div>
-								</button>
-							</div>
+			{#if !isItemFiltered(item)}
+				{@const uniqueItemId = extractUniqueId(item)}
+				{@const spatialItem = spatialMenu.getItem(item, { onSelect: () => goToItem(uniqueItemId) })}
+				<ContentColumn>
+					<article
+						{...mergeAttrs(spatialItem.attrs, {
+							onclick: () => goToItem(uniqueItemId),
+							id: uniqueItemId
+						})}
+						class="no-padding item-select border"
+						class:item-select-focused={spatialItem.highlighted}
+						style="height: 100%;"
+					>
+						{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream' || item.type === 'historyVideo'}
+							{#key item.videoId}
+								<Thumbnail video={item} {playlistId} />
+							{/key}
+							{#if $invidiousAuthStore && decodeURIComponent($invidiousAuthStore.username) === playlistAuthor && 'indexId' in item}
+								<div class="right-align" style="margin: 1em .5em;">
+									<button
+										onclick={async () => removePlaylistItem(item.indexId)}
+										class="tertiary circle small"
+									>
+										<i>delete</i>
+										<div class="tooltip">{$_('delete')}</div>
+									</button>
+								</div>
+							{/if}
+						{:else if item.type === 'channel'}
+							<ChannelThumbnail channel={item} />
+						{:else if item.type === 'playlist'}
+							<PlaylistThumbnail playlist={item} />
+						{:else if item.type === 'hashtag'}
+							<HashtagThumbnail hashtag={item} />
 						{/if}
-					{:else if item.type === 'channel'}
-						<ChannelThumbnail channel={item} />
-					{:else if item.type === 'playlist'}
-						<PlaylistThumbnail playlist={item} />
-					{:else if item.type === 'hashtag'}
-						<HashtagThumbnail hashtag={item} />
-					{/if}
-				</article>
-			</ContentColumn>
+					</article>
+				</ContentColumn>
+			{/if}
 		{/each}
 	</div>
 </div>

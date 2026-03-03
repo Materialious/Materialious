@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { FeedItem } from './feed';
 import isSafeRegex from 'safe-regex2';
-import { blocklistStore } from './store';
+import { filterContentListStore } from './store';
 import { get } from 'svelte/store';
 
 const zFilterOperatorEnum = z.enum([
@@ -33,62 +33,58 @@ const zFilterGroup = z.object({
 	operator: z.enum(['AND', 'OR']).optional() // Logical grouping of conditions
 });
 
-export const zBlockListSchema = z.array(zFilterGroup);
+export const zFilterSchema = z.array(zFilterGroup);
 
-const zBlocklistRootSchema = z.object({
+const zFilterRootSchema = z.object({
 	version: z.literal('v1'),
 	for: z.literal('materialious'),
-	blocklist: zBlockListSchema
+	filterBy: zFilterSchema
 });
 
-export function filterByBlocklist<T extends FeedItem>(data: T[]): T[] {
-	const blocklist = get(blocklistStore);
-	if (!blocklist) return data;
+export function isItemFiltered(item: FeedItem): boolean {
+	const filteredContent = get(filterContentListStore);
+	if (!filteredContent) return false;
 
-	return data.filter((item) => {
-		return blocklist.every((filterGroup) => {
-			return filterGroup.conditions.every((condition) => {
-				if (!(condition.field in item)) return false;
+	return filteredContent.every((filterGroup) => {
+		return filterGroup.conditions.every((condition) => {
+			if (!(condition.field in item)) return false;
 
-				const fieldValue = item[condition.field as keyof T];
+			const fieldValue = item[condition.field as keyof FeedItem];
 
-				switch (condition.operator) {
-					case 'equals':
-						return fieldValue === condition.value;
-					case 'in':
-						return (
-							Array.isArray(condition.value) && (condition.value as any[]).includes(fieldValue)
-						);
-					case 'like':
-						return (
-							typeof fieldValue === 'string' &&
-							typeof condition.value === 'string' &&
-							fieldValue.includes(condition.value)
-						);
-					case 'gt':
-						return (
-							typeof fieldValue === 'number' &&
-							typeof condition.value === 'number' &&
-							fieldValue > condition.value
-						);
-					case 'lt':
-						return (
-							typeof fieldValue === 'number' &&
-							typeof condition.value === 'number' &&
-							fieldValue < condition.value
-						);
-					case 'regex':
-						if (typeof condition.value !== 'string' || !isSafeRegex(condition.value)) return false;
-						return typeof fieldValue === 'string' && new RegExp(condition.value).test(fieldValue);
-					default:
-						return false;
-				}
-			});
+			switch (condition.operator) {
+				case 'equals':
+					return fieldValue === condition.value;
+				case 'in':
+					return Array.isArray(condition.value) && (condition.value as any[]).includes(fieldValue);
+				case 'like':
+					return (
+						typeof fieldValue === 'string' &&
+						typeof condition.value === 'string' &&
+						fieldValue.includes(condition.value)
+					);
+				case 'gt':
+					return (
+						typeof fieldValue === 'number' &&
+						typeof condition.value === 'number' &&
+						fieldValue > condition.value
+					);
+				case 'lt':
+					return (
+						typeof fieldValue === 'number' &&
+						typeof condition.value === 'number' &&
+						fieldValue < condition.value
+					);
+				case 'regex':
+					if (typeof condition.value !== 'string' || !isSafeRegex(condition.value)) return false;
+					return typeof fieldValue === 'string' && new RegExp(condition.value).test(fieldValue);
+				default:
+					return false;
+			}
 		});
 	});
 }
 
-export async function loadBlockListFromRemote(url: string) {
+export async function loadContentFilterFromURL(url: string) {
 	const resp = await fetch(url, { method: 'GET', credentials: 'omit' });
 	if (!resp.ok) throw new Error('Response status code');
 
@@ -101,9 +97,9 @@ export async function loadBlockListFromRemote(url: string) {
 
 	if (!respJson) throw new Error('Invalid JSON');
 
-	const parsedBlocklist = zBlocklistRootSchema.safeParse(respJson);
+	const parsedFilterList = zFilterRootSchema.safeParse(respJson);
 
-	if (!parsedBlocklist.success) throw new Error(parsedBlocklist.error.message);
+	if (!parsedFilterList.success) throw new Error(parsedFilterList.error.message);
 
-	blocklistStore.set(parsedBlocklist.data.blocklist);
+	filterContentListStore.set(parsedFilterList.data.filterBy);
 }

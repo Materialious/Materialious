@@ -253,6 +253,11 @@ export const persistedStores: PersistedStore<any>[] = [
 		store: sponsorBlockCategoriesStore,
 		schema: zChapterModeRecord,
 		serialize: JSON.stringify
+	},
+	{
+		name: 'watchHistoryEnabled',
+		store: watchHistoryEnabledStore,
+		schema: zBoolean
 	}
 ];
 
@@ -333,11 +338,6 @@ if (isOwnBackend()) {
 	persistedStores.push({
 		name: 'youTubeJsAlways',
 		store: playerYouTubeJsAlways,
-		schema: zBoolean
-	});
-	persistedStores.push({
-		name: 'watchHistoryEnabled',
-		store: watchHistoryEnabledStore,
 		schema: zBoolean
 	});
 }

@@ -53,3 +53,12 @@ export function titleCase(text: string): string {
 
 	return titleCasedWords.join(' ');
 }
+
+export function camelCaseToHuman(input: string): string {
+	return sentenceCase(
+		input
+			.replace(/([a-z])([A-Z])/g, '$1 $2')
+			.replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
+			.trim()
+	);
+}

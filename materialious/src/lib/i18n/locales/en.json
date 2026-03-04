@@ -261,7 +261,7 @@
 		},
 		"filter": {
 			"title": "Content Filters",
-			"url": "Remote filter list"
+			"url": "Import Filters from URL"
 		},
 		"deArrow": {
 			"title": "DeArrow",

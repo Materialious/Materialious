@@ -6,7 +6,7 @@ import { get } from 'svelte/store';
 import { originalFetch } from '$lib/fetchProxy';
 import { ChannelSchema, VideoSchema } from './schemas';
 
-const zFilterOperatorEnum = z.enum([
+export const zFilterOperatorEnum = z.enum([
 	'equals', // equal to
 	'in', // in a set of values
 	'like', // contains (string matching)
@@ -34,9 +34,8 @@ const zFilterCondition = z.object({
 });
 
 // Logical grouping operator
-const zFilterGroup = z.object({
+export const zFilterGroup = z.object({
 	conditions: z.array(zFilterCondition), // A list of conditions to apply
-	operator: z.enum(['AND', 'OR']).optional(), // Logical grouping of conditions
 	type: z.union([z.literal('video'), z.literal('channel')]) // Type of content
 });
 
@@ -103,17 +102,13 @@ export function isItemFiltered(item: FeedItem): boolean {
 			}
 		};
 
-		const groupOperator = filterGroup.operator ?? 'AND';
-
-		if (groupOperator === 'OR') {
-			return filterGroup.conditions.some(evaluateCondition);
-		}
-
 		return filterGroup.conditions.every(evaluateCondition);
 	});
 }
 
-export async function loadContentFilterFromURL(url: string) {
+export async function loadContentFilterFromURL(
+	url: string
+): Promise<z.infer<typeof zFilterSchema>> {
 	const resp = await originalFetch(url, { method: 'GET', credentials: 'omit' });
 	if (!resp.ok) throw new Error('Response status code');
 
@@ -130,7 +125,5 @@ export async function loadContentFilterFromURL(url: string) {
 
 	if (!parsedFilterList.success) throw new Error(parsedFilterList.error.message);
 
-	console.log(parsedFilterList.data.filterBy);
-
-	filterContentListStore.set(parsedFilterList.data.filterBy);
+	return parsedFilterList.data.filterBy;
 }

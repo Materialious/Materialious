@@ -1,10 +1,26 @@
 <script lang="ts">
-	import { loadContentFilterFromURL } from '$lib/filtering';
+	import { loadContentFilterFromURL, zFilterGroup, zFilterOperatorEnum } from '$lib/filtering';
+	import { ChannelSchema, VideoSchema } from '$lib/filtering/schemas';
 	import { _ } from '$lib/i18n';
+	import { titleCase, camelCaseToHuman } from '$lib/letterCasing';
 	import { filterContentListStore } from '$lib/store';
+	import type z from 'zod';
 
 	let remoteFilterListUrl: string = $state('');
 	let remoteError: string = $state('');
+
+	type Operator = 'AND' | 'OR';
+	type FilterType = 'channel' | 'video';
+
+	const filterTypes: FilterType[] = ['channel', 'video'];
+	const operators: Operator[] = ['AND', 'OR'];
+
+	const schema: Record<FilterType, Record<string, string | string[]>> = {
+		channel: ChannelSchema,
+		video: VideoSchema
+	};
+
+	let contentFilters = $state($filterContentListStore);
 
 	async function loadFilterList(event: Event) {
 		event.preventDefault();
@@ -17,10 +33,30 @@
 		}
 
 		try {
-			await loadContentFilterFromURL(remoteFilterListUrl);
+			contentFilters = await loadContentFilterFromURL(remoteFilterListUrl);
+			filterContentListStore.set(contentFilters);
 		} catch (errorMsg) {
 			remoteError = (errorMsg as Error).message;
 		}
+	}
+
+	function addFilter(type: FilterType) {
+		if (!contentFilters) contentFilters = [];
+
+		contentFilters.push({
+			conditions: [],
+			type
+		});
+
+		filterContentListStore.set(contentFilters);
+	}
+
+	function removeFilter(filter: z.infer<typeof zFilterGroup>) {
+		if (!contentFilters) contentFilters = [];
+
+		contentFilters = contentFilters.filter((item) => item !== filter);
+
+		filterContentListStore.set(contentFilters);
 	}
 </script>
 
@@ -43,32 +79,88 @@
 	</nav>
 </form>
 
-{#if $filterContentListStore}
-	{#each $filterContentListStore as filter, index (index)}
-		<article class="no-margin surface-container-highest">
-			<h6>{filter.type}</h6>
-			<ul class="list">
-				{#each filter.conditions as condition, index (index)}
-					<li>
-						<p>
-							<code>{condition.field}</code>
-							<b>{condition.operator.replace('gt', 'greater then').replace('lt', 'less then')}</b>
-							<code>{condition.value}</code>
-						</p>
-					</li>
-					{#if index < filter.conditions.length - 1}
-						<li>
-							<p>{filter.operator}</p>
+{#if contentFilters}
+	{#each contentFilters as filter (filter)}
+		<article class="no-margin surface-container-high">
+			<div class="grid">
+				<div class="s12 m6 l6">
+					<div class="label field suffix border surface-container-highest">
+						<select name="content-type">
+							{#each filterTypes as filterType (filterType)}
+								<option selected={filterType === filter.type} value={filterType}
+									>{titleCase(filterType)}</option
+								>
+							{/each}
+						</select>
+						<label for="content-type">Content type</label>
+						<i>arrow_drop_down</i>
+					</div>
+				</div>
+				<div class="s12 m6 l6 right-align">
+					<button onclick={() => removeFilter(filter)} class="surface-container-highest">
+						<i>close</i>
+					</button>
+				</div>
+			</div>
+			{#if filter.conditions}
+				<ul class="list">
+					{#each filter.conditions as condition, index (condition)}
+						<li style="display: block;">
+							<div class="label field suffix border surface-container-highest">
+								<select name="field">
+									{#each Object.keys(schema[filter.type]) as key (key)}
+										<option value={key} selected={condition.field === key}
+											>{camelCaseToHuman(key)}</option
+										>
+									{/each}
+								</select>
+								<label for="field">Field</label>
+								<i>arrow_drop_down</i>
+							</div>
+
+							<div class="field label suffix border surface-container-highest">
+								<select name="operator">
+									{#each zFilterOperatorEnum.options as operator (operator)}
+										<option selected={operator === condition.operator} value={operator}
+											>{operator}</option
+										>
+									{/each}
+								</select>
+								<label for="operator">Operator</label>
+								<i>arrow_drop_down</i>
+							</div>
+
+							<div class="field label border">
+								<input name="value" type="text" value={condition.value} />
+								<label for="value">Value</label>
+							</div>
 						</li>
-					{/if}
-				{/each}
-			</ul>
+						{#if index < filter.conditions.length - 1}
+							<li>
+								<h6 class="bold">AND</h6>
+							</li>
+						{/if}
+					{/each}
+				</ul>
+			{/if}
+			<div class="small-space"></div>
+			<button class="surface-container-highest">
+				<i>add</i>
+				<span>Add conditional</span>
+			</button>
 		</article>
 		<div class="small-space"></div>
 	{/each}
 {/if}
 
-<button class="surface-container-highest">
-	<i>add</i>
-	<span>Add filter</span>
-</button>
+<div>
+	<button class="surface-container-highest">
+		<i>add</i>
+		<span>Add filter</span>
+	</button>
+	<menu class="min">
+		{#each filterTypes as filterType (filterType)}
+			<li role="presentation" onclick={() => addFilter(filterType)}>{titleCase(filterType)}</li>
+		{/each}
+	</menu>
+</div>

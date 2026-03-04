@@ -61,7 +61,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import ClosedCaptions from './ClosedCaptions.svelte';
-	import { getVideoWatchHistory, updateWatchHistory } from '$lib/api/backend/history';
+	import { getVideoWatchHistory, updateWatchHistory } from '$lib/api';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -737,10 +737,8 @@
 			// Continue regardless of error
 		}
 
-		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-			const watchHistory = await getVideoWatchHistory(data.video.videoId);
-			if (watchHistory && watchHistory.progress > toSetTime) toSetTime = watchHistory.progress;
-		}
+		const watchHistory = await getVideoWatchHistory(data.video.videoId);
+		if (watchHistory && watchHistory.progress > toSetTime) toSetTime = watchHistory.progress;
 
 		return toSetTime;
 	}
@@ -748,23 +746,7 @@
 	function savePlayerbackHistory() {
 		if (data.video.liveNow || !$playerSavePlaybackPositionStore || !playerElement) return;
 
-		if (playerElement.currentTime < playerElement.duration - 10 && playerElement.currentTime > 10) {
-			try {
-				localStorage.setItem(`v_${data.video.videoId}`, playerElement.currentTime.toString());
-			} catch {
-				// Continue regardless of error
-			}
-		} else {
-			try {
-				localStorage.removeItem(`v_${data.video.videoId}`);
-			} catch {
-				// Continue regardless of error
-			}
-		}
-
-		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore) && playerElement.currentTime > 10) {
-			updateWatchHistory(data.video.videoId, playerElement.currentTime);
-		}
+		updateWatchHistory(data.video.videoId, playerElement.currentTime);
 	}
 
 	onDestroy(async () => {

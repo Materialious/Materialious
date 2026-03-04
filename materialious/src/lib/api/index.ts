@@ -1,6 +1,6 @@
 import { getVideoYTjs } from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
-import { playerYouTubeJsAlways, rawMasterKeyStore } from '../store';
+import { invidiousAuthStore, playerYouTubeJsAlways, rawMasterKeyStore } from '../store';
 import type {
 	ChannelPage,
 	Comments,
@@ -15,7 +15,8 @@ import type {
 	SearchResults,
 	CommentsOptions,
 	ChannelOptions,
-	ChannelContent
+	ChannelContent,
+	VideoWatchHistory
 } from './model';
 import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
@@ -66,6 +67,13 @@ import {
 	postPersonalPlaylistInvidious,
 	removePlaylistVideoInvidious
 } from './invidious/playlist';
+import {
+	deleteWatchHistoryBackend,
+	getVideoWatchHistoryBackend,
+	getWatchHistoryBackend,
+	saveWatchHistoryBackend,
+	updateWatchHistoryBackend
+} from './backend/history';
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	// Doesn't exist in YTjs.
@@ -270,16 +278,48 @@ export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestI
 	return deleteUnsubscribeInvidious(authorId, fetchOptions);
 }
 
-export async function getHistory(page: number = 1, maxResults: number = 20): Promise<string[]> {}
-
-export async function deleteHistory(videoId: string | undefined = undefined) {
-	if (isYTBackend()) return;
+export async function getWatchHistory(
+	options: { page?: number; videoIds?: string[]; fetchOptions?: RequestInit } = {
+		page: undefined,
+		videoIds: undefined,
+		fetchOptions: undefined
+	}
+): Promise<VideoWatchHistory[]> {
+	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		return getWatchHistoryBackend(options);
+	}
 }
 
-export async function postHistory(videoId: string, fetchOptions: RequestInit = {}) {
-	if (isYTBackend()) return;
+export async function getVideoWatchHistory(
+	videoId: string
+): Promise<VideoWatchHistory | undefined> {
+	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		return getVideoWatchHistoryBackend(videoId);
+	}
+}
 
-	return postHistoryInvidious(videoId, fetchOptions);
+export async function deleteWatchHistory() {
+	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		return deleteWatchHistoryBackend();
+	}
+}
+
+export async function updateWatchHistory(
+	videoId: string,
+	progress: number,
+	fetchOptions: RequestInit = {}
+) {
+	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		return updateWatchHistoryBackend(videoId, progress);
+	}
+
+	if (get(invidiousAuthStore)) postHistoryInvidious(videoId, fetchOptions);
+}
+
+export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {
+	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		return saveWatchHistoryBackend(video, progress);
+	}
 }
 
 export async function getPlaylist(

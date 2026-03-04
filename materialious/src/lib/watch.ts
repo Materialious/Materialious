@@ -1,4 +1,4 @@
-import { getComments, getPersonalPlaylists, getVideo } from '$lib/api/index';
+import { getComments, getPersonalPlaylists, getVideo, saveWatchHistory } from '$lib/api/index';
 import { loadEntirePlaylist } from '$lib/playlist';
 import {
 	invidiousAuthStore,
@@ -13,7 +13,6 @@ import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { _ } from './i18n';
 import { isOwnBackend } from './shared';
-import { saveWatchHistory } from './api/backend/history';
 import { getDislikesRYD } from './api/ytd';
 
 export async function getWatchDetails(videoId: string, url: URL) {
@@ -42,9 +41,7 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		personalPlaylists = null;
 	}
 
-	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-		saveWatchHistory(video);
-	}
+	saveWatchHistory(video);
 
 	let comments;
 	try {

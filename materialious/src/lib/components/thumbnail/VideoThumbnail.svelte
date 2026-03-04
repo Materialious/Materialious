@@ -22,7 +22,7 @@
 		rawMasterKeyStore
 	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
-	import { queueGetWatchHistory } from '$lib/api/backend/historyPool';
+	import { queueGetWatchHistory } from '$lib/api/historyPool';
 	import { page } from '$app/state';
 	import { isOwnBackend } from '$lib/shared';
 	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';

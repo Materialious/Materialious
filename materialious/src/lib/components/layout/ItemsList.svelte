@@ -14,7 +14,7 @@
 	import { SpatialMenu } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 	import { Capacitor } from '@capacitor/core';
-	import { isItemFiltered } from '$lib/filtering';
+	import { isItemFiltered } from '$lib/filtering/index';
 
 	interface Props {
 		items?: FeedItems;

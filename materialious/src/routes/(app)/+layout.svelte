@@ -42,7 +42,7 @@
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);
 	let playerIsPip = $state(false);
-	let showWatchParty = $state(false);
+	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
 
 	let pages = $state(getPages());
 	invidiousAuthStore.subscribe(() => {
@@ -252,6 +252,7 @@
 					<button
 						onclick={() => (showWatchParty = !showWatchParty)}
 						class="circle large transparent"
+						class:active={showWatchParty}
 					>
 						<i>groups</i>
 						<div class="tooltip bottom">{$_('watchParty.start')}</div>

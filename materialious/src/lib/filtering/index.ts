@@ -1,8 +1,10 @@
 import { z } from 'zod';
-import type { FeedItem } from './feed';
+import type { FeedItem } from '$lib/feed';
 import isSafeRegex from 'safe-regex2';
-import { filterContentListStore } from './store';
+import { filterContentListStore } from '$lib/store';
 import { get } from 'svelte/store';
+import { originalFetch } from '$lib/fetchProxy';
+import { ChannelSchema, VideoSchema } from './schemas';
 
 const zFilterOperatorEnum = z.enum([
 	'equals', // equal to
@@ -13,9 +15,13 @@ const zFilterOperatorEnum = z.enum([
 	'regex' // regular expression matching
 ]);
 
+const allowedFields = new Set([...Object.keys(VideoSchema), ...Object.keys(ChannelSchema)]);
+
 // Filter condition schema
 const zFilterCondition = z.object({
-	field: z.string(), // Field to filter
+	field: z.string().refine((val) => allowedFields.has(val), {
+		message: 'Invalid field'
+	}), // Field to filter
 	operator: zFilterOperatorEnum, // Operator
 	value: z.union([
 		// Value to compare against
@@ -30,14 +36,15 @@ const zFilterCondition = z.object({
 // Logical grouping operator
 const zFilterGroup = z.object({
 	conditions: z.array(zFilterCondition), // A list of conditions to apply
-	operator: z.enum(['AND', 'OR']).optional() // Logical grouping of conditions
+	operator: z.enum(['AND', 'OR']).optional(), // Logical grouping of conditions
+	type: z.union([z.literal('video'), z.literal('channel')]) // Type of content
 });
 
 export const zFilterSchema = z.array(zFilterGroup);
 
 const zFilterRootSchema = z.object({
 	version: z.literal('v1'),
-	for: z.literal('materialious'),
+	createdFor: z.literal('materialious'),
 	filterBy: zFilterSchema
 });
 
@@ -46,7 +53,13 @@ export function isItemFiltered(item: FeedItem): boolean {
 	if (!filteredContent) return false;
 
 	return filteredContent.every((filterGroup) => {
-		return filterGroup.conditions.every((condition) => {
+		if (filterGroup.type !== item.type) {
+			if (filterGroup.type !== 'video' || (item.type !== 'shortVideo' && item.type !== 'stream')) {
+				return false;
+			}
+		}
+
+		const evaluateCondition = (condition: (typeof filterGroup.conditions)[number]): boolean => {
 			if (!(condition.field in item)) return false;
 
 			const fieldValue = item[condition.field as keyof FeedItem];
@@ -54,38 +67,53 @@ export function isItemFiltered(item: FeedItem): boolean {
 			switch (condition.operator) {
 				case 'equals':
 					return fieldValue === condition.value;
+
 				case 'in':
 					return Array.isArray(condition.value) && (condition.value as any[]).includes(fieldValue);
+
 				case 'like':
 					return (
 						typeof fieldValue === 'string' &&
 						typeof condition.value === 'string' &&
 						fieldValue.includes(condition.value)
 					);
+
 				case 'gt':
 					return (
 						typeof fieldValue === 'number' &&
 						typeof condition.value === 'number' &&
 						fieldValue > condition.value
 					);
+
 				case 'lt':
 					return (
 						typeof fieldValue === 'number' &&
 						typeof condition.value === 'number' &&
 						fieldValue < condition.value
 					);
+
 				case 'regex':
 					if (typeof condition.value !== 'string' || !isSafeRegex(condition.value)) return false;
+
 					return typeof fieldValue === 'string' && new RegExp(condition.value).test(fieldValue);
+
 				default:
 					return false;
 			}
-		});
+		};
+
+		const groupOperator = filterGroup.operator ?? 'AND';
+
+		if (groupOperator === 'OR') {
+			return filterGroup.conditions.some(evaluateCondition);
+		}
+
+		return filterGroup.conditions.every(evaluateCondition);
 	});
 }
 
 export async function loadContentFilterFromURL(url: string) {
-	const resp = await fetch(url, { method: 'GET', credentials: 'omit' });
+	const resp = await originalFetch(url, { method: 'GET', credentials: 'omit' });
 	if (!resp.ok) throw new Error('Response status code');
 
 	let respJson;

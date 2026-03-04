@@ -1,17 +1,25 @@
 <script lang="ts">
-	import { pushState } from '$app/navigation';
+	import { goto, pushState } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { _ } from '$lib/i18n';
 	import { playerState } from '$lib/store';
 	import sodium from 'libsodium-wrappers-sumo';
 	import { onDestroy, onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
+	import { get } from 'svelte/store';
 	import { joinRoom, type ActionReceiver, type DataPayload, type Room } from 'trystero/mqtt';
 	import z from 'zod';
+	import { addToast } from './Toast.svelte';
 
 	const zWatchPartyEvent = z.object({
-		event: z.union([z.literal('pause'), z.literal('play'), z.literal('seek')]),
-		videoId: z.regex(/^[a-zA-Z0-9_-]{11}$/),
+		event: z.union([
+			z.literal('pause'),
+			z.literal('play'),
+			z.literal('seek'),
+			z.literal('goToVideo')
+		]),
+		videoId: z.string().regex(/^[a-zA-Z0-9_-]{11}$/),
 		sent: z.date(),
 		currentTime: z.number().min(0)
 	});
@@ -23,7 +31,7 @@
 
 	const appId = 'materialious_';
 
-	type SendEvent = (message: WatchPartyEvent) => void;
+	type SendEvent = (message: WatchPartyEvent, peerToSendTo?: string) => void;
 
 	// If room not in use message just get sent nowhere.
 	let sendEvent: SendEvent = () => {};
@@ -36,6 +44,11 @@
 		receiver((data) => {
 			const dataParsed = zWatchPartyEvent.safeParse(data);
 			if (!dataParsed.success) return;
+
+			if (dataParsed.data.event === 'goToVideo') {
+				goto(resolve('/watch/[videoId]', { videoId: dataParsed.data.videoId }));
+				return;
+			}
 
 			const player = $playerState;
 			if (!player?.playerElement) return;
@@ -88,6 +101,35 @@
 		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
 
 		currentSearchParams.set('room', roomId);
+
+		room.onPeerJoin((peerId) => {
+			const player = get(playerState);
+			if (!player || !player.data || !player.playerElement) return;
+
+			addToast({
+				data: {
+					text: $_('watchParty.userJoin')
+				}
+			});
+
+			sendEvent(
+				{
+					event: 'goToVideo',
+					videoId: player.data.video.videoId,
+					sent: new Date(),
+					currentTime: player.playerElement.currentTime
+				},
+				peerId
+			);
+		});
+
+		room.onPeerLeave(() => {
+			addToast({
+				data: {
+					text: $_('watchParty.userLeft')
+				}
+			});
+		});
 
 		pushState(`?${currentSearchParams.toString()}`, { replaceState: false }); // eslint-disable-line svelte/no-navigation-without-resolve
 	}

@@ -14,6 +14,7 @@
 	import InternalAccount from './InternalAccount.svelte';
 	import { Tabs } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
+	import Filters from './Filters.svelte';
 
 	type TabCategories =
 		| 'interface'
@@ -23,7 +24,8 @@
 		| 'dearrow'
 		| 'about'
 		| 'engine'
-		| 'account';
+		| 'account'
+		| 'filters';
 
 	const tabCategories: Tabs<TabCategories> = new Tabs({
 		value: 'interface',
@@ -39,6 +41,7 @@
 	let tabs: { id: TabCategories; label: string; icon: string; component: Component }[] = $state([
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
+		{ id: 'filters', label: $_('layout.filter.title'), icon: 'filter_alt', component: Filters },
 		{ id: 'ryd', label: 'Return YT Dislike', icon: 'thumb_down', component: Ryd },
 		{ id: 'sponsorblock', label: 'Sponsorblock', icon: 'block', component: SponsorBlock },
 		{

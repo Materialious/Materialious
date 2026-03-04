@@ -92,7 +92,9 @@
 		"joinRoom": "Join room",
 		"roomID": "Room ID",
 		"shareRoom": "Share room",
-		"leaveRoom": "Leave room"
+		"leaveRoom": "Leave room",
+		"userJoin": "User joined room",
+		"userLeft": "User left room"
 	},
 	"subscriptions": {
 		"manageSubscriptions": "Manage subscriptions"
@@ -256,6 +258,10 @@
 			"automatic": "Auto skip",
 			"manual": "Manual skip",
 			"timeline": "Timeline only"
+		},
+		"filter": {
+			"title": "Content Filters",
+			"url": "Remote filter list"
 		},
 		"deArrow": {
 			"title": "DeArrow",

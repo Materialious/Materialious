@@ -728,7 +728,9 @@
 		let toSetTime = 0;
 
 		const watchHistory = await getVideoWatchHistory(data.video.videoId);
-		if (watchHistory && watchHistory.progress > toSetTime) toSetTime = watchHistory.progress;
+		if (watchHistory && watchHistory.progress < playerMaxKnownTime - 10) {
+			toSetTime = watchHistory.progress;
+		}
 
 		return toSetTime;
 	}

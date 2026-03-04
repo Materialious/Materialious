@@ -26,16 +26,14 @@ export function getPages(): Pages {
 			href: '/playlists',
 			name: get(_)('pages.playlists'),
 			requiresAuth: true
-		}
-	];
-
-	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore))
-		pages.push({
+		},
+		{
 			icon: 'history',
 			href: '/history',
 			name: get(_)('pages.history'),
 			requiresAuth: false
-		});
+		}
+	];
 
 	pages = pages.filter((page) => {
 		return !page.requiresAuth || (get(invidiousAuthStore) && !isYTBackend());

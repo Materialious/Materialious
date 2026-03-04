@@ -74,6 +74,8 @@ import {
 	saveWatchHistoryBackend,
 	updateWatchHistoryBackend
 } from './backend/history';
+import { localDb } from '$lib/dexie';
+import { getBestThumbnail } from '$lib/images';
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	// Doesn't exist in YTjs.
@@ -288,6 +290,30 @@ export async function getWatchHistory(
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return getWatchHistoryBackend(options);
 	}
+
+	let watchHistory = await localDb.watchHistory.toArray();
+	watchHistory.sort((a, b) => b.watched.getDate() - a.watched.getDate());
+
+	if (options.videoIds) {
+		watchHistory = watchHistory.filter((item) => !options.videoIds?.includes(item.videoId));
+	}
+
+	const cullAfter = 1000;
+	if (watchHistory.length > cullAfter) {
+		const videosToDelete = watchHistory.slice(cullAfter);
+		const videoIdsToDelete = videosToDelete.map((video) => video.videoId);
+		await localDb.watchHistory.where('videoId').anyOf(videoIdsToDelete).delete();
+
+		// Don't display culled videos.
+		watchHistory = watchHistory.slice(0, cullAfter);
+	}
+
+	const maxResults = 100;
+
+	const start = (options.page ?? 1 - 1) * maxResults;
+	const end = start + maxResults;
+
+	return watchHistory.splice(start, end);
 }
 
 export async function getVideoWatchHistory(
@@ -296,12 +322,16 @@ export async function getVideoWatchHistory(
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return getVideoWatchHistoryBackend(videoId);
 	}
+
+	return await localDb.watchHistory.get({ videoId });
 }
 
 export async function deleteWatchHistory() {
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return deleteWatchHistoryBackend();
 	}
+
+	await localDb.watchHistory.clear();
 }
 
 export async function updateWatchHistory(
@@ -314,12 +344,28 @@ export async function updateWatchHistory(
 	}
 
 	if (get(invidiousAuthStore)) postHistoryInvidious(videoId, fetchOptions);
+
+	await localDb.watchHistory.update({ videoId }, { progress });
 }
 
 export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return saveWatchHistoryBackend(video, progress);
 	}
+
+	if (await localDb.watchHistory.get({ videoId: video.videoId })) return;
+
+	await localDb.watchHistory.add({
+		author: video.author,
+		watched: new Date(),
+		lengthSeconds: video.lengthSeconds,
+		progress,
+		id: video.videoId,
+		title: video.title,
+		thumbnail: getBestThumbnail(video.videoThumbnails),
+		videoId: video.videoId,
+		type: 'historyVideo'
+	});
 }
 
 export async function getPlaylist(

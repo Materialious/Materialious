@@ -31,7 +31,8 @@
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
 		searchHistoryStore,
-		themeColorStore
+		themeColorStore,
+		watchHistoryEnabledStore
 	} from '../../store';
 	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
@@ -267,6 +268,23 @@
 					interfaceSearchHistoryEnabled.set(!$interfaceSearchHistoryEnabled);
 					searchHistoryStore.set([]);
 				}}
+				role="switch"
+			/>
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<div>{$_('layout.historyEnabled')}</div>
+		</div>
+		<label class="switch" tabindex="0">
+			<input
+				type="checkbox"
+				bind:checked={$watchHistoryEnabledStore}
+				onclick={() => watchHistoryEnabledStore.set(!$watchHistoryEnabledStore)}
 				role="switch"
 			/>
 			<span></span>

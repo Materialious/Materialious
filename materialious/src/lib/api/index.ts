@@ -1,6 +1,11 @@
 import { getVideoYTjs } from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
-import { invidiousAuthStore, playerYouTubeJsAlways, rawMasterKeyStore } from '../store';
+import {
+	invidiousAuthStore,
+	playerYouTubeJsAlways,
+	rawMasterKeyStore,
+	watchHistoryEnabledStore
+} from '../store';
 import type {
 	ChannelPage,
 	Comments,
@@ -287,6 +292,8 @@ export async function getWatchHistory(
 		fetchOptions: undefined
 	}
 ): Promise<VideoWatchHistory[]> {
+	if (!get(watchHistoryEnabledStore)) return [];
+
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return getWatchHistoryBackend(options);
 	}
@@ -319,6 +326,8 @@ export async function getWatchHistory(
 export async function getVideoWatchHistory(
 	videoId: string
 ): Promise<VideoWatchHistory | undefined> {
+	if (!get(watchHistoryEnabledStore)) return;
+
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return getVideoWatchHistoryBackend(videoId);
 	}
@@ -339,6 +348,8 @@ export async function updateWatchHistory(
 	progress: number,
 	fetchOptions: RequestInit = {}
 ) {
+	if (!get(watchHistoryEnabledStore)) return;
+
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return updateWatchHistoryBackend(videoId, progress);
 	}
@@ -349,6 +360,8 @@ export async function updateWatchHistory(
 }
 
 export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {
+	if (!get(watchHistoryEnabledStore)) return;
+
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 		return saveWatchHistoryBackend(video, progress);
 	}

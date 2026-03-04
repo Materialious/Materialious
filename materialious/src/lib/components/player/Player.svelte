@@ -29,7 +29,6 @@
 		playerState,
 		playerTheatreModeIsActive,
 		playerYouTubeJsFallback,
-		rawMasterKeyStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -727,15 +726,6 @@
 		if (loadTimeFromUrl() || !$playerSavePlaybackPositionStore) return 0;
 
 		let toSetTime = 0;
-
-		try {
-			const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-			if (playerPos && Number(playerPos) > toSetTime) {
-				toSetTime = Number(playerPos);
-			}
-		} catch {
-			// Continue regardless of error
-		}
 
 		const watchHistory = await getVideoWatchHistory(data.video.videoId);
 		if (watchHistory && watchHistory.progress > toSetTime) toSetTime = watchHistory.progress;

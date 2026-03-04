@@ -2,8 +2,6 @@ import sodium from 'libsodium-wrappers-sumo';
 import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } from './encryption';
 import type { VideoPlay, VideoWatchHistory } from '../model';
 import { getBestThumbnail } from '$lib/images';
-import { get } from 'svelte/store';
-import { watchHistoryEnabledStore } from '$lib/store';
 
 export async function updateWatchHistoryBackend(videoId: string, progress: number) {
 	await sodium.ready;
@@ -121,8 +119,6 @@ export async function deleteWatchHistoryBackend() {
 }
 
 export async function saveWatchHistoryBackend(video: VideoPlay, progress: number = 0) {
-	if (!get(watchHistoryEnabledStore)) return;
-
 	await sodium.ready;
 	const rawKey = await getRawKey();
 	if (!rawKey) return;

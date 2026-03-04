@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
 	import { materialiousLogout } from '$lib/auth';
-	import { watchHistoryEnabledStore } from '$lib/store';
 
 	let clickCount = $state(0);
 	const clicksToDelte = 3;
@@ -21,27 +20,6 @@
 		}
 	}
 </script>
-
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.historyEnabled')}</div>
-		</div>
-		<label class="switch" tabindex="0">
-			<input
-				type="checkbox"
-				bind:checked={$watchHistoryEnabledStore}
-				onclick={() => watchHistoryEnabledStore.set(!$watchHistoryEnabledStore)}
-				role="switch"
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
-
-<div class="space"></div>
-<div class="divider"></div>
-<div class="space"></div>
 
 <button class="tertiary" onclick={deleteAccount}>
 	<i>warning</i>

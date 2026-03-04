@@ -1,24 +1,12 @@
 import { getVideoYTjs } from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
-import {
-	invidiousAuthStore,
-	deArrowInstanceStore,
-	deArrowThumbnailInstanceStore,
-	invidiousInstanceStore,
-	interfaceRegionStore,
-	playerYouTubeJsAlways,
-	playerYouTubeJsFallback,
-	rawMasterKeyStore,
-	returnYTDislikesInstanceStore
-} from '../store';
+import { playerYouTubeJsAlways, rawMasterKeyStore } from '../store';
 import type {
 	ChannelPage,
 	Comments,
-	DeArrow,
 	Feed,
 	PlaylistPage,
 	ResolvedUrl,
-	ReturnYTDislikes,
 	SearchSuggestion,
 	Subscription,
 	Video,
@@ -51,69 +39,33 @@ import {
 	getSubscriptionsBackend,
 	postSubscribeBackend
 } from './backend/subscriptions';
-import { getUserLocale } from '$lib/i18n';
-
-export function buildPath(path: string): URL {
-	return setLocale(new URL(`${get(invidiousInstanceStore)}/api/v1/${path}`));
-}
-
-export function setLocale(url: URL): URL {
-	const region = get(interfaceRegionStore);
-
-	if (region) {
-		url.searchParams.set('region', region);
-	}
-
-	const locale = getUserLocale();
-
-	url.searchParams.set('hl', locale);
-
-	return url;
-}
-
-export class HTTPError {
-	msg: string;
-	response: Response;
-
-	constructor(msg: string, response: Response) {
-		this.msg = msg;
-		this.response = response;
-	}
-
-	toString() {
-		return this.msg;
-	}
-}
-
-export async function fetchErrorHandle(response: Response): Promise<Response> {
-	if (!response.ok) {
-		let message = 'Internal error';
-
-		// Attempt to parse error.
-		try {
-			const json = await response.json();
-			message = json.errorBacktrace || json.error || json.message;
-		} catch {
-			// Continue regardless of error
-		}
-
-		throw new HTTPError(
-			`${response.status} - ${response.statusText}\n${decodeURIComponent(response.url)}\n${message}`,
-			response
-		);
-	}
-
-	return response;
-}
-
-export function buildAuthHeaders(): { headers: Record<string, string> } {
-	const authToken = get(invidiousAuthStore)?.token ?? '';
-	if (authToken.startsWith('SID=')) {
-		return { headers: { __sid_auth: authToken } };
-	} else {
-		return { headers: { Authorization: `Bearer ${authToken}` } };
-	}
-}
+import { getFeedInvidious, getPopularInvidious, getSubscriptionsInvidious } from './invidious/feed';
+import { getResolveUrlInvidious } from './invidious/misc';
+import { getVideoInvidious } from './invidious/video';
+import { getCommentsInvidious } from './invidious/comments';
+import {
+	getChannelContentInvidious,
+	getChannelInvidious,
+	searchChannelContentInvidious
+} from './invidious/channel';
+import { getSearchSuggestionsInvidious } from './invidious/searchSuggestions';
+import { getHashtagInvidious } from './invidious/hashtag';
+import { getSearchInvidious } from './invidious/search';
+import { notificationsMarkAsReadInvidious } from './invidious/notifcations';
+import {
+	amSubscribedInvidious,
+	deleteUnsubscribeInvidious,
+	postSubscribeInvidious
+} from './invidious/subscribe';
+import { postHistoryInvidious } from './invidious/history';
+import {
+	addPlaylistVideoInvidious,
+	deletePersonalPlaylistInvidious,
+	getPersonalPlaylistsInvidious,
+	getPlaylistInvidious,
+	postPersonalPlaylistInvidious,
+	removePlaylistVideoInvidious
+} from './invidious/playlist';
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	// Doesn't exist in YTjs.
@@ -121,20 +73,15 @@ export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 		return [];
 	}
 
-	const resp = await fetchErrorHandle(await fetch(buildPath('popular'), fetchOptions));
-	return await resp.json();
+	return getPopularInvidious(fetchOptions);
 }
 
 export async function getResolveUrl(url: string): Promise<ResolvedUrl> {
 	if (isYTBackend() || useEngineFallback('ResolveUrl')) {
-		return await getResolveUrlYTjs(url);
+		return getResolveUrlYTjs(url);
 	}
 
-	const path = buildPath('resolveurl');
-	path.searchParams.set('url', url);
-
-	const resp = await fetchErrorHandle(await fetch(path));
-	return await resp.json();
+	return getResolveUrlInvidious(url);
 }
 
 export async function getVideo(
@@ -147,30 +94,10 @@ export async function getVideo(
 		isYTBackend() ||
 		useEngineFallback('Video')
 	) {
-		return await getVideoYTjs(videoId);
+		return getVideoYTjs(videoId);
 	}
 
-	const path = buildPath(`videos/${videoId}`);
-	path.searchParams.set('local', local.toString());
-
-	const resp = await fetch(path, fetchOptions);
-
-	if (!resp.ok && get(playerYouTubeJsFallback) && isUnrestrictedPlatform()) {
-		return await getVideoYTjs(videoId);
-	} else {
-		await fetchErrorHandle(resp);
-	}
-	return await resp.json();
-}
-
-export async function getDislikes(
-	videoId: string,
-	fetchOptions?: RequestInit
-): Promise<ReturnYTDislikes> {
-	const resp = await fetchErrorHandle(
-		await fetch(`${get(returnYTDislikesInstanceStore)}/votes?videoId=${videoId}`, fetchOptions)
-	);
-	return await resp.json();
+	return getVideoInvidious(videoId, local, fetchOptions);
 }
 
 export async function getComments(
@@ -181,15 +108,10 @@ export async function getComments(
 	commentsSetDefaults(options);
 
 	if (isYTBackend() || useEngineFallback('Comments')) {
-		return await getCommentsYTjs(videoId, options);
+		return getCommentsYTjs(videoId, options);
 	}
 
-	const path = buildPath(`comments/${videoId}`);
-	if (options.continuation) path.searchParams.set('continuation', options.continuation);
-	if (options.sort_by) path.searchParams.set('sort_by', options.sort_by);
-
-	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
-	return await resp.json();
+	return getCommentsInvidious(videoId, options, fetchOptions);
 }
 
 export async function getChannel(
@@ -199,10 +121,8 @@ export async function getChannel(
 	if (isYTBackend() || useEngineFallback('Channel')) {
 		return getChannelYTjs(channelId);
 	}
-	const resp = await fetchErrorHandle(
-		await fetch(buildPath(`channels/${channelId}`), fetchOptions)
-	);
-	return await resp.json();
+
+	return getChannelInvidious(channelId, fetchOptions);
 }
 
 export async function getChannelContent(
@@ -213,18 +133,10 @@ export async function getChannelContent(
 	if (typeof options.type === 'undefined') options.type = 'videos';
 
 	if (isYTBackend() || useEngineFallback('ChannelContent')) {
-		return await getChannelContentYTjs(channelId, options);
+		return getChannelContentYTjs(channelId, options);
 	}
 
-	const url = buildPath(`channels/${channelId}/${options.type}`);
-
-	if (typeof options.continuation !== 'undefined')
-		url.searchParams.set('continuation', options.continuation);
-
-	if (typeof options.sortBy !== 'undefined') url.searchParams.set('sort_by', options.sortBy);
-
-	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
-	return await resp.json();
+	return getChannelContentInvidious(channelId, options, fetchOptions);
 }
 
 export async function searchChannelContent(
@@ -239,11 +151,7 @@ export async function searchChannelContent(
 		};
 	}
 
-	const path = buildPath(`channel/${channelId}/search`);
-	path.searchParams.set('q', search);
-
-	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
-	return await resp.json();
+	return searchChannelContentInvidious(channelId, search, fetchOptions);
 }
 
 export async function getSearchSuggestions(
@@ -254,22 +162,14 @@ export async function getSearchSuggestions(
 		return getSearchSuggestionsYTjs(search);
 	}
 
-	const path = buildPath('search/suggestions');
-	path.searchParams.set('q', search);
-
-	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
-	return await resp.json();
+	return getSearchSuggestionsInvidious(search, fetchOptions);
 }
 
 export async function getHashtag(tag: string, page: number = 0): Promise<{ results: Video[] }> {
 	// TODO: Implement in YTjs
 	if (isYTBackend()) return { results: [] };
 
-	const path = buildPath(`hashtag/${tag}`);
-	path.searchParams.set('page', page.toString());
-
-	const resp = await fetchErrorHandle(await fetch(path));
-	return await resp.json();
+	return getHashtagInvidious(tag, page);
 }
 
 export async function getSearch(
@@ -280,21 +180,10 @@ export async function getSearch(
 	searchSetDefaults(options);
 
 	if (isYTBackend() || useEngineFallback('Search')) {
-		return await getSearchYTjs(search, options);
+		return getSearchYTjs(search, options);
 	}
 
-	const path = buildPath('search');
-	path.searchParams.set('q', search);
-
-	if (options.date) path.searchParams.set('date', options.date);
-	if (options.duration) path.searchParams.set('duration', options.duration);
-	if (options.features) path.searchParams.set('features', options.features);
-	if (options.page) path.searchParams.set('page', options.page);
-	if (options.sort_by) path.searchParams.set('sort_by', options.sort_by);
-	if (options.type) path.searchParams.set('type', options.type);
-
-	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));
-	return await resp.json();
+	return getSearchInvidious(search, options, fetchOptions);
 }
 
 export async function getFeed(
@@ -306,21 +195,14 @@ export async function getFeed(
 		return getFeedYTjs(maxResults, page);
 	}
 
-	const path = buildPath('auth/feed');
-	path.searchParams.set('max_results', maxResults.toString());
-	path.searchParams.set('page', page.toString());
-	const resp = await fetchErrorHandle(
-		await fetch(path, { ...buildAuthHeaders(), ...fetchOptions })
-	);
-	return await resp.json();
+	return getFeedInvidious(maxResults, page, fetchOptions);
 }
 
 export async function notificationsMarkAsRead(fetchOptions: RequestInit = {}) {
 	// Not support functionality of YTjs
 	if (isYTBackend()) return;
 
-	const path = buildPath('auth/notifications');
-	await fetchErrorHandle(await fetch(path, { ...buildAuthHeaders(), ...fetchOptions }));
+	return notificationsMarkAsReadInvidious(fetchOptions);
 }
 
 export async function getSubscriptions(
@@ -339,10 +221,8 @@ export async function getSubscriptions(
 
 		return getSubscriptionsYTjs();
 	}
-	const resp = await fetchErrorHandle(
-		await fetch(buildPath('auth/subscriptions'), { ...buildAuthHeaders(), ...fetchOptions })
-	);
-	return await resp.json();
+
+	return getSubscriptionsInvidious(fetchOptions);
 }
 
 export async function amSubscribed(
@@ -357,16 +237,7 @@ export async function amSubscribed(
 		return amSubscribedYTjs(authorId);
 	}
 
-	if (!get(invidiousAuthStore)) return false;
-
-	try {
-		const subscriptions = (await getSubscriptions(fetchOptions)).filter(
-			(sub) => sub.authorId === authorId
-		);
-		return subscriptions.length === 1;
-	} catch {
-		return false;
-	}
+	return amSubscribedInvidious(authorId, fetchOptions);
 }
 
 export async function postSubscribe(
@@ -382,13 +253,7 @@ export async function postSubscribe(
 		return postSubscribeYTjs(authorId);
 	}
 
-	await fetchErrorHandle(
-		await fetch(buildPath(`auth/subscriptions/${authorId}`), {
-			method: 'POST',
-			...buildAuthHeaders(),
-			...fetchOptions
-		})
-	);
+	return postSubscribeInvidious(authorId, fetchOptions);
 }
 
 export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestInit = {}) {
@@ -402,68 +267,19 @@ export async function deleteUnsubscribe(authorId: string, fetchOptions: RequestI
 		return deleteUnsubscribeYTjs(authorId);
 	}
 
-	await fetchErrorHandle(
-		await fetch(buildPath(`auth/subscriptions/${authorId}`), {
-			method: 'DELETE',
-			...buildAuthHeaders(),
-			...fetchOptions
-		})
-	);
+	return deleteUnsubscribeInvidious(authorId, fetchOptions);
 }
 
-export async function getHistory(
-	page: number = 1,
-	maxResults: number = 20,
-	fetchOptions: RequestInit = {}
-): Promise<string[]> {
-	// Not supported functionality of YTjs.
-	if (isYTBackend()) {
-		return [];
-	}
+export async function getHistory(page: number = 1, maxResults: number = 20): Promise<string[]> {}
 
-	const path = buildPath(`auth/history`);
-	path.searchParams.set('page', page.toString());
-	path.searchParams.set('max_results', maxResults.toString());
-
-	const resp = await fetchErrorHandle(
-		await fetch(path, {
-			...buildAuthHeaders(),
-			...fetchOptions
-		})
-	);
-	return await resp.json();
-}
-
-export async function deleteHistory(
-	videoId: string | undefined = undefined,
-	fetchOptions: RequestInit = {}
-) {
+export async function deleteHistory(videoId: string | undefined = undefined) {
 	if (isYTBackend()) return;
-
-	let url = '/api/v1/auth/history';
-	if (typeof videoId !== 'undefined') {
-		url += `/${videoId}`;
-	}
-
-	await fetchErrorHandle(
-		await fetch(buildPath(url), {
-			method: 'DELETE',
-			...buildAuthHeaders(),
-			...fetchOptions
-		})
-	);
 }
 
 export async function postHistory(videoId: string, fetchOptions: RequestInit = {}) {
 	if (isYTBackend()) return;
 
-	await fetchErrorHandle(
-		await fetch(buildPath(`auth/history/${videoId}`), {
-			method: 'POST',
-			...buildAuthHeaders(),
-			...fetchOptions
-		})
-	);
+	return postHistoryInvidious(videoId, fetchOptions);
 }
 
 export async function getPlaylist(
@@ -475,21 +291,7 @@ export async function getPlaylist(
 		return await getPlaylistYTjs(playlistId);
 	}
 
-	let resp;
-
-	const path = buildPath(`${get(invidiousAuthStore) ? 'auth/' : ''}playlists/${playlistId}`);
-	path.searchParams.set('page', page.toString());
-
-	if (get(invidiousAuthStore)) {
-		resp = await fetch(path, {
-			...buildAuthHeaders(),
-			...fetchOptions
-		});
-	} else {
-		resp = await fetch(path, fetchOptions);
-	}
-	await fetchErrorHandle(resp);
-	return await resp.json();
+	return getPlaylistInvidious(playlistId, page, fetchOptions);
 }
 
 export async function getPersonalPlaylists(
@@ -497,21 +299,13 @@ export async function getPersonalPlaylists(
 ): Promise<PlaylistPage[]> {
 	if (isYTBackend()) return [];
 
-	const resp = await fetchErrorHandle(
-		await fetch(buildPath('auth/playlists'), { ...buildAuthHeaders(), ...fetchOptions })
-	);
-	return await resp.json();
+	return getPersonalPlaylistsInvidious(fetchOptions);
 }
 
 export async function deletePersonalPlaylist(playlistId: string) {
 	if (isYTBackend()) return;
 
-	await fetchErrorHandle(
-		await fetch(buildPath(`auth/playlists/${playlistId}`), {
-			method: 'DELETE',
-			...buildAuthHeaders()
-		})
-	);
+	return deletePersonalPlaylistInvidious(playlistId);
 }
 
 export async function postPersonalPlaylist(
@@ -520,21 +314,7 @@ export async function postPersonalPlaylist(
 	fetchOptions: RequestInit = {}
 ) {
 	if (isYTBackend()) return;
-
-	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
-	headers['headers']['Content-type'] = 'application/json';
-
-	await fetchErrorHandle(
-		await fetch(buildPath('auth/playlists'), {
-			method: 'POST',
-			body: JSON.stringify({
-				title: title,
-				privacy: privacy
-			}),
-			...headers,
-			...fetchOptions
-		})
-	);
+	return postPersonalPlaylistInvidious(title, privacy, fetchOptions);
 }
 
 export async function addPlaylistVideo(
@@ -543,20 +323,7 @@ export async function addPlaylistVideo(
 	fetchOptions: RequestInit = {}
 ) {
 	if (isYTBackend()) return;
-
-	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
-	headers['headers']['Content-type'] = 'application/json';
-
-	await fetchErrorHandle(
-		await fetch(buildPath(`auth/playlists/${playlistId}/videos`), {
-			method: 'POST',
-			body: JSON.stringify({
-				videoId: videoId
-			}),
-			...headers,
-			...fetchOptions
-		})
-	);
+	return addPlaylistVideoInvidious(playlistId, videoId, fetchOptions);
 }
 
 export async function removePlaylistVideo(
@@ -566,32 +333,5 @@ export async function removePlaylistVideo(
 ) {
 	if (isYTBackend()) return;
 
-	await fetchErrorHandle(
-		await fetch(buildPath(`auth/playlists/${playlistId}/videos/${indexId}`), {
-			method: 'DELETE',
-			...buildAuthHeaders(),
-			...fetchOptions
-		})
-	);
-}
-
-export async function getDeArrow(videoId: string, fetchOptions?: RequestInit): Promise<DeArrow> {
-	const resp = await fetchErrorHandle(
-		await fetch(`${get(deArrowInstanceStore)}/api/branding?videoID=${videoId}`, fetchOptions)
-	);
-	return await resp.json();
-}
-
-export async function getThumbnail(
-	videoId: string,
-	time: number,
-	fetchOptions?: RequestInit
-): Promise<string> {
-	const resp = await fetchErrorHandle(
-		await fetch(
-			`${get(deArrowThumbnailInstanceStore)}/api/v1/getThumbnail?videoID=${videoId}&time=${time}`,
-			fetchOptions
-		)
-	);
-	return URL.createObjectURL(await resp.blob());
+	return removePlaylistVideoInvidious(playlistId, indexId, fetchOptions);
 }

@@ -6,7 +6,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { getDeArrow, getThumbnail } from '$lib/api';
 	import { Avatar } from 'melt/builders';
 	import type {
 		Notification,
@@ -26,6 +25,7 @@
 	import { queueGetWatchHistory } from '$lib/api/backend/historyPool';
 	import { page } from '$app/state';
 	import { isOwnBackend } from '$lib/shared';
+	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo | VideoWatchHistory;
@@ -74,7 +74,7 @@
 				for (const thumbnail of deArrow.thumbnails) {
 					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
 						if (thumbnail.timestamp !== null) {
-							thumbnailSrc = await getThumbnail(video.videoId, thumbnail.timestamp, {
+							thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
 								priority: 'low'
 							});
 						}

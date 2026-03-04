@@ -1,6 +1,6 @@
 // Not possible to exact from typescript interfaces at runtime.
 
-export const VideoSchema: Record<string, string> = {
+export const VideoSchema: Record<string, string | string[]> = {
 	author: 'string',
 	authorId: 'string',
 	authorUrl: 'string',
@@ -8,7 +8,7 @@ export const VideoSchema: Record<string, string> = {
 	published: 'number',
 	publishedText: 'string',
 	title: 'string',
-	type: 'string',
+	type: ['video', 'shortVideo', 'stream'],
 	videoId: 'string',
 	viewCount: 'number',
 	viewCountText: 'string'

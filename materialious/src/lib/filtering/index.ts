@@ -54,6 +54,7 @@ export function isItemFiltered(item: FeedItem): boolean {
 
 	return filteredContent.some((filterGroup) => {
 		if (filterGroup.type !== item.type) {
+			// Video is an alias for shortVideo & stream
 			if (filterGroup.type !== 'video' || (item.type !== 'shortVideo' && item.type !== 'stream')) {
 				return false;
 			}

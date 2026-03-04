@@ -59,6 +59,8 @@ export function isItemFiltered(item: FeedItem): boolean {
 			}
 		}
 
+		if (filterGroup.conditions.length === 0) return false;
+
 		const evaluateCondition = (condition: (typeof filterGroup.conditions)[number]): boolean => {
 			if (!(condition.field in item)) return false;
 

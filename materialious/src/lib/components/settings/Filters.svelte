@@ -166,8 +166,8 @@
 										name="boolean-options"
 									>
 										<option value="" disabled selected>Select your option</option>
-										<option value="true">true</option>
-										<option value="false">false</option>
+										<option selected={condition.value === 'true'} value="true">true</option>
+										<option selected={condition.value === 'false'} value="false">false</option>
 									</select>
 									<label for="boolean-options">Value</label>
 									<i>arrow_drop_down</i>
@@ -183,7 +183,9 @@
 									>
 										<option value="" disabled selected>Select your option</option>
 										{#each schema[filter.type][condition.field] as value (value)}
-											<option {value}>{camelCaseToHuman(value)}</option>
+											<option selected={condition.value === value} {value}
+												>{camelCaseToHuman(value)}</option
+											>
 										{/each}
 									</select>
 									<label for="array-options">Value</label>

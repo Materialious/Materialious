@@ -4,7 +4,6 @@ import {
 	invidiousAuthStore,
 	playerProxyVideosStore,
 	playerState,
-	rawMasterKeyStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
@@ -12,7 +11,6 @@ import { parseDescription } from '$lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { _ } from './i18n';
-import { isOwnBackend } from './shared';
 import { getDislikesRYD } from './api/ytd';
 
 export async function getWatchDetails(videoId: string, url: URL) {

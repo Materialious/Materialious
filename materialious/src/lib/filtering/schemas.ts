@@ -1,10 +1,12 @@
 // Not possible to exact from typescript interfaces at runtime.
 
-export const VideoSchema: Record<string, string | string[]> = {
+export type SchemaStructure = Record<string, 'string' | 'number' | 'boolean' | string[]>;
+
+export const VideoSchema: SchemaStructure = {
 	author: 'string',
 	authorId: 'string',
 	authorUrl: 'string',
-	authauthorVerified: 'string',
+	authorVerified: 'boolean',
 	published: 'number',
 	publishedText: 'string',
 	title: 'string',
@@ -14,7 +16,7 @@ export const VideoSchema: Record<string, string | string[]> = {
 	viewCountText: 'string'
 };
 
-export const ChannelSchema: Record<string, string> = {
+export const ChannelSchema: SchemaStructure = {
 	author: 'string',
 	authorId: 'string',
 	authorUrl: 'string',

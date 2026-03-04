@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { loadContentFilterFromURL, zFilterGroup, zFilterOperatorEnum } from '$lib/filtering';
-	import { ChannelSchema, VideoSchema } from '$lib/filtering/schemas';
+	import { ChannelSchema, VideoSchema, type SchemaStructure } from '$lib/filtering/schemas';
 	import { _ } from '$lib/i18n';
 	import { titleCase, camelCaseToHuman } from '$lib/letterCasing';
 	import { filterContentListStore } from '$lib/store';
@@ -9,13 +9,11 @@
 	let remoteFilterListUrl: string = $state('');
 	let remoteError: string = $state('');
 
-	type Operator = 'AND' | 'OR';
 	type FilterType = 'channel' | 'video';
 
 	const filterTypes: FilterType[] = ['channel', 'video'];
-	const operators: Operator[] = ['AND', 'OR'];
 
-	const schema: Record<FilterType, Record<string, string | string[]>> = {
+	const schema: Record<FilterType, SchemaStructure> = {
 		channel: ChannelSchema,
 		video: VideoSchema
 	};
@@ -84,7 +82,7 @@
 		<article class="no-margin surface-container-high">
 			<div class="grid">
 				<div class="s12 m6 l6">
-					<div class="label field suffix border surface-container-highest">
+					<div class="label field suffix surface-container-highest">
 						<select name="content-type">
 							{#each filterTypes as filterType (filterType)}
 								<option selected={filterType === filter.type} value={filterType}
@@ -102,12 +100,32 @@
 					</button>
 				</div>
 			</div>
+			<div class="space"></div>
+			<hr />
 			{#if filter.conditions}
 				<ul class="list">
-					{#each filter.conditions as condition, index (condition)}
+					{#each filter.conditions as condition (condition)}
 						<li style="display: block;">
-							<div class="label field suffix border surface-container-highest">
-								<select name="field">
+							<nav class="right-align no-margin">
+								<button
+									onclick={() => {
+										filter.conditions = filter.conditions.filter((item) => condition !== item);
+										filterContentListStore.set(contentFilters);
+									}}
+									class="surface-container-highest"
+								>
+									<i>close</i>
+								</button>
+							</nav>
+
+							<div class="label field suffix surface-container-highest">
+								<select
+									onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
+										condition.field = event.currentTarget.value;
+										filterContentListStore.set(contentFilters);
+									}}
+									name="field"
+								>
 									{#each Object.keys(schema[filter.type]) as key (key)}
 										<option value={key} selected={condition.field === key}
 											>{camelCaseToHuman(key)}</option
@@ -118,8 +136,16 @@
 								<i>arrow_drop_down</i>
 							</div>
 
-							<div class="field label suffix border surface-container-highest">
-								<select name="operator">
+							<div class="field label suffix surface-container-highest">
+								<select
+									onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
+										condition.operator = event.currentTarget.value as z.infer<
+											typeof zFilterOperatorEnum
+										>;
+										filterContentListStore.set(contentFilters);
+									}}
+									name="operator"
+								>
 									{#each zFilterOperatorEnum.options as operator (operator)}
 										<option selected={operator === condition.operator} value={operator}
 											>{operator}</option
@@ -130,21 +156,68 @@
 								<i>arrow_drop_down</i>
 							</div>
 
-							<div class="field label border">
-								<input name="value" type="text" value={condition.value} />
-								<label for="value">Value</label>
-							</div>
+							{#if schema[filter.type][condition.field] === 'boolean'}
+								<div class="field label suffix surface-container-highest">
+									<select
+										onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
+											condition.value = event.currentTarget.value;
+											filterContentListStore.set(contentFilters);
+										}}
+										name="boolean-options"
+									>
+										<option value="" disabled selected>Select your option</option>
+										<option value="true">true</option>
+										<option value="false">false</option>
+									</select>
+									<label for="boolean-options">Value</label>
+									<i>arrow_drop_down</i>
+								</div>
+							{:else if Array.isArray(schema[filter.type][condition.field])}
+								<div class="field label suffix surface-container-highest">
+									<select
+										onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
+											condition.value = event.currentTarget.value;
+											filterContentListStore.set(contentFilters);
+										}}
+										name="array-options"
+									>
+										<option value="" disabled selected>Select your option</option>
+										{#each schema[filter.type][condition.field] as value (value)}
+											<option {value}>{camelCaseToHuman(value)}</option>
+										{/each}
+									</select>
+									<label for="array-options">Value</label>
+									<i>arrow_drop_down</i>
+								</div>
+							{:else}
+								<div class="field label border">
+									<input
+										oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
+											condition.value = event.currentTarget.value;
+											filterContentListStore.set(contentFilters);
+										}}
+										name="value"
+										type={schema[filter.type][condition.field] === 'string' ? 'text' : 'number'}
+										value={condition.value}
+									/>
+									<label for="value">Value</label>
+								</div>
+							{/if}
 						</li>
-						{#if index < filter.conditions.length - 1}
-							<li>
-								<h6 class="bold">AND</h6>
-							</li>
-						{/if}
 					{/each}
 				</ul>
 			{/if}
 			<div class="small-space"></div>
-			<button class="surface-container-highest">
+			<button
+				onclick={() => {
+					filter.conditions.push({
+						operator: 'equals',
+						field: 'author',
+						value: ''
+					});
+				}}
+				class="surface-container-highest"
+			>
 				<i>add</i>
 				<span>Add conditional</span>
 			</button>

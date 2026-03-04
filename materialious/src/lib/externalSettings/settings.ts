@@ -60,8 +60,8 @@ type PersistedStore<T> = {
 	store: Writable<T>;
 	schema: z.ZodType<T>;
 	serialize?: (value: T) => string;
-	excludeFromBookmarklet?: boolean; // Won't be include in bookmarklet
-	excludeFromBackendSync?: boolean;
+	excludeFromBookmarklet?: boolean; // Won't be included in bookmarklet
+	excludeFromBackendSync?: boolean; // Won't be sync'd to account cloud
 };
 
 const zBoolean = z.coerce.boolean();

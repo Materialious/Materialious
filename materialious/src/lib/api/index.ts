@@ -292,7 +292,7 @@ export async function getWatchHistory(
 	}
 
 	let watchHistory = await localDb.watchHistory.toArray();
-	watchHistory.sort((a, b) => b.watched.getDate() - a.watched.getDate());
+	watchHistory.sort((a, b) => b.watched.getTime() - a.watched.getTime());
 
 	if (options.videoIds) {
 		watchHistory = watchHistory.filter((item) => !options.videoIds?.includes(item.videoId));
@@ -345,7 +345,7 @@ export async function updateWatchHistory(
 
 	if (get(invidiousAuthStore)) postHistoryInvidious(videoId, fetchOptions);
 
-	await localDb.watchHistory.update({ videoId }, { progress });
+	await localDb.watchHistory.update({ videoId }, { progress, watched: new Date() });
 }
 
 export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {

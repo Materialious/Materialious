@@ -45,7 +45,7 @@
 
 {#if $filterContentListStore}
 	{#each $filterContentListStore as filter, index (index)}
-		<article class="no-margin">
+		<article class="no-margin surface-container-highest">
 			<h6>{filter.type}</h6>
 			<ul class="list">
 				{#each filter.conditions as condition, index (index)}
@@ -67,3 +67,8 @@
 		<div class="small-space"></div>
 	{/each}
 {/if}
+
+<button class="surface-container-highest">
+	<i>add</i>
+	<span>Add filter</span>
+</button>

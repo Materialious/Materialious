@@ -52,7 +52,7 @@ export function isItemFiltered(item: FeedItem): boolean {
 	const filteredContent = get(filterContentListStore);
 	if (!filteredContent) return false;
 
-	return filteredContent.every((filterGroup) => {
+	return filteredContent.some((filterGroup) => {
 		if (filterGroup.type !== item.type) {
 			if (filterGroup.type !== 'video' || (item.type !== 'shortVideo' && item.type !== 'stream')) {
 				return false;
@@ -75,7 +75,7 @@ export function isItemFiltered(item: FeedItem): boolean {
 					return (
 						typeof fieldValue === 'string' &&
 						typeof condition.value === 'string' &&
-						fieldValue.includes(condition.value)
+						fieldValue.toLowerCase().includes(condition.value.toLowerCase())
 					);
 
 				case 'gt':
@@ -128,6 +128,8 @@ export async function loadContentFilterFromURL(url: string) {
 	const parsedFilterList = zFilterRootSchema.safeParse(respJson);
 
 	if (!parsedFilterList.success) throw new Error(parsedFilterList.error.message);
+
+	console.log(parsedFilterList.data.filterBy);
 
 	filterContentListStore.set(parsedFilterList.data.filterBy);
 }

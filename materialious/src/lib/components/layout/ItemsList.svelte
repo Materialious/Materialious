@@ -79,7 +79,7 @@
 
 <div
 	class={classes}
-	class:item-container={Capacitor.getPlatform() !== 'android' || $isAndroidTvStore}
+	class:item-container={Capacitor.getPlatform() !== 'android' && !$isAndroidTvStore}
 >
 	{#if items.length === 0}
 		<NoResults />

@@ -14,12 +14,7 @@
 		VideoBase,
 		VideoWatchHistory
 	} from '$lib/api/model';
-	import {
-		deArrowEnabledStore,
-		isAndroidTvStore,
-		playerSavePlaybackPositionStore,
-		playerState
-	} from '$lib/store';
+	import { deArrowEnabledStore, isAndroidTvStore, playerState } from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
 	import { queueGetWatchHistory } from '$lib/api/historyPool';
 	import { page } from '$app/state';

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
@@ -10,9 +8,10 @@
 </script>
 
 <form
-	onsubmit={preventDefault(() =>
-		returnYTDislikesInstanceStore.set(ensureNoTrailingSlash(returnYTInstance))
-	)}
+	onsubmit={(event: Event) => {
+		event.preventDefault();
+		returnYTDislikesInstanceStore.set(ensureNoTrailingSlash(returnYTInstance));
+	}}
 >
 	<nav>
 		<div class="field prefix label surface-container-highest max">

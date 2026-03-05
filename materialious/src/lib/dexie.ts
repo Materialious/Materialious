@@ -1,6 +1,6 @@
 import type { Table } from 'dexie';
 import Dexie from 'dexie';
-import type { Video } from './api/model';
+import type { Video, VideoWatchHistory } from './api/model';
 
 export interface FavouriteChannels {
 	channelId: string;
@@ -17,13 +17,15 @@ export class MaterialiousDb extends Dexie {
 	favouriteChannels!: Table<FavouriteChannels>;
 	channelSubscriptions!: Table<ChannelSubscriptions>;
 	subscriptionFeed!: Table<Video>;
+	watchHistory!: Table<VideoWatchHistory>;
 
 	constructor() {
 		super('materialious');
-		this.version(2).stores({
+		this.version(3).stores({
 			favouriteChannels: 'channelId',
 			channelSubscriptions: 'channelId',
-			subscriptionFeed: 'videoId, authorId, published'
+			subscriptionFeed: 'videoId, authorId, published',
+			watchHistory: 'videoId'
 		});
 	}
 }

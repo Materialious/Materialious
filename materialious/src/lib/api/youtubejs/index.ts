@@ -1,3 +1,4 @@
+import { getPublicEnv } from '$lib/misc';
 import { interfaceRegionStore } from '$lib/store';
 import { USER_AGENT } from 'bgutils-js';
 import { get } from 'svelte/store';
@@ -12,7 +13,8 @@ export async function getInnertube(): Promise<Innertube> {
 		fetch: fetch,
 		cache: new UniversalCache(true),
 		location: get(interfaceRegionStore),
-		user_agent: USER_AGENT
+		user_agent: USER_AGENT,
+		player_id: getPublicEnv('PLAYER_ID') ?? '9f4cc5e4'
 	});
 
 	return innertube;

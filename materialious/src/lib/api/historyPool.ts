@@ -1,5 +1,5 @@
-import type { VideoWatchHistory } from '../model';
-import { getWatchHistory } from './history';
+import type { VideoWatchHistory } from './model';
+import { getWatchHistory } from './index';
 
 const videoIds: string[] = [];
 const pendingResolves = new Map<string, (result: VideoWatchHistory | undefined) => void>();

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { getBestThumbnail } from '$lib/images';
 	import { videoLength } from '$lib/numbers';
 	import { generateChapterWebVTT, type ParsedDescription } from '$lib/description';
 	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
-	import { error, type Page } from '@sveltejs/kit';
+	import { error } from '@sveltejs/kit';
 	import Mousetrap from 'mousetrap';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
@@ -27,9 +27,8 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
-		playertheatreModeIsActive,
+		playerTheatreModeIsActive,
 		playerYouTubeJsFallback,
-		rawMasterKeyStore,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
@@ -61,7 +60,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import ClosedCaptions from './ClosedCaptions.svelte';
-	import { getVideoWatchHistory, updateWatchHistory } from '$lib/api/backend/history';
+	import { getVideoWatchHistory, updateWatchHistory } from '$lib/api';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -113,7 +112,7 @@
 		step: 0.01
 	});
 
-	playertheatreModeIsActive.subscribe(async () => {
+	playerTheatreModeIsActive.subscribe(async () => {
 		await tick();
 		updateVideoPlayerHeight();
 	});
@@ -198,7 +197,7 @@
 		});
 	}
 
-	function loadTimeFromUrl(page: Page): boolean {
+	function loadTimeFromUrl(): boolean {
 		if (player) {
 			const timeGivenUrl = page.url.searchParams.get('time');
 			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
@@ -211,7 +210,9 @@
 		return false;
 	}
 
-	page.subscribe((pageUpdate) => loadTimeFromUrl(pageUpdate));
+	$effect(() => {
+		loadTimeFromUrl();
+	});
 
 	function toggleFullscreen() {
 		if (document.fullscreenElement) {
@@ -446,8 +447,6 @@
 
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
-
-		playerContainer = document.getElementById('player-container') as HTMLElement;
 
 		window.addEventListener('resize', updateVideoPlayerHeight);
 		updateVideoPlayerHeight();
@@ -724,22 +723,13 @@
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
-		if (loadTimeFromUrl($page) || !$playerSavePlaybackPositionStore) return 0;
+		if (loadTimeFromUrl() || !$playerSavePlaybackPositionStore) return 0;
 
 		let toSetTime = 0;
 
-		try {
-			const playerPos = localStorage.getItem(`v_${data.video.videoId}`);
-			if (playerPos && Number(playerPos) > toSetTime) {
-				toSetTime = Number(playerPos);
-			}
-		} catch {
-			// Continue regardless of error
-		}
-
-		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-			const watchHistory = await getVideoWatchHistory(data.video.videoId);
-			if (watchHistory) toSetTime = watchHistory.progress;
+		const watchHistory = await getVideoWatchHistory(data.video.videoId);
+		if (watchHistory && watchHistory.progress < playerMaxKnownTime - 10) {
+			toSetTime = watchHistory.progress;
 		}
 
 		return toSetTime;
@@ -748,23 +738,7 @@
 	function savePlayerbackHistory() {
 		if (data.video.liveNow || !$playerSavePlaybackPositionStore || !playerElement) return;
 
-		if (playerElement.currentTime < playerElement.duration - 10 && playerElement.currentTime > 10) {
-			try {
-				localStorage.setItem(`v_${data.video.videoId}`, playerElement.currentTime.toString());
-			} catch {
-				// Continue regardless of error
-			}
-		} else {
-			try {
-				localStorage.removeItem(`v_${data.video.videoId}`);
-			} catch {
-				// Continue regardless of error
-			}
-		}
-
-		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-			updateWatchHistory(data.video.videoId, playerElement.currentTime);
-		}
+		updateWatchHistory(data.video.videoId, playerElement.currentTime);
 	}
 
 	onDestroy(async () => {

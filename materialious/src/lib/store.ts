@@ -22,6 +22,8 @@ import type {
 import type { ParsedDescription } from './description';
 import { ensureNoTrailingSlash, getPublicEnv } from './misc';
 import type { EngineFallback } from './api/misc';
+import type z from 'zod';
+import type { zFilterSchema } from './filtering/index';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;
@@ -187,7 +189,7 @@ export interface PlayerState {
 }
 
 export const playerState: Writable<PlayerState | undefined> = writable(undefined);
-export const playertheatreModeIsActive = writable(false);
+export const playerTheatreModeIsActive = writable(false);
 
 export const returnYtDislikesStore = persist(writable(false), createStorage(), 'returnYtDislikes');
 export const returnYTDislikesInstanceStore: Writable<string | null | undefined> = persist(
@@ -337,6 +339,24 @@ export const searchHistoryStore: Writable<string[]> = persist(
 	writable([]),
 	createStorage(),
 	'searchHistory'
+);
+
+export const filterContentListStore: Writable<z.infer<typeof zFilterSchema> | undefined> = persist(
+	writable(),
+	createStorage(),
+	'filterContentList'
+);
+
+export const filterContentUrlStore: Writable<string | undefined> = persist(
+	writable(),
+	createStorage(),
+	'filterContentUrl'
+);
+
+export const filterContentUrlAutoUpdateStore: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'filterContentUrlAutoUpdate'
 );
 
 export const feedLoadingStore: Writable<boolean> = writable(false);

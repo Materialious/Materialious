@@ -47,6 +47,11 @@ services:
       # guide here for URL structure https://docs.preset.io/docs/uri-connection-strings
       DATABASE_CONNECTION_URI: "sqlite:///materialious-data/materialious.db"
 
+      # YouTube player id to use, can be left blank but setting to a older player id may fix 
+      # video playback with local video processing.
+      # https://youtube-player-ids.nadeko.net
+      PUBLIC_PLAYER_ID: ""
+
       # Use Materialious account system.
       PUBLIC_INTERNAL_AUTH: "true"
 

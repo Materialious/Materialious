@@ -31,6 +31,7 @@
 		'invidious redirect': 'https://redirect.invidious.io'
 	};
 
+	let shareButtonElement: HTMLElement | undefined = $state();
 	let includePrompt = $state(false);
 
 	async function onShare(share: ShareLink) {
@@ -40,10 +41,16 @@
 			url.searchParams.append(share.param.key, share.param.value().toString());
 
 		await shareURL(url.toString());
+
+		shareButtonElement?.click();
 	}
 </script>
 
-<button class="surface-container-highest" onclick={(event: Event) => event.stopPropagation()}>
+<button
+	bind:this={shareButtonElement}
+	class="surface-container-highest"
+	onclick={(event: Event) => event.stopPropagation()}
+>
 	<i>share</i>
 	{#if !iconOnly}
 		{$_('player.share.title')}

@@ -76,7 +76,7 @@
 
 <article class="comment" class:border={!isSubComp}>
 	<div class="comment-header">
-		<img {...avatar.image} loading="lazy" class="circle small" alt="comment profile" />
+		<img {...avatar.image} class="circle small" alt="comment profile" />
 		<button
 			class="secondary-container"
 			{...mergeAttrs(avatar.fallback, {

@@ -2,10 +2,8 @@ import sodium from 'libsodium-wrappers-sumo';
 import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } from './encryption';
 import type { VideoPlay, VideoWatchHistory } from '../model';
 import { getBestThumbnail } from '$lib/images';
-import { get } from 'svelte/store';
-import { watchHistoryEnabledStore } from '$lib/store';
 
-export async function updateWatchHistory(videoId: string, progress: number) {
+export async function updateWatchHistoryBackend(videoId: string, progress: number) {
 	await sodium.ready;
 	const rawKey = await getRawKey();
 	if (!rawKey) return;
@@ -55,7 +53,7 @@ async function decryptWatchHistory(
 	};
 }
 
-export async function getVideoWatchHistory(
+export async function getVideoWatchHistoryBackend(
 	videoId: string
 ): Promise<VideoWatchHistory | undefined> {
 	await sodium.ready;
@@ -74,7 +72,7 @@ export async function getVideoWatchHistory(
 	return await decryptWatchHistory(await resp.json());
 }
 
-export async function getWatchHistory(
+export async function getWatchHistoryBackend(
 	options: { page?: number; videoIds?: string[]; fetchOptions?: RequestInit } = {
 		page: undefined,
 		videoIds: undefined,
@@ -116,13 +114,11 @@ export async function getWatchHistory(
 	return history;
 }
 
-export async function deleteWatchHistory() {
+export async function deleteWatchHistoryBackend() {
 	await fetch('/api/user/history', { method: 'DELETE' });
 }
 
-export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {
-	if (!get(watchHistoryEnabledStore)) return;
-
+export async function saveWatchHistoryBackend(video: VideoPlay, progress: number = 0) {
 	await sodium.ready;
 	const rawKey = await getRawKey();
 	if (!rawKey) return;

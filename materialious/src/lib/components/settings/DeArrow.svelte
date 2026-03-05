@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { ensureNoTrailingSlash } from '../../misc';
@@ -15,7 +13,12 @@
 	let deArrowThumbnailUrl = $state(get(deArrowThumbnailInstanceStore));
 </script>
 
-<form onsubmit={preventDefault(() => deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl)))}>
+<form
+	onsubmit={(event: Event) => {
+		event.preventDefault();
+		deArrowInstanceStore.set(ensureNoTrailingSlash(deArrowUrl));
+	}}
+>
 	<nav>
 		<div class="field prefix label surface-container-highest max">
 			<i>link</i>
@@ -28,7 +31,12 @@
 	</nav>
 </form>
 
-<form onsubmit={preventDefault(() => deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl))}>
+<form
+	onsubmit={(event: Event) => {
+		event.preventDefault();
+		deArrowThumbnailInstanceStore.set(deArrowThumbnailUrl);
+	}}
+>
 	<nav>
 		<div class="field prefix label surface-container-highest max">
 			<i>link</i>

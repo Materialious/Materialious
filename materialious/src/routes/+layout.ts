@@ -12,7 +12,10 @@ import {
 	invidiousInstanceStore,
 	interfaceDefaultPage,
 	isAndroidTvStore,
-	rawMasterKeyStore
+	rawMasterKeyStore,
+	filterContentListStore,
+	filterContentUrlStore,
+	filterContentUrlAutoUpdateStore
 } from '$lib/store';
 import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
@@ -21,6 +24,7 @@ import { deserialize } from '@macfja/serializer';
 import { isYTBackend } from '$lib/misc';
 import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
+import { loadContentFilterFromURL } from '$lib/filtering/index.js';
 
 export const ssr = false;
 export const prerender = false;
@@ -37,13 +41,27 @@ export async function load({ url }) {
 			invidiousInstance: invidiousInstanceStore,
 			authToken: invidiousAuthStore,
 			backendInUse: backendInUseStore,
-			rawMasterKey: rawMasterKeyStore
+			rawMasterKey: rawMasterKeyStore,
+			filterContentList: filterContentListStore,
+			filterContentUrl: filterContentUrlStore,
+			filterContentUrlAutoUpdate: filterContentUrlAutoUpdateStore
 		};
 
 		for (const [key, store] of Object.entries(preferenceKey)) {
 			const result = await Preferences.get({ key });
 			if (result.value !== null) {
 				store.set(deserialize(result.value));
+			}
+		}
+	}
+
+	if (get(filterContentUrlAutoUpdateStore)) {
+		const filterUrl = get(filterContentUrlStore);
+		if (filterUrl) {
+			try {
+				loadContentFilterFromURL(filterUrl);
+			} catch {
+				// Continue regardless of error
 			}
 		}
 	}

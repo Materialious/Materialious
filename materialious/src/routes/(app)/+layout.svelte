@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { goto } from '$app/navigation';
 
-	import { navigating, page } from '$app/stores';
+	import { navigating, page } from '$app/state';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
 	import type { Notification } from '$lib/api/model';
 	import Logo from '$lib/components/Logo.svelte';
@@ -18,7 +18,7 @@
 		interfaceDefaultPage,
 		isAndroidTvStore,
 		playerState,
-		playertheatreModeIsActive,
+		playerTheatreModeIsActive,
 		rawMasterKeyStore,
 		themeColorStore,
 		backendInUseStore,
@@ -33,6 +33,7 @@
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import WatchParty from '$lib/components/WatchParty.svelte';
 
 	let { children } = $props();
 
@@ -40,7 +41,8 @@
 
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);
-	let playerIsPip: boolean = $state(false);
+	let playerIsPip = $state(false);
+	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
 
 	let pages = $state(getPages());
 	invidiousAuthStore.subscribe(() => {
@@ -53,8 +55,8 @@
 		pages = getPages();
 	});
 
-	page.subscribe((pageData) => {
-		playerIsPip = !pageData.url.pathname.includes('/watch');
+	$effect(() => {
+		playerIsPip = !page.url.pathname.includes('/watch');
 		requestAnimationFrame(() => resetScroll());
 	});
 
@@ -160,7 +162,7 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
-		class:hide={$playertheatreModeIsActive}
+		class:hide={$playerTheatreModeIsActive}
 	>
 		<header class="small-padding">
 			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
@@ -168,13 +170,13 @@
 			</a>
 		</header>
 		{#if $isAndroidTvStore}
-			<a href={resolve('/search', {})} class:active={$page.url.href.endsWith('/search')}>
+			<a href={resolve('/search', {})} class:active={page.url.href.endsWith('/search')}>
 				<i>search</i>
 				<div>{$_('searchPlaceholder')}</div>
 			</a>
 		{/if}
 		{#each pages as navPage (navPage)}
-			<a href={resolve(navPage.href, {})} class:active={$page.url.href.endsWith(navPage.href)}
+			<a href={resolve(navPage.href, {})} class:active={page.url.href.endsWith(navPage.href)}
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
 			</a>
@@ -202,7 +204,7 @@
 	</nav>
 	{#if !$isAndroidTvStore}
 		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
-			{#if $playertheatreModeIsActive}
+			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
 						<Logo />
@@ -245,6 +247,17 @@
 					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
 				</div>
 			{:else}
+				<!-- Watch parties only work in HTTPS environments -->
+				{#if page.url.protocol === 'https:'}
+					<button
+						onclick={() => (showWatchParty = !showWatchParty)}
+						class="circle large transparent"
+						class:active={showWatchParty}
+					>
+						<i>groups</i>
+						<div class="tooltip bottom">{$_('watchParty.start')}</div>
+					</button>
+				{/if}
 				{#if $invidiousAuthStore && !isYTBackend()}
 					<button
 						class="circle large transparent"
@@ -290,7 +303,7 @@
 			<a
 				class="round"
 				href={resolve(navPage.href, {})}
-				class:active={$page.url.href.endsWith(navPage.href)}
+				class:active={page.url.href.endsWith(navPage.href)}
 				data-sveltekit-preload-data="off"
 				><i>{navPage.icon}</i>
 				<span style="font-size: .8em;">{navPage.name}</span>
@@ -317,14 +330,18 @@
 	</dialog>
 
 	<main id="main-content" tabindex="0" class="responsive max root">
+		{#if showWatchParty}
+			<WatchParty />
+		{/if}
+
 		{#if $playerState}
 			<div class="grid">
 				<div
 					class:pip={playerIsPip}
 					class:s12={!playerIsPip}
 					class:m12={!playerIsPip}
-					class:l12={$playertheatreModeIsActive && !playerIsPip}
-					class:l9={!$playertheatreModeIsActive && !playerIsPip}
+					class:l12={$playerTheatreModeIsActive && !playerIsPip}
+					class:l9={!$playerTheatreModeIsActive && !playerIsPip}
 				>
 					<div class="pip-info">
 						{#if playerIsPip}
@@ -369,11 +386,12 @@
 			</div>
 		{/if}
 
-		{#if $navigating}
+		{#await navigating.complete}
 			<PageLoading />
-		{:else}
+			<!-- eslint-disable-next-line  @typescript-eslint/no-unused-vars -->
+		{:then _}
 			{@render children?.()}
-		{/if}
+		{/await}
 
 		<Toast />
 	</main>

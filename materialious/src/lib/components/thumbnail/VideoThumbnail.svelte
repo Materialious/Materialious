@@ -6,7 +6,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { getDeArrow, getThumbnail } from '$lib/api';
 	import { Avatar } from 'melt/builders';
 	import type {
 		Notification,
@@ -15,17 +14,11 @@
 		VideoBase,
 		VideoWatchHistory
 	} from '$lib/api/model';
-	import {
-		deArrowEnabledStore,
-		isAndroidTvStore,
-		playerSavePlaybackPositionStore,
-		playerState,
-		rawMasterKeyStore
-	} from '$lib/store';
+	import { deArrowEnabledStore, isAndroidTvStore, playerState } from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
-	import { queueGetWatchHistory } from '$lib/api/backend/historyPool';
+	import { queueGetWatchHistory } from '$lib/api/historyPool';
 	import { page } from '$app/state';
-	import { isOwnBackend } from '$lib/shared';
+	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo | VideoWatchHistory;
@@ -44,18 +37,7 @@
 		watchUrl.searchParams.set('playlist', playlistId);
 	}
 
-	let beenWatched: boolean = $state(false);
-
 	let progress: string | undefined = $state();
-	if (get(playerSavePlaybackPositionStore)) {
-		try {
-			progress = localStorage.getItem(`v_${video.videoId}`) ?? undefined;
-		} catch {
-			progress = undefined;
-		}
-	} else {
-		progress = undefined;
-	}
 
 	let thumbnailSrc = $state(
 		'thumbnail' in video ? video.thumbnail : (getBestThumbnail(video.videoThumbnails) as string)
@@ -74,7 +56,7 @@
 				for (const thumbnail of deArrow.thumbnails) {
 					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
 						if (thumbnail.timestamp !== null) {
-							thumbnailSrc = await getThumbnail(video.videoId, thumbnail.timestamp, {
+							thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
 								priority: 'low'
 							});
 						}
@@ -99,24 +81,14 @@
 		} else sideways = true;
 	}
 
-	function checkIfWatched() {
-		beenWatched = !!(progress && !page.url.pathname.endsWith('/history'));
-	}
-
 	onMount(async () => {
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
-		checkIfWatched();
 
-		if (
-			!page.url.pathname.endsWith('/history') &&
-			isOwnBackend()?.internalAuth &&
-			get(rawMasterKeyStore)
-		)
+		if (!page.url.pathname.endsWith('/history'))
 			queueGetWatchHistory(video.videoId).then((watchHistory) => {
 				if (watchHistory) {
 					progress = watchHistory.progress.toString();
-					checkIfWatched();
 				}
 			});
 	});
@@ -144,7 +116,7 @@
 				<div class:crop={thumbnailHTMLElement ? thumbnailHTMLElement.height > 300 : false}>
 					<img
 						class="responsive"
-						class:watched={beenWatched}
+						class:watched={progress !== undefined}
 						{...thumbnail.image}
 						bind:this={thumbnailHTMLElement}
 						alt="Thumbnail for video"
@@ -156,7 +128,7 @@
 					style="height: 200px;"
 				></div>
 
-				{#if beenWatched}
+				{#if progress !== undefined}
 					<div class="chip surface-container-highest">
 						<i>check</i>
 					</div>

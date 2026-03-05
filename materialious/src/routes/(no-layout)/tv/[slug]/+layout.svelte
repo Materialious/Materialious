@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { navigating } from '$app/stores';
+	import { navigating } from '$app/state';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 
 	let { children } = $props();
@@ -14,8 +14,9 @@
 	</style>
 </svelte:head>
 
-{#if $navigating}
+{#await navigating.complete}
 	<PageLoading />
-{:else}
+	<!-- eslint-disable-next-line  @typescript-eslint/no-unused-vars -->
+{:then _}
 	{@render children?.()}
-{/if}
+{/await}

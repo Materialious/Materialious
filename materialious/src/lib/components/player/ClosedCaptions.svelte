@@ -1,6 +1,6 @@
 <script lang="ts" module>
 	let trackVisible: boolean = $state(false);
-	let captionsCues: VTTCue[] = $state([]);
+	let renderer: CaptionsRenderer | undefined;
 
 	let captionTracks: Record<string, string> = {};
 
@@ -19,7 +19,7 @@
 			});
 		}
 
-		captionsCues = (await parseText(await resp.text(), { strict: true, type: 'vtt' })).cues;
+		renderer?.changeTrack(await parseResponse(resp));
 	}
 </script>
 
@@ -27,8 +27,9 @@
 	import type { VideoPlay } from '$lib/api/model';
 	import { onDestroy, onMount } from 'svelte';
 	import { addToast } from '../Toast.svelte';
-	import { parseText, renderVTTCueString, type VTTCue } from 'media-captions';
+	import { parseResponse, CaptionsRenderer } from 'media-captions';
 	import { getCaptionUrl } from '$lib/player/captions';
+	import 'media-captions/styles/captions.css';
 
 	let {
 		video,
@@ -41,21 +42,8 @@
 	} = $props();
 
 	let captionElement: HTMLElement | undefined = $state();
-	let captionContainerHeight: number = $state(0);
-
-	function updateCaptionHeight() {
-		if (captionElement) {
-			captionContainerHeight = captionElement.offsetHeight;
-		}
-	}
-
-	$effect(() => {
-		updateCaptionHeight();
-	});
 
 	onMount(async () => {
-		window.addEventListener('resize', updateCaptionHeight);
-
 		if (video.captions) {
 			for (const caption of video.captions) {
 				const captionUrl = getCaptionUrl(caption, video.fallbackPatch);
@@ -65,66 +53,58 @@
 				captionTracks[caption.language_code] = captionUrl;
 			}
 		}
+
+		if (captionElement) {
+			renderer = new CaptionsRenderer(captionElement);
+		}
 	});
 
 	onDestroy(() => {
-		window.removeEventListener('resize', updateCaptionHeight);
-
 		captionTracks = {};
-		captionsCues = [];
 		trackVisible = false;
+	});
+
+	$effect(() => {
+		if (!renderer) return;
+		renderer.currentTime = currentTime;
 	});
 </script>
 
-{#if trackVisible && captionsCues.length > 0}
-	<div
-		class="caption-container"
-		bind:this={captionElement}
-		style:top={`calc(${showControls ? 'var(--video-player-height) * var(--top-percentage-controls-shown)' : 'var(--video-player-height) * var(--top-percentage-controls-hidden)'} - ${captionContainerHeight}px)`}
-	>
-		{#each captionsCues as cue (cue)}
-			<p class:hide={currentTime <= cue.startTime || currentTime >= cue.endTime}>
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html renderVTTCueString(cue, currentTime)}
-			</p>
-		{/each}
-	</div>
-{/if}
+<div
+	id="captions"
+	class:controls-shown={showControls}
+	bind:this={captionElement}
+	class:hide={!trackVisible}
+></div>
 
 <style>
-	:root {
-		--top-percentage-controls-shown: 0.85;
-		--top-percentage-controls-hidden: 0.98;
+	#captions {
+		--overlay-padding: 1%;
+		--cue-color: white;
+		--cue-bg-color: rgba(0, 0, 0, 0.8);
+		--cue-font-size: calc(var(--overlay-height) / 100 * 3);
+		--cue-line-height: calc(var(--cue-font-size) * 1.2);
+		--cue-padding-x: calc(var(--cue-font-size) * 0.6);
+		--cue-padding-y: calc(var(--cue-font-size) * 0.4);
+
+		bottom: 30px;
+		left: 55%;
+		transform: translateX(-50%); /* true horizontal centering */
 	}
 
-	.caption-container {
-		position: absolute;
-		z-index: 5;
-		left: 50%;
-		transform: translateX(-50%);
-		width: fit-content;
-	}
-
-	p {
-		padding: 5px;
-		border-radius: 0.25rem;
-		user-select: none;
-		font-size: 1.5rem;
-		color: #fff !important;
-		background-color: rgb(0, 0, 0, 0.7);
+	#captions.controls-shown {
+		bottom: 80px;
 	}
 
 	@media screen and (max-width: 1000px) {
-		:root {
-			--top-percentage-controls-shown: 0;
-		}
-
-		.caption-container {
+		#captions {
+			--cue-font-size: calc(var(--overlay-height) / 100 * 8);
+			bottom: 0px;
 			width: 100%;
 		}
 
-		p {
-			font-size: 1rem;
+		#captions.controls-shown {
+			display: none;
 		}
 	}
 </style>

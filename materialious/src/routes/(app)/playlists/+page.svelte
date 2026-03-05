@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
@@ -71,7 +69,12 @@
 </div>
 
 <dialog id="create-playlist">
-	<form onsubmit={preventDefault(createPlaylist)}>
+	<form
+		onsubmit={async (event: Event) => {
+			event.preventDefault();
+			await createPlaylist();
+		}}
+	>
 		<div class="field label border">
 			<input bind:value={playlistTitle} required name="title" type="text" />
 			<label for="title">{$_('title')}</label>

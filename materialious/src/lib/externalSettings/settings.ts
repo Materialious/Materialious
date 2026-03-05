@@ -51,7 +51,9 @@ import {
 	playerYouTubeJsAlways,
 	interfaceSearchHistoryEnabled,
 	playerPreferredVolumeStore,
-	watchHistoryEnabledStore
+	watchHistoryEnabledStore,
+	filterContentUrlStore,
+	filterContentUrlAutoUpdateStore
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 
@@ -60,8 +62,8 @@ type PersistedStore<T> = {
 	store: Writable<T>;
 	schema: z.ZodType<T>;
 	serialize?: (value: T) => string;
-	excludeFromBookmarklet?: boolean; // Won't be include in bookmarklet
-	excludeFromBackendSync?: boolean;
+	excludeFromBookmarklet?: boolean; // Won't be included in bookmarklet
+	excludeFromBackendSync?: boolean; // Won't be sync'd to account cloud
 };
 
 const zBoolean = z.coerce.boolean();
@@ -253,6 +255,21 @@ export const persistedStores: PersistedStore<any>[] = [
 		store: sponsorBlockCategoriesStore,
 		schema: zChapterModeRecord,
 		serialize: JSON.stringify
+	},
+	{
+		name: 'watchHistoryEnabled',
+		store: watchHistoryEnabledStore,
+		schema: zBoolean
+	},
+	{
+		name: 'filterContentUrl',
+		store: filterContentUrlStore,
+		schema: zString
+	},
+	{
+		name: 'filterContentUrlAutoUpdate',
+		store: filterContentUrlAutoUpdateStore,
+		schema: zBoolean
 	}
 ];
 
@@ -333,11 +350,6 @@ if (isOwnBackend()) {
 	persistedStores.push({
 		name: 'youTubeJsAlways',
 		store: playerYouTubeJsAlways,
-		schema: zBoolean
-	});
-	persistedStores.push({
-		name: 'watchHistoryEnabled',
-		store: watchHistoryEnabledStore,
 		schema: zBoolean
 	});
 }

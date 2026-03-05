@@ -1,16 +1,9 @@
-import {
-	getComments,
-	getDislikes,
-	getPersonalPlaylists,
-	getVideo,
-	postHistory
-} from '$lib/api/index';
+import { getComments, getPersonalPlaylists, getVideo, saveWatchHistory } from '$lib/api/index';
 import { loadEntirePlaylist } from '$lib/playlist';
 import {
 	invidiousAuthStore,
 	playerProxyVideosStore,
 	playerState,
-	rawMasterKeyStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
 } from '$lib/store';
@@ -18,8 +11,7 @@ import { parseDescription } from '$lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { _ } from './i18n';
-import { isOwnBackend } from './shared';
-import { saveWatchHistory } from './api/backend/history';
+import { getDislikesRYD } from './api/ytd';
 
 export async function getWatchDetails(videoId: string, url: URL) {
 	const playerStateRetrieved = get(playerState);
@@ -42,15 +34,12 @@ export async function getWatchDetails(videoId: string, url: URL) {
 
 	let personalPlaylists;
 	if (get(invidiousAuthStore)) {
-		postHistory(video.videoId);
 		personalPlaylists = getPersonalPlaylists({ priority: 'low' });
 	} else {
 		personalPlaylists = null;
 	}
 
-	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-		saveWatchHistory(video);
-	}
+	saveWatchHistory(video);
 
 	let comments;
 	try {
@@ -64,7 +53,7 @@ export async function getWatchDetails(videoId: string, url: URL) {
 	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
 		try {
 			returnYTDislikes = get(returnYtDislikesStore)
-				? getDislikes(videoId, { priority: 'low' })
+				? getDislikesRYD(videoId, { priority: 'low' })
 				: null;
 		} catch {
 			// Continue regardless of error

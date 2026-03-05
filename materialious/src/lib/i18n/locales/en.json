@@ -77,11 +77,6 @@
 	"newest": "Newest",
 	"oldest": "Oldest",
 	"popular": "Popular",
-	"syncParty": {
-		"userJoined": "User joined your watch party.",
-		"userLeft": "User left your watch party.",
-		"userOnPrivatePage": "User currently viewing a private page, syncing will resume shorty."
-	},
 	"videoTabs": {
 		"all": "All",
 		"videos": "Videos",
@@ -89,6 +84,17 @@
 		"channels": "Channels",
 		"shorts": "Shorts",
 		"streams": "Streams"
+	},
+	"watchParty": {
+		"start": "Start a watch party",
+		"header": "Watch party",
+		"createRoom": "Create room",
+		"joinRoom": "Join room",
+		"roomID": "Room ID",
+		"shareRoom": "Share room",
+		"leaveRoom": "Leave room",
+		"userJoin": "User joined room",
+		"userLeft": "User left room"
 	},
 	"subscriptions": {
 		"manageSubscriptions": "Manage subscriptions"
@@ -167,13 +173,8 @@
 		"interface": "Interface",
 		"star": "Star us on Github!",
 		"engine": "Backend engine",
-		"syncParty": "Sync party",
 		"about": "About",
 		"materialiousAccount": "Account",
-		"syncPartyWarning": "Please note your IP will be visible to users you invite.",
-		"startSyncParty": "Start sync party",
-		"endSyncParty": "End sync party",
-		"joinSyncParty": "Enter sync party URL",
 		"shareURL": "Share URL",
 		"notifications": "Notifications",
 		"noNewNotifications": "No new notifications here",
@@ -257,6 +258,18 @@
 			"automatic": "Auto skip",
 			"manual": "Manual skip",
 			"timeline": "Timeline only"
+		},
+		"filter": {
+			"title": "Content Filters",
+			"url": "Import Filters from URL",
+			"autoUpdate": "Automatically update filter from URL",
+			"contentType": "Content type",
+			"field": "Field",
+			"operator": "Operator",
+			"optionPlaceholder": "Select your option",
+			"value": "Value",
+			"addConditional": "Add conditional",
+			"addFilter": "Add filter"
 		},
 		"deArrow": {
 			"title": "DeArrow",

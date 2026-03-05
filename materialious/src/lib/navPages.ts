@@ -1,8 +1,7 @@
 import { _ } from '$lib/i18n';
 import { get } from 'svelte/store';
 import { isYTBackend } from './misc';
-import { invidiousAuthStore, rawMasterKeyStore } from './store';
-import { isOwnBackend } from './shared';
+import { invidiousAuthStore } from './store';
 
 export type Pages = { icon: string; href: string; name: string; requiresAuth: boolean }[];
 
@@ -26,16 +25,14 @@ export function getPages(): Pages {
 			href: '/playlists',
 			name: get(_)('pages.playlists'),
 			requiresAuth: true
-		}
-	];
-
-	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore))
-		pages.push({
+		},
+		{
 			icon: 'history',
 			href: '/history',
 			name: get(_)('pages.history'),
 			requiresAuth: false
-		});
+		}
+	];
 
 	pages = pages.filter((page) => {
 		return !page.requiresAuth || (get(invidiousAuthStore) && !isYTBackend());

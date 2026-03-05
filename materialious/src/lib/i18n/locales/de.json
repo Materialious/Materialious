@@ -205,7 +205,8 @@
         "clickXmoreTimesToDelete": "Klicke {{clicksTillDelete}} weitere(s) Mal(e) zum Löschen",
         "backendEngine": {
             "warning": "Erweiterte Einstellungen! Nur für erfahrene Nutzer. Ändere sie nicht, ausser du weisst, was du tust."
-        }
+        },
+        "historyEnabled": "Wiedergabeverlauf speichern"
     },
     "subscribe": "Abonnieren",
     "recommendedVideos": "Vorgeschlagene Videos",

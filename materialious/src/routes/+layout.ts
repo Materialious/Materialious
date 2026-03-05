@@ -59,7 +59,9 @@ export async function load({ url }) {
 		const filterUrl = get(filterContentUrlStore);
 		if (filterUrl) {
 			try {
-				loadContentFilterFromURL(filterUrl);
+				loadContentFilterFromURL(filterUrl).then((filterList) =>
+					filterContentListStore.set(filterList)
+				);
 			} catch {
 				// Continue regardless of error
 			}

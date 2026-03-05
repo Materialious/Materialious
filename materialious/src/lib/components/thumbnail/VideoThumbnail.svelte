@@ -113,7 +113,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={thumbnailHTMLElement ? thumbnailHTMLElement.height > 300 : false}>
+				<div class:crop={thumbnailHTMLElement ? thumbnailHTMLElement.naturalHeight > 300 : false}>
 					<img
 						class="responsive"
 						class:watched={progress !== undefined}

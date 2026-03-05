@@ -3,10 +3,16 @@
 	import { ChannelSchema, VideoSchema, type SchemaStructure } from '$lib/filtering/schemas';
 	import { _ } from '$lib/i18n';
 	import { titleCase, camelCaseToHuman } from '$lib/letterCasing';
-	import { filterContentListStore } from '$lib/store';
+	import {
+		filterContentListStore,
+		filterContentUrlAutoUpdateStore,
+		filterContentUrlStore
+	} from '$lib/store';
 	import type z from 'zod';
+	import { addToast } from '../Toast.svelte';
+	import { Clipboard } from '@capacitor/clipboard';
 
-	let remoteFilterListUrl: string = $state('');
+	let remoteFilterListUrl: string = $state($filterContentUrlStore ?? '');
 	let remoteError: string = $state('');
 
 	type FilterType = 'channel' | 'video';
@@ -33,9 +39,31 @@
 		try {
 			contentFilters = await loadContentFilterFromURL(remoteFilterListUrl);
 			filterContentListStore.set(contentFilters);
+			filterContentUrlStore.set(remoteFilterListUrl);
+			filterContentUrlAutoUpdateStore.set(false);
 		} catch (errorMsg) {
 			remoteError = (errorMsg as Error).message;
 		}
+	}
+
+	async function exportAsJSON() {
+		await Clipboard.write({
+			string: JSON.stringify(
+				{
+					version: 'v1',
+					createdFor: 'materialious',
+					filterBy: contentFilters
+				},
+				null,
+				2
+			)
+		});
+
+		addToast({
+			data: {
+				text: $_('player.share.copiedSuccess')
+			}
+		});
 	}
 
 	function addFilter(type: FilterType) {
@@ -58,6 +86,10 @@
 	}
 </script>
 
+<article class="error-container">
+	<p>{$_('layout.backendEngine.warning')}</p>
+</article>
+
 <form onsubmit={loadFilterList}>
 	<nav>
 		<div
@@ -77,7 +109,33 @@
 	</nav>
 </form>
 
+{#if $filterContentUrlStore}
+	<nav class="no-padding">
+		<div class="max">
+			<p>{$_('layout.filter.autoUpdate')}</p>
+		</div>
+		<label class="switch" tabindex="0">
+			<input
+				bind:checked={$filterContentUrlAutoUpdateStore}
+				onclick={() => filterContentUrlAutoUpdateStore.set(!$filterContentUrlAutoUpdateStore)}
+				type="checkbox"
+				role="switch"
+			/>
+			<span></span>
+		</label>
+	</nav>
+	<div class="space"></div>
+{/if}
+
 {#if contentFilters}
+	{#if contentFilters.length > 0}
+		<button class="surface-container-highest" onclick={exportAsJSON}>
+			<i>content_copy</i>
+			<span>{$_('copy')}</span>
+		</button>
+		<div class="space"></div>
+	{/if}
+
 	{#each contentFilters as filter (filter)}
 		<article class="no-margin surface-container-high">
 			<div class="grid">
@@ -195,7 +253,10 @@
 								<div class="field label border">
 									<input
 										oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
-											condition.value = event.currentTarget.value;
+											condition.value =
+												schema[filter.type][condition.field] === 'number'
+													? Number(event.currentTarget.value)
+													: event.currentTarget.value;
 											filterContentListStore.set(contentFilters);
 										}}
 										name="value"
@@ -233,7 +294,7 @@
 		<i>add</i>
 		<span>Add filter</span>
 	</button>
-	<menu class="min">
+	<menu>
 		{#each filterTypes as filterType (filterType)}
 			<li role="presentation" onclick={() => addFilter(filterType)}>{titleCase(filterType)}</li>
 		{/each}

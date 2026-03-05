@@ -68,7 +68,7 @@ export function isItemFiltered(item: FeedItem): boolean {
 
 			switch (condition.operator) {
 				case 'equals':
-					return fieldValue === condition.value;
+					return fieldValue.toString() === condition.value.toString();
 
 				case 'in':
 					return Array.isArray(condition.value) && (condition.value as any[]).includes(fieldValue);

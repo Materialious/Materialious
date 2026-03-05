@@ -347,6 +347,18 @@ export const filterContentListStore: Writable<z.infer<typeof zFilterSchema> | un
 	'filterContentList'
 );
 
+export const filterContentUrlStore: Writable<string | undefined> = persist(
+	writable(),
+	createStorage(),
+	'filterContentUrl'
+);
+
+export const filterContentUrlAutoUpdateStore: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'filterContentUrlAutoUpdate'
+);
+
 export const feedLoadingStore: Writable<boolean> = writable(false);
 export const feedCacheStore: Writable<{
 	[key: string]: (VideoBase | Video | PlaylistPageVideo)[];

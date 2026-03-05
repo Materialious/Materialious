@@ -261,7 +261,8 @@
 		},
 		"filter": {
 			"title": "Content Filters",
-			"url": "Import Filters from URL"
+			"url": "Import Filters from URL",
+			"autoUpdate": "Automatically update filter from URL"
 		},
 		"deArrow": {
 			"title": "DeArrow",

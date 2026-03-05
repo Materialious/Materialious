@@ -51,7 +51,9 @@ import {
 	playerYouTubeJsAlways,
 	interfaceSearchHistoryEnabled,
 	playerPreferredVolumeStore,
-	watchHistoryEnabledStore
+	watchHistoryEnabledStore,
+	filterContentUrlStore,
+	filterContentUrlAutoUpdateStore
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 
@@ -257,6 +259,16 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'watchHistoryEnabled',
 		store: watchHistoryEnabledStore,
+		schema: zBoolean
+	},
+	{
+		name: 'filterContentUrl',
+		store: filterContentUrlStore,
+		schema: zString
+	},
+	{
+		name: 'filterContentUrlAutoUpdate',
+		store: filterContentUrlAutoUpdateStore,
 		schema: zBoolean
 	}
 ];

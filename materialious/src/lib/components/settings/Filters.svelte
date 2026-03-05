@@ -148,7 +148,7 @@
 								>
 							{/each}
 						</select>
-						<label for="content-type">Content type</label>
+						<label for="content-type">{$_('layout.filter.contentType')}</label>
 						<i>arrow_drop_down</i>
 					</div>
 				</div>
@@ -190,7 +190,7 @@
 										>
 									{/each}
 								</select>
-								<label for="field">Field</label>
+								<label for="field">{$_('layout.filter.field')}</label>
 								<i>arrow_drop_down</i>
 							</div>
 
@@ -210,7 +210,7 @@
 										>
 									{/each}
 								</select>
-								<label for="operator">Operator</label>
+								<label for="operator">{$_('layout.filter.operator')}</label>
 								<i>arrow_drop_down</i>
 							</div>
 
@@ -223,7 +223,9 @@
 										}}
 										name="boolean-options"
 									>
-										<option value="" disabled selected>Select your option</option>
+										<option value="" disabled selected
+											>{$_('layout.filter.optionPlaceholder')}</option
+										>
 										<option selected={condition.value === 'true'} value="true">true</option>
 										<option selected={condition.value === 'false'} value="false">false</option>
 									</select>
@@ -239,7 +241,9 @@
 										}}
 										name="array-options"
 									>
-										<option value="" disabled selected>Select your option</option>
+										<option value="" disabled selected
+											>{$_('layout.filter.optionPlaceholder')}</option
+										>
 										{#each schema[filter.type][condition.field] as value (value)}
 											<option selected={condition.value === value} {value}
 												>{camelCaseToHuman(value)}</option
@@ -263,7 +267,7 @@
 										type={schema[filter.type][condition.field] === 'string' ? 'text' : 'number'}
 										value={condition.value}
 									/>
-									<label for="value">Value</label>
+									<label for="value">{$_('layout.filter.value')}</label>
 								</div>
 							{/if}
 						</li>
@@ -282,7 +286,7 @@
 				class="surface-container-highest"
 			>
 				<i>add</i>
-				<span>Add conditional</span>
+				<span>{$_('layout.filter.addConditional')}</span>
 			</button>
 		</article>
 		<div class="small-space"></div>
@@ -292,7 +296,7 @@
 <div>
 	<button class="surface-container-highest">
 		<i>add</i>
-		<span>Add filter</span>
+		<span>{$_('layout.filter.addFilter')}</span>
 	</button>
 	<menu>
 		{#each filterTypes as filterType (filterType)}

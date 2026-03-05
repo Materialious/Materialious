@@ -262,7 +262,14 @@
 		"filter": {
 			"title": "Content Filters",
 			"url": "Import Filters from URL",
-			"autoUpdate": "Automatically update filter from URL"
+			"autoUpdate": "Automatically update filter from URL",
+			"contentType": "Content type",
+			"field": "Field",
+			"operator": "Operator",
+			"optionPlaceholder": "Select your option",
+			"value": "Value",
+			"addConditional": "Add conditional",
+			"addFilter": "Add filter"
 		},
 		"deArrow": {
 			"title": "DeArrow",

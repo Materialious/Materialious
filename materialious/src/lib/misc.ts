@@ -10,7 +10,9 @@ import { addToast } from './components/Toast.svelte';
 import { _ } from './i18n';
 
 export function getPublicEnv(envName: string): string | undefined {
-	return env[`PUBLIC_${envName}`] ?? import.meta.env[`VITE_${envName}`];
+	const envValue = env[`PUBLIC_${envName}`] ?? import.meta.env[`VITE_${envName}`];
+	if (envValue === '') return;
+	return envValue;
 }
 
 export function isMobile(): boolean {

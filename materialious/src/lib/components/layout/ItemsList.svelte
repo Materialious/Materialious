@@ -6,14 +6,13 @@
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, type FeedItems } from '$lib/feed';
-	import { timeout } from '$lib/misc';
+	import { isMobile, timeout } from '$lib/misc';
 	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
 	import NoResults from '$lib/components/NoResults.svelte';
 	import { SpatialMenu } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
-	import { Capacitor } from '@capacitor/core';
 	import { isItemFiltered } from '$lib/filtering/index';
 
 	interface Props {
@@ -77,10 +76,7 @@
 	});
 </script>
 
-<div
-	class={classes}
-	class:item-container={Capacitor.getPlatform() !== 'android' && !$isAndroidTvStore}
->
+<div class={classes} class:item-container={!isMobile() && !$isAndroidTvStore}>
 	{#if items.length === 0}
 		<NoResults />
 	{/if}

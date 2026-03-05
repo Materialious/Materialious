@@ -26,6 +26,8 @@
 
 	let contentFilters = $state($filterContentListStore);
 
+	filterContentListStore.subscribe((updatedFilterList) => (contentFilters = updatedFilterList));
+
 	async function loadFilterList(event: Event) {
 		event.preventDefault();
 
@@ -75,6 +77,8 @@
 		});
 
 		filterContentListStore.set(contentFilters);
+
+		filterContentUrlAutoUpdateStore.set(false);
 	}
 
 	function removeFilter(filter: z.infer<typeof zFilterGroup>) {
@@ -83,6 +87,7 @@
 		contentFilters = contentFilters.filter((item) => item !== filter);
 
 		filterContentListStore.set(contentFilters);
+		filterContentUrlAutoUpdateStore.set(false);
 	}
 </script>
 
@@ -169,6 +174,7 @@
 									onclick={() => {
 										filter.conditions = filter.conditions.filter((item) => condition !== item);
 										filterContentListStore.set(contentFilters);
+										filterContentUrlAutoUpdateStore.set(false);
 									}}
 									class="surface-container-highest"
 								>
@@ -181,6 +187,7 @@
 									onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
 										condition.field = event.currentTarget.value;
 										filterContentListStore.set(contentFilters);
+										filterContentUrlAutoUpdateStore.set(false);
 									}}
 									name="field"
 								>
@@ -201,6 +208,7 @@
 											typeof zFilterOperatorEnum
 										>;
 										filterContentListStore.set(contentFilters);
+										filterContentUrlAutoUpdateStore.set(false);
 									}}
 									name="operator"
 								>
@@ -220,6 +228,7 @@
 										onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
 											condition.value = event.currentTarget.value;
 											filterContentListStore.set(contentFilters);
+											filterContentUrlAutoUpdateStore.set(false);
 										}}
 										name="boolean-options"
 									>
@@ -238,6 +247,7 @@
 										onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
 											condition.value = event.currentTarget.value;
 											filterContentListStore.set(contentFilters);
+											filterContentUrlAutoUpdateStore.set(false);
 										}}
 										name="array-options"
 									>
@@ -262,6 +272,7 @@
 													? Number(event.currentTarget.value)
 													: event.currentTarget.value;
 											filterContentListStore.set(contentFilters);
+											filterContentUrlAutoUpdateStore.set(false);
 										}}
 										name="value"
 										type={schema[filter.type][condition.field] === 'string' ? 'text' : 'number'}
@@ -282,6 +293,7 @@
 						field: 'author',
 						value: ''
 					});
+					filterContentUrlAutoUpdateStore.set(false);
 				}}
 				class="surface-container-highest"
 			>

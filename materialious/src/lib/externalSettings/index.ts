@@ -21,17 +21,21 @@ export async function syncSettingsToBackend() {
 			getKeyValue(store.name).then((currentKeyValue) => {
 				if (currentKeyValue !== null || allowNullOverwrite.includes(store.name)) {
 					const currentKeyValueParsed = parseWithSchema(store.schema, currentKeyValue);
-					if (currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) {
+					if (
+						(currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) ||
+						allowNullOverwrite.includes(store.name)
+					) {
 						store.store.set(currentKeyValueParsed);
 					}
 				}
 			});
 
-			let initalLoad = true;
+			let initialLoad = true;
 			store.store.subscribe((value) => {
 				if (!get(rawMasterKeyStore)) return;
-				if (initalLoad) {
-					initalLoad = false;
+
+				if (initialLoad && !allowNullOverwrite.includes(store.name)) {
+					initialLoad = false;
 					return;
 				}
 

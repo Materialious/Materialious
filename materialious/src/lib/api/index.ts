@@ -302,7 +302,7 @@ export async function getWatchHistory(
 	watchHistory.sort((a, b) => b.watched.getTime() - a.watched.getTime());
 
 	if (options.videoIds) {
-		watchHistory = watchHistory.filter((item) => !options.videoIds?.includes(item.videoId));
+		watchHistory = watchHistory.filter((item) => options.videoIds?.includes(item.videoId));
 	}
 
 	const cullAfter = 1000;
@@ -317,10 +317,13 @@ export async function getWatchHistory(
 
 	const maxResults = 100;
 
-	const start = (options.page ?? 1 - 1) * maxResults;
+	const page = options.page ?? 1; // default to page 1
+	const start = (page - 1) * maxResults;
 	const end = start + maxResults;
 
-	return watchHistory.splice(start, end);
+	watchHistory = watchHistory.slice(start, end);
+
+	return watchHistory;
 }
 
 export async function getVideoWatchHistory(

@@ -38,6 +38,7 @@
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
+	import { isItemFiltered } from '$lib/filtering/index.js';
 
 	let { data = $bindable() } = $props();
 
@@ -461,11 +462,13 @@
 				<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />
 			{:else if data.video.recommendedVideos}
 				{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
-					<article class="no-padding border">
-						{#key recommendedVideo.videoId}
-							<Thumbnail video={recommendedVideo} sideways={true} />
-						{/key}
-					</article>
+					{#if !isItemFiltered(recommendedVideo)}
+						<article class="no-padding border">
+							{#key recommendedVideo.videoId}
+								<Thumbnail video={recommendedVideo} sideways={true} />
+							{/key}
+						</article>
+					{/if}
 				{/each}
 			{/if}
 		</div>

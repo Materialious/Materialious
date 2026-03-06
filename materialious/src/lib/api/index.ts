@@ -257,15 +257,15 @@ export async function amSubscribed(
 
 export async function postSubscribe(
 	authorId: string,
-	fetchOptions: RequestInit = {},
-	bypassYTBackend: boolean = false
+	authorName: string | undefined = undefined,
+	fetchOptions: RequestInit = {}
 ) {
-	if (isYTBackend() && !bypassYTBackend) {
+	if (isYTBackend()) {
 		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-			return postSubscribeBackend(authorId);
+			return postSubscribeBackend(authorId, authorName);
 		}
 
-		return postSubscribeYTjs(authorId);
+		return postSubscribeYTjs(authorId, authorName);
 	}
 
 	return postSubscribeInvidious(authorId, fetchOptions);

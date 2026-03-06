@@ -271,6 +271,11 @@
 			"addConditional": "Add conditional",
 			"addFilter": "Add filter"
 		},
+		"export": {
+			"title": "Export/Import",
+			"importSub": "Import subscriptions",
+			"importSubSupported": "YouTube CSV/OPML, Invidious OPML/JSON, Freetube database & NewPipe JSON supported"
+		},
 		"deArrow": {
 			"title": "DeArrow",
 			"thumbnailInstanceUrl": "Thumbnail instance URL",

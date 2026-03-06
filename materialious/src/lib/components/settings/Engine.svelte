@@ -1,21 +1,14 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
 	import {
-		invidiousAuthStore,
 		engineCooldownYTStore,
 		engineCullYTStore,
 		engineFallbacksStore,
 		engineMaxConcurrentChannelsStore,
-		invidiousInstanceStore,
 		backendInUseStore
 	} from '$lib/store';
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
-	import { getSubscriptions } from '$lib/api';
-	import { addToast, toaster } from '../Toast.svelte';
-	import { importSubscriptions } from '$lib/importExport';
-	import { postSubscribeInvidious } from '$lib/api/invidious/subscribe';
-	import { getSubscriptionsInvidious } from '$lib/api/invidious/feed';
 
 	const engineFallbacks: EngineFallback[] = [
 		'Channel',
@@ -44,55 +37,6 @@
 		}
 
 		engineFallbacksStore.set(enabledFallbacks);
-	}
-
-	async function importInvidiousSubs() {
-		const importedSubs = await getSubscriptionsInvidious();
-
-		addToast({
-			data: {
-				text: $_('layout.backendEngine.importingToMaterialious')
-			},
-			id: 'import-to-materialious',
-			closeDelay: 0
-		});
-
-		await importSubscriptions(importedSubs);
-
-		toaster.removeToast('import-to-materialious');
-
-		addToast({
-			data: {
-				text: $_('layout.backendEngine.importingToMaterialiousFinished')
-			}
-		});
-	}
-
-	async function exportMaterialiousSubs() {
-		const subs = await getSubscriptions();
-
-		addToast({
-			data: {
-				text: $_('layout.backendEngine.exportingToInvidious')
-			},
-			id: 'export-to-invidious',
-			closeDelay: 0
-		});
-
-		const subPromises: Promise<void>[] = [];
-		for (const sub of subs) {
-			subPromises.push(postSubscribeInvidious(sub.authorId));
-		}
-
-		await Promise.all(subPromises);
-
-		toaster.removeToast('export-to-invidious');
-
-		addToast({
-			data: {
-				text: $_('layout.backendEngine.exportingToInvidiousFinished')
-			}
-		});
 	}
 </script>
 
@@ -138,23 +82,6 @@
 		/>
 		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>
-
-	{#if $invidiousAuthStore && $invidiousInstanceStore}
-		<h6>{$_('layout.backendEngine.importExport')}</h6>
-		<div class="space"></div>
-
-		<button onclick={exportMaterialiousSubs} class="surface-container-highest">
-			<i>upload</i>
-			<div>{$_('layout.backendEngine.exportToInvidious')}</div>
-		</button>
-
-		<div class="space"></div>
-
-		<button onclick={importInvidiousSubs} class="surface-container-highest">
-			<i>download</i>
-			<div>{$_('layout.backendEngine.importToMaterialious')}</div>
-		</button>
-	{/if}
 {:else}
 	<h6>{$_('layout.backendEngine.fallbacks')}</h6>
 	{#each engineFallbacks as fallback (fallback)}

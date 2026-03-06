@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { bookmarkletSaveToUrl, settingsToJson } from '$lib/externalSettings/index';
+	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
 	import { letterCase, titleCases } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
-	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
@@ -34,7 +33,6 @@
 		themeColorStore,
 		watchHistoryEnabledStore
 	} from '../../store';
-	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
 
@@ -168,12 +166,12 @@
 		</form>
 		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
-				<button onclick={goToInvidiousLogin}>
+				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
 					<i>link</i>
 					<span>{$_('linkInvidious')}</span>
 				</button>
 			{:else}
-				<button onclick={invidiousLogout}>
+				<button class="surface-container-highest" onclick={invidiousLogout}>
 					<i>link_off</i>
 					<span>{$_('unlinkInvidious')}</span>
 				</button>
@@ -204,7 +202,7 @@
 	{/if}
 {/if}
 
-<button onclick={toggleDarkMode} class="no-margin">
+<button onclick={toggleDarkMode} class="no-margin surface-container-highest">
 	{#if !$darkModeStore}
 		<i>dark_mode</i>
 		<span>{$_('layout.theme.darkMode')}</span>
@@ -213,7 +211,7 @@
 		<span>{$_('layout.theme.lightMode')}</span>
 	{/if}
 </button>
-<button onclick={() => (colorPickerOpen = !colorPickerOpen)}>
+<button class="surface-container-highest" onclick={() => (colorPickerOpen = !colorPickerOpen)}>
 	<i>palette</i>
 	<span>{$_('layout.theme.color')}</span>
 </button>
@@ -457,33 +455,13 @@
 		<h6>{$_('layout.bookmarklet')}</h6>
 		<div class="space"></div>
 		<button
-			class="no-margin"
+			class="no-margin surface-container-highest"
 			onclick={async () => {
 				await shareURL(bookmarkletSaveToUrl());
 			}}
 		>
 			<i>content_copy</i>
 			<span>{$_('copyUrl')}</span>
-		</button>
-	</div>
-	<div class="space"></div>
-	<div class="settings">
-		<h6>{$_('layout.exportToJson')}</h6>
-		<div class="space"></div>
-		<button
-			class="no-margin"
-			onclick={async () => {
-				await Clipboard.write({ string: settingsToJson() });
-
-				addToast({
-					data: {
-						text: get(_)('player.share.copiedSuccess')
-					}
-				});
-			}}
-		>
-			<i>content_copy</i>
-			<span>{$_('copy')}</span>
 		</button>
 	</div>
 {/if}

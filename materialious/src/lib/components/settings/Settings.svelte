@@ -15,6 +15,7 @@
 	import { Tabs } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 	import Filters from './Filters.svelte';
+	import ExportImport from './ExportImport.svelte';
 
 	type TabCategories =
 		| 'interface'
@@ -25,7 +26,8 @@
 		| 'about'
 		| 'engine'
 		| 'account'
-		| 'filters';
+		| 'filters'
+		| 'export';
 
 	const tabCategories: Tabs<TabCategories> = new Tabs({
 		value: 'interface',
@@ -49,6 +51,12 @@
 			label: $_('layout.deArrow.title'),
 			icon: 'keyboard_double_arrow_down',
 			component: DeArrow
+		},
+		{
+			id: 'export',
+			label: $_('layout.export.title'),
+			icon: 'file_export',
+			component: ExportImport
 		},
 		{
 			id: 'about',

@@ -80,6 +80,21 @@ function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
 	}
 }
 
+export async function loadSettingsFromFile(file: File) {
+	const fileContents = await file.text();
+
+	let fileJson: Record<any, any> | undefined;
+	try {
+		fileJson = JSON.parse(fileContents);
+	} catch {
+		// Handled outside of catch.
+	}
+
+	if (!fileJson) return;
+
+	setStores(fileJson, true);
+}
+
 export function loadSettingsFromEnv() {
 	const defaultSettings = getPublicEnv('DEFAULT_SETTINGS');
 

@@ -220,11 +220,8 @@ export async function notificationsMarkAsRead(fetchOptions: RequestInit = {}) {
 	return notificationsMarkAsReadInvidious(fetchOptions);
 }
 
-export async function getSubscriptions(
-	fetchOptions: RequestInit = {},
-	bypassYTBackend: boolean = false
-): Promise<Subscription[]> {
-	if (isYTBackend() && !bypassYTBackend) {
+export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<Subscription[]> {
+	if (isYTBackend()) {
 		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 			return (await getSubscriptionsBackend()).map((sub) => {
 				return {
@@ -257,15 +254,15 @@ export async function amSubscribed(
 
 export async function postSubscribe(
 	authorId: string,
-	fetchOptions: RequestInit = {},
-	bypassYTBackend: boolean = false
+	authorName: string | undefined = undefined,
+	fetchOptions: RequestInit = {}
 ) {
-	if (isYTBackend() && !bypassYTBackend) {
+	if (isYTBackend()) {
 		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
-			return postSubscribeBackend(authorId);
+			return postSubscribeBackend(authorId, authorName);
 		}
 
-		return postSubscribeYTjs(authorId);
+		return postSubscribeYTjs(authorId, authorName);
 	}
 
 	return postSubscribeInvidious(authorId, fetchOptions);

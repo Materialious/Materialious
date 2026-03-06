@@ -4,7 +4,7 @@
 	"popularPageDisabled": "Popular page has been disabled by Admins",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
 	"copyUrl": "Copy URL",
-	"copy": "Copy JSON",
+	"copy": "Copy to clipboard",
 	"loadMore": "Load more",
 	"views": "views",
 	"login": "Login",
@@ -210,7 +210,7 @@
 			"cooldown": "Re-fetch channel hour cooldown",
 			"concurrent": "Max amount of channels to parse before feed return",
 			"fallbacks": "Fallbacks",
-			"importExport": "Import/Export subscriptions",
+			"importExport": "Automatic export/import",
 			"exportToInvidious": "Export to Invidious from Materialious",
 			"importToMaterialious": "Import from Invidious to Materialious",
 			"importingToMaterialious": "Importing to Materialious began",
@@ -270,6 +270,17 @@
 			"value": "Value",
 			"addConditional": "Add conditional",
 			"addFilter": "Add filter"
+		},
+		"export": {
+			"title": "Export/Import",
+			"importSub": "Import subscriptions",
+			"importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube database & NewPipe JSON supported",
+			"importing": "Importing subscriptions (this will take a moment)",
+			"importingCompleted": "Subscriptions successfully imported",
+			"exportSub": "Export subscriptions",
+			"exportToClipboard": "Export to clipboard",
+			"exportToFile": "Export to file",
+			"importFromFile": "Import from file"
 		},
 		"deArrow": {
 			"title": "DeArrow",

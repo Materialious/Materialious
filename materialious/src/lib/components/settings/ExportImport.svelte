@@ -58,6 +58,9 @@
 	}
 </script>
 
+<h3>{$_('pages.subscriptions')}</h3>
+<div class="space"></div>
+
 <div>
 	<button class="surface-container-highest">
 		<i>attach_file</i>

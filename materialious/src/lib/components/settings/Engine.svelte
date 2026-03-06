@@ -45,7 +45,7 @@
 </article>
 
 {#if $backendInUseStore === 'yt'}
-	<h6>Feed</h6>
+	<h3>Feed</h3>
 	<div class="field label prefix surface-container-highest">
 		<i>view_stream</i>
 		<input
@@ -83,7 +83,7 @@
 		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>
 {:else}
-	<h6>{$_('layout.backendEngine.fallbacks')}</h6>
+	<h3>{$_('layout.backendEngine.fallbacks')}</h3>
 	{#each engineFallbacks as fallback (fallback)}
 		<nav class="no-padding">
 			<div class="max">

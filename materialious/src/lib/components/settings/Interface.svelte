@@ -166,12 +166,12 @@
 		</form>
 		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
-				<button onclick={goToInvidiousLogin}>
+				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
 					<i>link</i>
 					<span>{$_('linkInvidious')}</span>
 				</button>
 			{:else}
-				<button onclick={invidiousLogout}>
+				<button class="surface-container-highest" onclick={invidiousLogout}>
 					<i>link_off</i>
 					<span>{$_('unlinkInvidious')}</span>
 				</button>
@@ -202,7 +202,7 @@
 	{/if}
 {/if}
 
-<button onclick={toggleDarkMode} class="no-margin">
+<button onclick={toggleDarkMode} class="no-margin surface-container-highest">
 	{#if !$darkModeStore}
 		<i>dark_mode</i>
 		<span>{$_('layout.theme.darkMode')}</span>
@@ -211,7 +211,7 @@
 		<span>{$_('layout.theme.lightMode')}</span>
 	{/if}
 </button>
-<button onclick={() => (colorPickerOpen = !colorPickerOpen)}>
+<button class="surface-container-highest" onclick={() => (colorPickerOpen = !colorPickerOpen)}>
 	<i>palette</i>
 	<span>{$_('layout.theme.color')}</span>
 </button>
@@ -455,7 +455,7 @@
 		<h6>{$_('layout.bookmarklet')}</h6>
 		<div class="space"></div>
 		<button
-			class="no-margin"
+			class="no-margin surface-container-highest"
 			onclick={async () => {
 				await shareURL(bookmarkletSaveToUrl());
 			}}

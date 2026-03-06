@@ -11,7 +11,7 @@
 		action?: ToastAction;
 	}
 
-	const toaster = new Toaster<ToastData>();
+	export const toaster = new Toaster<ToastData>();
 
 	export const addToast = toaster.addToast;
 </script>

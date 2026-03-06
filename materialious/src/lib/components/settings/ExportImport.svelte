@@ -7,6 +7,9 @@
 	import { postSubscribeInvidious } from '$lib/api/invidious/subscribe';
 	import { getSubscriptionsInvidious } from '$lib/api/invidious/feed';
 	import { backendInUseStore, invidiousAuthStore, invidiousInstanceStore } from '$lib/store';
+	import { Clipboard } from '@capacitor/clipboard';
+	import { settingsToJson } from '$lib/externalSettings';
+	import { downloadStringAsFile } from '$lib/misc';
 
 	async function importInvidiousSubs() {
 		const importedSubs = await getSubscriptionsInvidious();
@@ -128,3 +131,31 @@
 		<div>{$_('layout.backendEngine.importToMaterialious')}</div>
 	</button>
 {/if}
+
+<h3>{$_('layout.settings')}</h3>
+<div class="space"></div>
+<button
+	class="no-margin surface-container-highest"
+	onclick={async () => {
+		await Clipboard.write({ string: settingsToJson() });
+
+		addToast({
+			data: {
+				text: $_('player.share.copiedSuccess')
+			}
+		});
+	}}
+>
+	<i>content_copy</i>
+	<span>{$_('copy')}</span>
+</button>
+<div class="space"></div>
+<button
+	class="no-margin surface-container-highest"
+	onclick={async () => {
+		downloadStringAsFile(settingsToJson(), 'materialious-settings.json');
+	}}
+>
+	<i>download</i>
+	<span>{$_('player.download')}</span>
+</button>

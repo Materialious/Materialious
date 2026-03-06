@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { bookmarkletSaveToUrl, settingsToJson } from '$lib/externalSettings/index';
+	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
 	import { letterCase, titleCases } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
-	import { Clipboard } from '@capacitor/clipboard';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
@@ -464,26 +463,6 @@
 		>
 			<i>content_copy</i>
 			<span>{$_('copyUrl')}</span>
-		</button>
-	</div>
-	<div class="space"></div>
-	<div class="settings">
-		<h6>{$_('layout.exportToJson')}</h6>
-		<div class="space"></div>
-		<button
-			class="no-margin"
-			onclick={async () => {
-				await Clipboard.write({ string: settingsToJson() });
-
-				addToast({
-					data: {
-						text: get(_)('player.share.copiedSuccess')
-					}
-				});
-			}}
-		>
-			<i>content_copy</i>
-			<span>{$_('copy')}</span>
 		</button>
 	</div>
 {/if}

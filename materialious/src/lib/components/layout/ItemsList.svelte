@@ -92,7 +92,7 @@
 							id: uniqueItemId
 						})}
 						class="no-padding item-select border"
-						class:item-select-focused={spatialItem.highlighted}
+						class:item-select-focused={!isMobile() && spatialItem.highlighted}
 						style="height: 100%;"
 					>
 						{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream' || item.type === 'historyVideo'}

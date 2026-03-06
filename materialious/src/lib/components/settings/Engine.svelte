@@ -12,9 +12,10 @@
 	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
 	import { get } from 'svelte/store';
 	import { getSubscriptions } from '$lib/api';
-	import { addToast } from '../Toast.svelte';
+	import { addToast, toaster } from '../Toast.svelte';
 	import { importSubscriptions } from '$lib/importExport';
 	import { postSubscribeInvidious } from '$lib/api/invidious/subscribe';
+	import { getSubscriptionsInvidious } from '$lib/api/invidious/feed';
 
 	const engineFallbacks: EngineFallback[] = [
 		'Channel',
@@ -46,15 +47,19 @@
 	}
 
 	async function importInvidiousSubs() {
-		const importedSubs = await getSubscriptions({}, true);
+		const importedSubs = await getSubscriptionsInvidious();
 
 		addToast({
 			data: {
 				text: $_('layout.backendEngine.importingToMaterialious')
-			}
+			},
+			id: 'import-to-materialious',
+			closeDelay: 0
 		});
 
 		await importSubscriptions(importedSubs);
+
+		toaster.removeToast('import-to-materialious');
 
 		addToast({
 			data: {
@@ -69,7 +74,9 @@
 		addToast({
 			data: {
 				text: $_('layout.backendEngine.exportingToInvidious')
-			}
+			},
+			id: 'export-to-invidious',
+			closeDelay: 0
 		});
 
 		const subPromises: Promise<void>[] = [];
@@ -78,6 +85,8 @@
 		}
 
 		await Promise.all(subPromises);
+
+		toaster.removeToast('export-to-invidious');
 
 		addToast({
 			data: {

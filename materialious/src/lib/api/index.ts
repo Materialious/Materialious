@@ -220,11 +220,8 @@ export async function notificationsMarkAsRead(fetchOptions: RequestInit = {}) {
 	return notificationsMarkAsReadInvidious(fetchOptions);
 }
 
-export async function getSubscriptions(
-	fetchOptions: RequestInit = {},
-	bypassYTBackend: boolean = false
-): Promise<Subscription[]> {
-	if (isYTBackend() && !bypassYTBackend) {
+export async function getSubscriptions(fetchOptions: RequestInit = {}): Promise<Subscription[]> {
+	if (isYTBackend()) {
 		if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
 			return (await getSubscriptionsBackend()).map((sub) => {
 				return {

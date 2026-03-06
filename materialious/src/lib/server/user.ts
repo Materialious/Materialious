@@ -51,6 +51,8 @@ export class User {
 	}
 
 	async addSubscription(subscription: Omit<ChannelSubscriptionModel, 'userId'>) {
+		if (await this.amSubscribed(subscription.id)) return;
+
 		await getSequelize().ChannelSubscriptionTable.create({
 			...subscription,
 			UserId: this.id

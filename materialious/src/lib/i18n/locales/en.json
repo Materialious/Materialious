@@ -274,7 +274,7 @@
 		"export": {
 			"title": "Export/Import",
 			"importSub": "Import subscriptions",
-			"importSubSupported": "YouTube CSV/OPML, Invidious OPML/JSON, Freetube database & NewPipe JSON supported",
+			"importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube database & NewPipe JSON supported",
 			"importing": "Importing subscriptions (this will take a moment)",
 			"importingCompleted": "Subscriptions successfully imported",
 			"exportSub": "Export subscriptions"

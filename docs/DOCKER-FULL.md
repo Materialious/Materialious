@@ -112,7 +112,7 @@ volumes:
 ```
 
 ### Overwriting Materialious defaults
-Materialious lets you customize the default settings by overriding them with `PUBLIC_DEFAULT_SETTINGS`. To configure this easily, go to **Settings** → **Export/Import** and click "Copy to clipboard" under the "Settings" header. For more details, check the [SETTINGS](./SETTINGS.md) page.
+Materialious lets you customize the default settings by overriding them with `PUBLIC_DEFAULT_SETTINGS`. To configure this easily, go to **Settings** → **Export/Import** and click "Export to clipboard" under the "Settings" header. For more details, check the [SETTINGS](./SETTINGS.md) page.
 
 **Please note:** These overwrites only apply on 1st load & won't replace existing configuration stored in browser local storage.
 

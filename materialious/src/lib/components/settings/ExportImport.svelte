@@ -8,7 +8,7 @@
 	import { getSubscriptionsInvidious } from '$lib/api/invidious/feed';
 	import { backendInUseStore, invidiousAuthStore, invidiousInstanceStore } from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
-	import { settingsToJson } from '$lib/externalSettings';
+	import { loadSettingsFromFile, settingsToJson } from '$lib/externalSettings';
 	import { downloadStringAsFile } from '$lib/misc';
 
 	async function importInvidiousSubs() {
@@ -147,7 +147,7 @@
 	}}
 >
 	<i>content_copy</i>
-	<span>{$_('copy')}</span>
+	<span>{$_('layout.export.exportToClipboard')}</span>
 </button>
 <div class="space"></div>
 <button
@@ -156,6 +156,24 @@
 		downloadStringAsFile(settingsToJson(), 'materialious-settings.json');
 	}}
 >
-	<i>download</i>
-	<span>{$_('player.download')}</span>
+	<i>file_export</i>
+	<span>{$_('layout.export.exportToFile')}</span>
 </button>
+
+<div class="space"></div>
+
+<div>
+	<button class="surface-container-highest">
+		<i>attach_file</i>
+		<span>{$_('layout.export.importFromFile')}</span>
+	</button>
+	<input
+		onchange={async (event: Event) => {
+			const files = (event.target as HTMLInputElement).files;
+			if (files?.length === 0 || !files) return;
+
+			await loadSettingsFromFile(files[0]);
+		}}
+		type="file"
+	/>
+</div>

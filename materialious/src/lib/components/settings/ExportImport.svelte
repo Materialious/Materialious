@@ -92,6 +92,7 @@
 				}
 			});
 		}}
+		accept=".json,.opml,.csv"
 		type="file"
 	/>
 </div>
@@ -174,6 +175,7 @@
 
 			await loadSettingsFromFile(files[0]);
 		}}
+		accept=".json"
 		type="file"
 	/>
 </div>

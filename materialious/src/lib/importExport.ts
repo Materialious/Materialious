@@ -58,7 +58,7 @@ export async function importSubscriptionsFromFile(file: File) {
 
 	const subsToImport: Subscription[] = [];
 
-	if (fileContents.startsWith('<opml')) {
+	if (file.name.endsWith('.opml')) {
 		const parser = new DOMParser();
 		const xmlDoc = parser.parseFromString(fileContents, 'text/xml');
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import { importSubscriptionsFromFile } from '$lib/importExport';
+	import { exportSubscriptionsAsFile, importSubscriptionsFromFile } from '$lib/importExport';
 	import { addToast, toaster } from '../Toast.svelte';
 </script>
 
@@ -36,3 +36,20 @@
 	/>
 </div>
 <p><i>info</i> {$_('layout.export.importSubSupported')}</p>
+
+<div class="space"></div>
+
+<div>
+	<button>
+		<i>file_export</i>
+		<span>{$_('layout.export.exportSub')}</span>
+	</button>
+	<menu>
+		<li role="presentation" onclick={() => exportSubscriptionsAsFile('InvidiousJSON')}>
+			Invidious JSON
+		</li>
+		<li role="presentation" onclick={() => exportSubscriptionsAsFile('OPML')}>
+			FreeTube/NewPipe/YouTube OPML
+		</li>
+	</menu>
+</div>

@@ -1,7 +1,8 @@
 import z from 'zod';
 import type { Subscription } from './api/model';
-import { getChannel, postSubscribe } from './api';
+import { getChannel, getSubscriptions, postSubscribe } from './api';
 import Papa from 'papaparse';
+import { downloadStringAsFile } from './misc';
 
 const zInvidiousSubs = z.object({
 	subscriptions: z.array(z.string())
@@ -165,4 +166,62 @@ export async function importSubscriptionsFromFile(file: File) {
 	}
 
 	throw new Error('Unable to determine imported file type');
+}
+
+export async function exportSubscriptionsAsFile(exportType: 'InvidiousJSON' | 'OPML') {
+	const subscriptions = await getSubscriptions();
+
+	let data: string | undefined;
+
+	if (exportType === 'InvidiousJSON') {
+		const subIds = [];
+
+		for (const sub of subscriptions) {
+			subIds.push(sub.authorId);
+		}
+
+		data = JSON.stringify({
+			subscriptions: subIds
+		});
+	} else {
+		const xmlDoc = document.implementation.createDocument('', '', null);
+
+		const opml = xmlDoc.createElement('opml');
+		opml.setAttribute('version', '1.1');
+
+		const body = xmlDoc.createElement('body');
+
+		const mainOutline = xmlDoc.createElement('outline');
+		mainOutline.setAttribute('text', 'YouTube Subscriptions');
+		mainOutline.setAttribute('title', 'YouTube Subscriptions');
+
+		body.appendChild(mainOutline);
+
+		for (const sub of subscriptions) {
+			const outline = xmlDoc.createElement('outline');
+			outline.setAttribute('text', sub.author);
+			outline.setAttribute('title', sub.author);
+			outline.setAttribute('type', 'rss');
+			outline.setAttribute(
+				'xmlUrl',
+				`https://www.youtube.com/feeds/videos.xml?channel_id=${sub.authorId}`
+			);
+
+			body.appendChild(outline);
+		}
+
+		opml.appendChild(body);
+		xmlDoc.appendChild(opml);
+
+		const serializer = new XMLSerializer();
+
+		data = serializer.serializeToString(xmlDoc);
+	}
+
+	if (data) {
+		downloadStringAsFile(
+			data,
+			`materialious-export-${new Date().toDateString().replaceAll(' ', '')}.${exportType === 'InvidiousJSON' ? 'json' : 'opml'}`
+		);
+	}
 }

@@ -1,6 +1,7 @@
 import z from 'zod';
 import type { Subscription } from './api/model';
 import { getChannel, postSubscribe } from './api';
+import Papa from 'papaparse';
 
 const zInvidiousSubs = z.object({
 	subscriptions: z.array(z.string())
@@ -15,6 +16,32 @@ const zFreetubeSubs = z.object({
 		})
 	)
 });
+
+const zNewPipeSubs = z.object({
+	subscriptions: z.array(
+		z.object({
+			service_id: z.number(),
+			url: z.url(),
+			name: z.string()
+		})
+	)
+});
+
+const zYouTubeSubs = z.array(
+	z.object({
+		snippet: z.object({
+			channelId: z.string(),
+			title: z.string()
+		})
+	})
+);
+
+const zYouTubeCsvSubs = z.array(
+	z.object({
+		'Channel ID': z.string(),
+		'Channel title': z.string()
+	})
+);
 
 export async function importSubscriptions(subscriptions: Subscription[]) {
 	const subPromises: Promise<void>[] = [];
@@ -64,7 +91,7 @@ export async function importSubscriptionsFromFile(file: File) {
 				authorId: channelId
 			});
 		}
-	} else {
+	} else if (file.name.endsWith('.json')) {
 		let fileJson: Record<any, any> | undefined;
 		try {
 			fileJson = JSON.parse(fileContents);
@@ -75,6 +102,8 @@ export async function importSubscriptionsFromFile(file: File) {
 		if (fileJson) {
 			const invidiousSubs = zInvidiousSubs.safeParse(fileJson);
 			const freetubeSubs = zFreetubeSubs.safeParse(fileJson);
+			const newPipeSubs = zNewPipeSubs.safeParse(fileJson);
+			const youtubeSubs = zYouTubeSubs.safeParse(fileJson);
 
 			if (invidiousSubs.success) {
 				for (const authorId of invidiousSubs.data.subscriptions) {
@@ -93,6 +122,37 @@ export async function importSubscriptionsFromFile(file: File) {
 					subsToImport.push({
 						author: sub.name,
 						authorId: sub.id
+					});
+				}
+			} else if (newPipeSubs.success) {
+				for (const sub of newPipeSubs.data.subscriptions) {
+					const authorId = sub.url.split('/')[4];
+					if (typeof authorId !== 'string') continue;
+					subsToImport.push({
+						author: sub.name,
+						authorId
+					});
+				}
+			} else if (youtubeSubs.success) {
+				for (const sub of youtubeSubs.data) {
+					subsToImport.push({
+						author: sub.snippet.title,
+						authorId: sub.snippet.channelId
+					});
+				}
+			}
+		}
+	} else if (file.name.endsWith('.csv')) {
+		const csv = Papa.parse(fileContents, { header: true, skipEmptyLines: true });
+
+		if (csv.data.length > 0) {
+			const youtubeSubs = zYouTubeCsvSubs.safeParse(csv.data);
+
+			if (youtubeSubs.success) {
+				for (const sub of youtubeSubs.data) {
+					subsToImport.push({
+						author: sub['Channel title'],
+						authorId: sub['Channel ID']
 					});
 				}
 			}

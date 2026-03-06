@@ -33,7 +33,6 @@
 		themeColorStore,
 		watchHistoryEnabledStore
 	} from '../../store';
-	import { addToast } from '../Toast.svelte';
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
 

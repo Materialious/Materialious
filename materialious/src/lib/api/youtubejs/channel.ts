@@ -24,8 +24,9 @@ export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
 		innerResults.header.content?.is(YTNodes.PageHeaderView)
 	) {
 		authorBanners = innerResults.header.content.banner?.image ?? [];
-		associateAvatar(channelId, authorBanners);
 	}
+
+	if (innerResults.metadata.avatar) await associateAvatar(channelId, innerResults.metadata.avatar);
 
 	const description = innerResults.metadata.description ?? '';
 

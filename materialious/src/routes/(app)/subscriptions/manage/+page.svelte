@@ -4,6 +4,7 @@
 	import Fuse from 'fuse.js';
 	import { _ } from '$lib/i18n';
 	import NoResults from '$lib/components/NoResults.svelte';
+	import AuthorAvatar from '$lib/components/AuthorAvatar.svelte';
 
 	let { data } = $props();
 
@@ -49,6 +50,8 @@
 		{#each subscriptions as sub (sub.authorId)}
 			<article>
 				<nav>
+					<AuthorAvatar author={sub.author} authorId={sub.authorId} />
+
 					<a href={resolve(`/channel/[authorId]`, { authorId: sub.authorId })}
 						><h6>
 							{sub.author}

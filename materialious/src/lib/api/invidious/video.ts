@@ -25,7 +25,7 @@ export async function getVideoInvidious(
 	const respJson = await resp.json();
 
 	if (resp.ok) {
-		associateAvatar(respJson.authorId, respJson.authorThumbnails);
+		await associateAvatar(respJson.authorId, respJson.authorThumbnails);
 	}
 
 	return respJson;

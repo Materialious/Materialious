@@ -86,7 +86,7 @@
 	}
 
 	const banner = new Avatar({
-		src: proxyGoogleImage($channelCacheStore[page.params.slug].channel.authorBanners[0].url)
+		src: proxyGoogleImage($channelCacheStore[page.params.slug].channel.authorBanners[0]?.url ?? '')
 	});
 </script>
 

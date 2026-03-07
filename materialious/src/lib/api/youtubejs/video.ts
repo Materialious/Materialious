@@ -151,7 +151,7 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 		const channel = await innertube.getChannel(video.basic_info.channel_id);
 		authorThumbnails = channel.metadata.avatar as Image[];
 
-		associateAvatar(video.basic_info.channel_id, authorThumbnails);
+		await associateAvatar(video.basic_info.channel_id, authorThumbnails);
 	} else {
 		authorThumbnails = [];
 	}

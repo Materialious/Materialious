@@ -12,7 +12,7 @@ export async function getChannelInvidious(
 	const respJson = await resp.json();
 
 	if (resp.ok) {
-		associateAvatar(channelId, respJson.authorBanners);
+		await associateAvatar(channelId, respJson.authorThumbnails);
 	}
 
 	return respJson;

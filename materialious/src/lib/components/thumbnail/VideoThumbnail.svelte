@@ -69,7 +69,15 @@
 		}
 	}
 
-	const thumbnail = new Avatar({ src: () => thumbnailSrc });
+	let thumbnailHeight = $state(0);
+
+	const thumbnail = new Avatar({
+		src: () => thumbnailSrc,
+		onLoadingStatusChange: () => {
+			if (thumbnailHTMLElement) thumbnailHeight = thumbnailHTMLElement.naturalHeight;
+		}
+	});
+
 	let thumbnailHTMLElement: HTMLImageElement | undefined = $state();
 
 	let startedSideways = sideways === true;
@@ -113,7 +121,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={thumbnailHTMLElement ? thumbnailHTMLElement.naturalHeight > 300 : false}>
+				<div class:crop={thumbnailHeight > 300}>
 					<img
 						class="responsive"
 						class:watched={progress !== undefined}
@@ -224,7 +232,7 @@
 		clip-path: inset(10% 0 10% 0);
 		display: block;
 		transform: translateY(-15%);
-		margin-bottom: -20%;
+		margin-bottom: -22%;
 	}
 
 	.thumbnail {

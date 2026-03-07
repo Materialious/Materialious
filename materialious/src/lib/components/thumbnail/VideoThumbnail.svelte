@@ -19,8 +19,7 @@
 	import { queueGetWatchHistory } from '$lib/api/historyPool';
 	import { page } from '$app/state';
 	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
-	import { avatarFromChannelId } from '$lib/thumbnail';
-	import { mergeAttrs } from 'melt';
+	import AuthorAvatar from '../AuthorAvatar.svelte';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo | VideoWatchHistory;
@@ -81,11 +80,6 @@
 		}
 	});
 
-	let authorAvatarSrc = $state('');
-	const authorAvatar = new Avatar({
-		src: () => authorAvatarSrc
-	});
-
 	let startedSideways = sideways === true;
 	function disableSideways() {
 		if (!startedSideways) return;
@@ -96,12 +90,6 @@
 	}
 
 	onMount(async () => {
-		if ('authorId' in video) {
-			avatarFromChannelId(video.authorId).then((url) => {
-				if (url) authorAvatarSrc = url;
-			});
-		}
-
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
@@ -194,14 +182,8 @@
 			</a>
 
 			<nav>
-				{#if !sideways}
-					<img class="circle small" {...authorAvatar.image} alt="Channel profile" />
-					<button
-						class="secondary-container"
-						{...mergeAttrs(authorAvatar.fallback, {
-							style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
-						})}>{video.author[0]}</button
-					>
+				{#if !sideways && 'authorId' in video}
+					<AuthorAvatar author={video.author} authorId={video.authorId} />
 				{/if}
 				<div>
 					{#if 'authorId' in video && video.authorId}

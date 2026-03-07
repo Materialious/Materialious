@@ -109,7 +109,7 @@ export function isItemFiltered(item: FeedItem): boolean {
 			});
 		};
 
-		return filterGroup.conditions.some(evaluateCondition);
+		return filterGroup.conditions.every(evaluateCondition);
 	});
 }
 

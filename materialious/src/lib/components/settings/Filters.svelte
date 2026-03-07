@@ -11,6 +11,7 @@
 	import type z from 'zod';
 	import { addToast } from '../Toast.svelte';
 	import { Clipboard } from '@capacitor/clipboard';
+	import { downloadStringAsFile } from '$lib/misc';
 
 	let remoteFilterListUrl: string = $state($filterContentUrlStore ?? '');
 	let remoteError: string = $state('');
@@ -48,17 +49,21 @@
 		}
 	}
 
-	async function exportAsJSON() {
+	function filtersAsJSON() {
+		return JSON.stringify(
+			{
+				version: 'v1',
+				createdFor: 'materialious',
+				filterBy: contentFilters
+			},
+			null,
+			2
+		);
+	}
+
+	async function exportToClipboard() {
 		await Clipboard.write({
-			string: JSON.stringify(
-				{
-					version: 'v1',
-					createdFor: 'materialious',
-					filterBy: contentFilters
-				},
-				null,
-				2
-			)
+			string: filtersAsJSON()
 		});
 
 		addToast({
@@ -134,9 +139,16 @@
 
 {#if contentFilters}
 	{#if contentFilters.length > 0}
-		<button class="surface-container-highest" onclick={exportAsJSON}>
+		<button class="surface-container-highest" onclick={exportToClipboard}>
 			<i>content_copy</i>
-			<span>{$_('copy')}</span>
+			<span>{$_('layout.export.exportToClipboard')}</span>
+		</button>
+		<button
+			class="surface-container-highest"
+			onclick={() => downloadStringAsFile(filtersAsJSON(), 'materialious-filters.json')}
+		>
+			<i>content_copy</i>
+			<span>{$_('layout.export.exportToFile')}</span>
 		</button>
 		<div class="space"></div>
 	{/if}

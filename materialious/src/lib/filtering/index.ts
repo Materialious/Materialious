@@ -23,14 +23,17 @@ const zFilterCondition = z.object({
 		message: 'Invalid field'
 	}), // Field to filter
 	operator: zFilterOperatorEnum, // Operator
-	value: z.union([
-		// Value to compare against
-		z.string(),
-		z.number(),
-		z.array(z.string()),
-		z.array(z.number()),
-		z.string().regex(/.*/)
-	])
+	values: z.array(
+		z.union([
+			// Value to compare against
+			z.string(),
+			z.number(),
+			z.array(z.string()),
+			z.array(z.number()),
+			z.string().regex(/.*/)
+		])
+	),
+	note: z.string().optional()
 });
 
 // Logical grouping operator
@@ -42,7 +45,7 @@ export const zFilterGroup = z.object({
 export const zFilterSchema = z.array(zFilterGroup);
 
 const zFilterRootSchema = z.object({
-	version: z.literal('v1'),
+	version: z.literal('v2'),
 	createdFor: z.literal('materialious'),
 	filterBy: zFilterSchema
 });
@@ -66,45 +69,47 @@ export function isItemFiltered(item: FeedItem): boolean {
 
 			const fieldValue = item[condition.field as keyof FeedItem];
 
-			switch (condition.operator) {
-				case 'equals':
-					return fieldValue.toString() === condition.value.toString();
+			return condition.values.some((conditionValue) => {
+				switch (condition.operator) {
+					case 'equals':
+						return fieldValue.toString() === conditionValue.toString();
 
-				case 'in':
-					return Array.isArray(condition.value) && (condition.value as any[]).includes(fieldValue);
+					case 'in':
+						return Array.isArray(conditionValue) && (conditionValue as any[]).includes(fieldValue);
 
-				case 'like':
-					return (
-						typeof fieldValue === 'string' &&
-						typeof condition.value === 'string' &&
-						fieldValue.toLowerCase().includes(condition.value.toLowerCase())
-					);
+					case 'like':
+						return (
+							typeof fieldValue === 'string' &&
+							typeof conditionValue === 'string' &&
+							fieldValue.toLowerCase().includes(conditionValue.toLowerCase())
+						);
 
-				case 'gt':
-					return (
-						typeof fieldValue === 'number' &&
-						typeof condition.value === 'number' &&
-						fieldValue > condition.value
-					);
+					case 'gt':
+						return (
+							typeof fieldValue === 'number' &&
+							typeof conditionValue === 'number' &&
+							fieldValue > conditionValue
+						);
 
-				case 'lt':
-					return (
-						typeof fieldValue === 'number' &&
-						typeof condition.value === 'number' &&
-						fieldValue < condition.value
-					);
+					case 'lt':
+						return (
+							typeof fieldValue === 'number' &&
+							typeof conditionValue === 'number' &&
+							fieldValue < conditionValue
+						);
 
-				case 'regex':
-					if (typeof condition.value !== 'string' || !isSafeRegex(condition.value)) return false;
+					case 'regex':
+						if (typeof conditionValue !== 'string' || !isSafeRegex(conditionValue)) return false;
 
-					return typeof fieldValue === 'string' && new RegExp(condition.value).test(fieldValue);
+						return typeof fieldValue === 'string' && new RegExp(conditionValue).test(fieldValue);
 
-				default:
-					return false;
-			}
+					default:
+						return false;
+				}
+			});
 		};
 
-		return filterGroup.conditions.every(evaluateCondition);
+		return filterGroup.conditions.some(evaluateCondition);
 	});
 }
 

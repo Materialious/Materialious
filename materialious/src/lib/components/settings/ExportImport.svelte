@@ -92,7 +92,7 @@
 				}
 			});
 		}}
-		accept=".json,.opml,.csv"
+		accept=".json,.opml,.csv,.db"
 		type="file"
 	/>
 </div>

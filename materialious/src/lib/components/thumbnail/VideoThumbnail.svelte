@@ -19,6 +19,8 @@
 	import { queueGetWatchHistory } from '$lib/api/historyPool';
 	import { page } from '$app/state';
 	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
+	import { avatarFromChannelId } from '$lib/thumbnail';
+	import { mergeAttrs } from 'melt';
 
 	interface Props {
 		video: VideoBase | Video | Notification | PlaylistPageVideo | VideoWatchHistory;
@@ -70,6 +72,7 @@
 	}
 
 	let thumbnailHeight = $state(0);
+	let thumbnailHTMLElement: HTMLImageElement | undefined = $state();
 
 	const thumbnail = new Avatar({
 		src: () => thumbnailSrc,
@@ -78,7 +81,10 @@
 		}
 	});
 
-	let thumbnailHTMLElement: HTMLImageElement | undefined = $state();
+	let authorAvatarSrc = $state('');
+	const authorAvatar = new Avatar({
+		src: () => authorAvatarSrc
+	});
 
 	let startedSideways = sideways === true;
 	function disableSideways() {
@@ -90,6 +96,12 @@
 	}
 
 	onMount(async () => {
+		if ('authorId' in video) {
+			avatarFromChannelId(video.authorId).then((url) => {
+				if (url) authorAvatarSrc = url;
+			});
+		}
+
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
@@ -181,39 +193,50 @@
 				<span class="bold">{letterCase(video.title.trimEnd())}</span>
 			</a>
 
-			<div>
-				{#if 'authorId' in video && video.authorId}
-					<a
-						tabindex="-1"
-						class:author={!sideways}
-						href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
-						data-sveltekit-preload-data="off"
-						>{video.author}
-					</a>
-				{:else}
-					<p>{video.author}</p>
+			<nav>
+				{#if !sideways}
+					<img class="circle small" {...authorAvatar.image} alt="Channel profile" />
+					<button
+						class="secondary-container"
+						{...mergeAttrs(authorAvatar.fallback, {
+							style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
+						})}>{video.author[0]}</button
+					>
 				{/if}
+				<div>
+					{#if 'authorId' in video && video.authorId}
+						<a
+							tabindex="-1"
+							class:author={!sideways}
+							href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
+							data-sveltekit-preload-data="off"
+							>{video.author}
+						</a>
+					{:else}
+						<p>{video.author}</p>
+					{/if}
 
-				{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
-					<i>star</i>
-				{/if}
+					{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
+						<i>star</i>
+					{/if}
 
-				{#if !('publishedText' in video) && 'viewCountText' in video}
-					•
-					{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
-					{$_('views')}
-				{/if}
-
-				{#if 'published' in video}
-					<div class="max">
-						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+					{#if !('publishedText' in video) && 'viewCountText' in video}
 						•
-						{video.published && video.published !== 0
-							? relativeTimestamp(video.published * 1000, false)
-							: video.publishedText}
-					</div>
-				{/if}
-			</div>
+						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+						{$_('views')}
+					{/if}
+
+					{#if 'published' in video}
+						<div>
+							{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+							•
+							{video.published && video.published !== 0
+								? relativeTimestamp(video.published * 1000, false)
+								: video.publishedText}
+						</div>
+					{/if}
+				</div>
+			</nav>
 		</div>
 	</div>
 </div>

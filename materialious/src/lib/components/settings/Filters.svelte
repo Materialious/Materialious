@@ -11,6 +11,7 @@
 	import type z from 'zod';
 	import { addToast } from '../Toast.svelte';
 	import { Clipboard } from '@capacitor/clipboard';
+	import { downloadStringAsFile } from '$lib/misc';
 
 	let remoteFilterListUrl: string = $state($filterContentUrlStore ?? '');
 	let remoteError: string = $state('');
@@ -48,17 +49,21 @@
 		}
 	}
 
-	async function exportAsJSON() {
+	function filtersAsJSON() {
+		return JSON.stringify(
+			{
+				version: 'v2',
+				createdFor: 'materialious',
+				filterBy: contentFilters
+			},
+			null,
+			2
+		);
+	}
+
+	async function exportToClipboard() {
 		await Clipboard.write({
-			string: JSON.stringify(
-				{
-					version: 'v1',
-					createdFor: 'materialious',
-					filterBy: contentFilters
-				},
-				null,
-				2
-			)
+			string: filtersAsJSON()
 		});
 
 		addToast({
@@ -93,6 +98,14 @@
 
 <article class="error-container">
 	<p>{$_('layout.backendEngine.warning')}</p>
+	<p>
+		Need Help? Check out our <a
+			class="link"
+			href="https://github.com/Materialious/Materialious/blob/main/docs/CONTENT-FILTERS.md"
+			target="_blank"
+			referrerpolicy="no-referrer">guide</a
+		>.
+	</p>
 </article>
 
 <form onsubmit={loadFilterList}>
@@ -134,9 +147,16 @@
 
 {#if contentFilters}
 	{#if contentFilters.length > 0}
-		<button class="surface-container-highest" onclick={exportAsJSON}>
+		<button class="surface-container-highest" onclick={exportToClipboard}>
 			<i>content_copy</i>
-			<span>{$_('copy')}</span>
+			<span>{$_('layout.export.exportToClipboard')}</span>
+		</button>
+		<button
+			class="surface-container-highest"
+			onclick={() => downloadStringAsFile(filtersAsJSON(), 'materialious-filters.json')}
+		>
+			<i>content_copy</i>
+			<span>{$_('layout.export.exportToFile')}</span>
 		</button>
 		<div class="space"></div>
 	{/if}
@@ -167,9 +187,9 @@
 			<hr />
 			{#if filter.conditions}
 				<ul class="list">
-					{#each filter.conditions as condition (condition)}
+					{#each filter.conditions as condition, conditionIndex (condition)}
 						<li style="display: block;">
-							<nav class="right-align no-margin">
+							<nav class="no-margin">
 								<button
 									onclick={() => {
 										filter.conditions = filter.conditions.filter((item) => condition !== item);
@@ -179,6 +199,7 @@
 									class="surface-container-highest"
 								>
 									<i>close</i>
+									<span>Delete conditional</span>
 								</button>
 							</nav>
 
@@ -222,66 +243,102 @@
 								<i>arrow_drop_down</i>
 							</div>
 
-							{#if schema[filter.type][condition.field] === 'boolean'}
-								<div class="field label suffix surface-container-highest">
-									<select
-										onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
-											condition.value = event.currentTarget.value;
-											filterContentListStore.set(contentFilters);
-											filterContentUrlAutoUpdateStore.set(false);
-										}}
-										name="boolean-options"
-									>
-										<option value="" disabled selected
-											>{$_('layout.filter.optionPlaceholder')}</option
-										>
-										<option selected={condition.value === 'true'} value="true">true</option>
-										<option selected={condition.value === 'false'} value="false">false</option>
-									</select>
-									<label for="boolean-options">Value</label>
-									<i>arrow_drop_down</i>
-								</div>
-							{:else if Array.isArray(schema[filter.type][condition.field])}
-								<div class="field label suffix surface-container-highest">
-									<select
-										onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
-											condition.value = event.currentTarget.value;
-											filterContentListStore.set(contentFilters);
-											filterContentUrlAutoUpdateStore.set(false);
-										}}
-										name="array-options"
-									>
-										<option value="" disabled selected
-											>{$_('layout.filter.optionPlaceholder')}</option
-										>
-										{#each schema[filter.type][condition.field] as value (value)}
-											<option selected={condition.value === value} {value}
-												>{camelCaseToHuman(value)}</option
+							{#each condition.values as conditionValue, index (index)}
+								<nav>
+									{#if schema[filter.type][condition.field] === 'boolean'}
+										<div class="field label suffix surface-container-highest max">
+											<select
+												onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
+													condition.values[index] = event.currentTarget.value;
+													filterContentListStore.set(contentFilters);
+													filterContentUrlAutoUpdateStore.set(false);
+												}}
+												name="boolean-options"
 											>
-										{/each}
-									</select>
-									<label for="array-options">Value</label>
-									<i>arrow_drop_down</i>
-								</div>
-							{:else}
-								<div class="field label border">
-									<input
-										oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
-											condition.value =
-												schema[filter.type][condition.field] === 'number'
-													? Number(event.currentTarget.value)
-													: event.currentTarget.value;
+												<option value="" disabled selected
+													>{$_('layout.filter.optionPlaceholder')}</option
+												>
+												<option selected={conditionValue === 'true'} value="true">true</option>
+												<option selected={conditionValue === 'false'} value="false">false</option>
+											</select>
+											<label for="boolean-options">Value</label>
+											<i>arrow_drop_down</i>
+										</div>
+									{:else if Array.isArray(schema[filter.type][condition.field])}
+										<div class="field label suffix surface-container-highest max">
+											<select
+												onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
+													condition.values[index] = event.currentTarget.value;
+													filterContentListStore.set(contentFilters);
+													filterContentUrlAutoUpdateStore.set(false);
+												}}
+												name="array-options"
+											>
+												<option value="" disabled selected
+													>{$_('layout.filter.optionPlaceholder')}</option
+												>
+												{#each schema[filter.type][condition.field] as value (value)}
+													<option selected={conditionValue === value} {value}
+														>{camelCaseToHuman(value)}</option
+													>
+												{/each}
+											</select>
+											<label for="array-options">Value</label>
+											<i>arrow_drop_down</i>
+										</div>
+									{:else}
+										<div class="field label surface-container-highest max">
+											<input
+												oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
+													condition.values[index] =
+														schema[filter.type][condition.field] === 'number'
+															? Number(event.currentTarget.value)
+															: event.currentTarget.value;
+													filterContentListStore.set(contentFilters);
+													filterContentUrlAutoUpdateStore.set(false);
+												}}
+												name="value"
+												type={schema[filter.type][condition.field] === 'string' ? 'text' : 'number'}
+												value={conditionValue}
+											/>
+											<label for="value">{$_('layout.filter.value')}</label>
+										</div>
+									{/if}
+									<button
+										onclick={() => {
+											condition.values = condition.values.filter((item) => conditionValue !== item);
 											filterContentListStore.set(contentFilters);
 											filterContentUrlAutoUpdateStore.set(false);
 										}}
-										name="value"
-										type={schema[filter.type][condition.field] === 'string' ? 'text' : 'number'}
-										value={condition.value}
-									/>
-									<label for="value">{$_('layout.filter.value')}</label>
-								</div>
-							{/if}
+										class="circle surface-container-highest"
+									>
+										<i>close</i>
+										<div class="tooltip">Delete Value</div>
+									</button>
+								</nav>
+
+								{#if condition.values.length > 0 && index < condition.values.length - 1}
+									<h6 class="center-align">OR</h6>
+								{/if}
+							{/each}
+
+							<div class="space"></div>
+							<button
+								onclick={() => {
+									condition.values.push('');
+									filterContentListStore.set(contentFilters);
+									filterContentUrlAutoUpdateStore.set(false);
+								}}
+								class="surface-container-highest"
+							>
+								<i>add</i>
+								<span>Add OR</span>
+							</button>
 						</li>
+
+						{#if filter.conditions.length > 0 && conditionIndex < filter.conditions.length - 1}
+							<h6 class="center-align">AND</h6>
+						{/if}
 					{/each}
 				</ul>
 			{/if}
@@ -291,8 +348,9 @@
 					filter.conditions.push({
 						operator: 'equals',
 						field: 'author',
-						value: ''
+						values: ['']
 					});
+					filterContentListStore.set(contentFilters);
 					filterContentUrlAutoUpdateStore.set(false);
 				}}
 				class="surface-container-highest"

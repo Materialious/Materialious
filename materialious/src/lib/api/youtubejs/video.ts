@@ -17,6 +17,7 @@ import { Utils, YT, YTNodes, Platform, type IGetChallengeResponse } from 'youtub
 import { getInnertube } from '.';
 import { isUnrestrictedPlatform } from '$lib/misc';
 import { webPoTokenMinter } from '$lib/web/youtube/minter';
+import { associateAvatar } from '$lib/thumbnail';
 
 Platform.shim.eval = async (
 	data: Types.BuildScriptResult,
@@ -149,6 +150,8 @@ export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
 	if (video.basic_info.channel_id) {
 		const channel = await innertube.getChannel(video.basic_info.channel_id);
 		authorThumbnails = channel.metadata.avatar as Image[];
+
+		associateAvatar(video.basic_info.channel_id, authorThumbnails);
 	} else {
 		authorThumbnails = [];
 	}

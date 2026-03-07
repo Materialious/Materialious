@@ -4,6 +4,7 @@ import { buildPath, fetchErrorHandle } from './request';
 import { getVideoYTjs } from '../youtubejs/video';
 import { playerYouTubeJsFallback } from '$lib/store';
 import { isUnrestrictedPlatform } from '$lib/misc';
+import { associateAvatar } from '$lib/thumbnail';
 
 export async function getVideoInvidious(
 	videoId: string,
@@ -20,5 +21,12 @@ export async function getVideoInvidious(
 	} else {
 		await fetchErrorHandle(resp);
 	}
-	return await resp.json();
+
+	const respJson = await resp.json();
+
+	if (resp.ok) {
+		associateAvatar(respJson.authorId, respJson.authorThumbnails);
+	}
+
+	return respJson;
 }

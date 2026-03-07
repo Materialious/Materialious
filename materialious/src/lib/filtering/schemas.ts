@@ -13,7 +13,11 @@ export const VideoSchema: SchemaStructure = {
 	type: ['video', 'shortVideo', 'stream'],
 	videoId: 'string',
 	viewCount: 'number',
-	viewCountText: 'string'
+	viewCountText: 'string',
+	lengthSeconds: 'number',
+	premiereTimestamp: 'number',
+	isUpcoming: 'boolean',
+	premium: 'boolean'
 };
 
 export const ChannelSchema: SchemaStructure = {

@@ -1,3 +1,4 @@
+import { associateAvatar } from '$lib/thumbnail';
 import type { ChannelContent, ChannelOptions, ChannelPage } from '../model';
 import { buildPath, fetchErrorHandle } from './request';
 
@@ -8,7 +9,13 @@ export async function getChannelInvidious(
 	const resp = await fetchErrorHandle(
 		await fetch(buildPath(`channels/${channelId}`), fetchOptions)
 	);
-	return await resp.json();
+	const respJson = await resp.json();
+
+	if (resp.ok) {
+		associateAvatar(channelId, respJson.authorBanners);
+	}
+
+	return respJson;
 }
 
 export async function getChannelContentInvidious(

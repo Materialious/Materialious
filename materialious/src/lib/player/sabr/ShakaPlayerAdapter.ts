@@ -317,6 +317,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 				}
 
 				if (result) {
+					abortController.abort();
 					return this.createShakaResponse({
 						uri,
 						request,

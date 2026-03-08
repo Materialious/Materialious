@@ -104,7 +104,7 @@
         "defaultLanguage": "既定の言語",
         "retryText": "動画の読み込みに失敗。どう続けますか？",
         "enableYoutubejsTemp": "一度だけ動画への直接接続に切り替え",
-        "enableYoutubejsPerm": "常に動画への接続エラーで直接接続を許可",
+        "enableYoutubejsPerm": "ローカル動画へのフォールバックを常に許可",
         "youtubeJsFallBack": "動画接続エラー 直接接続に切替",
         "youtubeJsLoading": "動画の読み込みに失敗。動画への直接接続に切り替えます。",
         "premiere": "動画は利用可能です",
@@ -163,12 +163,12 @@
             "proxyVideos": "動画のプロキシ",
             "backgroundPlay": "バックグラウンドで音声を再生",
             "dash": "DASH",
-            "listenByDefault": "最初から音声モード",
-            "silenceSkipper": "無音部分を飛ばす (実験的)",
+            "listenByDefault": "既定で音声再生",
+            "silenceSkipper": "無音部分をスキップ (実験的機能)",
             "localVideoFallback": "動画の接続エラーで直接接続に切替",
             "youtubeJsFallback": "失敗時に動画の代替処理を使用",
             "youtubeJsAlways": "常に使用",
-            "lockOrientation": "アスペクト比と向きを固定",
+            "lockOrientation": "アスペクト比に合わせて向きを固定",
             "defaultPlaybackSpeed": "既定の再生速度",
             "playerStatistics": "最初からプレイヤー統計情報を表示",
             "networkChangePause": "ネットワーク変更時に一時停止"
@@ -178,7 +178,7 @@
         "sponsors": {
             "sponsor": "協賛",
             "disableToast": "通知を非表示",
-            "disableTimeline": "タイムライン上のシーン表示を非表示",
+            "disableTimeline": "タイムライン上のセグメントを無効化",
             "Catagories": "分類",
             "unpaidSelfPromotion": "無償または自己の宣伝",
             "interactionReminder": "登録など操作を頼む自己宣伝",
@@ -213,7 +213,7 @@
             "cooldown": "チャンネル時間制限の再取得",
             "concurrent": "フィードが返される前に解析する最大チャンネル数",
             "fallbacks": "フォールバック",
-            "importExport": "サブスクリプションのインポート/エクスポート",
+            "importExport": "自動エクスポート/インポート",
             "exportToInvidious": "MaterialiousからInvidiousにエクスポート",
             "importToMaterialious": "Invidious から Materialious へのインポート",
             "importingToMaterialious": "マテリアルへのインポートを開始しました",
@@ -222,9 +222,32 @@
             "exportingToInvidiousFinished": "Invidiousへのエクスポートが終了しました"
         },
         "exportToJson": "JSON にエクスポート",
-        "historyEnabled": "視聴履歴を保存"
+        "historyEnabled": "視聴履歴を保存",
+        "filter": {
+            "title": "コンテンツフィルター",
+            "url": "URLからフィルターをインポート",
+            "autoUpdate": "URLからフィルターを自動更新する",
+            "contentType": "コンテンツタイプ",
+            "field": "フィールド",
+            "operator": "オペレーター",
+            "optionPlaceholder": "オプションの選択",
+            "value": "値",
+            "addConditional": "条件を追加",
+            "addFilter": "フィルターを追加"
+        },
+        "export": {
+            "title": "エクスポート/インポート",
+            "importSub": "登録チャンネルをインポート",
+            "importSubSupported": "YouTube CSV/OPML/JSON、Invidious OPML/JSON、Freetube データベース、NewPipe JSON をサポート",
+            "importing": "登録チャンネルをインポートしています (少し時間がかかります)",
+            "importingCompleted": "登録チャンネルを正常にインポートしました",
+            "exportSub": "登録チャンネルをエクスポート",
+            "exportToClipboard": "クリップボードへエクスポート",
+            "exportToFile": "ファイルへエクスポート",
+            "importFromFile": "ファイルからインポート"
+        }
     },
-    "subscribe": "登録",
+    "subscribe": "チャンネル登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
     "reply": "返信",
     "comments": "コメント",
@@ -248,7 +271,7 @@
     "popular": "人気",
     "favouriteChannel": "お気に入りチャンネル",
     "unfavouriteChannel": "お気に入り解除チャンネル",
-    "copy": "JSON をコピー",
+    "copy": "クリップボードにコピー",
     "username": "ユーザー名",
     "password": "パスワード",
     "captionStyle": "見出しのスタイル",
@@ -274,5 +297,16 @@
         "localFallbackInfo": "Invidious からのビデオの読み込みに失敗した場合、Materialious はそれをローカルに読み込みます。",
         "configureInstance": "インスタンスの構成",
         "done": "完了"
+    },
+    "watchParty": {
+        "start": "ウォッチパーティーを開始",
+        "header": "ウォッチパーティー",
+        "createRoom": "ルームを作成",
+        "joinRoom": "ルームに参加",
+        "roomID": "ルーム ID",
+        "shareRoom": "ルームを共有",
+        "leaveRoom": "ルームから退出",
+        "userJoin": "ユーザーがルームに参加しました",
+        "userLeft": "ユーザーがルームから退出しました"
     }
 }

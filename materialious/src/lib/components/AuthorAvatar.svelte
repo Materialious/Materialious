@@ -21,7 +21,7 @@
 
 <img class="circle small" {...avatar.image} alt="Channel profile" />
 <button
-	class="secondary-container"
+	class="circle secondary-container"
 	{...mergeAttrs(avatar.fallback, {
 		style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
 	})}>{author[0]}</button

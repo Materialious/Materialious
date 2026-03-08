@@ -819,9 +819,11 @@
 					{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
 				{/if}
 			</p>
-			<p class="chip surface-container-highest">
-				{playerVideoEndTimePretty}
-			</p>
+			{#if playerVideoEndTimePretty && playerVideoEndTimePretty !== ''}
+				<p class="chip surface-container-highest">
+					{playerVideoEndTimePretty}
+				</p>
+			{/if}
 		</div>
 	{/if}
 	<TouchControls
@@ -833,64 +835,62 @@
 		bind:playerMaxKnownTime
 		bind:playerIsBuffering
 	/>
-	{#if showControls}
-		<div id="player-controls" transition:fade>
-			<Timeline
-				{playerElement}
-				{currentTime}
-				{showPlayerUI}
-				{segments}
-				video={data.video}
-				content={data.content}
-				bind:userManualSeeking
-				bind:playerMaxKnownTime
-			/>
-			<nav>
-				{#if !$isAndroidTvStore}
-					<nav class="no-wrap">
-						<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
-							<i>
-								{#if playerCurrentPlaybackState}
-									pause
-								{:else}
-									play_arrow
-								{/if}
-							</i>
-						</button>
-						{#if !isMobile()}
-							<div class="player-slider volume m l" {...playerVolumeSlider.root}>
-								<div class="track">
-									<div class="range"></div>
-									<div {...playerVolumeSlider.thumb}></div>
-								</div>
-							</div>
-						{/if}
-					</nav>
-				{/if}
-
-				<div class="max"></div>
-
+	<div id="player-controls" class="hide" class:show={showControls}>
+		<Timeline
+			{playerElement}
+			{currentTime}
+			{showPlayerUI}
+			{segments}
+			video={data.video}
+			content={data.content}
+			bind:userManualSeeking
+			bind:playerMaxKnownTime
+		/>
+		<nav>
+			{#if !$isAndroidTvStore}
 				<nav class="no-wrap">
-					<p class="chip m l" style="height: 100%;">
-						{#if data.video.liveNow}
-							{$_('thumbnail.live')}
-						{:else}
-							{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
-						{/if}
-					</p>
-					{#if !$isAndroidTvStore}
-						<CaptionSettings video={data.video} />
-						{#if playerElement}
-							<Settings {player} {playerElement} />
-							<Airplay {playerElement} />
-							<Pip {playerElement} />
-						{/if}
-						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+					<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
+						<i>
+							{#if playerCurrentPlaybackState}
+								pause
+							{:else}
+								play_arrow
+							{/if}
+						</i>
+					</button>
+					{#if !isMobile()}
+						<div class="player-slider volume m l" {...playerVolumeSlider.root}>
+							<div class="track">
+								<div class="range"></div>
+								<div {...playerVolumeSlider.thumb}></div>
+							</div>
+						</div>
 					{/if}
 				</nav>
+			{/if}
+
+			<div class="max"></div>
+
+			<nav class="no-wrap">
+				<p class="chip m l" style="height: 100%;">
+					{#if data.video.liveNow}
+						{$_('thumbnail.live')}
+					{:else}
+						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
+					{/if}
+				</p>
+				{#if !$isAndroidTvStore}
+					<CaptionSettings video={data.video} />
+					{#if playerElement}
+						<Settings {player} {playerElement} />
+						<Airplay {playerElement} />
+						<Pip {playerElement} />
+					{/if}
+					<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+				{/if}
 			</nav>
-		</div>
-	{/if}
+		</nav>
+	</div>
 </div>
 
 {#if showVideoRetry}

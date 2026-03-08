@@ -366,15 +366,19 @@
 		{videoLength(timeInSeconds)}
 	{/snippet}
 	<div class="track">
-		{#if !userManualSeeking && playerShowTimelineThumbnail}
-			<div bind:this={playerTimelineTooltip} class="timeline tooltip">
+		{#if !userManualSeeking}
+			<div
+				bind:this={playerTimelineTooltip}
+				class="timeline tooltip"
+				class:hide={!playerShowTimelineThumbnail}
+			>
 				{@render timelineTooltip('timeline', playerTimelineTimeHover)}
 			</div>
 		{/if}
 		<div class="range"></div>
 		<div {...playerTimelineSlider.thumb}>
-			{#if playerSliderInteracted && playerShowTimelineThumbnail}
-				<div class="tooltip thumb">
+			{#if playerSliderInteracted}
+				<div class="tooltip thumb" class:hide={!playerShowTimelineThumbnail}>
 					{@render timelineTooltip('thumb', currentTime)}
 				</div>
 			{/if}

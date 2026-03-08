@@ -15,6 +15,7 @@ import { isOwnBackend } from './shared';
 import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 import { ensureNoTrailingSlash, isYTBackend } from './misc';
+import { deleteKeyValue } from './api/backend/keyvalue';
 
 export function clearCaches() {
 	feedCacheStore.set({});
@@ -27,6 +28,12 @@ export function authProtected() {
 	if (!get(invidiousAuthStore) && !isYTBackend()) {
 		goto(resolve('/', {}), { replaceState: true });
 	}
+}
+
+async function removeAuthFromBackend() {
+	if (!get(rawMasterKeyStore)) return;
+
+	await deleteKeyValue('authToken');
 }
 
 export async function setInvidiousInstance(
@@ -64,6 +71,8 @@ export async function setInvidiousInstance(
 	invidiousInstanceStore.set(instance);
 	invidiousAuthStore.set(null);
 
+	await removeAuthFromBackend();
+
 	return true;
 }
 
@@ -86,6 +95,8 @@ export async function goToInvidiousLogin() {
 
 export async function invidiousLogout() {
 	invidiousAuthStore.set(null);
+	await removeAuthFromBackend();
+
 	goto(resolve('/', {}));
 }
 

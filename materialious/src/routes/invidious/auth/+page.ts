@@ -1,4 +1,5 @@
 import { resolve } from '$app/paths';
+import { addOrUpdateKeyValue } from '$lib/api/backend/keyvalue.js';
 import { invidiousAuthStore } from '$lib/store';
 import { redirect } from '@sveltejs/kit';
 
@@ -7,10 +8,12 @@ export async function load({ url }) {
 	const token = url.searchParams.get('token');
 
 	if (username && token) {
-		invidiousAuthStore.set({
+		const authToken = {
 			username: username,
 			token: token
-		});
+		};
+		invidiousAuthStore.set(authToken);
+		await addOrUpdateKeyValue('authToken', JSON.stringify(authToken));
 	}
 
 	throw redirect(302, resolve('/', {}));

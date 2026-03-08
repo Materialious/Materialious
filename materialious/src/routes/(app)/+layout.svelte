@@ -162,7 +162,7 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
-		class:hide={$playerTheatreModeIsActive}
+		class:hide-element={$playerTheatreModeIsActive}
 	>
 		<header class="small-padding">
 			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
@@ -425,6 +425,10 @@
 </dialog>
 
 <style>
+	.hide-element {
+		display: none;
+	}
+
 	.tv-nav {
 		min-inline-size: 0.5rem;
 		padding: 0;

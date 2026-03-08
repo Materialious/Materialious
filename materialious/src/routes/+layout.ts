@@ -25,6 +25,7 @@ import { isYTBackend } from '$lib/misc';
 import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
 import { loadContentFilterFromURL } from '$lib/filtering/index.js';
+import { getKeyValue } from '$lib/api/backend/keyvalue.js';
 
 export const ssr = false;
 export const prerender = false;
@@ -32,6 +33,13 @@ export const prerender = false;
 export async function load({ url }) {
 	if (browser) {
 		await initI18n();
+	}
+
+	if (get(rawMasterKeyStore)) {
+		const authTokenFromCloud = await getKeyValue('authToken');
+		if (typeof authTokenFromCloud === 'string')
+			invidiousAuthStore.set(JSON.parse(authTokenFromCloud));
+		else invidiousAuthStore.set(null);
 	}
 
 	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);

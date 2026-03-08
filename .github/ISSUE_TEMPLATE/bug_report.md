@@ -23,6 +23,10 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**Materialious (please complete the following information):**
+- Version: [e.g. 1.16.15]
+- Backend: [e.g. Invidious, YouTube, Both]
+
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]

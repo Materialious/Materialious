@@ -46,11 +46,7 @@
 	}
 </script>
 
-<button
-	bind:this={shareButtonElement}
-	class="surface-container-highest"
-	onclick={(event: Event) => event.stopPropagation()}
->
+<button bind:this={shareButtonElement} class="surface-container-highest">
 	<i>share</i>
 	{#if !iconOnly}
 		{$_('player.share.title')}

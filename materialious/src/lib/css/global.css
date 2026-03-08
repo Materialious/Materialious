@@ -31,14 +31,14 @@ body {
 	opacity: 0 !important;
 	visibility: hidden !important;
 	transition:
-		opacity 200ms linear,
-		visibility 0s linear 200ms !important;
+		opacity 300ms linear,
+		visibility 0s linear 300ms !important;
 }
 
 .show {
 	opacity: 1 !important;
 	visibility: visible !important;
-	transition: opacity 200ms linear !important;
+	transition: opacity 300ms linear !important;
 }
 
 article {

@@ -9,22 +9,19 @@ import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend/keyvalue';
 import { rawMasterKeyStore } from '$lib/store';
 import { getPublicEnv } from '$lib/misc';
 
-const allowNullOverwrite = ['authToken'];
+const dontAutoSync = ['authToken'];
 
 export async function syncSettingsToBackend() {
 	if (!isOwnBackend() || !get(rawMasterKeyStore)) return;
 
 	await Promise.all(
 		persistedStores.map(async (store) => {
-			if (store.excludeFromBackendSync) return;
+			if (store.excludeFromBackendSync || dontAutoSync.includes(store.name)) return;
 
 			getKeyValue(store.name).then((currentKeyValue) => {
-				if (currentKeyValue !== null || allowNullOverwrite.includes(store.name)) {
+				if (currentKeyValue !== null) {
 					const currentKeyValueParsed = parseWithSchema(store.schema, currentKeyValue);
-					if (
-						(currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) ||
-						allowNullOverwrite.includes(store.name)
-					) {
+					if (currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) {
 						store.store.set(currentKeyValueParsed);
 					}
 				}
@@ -34,7 +31,7 @@ export async function syncSettingsToBackend() {
 			store.store.subscribe((value) => {
 				if (!get(rawMasterKeyStore)) return;
 
-				if (initialLoad && !allowNullOverwrite.includes(store.name)) {
+				if (initialLoad) {
 					initialLoad = false;
 					return;
 				}

@@ -3,7 +3,7 @@ import { getUser } from '$lib/server/user';
 import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 
-async function keyAllowed(key: string) {
+function keyAllowed(key: string) {
 	if (!persistedStoreKeys.includes(key)) throw error(400);
 }
 
@@ -19,7 +19,6 @@ export async function DELETE({ locals, params }) {
 	keyAllowed(params.key);
 
 	const user = await getUser(locals.userId);
-
 	await user.deleteKeyValue(params.key);
 
 	return new Response();

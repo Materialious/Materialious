@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
 	import { feedLastItemId, isAndroidTvStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';

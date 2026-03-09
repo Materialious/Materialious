@@ -93,6 +93,8 @@
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
+		addEventListener('resize', disableSideways);
+
 		if (!page.url.pathname.endsWith('/history'))
 			queueGetWatchHistory(video.videoId).then((watchHistory) => {
 				if (watchHistory) {
@@ -110,7 +112,7 @@
 	}
 </script>
 
-<div class:sideways-root={sideways} style="height: 100%; display: flex; flex-direction: column;" tabindex="0" role="button">
+<div class:sideways-root={sideways} class:use-flex-column={!sideways} tabindex="0" role="button">
 	<div id="thumbnail-container">
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
@@ -169,7 +171,7 @@
 	</div>
 
 	<div class="thumbnail-details video-title" style="flex: 1;">
-		<div class="video-title" style="height: 100%; display: flex; flex-direction: column;">
+		<div class="video-title use-flex-column">
 			<a
 				tabindex="-1"
 				style="padding-left: 1px;"
@@ -181,7 +183,7 @@
 				<span class="bold" style="width: 100%;">{letterCase(video.title.trimEnd())}</span>
 			</a>
 
-			<nav style="flex: 1; align-items: end;">
+			<nav class="align-end">
 				{#if !sideways && 'authorId' in video}
 					<AuthorAvatar author={video.author} authorId={video.authorId} />
 				{/if}
@@ -238,6 +240,12 @@
 		display: block;
 		transform: translateY(-15%);
 		margin-bottom: -22%;
+	}
+
+	.use-flex-column {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.thumbnail {
@@ -305,6 +313,17 @@
 
 	.watched {
 		filter: brightness(40%);
+	}
+
+	.align-end {
+		flex: 1;
+		align-items: end;
+	}
+
+	@media screen and (max-width: 1000px) {
+		.align-end {
+			align-items: center;
+		}
 	}
 
 	@media screen and (max-width: 1499px) {

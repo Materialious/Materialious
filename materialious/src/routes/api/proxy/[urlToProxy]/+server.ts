@@ -129,7 +129,7 @@ async function proxyRequest(
 
 	let body;
 	if (request.body && request.headers.has('__is_base64_encoded')) {
-		request.headers.delete('__is_base64_encoded');
+		requestHeaders.delete('__is_base64_encoded');
 
 		await sodium.ready;
 		body = Uint8Array.from(sodium.from_base64(await request.text()));

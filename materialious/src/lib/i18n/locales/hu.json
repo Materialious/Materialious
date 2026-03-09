@@ -127,7 +127,7 @@
             "cooldown": "Csatorna óra lehűlési idejének újbóli lekérése",
             "concurrent": "Csatornák maximális száma a hírcsatorna-visszatérés előtt",
             "fallbacks": "Visszatérések",
-            "importExport": "Feliratkozások importálása és exportálása",
+            "importExport": "Automatikus exportálás és importálás",
             "exportToInvidious": "Exportálás az Invidiousba a Materialiousból",
             "importToMaterialious": "Importálás az Invidiousból a Materialiousba",
             "importingToMaterialious": "A Materialiousba történő importálás megkezdve",
@@ -136,7 +136,30 @@
             "exportingToInvidiousFinished": "Az Invidiousba történő exportálás befejezve"
         },
         "exportToJson": "Exportálás JSON-ba",
-        "historyEnabled": "Megtekintési előzmények mentése"
+        "historyEnabled": "Megtekintési előzmények mentése",
+        "filter": {
+            "title": "Tartalomszűrők",
+            "url": "Szűrők importálása webcímből",
+            "autoUpdate": "Szűrő automatikus frissítése webcímből",
+            "contentType": "Tartalomtípus",
+            "field": "Mező",
+            "operator": "Üzemeltető",
+            "optionPlaceholder": "Válassza ki a lehetőséget",
+            "value": "Érték",
+            "addConditional": "Feltétel hozzáadása",
+            "addFilter": "Szűrő hozzáadása"
+        },
+        "export": {
+            "title": "Exportálás és importálás",
+            "importSub": "Feliratkozások importálása",
+            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube adatbázis és NewPipe JSON támogatott",
+            "importing": "Feliratkozások importálása (ez eltarthat egy ideig)",
+            "importingCompleted": "Feliratkozások sikeresen importálva",
+            "exportSub": "Feliratkozások exportálása",
+            "exportToClipboard": "Vágólapra másolás",
+            "exportToFile": "Mentés fájlba",
+            "importFromFile": "Importálás fájlból"
+        }
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",
@@ -273,6 +296,17 @@
         "configureInstance": "Példány konfigurálása",
         "done": "Kész"
     },
-    "copy": "JSON másolása",
-    "captionStyle": "Feliratstílusok"
+    "copy": "Másolás a vágólapra",
+    "captionStyle": "Feliratstílusok",
+    "watchParty": {
+        "start": "Közös nézés indítása",
+        "header": "Közös nézés",
+        "createRoom": "Szoba létrehozása",
+        "joinRoom": "Csatlakozás a szobához",
+        "roomID": "Szobaazonosító",
+        "shareRoom": "Szoba megosztása",
+        "leaveRoom": "Szoba elhagyása",
+        "userJoin": "Felhasználó csatlakozott a szobához",
+        "userLeft": "Felhasználó elhagyta a szobát"
+    }
 }

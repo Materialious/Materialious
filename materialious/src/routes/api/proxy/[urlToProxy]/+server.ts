@@ -100,14 +100,24 @@ async function proxyRequest(
 		}
 	}
 
-	const requestHeaders = new Headers();
+	const requestHeaders = new Headers(request.headers);
 	requestHeaders.set('host', urlToProxyObj.host);
 	requestHeaders.set('origin', urlToProxyObj.origin);
 	requestHeaders.set('user-agent', USER_AGENT);
 
-	const authHeader = request.headers.get('Authorization');
-	if (authHeader) {
-		requestHeaders.set('Authorization', authHeader);
+	// Remove headers that may cause issues or be auto-managed
+	for (const key of [
+		'referer',
+		'x-forwarded-for',
+		'x-requested-with',
+		'sec-ch-ua-mobile',
+		'sec-ch-ua',
+		'sec-ch-ua-platform',
+		'cookie', // Ensure auth cookies don't become included.
+		'content-type',
+		'content-length'
+	]) {
+		requestHeaders.delete(key);
 	}
 
 	const requestOptions: RequestInit = {

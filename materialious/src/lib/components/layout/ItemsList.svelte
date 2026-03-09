@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
-	import { removePlaylistVideo } from '$lib/api';
-	import { invidiousAuthStore, feedLastItemId, isAndroidTvStore } from '$lib/store';
+	import { feedLastItemId, isAndroidTvStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
@@ -18,21 +16,10 @@
 	interface Props {
 		items?: FeedItems;
 		playlistId?: string;
-		playlistAuthor?: string;
 		classes?: string;
 	}
 
-	let {
-		items = [],
-		playlistId = '',
-		playlistAuthor = '',
-		classes = 'page right active'
-	}: Props = $props();
-
-	async function removePlaylistItem(indexId: string) {
-		if (!playlistId) return;
-		await removePlaylistVideo(playlistId, indexId);
-	}
+	let { items = [], playlistId = '', classes = 'page right active' }: Props = $props();
 
 	onMount(async () => {
 		if (!$feedLastItemId) return;
@@ -99,17 +86,6 @@
 							{#key item.videoId}
 								<Thumbnail video={item} {playlistId} />
 							{/key}
-							{#if $invidiousAuthStore && decodeURIComponent($invidiousAuthStore.username) === playlistAuthor && 'indexId' in item}
-								<div class="right-align" style="margin: 1em .5em;">
-									<button
-										onclick={async () => removePlaylistItem(item.indexId)}
-										class="tertiary circle small"
-									>
-										<i>delete</i>
-										<div class="tooltip">{$_('delete')}</div>
-									</button>
-								</div>
-							{/if}
 						{:else if item.type === 'channel'}
 							<ChannelThumbnail channel={item} />
 						{:else if item.type === 'playlist'}

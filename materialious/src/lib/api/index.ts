@@ -74,6 +74,7 @@ import {
 } from './invidious/playlist';
 import {
 	deleteWatchHistoryBackend,
+	deleteWatchHistoryItemBackend,
 	getVideoWatchHistoryBackend,
 	getWatchHistoryBackend,
 	saveWatchHistoryBackend,
@@ -341,6 +342,14 @@ export async function deleteWatchHistory() {
 	}
 
 	await localDb.watchHistory.clear();
+}
+
+export async function deleteWatchHistoryItem(videoId: string) {
+	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
+		return deleteWatchHistoryItemBackend(videoId);
+	}
+
+	await localDb.watchHistory.delete({ videoId });
 }
 
 export async function updateWatchHistory(

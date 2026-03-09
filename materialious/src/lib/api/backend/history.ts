@@ -118,6 +118,16 @@ export async function deleteWatchHistoryBackend() {
 	await fetch('/api/user/history', { method: 'DELETE' });
 }
 
+export async function deleteWatchHistoryItemBackend(videoId: string) {
+	await sodium.ready;
+	const rawKey = await getRawKey();
+	if (!rawKey) return;
+
+	const videoHash = await getSecureHash(videoId, rawKey);
+
+	await fetch(`/api/user/history/${videoHash}`, { method: 'DELETE' });
+}
+
 export async function saveWatchHistoryBackend(video: VideoPlay, progress: number = 0) {
 	await sodium.ready;
 	const rawKey = await getRawKey();

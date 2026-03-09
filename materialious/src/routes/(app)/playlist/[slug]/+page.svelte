@@ -97,9 +97,5 @@
 <div class="space"></div>
 
 {#if data.playlist.videos}
-	<ItemsList
-		items={data.playlist.videos}
-		playlistAuthor={data.playlist.info.author}
-		playlistId={data.playlist.info.playlistId}
-	/>
+	<ItemsList items={data.playlist.videos} playlistId={data.playlist.info.playlistId} />
 {/if}

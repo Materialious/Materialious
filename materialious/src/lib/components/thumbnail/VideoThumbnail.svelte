@@ -320,16 +320,14 @@
 		align-items: end;
 	}
 
-	@media screen and (max-width: 1000px) {
-		.align-end {
-			align-items: center;
-		}
-	}
-
-	@media screen and (max-width: 1499px) {
+	@media screen and (max-width: 1800px) {
 		.sideways-root .thumbnail {
 			width: 100%;
 			max-height: 100%;
+		}
+
+		.align-end {
+			align-items: center;
 		}
 
 		.sideways-root .thumbnail-details {

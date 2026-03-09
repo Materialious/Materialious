@@ -60,7 +60,7 @@
 		<nav style="gap: 0.5em;">
 			<img class="circle large" {...avatar.image} alt="Channel profile" />
 			<button
-				class="large secondary-container"
+				class="circle large secondary-container"
 				{...mergeAttrs(avatar.fallback, {
 					style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
 				})}>{channel.author[0]}</button

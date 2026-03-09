@@ -110,7 +110,7 @@
 	}
 </script>
 
-<div class:sideways-root={sideways} tabindex="0" role="button">
+<div class:sideways-root={sideways} style="height: 100%; display: flex; flex-direction: column;" tabindex="0" role="button">
 	<div id="thumbnail-container">
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
@@ -168,8 +168,8 @@
 		</a>
 	</div>
 
-	<div class="thumbnail-details video-title">
-		<div class="video-title">
+	<div class="thumbnail-details video-title" style="flex: 1;">
+		<div class="video-title" style="height: 100%; display: flex; flex-direction: column;">
 			<a
 				tabindex="-1"
 				style="padding-left: 1px;"
@@ -178,10 +178,10 @@
 				href={watchUrl.toString()}
 				onclick={onVideoSelected}
 			>
-				<span class="bold">{letterCase(video.title.trimEnd())}</span>
+				<span class="bold" style="width: 100%;">{letterCase(video.title.trimEnd())}</span>
 			</a>
 
-			<nav>
+			<nav style="flex: 1; align-items: end;">
 				{#if !sideways && 'authorId' in video}
 					<AuthorAvatar author={video.author} authorId={video.authorId} />
 				{/if}

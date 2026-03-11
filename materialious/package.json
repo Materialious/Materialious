@@ -87,7 +87,7 @@
 		"mousetrap": "^1.6.5",
 		"mysql2": "^3.18.2",
 		"papaparse": "^5.5.3",
-		"pg": "^8.19.0",
+		"pg": "^8.20.0",
 		"pg-hstore": "^2.3.4",
 		"safe-regex2": "^5.0.0",
 		"sequelize": "^6.37.8",

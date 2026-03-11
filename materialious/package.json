@@ -90,7 +90,7 @@
 		"pg": "^8.19.0",
 		"pg-hstore": "^2.3.4",
 		"safe-regex2": "^5.0.0",
-		"sequelize": "^6.37.7",
+		"sequelize": "^6.37.8",
 		"shaka-player": "^4.16.14",
 		"sponsorblock-api": "^0.2.4",
 		"sqlite3": "^5.1.7",

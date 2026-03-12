@@ -12,6 +12,7 @@
 	import { addToast } from '../Toast.svelte';
 	import { Clipboard } from '@capacitor/clipboard';
 	import { downloadStringAsFile } from '$lib/misc';
+	import ComboBox from '../ComboBox.svelte';
 
 	let remoteFilterListUrl: string = $state($filterContentUrlStore ?? '');
 	let remoteError: string = $state('');
@@ -165,17 +166,21 @@
 		<article class="no-margin surface-container-high">
 			<div class="grid">
 				<div class="s12 m6 l6">
-					<div class="label field suffix surface-container-highest">
-						<select name="content-type">
-							{#each filterTypes as filterType (filterType)}
-								<option selected={filterType === filter.type} value={filterType}
-									>{titleCase(filterType)}</option
-								>
-							{/each}
-						</select>
-						<label for="content-type">{$_('layout.filter.contentType')}</label>
-						<i>arrow_drop_down</i>
-					</div>
+					<ComboBox
+						label={$_('layout.filter.contentType')}
+						defaultValue={filter.type}
+						options={filterTypes.map((filterType) => {
+							return {
+								label: titleCase(filterType),
+								value: filterType
+							};
+						})}
+						onChange={(value) => {
+							filter.type = value as 'channel' | 'video';
+							filterContentListStore.set(contentFilters);
+							filterContentUrlAutoUpdateStore.set(false);
+						}}
+					/>
 				</div>
 				<div class="s12 m6 l6 right-align">
 					<button onclick={() => removeFilter(filter)} class="surface-container-highest">
@@ -203,89 +208,70 @@
 								</button>
 							</nav>
 
-							<div class="label field suffix surface-container-highest">
-								<select
-									onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
-										condition.field = event.currentTarget.value;
-										filterContentListStore.set(contentFilters);
-										filterContentUrlAutoUpdateStore.set(false);
-									}}
-									name="field"
-								>
-									{#each Object.keys(schema[filter.type]) as key (key)}
-										<option value={key} selected={condition.field === key}
-											>{camelCaseToHuman(key)}</option
-										>
-									{/each}
-								</select>
-								<label for="field">{$_('layout.filter.field')}</label>
-								<i>arrow_drop_down</i>
-							</div>
+							<ComboBox
+								label={$_('layout.filter.field')}
+								defaultValue={condition.field}
+								options={Object.keys(schema[filter.type]).map((key) => {
+									return {
+										label: camelCaseToHuman(key),
+										value: key
+									};
+								})}
+								onChange={(value) => {
+									condition.field = value;
+									filterContentListStore.set(contentFilters);
+									filterContentUrlAutoUpdateStore.set(false);
+								}}
+							/>
 
-							<div class="field label suffix surface-container-highest">
-								<select
-									onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
-										condition.operator = event.currentTarget.value as z.infer<
-											typeof zFilterOperatorEnum
-										>;
-										filterContentListStore.set(contentFilters);
-										filterContentUrlAutoUpdateStore.set(false);
-									}}
-									name="operator"
-								>
-									{#each zFilterOperatorEnum.options as operator (operator)}
-										<option selected={operator === condition.operator} value={operator}
-											>{operator}</option
-										>
-									{/each}
-								</select>
-								<label for="operator">{$_('layout.filter.operator')}</label>
-								<i>arrow_drop_down</i>
-							</div>
+							<ComboBox
+								label={$_('layout.filter.operator')}
+								defaultValue={condition.operator}
+								options={zFilterOperatorEnum.options.map((operator) => {
+									return {
+										label: operator,
+										value: operator
+									};
+								})}
+								onChange={(value) => {
+									condition.operator = value as z.infer<typeof zFilterOperatorEnum>;
+									filterContentListStore.set(contentFilters);
+									filterContentUrlAutoUpdateStore.set(false);
+								}}
+							/>
 
 							{#each condition.values as conditionValue, index (index)}
 								<nav>
 									{#if schema[filter.type][condition.field] === 'boolean'}
-										<div class="field label suffix surface-container-highest max">
-											<select
-												onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
-													condition.values[index] = event.currentTarget.value;
-													filterContentListStore.set(contentFilters);
-													filterContentUrlAutoUpdateStore.set(false);
-												}}
-												name="boolean-options"
-											>
-												<option value="" disabled selected
-													>{$_('layout.filter.optionPlaceholder')}</option
-												>
-												<option selected={conditionValue === 'true'} value="true">true</option>
-												<option selected={conditionValue === 'false'} value="false">false</option>
-											</select>
-											<label for="boolean-options">Value</label>
-											<i>arrow_drop_down</i>
-										</div>
+										<ComboBox
+											label="Value"
+											defaultValue={conditionValue as string}
+											options={[
+												{ label: 'True', value: 'true' },
+												{ label: 'False', value: 'false' }
+											]}
+											onChange={(value) => {
+												condition.values[index] = value;
+												filterContentListStore.set(contentFilters);
+												filterContentUrlAutoUpdateStore.set(false);
+											}}
+										/>
 									{:else if Array.isArray(schema[filter.type][condition.field])}
-										<div class="field label suffix surface-container-highest max">
-											<select
-												onchange={(event: Event & { currentTarget: HTMLSelectElement }) => {
-													condition.values[index] = event.currentTarget.value;
-													filterContentListStore.set(contentFilters);
-													filterContentUrlAutoUpdateStore.set(false);
-												}}
-												name="array-options"
-											>
-												<option value="" disabled selected
-													>{$_('layout.filter.optionPlaceholder')}</option
-												>
-												{#each schema[filter.type][condition.field] as value (value)}
-													<option selected={conditionValue === value} {value}
-														>{camelCaseToHuman(value)}</option
-													>
-												{/each}
-											</select>
-											<label for="array-options">Value</label>
-											<i>arrow_drop_down</i>
-										</div>
+										<ComboBox
+											label="Value"
+											defaultValue={conditionValue as string}
+											options={(schema[filter.type][condition.field] as string[]).map((value) => {
+												return {
+													label: camelCaseToHuman(value),
+													value
+												};
+											})}
+											onChange={(value) => {
+												condition.values[index] = value;
+												filterContentListStore.set(contentFilters);
+												filterContentUrlAutoUpdateStore.set(false);
+											}}
+										/>
 									{:else}
 										<div class="field label surface-container-highest max">
 											<input

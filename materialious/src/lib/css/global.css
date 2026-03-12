@@ -199,6 +199,8 @@ menu.player-settings {
 	padding: 1rem;
 	font-size: 1rem;
 	border-radius: var(--border-radius);
+	overflow-y: scroll;
+	max-height: 200px;
 }
 
 [data-melt-combobox-option] {

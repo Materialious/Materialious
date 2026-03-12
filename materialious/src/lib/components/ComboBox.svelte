@@ -7,20 +7,20 @@
 
 	let {
 		options,
-		label,
+		label = undefined,
 		defaultValue = undefined,
 		onChange = undefined
 	}: {
 		options: ComboOption[];
-		label: string;
-		defaultValue?: string;
+		label?: string;
+		defaultValue?: string | null;
 		onChange?: (value: string) => void;
 	} = $props();
 
 	let initialValueChange = true;
 	const combobox = new Combobox<string>({
 		onValueChange: (value) => {
-			if (initialValueChange && typeof defaultValue !== 'undefined') {
+			if (initialValueChange && defaultValue) {
 				initialValueChange = false;
 				return;
 			}
@@ -53,13 +53,15 @@
 	});
 </script>
 
-<div class="field label suffix surface-container-highest">
+<div class="field suffix surface-container-highest" class:label={typeof label === 'string'}>
 	<input
 		{...mergeAttrs(combobox.input, {
 			value: valueToLabel[combobox.input.value]
 		})}
 	/>
-	<label {...combobox.label}>{label}</label>
+	{#if label}
+		<label {...combobox.label}>{label}</label>
+	{/if}
 	<i>keyboard_arrow_down</i>
 
 	<div {...combobox.content}>

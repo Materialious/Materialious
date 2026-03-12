@@ -9,6 +9,7 @@
 		sponsorBlockTimelineStore,
 		sponsorBlockUrlStore
 	} from '../../store';
+	import ComboBox from '../ComboBox.svelte';
 
 	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
 
@@ -22,11 +23,8 @@
 		{ name: $_('layout.sponsors.tangentJokes'), category: 'filler' }
 	];
 
-	function onSponsorSet(
-		category: string,
-		event: Event & { currentTarget: EventTarget & HTMLSelectElement }
-	) {
-		const value = event.currentTarget.value as 'automatic' | 'manual' | 'timeline' | 'disabled';
+	function onSponsorSet(category: string, givenValue: string) {
+		const value = givenValue as 'automatic' | 'manual' | 'timeline' | 'disabled';
 
 		const categories = get(sponsorBlockCategoriesStore);
 
@@ -112,29 +110,23 @@
 <p class="bold">{$_('layout.sponsors.Catagories')}</p>
 
 {#each sponsorCategories as sponsor (sponsor)}
-	{@const currentCatergoryTrigger = $sponsorBlockCategoriesStore[sponsor.category]}
-	<div class="field middle-align no-margin">
+	{@const currentCategoryTrigger = $sponsorBlockCategoriesStore[sponsor.category]}
+
+	<div class="field middle-align">
 		<nav class="no-padding">
 			<div class="max">
 				<p>{sponsor.name}</p>
 			</div>
-			<div class="field suffix surface-container-highest">
-				<select onchange={(event) => onSponsorSet(sponsor.category, event)}>
-					<option selected={currentCatergoryTrigger === undefined} value="disabled"
-						>{$_('disabled')}</option
-					>
-					<option selected={currentCatergoryTrigger === 'automatic'} value="automatic"
-						>{$_('layout.sponsors.automatic')}</option
-					>
-					<option selected={currentCatergoryTrigger === 'manual'} value="manual"
-						>{$_('layout.sponsors.manual')}</option
-					>
-					<option selected={currentCatergoryTrigger === 'timeline'} value="timeline"
-						>{$_('layout.sponsors.timeline')}</option
-					>
-				</select>
-				<i>arrow_drop_down</i>
-			</div>
+			<ComboBox
+				options={[
+					{ label: $_('disabled'), value: 'disabled' },
+					{ label: $_('layout.sponsors.automatic'), value: 'automatic' },
+					{ label: $_('layout.sponsors.manual'), value: 'manual' },
+					{ label: $_('layout.sponsors.timeline'), value: 'timeline' }
+				]}
+				defaultValue={currentCategoryTrigger ?? 'disabled'}
+				onChange={(value) => onSponsorSet(sponsor.category, value)}
+			/>
 		</nav>
 	</div>
 {/each}

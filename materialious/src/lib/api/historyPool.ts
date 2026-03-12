@@ -5,7 +5,7 @@ const videoIds: string[] = [];
 const pendingResolves = new Map<string, (result: VideoWatchHistory | undefined) => void>();
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
-const DEBOUNCE_MS = 2000;
+const DEBOUNCE_MS = 1000;
 const BATCH_SIZE = 100;
 
 async function processBatches(): Promise<void> {

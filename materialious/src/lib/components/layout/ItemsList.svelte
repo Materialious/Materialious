@@ -71,11 +71,17 @@
 		{#each items as item, index (index)}
 			{#if !isItemFiltered(item)}
 				{@const uniqueItemId = extractUniqueId(item)}
-				{@const spatialItem = spatialMenu.getItem(item, { onSelect: () => goToItem(uniqueItemId) })}
+				{@const spatialItem = spatialMenu.getItem(item, {
+					onSelect: () => {
+						if ($isAndroidTvStore) goToItem(uniqueItemId);
+					}
+				})}
 				<ContentColumn>
 					<article
 						{...mergeAttrs(spatialItem.attrs, {
-							onclick: () => goToItem(uniqueItemId),
+							onclick: () => {
+								if ($isAndroidTvStore) goToItem(uniqueItemId);
+							},
 							id: uniqueItemId
 						})}
 						class="no-padding item-select border"

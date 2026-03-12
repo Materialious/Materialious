@@ -38,6 +38,10 @@
 		"sortBy": "Sort By",
 		"features": "Features"
 	},
+	"markAs": {
+		"watched": "Mark as watched",
+		"unwatched": "Mark as unwatched"
+	},
 	"initalSetup": {
 		"useInvidious": "I want to use Invidious",
 		"useLocalFallback": "I want to use local video fallback",

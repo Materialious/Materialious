@@ -1,8 +1,22 @@
-import type { Image } from './api/model';
+import type {
+	Image,
+	Notification,
+	PlaylistPageVideo,
+	Video,
+	VideoBase,
+	VideoWatchHistory
+} from './api/model';
 import { localDb } from './dexie';
 import { getBestThumbnail } from './images';
 
 let isInitial = false;
+
+export type ThumbnailVideo =
+	| VideoBase
+	| Video
+	| Notification
+	| PlaylistPageVideo
+	| VideoWatchHistory;
 
 export async function associateAvatar(channelId: string, avatars: Image[]) {
 	if (avatars.length === 0) return;

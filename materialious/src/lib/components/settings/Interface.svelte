@@ -35,6 +35,7 @@
 	} from '../../store';
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import ComboBox from '../ComboBox.svelte';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 	let region = $state(get(interfaceRegionStore));
@@ -81,10 +82,8 @@
 		location.reload();
 	}
 
-	async function setBackend(event: Event) {
-		const select = event.target as HTMLSelectElement;
-		backendInUseStore.set(select.value as 'ivg' | 'yt');
-
+	async function setBackend(backend: string) {
+		backendInUseStore.set(backend as 'ivg' | 'yt');
 		await timeout(100);
 		location.reload();
 	}
@@ -120,14 +119,15 @@
 </script>
 
 {#if isUnrestrictedPlatform()}
-	<div class="field label suffix surface-container-highest">
-		<select name="backend-in-use" onchange={setBackend}>
-			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
-			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube (Experimental)</option>
-		</select>
-		<label for="backend-in-use">{$_('backend')}</label>
-		<i>arrow_drop_down</i>
-	</div>
+	<ComboBox
+		label={$_('backend')}
+		defaultValue={$backendInUseStore}
+		onChange={setBackend}
+		options={[
+			{ label: 'Invidious', value: 'ivg' },
+			{ label: 'YouTube (Experimental)', value: 'yt' }
+		]}
+	/>
 
 	{#if $backendInUseStore === 'ivg'}
 		<form onsubmit={setInstance}>

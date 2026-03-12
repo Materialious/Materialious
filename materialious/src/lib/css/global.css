@@ -194,6 +194,22 @@ menu.player-settings {
 	transform: translate(-50%, -50%);
 }
 
+[data-melt-combobox-content] {
+	background-color: var(--surface-container-high);
+	padding: 1rem;
+	font-size: 1rem;
+	border-radius: var(--border-radius);
+}
+
+[data-melt-combobox-option] {
+	padding: 0.25rem;
+	cursor: pointer;
+}
+
+[data-highlighted] {
+	background-color: var(--surface-container-highest);
+}
+
 @media screen and (max-width: 1000px) {
 	menu.mobile {
 		position: fixed !important;

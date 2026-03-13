@@ -133,8 +133,8 @@ async function proxyRequest(
 
 		await sodium.ready;
 		body = Uint8Array.from(sodium.from_base64(await request.text()));
-	} else {
-		if (request.method !== 'GET' && request.method !== 'HEAD') body = await request.blob();
+	} else if (body && request.method !== 'GET' && request.method !== 'HEAD') {
+		body = await request.blob();
 	}
 
 	let response: Response | undefined;

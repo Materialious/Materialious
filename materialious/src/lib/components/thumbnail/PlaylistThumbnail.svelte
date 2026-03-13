@@ -10,10 +10,9 @@
 
 	interface Props {
 		playlist: Playlist | PlaylistPage;
-		disabled?: boolean;
 	}
 
-	let { playlist, disabled = false }: Props = $props();
+	let { playlist }: Props = $props();
 
 	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
 
@@ -27,12 +26,7 @@
 	const thumbnail = new Avatar({ src: thumbnailSrc });
 </script>
 
-<a
-	href={playlistLink}
-	class:link-disabled={disabled}
-	style="width: 100%; overflow: hidden;min-height:100px;"
-	class="wave"
->
+<a href={playlistLink} style="width: 100%; overflow: hidden;min-height:100px;" class="wave">
 	<img
 		class="responsive"
 		{...mergeAttrs(thumbnail.image, {
@@ -51,9 +45,7 @@
 <div class="small-padding">
 	<nav class="no-margin">
 		<div class="max">
-			<a class:link-disabled={disabled} href={playlistLink}
-				><div class="bold">{letterCase(truncate(playlist.title))}</div></a
-			>
+			<a href={playlistLink}><div class="bold">{letterCase(truncate(playlist.title))}</div></a>
 			<div>
 				{#if playlist.authorId}
 					<a href={resolve('/channel/[authorId]', { authorId: playlist.authorId })}
@@ -66,9 +58,3 @@
 		</div>
 	</nav>
 </div>
-
-<style>
-	.link-disabled {
-		pointer-events: none;
-	}
-</style>

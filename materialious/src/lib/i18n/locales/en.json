@@ -38,6 +38,10 @@
 		"sortBy": "Sort By",
 		"features": "Features"
 	},
+	"markAs": {
+		"watched": "Mark as watched",
+		"unwatched": "Mark as unwatched"
+	},
 	"initalSetup": {
 		"useInvidious": "I want to use Invidious",
 		"useLocalFallback": "I want to use local video fallback",
@@ -73,6 +77,7 @@
 	"letterCase": "Letter case for titles",
 	"hideReplies": "Hide replies",
 	"hideVideo": "Hide video",
+	"hideAuthor": "Hide author",
 	"defaultPage": "Default page",
 	"newest": "Newest",
 	"oldest": "Oldest",
@@ -269,7 +274,9 @@
 			"optionPlaceholder": "Select your option",
 			"value": "Value",
 			"addConditional": "Add conditional",
-			"addFilter": "Add filter"
+			"addFilter": "Add filter",
+			"videoFiltered": "\"{{videoTitle}}\" from \"{{authorName}}\" filtered",
+			"channelFiltered": "\"{{authorName}}\" filtered"
 		},
 		"export": {
 			"title": "Export/Import",

@@ -214,7 +214,7 @@ export const interfaceSearchSuggestionsStore = persist(
 	'searchSuggestions'
 );
 export const interfaceForceCase: Writable<TitleCase> = persist(
-	writable(null),
+	writable('original'),
 	createStorage(),
 	'forceCase'
 );

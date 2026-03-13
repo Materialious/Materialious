@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { feedLastItemId, isAndroidTvStore } from '$lib/store';
+	import { feedLastItemId, filterContentListStore, isAndroidTvStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
@@ -68,35 +68,43 @@
 		<NoResults />
 	{/if}
 	<div class="grid" {...spatialMenu.root}>
-		{#each items as item, index (index)}
-			{#if !isItemFiltered(item)}
-				{@const uniqueItemId = extractUniqueId(item)}
-				{@const spatialItem = spatialMenu.getItem(item, { onSelect: () => goToItem(uniqueItemId) })}
-				<ContentColumn>
-					<article
-						{...mergeAttrs(spatialItem.attrs, {
-							onclick: () => goToItem(uniqueItemId),
-							id: uniqueItemId
-						})}
-						class="no-padding item-select border"
-						class:item-select-focused={!isMobile() && spatialItem.highlighted}
-						style="height: 100%;"
-					>
-						{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream' || item.type === 'historyVideo'}
-							{#key item.videoId}
-								<Thumbnail video={item} {playlistId} />
-							{/key}
-						{:else if item.type === 'channel'}
-							<ChannelThumbnail channel={item} />
-						{:else if item.type === 'playlist'}
-							<PlaylistThumbnail playlist={item} />
-						{:else if item.type === 'hashtag'}
-							<HashtagThumbnail hashtag={item} />
-						{/if}
-					</article>
-				</ContentColumn>
-			{/if}
-		{/each}
+		{#key $filterContentListStore?.length}
+			{#each items as item, index (index)}
+				{#if !isItemFiltered(item)}
+					{@const uniqueItemId = extractUniqueId(item)}
+					{@const spatialItem = spatialMenu.getItem(item, {
+						onSelect: () => {
+							if ($isAndroidTvStore) goToItem(uniqueItemId);
+						}
+					})}
+					<ContentColumn>
+						<article
+							{...mergeAttrs(spatialItem.attrs, {
+								onclick: () => {
+									if ($isAndroidTvStore) goToItem(uniqueItemId);
+								},
+								id: uniqueItemId
+							})}
+							class="no-padding item-select border"
+							class:item-select-focused={!isMobile() && spatialItem.highlighted}
+							style="height: 100%;"
+						>
+							{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream' || item.type === 'historyVideo'}
+								{#key item.videoId}
+									<Thumbnail video={item} {playlistId} />
+								{/key}
+							{:else if item.type === 'channel'}
+								<ChannelThumbnail channel={item} />
+							{:else if item.type === 'playlist'}
+								<PlaylistThumbnail playlist={item} />
+							{:else if item.type === 'hashtag'}
+								<HashtagThumbnail hashtag={item} />
+							{/if}
+						</article>
+					</ContentColumn>
+				{/if}
+			{/each}
+		{/key}
 	</div>
 </div>
 

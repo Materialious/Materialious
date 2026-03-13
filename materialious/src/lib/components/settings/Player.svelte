@@ -3,7 +3,6 @@
 	import { Capacitor } from '@capacitor/core';
 	import ISO6391 from 'iso-639-1';
 	import { _ } from '$lib/i18n';
-	import { get } from 'svelte/store';
 	import {
 		backendInUseStore,
 		playerAlwaysLoopStore,
@@ -24,8 +23,7 @@
 	} from '../../store';
 	import { playbackRates } from '$lib/player/index';
 	import { isUnrestrictedPlatform } from '$lib/misc';
-
-	let defaultLanguage = $state(get(playerDefaultLanguage));
+	import ComboBox from '../ComboBox.svelte';
 
 	let localVideoFallback: 'enabled' | 'disabled' | 'always' = $state('enabled');
 	if (!$playerYouTubeJsFallback) {
@@ -38,18 +36,10 @@
 		ISO6391.getName(code).toLocaleLowerCase()
 	);
 
-	function onQualityChange(event: Event) {
-		const value = (event.target as HTMLSelectElement).value;
-		playerDefaultQualityStore.set(value);
-	}
+	languageNames.unshift('original');
 
-	function onSpeedChange(event: Event) {
-		const value = (event.target as HTMLSelectElement).value;
-		playerDefaultPlaybackSpeed.set(Number(value));
-	}
-
-	function onLocalVideoFallbackChange() {
-		switch (localVideoFallback) {
+	function onLocalVideoFallbackChange(value: string) {
+		switch (value) {
 			case 'enabled':
 				playerYouTubeJsFallback.set(true);
 				playerYouTubeJsAlways.set(false);
@@ -67,78 +57,61 @@
 </script>
 
 <div class="margin"></div>
-<div class="field label suffix surface-container-highest">
-	<select
-		tabindex="0"
-		name="case"
-		bind:value={defaultLanguage}
-		onchange={() => playerDefaultLanguage.set(defaultLanguage)}
-	>
-		<option selected={$playerDefaultLanguage === 'original'} value="original">Original</option>
-		{#each languageNames as language (language)}
-			<option selected={$playerDefaultLanguage === language} value={language}
-				>{titleCase(language)}</option
-			>
-		{/each}
-	</select>
-	<label tabindex="-1" for="case">{$_('player.defaultLanguage')}</label>
-	<i>arrow_drop_down</i>
-</div>
+<ComboBox
+	label={$_('player.defaultLanguage')}
+	defaultValue={$playerDefaultLanguage}
+	options={languageNames.map((language) => {
+		return {
+			label: titleCase(language),
+			value: language
+		};
+	})}
+	onChange={(value) => playerDefaultLanguage.set(value)}
+/>
 
-<div class="field label suffix surface-container-highest">
-	<select
-		tabindex="0"
-		name="quality"
-		id="quality"
-		bind:value={$playerDefaultQualityStore}
-		onchange={onQualityChange}
-	>
-		<option value="auto">Auto (Recommended)</option>
-		<option value="144">144p (Ultra low)</option>
-		<option value="240">240p (Low)</option>
-		<option value="360">360p (SD)</option>
-		<option value="480">480p (SD+)</option>
-		<option value="720">720p (HD)</option>
-		<option value="1080">1080p (Full HD)</option>
-		<option value="1440">1440p (2K)</option>
-		<option value="2160">2160p (4K UHD)</option>
-	</select>
-	<label tabindex="-1" for="quality">{$_('player.preferredQuality')}</label>
-	<i>arrow_drop_down</i>
-</div>
+<ComboBox
+	label={$_('player.preferredQuality')}
+	defaultValue={$playerDefaultQualityStore}
+	onChange={(value) => playerDefaultQualityStore.set(value)}
+	options={[
+		{ label: 'Auto (Recommended)', value: 'auto' },
+		{ label: '144p (Ultra low)', value: '144' },
+		{ label: '240p (Low)', value: '240' },
+		{ label: '360p (SD)', value: '360' },
+		{ label: '480p (SD+)', value: '480' },
+		{ label: '720p (HD)', value: '720' },
+		{ label: '1080p (Full HD)', value: '1080' },
+		{ label: '1440p (2K)', value: '1440' },
+		{ label: '2160p (4K UHD)', value: '2160' }
+	]}
+/>
 
-<div class="field label suffix surface-container-highest">
-	<select
-		tabindex="0"
-		name="quality"
-		id="quality"
-		bind:value={$playerDefaultPlaybackSpeed}
-		onchange={onSpeedChange}
-	>
-		{#each playbackRates as speed (speed)}
-			<option value={speed}>x{speed}</option>
-		{/each}
-	</select>
-	<label tabindex="-1" for="quality">{$_('layout.player.defaultPlaybackSpeed')}</label>
-	<i>arrow_drop_down</i>
-</div>
+<ComboBox
+	label={$_('layout.player.defaultPlaybackSpeed')}
+	defaultValue={$playerDefaultPlaybackSpeed.toString()}
+	options={playbackRates.map((rate) => {
+		return {
+			label: `x${rate}`,
+			value: rate.toString()
+		};
+	})}
+	onChange={(value) => playerDefaultPlaybackSpeed.set(Number(value))}
+/>
 
 {#if isUnrestrictedPlatform() && $backendInUseStore === 'ivg'}
-	<div class="field suffix surface-container-highest label">
-		<select
-			tabindex="0"
-			name="ytfallback"
-			bind:value={localVideoFallback}
-			onchange={onLocalVideoFallbackChange}
-		>
-			<option value="enabled">{$_('enabled')}</option>
-			<option value="always">{$_('layout.player.youtubeJsAlways')}</option>
-			<option value="disabled">{$_('disabled')}</option>
-		</select>
-		<label tabindex="-1" for="ytfallback">{$_('layout.player.localVideoFallback')}</label>
-		<i>arrow_drop_down</i>
-	</div>
+	<ComboBox
+		label={$_('layout.player.localVideoFallback')}
+		defaultValue={localVideoFallback}
+		options={[
+			{ label: $_('enabled'), value: 'enabled' },
+			{ label: $_('layout.player.youtubeJsAlways'), value: 'always' },
+			{ label: $_('disabled'), value: 'disabled' }
+		]}
+		onChange={(value) => onLocalVideoFallbackChange(value)}
+	/>
 {/if}
+
+<div class="space"></div>
 
 <div class="field no-margin">
 	<nav class="no-padding">

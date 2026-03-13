@@ -82,6 +82,7 @@ import {
 } from './backend/history';
 import { localDb } from '$lib/dexie';
 import { getBestThumbnail } from '$lib/images';
+import type { ThumbnailVideo } from '$lib/thumbnail';
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	// Doesn't exist in YTjs.
@@ -368,7 +369,7 @@ export async function updateWatchHistory(
 	await localDb.watchHistory.update({ videoId }, { progress, watched: new Date() });
 }
 
-export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {
+export async function saveWatchHistory(video: ThumbnailVideo, progress: number = 0) {
 	if (!get(watchHistoryEnabledStore)) return;
 
 	if (isOwnBackend()?.internalAuth && get(rawMasterKeyStore)) {
@@ -384,7 +385,8 @@ export async function saveWatchHistory(video: VideoPlay, progress: number = 0) {
 		progress,
 		id: video.videoId,
 		title: video.title,
-		thumbnail: getBestThumbnail(video.videoThumbnails),
+		thumbnail:
+			'videoThumbnails' in video ? getBestThumbnail(video.videoThumbnails) : video.thumbnail,
 		videoId: video.videoId,
 		type: 'historyVideo'
 	});

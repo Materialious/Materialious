@@ -17,11 +17,17 @@
 	let {
 		shares,
 		includePromptText = undefined,
-		iconOnly = true
+		iconOnly = true,
+		classes = 'surface-container-highest',
+		menuClasses = 'mobile no-wrap',
+		onShare = undefined
 	}: {
 		shares: ShareLink[];
 		includePromptText?: string;
 		iconOnly: boolean;
+		classes?: string;
+		menuClasses?: string;
+		onShare?: (value: string) => void;
 	} = $props();
 
 	const shareBase = {
@@ -34,11 +40,13 @@
 	let shareButtonElement: HTMLElement | undefined = $state();
 	let includePrompt = $state(false);
 
-	async function onShare(share: ShareLink) {
+	async function onShareValue(share: ShareLink) {
 		const url = new URL(`${shareBase[share.type]}${share.path}`);
 
 		if (share.param && includePrompt)
 			url.searchParams.append(share.param.key, share.param.value().toString());
+
+		onShare?.(url.toString());
 
 		await shareURL(url.toString());
 
@@ -46,7 +54,7 @@
 	}
 </script>
 
-<button bind:this={shareButtonElement} class="surface-container-highest">
+<button bind:this={shareButtonElement} class={classes}>
 	<i>share</i>
 	{#if !iconOnly}
 		{$_('player.share.title')}
@@ -54,7 +62,7 @@
 	<div class="tooltip">
 		{$_('player.share.title')}
 	</div>
-	<menu class="no-wrap mobile" data-ui="#share-menu" id="share-menu">
+	<menu class={menuClasses} data-ui="#share-menu" id="share-menu">
 		{#if includePromptText}
 			<li class="row">
 				<label class="switch">
@@ -73,7 +81,7 @@
 					class="row"
 					role="presentation"
 					onclick={() => {
-						onShare(share);
+						onShareValue(share);
 					}}
 				>
 					<div class="min">

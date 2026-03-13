@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
-	import { letterCase, titleCases } from '$lib/letterCasing';
+	import { letterCase, titleCases, type TitleCase } from '$lib/letterCasing';
 	import { setAmoledTheme } from '$lib/theme';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -35,11 +35,9 @@
 	} from '../../store';
 	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import ComboBox from '../ComboBox.svelte';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
-	let region = $state(get(interfaceRegionStore));
-	let forceCase = $state(get(interfaceForceCase));
-	let defaultPage = $state(get(interfaceDefaultPage));
 
 	let invalidInstance = $state(false);
 	let colorPickerOpen = $state(false);
@@ -81,10 +79,8 @@
 		location.reload();
 	}
 
-	async function setBackend(event: Event) {
-		const select = event.target as HTMLSelectElement;
-		backendInUseStore.set(select.value as 'ivg' | 'yt');
-
+	async function setBackend(backend: string) {
+		backendInUseStore.set(backend as 'ivg' | 'yt');
 		await timeout(100);
 		location.reload();
 	}
@@ -120,14 +116,15 @@
 </script>
 
 {#if isUnrestrictedPlatform()}
-	<div class="field label suffix surface-container-highest">
-		<select name="backend-in-use" onchange={setBackend}>
-			<option selected={$backendInUseStore === 'ivg'} value="ivg">Invidious</option>
-			<option selected={$backendInUseStore === 'yt'} value="yt">YouTube (Experimental)</option>
-		</select>
-		<label for="backend-in-use">{$_('backend')}</label>
-		<i>arrow_drop_down</i>
-	</div>
+	<ComboBox
+		label={$_('backend')}
+		defaultValue={$backendInUseStore}
+		onChange={setBackend}
+		options={[
+			{ label: 'Invidious', value: 'ivg' },
+			{ label: 'YouTube (Experimental)', value: 'yt' }
+		]}
+	/>
 
 	{#if $backendInUseStore === 'ivg'}
 		<form onsubmit={setInstance}>
@@ -396,58 +393,43 @@
 	</div>
 {/if}
 
-<div class="field label suffix surface-container-highest">
-	<select
-		tabindex="0"
-		name="region"
-		bind:value={region}
-		onchange={() => interfaceRegionStore.set(region)}
-	>
-		{#each iso31661 as region (region)}
-			<option selected={$interfaceRegionStore === region.alpha2} value={region.alpha2}
-				>{region.alpha2} - {region.name}</option
-			>
-		{/each}
-	</select>
-	<label tabindex="-1" for="region">{$_('region')}</label>
-	<i>arrow_drop_down</i>
-</div>
+<ComboBox
+	label={$_('region')}
+	defaultValue={$interfaceRegionStore}
+	options={iso31661.map((region) => {
+		return {
+			label: region.name,
+			value: region.alpha2
+		};
+	})}
+	onChange={(value) => interfaceRegionStore.set(value)}
+/>
 
-<div class="field label suffix surface-container-highest">
-	<select
-		tabindex="0"
-		name="case"
-		bind:value={forceCase}
-		onchange={() => interfaceForceCase.set(forceCase)}
-	>
-		<option selected={$interfaceForceCase === null} value={null}>Default</option>
-		{#each titleCases as caseType (caseType)}
-			<option selected={$interfaceForceCase === caseType} value={caseType}
-				>{letterCase(`${caseType}`, caseType)}</option
-			>
-		{/each}
-	</select>
-	<label tabindex="-1" for="case">{$_('letterCase')}</label>
-	<i>arrow_drop_down</i>
-</div>
+<ComboBox
+	label={$_('letterCase')}
+	defaultValue={$interfaceForceCase}
+	options={[
+		...titleCases.map((caseType) => {
+			return {
+				label: letterCase(`${caseType}`, caseType),
+				value: caseType as string
+			};
+		})
+	]}
+	onChange={(value) => interfaceForceCase.set(value as TitleCase)}
+/>
 
-<div class="field label suffix surface-container-highest">
-	<select
-		name="defaultPage"
-		tabindex="0"
-		bind:value={defaultPage}
-		onchange={() => interfaceDefaultPage.set(defaultPage)}
-	>
-		{#each pages as page (page)}
-			{#if !page.requiresAuth || get(invidiousAuthStore)}
-				<option selected={$interfaceDefaultPage === page.href} value={page.href}>{page.name}</option
-				>
-			{/if}
-		{/each}
-	</select>
-	<label tabindex="-1" for="defaultPage">{$_('defaultPage')}</label>
-	<i>arrow_drop_down</i>
-</div>
+<ComboBox
+	label={$_('defaultPage')}
+	defaultValue={$interfaceDefaultPage}
+	options={pages.map((page) => {
+		return {
+			label: page.name,
+			value: page.href
+		};
+	})}
+	onChange={(value) => interfaceDefaultPage.set(value)}
+/>
 
 {#if !Capacitor.isNativePlatform()}
 	<div class="space"></div>

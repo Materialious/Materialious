@@ -119,7 +119,7 @@
 				{#if currentTab}
 					<button
 						bind:this={mobileCategoriesButton}
-						class="large small-round surface-container-highest max"
+						class="large surface-container-highest max"
 						data-ui="#tab-menu"
 					>
 						<i>{currentTab.icon}</i>

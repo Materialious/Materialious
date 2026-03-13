@@ -7,22 +7,24 @@
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { Avatar } from 'melt/builders';
-	import type {
-		Notification,
-		PlaylistPageVideo,
-		Video,
-		VideoBase,
-		VideoWatchHistory
-	} from '$lib/api/model';
-	import { deArrowEnabledStore, isAndroidTvStore, playerState } from '$lib/store';
+
+	import {
+		deArrowEnabledStore,
+		filterContentListStore,
+		filterContentUrlAutoUpdateStore,
+		isAndroidTvStore,
+		playerState
+	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
 	import { queueGetWatchHistory } from '$lib/api/historyPool';
-	import { page } from '$app/state';
 	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
 	import AuthorAvatar from '../AuthorAvatar.svelte';
+	import Share from '../Share.svelte';
+	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
+	import type { ThumbnailVideo } from '$lib/thumbnail';
 
 	interface Props {
-		video: VideoBase | Video | Notification | PlaylistPageVideo | VideoWatchHistory;
+		video: ThumbnailVideo;
 		playlistId?: string;
 		sideways?: boolean;
 	}
@@ -71,12 +73,13 @@
 	}
 
 	let thumbnailHeight = $state(0);
-	let thumbnailHTMLElement: HTMLImageElement | undefined = $state();
+	let thumbnailImageElement: HTMLImageElement | undefined = $state();
+	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
 		src: () => thumbnailSrc,
 		onLoadingStatusChange: () => {
-			if (thumbnailHTMLElement) thumbnailHeight = thumbnailHTMLElement.naturalHeight;
+			if (thumbnailImageElement) thumbnailHeight = thumbnailImageElement.naturalHeight;
 		}
 	});
 
@@ -89,22 +92,30 @@
 		} else sideways = true;
 	}
 
+	let thumbnailActionsVisible = $state(false);
+
+	const observer = new IntersectionObserver(([entry]) => {
+		if (!entry.isIntersecting) thumbnailActionsVisible = false;
+	});
+
 	onMount(async () => {
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
 		addEventListener('resize', disableSideways);
 
-		if (!page.url.pathname.endsWith('/history'))
-			queueGetWatchHistory(video.videoId).then((watchHistory) => {
-				if (watchHistory) {
-					progress = watchHistory.progress.toString();
-				}
-			});
+		queueGetWatchHistory(video.videoId).then(async (watchHistory) => {
+			if (watchHistory) {
+				progress = watchHistory.progress.toString();
+			}
+		});
+
+		if (thumbnailElement) observer.observe(thumbnailElement);
 	});
 
 	onDestroy(() => {
 		removeEventListener('resize', disableSideways);
+		observer.disconnect();
 	});
 
 	function onVideoSelected() {
@@ -112,7 +123,129 @@
 	}
 </script>
 
-<div class:sideways-root={sideways} class:use-flex-column={!sideways} tabindex="0" role="button">
+<div
+	class:sideways-root={sideways}
+	class:use-flex-column={!sideways}
+	bind:this={thumbnailElement}
+	tabindex="0"
+	role="button"
+	onmouseleave={() => (thumbnailActionsVisible = false)}
+>
+	{#if thumbnailActionsVisible}
+		<menu class="active root-menu" onmouseleave={() => (thumbnailActionsVisible = false)}>
+			<li>
+				<Share
+					shares={[
+						{
+							type: 'materialious',
+							path: resolve('/watch/[videoId]', { videoId: video.videoId })
+						},
+						{
+							type: 'invidious',
+							path: `/watch?v=${video.videoId}`
+						},
+						{
+							type: 'invidious redirect',
+							path: `/watch?v=${video.videoId}`
+						},
+						{
+							type: 'youtube',
+							path: `/watch?v=${video.videoId}`
+						}
+					]}
+					classes="transparent max"
+					menuClasses="max no-wrap"
+					iconOnly={false}
+					onShare={() => (thumbnailActionsVisible = false)}
+				/>
+			</li>
+			<li>
+				<button
+					onclick={async () => {
+						if (progress) {
+							await deleteWatchHistoryItem(video.videoId);
+							progress = undefined;
+						} else {
+							await saveWatchHistory(video, 1);
+							progress = '0';
+						}
+
+						thumbnailActionsVisible = false;
+					}}
+					class="transparent max"
+				>
+					{#if progress}
+						<i>visibility_off</i>
+						<span>{$_('markAs.unwatched')}</span>
+					{:else}
+						<i>visibility</i>
+						<span>{$_('markAs.watched')}</span>
+					{/if}
+				</button>
+			</li>
+			<li>
+				<button class="transparent max">
+					<i>disabled_visible</i>
+					<span>
+						{$_('layout.filter.addFilter')}
+					</span>
+					<menu class="max" data-ui="#hide-menu" id="hide-menu">
+						{#if 'authorId' in video}
+							<li
+								onclick={() => {
+									$filterContentListStore?.push({
+										type: 'video',
+										conditions: [
+											{
+												field: 'authorId',
+												operator: 'equals',
+												values: [video.authorId],
+												note: $_('layout.filter.channelFiltered', { authorName: video.author })
+											}
+										]
+									});
+									filterContentListStore.set($filterContentListStore);
+									filterContentUrlAutoUpdateStore.set(false);
+									thumbnailActionsVisible = false;
+								}}
+								role="presentation"
+								data-ui="#hide-menu"
+								class="row"
+							>
+								{$_('hideAuthor')}
+							</li>
+						{/if}
+						<li
+							onclick={() => {
+								$filterContentListStore?.push({
+									type: 'video',
+									conditions: [
+										{
+											field: 'videoId',
+											operator: 'equals',
+											values: [video.videoId],
+											note: $_('layout.filter.videoFiltered', {
+												videoTitle: video.title,
+												authorName: video.author
+											})
+										}
+									]
+								});
+								filterContentListStore.set($filterContentListStore);
+								filterContentUrlAutoUpdateStore.set(false);
+								thumbnailActionsVisible = false;
+							}}
+							role="presentation"
+							data-ui="#hide-menu"
+							class="row"
+						>
+							{$_('hideVideo')}
+						</li>
+					</menu>
+				</button>
+			</li>
+		</menu>
+	{/if}
 	<div id="thumbnail-container">
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
@@ -126,9 +259,9 @@
 				<div class:crop={thumbnailHeight > 300}>
 					<img
 						class="responsive"
-						class:watched={progress !== undefined}
+						class:watched={progress}
 						{...thumbnail.image}
-						bind:this={thumbnailHTMLElement}
+						bind:this={thumbnailImageElement}
 						alt="Thumbnail for video"
 					/>
 				</div>
@@ -138,7 +271,7 @@
 					style="height: 200px;"
 				></div>
 
-				{#if progress !== undefined}
+				{#if progress}
 					<div class="chip surface-container-highest">
 						<i>check</i>
 					</div>
@@ -184,41 +317,53 @@
 			</a>
 
 			<nav class="align-end">
-				{#if !sideways && 'authorId' in video}
-					<AuthorAvatar author={video.author} authorId={video.authorId} />
+				{#if !sideways}
+					<AuthorAvatar
+						author={video.author}
+						authorId={'authorId' in video ? video.authorId : ''}
+					/>
 				{/if}
-				<div>
-					{#if 'authorId' in video && video.authorId}
-						<a
-							tabindex="-1"
-							class:author={!sideways}
-							href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
-							data-sveltekit-preload-data="off"
-							>{video.author}
-						</a>
-					{:else}
-						<p>{video.author}</p>
-					{/if}
-
-					{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
-						<i>star</i>
-					{/if}
-
-					{#if !('publishedText' in video) && 'viewCountText' in video}
-						•
-						{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
-						{$_('views')}
-					{/if}
-
-					{#if 'published' in video}
+				<div style="width: 82%;">
+					<nav style="justify-content: space-between;width: 100%;">
 						<div>
-							{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
-							•
-							{video.published && video.published !== 0
-								? relativeTimestamp(video.published * 1000, false)
-								: video.publishedText}
+							{#if 'authorId' in video && video.authorId}
+								<a
+									tabindex="-1"
+									class:author={!sideways}
+									href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
+									data-sveltekit-preload-data="off"
+									>{video.author}
+								</a>
+							{:else}
+								<p>{video.author}</p>
+							{/if}
+
+							{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
+								<i>star</i>
+							{/if}
+
+							{#if !('publishedText' in video) && 'viewCountText' in video}
+								•
+								{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+								{$_('views')}
+							{/if}
+
+							{#if 'published' in video}
+								<div>
+									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+									•
+									{video.published && video.published !== 0
+										? relativeTimestamp(video.published * 1000, false)
+										: video.publishedText}
+								</div>
+							{/if}
 						</div>
-					{/if}
+						{#if !sideways}
+							<button onclick={() => (thumbnailActionsVisible = true)} class="transparent circle">
+								<i>more_vert</i>
+							</button>
+						{/if}
+					</nav>
 				</div>
 			</nav>
 		</div>
@@ -291,6 +436,7 @@
 		word-wrap: break-word;
 		overflow: hidden;
 		border-radius: 0px;
+		width: 100%;
 	}
 
 	.thumbnail-details {
@@ -318,6 +464,10 @@
 	.align-end {
 		flex: 1;
 		align-items: end;
+	}
+
+	.root-menu > li:hover {
+		background-color: transparent;
 	}
 
 	@media screen and (max-width: 1800px) {

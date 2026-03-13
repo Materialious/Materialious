@@ -1,7 +1,8 @@
 import sodium from 'libsodium-wrappers-sumo';
 import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } from './encryption';
-import type { VideoPlay, VideoWatchHistory } from '../model';
+import type { VideoWatchHistory } from '../model';
 import { getBestThumbnail } from '$lib/images';
+import type { ThumbnailVideo } from '$lib/thumbnail';
 
 export async function updateWatchHistoryBackend(videoId: string, progress: number) {
 	await sodium.ready;
@@ -128,7 +129,7 @@ export async function deleteWatchHistoryItemBackend(videoId: string) {
 	await fetch(`/api/user/history/${videoHash}`, { method: 'DELETE' });
 }
 
-export async function saveWatchHistoryBackend(video: VideoPlay, progress: number = 0) {
+export async function saveWatchHistoryBackend(video: ThumbnailVideo, progress: number = 0) {
 	await sodium.ready;
 	const rawKey = await getRawKey();
 	if (!rawKey) return;
@@ -137,7 +138,9 @@ export async function saveWatchHistoryBackend(video: VideoPlay, progress: number
 
 	const title = await encryptWithMasterKey(video.title);
 	const author = await encryptWithMasterKey(video.author);
-	const thumbnail = await encryptWithMasterKey(getBestThumbnail(video.videoThumbnails));
+	const thumbnail = await encryptWithMasterKey(
+		'videoThumbnails' in video ? getBestThumbnail(video.videoThumbnails) : video.thumbnail
+	);
 	const videoId = await encryptWithMasterKey(video.videoId);
 
 	await fetch('/api/user/history', {

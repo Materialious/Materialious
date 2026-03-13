@@ -43,7 +43,7 @@
 			<ContentColumn>
 				<article class="no-padding" style="height: 100%;">
 					{#key playlist.playlistId}
-						<PlaylistThumbnail disabled={playlist.videoCount === 0} {playlist} />
+						<PlaylistThumbnail {playlist} />
 					{/key}
 
 					<nav class="right-align padding">

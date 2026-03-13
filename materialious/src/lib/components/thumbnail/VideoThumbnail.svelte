@@ -22,7 +22,6 @@
 	import Share from '../Share.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
-	import { isMobile } from '$lib/misc';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -105,7 +104,7 @@
 
 		addEventListener('resize', disableSideways);
 
-		queueGetWatchHistory(video.videoId).then((watchHistory) => {
+		queueGetWatchHistory(video.videoId).then(async (watchHistory) => {
 			if (watchHistory) {
 				progress = watchHistory.progress.toString();
 			}
@@ -249,7 +248,7 @@
 				<div class:crop={thumbnailHeight > 300}>
 					<img
 						class="responsive"
-						class:watched={progress !== undefined}
+						class:watched={progress}
 						{...thumbnail.image}
 						bind:this={thumbnailImageElement}
 						alt="Thumbnail for video"
@@ -261,7 +260,7 @@
 					style="height: 200px;"
 				></div>
 
-				{#if progress !== undefined}
+				{#if progress}
 					<div class="chip surface-container-highest">
 						<i>check</i>
 					</div>
@@ -307,11 +306,14 @@
 			</a>
 
 			<nav class="align-end">
-				{#if !sideways && 'authorId' in video}
-					<AuthorAvatar author={video.author} authorId={video.authorId} />
+				{#if !sideways}
+					<AuthorAvatar
+						author={video.author}
+						authorId={'authorId' in video ? video.authorId : ''}
+					/>
 				{/if}
-				<div>
-					<nav>
+				<div style="width: 82%;">
+					<nav style="justify-content: space-between;width: 100%;">
 						<div>
 							{#if 'authorId' in video && video.authorId}
 								<a

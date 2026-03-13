@@ -359,7 +359,10 @@
 							{/if}
 						</div>
 						{#if !sideways}
-							<button onclick={() => (thumbnailActionsVisible = true)} class="transparent circle">
+							<button
+								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
+								class="transparent circle"
+							>
 								<i>more_vert</i>
 							</button>
 						{/if}

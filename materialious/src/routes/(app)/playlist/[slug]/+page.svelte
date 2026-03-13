@@ -12,7 +12,7 @@
 </script>
 
 <article class="border padding">
-	{#if data.playlist.videos}
+	{#if data.playlist.videos.length > 0}
 		<nav>
 			<a
 				href={resolve(
@@ -96,6 +96,4 @@
 
 <div class="space"></div>
 
-{#if data.playlist.videos}
-	<ItemsList items={data.playlist.videos} playlistId={data.playlist.info.playlistId} />
-{/if}
+<ItemsList items={data.playlist.videos} playlistId={data.playlist.info.playlistId} />

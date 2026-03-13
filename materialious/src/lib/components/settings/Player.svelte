@@ -3,7 +3,6 @@
 	import { Capacitor } from '@capacitor/core';
 	import ISO6391 from 'iso-639-1';
 	import { _ } from '$lib/i18n';
-	import { get } from 'svelte/store';
 	import {
 		backendInUseStore,
 		playerAlwaysLoopStore,

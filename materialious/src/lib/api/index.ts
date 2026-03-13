@@ -21,8 +21,7 @@ import type {
 	CommentsOptions,
 	ChannelOptions,
 	ChannelContent,
-	VideoWatchHistory,
-	VideoBase
+	VideoWatchHistory
 } from './model';
 import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';

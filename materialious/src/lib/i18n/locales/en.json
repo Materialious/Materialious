@@ -274,7 +274,9 @@
 			"optionPlaceholder": "Select your option",
 			"value": "Value",
 			"addConditional": "Add conditional",
-			"addFilter": "Add filter"
+			"addFilter": "Add filter",
+			"videoFiltered": "\"{{videoTitle}}\" from \"{{authorName}}\" filtered",
+			"channelFiltered": "\"{{authorName}}\" filtered"
 		},
 		"export": {
 			"title": "Export/Import",

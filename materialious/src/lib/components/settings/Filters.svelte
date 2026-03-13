@@ -208,6 +208,20 @@
 								</button>
 							</nav>
 
+							<div class="field label surface-container-highest">
+								<input
+									oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
+										condition.note = event.currentTarget.value;
+										filterContentListStore.set(contentFilters);
+										filterContentUrlAutoUpdateStore.set(false);
+									}}
+									name="note"
+									type="text"
+									value={condition.note}
+								/>
+								<label for="note">Note</label>
+							</div>
+
 							<ComboBox
 								label={$_('layout.filter.field')}
 								defaultValue={condition.field}

@@ -199,7 +199,8 @@
 											{
 												field: 'authorId',
 												operator: 'equals',
-												values: [video.authorId]
+												values: [video.authorId],
+												note: $_('layout.filter.channelFiltered', { authorName: video.author })
 											}
 										]
 									});
@@ -218,7 +219,17 @@
 							onclick={() => {
 								$filterContentListStore?.push({
 									type: 'video',
-									conditions: [{ field: 'videoId', operator: 'equals', values: [video.videoId] }]
+									conditions: [
+										{
+											field: 'videoId',
+											operator: 'equals',
+											values: [video.videoId],
+											note: $_('layout.filter.videoFiltered', {
+												videoTitle: video.title,
+												authorName: video.author
+											})
+										}
+									]
 								});
 								filterContentListStore.set($filterContentListStore);
 								filterContentUrlAutoUpdateStore.set(false);

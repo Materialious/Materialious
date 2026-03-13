@@ -128,7 +128,7 @@ async function proxyRequest(
 	};
 
 	let body: any = request.body;
-	if (request.body && request.headers.has('__is_base64_encoded')) {
+	if (body && request.headers.has('__is_base64_encoded')) {
 		requestHeaders.delete('__is_base64_encoded');
 
 		await sodium.ready;

@@ -8,13 +8,11 @@ export function buildPath(path: string): URL {
 
 export function setLocale(url: URL): URL {
 	const region = get(interfaceRegionStore);
-
 	if (region) {
 		url.searchParams.set('region', region);
 	}
 
 	const locale = getUserLocale();
-
 	url.searchParams.set('hl', locale);
 
 	return url;

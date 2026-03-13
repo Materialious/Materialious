@@ -128,13 +128,15 @@ async function proxyRequest(
 	};
 
 	let body: any = request.body;
-	if (body && request.headers.has('__is_base64_encoded')) {
-		requestHeaders.delete('__is_base64_encoded');
+	if (body) {
+		if (request.headers.has('__is_base64_encoded')) {
+			requestHeaders.delete('__is_base64_encoded');
 
-		await sodium.ready;
-		body = Uint8Array.from(sodium.from_base64(await request.text()));
-	} else if (body && request.method !== 'GET' && request.method !== 'HEAD') {
-		body = await request.blob();
+			await sodium.ready;
+			body = Uint8Array.from(sodium.from_base64(await request.text()));
+		} else if (request.method !== 'GET' && request.method !== 'HEAD') {
+			body = await request.blob();
+		}
 	}
 
 	let response: Response | undefined;

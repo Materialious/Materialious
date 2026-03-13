@@ -22,6 +22,7 @@
 	import Share from '../Share.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
+	import { isMobile } from '$lib/misc';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -127,10 +128,114 @@
 	class:sideways-root={sideways}
 	class:use-flex-column={!sideways}
 	bind:this={thumbnailElement}
-	onmouseleave={() => (thumbnailActionsVisible = false)}
 	tabindex="0"
 	role="button"
+	onmouseleave={() => (thumbnailActionsVisible = false)}
 >
+	{#if thumbnailActionsVisible}
+		<menu class="active root-menu" onmouseleave={() => (thumbnailActionsVisible = false)}>
+			<li>
+				<Share
+					shares={[
+						{
+							type: 'materialious',
+							path: resolve('/watch/[videoId]', { videoId: video.videoId })
+						},
+						{
+							type: 'invidious',
+							path: `/watch?v=${video.videoId}`
+						},
+						{
+							type: 'invidious redirect',
+							path: `/watch?v=${video.videoId}`
+						},
+						{
+							type: 'youtube',
+							path: `/watch?v=${video.videoId}`
+						}
+					]}
+					classes="transparent max"
+					menuClasses="max no-wrap"
+					iconOnly={false}
+					onShare={() => (thumbnailActionsVisible = false)}
+				/>
+			</li>
+			<li>
+				<button
+					onclick={async () => {
+						if (progress) {
+							await deleteWatchHistoryItem(video.videoId);
+							progress = undefined;
+						} else {
+							await saveWatchHistory(video, 1);
+							progress = '0';
+						}
+
+						thumbnailActionsVisible = false;
+					}}
+					class="transparent max"
+				>
+					{#if progress}
+						<i>visibility_off</i>
+						<span>{$_('markAs.unwatched')}</span>
+					{:else}
+						<i>visibility</i>
+						<span>{$_('markAs.watched')}</span>
+					{/if}
+				</button>
+			</li>
+			<li>
+				<button class="transparent max">
+					<i>disabled_visible</i>
+					<span>
+						{$_('layout.filter.addFilter')}
+					</span>
+					<menu class="max" data-ui="#hide-menu" id="hide-menu">
+						{#if 'authorId' in video}
+							<li
+								onclick={() => {
+									$filterContentListStore?.push({
+										type: 'video',
+										conditions: [
+											{
+												field: 'authorId',
+												operator: 'equals',
+												values: [video.authorId]
+											}
+										]
+									});
+									filterContentListStore.set($filterContentListStore);
+									filterContentUrlAutoUpdateStore.set(false);
+									thumbnailActionsVisible = false;
+								}}
+								role="presentation"
+								data-ui="#hide-menu"
+								class="row"
+							>
+								{$_('hideAuthor')}
+							</li>
+						{/if}
+						<li
+							onclick={() => {
+								$filterContentListStore?.push({
+									type: 'video',
+									conditions: [{ field: 'videoId', operator: 'equals', values: [video.videoId] }]
+								});
+								filterContentListStore.set($filterContentListStore);
+								filterContentUrlAutoUpdateStore.set(false);
+								thumbnailActionsVisible = false;
+							}}
+							role="presentation"
+							data-ui="#hide-menu"
+							class="row"
+						>
+							{$_('hideVideo')}
+						</li>
+					</menu>
+				</button>
+			</li>
+		</menu>
+	{/if}
 	<div id="thumbnail-container">
 		<!-- eslint-disable svelte/no-navigation-without-resolve -->
 		<a
@@ -244,112 +349,6 @@
 							<button onclick={() => (thumbnailActionsVisible = true)} class="transparent circle">
 								<i>more_vert</i>
 							</button>
-							{#if thumbnailActionsVisible}
-								<menu class="max active root-menu">
-									<li>
-										<Share
-											shares={[
-												{
-													type: 'materialious',
-													path: resolve('/watch/[videoId]', { videoId: video.videoId })
-												},
-												{
-													type: 'invidious',
-													path: `/watch?v=${video.videoId}`
-												},
-												{
-													type: 'invidious redirect',
-													path: `/watch?v=${video.videoId}`
-												},
-												{
-													type: 'youtube',
-													path: `/watch?v=${video.videoId}`
-												}
-											]}
-											classes="transparent max"
-											menuClasses=""
-											iconOnly={false}
-											onShare={() => (thumbnailActionsVisible = false)}
-										/>
-									</li>
-									<li>
-										<button
-											onclick={async () => {
-												if (progress) {
-													await deleteWatchHistoryItem(video.videoId);
-													progress = undefined;
-												} else {
-													await saveWatchHistory(video, 1);
-													progress = '0';
-												}
-
-												thumbnailActionsVisible = false;
-											}}
-											class="transparent max"
-										>
-											{#if progress}
-												<i>visibility_off</i>
-												<span>{$_('markAs.unwatched')}</span>
-											{:else}
-												<i>visibility</i>
-												<span>{$_('markAs.watched')}</span>
-											{/if}
-										</button>
-									</li>
-									<li>
-										<button class="transparent max">
-											<i>disabled_visible</i>
-											<span>
-												{$_('layout.filter.addFilter')}
-											</span>
-											<menu data-ui="#hide-menu" id="hide-menu">
-												{#if 'authorId' in video}
-													<li
-														onclick={() => {
-															$filterContentListStore?.push({
-																type: 'video',
-																conditions: [
-																	{
-																		field: 'authorId',
-																		operator: 'equals',
-																		values: [video.authorId]
-																	}
-																]
-															});
-															filterContentListStore.set($filterContentListStore);
-															filterContentUrlAutoUpdateStore.set(false);
-															thumbnailActionsVisible = false;
-														}}
-														role="presentation"
-														data-ui="#hide-menu"
-														class="row"
-													>
-														{$_('hideAuthor')}
-													</li>
-												{/if}
-												<li
-													onclick={() => {
-														$filterContentListStore?.push({
-															type: 'video',
-															conditions: [
-																{ field: 'videoId', operator: 'equals', values: [video.videoId] }
-															]
-														});
-														filterContentListStore.set($filterContentListStore);
-														filterContentUrlAutoUpdateStore.set(false);
-														thumbnailActionsVisible = false;
-													}}
-													role="presentation"
-													data-ui="#hide-menu"
-													class="row"
-												>
-													{$_('hideVideo')}
-												</li>
-											</menu>
-										</button>
-									</li>
-								</menu>
-							{/if}
 						{/if}
 					</nav>
 				</div>

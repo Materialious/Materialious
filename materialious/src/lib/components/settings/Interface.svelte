@@ -408,12 +408,14 @@
 <ComboBox
 	label={$_('letterCase')}
 	defaultValue={$interfaceForceCase}
-	options={titleCases.map((caseType) => {
-		return {
-			label: letterCase(`${caseType}`, caseType),
-			value: caseType as string
-		};
-	})}
+	options={[
+		...titleCases.map((caseType) => {
+			return {
+				label: letterCase(`${caseType}`, caseType),
+				value: caseType as string
+			};
+		})
+	]}
 	onChange={(value) => interfaceForceCase.set(value as TitleCase)}
 />
 

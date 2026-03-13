@@ -3,7 +3,7 @@
 	import { mergeAttrs } from 'melt';
 	import { Combobox } from 'melt/builders';
 
-	type ComboOption = { label: string; value: string };
+	type ComboOption = { label: string; value: any };
 
 	let {
 		options,

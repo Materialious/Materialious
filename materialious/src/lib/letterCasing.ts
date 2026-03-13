@@ -1,8 +1,20 @@
 import { get } from 'svelte/store';
 import { interfaceForceCase } from './store';
 
-export type TitleCase = 'uppercase' | 'lowercase' | 'sentence case' | 'title case' | null;
-export const titleCases: TitleCase[] = ['lowercase', 'uppercase', 'title case', 'sentence case'];
+export type TitleCase =
+	| 'uppercase'
+	| 'lowercase'
+	| 'sentence case'
+	| 'title case'
+	| 'original'
+	| null;
+export const titleCases: TitleCase[] = [
+	'original',
+	'lowercase',
+	'uppercase',
+	'title case',
+	'sentence case'
+];
 
 export function letterCase(text: string, caseTypeOverwrite?: TitleCase): string {
 	const casing = caseTypeOverwrite ? caseTypeOverwrite : get(interfaceForceCase);

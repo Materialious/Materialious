@@ -8,13 +8,18 @@
 	import { get } from 'svelte/store';
 	import { Avatar } from 'melt/builders';
 
-	import { deArrowEnabledStore, isAndroidTvStore, playerState } from '$lib/store';
+	import {
+		deArrowEnabledStore,
+		filterContentListStore,
+		filterContentUrlAutoUpdateStore,
+		isAndroidTvStore,
+		playerState
+	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
 	import { queueGetWatchHistory } from '$lib/api/historyPool';
 	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
 	import AuthorAvatar from '../AuthorAvatar.svelte';
 	import Share from '../Share.svelte';
-	import { fade } from 'svelte/transition';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
 
@@ -240,7 +245,7 @@
 								<i>more_vert</i>
 							</button>
 							{#if thumbnailActionsVisible}
-								<menu class="max active" transition:fade>
+								<menu class="max active root-menu">
 									<li>
 										<Share
 											shares={[
@@ -289,6 +294,58 @@
 												<i>visibility</i>
 												<span>{$_('markAs.watched')}</span>
 											{/if}
+										</button>
+									</li>
+									<li>
+										<button class="transparent max">
+											<i>disabled_visible</i>
+											<span>
+												{$_('layout.filter.addFilter')}
+											</span>
+											<menu data-ui="#hide-menu" id="hide-menu">
+												{#if 'authorId' in video}
+													<li
+														onclick={() => {
+															$filterContentListStore?.push({
+																type: 'video',
+																conditions: [
+																	{
+																		field: 'authorId',
+																		operator: 'equals',
+																		values: [video.authorId]
+																	}
+																]
+															});
+															filterContentListStore.set($filterContentListStore);
+															filterContentUrlAutoUpdateStore.set(false);
+															thumbnailActionsVisible = false;
+														}}
+														role="presentation"
+														data-ui="#hide-menu"
+														class="row"
+													>
+														{$_('hideAuthor')}
+													</li>
+												{/if}
+												<li
+													onclick={() => {
+														$filterContentListStore?.push({
+															type: 'video',
+															conditions: [
+																{ field: 'videoId', operator: 'equals', values: [video.videoId] }
+															]
+														});
+														filterContentListStore.set($filterContentListStore);
+														filterContentUrlAutoUpdateStore.set(false);
+														thumbnailActionsVisible = false;
+													}}
+													role="presentation"
+													data-ui="#hide-menu"
+													class="row"
+												>
+													{$_('hideVideo')}
+												</li>
+											</menu>
 										</button>
 									</li>
 								</menu>
@@ -397,7 +454,7 @@
 		align-items: end;
 	}
 
-	menu li:hover {
+	.root-menu > li:hover {
 		background-color: transparent;
 	}
 

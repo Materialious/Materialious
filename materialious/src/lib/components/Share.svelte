@@ -19,7 +19,7 @@
 		includePromptText = undefined,
 		iconOnly = true,
 		classes = 'surface-container-highest',
-		menuClasses = 'mobile',
+		menuClasses = 'mobile no-wrap',
 		onShare = undefined
 	}: {
 		shares: ShareLink[];
@@ -62,7 +62,7 @@
 	<div class="tooltip">
 		{$_('player.share.title')}
 	</div>
-	<menu class={menuClasses + ' no-wrap'} data-ui="#share-menu" id="share-menu">
+	<menu class={menuClasses} data-ui="#share-menu" id="share-menu">
 		{#if includePromptText}
 			<li class="row">
 				<label class="switch">

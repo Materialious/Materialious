@@ -57,11 +57,12 @@
 <button bind:this={shareButtonElement} class={classes}>
 	<i>share</i>
 	{#if !iconOnly}
-		{$_('player.share.title')}
+		<span>{$_('player.share.title')}</span>
+	{:else}
+		<div class="tooltip">
+			{$_('player.share.title')}
+		</div>
 	{/if}
-	<div class="tooltip">
-		{$_('player.share.title')}
-	</div>
 	<menu class={menuClasses} data-ui="#share-menu" id="share-menu">
 		{#if includePromptText}
 			<li class="row">

@@ -39,7 +39,7 @@
 		"patch-package": "^8.0.1",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.5.0",
-		"svelte": "^5.53.6",
+		"svelte": "^5.53.12",
 		"svelte-check": "^4.4.4",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",

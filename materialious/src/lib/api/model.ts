@@ -4,7 +4,7 @@ export interface SearchOptions {
 	sort_by?: 'relevance' | 'rating' | 'upload_date' | 'view_count';
 	type?: 'video' | 'playlist' | 'channel' | 'all';
 	duration?: 'short' | 'medium' | 'long';
-	date?: 'hour' | 'today' | 'week' | 'month' | 'year';
+	date?: 'today' | 'week' | 'month' | 'year';
 	features?: string;
 	page?: string;
 }

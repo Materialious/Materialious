@@ -14,7 +14,7 @@ export async function getInnertube(): Promise<Innertube> {
 		cache: new UniversalCache(true),
 		location: get(interfaceRegionStore),
 		user_agent: USER_AGENT,
-		player_id: getPublicEnv('PLAYER_ID') ?? '9f4cc5e4'
+		player_id: getPublicEnv('PLAYER_ID')
 	});
 
 	return innertube;

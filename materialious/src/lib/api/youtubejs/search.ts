@@ -33,9 +33,23 @@ export async function getSearchYTjs(
 ): Promise<SearchResults> {
 	const innertube = await getInnertube();
 
+	let duration: Types.Duration = 'all';
+
+	switch (options.duration) {
+		case 'long':
+			duration = 'over_twenty_mins';
+			break;
+		case 'medium':
+			duration = 'three_to_twenty_mins';
+			break;
+		case 'short':
+			duration = 'under_three_mins';
+			break;
+	}
+
 	const innerResults = await innertube.search(search, {
-		sort_by: options.sort_by,
-		duration: options.duration,
+		prioritize: options.sort_by !== 'relevance' ? 'popularity' : 'relevance',
+		duration: duration,
 		features: [options.features] as Types.Feature[],
 		upload_date: options.date
 	});

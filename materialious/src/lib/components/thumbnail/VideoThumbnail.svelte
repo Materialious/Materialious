@@ -22,6 +22,7 @@
 	import Share from '../Share.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
+	import { truncate } from '$lib/misc';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -332,10 +333,10 @@
 									class:author={!sideways}
 									href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
 									data-sveltekit-preload-data="off"
-									>{video.author}
+									>{truncate(video.author, 20)}
 								</a>
 							{:else}
-								<p>{video.author}</p>
+								<p>{truncate(video.author, 20)}</p>
 							{/if}
 
 							{#if 'promotedBy' in video && video.promotedBy === 'favourited'}

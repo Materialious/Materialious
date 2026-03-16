@@ -62,7 +62,7 @@
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"altcha": "^2.3.0",
 		"altcha-lib": "^1.4.1",
-		"beercss": "^4.0.17",
+		"beercss": "^4.0.19",
 		"bgutils-js": "^3.2.0",
 		"buffer": "^6.0.3",
 		"capacitor-music-controls-plugin": "^6.1.0",

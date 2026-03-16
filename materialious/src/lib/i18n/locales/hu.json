@@ -147,7 +147,9 @@
             "optionPlaceholder": "Válassza ki a lehetőséget",
             "value": "Érték",
             "addConditional": "Feltétel hozzáadása",
-            "addFilter": "Szűrő hozzáadása"
+            "addFilter": "Szűrő hozzáadása",
+            "videoFiltered": "„{{videoTitle}}” – „{{authorName}}” szűrve",
+            "channelFiltered": "„{{authorName}}” szűrve"
         },
         "export": {
             "title": "Exportálás és importálás",
@@ -308,5 +310,10 @@
         "leaveRoom": "Szoba elhagyása",
         "userJoin": "Felhasználó csatlakozott a szobához",
         "userLeft": "Felhasználó elhagyta a szobát"
-    }
+    },
+    "markAs": {
+        "watched": "Jelölés megtekintettként",
+        "unwatched": "Jelölés nem megtekintettnek"
+    },
+    "hideAuthor": "Szerző elrejtése"
 }

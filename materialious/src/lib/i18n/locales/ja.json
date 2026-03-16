@@ -233,7 +233,9 @@
             "optionPlaceholder": "オプションの選択",
             "value": "値",
             "addConditional": "条件を追加",
-            "addFilter": "フィルターを追加"
+            "addFilter": "フィルターを追加",
+            "videoFiltered": "{{authorName}} の {{videoTitle}} をフィルターしました",
+            "channelFiltered": "{{authorName}} をフィルターしました"
         },
         "export": {
             "title": "エクスポート/インポート",
@@ -308,5 +310,10 @@
         "leaveRoom": "ルームから退出",
         "userJoin": "ユーザーがルームに参加しました",
         "userLeft": "ユーザーがルームから退出しました"
-    }
+    },
+    "markAs": {
+        "watched": "視聴済みにする",
+        "unwatched": "未視聴にする"
+    },
+    "hideAuthor": "投稿者を非表示"
 }

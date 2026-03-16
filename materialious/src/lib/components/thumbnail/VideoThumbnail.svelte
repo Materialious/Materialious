@@ -317,14 +317,18 @@
 				<span class="bold" style="width: 100%;">{letterCase(video.title.trimEnd())}</span>
 			</a>
 
-			<nav class="align-end">
+			{#if !sideways}
+				<div class="small-space"></div>
+			{/if}
+
+			<nav class="align-end no-margin">
 				{#if !sideways}
 					<AuthorAvatar
 						author={video.author}
 						authorId={'authorId' in video ? video.authorId : ''}
 					/>
 				{/if}
-				<div class="author-details">
+				<div class="author-details" class:not-sideways={!sideways}>
 					<nav style="justify-content: space-between;width: 100%;">
 						<div>
 							{#if 'authorId' in video && video.authorId}
@@ -344,9 +348,10 @@
 							{/if}
 
 							{#if !('publishedText' in video) && 'viewCountText' in video}
-								•
-								{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
-								{$_('views')}
+								<span>
+									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+									{$_('views')}
+								</span>
 							{/if}
 
 							{#if 'published' in video}
@@ -435,8 +440,8 @@
 		white-space: normal;
 		word-wrap: break-word;
 		line-height: 1.2;
-
-		font-size: clamp(0.65rem, 2.5cqw + 0.3rem, 1.15rem);
+		font-size: clamp(0.65rem, 2.5cqw + 0.33rem, 1.15rem);
+		margin: 0;
 	}
 
 	.author-details {
@@ -480,6 +485,10 @@
 
 	.root-menu > li:hover {
 		background-color: transparent;
+	}
+
+	.root-menu > li > button {
+		padding: 0 1rem;
 	}
 
 	.sideways-root,

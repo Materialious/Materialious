@@ -204,9 +204,46 @@
         "deleteAccount": "Konto löschen",
         "clickXmoreTimesToDelete": "Klicke {{clicksTillDelete}} weitere(s) Mal(e) zum Löschen",
         "backendEngine": {
-            "warning": "Erweiterte Einstellungen! Nur für erfahrene Nutzer. Ändere sie nicht, ausser du weisst, was du tust."
+            "warning": "Erweiterte Einstellungen! Nur für erfahrene Nutzer. Ändere sie nicht, ausser du weisst, was du tust.",
+            "cull": "Maximale Feed-Elemente",
+            "cooldown": "Cooldown der stündlichen Kanalabfrage",
+            "concurrent": "Maximale Anzahl der Kanäle, die vor der Feed-Rückgabe geparsed werden",
+            "fallbacks": "Fallbacks",
+            "importExport": "Automatischer Export/Import",
+            "exportToInvidious": "Von Materialious nach Invidious exportieren",
+            "importToMaterialious": "Von Invidious nach Materialious importieren",
+            "importingToMaterialious": "Import zu Materialious gestartet",
+            "importingToMaterialiousFinished": "Import zu Materialious abgeschlossen",
+            "exportingToInvidious": "Export zu Invidious gestartet",
+            "exportingToInvidiousFinished": "Export zu Invidious abgeschlossen"
         },
-        "historyEnabled": "Wiedergabeverlauf speichern"
+        "historyEnabled": "Wiedergabeverlauf speichern",
+        "exportToJson": "Nach JSON exportieren",
+        "filter": {
+            "title": "Inhaltsfilter",
+            "url": "Importiere Filter via URL",
+            "autoUpdate": "Filter automatisch via URL aktualisieren",
+            "contentType": "Inhaltstyp",
+            "field": "Feld",
+            "operator": "Operator",
+            "optionPlaceholder": "Option auswählen",
+            "value": "Wert",
+            "addConditional": "Kondition hinzufügen",
+            "addFilter": "Filter hinzufügen",
+            "videoFiltered": "«{{videoTitle}}» von «{{authorName}}» gefiltert",
+            "channelFiltered": "«{{authorName}}» gefiltert"
+        },
+        "export": {
+            "title": "Export/Import",
+            "importSub": "Abonnements importieren",
+            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Feetube-Datenbank & NewPipe JSON werden unterstützt",
+            "importing": "Abonnements werden importiert (dies wird einen Moment dauern)",
+            "importingCompleted": "Abonnements erfolgreich importiert",
+            "exportSub": "Abonnements exportieren",
+            "exportToClipboard": "In die Zwischenablage exportieren",
+            "exportToFile": "In eine Datei exportieren",
+            "importFromFile": "Von einer Datei importieren"
+        }
     },
     "subscribe": "Abonnieren",
     "recommendedVideos": "Vorgeschlagene Videos",
@@ -236,7 +273,7 @@
     "unfavouriteChannel": "Kanal entfavorisieren",
     "skip": "Überspringen",
     "upcomingSegment": "Kommend ",
-    "copy": "JSON kopieren",
+    "copy": "In die Zwischenablage kopieren",
     "username": "Benutzername",
     "password": "Passwort",
     "captionStyle": "Untertitel-Stil",
@@ -262,5 +299,21 @@
         "localFallbackInfo": "Wenn das Laden eines Videos von Invidious fehlschlägt, lädt Materialious es lokal.",
         "configureInstance": "Instanz konfigurieren",
         "done": "Fertig"
+    },
+    "markAs": {
+        "watched": "Als gesehen markieren",
+        "unwatched": "Als ungesehen markieren"
+    },
+    "hideAuthor": "Autor verstecken",
+    "watchParty": {
+        "start": "Wiedergabegruppe starten",
+        "header": "Wiedergabegruppe",
+        "createRoom": "Raum erstellen",
+        "joinRoom": "Raum beitreten",
+        "roomID": "Raum-ID",
+        "shareRoom": "Raum teilen",
+        "leaveRoom": "Raum verlassen",
+        "userJoin": "Nutzer ist dem Raum beigetreten",
+        "userLeft": "Nutzer hat den Raum verlassen"
     }
 }

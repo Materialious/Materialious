@@ -32,9 +32,9 @@ export function relativeTimestamp(epochTime: number, includeTime: boolean = true
 	if (isSameDay || isSameWeek) {
 		return diffDuration.humanize(true);
 	} else if (isThisYear) {
-		return timestamp.format(`MMMM Do ${time}`);
+		return timestamp.format(`MMM Do ${time}`);
 	} else {
-		return timestamp.format(`MMMM Do YYYY ${time}`);
+		return timestamp.format(`MMM Do YYYY ${time}`);
 	}
 }
 

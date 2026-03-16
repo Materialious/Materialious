@@ -1,1 +1,1 @@
-Modernes Material-Design für Invidious
+Modernes Material-Design für YouTube und Invidious.

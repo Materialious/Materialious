@@ -30,7 +30,7 @@
 			key: 'type'
 		},
 		{
-			options: ['hour', 'today', 'week', 'month', 'year'],
+			options: ['today', 'week', 'month', 'year'],
 			title: $_('filters.uploadDate'),
 			key: 'date'
 		},

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { isAndroidTvStore } from '$lib/store';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	let { children } = $props();
 
@@ -21,7 +21,11 @@
 	onMount(() => {
 		checkWidth();
 
-		addEventListener('resize', () => checkWidth());
+		addEventListener('resize', checkWidth);
+	});
+
+	onDestroy(() => {
+		removeEventListener('resize', checkWidth);
 	});
 </script>
 

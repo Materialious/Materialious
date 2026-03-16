@@ -323,7 +323,7 @@
 						authorId={'authorId' in video ? video.authorId : ''}
 					/>
 				{/if}
-				<div style="width: 82%;">
+				<div class="author-details">
 					<nav style="justify-content: space-between;width: 100%;">
 						<div>
 							{#if 'authorId' in video && video.authorId}
@@ -349,13 +349,13 @@
 							{/if}
 
 							{#if 'published' in video}
-								<div>
+								<span>
 									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
 									•
 									{video.published && video.published !== 0
 										? relativeTimestamp(video.published * 1000, false)
 										: video.publishedText}
-								</div>
+								</span>
 							{/if}
 						</div>
 						{#if !sideways}
@@ -427,12 +427,20 @@
 		overflow: hidden;
 	}
 
-	.sideways-root .video-title span {
+	.author-details span,
+	.author-details p,
+	.author-details a {
 		display: block;
 		white-space: normal;
-		overflow: hidden;
 		word-wrap: break-word;
 		line-height: 1.2;
+
+		font-size: clamp(0.65rem, 2.5cqw + 0.3rem, 1.15rem);
+	}
+
+	.author-details {
+		flex: 1;
+		min-width: 0;
 	}
 
 	.video-title {
@@ -471,6 +479,11 @@
 
 	.root-menu > li:hover {
 		background-color: transparent;
+	}
+
+	.sideways-root,
+	.thumbnail-details {
+		container-type: inline-size;
 	}
 
 	@media screen and (max-width: 1800px) {

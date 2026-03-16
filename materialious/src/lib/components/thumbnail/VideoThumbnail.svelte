@@ -324,7 +324,7 @@
 						authorId={'authorId' in video ? video.authorId : ''}
 					/>
 				{/if}
-				<div class="author-details">
+				<div class="author-details" class:not-sideways={!sideways}>
 					<nav style="justify-content: space-between;width: 100%;">
 						<div>
 							{#if 'authorId' in video && video.authorId}
@@ -431,12 +431,16 @@
 	.author-details span,
 	.author-details p,
 	.author-details a {
-		display: block;
 		white-space: normal;
 		word-wrap: break-word;
 		line-height: 1.2;
+		font-size: clamp(0.65rem, 2.5cqw + 0.33rem, 1.15rem);
+	}
 
-		font-size: clamp(0.65rem, 2.5cqw + 0.3rem, 1.15rem);
+	.author-details.not-sideways a,
+	.author-details.not-sideways p,
+	.author-details.not-sideways span {
+		display: block;
 	}
 
 	.author-details {

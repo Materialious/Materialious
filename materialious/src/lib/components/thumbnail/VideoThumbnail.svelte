@@ -486,6 +486,10 @@
 		background-color: transparent;
 	}
 
+	.root-menu > li > button {
+		padding: 0 1rem;
+	}
+
 	.sideways-root,
 	.thumbnail-details {
 		container-type: inline-size;

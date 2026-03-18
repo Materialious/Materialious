@@ -39,7 +39,7 @@ export async function searchChannelContentInvidious(
 	search: string,
 	fetchOptions?: RequestInit
 ): Promise<ChannelContent> {
-	const path = buildPath(`channel/${channelId}/search`);
+	const path = buildPath(`channels/${channelId}/search`);
 	path.searchParams.set('q', search);
 
 	const resp = await fetchErrorHandle(await fetch(path, fetchOptions));

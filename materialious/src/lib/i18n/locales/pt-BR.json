@@ -232,7 +232,10 @@
             "importFromFile": "Importar de arquivo"
         },
         "engine": "Motor de backend",
-        "displayThumbnailAvatars": "Avatares de miniaturas (Lento)"
+        "displayThumbnailAvatars": "Avatares de miniaturas (Lento)",
+        "companionUrl": "URL complementar",
+        "clickXmoreTimesToDelete": "Clique {{clicksTillDelete}} vez(es) mais para deletar",
+        "expandChapters": "Expandir capítulos por padrão"
     },
     "subscribe": "Inscrever-se",
     "disabled": "Desativado",

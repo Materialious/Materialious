@@ -75,7 +75,9 @@
             "materialiousLink": "Copiar link Materialious",
             "invidiousRedirect": "Copiar link de redirecionamento Invidious",
             "youtubeLink": "Copiar link do Youtube",
-            "copiedSuccess": "Copiado para área de transfêrencia"
+            "copiedSuccess": "Copiado para área de transfêrencia",
+            "copyXLink": "Copiar {{linkType}} link",
+            "includeTimestamp": "marcação de tempo"
         },
         "download": "Baixar",
         "downloadSteps": {
@@ -154,8 +156,11 @@
             "dash": "Hífen",
             "silenceSkipper": "Pular silêncio (Experimental)",
             "youtubeJsFallback": "Fallback para processamento de vídeo local",
-            "youtubeJsAlways": "Sempre usar processamento de vídeo local",
-            "lockOrientation": "Orientação travada para igualar aspecto de proporção"
+            "youtubeJsAlways": "Sempre usar",
+            "lockOrientation": "Orientação travada para igualar aspecto de proporção",
+            "ccByDefault": "Legendas ativadas por padrão",
+            "defaultPlaybackSpeed": "Velocidade de reprodução padrão",
+            "playerStatistics": "Mostrar estatísticas de reprodutor por padrão"
         },
         "bookmarklet": "Favoritos",
         "instanceUrl": "URL da instância",
@@ -169,7 +174,11 @@
             "intermissionIntroAnimation": "Intervalo/Animação de introdução",
             "credits": "Cartões finais/Créditos",
             "preViewRecapHook": "Prévia/Recapitulação/Gancho",
-            "tangentJokes": "Tangente não relacionada/Piadas"
+            "tangentJokes": "Tangente não relacionada/Piadas",
+            "musicOffTopic": "Segmento não musical",
+            "automatic": "Pular automaticamente",
+            "manual": "Pular manualmente",
+            "timeline": "Apenas linha do tempo"
         },
         "deArrow": {
             "title": "DeArrow",
@@ -177,13 +186,59 @@
             "titleOnly": "Somente títulos"
         },
         "about": "Sobre",
-        "materialiousAccount": "Conta"
+        "materialiousAccount": "Conta",
+        "shareURL": "Compartilhar URL",
+        "searchHistory": "Histórico de pesquisa",
+        "deleteAccount": "Deletar conta",
+        "historyEnabled": "Salvar histórico de exibição",
+        "allowInsecureRequests": "Permitir solicitações inseguras",
+        "disableAutoUpdate": "Desativar atualizações automáticas",
+        "androidNativeShare": "Usar compartilhamento nativo",
+        "backendEngine": {
+            "warning": "Configurações avançadas! Para usuários experientes apenas. Só modifique se você souber o que está fazendo.",
+            "concurrent": "Quantidade máxima de canais para analisar antes de retornar o feed",
+            "importExport": "Exportar/importar automáticos",
+            "exportToInvidious": "Exportar para Invidious de Materialious",
+            "importToMaterialious": "Exportar de Invidious para Materialious",
+            "importingToMaterialious": "Importação para Materialious começou",
+            "importingToMaterialiousFinished": "Importação para Materialious finalizada",
+            "exportingToInvidious": "Exportação para Invidious começou",
+            "exportingToInvidiousFinished": "Exportação para Invidious finalizada"
+        },
+        "exportToJson": "Exportar para JSON",
+        "filter": {
+            "title": "Filtros de conteúdo",
+            "url": "Importar Filtros de URL",
+            "autoUpdate": "Atualizar automaticamente filtro de URL",
+            "contentType": "Tipo de conteúdo",
+            "operator": "Operador",
+            "optionPlaceholder": "Selecione sua opção",
+            "value": "Valor",
+            "addConditional": "Adicionar condicional",
+            "addFilter": "Adicionar filtro",
+            "field": "Campo",
+            "channelFiltered": "\"{{authorName}}\" filtrado",
+            "videoFiltered": "\"{{videoTitle}}\" de \"{{authorName}}\" filtrado"
+        },
+        "export": {
+            "title": "Exportar/importar",
+            "importSub": "Importar inscrições",
+            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, banco de dados Freetube & NewPipe JSON suportados",
+            "importing": "Importando inscrições (isso levará um momento)",
+            "importingCompleted": "Inscrições importadas com sucesso",
+            "exportSub": "Exportar inscrições",
+            "exportToClipboard": "Exportar para área de transferência",
+            "exportToFile": "Exportar para arquivo",
+            "importFromFile": "Importar de arquivo"
+        },
+        "engine": "Motor de backend",
+        "displayThumbnailAvatars": "Avatares de miniaturas (Lento)"
     },
     "subscribe": "Inscrever-se",
     "disabled": "Desativado",
     "popularPageDisabled": "Página popular foi desativada por Administradores",
     "premium": "Conteúdo premium do youtube não podem ser assistidos no Materialious.",
-    "copy": "Copiar JSON",
+    "copy": "Copiar para área de transferência",
     "login": "Login",
     "username": "Nome de usuário",
     "password": "Senha",
@@ -217,7 +272,8 @@
         "invidiousInfo": "Invidious é uma interface do youtube auto-hospedável.",
         "localFallbackInfo": "Quando um vídeo não consegue ser carregado a partir do Invidious, Materialious carrega-o localmente.",
         "configureInstance": "Configurar Instância",
-        "done": "Feito"
+        "done": "Feito",
+        "useLocalFallback": "Eu quero usar fallback de vídeo local"
     },
     "skip": "Pular",
     "upcomingSegment": "Próximo ",
@@ -228,5 +284,26 @@
     "defaultPage": "Página padrão",
     "newest": "Mais recente",
     "oldest": "Mais antigos",
-    "popular": "Popular"
+    "popular": "Popular",
+    "markAs": {
+        "watched": "Marcar como assistido",
+        "unwatched": "Marcar como não assistido"
+    },
+    "hideAuthor": "Esconder autor",
+    "watchParty": {
+        "createRoom": "Criar sala",
+        "joinRoom": "Entrar na sala",
+        "roomID": "ID da sala",
+        "shareRoom": "Compartilhar sala",
+        "leaveRoom": "Sair da sala",
+        "userJoin": "Usuário entrou na sala",
+        "userLeft": "Usuário saiu da sala",
+        "start": "Iniciar um grupo para assistir",
+        "header": "Assistir em grupo"
+    },
+    "favouriteChannel": "Favoritar canal",
+    "unfavouriteChannel": "Desfavoritar canal",
+    "linkInvidious": "Vincular conta Invidious",
+    "unlinkInvidious": "Desvincular conta Invidious",
+    "playlistVideos": "Vídeos da lista de reprodução"
 }

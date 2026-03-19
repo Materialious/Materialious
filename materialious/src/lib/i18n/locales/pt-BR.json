@@ -160,7 +160,9 @@
             "lockOrientation": "Orientação travada para igualar aspecto de proporção",
             "ccByDefault": "Legendas ativadas por padrão",
             "defaultPlaybackSpeed": "Velocidade de reprodução padrão",
-            "playerStatistics": "Mostrar estatísticas de reprodutor por padrão"
+            "playerStatistics": "Mostrar estatísticas de reprodutor por padrão",
+            "localVideoFallback": "Fallback de vídeo local",
+            "networkChangePause": "Pausar na mudança de rede"
         },
         "bookmarklet": "Favoritos",
         "instanceUrl": "URL da instância",
@@ -203,7 +205,10 @@
             "importingToMaterialious": "Importação para Materialious começou",
             "importingToMaterialiousFinished": "Importação para Materialious finalizada",
             "exportingToInvidious": "Exportação para Invidious começou",
-            "exportingToInvidiousFinished": "Exportação para Invidious finalizada"
+            "exportingToInvidiousFinished": "Exportação para Invidious finalizada",
+            "cull": "Itens máximos do feed",
+            "cooldown": "Atualizar intervalo horário de espera",
+            "fallbacks": "Fallbacks"
         },
         "exportToJson": "Exportar para JSON",
         "filter": {

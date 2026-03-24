@@ -53,7 +53,7 @@
 		"@capacitor/app": "^8.0.1",
 		"@capacitor/browser": "^8.0.1",
 		"@capacitor/clipboard": "^8.0.1",
-		"@capacitor/core": "^8.0.0",
+		"@capacitor/core": "^8.2.0",
 		"@capacitor/network": "^8.0.1",
 		"@capacitor/preferences": "^8.0.1",
 		"@capacitor/screen-orientation": "^8.0.1",

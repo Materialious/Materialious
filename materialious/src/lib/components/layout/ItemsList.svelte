@@ -45,8 +45,6 @@
 	});
 
 	function goToItem(uniqueItemId: string) {
-		feedLastItemId.set(uniqueItemId);
-
 		const articleElement = document.getElementById(uniqueItemId);
 		if (articleElement) {
 			const clickable = articleElement.querySelector('a, button');
@@ -74,6 +72,8 @@
 					{@const uniqueItemId = extractUniqueId(item)}
 					{@const spatialItem = spatialMenu.getItem(item, {
 						onSelect: () => {
+							feedLastItemId.set(uniqueItemId);
+
 							if ($isAndroidTvStore) goToItem(uniqueItemId);
 						}
 					})}
@@ -81,6 +81,8 @@
 						<article
 							{...mergeAttrs(spatialItem.attrs, {
 								onclick: () => {
+									feedLastItemId.set(uniqueItemId);
+
 									if ($isAndroidTvStore) goToItem(uniqueItemId);
 								},
 								id: uniqueItemId

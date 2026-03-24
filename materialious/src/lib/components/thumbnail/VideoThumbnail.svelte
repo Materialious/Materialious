@@ -359,7 +359,12 @@
 									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
 									•
 									{video.published && video.published !== 0
-										? relativeTimestamp(video.published * 1000, false)
+										? relativeTimestamp(
+												typeof video.published === 'string'
+													? new Date(video.published).getTime()
+													: video.published * 1000,
+												false
+											)
 										: video.publishedText}
 								</span>
 							{/if}

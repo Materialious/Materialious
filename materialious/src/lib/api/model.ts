@@ -34,6 +34,7 @@ export interface VideoBase {
 	// Means it was given preference in rankings due to
 	// a users settings
 	promotedBy?: 'favourited';
+	isShort?: boolean;
 }
 
 export interface ResolvedUrl {

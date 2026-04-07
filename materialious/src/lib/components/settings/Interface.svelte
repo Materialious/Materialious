@@ -130,7 +130,7 @@
 		<form onsubmit={setInstance}>
 			<nav>
 				<div
-					class="field prefix suffix label surface-container-highest max"
+					class="field prefix label surface-container-highest max"
 					class:invalid={invalidInstance}
 				>
 					<i>link</i>
@@ -143,17 +143,6 @@
 					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
 					{#if invalidInstance}
 						<span class="error">{$_('invalidInstance')}</span>
-					{/if}
-					{#if $invidiousInstanceStore}
-						<i
-							role="presentation"
-							class="front"
-							onclick={() => {
-								invidiousInstanceStore.set(undefined);
-								invidiousInstance = undefined;
-								invidiousLogout();
-							}}>close</i
-						>
 					{/if}
 				</div>
 				<button class="circle">

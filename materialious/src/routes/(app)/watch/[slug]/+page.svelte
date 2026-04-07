@@ -557,6 +557,10 @@
 		height: 50vh;
 	}
 
+	.video-actions button {
+		margin-left: 0;
+	}
+
 	@media screen and (max-width: 1200px) {
 		.video-actions {
 			align-items: flex-start;

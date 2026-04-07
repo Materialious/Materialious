@@ -199,7 +199,8 @@
 			"darkMode": "Dark mode",
 			"lightMode": "Light mode",
 			"AmoledTheme": "Amoled theme",
-			"color": "Color"
+			"color": "Color",
+			"advanced": "Advanced theming"
 		},
 		"searchSuggestions": "Search suggestions",
 		"previewVideoOnHover": "Preview video on hover",

@@ -64,17 +64,20 @@
 		if (colorPickerDebounce) clearTimeout(colorPickerDebounce);
 
 		colorPickerDebounce = setTimeout(async () => {
+			interfaceAdvancedThemingStore.set({});
+
 			themeColorStore.set(color.hex);
 			await tick();
 
 			setAmoledTheme();
 			currentThemeColors = await getDynamicTheme();
-			interfaceAdvancedThemingStore.set({});
 		}, 100);
 	}
 
 	async function toggleDarkMode() {
 		const isDark = get(darkModeStore);
+
+		interfaceAdvancedThemingStore.set({});
 
 		if (isDark) {
 			ui('mode', 'light');
@@ -85,7 +88,6 @@
 		}
 
 		currentThemeColors = await getDynamicTheme();
-		interfaceAdvancedThemingStore.set({});
 	}
 </script>
 
@@ -132,6 +134,7 @@
 					type="checkbox"
 					bind:checked={$interfaceAmoledTheme}
 					onclick={async () => {
+						interfaceAdvancedThemingStore.set({});
 						interfaceAmoledTheme.set(!$interfaceAmoledTheme);
 						await setThemeColors();
 					}}

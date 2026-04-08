@@ -36,22 +36,23 @@
 		await ui('theme', hex);
 	});
 
-	interfaceAdvancedThemingStore.subscribe((colors) => {
+	interfaceAdvancedThemingStore.subscribe(async (colors) => {
 		setThemeColors(colors);
+		await setStatusBarColor();
 	});
 
 	interfaceAmoledTheme.subscribe(async () => {
-		setAmoledTheme();
-		setThemeColors($interfaceAdvancedThemingStore);
+		if (Object.keys($interfaceAdvancedThemingStore).length > 0) return;
 
+		setAmoledTheme();
 		await setStatusBarColor();
 	});
 
 	darkModeStore.subscribe(async () => {
+		if (Object.keys($interfaceAdvancedThemingStore).length > 0) return;
+
 		setTheme();
 		setAmoledTheme();
-
-		setThemeColors($interfaceAdvancedThemingStore);
 
 		await setStatusBarColor();
 	});

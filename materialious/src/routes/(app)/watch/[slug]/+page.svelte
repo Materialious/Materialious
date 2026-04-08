@@ -22,7 +22,8 @@
 		playerTheatreModeByDefaultStore,
 		playerTheatreModeIsActive,
 		playlistCacheStore,
-		type PlayerState
+		type PlayerState,
+		filterContentListStore
 	} from '$lib/store';
 	import ui from 'beercss';
 	import { onDestroy, onMount, tick } from 'svelte';
@@ -38,7 +39,7 @@
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
-	import { isItemFiltered } from '$lib/filtering/index.js';
+	import { isItemFiltered } from '$lib/filtering/index';
 
 	let { data = $bindable() } = $props();
 
@@ -461,15 +462,17 @@
 			{#if data.playlistId && data.playlistId in $playlistCacheStore}
 				<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />
 			{:else if data.video.recommendedVideos}
-				{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
-					{#if !isItemFiltered(recommendedVideo)}
-						<article class="no-padding border">
-							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} sideways={true} />
-							{/key}
-						</article>
-					{/if}
-				{/each}
+				{#key $filterContentListStore?.length}
+					{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
+						{#if !isItemFiltered(recommendedVideo)}
+							<article class="no-padding border">
+								{#key recommendedVideo.videoId}
+									<Thumbnail video={recommendedVideo} sideways={true} />
+								{/key}
+							</article>
+						{/if}
+					{/each}
+				{/key}
 			{/if}
 		</div>
 	{/if}

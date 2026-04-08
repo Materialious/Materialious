@@ -51,6 +51,7 @@ const zFilterRootSchema = z.object({
 });
 
 export function isItemFiltered(item: FeedItem): boolean {
+	console.log(item);
 	const filteredContent = get(filterContentListStore);
 	if (!filteredContent) return false;
 

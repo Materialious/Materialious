@@ -133,6 +133,8 @@
 		// Should always be loaded after env settings
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
+
+		setThemeColors($interfaceAdvancedThemingStore);
 	});
 
 	let syncToSettingsInitialized = false;

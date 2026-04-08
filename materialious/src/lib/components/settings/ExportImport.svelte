@@ -6,10 +6,21 @@
 	import { importSubscriptions } from '$lib/importExport';
 	import { postSubscribeInvidious } from '$lib/api/invidious/subscribe';
 	import { getSubscriptionsInvidious } from '$lib/api/invidious/feed';
-	import { backendInUseStore, invidiousAuthStore, invidiousInstanceStore } from '$lib/store';
+	import {
+		backendInUseStore,
+		interfaceAdvancedThemingStore,
+		interfaceBorderRadiusStore,
+		invidiousAuthStore,
+		invidiousInstanceStore
+	} from '$lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
-	import { loadSettingsFromFile, settingsToJson } from '$lib/externalSettings';
+	import {
+		bookmarkletSaveToUrl,
+		loadSettingsFromFile,
+		settingsToJson
+	} from '$lib/externalSettings';
 	import { downloadStringAsFile } from '$lib/misc';
+	import { zNumber, zThemeColors } from '$lib/externalSettings/settings';
 
 	async function importInvidiousSubs() {
 		const importedSubs = await getSubscriptionsInvidious();
@@ -163,6 +174,82 @@
 
 <div class="space"></div>
 
+<div>
+	<button class="surface-container-highest">
+		<i>attach_file</i>
+		<span>{$_('layout.export.importFromFile')}</span>
+	</button>
+	<input
+		onchange={async (event: Event) => {
+			const files = (event.target as HTMLInputElement).files;
+			if (files?.length === 0 || !files) return;
+
+			await loadSettingsFromFile(files[0]);
+		}}
+		accept=".json"
+		type="file"
+	/>
+</div>
+
+<h3>{$_('layout.theme.theme')}</h3>
+<div class="space"></div>
+<button
+	class="no-margin surface-container-highest"
+	onclick={async () => {
+		await Clipboard.write({
+			string: bookmarkletSaveToUrl([
+				{
+					name: 'advancedTheming',
+					store: interfaceAdvancedThemingStore,
+					schema: zThemeColors,
+					serialize: JSON.stringify
+				},
+				{
+					name: 'borderRadius',
+					store: interfaceBorderRadiusStore,
+					schema: zNumber
+				}
+			])
+		});
+
+		addToast({
+			data: {
+				text: $_('player.share.copiedSuccess')
+			}
+		});
+	}}
+>
+	<i>content_copy</i>
+	<span>{$_('layout.export.exportToShareUrl')}</span>
+</button>
+
+<div class="space"></div>
+<button
+	class="no-margin surface-container-highest"
+	onclick={async () => {
+		downloadStringAsFile(
+			settingsToJson([
+				{
+					name: 'advancedTheming',
+					store: interfaceAdvancedThemingStore,
+					schema: zThemeColors,
+					serialize: JSON.stringify
+				},
+				{
+					name: 'borderRadius',
+					store: interfaceBorderRadiusStore,
+					schema: zNumber
+				}
+			]),
+			'materialious-theme.json'
+		);
+	}}
+>
+	<i>file_export</i>
+	<span>{$_('layout.export.exportToFile')}</span>
+</button>
+
+<div class="space"></div>
 <div>
 	<button class="surface-container-highest">
 		<i>attach_file</i>

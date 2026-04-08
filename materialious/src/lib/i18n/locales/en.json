@@ -295,7 +295,8 @@
 			"exportSub": "Export subscriptions",
 			"exportToClipboard": "Export to clipboard",
 			"exportToFile": "Export to file",
-			"importFromFile": "Import from file"
+			"importFromFile": "Import from file",
+			"exportToShareUrl": "Export to share URL"
 		},
 		"deArrow": {
 			"title": "DeArrow",

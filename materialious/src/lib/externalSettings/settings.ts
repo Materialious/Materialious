@@ -60,7 +60,7 @@ import {
 import { isOwnBackend } from '$lib/shared';
 import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
 
-type PersistedStore<T> = {
+export type PersistedStore<T> = {
 	name: string;
 	store: Writable<T>;
 	schema: z.ZodType<T>;
@@ -69,18 +69,18 @@ type PersistedStore<T> = {
 	excludeFromBackendSync?: boolean; // Won't be sync'd to account cloud
 };
 
-const zBoolean = z.coerce.boolean();
-const zNumber = z.coerce.number();
-const zFloat = z.coerce.number().min(0).max(1);
-const zString = z.string();
-const zArray = z.array(z.string());
-const zChapterMode = z.enum(['automatic', 'manual', 'timeline']);
-const zChapterModeRecord = z.record(z.string(), zChapterMode.optional());
-const zAuth = z.object({
+export const zBoolean = z.coerce.boolean();
+export const zNumber = z.coerce.number();
+export const zFloat = z.coerce.number().min(0).max(1);
+export const zString = z.string();
+export const zArray = z.array(z.string());
+export const zChapterMode = z.enum(['automatic', 'manual', 'timeline']);
+export const zChapterModeRecord = z.record(z.string(), zChapterMode.optional());
+export const zAuth = z.object({
 	username: z.string(),
 	token: z.string()
 });
-const zThemeColors = z.record(
+export const zThemeColors = z.record(
 	z.string().refine((val) => SUPPORTED_THEME_KEYS.includes(val), {
 		message: 'CSS property not allowed'
 	}),

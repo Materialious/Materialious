@@ -399,26 +399,55 @@
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp (timestamp)}
-								<li
-									role="presentation"
-									onclick={() => {
-										if (playerElement) playerElement.currentTime = timestamp.time;
-									}}
-								>
+								<li>
 									<img
 										class="round large"
 										loading="lazy"
 										src={getBestThumbnail(data.video.videoThumbnails) as string}
 										alt="Thumbnail for current video"
+										role="presentation"
+										onclick={() => {
+											if (playerElement) playerElement.currentTime = timestamp.time;
+										}}
 									/>
-									<div class="max" style="white-space: pre-line; overflow-wrap: break-word;">
-										<p style="no-margin no-padding">{timestamp.title}</p>
+									<div
+										role="presentation"
+										onclick={() => {
+											if (playerElement) playerElement.currentTime = timestamp.time;
+										}}
+										class="max"
+										style="white-space: pre-line; overflow-wrap: break-word;"
+									>
+										<p style="margin: 0;">{timestamp.title}</p>
 										<span
 											class:primary={playerCurrentTime >= timestamp.time &&
 												(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
 											class="chip no-margin">{timestamp.timePretty}</span
 										>
 									</div>
+									<Share
+										shares={[
+											{
+												type: 'materialious',
+												path: resolve(`/watch/[videoId]?time=${Math.round(timestamp.time)}`, {
+													videoId: data.video.videoId
+												})
+											},
+											{
+												type: 'invidious',
+												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+											},
+											{
+												type: 'invidious redirect',
+												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+											},
+											{
+												type: 'youtube',
+												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+											}
+										]}
+										iconOnly={true}
+									/>
 								</li>
 							{/each}
 						</ul>

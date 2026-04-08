@@ -448,6 +448,8 @@
 		transform: translateY(-50%);
 		z-index: 1;
 		pointer-events: none;
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
 		border-top-right-radius: var(--player-border-radius);
 		border-bottom-right-radius: var(--player-border-radius);
 		opacity: 0.5;

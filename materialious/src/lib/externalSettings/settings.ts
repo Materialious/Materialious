@@ -54,7 +54,8 @@ import {
 	watchHistoryEnabledStore,
 	filterContentUrlStore,
 	filterContentUrlAutoUpdateStore,
-	interfaceAdvancedThemingStore
+	interfaceAdvancedThemingStore,
+	interfaceBorderRadiusStore
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
@@ -284,6 +285,11 @@ export const persistedStores: PersistedStore<any>[] = [
 		store: interfaceAdvancedThemingStore,
 		schema: zThemeColors,
 		serialize: JSON.stringify
+	},
+	{
+		name: 'borderRadius',
+		store: interfaceBorderRadiusStore,
+		schema: zNumber
 	}
 ];
 

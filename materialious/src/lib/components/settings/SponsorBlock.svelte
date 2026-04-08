@@ -113,7 +113,7 @@
 	{@const currentCategoryTrigger = $sponsorBlockCategoriesStore[sponsor.category]}
 
 	<div class="field middle-align">
-		<nav class="no-padding">
+		<nav class="no-padding combobox">
 			<div class="max">
 				<p>{sponsor.name}</p>
 			</div>
@@ -130,3 +130,12 @@
 		</nav>
 	</div>
 {/each}
+
+<style>
+	@media screen and (max-width: 640px) {
+		nav.combobox {
+			flex-direction: column;
+			align-items: start;
+		}
+	}
+</style>

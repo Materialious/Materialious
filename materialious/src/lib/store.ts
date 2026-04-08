@@ -266,6 +266,11 @@ export const interfaceAdvancedThemingStore: Writable<ThemeColors> = persist(
 	createStorage(),
 	'advancedTheming'
 );
+export const interfaceBorderRadiusStore: Writable<number> = persist(
+	writable(0.5),
+	createStorage(),
+	'borderRadius'
+);
 
 export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist(

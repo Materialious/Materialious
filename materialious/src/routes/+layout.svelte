@@ -3,6 +3,7 @@
 		darkModeStore,
 		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
+		interfaceBorderRadiusStore,
 		invidiousAuthStore,
 		isAndroidTvStore,
 		rawMasterKeyStore,
@@ -39,6 +40,10 @@
 	interfaceAdvancedThemingStore.subscribe(async (colors) => {
 		setThemeColors(colors);
 		await setStatusBarColor();
+	});
+
+	interfaceBorderRadiusStore.subscribe((radius) => {
+		document.documentElement.style.setProperty('--border-radius', `${radius}rem`);
 	});
 
 	interfaceAmoledTheme.subscribe(async () => {

@@ -200,7 +200,14 @@
 			"lightMode": "Light mode",
 			"AmoledTheme": "Amoled theme",
 			"color": "Color",
-			"advanced": "Advanced theming"
+			"advanced": "Advanced theming",
+			"borderRadius": {
+				"none": "None",
+				"slight": "Slight",
+				"modern": "Modern",
+				"rounded": "Rounded",
+				"borderRadius": "Border radius"
+			}
 		},
 		"searchSuggestions": "Search suggestions",
 		"previewVideoOnHover": "Preview video on hover",

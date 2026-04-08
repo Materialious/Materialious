@@ -15,6 +15,7 @@
 		darkModeStore,
 		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
+		interfaceBorderRadiusStore,
 		themeColorStore
 	} from '../../store';
 	import { onMount, tick } from 'svelte';
@@ -145,6 +146,54 @@
 		</nav>
 	</div>
 {/if}
+
+<h5>{$_('layout.theme.borderRadius.borderRadius')}</h5>
+<div class="grid">
+	<div class="s3 m3 l3">
+		<button
+			onclick={() => {
+				interfaceBorderRadiusStore.set(0);
+			}}
+			class="surface-container-highest"
+			style="border-radius: 0 !important;width: 80%;"
+		>
+			<p>{$_('layout.theme.borderRadius.none')}</p>
+		</button>
+	</div>
+	<div class="s3 m3 l3">
+		<button
+			onclick={() => {
+				interfaceBorderRadiusStore.set(0.25);
+			}}
+			class="surface-container-highest"
+			style="border-radius: 0.25rem !important;width: 80%;"
+		>
+			<p>{$_('layout.theme.borderRadius.slight')}</p>
+		</button>
+	</div>
+	<div class="s3 m3 l3">
+		<button
+			onclick={() => {
+				interfaceBorderRadiusStore.set(0.5);
+			}}
+			class="surface-container-highest"
+			style="border-radius: 0.5rem !important;width: 80%;"
+		>
+			<p>{$_('layout.theme.borderRadius.modern')}</p>
+		</button>
+	</div>
+	<div class="s3 m3 l3">
+		<button
+			onclick={() => {
+				interfaceBorderRadiusStore.set(1);
+			}}
+			class="surface-container-highest"
+			style="border-radius: 1rem !important;width: 80%;"
+		>
+			<p>{$_('layout.theme.borderRadius.rounded')}</p>
+		</button>
+	</div>
+</div>
 
 <h5>{$_('layout.theme.advanced')}</h5>
 <div class="space"></div>

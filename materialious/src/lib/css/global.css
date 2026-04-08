@@ -43,6 +43,7 @@ body {
 
 article {
 	box-shadow: none !important;
+	border-radius: var(--border-radius) !important;
 }
 
 .primary-border {
@@ -75,7 +76,17 @@ nav.bottom {
 }
 
 dialog {
-	border-radius: 0.25rem !important;
+	border-radius: var(--border-radius) !important;
+}
+
+:is(.button, button):not(.chip):active,
+:is(.button, button):not(.chip).active {
+	border-radius: var(--border-radius) !important;
+}
+
+nav:not(.max):is(.left, .right, .top, .bottom) > a:not(.button, .chip) > i,
+nav:not(.max):is(.left, .right, .top, .bottom) > :is(ol, ul) > li > a:not(.button, .chip) > i {
+	border-radius: var(--border-radius) !important;
 }
 
 main.root {

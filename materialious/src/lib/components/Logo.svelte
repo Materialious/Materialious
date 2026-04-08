@@ -14,7 +14,7 @@
 	let fillColor = $state('');
 
 	async function setFill() {
-		fillColor = (await getDynamicTheme())['--primary'];
+		fillColor = (await getDynamicTheme())['--primary'] ?? '#fff';
 	}
 
 	onMount(async () => {

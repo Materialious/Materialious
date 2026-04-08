@@ -53,9 +53,11 @@ import {
 	playerPreferredVolumeStore,
 	watchHistoryEnabledStore,
 	filterContentUrlStore,
-	filterContentUrlAutoUpdateStore
+	filterContentUrlAutoUpdateStore,
+	interfaceAdvancedThemingStore
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
+import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
 
 type PersistedStore<T> = {
 	name: string;
@@ -77,6 +79,12 @@ const zAuth = z.object({
 	username: z.string(),
 	token: z.string()
 });
+const zThemeColors = z.record(
+	z.string().refine((val) => SUPPORTED_THEME_KEYS.includes(val), {
+		message: 'CSS property not allowed'
+	}),
+	z.string().regex(/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
+);
 
 export const persistedStores: PersistedStore<any>[] = [
 	{
@@ -270,6 +278,12 @@ export const persistedStores: PersistedStore<any>[] = [
 		name: 'filterContentUrlAutoUpdate',
 		store: filterContentUrlAutoUpdateStore,
 		schema: zBoolean
+	},
+	{
+		name: 'advancedTheming',
+		store: interfaceAdvancedThemingStore,
+		schema: zThemeColors,
+		serialize: JSON.stringify
 	}
 ];
 

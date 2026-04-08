@@ -116,45 +116,6 @@ export function setTheme() {
 	}
 }
 
-export const SUPPORTED_THEME_KEYS: ThemeKey[] = [
-	'--primary',
-	'--on-primary',
-	'--primary-container',
-	'--on-primary-container',
-	'--secondary',
-	'--on-secondary',
-	'--secondary-container',
-	'--on-secondary-container',
-	'--tertiary',
-	'--on-tertiary',
-	'--tertiary-container',
-	'--on-tertiary-container',
-	'--error',
-	'--on-error',
-	'--error-container',
-	'--on-error-container',
-	'--background',
-	'--on-background',
-	'--surface',
-	'--on-surface',
-	'--surface-variant',
-	'--on-surface-variant',
-	'--outline',
-	'--outline-variant',
-	'--shadow',
-	'--scrim',
-	'--inverse-surface',
-	'--inverse-on-surface',
-	'--inverse-primary',
-	'--surface-dim',
-	'--surface-bright',
-	'--surface-container-lowest',
-	'--surface-container-low',
-	'--surface-container',
-	'--surface-container-high',
-	'--surface-container-highest'
-] as const;
-
 export function setThemeColors(theme: ThemeColors) {
 	for (const [themeKey, themeValue] of Object.entries(theme)) {
 		setThemeColor(themeKey as ThemeKey, themeValue.trim());

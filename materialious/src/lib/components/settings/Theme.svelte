@@ -29,6 +29,13 @@
 		currentThemeColors = await getDynamicTheme();
 	});
 
+	async function setThemeColors() {
+		await tick();
+
+		currentThemeColors = await getDynamicTheme();
+		interfaceAdvancedThemingStore.set(currentThemeColors);
+	}
+
 	async function colorOnInput(
 		color: {
 			hsv: HsvaColor | null;
@@ -43,10 +50,7 @@
 		colorPickerDebounce = setTimeout(async () => {
 			if (!color.hex) return;
 			setThemeColor(propetyKey, color.hex);
-			await tick();
-			currentThemeColors = await getDynamicTheme();
-
-			interfaceAdvancedThemingStore.set(currentThemeColors);
+			await setThemeColors();
 		}, 100);
 	}
 
@@ -62,8 +66,10 @@
 		colorPickerDebounce = setTimeout(async () => {
 			themeColorStore.set(color.hex);
 			await tick();
+
 			setAmoledTheme();
 			currentThemeColors = await getDynamicTheme();
+			interfaceAdvancedThemingStore.set({});
 		}, 100);
 	}
 
@@ -79,6 +85,7 @@
 		}
 
 		currentThemeColors = await getDynamicTheme();
+		interfaceAdvancedThemingStore.set({});
 	}
 </script>
 
@@ -126,7 +133,7 @@
 					bind:checked={$interfaceAmoledTheme}
 					onclick={async () => {
 						interfaceAmoledTheme.set(!$interfaceAmoledTheme);
-						currentThemeColors = await getDynamicTheme();
+						await setThemeColors();
 					}}
 					role="switch"
 				/>

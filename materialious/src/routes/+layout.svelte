@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		darkModeStore,
+		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
 		invidiousAuthStore,
 		isAndroidTvStore,
@@ -15,7 +16,7 @@
 	import 'beercss';
 	import 'material-dynamic-colors';
 
-	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
+	import { setAmoledTheme, setStatusBarColor, setTheme, setThemeColors } from '$lib/theme';
 
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';
@@ -30,8 +31,18 @@
 
 	let { children } = $props();
 
+	themeColorStore.subscribe(async (hex) => {
+		if (!hex || Object.keys($interfaceAdvancedThemingStore).length > 0) return;
+		await ui('theme', hex);
+	});
+
+	interfaceAdvancedThemingStore.subscribe((colors) => {
+		setThemeColors(colors);
+	});
+
 	interfaceAmoledTheme.subscribe(async () => {
 		setAmoledTheme();
+		setThemeColors($interfaceAdvancedThemingStore);
 
 		await setStatusBarColor();
 	});
@@ -39,6 +50,8 @@
 	darkModeStore.subscribe(async () => {
 		setTheme();
 		setAmoledTheme();
+
+		setThemeColors($interfaceAdvancedThemingStore);
 
 		await setStatusBarColor();
 	});
@@ -114,11 +127,6 @@
 		// Should always be loaded after env settings
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
-
-		await setStatusBarColor();
-
-		setTheme();
-		setAmoledTheme();
 	});
 
 	let syncToSettingsInitialized = false;

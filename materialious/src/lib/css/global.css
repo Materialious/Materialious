@@ -183,7 +183,7 @@ menu.player-settings {
 
 .player-slider [data-melt-slider-thumb] {
 	position: absolute;
-	border-radius: 1rem;
+	border-radius: var(--player-border-radius);
 	background: var(--primary);
 	left: var(--percentage);
 	top: 50%;

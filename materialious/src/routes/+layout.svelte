@@ -1,7 +1,9 @@
 <script lang="ts">
 	import {
 		darkModeStore,
+		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
+		interfaceBorderRadiusStore,
 		invidiousAuthStore,
 		isAndroidTvStore,
 		rawMasterKeyStore,
@@ -15,7 +17,7 @@
 	import 'beercss';
 	import 'material-dynamic-colors';
 
-	import { setAmoledTheme, setStatusBarColor, setTheme } from '$lib/theme';
+	import { setAmoledTheme, setStatusBarColor, setTheme, setThemeColors } from '$lib/theme';
 
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';
@@ -30,13 +32,30 @@
 
 	let { children } = $props();
 
-	interfaceAmoledTheme.subscribe(async () => {
-		setAmoledTheme();
+	themeColorStore.subscribe(async (hex) => {
+		if (!hex || Object.keys($interfaceAdvancedThemingStore).length > 0) return;
+		await ui('theme', hex);
+	});
 
+	interfaceAdvancedThemingStore.subscribe(async (colors) => {
+		setThemeColors(colors);
+		await setStatusBarColor();
+	});
+
+	interfaceBorderRadiusStore.subscribe((radius) => {
+		document.documentElement.style.setProperty('--border-radius', `${radius}rem`);
+	});
+
+	interfaceAmoledTheme.subscribe(async () => {
+		if (Object.keys($interfaceAdvancedThemingStore).length > 0) return;
+
+		setAmoledTheme();
 		await setStatusBarColor();
 	});
 
 	darkModeStore.subscribe(async () => {
+		if (Object.keys($interfaceAdvancedThemingStore).length > 0) return;
+
 		setTheme();
 		setAmoledTheme();
 
@@ -115,10 +134,7 @@
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();
 
-		await setStatusBarColor();
-
-		setTheme();
-		setAmoledTheme();
+		setThemeColors($interfaceAdvancedThemingStore);
 	});
 
 	let syncToSettingsInitialized = false;

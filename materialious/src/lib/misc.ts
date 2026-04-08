@@ -125,7 +125,7 @@ export function downloadStringAsFile(content: string, filename: string) {
 
 	const a = document.createElement('a');
 	a.href = url;
-	a.download = filename;
+	a.download = `${new Date().toDateString().replaceAll(' ', '')}-${filename}`;
 
 	document.body.appendChild(a);
 	a.click();

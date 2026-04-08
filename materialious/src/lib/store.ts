@@ -24,6 +24,7 @@ import { ensureNoTrailingSlash, getPublicEnv } from './misc';
 import type { EngineFallback } from './api/misc';
 import type z from 'zod';
 import type { zFilterSchema } from './filtering/index';
+import type { ThemeColors } from './theme';
 
 function createListenerFunctions(): {
 	callListeners: (eventKey: string, newValue: any) => void;
@@ -259,6 +260,16 @@ export const interfaceAndroidUseNativeShare = persist(
 	writable(true),
 	createStorage(),
 	'androidUseNativeShare'
+);
+export const interfaceAdvancedThemingStore: Writable<ThemeColors> = persist(
+	writable({}),
+	createStorage(),
+	'advancedTheming'
+);
+export const interfaceBorderRadiusStore: Writable<number> = persist(
+	writable(0.5),
+	createStorage(),
+	'borderRadius'
 );
 
 export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');

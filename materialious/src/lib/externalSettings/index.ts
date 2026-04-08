@@ -2,7 +2,7 @@ import { page } from '$app/state';
 import { get } from 'svelte/store';
 import { z } from 'zod';
 
-import { persistedStores } from './settings';
+import { persistedStores, type PersistedStore } from './settings';
 
 import { isOwnBackend } from '$lib/shared';
 import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend/keyvalue';
@@ -121,10 +121,10 @@ export function loadSettingsFromEnv() {
 	}
 }
 
-export function bookmarkletSaveToUrl(): string {
+export function bookmarkletSaveToUrl(stores: PersistedStore<any>[] = persistedStores): string {
 	const url = new URL(location.origin);
 
-	for (const { name, store, serialize, excludeFromBookmarklet } of persistedStores) {
+	for (const { name, store, serialize, excludeFromBookmarklet } of stores) {
 		const value = get(store);
 		const encoded = serialize ? serialize(value) : value?.toString();
 
@@ -136,10 +136,10 @@ export function bookmarkletSaveToUrl(): string {
 	return url.toString();
 }
 
-export function settingsToJson(): string {
+export function settingsToJson(stores: PersistedStore<any>[] = persistedStores): string {
 	const settings: Record<string, string> = {};
 
-	for (const { name, store, excludeFromBookmarklet } of persistedStores) {
+	for (const { name, store, excludeFromBookmarklet } of stores) {
 		const value = get(store);
 		if (!excludeFromBookmarklet) {
 			settings[name] = value;

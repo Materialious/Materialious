@@ -58,16 +58,16 @@
 <nav>
 	<a href={resolve(`/channel/[authorId]`, { authorId: channel.authorId })}>
 		<nav style="gap: 0.5em;">
-			<img class="circle large" {...avatar.image} alt="Channel profile" />
+			<img class="circle" {...avatar.image} alt="Channel profile" />
 			<button
-				class="circle large secondary-container"
+				class="circle small secondary-container"
 				{...mergeAttrs(avatar.fallback, {
 					style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
 				})}>{channel.author[0]}</button
 			>
 			<div>
 				<p style="margin: 0;" class="bold">
-					{$isAndroidTvStore ? channel.author : truncate(channel.author, 16)}
+					{$isAndroidTvStore ? channel.author : truncate(channel.author, 14)}
 				</p>
 				<p style="margin: 0;">{channel.subCountText}</p>
 			</div>

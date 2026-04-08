@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.16.23",
+	"version": "1.16.24",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -44,7 +44,7 @@
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.55.0",
-		"vite": "^7.3.1"
+		"vite": "^7.3.2"
 	},
 	"type": "module",
 	"dependencies": {

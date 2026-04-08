@@ -16,6 +16,7 @@
 	import { mergeAttrs } from 'melt';
 	import Filters from './Filters.svelte';
 	import ExportImport from './ExportImport.svelte';
+	import Theme from './Theme.svelte';
 
 	type TabCategories =
 		| 'interface'
@@ -27,7 +28,8 @@
 		| 'engine'
 		| 'account'
 		| 'filters'
-		| 'export';
+		| 'export'
+		| 'theme';
 
 	const tabCategories: Tabs<TabCategories> = new Tabs({
 		value: 'interface',
@@ -42,6 +44,7 @@
 
 	let tabs: { id: TabCategories; label: string; icon: string; component: Component }[] = $state([
 		{ id: 'interface', label: $_('layout.interface'), icon: 'grid_view', component: Interface },
+		{ id: 'theme', label: $_('layout.theme.theme'), icon: 'colors', component: Theme },
 		{ id: 'player', label: $_('layout.player.title'), icon: 'smart_display', component: Player },
 		{ id: 'filters', label: $_('layout.filter.title'), icon: 'filter_alt', component: Filters },
 		{ id: 'ryd', label: 'Return YT Dislike', icon: 'thumb_down', component: Ryd },

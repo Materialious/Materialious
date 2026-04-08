@@ -20,7 +20,6 @@
 		playerState,
 		playerTheatreModeIsActive,
 		rawMasterKeyStore,
-		themeColorStore,
 		backendInUseStore,
 		hideSearchStore
 	} from '$lib/store';
@@ -125,11 +124,6 @@
 		const feed = await getFeed(100, 1);
 		notifications = feed.notifications;
 	}
-
-	themeColorStore.subscribe(async (hex) => {
-		if (!hex) return;
-		await ui('theme', hex);
-	});
 
 	function resetScroll() {
 		const main = document.querySelector('main.root');

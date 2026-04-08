@@ -25,7 +25,7 @@ export async function DELETE({ locals, params }) {
 }
 
 const zUpdateKeyStore = z.object({
-	valueCipher: z.string().max(1000),
+	valueCipher: z.string().max(3000),
 	valueNonce: z.string().max(255)
 });
 

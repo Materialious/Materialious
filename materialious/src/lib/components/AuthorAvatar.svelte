@@ -19,14 +19,20 @@
 			if (src) avatarSrc = proxyGoogleImage(src);
 		});
 	});
+
+	function goToChannel() {
+		goto(resolve('/channel/[authorId]', { authorId }));
+	}
 </script>
 
-<img class="circle small" {...avatar.image} alt="Channel profile" />
+<img
+	class="circle small"
+	{...mergeAttrs(avatar.image, { onclick: goToChannel })}
+	alt="Channel profile"
+/>
 <button
 	class="circle secondary-container"
-	onclick={() => {
-		goto(resolve('/channel/[authorId]', { authorId }));
-	}}
+	onclick={goToChannel}
 	{...mergeAttrs(avatar.fallback, {
 		style: 'text-transform: uppercase;border-radius: 2.5rem !important;'
 	})}>{author[0]}</button

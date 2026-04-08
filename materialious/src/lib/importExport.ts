@@ -221,7 +221,7 @@ export async function exportSubscriptionsAsFile(exportType: 'InvidiousJSON' | 'O
 	if (data) {
 		downloadStringAsFile(
 			data,
-			`materialious-export-${new Date().toDateString().replaceAll(' ', '')}.${exportType === 'InvidiousJSON' ? 'json' : 'opml'}`
+			`materialious-export.${exportType === 'InvidiousJSON' ? 'json' : 'opml'}`
 		);
 	}
 }

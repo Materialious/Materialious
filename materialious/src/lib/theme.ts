@@ -4,16 +4,61 @@ import { get } from 'svelte/store';
 import { SystemBars, SystemBarsStyle } from '@capacitor/core';
 import { darkModeStore, interfaceAmoledTheme } from './store';
 
-export async function getDynamicTheme(mode?: string): Promise<Record<string, string>> {
+export type ThemeKey =
+	| '--primary'
+	| '--on-primary'
+	| '--primary-container'
+	| '--on-primary-container'
+	| '--secondary'
+	| '--on-secondary'
+	| '--secondary-container'
+	| '--on-secondary-container'
+	| '--tertiary'
+	| '--on-tertiary'
+	| '--tertiary-container'
+	| '--on-tertiary-container'
+	| '--error'
+	| '--on-error'
+	| '--error-container'
+	| '--on-error-container'
+	| '--background'
+	| '--on-background'
+	| '--surface'
+	| '--on-surface'
+	| '--surface-variant'
+	| '--on-surface-variant'
+	| '--outline'
+	| '--outline-variant'
+	| '--shadow'
+	| '--scrim'
+	| '--inverse-surface'
+	| '--inverse-on-surface'
+	| '--inverse-primary'
+	| '--surface-dim'
+	| '--surface-bright'
+	| '--surface-container-lowest'
+	| '--surface-container-low'
+	| '--surface-container'
+	| '--surface-container-high'
+	| '--surface-container-highest';
+
+export type ThemeColors = Partial<Record<ThemeKey, string>>;
+
+export async function getDynamicTheme(mode?: string): Promise<ThemeColors> {
 	const givenSettings = await ui('theme');
+
+	if (typeof givenSettings !== 'object') return {};
 
 	// @ts-expect-error Works as expected
 	const themes: string = givenSettings[mode ? mode : (ui('mode') as string)];
 	const themeVars: Record<string, string> = {};
-	themes.split(';').forEach((keyVar) => {
+	for (const keyVar of themes.split(';')) {
 		const [key, value] = keyVar.split(':');
-		themeVars[key] = value;
-	});
+		themeVars[key] = window.getComputedStyle(document.body).getPropertyValue(key) ?? value;
+	}
+
+	delete themeVars[''];
+
 	return themeVars;
 }
 
@@ -35,7 +80,7 @@ export function setAmoledTheme() {
 	const isDark = get(darkModeStore);
 
 	if (isAmoled && isDark) {
-		const rootVars = [
+		const rootVars: ThemeKey[] = [
 			'--surface-container',
 			'--surface',
 			'--surface-container-lowest',
@@ -44,7 +89,7 @@ export function setAmoledTheme() {
 			'--surface-container-highest'
 		];
 		rootVars.forEach((varName) => {
-			document.body.style.setProperty(varName, '#000');
+			setThemeColor(varName, '#000');
 		});
 	} else {
 		setTheme();
@@ -69,4 +114,15 @@ export function setTheme() {
 			ui('mode', 'light');
 		}
 	}
+}
+
+export function setThemeColors(theme: ThemeColors) {
+	for (const [themeKey, themeValue] of Object.entries(theme)) {
+		setThemeColor(themeKey as ThemeKey, themeValue.trim());
+	}
+}
+
+export function setThemeColor(theme: ThemeKey, color: string) {
+	document.documentElement.style.setProperty(theme, color.trim());
+	document.body.style.setProperty(theme, color.trim());
 }

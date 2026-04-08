@@ -1,24 +1,18 @@
 <script lang="ts">
 	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
 	import { letterCase, titleCases, type TitleCase } from '$lib/letterCasing';
-	import { setAmoledTheme } from '$lib/theme';
 	import { Capacitor } from '@capacitor/core';
-	import ui from 'beercss';
 	import { iso31661 } from 'iso-3166';
-	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { isUnrestrictedPlatform, timeout, shareURL } from '$lib/misc';
 	import { getPages, type Pages } from '$lib/navPages';
 	import { setInvidiousInstance, goToInvidiousLogin, invidiousLogout } from '$lib/auth';
-	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
 		invidiousAuthStore,
 		backendInUseStore,
-		darkModeStore,
 		invidiousInstanceStore,
 		interfaceAllowInsecureRequests,
-		interfaceAmoledTheme,
 		interfaceAndroidUseNativeShare,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
@@ -30,46 +24,14 @@
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
 		searchHistoryStore,
-		themeColorStore,
 		watchHistoryEnabledStore
 	} from '../../store';
-	import { tick } from 'svelte';
 	import { isOwnBackend } from '$lib/shared';
 	import ComboBox from '../ComboBox.svelte';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 
 	let invalidInstance = $state(false);
-	let colorPickerOpen = $state(false);
-	let colorPickerDebounce: ReturnType<typeof setTimeout>;
-
-	async function setColor(color: {
-		hsv: HsvaColor | null;
-		rgb: RgbaColor | null;
-		hex: string | null;
-		color: Colord | null;
-	}) {
-		if (!color.hex) return;
-		if (colorPickerDebounce) clearTimeout(colorPickerDebounce);
-
-		colorPickerDebounce = setTimeout(async () => {
-			themeColorStore.set(color.hex);
-			await tick();
-			setAmoledTheme();
-		}, 10);
-	}
-
-	function toggleDarkMode() {
-		const isDark = get(darkModeStore);
-
-		if (isDark) {
-			ui('mode', 'light');
-			darkModeStore.set(false);
-		} else {
-			ui('mode', 'dark');
-			darkModeStore.set(true);
-		}
-	}
 
 	async function setInstance(event: Event) {
 		event.preventDefault();
@@ -130,7 +92,7 @@
 		<form onsubmit={setInstance}>
 			<nav>
 				<div
-					class="field prefix suffix label surface-container-highest max"
+					class="field prefix label surface-container-highest max"
 					class:invalid={invalidInstance}
 				>
 					<i>link</i>
@@ -143,17 +105,6 @@
 					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
 					{#if invalidInstance}
 						<span class="error">{$_('invalidInstance')}</span>
-					{/if}
-					{#if $invidiousInstanceStore}
-						<i
-							role="presentation"
-							class="front"
-							onclick={() => {
-								invidiousInstanceStore.set(undefined);
-								invidiousInstance = undefined;
-								invidiousLogout();
-							}}>close</i
-						>
 					{/if}
 				</div>
 				<button class="circle">
@@ -197,57 +148,6 @@
 			</nav>
 		</div>
 	{/if}
-{/if}
-
-<button onclick={toggleDarkMode} class="no-margin surface-container-highest">
-	{#if !$darkModeStore}
-		<i>dark_mode</i>
-		<span>{$_('layout.theme.darkMode')}</span>
-	{:else}
-		<i>light_mode</i>
-		<span>{$_('layout.theme.lightMode')}</span>
-	{/if}
-</button>
-<button class="surface-container-highest" onclick={() => (colorPickerOpen = !colorPickerOpen)}>
-	<i>palette</i>
-	<span>{$_('layout.theme.color')}</span>
-</button>
-
-{#if colorPickerOpen}
-	<div class="space"></div>
-
-	<div class="color-picker">
-		<ColorPicker
-			isTextInput={false}
-			isDialog={false}
-			onInput={setColor}
-			position="responsive"
-			isAlpha={false}
-			hex={get(themeColorStore)}
-			sliderDirection="horizontal"
-		/>
-	</div>
-{/if}
-
-<div class="space"></div>
-
-{#if $darkModeStore}
-	<div class="field no-margin">
-		<nav class="no-padding">
-			<div class="max">
-				<div>{$_('layout.theme.AmoledTheme')}</div>
-			</div>
-			<label class="switch" tabindex="0">
-				<input
-					type="checkbox"
-					bind:checked={$interfaceAmoledTheme}
-					onclick={() => interfaceAmoledTheme.set(!$interfaceAmoledTheme)}
-					role="switch"
-				/>
-				<span></span>
-			</label>
-		</nav>
-	</div>
 {/if}
 
 <div class="field no-margin">
@@ -447,22 +347,3 @@
 		</button>
 	</div>
 {/if}
-
-<style>
-	.color-picker {
-		--cp-bg-color: var(--surface-container);
-		--cp-border-color: transparent;
-		--cp-text-color: var(--on-surface);
-		--cp-input-color: var(--surface);
-		--cp-button-hover-color: var(--surface-variant);
-		--slider-width: 50px;
-		--picker-width: 500px;
-		width: 100%;
-	}
-
-	@media screen and (max-width: 640px) {
-		.color-picker {
-			--picker-width: 95vw;
-		}
-	}
-</style>

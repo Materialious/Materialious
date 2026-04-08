@@ -199,7 +199,15 @@
 			"darkMode": "Dark mode",
 			"lightMode": "Light mode",
 			"AmoledTheme": "Amoled theme",
-			"color": "Color"
+			"color": "Color",
+			"advanced": "Advanced theming",
+			"borderRadius": {
+				"none": "None",
+				"slight": "Slight",
+				"modern": "Modern",
+				"rounded": "Rounded",
+				"borderRadius": "Border radius"
+			}
 		},
 		"searchSuggestions": "Search suggestions",
 		"previewVideoOnHover": "Preview video on hover",
@@ -287,7 +295,8 @@
 			"exportSub": "Export subscriptions",
 			"exportToClipboard": "Export to clipboard",
 			"exportToFile": "Export to file",
-			"importFromFile": "Import from file"
+			"importFromFile": "Import from file",
+			"exportToShareUrl": "Export to share URL"
 		},
 		"deArrow": {
 			"title": "DeArrow",

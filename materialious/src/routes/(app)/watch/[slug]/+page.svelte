@@ -22,7 +22,8 @@
 		playerTheatreModeByDefaultStore,
 		playerTheatreModeIsActive,
 		playlistCacheStore,
-		type PlayerState
+		type PlayerState,
+		filterContentListStore
 	} from '$lib/store';
 	import ui from 'beercss';
 	import { onDestroy, onMount, tick } from 'svelte';
@@ -38,7 +39,7 @@
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
-	import { isItemFiltered } from '$lib/filtering/index.js';
+	import { isItemFiltered } from '$lib/filtering/index';
 
 	let { data = $bindable() } = $props();
 
@@ -398,26 +399,55 @@
 					<div class="chapter-list" id="chapters">
 						<ul class="list">
 							{#each data.content.timestamps as timestamp (timestamp)}
-								<li
-									role="presentation"
-									onclick={() => {
-										if (playerElement) playerElement.currentTime = timestamp.time;
-									}}
-								>
+								<li>
 									<img
 										class="round large"
 										loading="lazy"
 										src={getBestThumbnail(data.video.videoThumbnails) as string}
 										alt="Thumbnail for current video"
+										role="presentation"
+										onclick={() => {
+											if (playerElement) playerElement.currentTime = timestamp.time;
+										}}
 									/>
-									<div class="max" style="white-space: pre-line; overflow-wrap: break-word;">
-										<p style="no-margin no-padding">{timestamp.title}</p>
+									<div
+										role="presentation"
+										onclick={() => {
+											if (playerElement) playerElement.currentTime = timestamp.time;
+										}}
+										class="max"
+										style="white-space: pre-line; overflow-wrap: break-word;"
+									>
+										<p style="margin: 0;">{timestamp.title}</p>
 										<span
 											class:primary={playerCurrentTime >= timestamp.time &&
 												(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
 											class="chip no-margin">{timestamp.timePretty}</span
 										>
 									</div>
+									<Share
+										shares={[
+											{
+												type: 'materialious',
+												path: resolve(`/watch/[videoId]?time=${Math.round(timestamp.time)}`, {
+													videoId: data.video.videoId
+												})
+											},
+											{
+												type: 'invidious',
+												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+											},
+											{
+												type: 'invidious redirect',
+												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+											},
+											{
+												type: 'youtube',
+												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+											}
+										]}
+										iconOnly={true}
+									/>
 								</li>
 							{/each}
 						</ul>
@@ -461,15 +491,17 @@
 			{#if data.playlistId && data.playlistId in $playlistCacheStore}
 				<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />
 			{:else if data.video.recommendedVideos}
-				{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
-					{#if !isItemFiltered(recommendedVideo)}
-						<article class="no-padding border">
-							{#key recommendedVideo.videoId}
-								<Thumbnail video={recommendedVideo} sideways={true} />
-							{/key}
-						</article>
-					{/if}
-				{/each}
+				{#key $filterContentListStore?.length}
+					{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
+						{#if !isItemFiltered(recommendedVideo)}
+							<article class="no-padding border">
+								{#key recommendedVideo.videoId}
+									<Thumbnail video={recommendedVideo} sideways={true} />
+								{/key}
+							</article>
+						{/if}
+					{/each}
+				{/key}
 			{/if}
 		</div>
 	{/if}
@@ -555,6 +587,10 @@
 
 	.video-placeholder {
 		height: 50vh;
+	}
+
+	.video-actions button {
+		margin-left: 0;
 	}
 
 	@media screen and (max-width: 1200px) {

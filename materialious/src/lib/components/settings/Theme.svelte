@@ -149,7 +149,7 @@
 
 <h5>{$_('layout.theme.borderRadius.borderRadius')}</h5>
 <div class="grid">
-	<div class="s3 m3 l3">
+	<div class="s6 m3 l3">
 		<button
 			onclick={() => {
 				interfaceBorderRadiusStore.set(0);
@@ -160,7 +160,7 @@
 			<p>{$_('layout.theme.borderRadius.none')}</p>
 		</button>
 	</div>
-	<div class="s3 m3 l3">
+	<div class="s6 m3 l3">
 		<button
 			onclick={() => {
 				interfaceBorderRadiusStore.set(0.25);
@@ -171,7 +171,7 @@
 			<p>{$_('layout.theme.borderRadius.slight')}</p>
 		</button>
 	</div>
-	<div class="s3 m3 l3">
+	<div class="s6 m3 l3">
 		<button
 			onclick={() => {
 				interfaceBorderRadiusStore.set(0.5);
@@ -182,7 +182,7 @@
 			<p>{$_('layout.theme.borderRadius.modern')}</p>
 		</button>
 	</div>
-	<div class="s3 m3 l3">
+	<div class="s6 m3 l3">
 		<button
 			onclick={() => {
 				interfaceBorderRadiusStore.set(1);

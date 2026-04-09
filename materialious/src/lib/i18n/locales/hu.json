@@ -69,7 +69,15 @@
             "darkMode": "Sötét mód",
             "lightMode": "Világos mód",
             "AmoledTheme": "Amoled téma",
-            "color": "Szín"
+            "color": "Szín",
+            "advanced": "Speciális témázás",
+            "borderRadius": {
+                "none": "Nincs",
+                "slight": "Enyhe",
+                "modern": "Modern",
+                "rounded": "Lekerekített",
+                "borderRadius": "Szegélysugár"
+            }
         },
         "searchSuggestions": "Keresési javaslatok",
         "previewVideoOnHover": "Videó előnézete az egérmutatóval",
@@ -160,7 +168,8 @@
             "exportSub": "Feliratkozások exportálása",
             "exportToClipboard": "Vágólapra másolás",
             "exportToFile": "Mentés fájlba",
-            "importFromFile": "Importálás fájlból"
+            "importFromFile": "Importálás fájlból",
+            "exportToShareUrl": "Exportálás megosztási webcímre"
         }
     },
     "enabled": "Engedélyezve",

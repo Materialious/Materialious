@@ -135,11 +135,13 @@
             "lightMode": "Heller Modus",
             "AmoledTheme": "Amoled-Thema",
             "color": "Farbe",
-            "advanced": "Erweitertes Themen",
+            "advanced": "Erweitertes Theming",
             "borderRadius": {
                 "none": "Keine",
                 "modern": "Modern",
-                "rounded": "Abgerundet"
+                "rounded": "Abgerundet",
+                "slight": "Leicht",
+                "borderRadius": "Eckenabrundung"
             }
         },
         "searchSuggestions": "Suchvorschläge",

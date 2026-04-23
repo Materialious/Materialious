@@ -6,7 +6,7 @@ import {
 } from '@capacitor-community/electron';
 import { USER_AGENT } from 'bgutils-js';
 import path from 'node:path';
-import chokidar from 'chokidar';
+import chokidar, { FSWatcher } from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';
 import {
 	app,
@@ -25,8 +25,12 @@ import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 
 // Define components for a watcher to detect when the webapp is changed so we can reload in Dev mode.
-const reloadWatcher = {
-	debouncer: null,
+const reloadWatcher: {
+  debouncer: undefined | ReturnType<typeof setTimeout>,
+  ready: boolean,
+  watcher: FSWatcher | null
+} = {
+	debouncer: undefined,
 	ready: false,
 	watcher: null
 };
@@ -46,7 +50,7 @@ export function setupReloadWatcher(electronCapacitorApp: ElectronCapacitorApp): 
 					electronCapacitorApp.getMainWindow().webContents.reload();
 					reloadWatcher.ready = false;
 					clearTimeout(reloadWatcher.debouncer);
-					reloadWatcher.debouncer = null;
+					reloadWatcher.debouncer = undefined;
 					reloadWatcher.watcher = null;
 					setupReloadWatcher(electronCapacitorApp);
 				}, 1500);
@@ -56,14 +60,14 @@ export function setupReloadWatcher(electronCapacitorApp: ElectronCapacitorApp): 
 
 // Define our class to manage our app.
 export class ElectronCapacitorApp {
-	private MainWindow: BrowserWindow | null = null;
-	private SplashScreen: CapacitorSplashScreen | null = null;
-	private TrayIcon: Tray | null = null;
+	private MainWindow: BrowserWindow | undefined = undefined;
+	private SplashScreen: CapacitorSplashScreen | undefined = undefined;
+	private TrayIcon: Tray  | undefined = undefined;
 	private CapacitorFileConfig: CapacitorElectronConfig;
 	private TrayMenuTemplate: (MenuItem | MenuItemConstructorOptions)[] = [
 		new MenuItem({ label: 'Quit App', role: 'quit' })
 	];
-	private mainWindowState;
+  private mainWindowState: windowStateKeeper.State | undefined = undefined;
 	private loadWebApp;
 	private customScheme: string;
 
@@ -93,7 +97,7 @@ export class ElectronCapacitorApp {
 
 	// Expose the mainWindow ref for use outside of the class.
 	getMainWindow(): BrowserWindow {
-		return this.MainWindow;
+		return this.MainWindow as BrowserWindow;
 	}
 
 	getCustomURLScheme(): string {
@@ -128,7 +132,7 @@ export class ElectronCapacitorApp {
 		});
 		this.mainWindowState.manage(this.MainWindow);
 
-		if (this.CapacitorFileConfig.backgroundColor) {
+		if (this.CapacitorFileConfig?.electron?.backgroundColor) {
 			this.MainWindow.setBackgroundColor(this.CapacitorFileConfig.electron.backgroundColor);
 		}
 
@@ -188,7 +192,7 @@ export class ElectronCapacitorApp {
 			this.loadMainWindow(this);
 		}
 		globalShortcut.register('Control+Shift+I', () => {
-			this.MainWindow.webContents.toggleDevTools();
+			this.MainWindow?.webContents.toggleDevTools();
     });
 		// Security
 		this.MainWindow.webContents.setWindowOpenHandler((details) => {
@@ -196,7 +200,7 @@ export class ElectronCapacitorApp {
 			return { action: 'deny' };
 		});
 		this.MainWindow.webContents.on('will-navigate', (event, _newURL) => {
-			if (!this.MainWindow.webContents.getURL().includes(this.customScheme)) {
+			if (!this.MainWindow?.webContents?.getURL().includes(this.customScheme)) {
 				event.preventDefault();
 			}
 		});
@@ -205,15 +209,15 @@ export class ElectronCapacitorApp {
 
 		// When the web app is loaded we hide the splashscreen if needed and show the mainwindow.
 		this.MainWindow.webContents.on('dom-ready', () => {
-			if (this.CapacitorFileConfig.electron?.splashScreenEnabled) {
+			if (this.CapacitorFileConfig.electron?.splashScreenEnabled && this.SplashScreen) {
 				this.SplashScreen.getSplashWindow().hide();
 			}
 			if (!this.CapacitorFileConfig.electron?.hideMainWindowOnLaunch) {
-				this.MainWindow.show();
+				this.MainWindow?.show();
 			}
 			setTimeout(() => {
 				if (electronIsDev) {
-					this.MainWindow.webContents.openDevTools();
+					this.MainWindow?.webContents?.openDevTools();
 				}
 				CapElectronEventEmitter.emit('CAPELECTRON_DeeplinkListenerInitialized', '');
 			}, 400);

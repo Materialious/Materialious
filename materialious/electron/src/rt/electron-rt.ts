@@ -33,11 +33,11 @@ Object.keys(plugins).forEach((pluginKey) => {
       // Events
       if (plugins[pluginKey][classKey].prototype instanceof EventEmitter) {
         const listeners: { [key: string]: { type: string; listener: (...args: any[]) => void } } = {};
-        const listenersOfTypeExist = (type) =>
+        const listenersOfTypeExist = (type: any) =>
           !!Object.values(listeners).find((listenerObj) => listenerObj.type === type);
 
         Object.assign(contextApi[classKey], {
-          addListener(type: string, callback: (...args) => void) {
+          addListener(type: string, callback: (...args: any[]) => void) {
             const id = randomId();
 
             // Deduplicate events
@@ -45,7 +45,7 @@ Object.keys(plugins).forEach((pluginKey) => {
               ipcRenderer.send(`event-add-${classKey}`, type);
             }
 
-            const eventHandler = (_, ...args) => callback(...args);
+            const eventHandler = (_: any, ...args: any[]) => callback(...args);
 
             ipcRenderer.addListener(`event-${classKey}-${type}`, eventHandler);
             listeners[id] = { type, listener: eventHandler };

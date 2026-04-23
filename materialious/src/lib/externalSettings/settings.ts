@@ -55,7 +55,8 @@ import {
 	filterContentUrlStore,
 	filterContentUrlAutoUpdateStore,
 	interfaceAdvancedThemingStore,
-	interfaceBorderRadiusStore
+	interfaceBorderRadiusStore,
+	interfacePreserveTranslation
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
@@ -290,6 +291,11 @@ export const persistedStores: PersistedStore<any>[] = [
 		name: 'borderRadius',
 		store: interfaceBorderRadiusStore,
 		schema: zNumber
+	},
+	{
+		name: 'preserveTranslation',
+		store: interfacePreserveTranslation,
+		schema: zBoolean
 	}
 ];
 

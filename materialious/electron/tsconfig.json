@@ -9,8 +9,8 @@
     "outDir": "./build",
     "importHelpers": true,
     "target": "ES2017",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
     "typeRoots": [
       "./node_modules/@types"

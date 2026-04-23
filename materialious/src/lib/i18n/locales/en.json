@@ -194,6 +194,7 @@
 		"deleteAccount": "Delete account",
 		"clickXmoreTimesToDelete": "Click {{clicksTillDelete}} more time(s) to delete",
 		"historyEnabled": "Save watch history",
+		"preserveTranslation": "Use original traslation",
 		"theme": {
 			"theme": "Theme",
 			"darkMode": "Dark mode",

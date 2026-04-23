@@ -20,7 +20,8 @@
 		iconOnly = true,
 		classes = 'surface-container-highest',
 		menuClasses = 'mobile no-wrap',
-		onShare = undefined
+		onShare = undefined,
+		style = ''
 	}: {
 		shares: ShareLink[];
 		includePromptText?: string;
@@ -28,6 +29,7 @@
 		classes?: string;
 		menuClasses?: string;
 		onShare?: (value: string) => void;
+		style?: string;
 	} = $props();
 
 	const shareBase = {
@@ -54,7 +56,7 @@
 	}
 </script>
 
-<button bind:this={shareButtonElement} class={classes}>
+<button bind:this={shareButtonElement} class={classes} {style}>
 	<i>share</i>
 	{#if !iconOnly}
 		<span>{$_('player.share.title')}</span>

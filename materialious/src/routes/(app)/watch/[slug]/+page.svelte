@@ -336,6 +336,7 @@
 							}
 						]}
 						iconOnly={true}
+						style="margin-left: 0;"
 					/>
 					{#if personalPlaylists && personalPlaylists.length > 0}
 						<button class="surface-container-highest">

@@ -271,6 +271,11 @@ export const interfaceBorderRadiusStore: Writable<number> = persist(
 	createStorage(),
 	'borderRadius'
 );
+export const interfacePreserveTranslation: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'preserveTranslation'
+);
 
 export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist(

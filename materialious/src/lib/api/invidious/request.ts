@@ -1,5 +1,10 @@
 import { getUserLocale } from '$lib/i18n';
-import { interfaceRegionStore, invidiousAuthStore, invidiousInstanceStore } from '$lib/store';
+import {
+	interfacePreserveTranslation,
+	interfaceRegionStore,
+	invidiousAuthStore,
+	invidiousInstanceStore
+} from '$lib/store';
 import { get } from 'svelte/store';
 
 export function buildPath(path: string): URL {
@@ -12,8 +17,10 @@ export function setLocale(url: URL): URL {
 		url.searchParams.set('region', region);
 	}
 
-	const locale = getUserLocale();
-	url.searchParams.set('hl', locale);
+	if (!get(interfacePreserveTranslation)) {
+		const locale = getUserLocale();
+		url.searchParams.set('hl', locale);
+	}
 
 	return url;
 }

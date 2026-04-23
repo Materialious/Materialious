@@ -206,7 +206,7 @@
 	{#each Object.entries(currentThemeColors) as [themeVar, themeColor] (themeVar)}
 		<div class="color-picker">
 			<ColorPicker
-				hex={themeColor}
+				hex={themeColor.toString()}
 				label={titleCase(themeVar.replaceAll('--', '').replaceAll('-', ' '))}
 				position="responsive"
 				textInputModes={['hex']}

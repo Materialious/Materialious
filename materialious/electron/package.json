@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.0",
+		"@types/jsdom": "^28.0.1",
 		"bgutils-js": "^3.2.0",
 		"chokidar": "~5.0.0",
 		"electron-is-dev": "~2.0.0",

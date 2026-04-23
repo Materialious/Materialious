@@ -6,7 +6,6 @@ import { Helpers, YTNodes } from 'youtubei.js';
 export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Playlist | undefined {
 	if (item.is(YTNodes.Video)) {
 		const views = extractNumber(item.view_count?.toString() || '');
-		console.log(item);
 		return {
 			type: 'video',
 			title: item.title.toString(),

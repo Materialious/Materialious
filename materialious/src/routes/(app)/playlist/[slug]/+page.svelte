@@ -7,29 +7,63 @@
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Share from '$lib/components/Share.svelte';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import type { VideoWatchHistory } from '$lib/api/model.js';
+	import { getWatchHistory } from '$lib/api/index.js';
 
 	let { data } = $props();
+
+	async function loadLastWatched() {
+		const videoIds = data.playlist.videos.map((video) => video.videoId);
+
+		let lastHistory: VideoWatchHistory[] = [];
+
+		let page = 0;
+		while (true) {
+			const historyPage = await getWatchHistory({ page, videoIds });
+
+			if (historyPage.length === 0) break;
+
+			lastHistory = historyPage;
+
+			page++;
+		}
+
+		if (lastHistory.length > 0) {
+			goto(
+				resolve(
+					$isAndroidTvStore
+						? `/tv/[videoId]?playlist=${data.playlist.info.playlistId}`
+						: `/watch/[videoId]?playlist=${data.playlist.info.playlistId}`,
+					{
+						videoId: lastHistory[0].videoId
+					}
+				)
+			);
+		} else {
+			goto(
+				resolve(
+					$isAndroidTvStore
+						? `/tv/[videoId]?playlist=${data.playlist.info.playlistId}`
+						: `/watch/[videoId]?playlist=${data.playlist.info.playlistId}`,
+					{
+						videoId: data.playlist.videos[0].videoId
+					}
+				)
+			);
+		}
+	}
 </script>
 
 <article class="border padding">
 	{#if data.playlist.videos.length > 0}
 		<nav>
-			<a
-				href={resolve(
-					$isAndroidTvStore
-						? `/tv/[playlistId]?playlist=${data.playlist.info.playlistId}`
-						: `/watch/[playlistId]?playlist=${data.playlist.info.playlistId}`,
-					{
-						playlistId: data.playlist.videos[0].videoId
-					}
-				)}
-				class="button circle extra no-margin"
-			>
+			<button onclick={loadLastWatched} class="button circle extra no-margin">
 				<i>play_arrow</i>
 				<div class="tooltip bottom">
 					{$_('playlist.playVideos')}
 				</div>
-			</a>
+			</button>
 
 			<a
 				href={resolve(

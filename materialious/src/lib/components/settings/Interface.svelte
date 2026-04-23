@@ -37,6 +37,8 @@
 		event.preventDefault();
 		invalidInstance = !(await setInvidiousInstance(invidiousInstance));
 
+		if (invalidInstance) return;
+
 		await timeout(100);
 		location.reload();
 	}

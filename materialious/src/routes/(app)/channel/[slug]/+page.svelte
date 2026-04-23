@@ -26,12 +26,26 @@
 
 	let displayContent: ChannelContent | undefined = $state(undefined);
 
+	let channelSearchDebounce: ReturnType<typeof setTimeout>;
+
 	onMount(() => {
 		displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
 	});
 
 	async function searchChannel() {
-		displayContent = await searchChannelContent(page.params.slug, channelSearch);
+		if (channelSearchDebounce) clearTimeout(channelSearchDebounce);
+
+		if (channelSearch.trim() === '') {
+			displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
+			return;
+		}
+
+		channelSearchDebounce = setTimeout(async () => {
+			displayContent = {
+				videos: await searchChannelContent(page.params.slug, channelSearch)
+			};
+			console.log(displayContent);
+		}, 200);
 	}
 
 	async function loadMore(event: InfiniteEvent) {
@@ -160,7 +174,7 @@
 	</div>
 
 	<div class="grid">
-		<div class="s12 m6 l6">
+		<div class="s12 m9 l9">
 			<nav class="group">
 				{#each sortByOptions as sortingOption (sortingOption)}
 					<button
@@ -179,9 +193,9 @@
 			</nav>
 		</div>
 		{#if !isYTBackend()}
-			<div class="s12 m6 l6">
+			<div class="s12 m3 l3">
 				{#if showSearch}
-					<div class="max field suffix prefix small no-margin surface-variant">
+					<div class="field suffix prefix suffix small no-margin surface-variant">
 						<i class="front">search</i><input
 							bind:value={channelSearch}
 							oninput={searchChannel}
@@ -206,7 +220,6 @@
 	{:else}
 		<ItemsList items={displayContent.playlists} />
 	{/if}
-
 	<InfiniteLoading on:infinite={loadMore} />
 {:else}
 	<PageLoading />

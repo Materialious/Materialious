@@ -1,5 +1,5 @@
 import { associateAvatar } from '$lib/thumbnail';
-import type { ChannelContent, ChannelOptions, ChannelPage } from '../model';
+import type { ChannelContent, ChannelOptions, ChannelPage, Video } from '../model';
 import { buildPath, fetchErrorHandle } from './request';
 
 export async function getChannelInvidious(
@@ -38,7 +38,7 @@ export async function searchChannelContentInvidious(
 	channelId: string,
 	search: string,
 	fetchOptions?: RequestInit
-): Promise<ChannelContent> {
+): Promise<Video[]> {
 	const path = buildPath(`channels/${channelId}/search`);
 	path.searchParams.set('q', search);
 

@@ -22,7 +22,7 @@
 		while (true) {
 			const historyPage = await getWatchHistory({ page, videoIds });
 
-			if (historyPage.length === 0) break;
+			if (historyPage.length === 0 || page > 999) break;
 
 			lastHistory = historyPage;
 

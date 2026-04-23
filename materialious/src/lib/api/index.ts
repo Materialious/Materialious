@@ -160,12 +160,10 @@ export async function searchChannelContent(
 	channelId: string,
 	search: string,
 	fetchOptions?: RequestInit
-): Promise<ChannelContent> {
+): Promise<Video[]> {
 	// Not Implemented in YTjs
 	if (isYTBackend()) {
-		return {
-			videos: []
-		};
+		return [];
 	}
 
 	return searchChannelContentInvidious(channelId, search, fetchOptions);

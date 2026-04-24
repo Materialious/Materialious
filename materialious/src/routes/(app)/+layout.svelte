@@ -96,7 +96,6 @@
 			method: 'POST',
 			body: body,
 			headers: {
-				__redirect: 'manual',
 				__custom_return: 'json-headers'
 			}
 		});

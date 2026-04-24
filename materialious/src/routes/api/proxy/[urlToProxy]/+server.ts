@@ -159,6 +159,7 @@ async function proxyRequest(
 	const responseHeaders = new Headers(response.headers);
 	responseHeaders.delete('content-encoding');
 	responseHeaders.delete('content-length');
+	responseHeaders.set('x-final-url', response.url);
 
 	return new Response(response.body, {
 		status: response.status,

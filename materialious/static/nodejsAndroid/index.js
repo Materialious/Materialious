@@ -27,7 +27,6 @@ const CORS_HEADERS = [
 	'Range',
 	'Referer',
 	'Cookie',
-	'__redirect',
 	'__custom_return',
 	'__sid_auth'
 ].join(', ');
@@ -40,6 +39,7 @@ function setCorsHeaders(res) {
 	res.setHeader('Access-Control-Allow-Origin', CORS_ORIGIN);
 	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 	res.setHeader('Access-Control-Allow-Headers', CORS_HEADERS);
+	res.setHeader('Access-Control-Expose-Headers', 'x-final-url');
 	res.setHeader('Access-Control-Max-Age', '86400');
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 }
@@ -50,8 +50,6 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 		return clientRes.end('Too many redirects');
 	}
 
-	const redirectAllowed = clientReq.headers.__redirect !== 'manual';
-	delete clientReq.headers.__redirect;
 	const returnHeadersAsJson = clientReq.headers.__custom_return === 'json-headers';
 	delete clientReq.headers.__custom_return;
 
@@ -88,19 +86,14 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 	}
 
 	const proxyReq = httpClient.request(parsedUrl, proxyOptions, (proxyRes) => {
-		// Handle redirects normally if redirectAllowed
-		if (
+		const isRedirect =
 			proxyRes.statusCode >= 300 &&
 			proxyRes.statusCode < 400 &&
-			proxyRes.headers.location &&
-			redirectAllowed
-		) {
-			proxyRes.resume(); // discard response data
-			const newUrl = new URL(proxyRes.headers.location, parsedUrl);
-			return proxyRequest(clientReq, clientRes, newUrl, bodyChunks, redirectCount + 1);
-		}
+			proxyRes.headers.location;
 
 		if (returnHeadersAsJson) {
+			// Used by the TV login flow to read upstream response headers as JSON.
+			proxyRes.resume();
 			const headersDict = {};
 			for (const [key, value] of Object.entries(proxyRes.headers)) {
 				headersDict[key] = value;
@@ -110,13 +103,15 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 
 			clientRes.writeHead(200, {
 				'Content-Type': 'application/json',
-				'Access-Control-Allow-Origin': CORS_ORIGIN,
-				'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-				'Access-Control-Allow-Headers': CORS_HEADERS,
-				'Access-Control-Allow-Credentials': 'true',
 				'Content-Length': Buffer.byteLength(body)
 			});
 			return clientRes.end(body);
+		}
+
+		if (isRedirect) {
+			proxyRes.resume();
+			const newUrl = new URL(proxyRes.headers.location, parsedUrl);
+			return proxyRequest(clientReq, clientRes, newUrl, bodyChunks, redirectCount + 1);
 		}
 
 		clientRes.writeHead(proxyRes.statusCode, {
@@ -124,9 +119,10 @@ function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirect
 			'Access-Control-Allow-Origin': CORS_ORIGIN,
 			'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 			'Access-Control-Allow-Headers': CORS_HEADERS,
-			'Access-Control-Allow-Credentials': 'true'
+			'Access-Control-Expose-Headers': 'x-final-url',
+			'Access-Control-Allow-Credentials': 'true',
+			'x-final-url': parsedUrl.href
 		});
-
 		proxyRes.pipe(clientRes);
 	});
 

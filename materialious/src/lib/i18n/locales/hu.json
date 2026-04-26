@@ -170,7 +170,8 @@
             "exportToFile": "Mentés fájlba",
             "importFromFile": "Importálás fájlból",
             "exportToShareUrl": "Exportálás megosztási webcímre"
-        }
+        },
+        "preserveTranslation": "Eredeti fordítás használata"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",

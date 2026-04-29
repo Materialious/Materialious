@@ -69,6 +69,9 @@ services:
       # Should be comma separated and be the base domain
       # e.g. "youtube.com,google.com" NOT "https://youtube.com,https://videos.google.com"
       WHITELIST_BASE_DOMAIN: ""
+  
+      # Specify a path to a certificate to trust, useful when using self-signed certificates.
+      PROXY_TRUST_CA: ""
 
       # Allow any domain in proxy
       # This shouldn't be used unless you KNOW what your doing

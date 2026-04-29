@@ -2,6 +2,8 @@ import { get } from 'svelte/store';
 import type { Image } from './api/model';
 import { invidiousInstanceStore } from './store';
 import { isYTBackend } from './misc';
+import { Capacitor } from '@capacitor/core';
+import { corsProxyUrl } from './fetchProxy';
 
 export class ImageCache {
 	private cache = new Map<string, HTMLImageElement>();
@@ -66,4 +68,12 @@ export function proxyGoogleImage(source: string): string {
 	if (typeof path === 'undefined') return '';
 
 	return `${get(invidiousInstanceStore)}/ggpht${path}`;
+}
+
+export function imageHandleCors(source: string): string {
+	if (Capacitor.getPlatform() === 'android') {
+		return corsProxyUrl + source;
+	}
+
+	return source;
 }

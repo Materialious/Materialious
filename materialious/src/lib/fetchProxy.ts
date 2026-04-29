@@ -4,7 +4,7 @@ import sodium from 'libsodium-wrappers-sumo';
 import { isOwnBackend } from './shared';
 
 export const originalFetch = window.fetch;
-const corsProxyUrl =
+export const corsProxyUrl =
 	Capacitor.getPlatform() === 'android'
 		? 'http://localhost:3000/'
 		: `${location.origin}/api/proxy/`;

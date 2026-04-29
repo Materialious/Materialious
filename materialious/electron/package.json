@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.16.25",
+	"version": "1.16.26",
 	"description": "Modern material design for YouTube and Invidious.",
 	"author": {
 		"name": "Ward Pearce",
@@ -31,12 +31,12 @@
 		"electron-unhandled": "^4.0.1",
 		"electron-updater": "^6.8.3",
 		"electron-window-state": "^5.0.3",
-		"jsdom": "^29.0.1",
+		"jsdom": "^29.1.0",
 		"jsonfile": "^6.2.1",
 		"youtubei.js": "^17.0.1"
 	},
 	"devDependencies": {
-		"electron": "^41.2.1",
+		"electron": "^41.3.0",
 		"electron-builder": "^26.0.12",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^6.0.3"

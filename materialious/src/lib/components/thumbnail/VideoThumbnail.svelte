@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestThumbnail } from '$lib/images';
+	import { getBestThumbnail, imageHandleCors } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
@@ -78,7 +78,7 @@
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
-		src: () => thumbnailSrc,
+		src: () => imageHandleCors(thumbnailSrc),
 		onLoadingStatusChange: () => {
 			if (thumbnailImageElement) thumbnailHeight = thumbnailImageElement.naturalHeight;
 		}

@@ -42,12 +42,8 @@ export const fetchProxied = async (
 	const nonProxiedUrl =
 		requestInput instanceof Request ? requestInput.url : requestInput.toString();
 
-	console.log('nonProxiedUrl', nonProxiedUrl);
-
 	if (needsProxying(nonProxiedUrl)) {
 		const proxiedUrl = corsProxyUrl + encodeUrl(nonProxiedUrl);
-
-		console.log('proxiedUrl', proxiedUrl);
 
 		if (requestInput instanceof Request) {
 			requestInput = new Request(proxiedUrl, {

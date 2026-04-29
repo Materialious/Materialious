@@ -1,6 +1,9 @@
 import { isOwnBackend } from '$lib/shared';
 import { env } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
+import { Agent } from 'undici';
+import fs from 'fs';
+import tls from 'tls';
 
 import { error } from '@sveltejs/kit';
 import { parse as tldParse } from 'tldts';
@@ -57,6 +60,19 @@ for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
 	if (dynamicDomain) {
 		dynamicAllowDomains.push(dynamicDomain.replace(/^https?:\/\//, ''));
 	}
+}
+
+let dispatcher: Agent;
+
+const certPath = privateEnv.PROXY_TRUST_CA;
+if (certPath && fs.existsSync(certPath)) {
+	dispatcher = new Agent({
+		connect: {
+			ca: [fs.readFileSync(certPath), ...tls.rootCertificates]
+		}
+	});
+} else {
+	dispatcher = new Agent();
 }
 
 async function proxyRequest(
@@ -145,7 +161,9 @@ async function proxyRequest(
 		response = await fetch(urlToProxyObj.toString(), {
 			...requestOptions,
 			body,
-			signal: AbortSignal.timeout(10000)
+			signal: AbortSignal.timeout(10000),
+			// @ts-expect-error Node-specific option
+			dispatcher
 		});
 	} catch (err) {
 		errorMsg = (err as any).toString();

@@ -70,7 +70,7 @@ services:
       # e.g. "youtube.com,google.com" NOT "https://youtube.com,https://videos.google.com"
       WHITELIST_BASE_DOMAIN: ""
   
-      # Add a certificate to trust, useful when using self-signed certificates.
+      # Specify a path to a certificate to trust, useful when using self-signed certificates.
       PROXY_TRUST_CA: ""
 
       # Allow any domain in proxy

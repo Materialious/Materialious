@@ -134,7 +134,15 @@
             "darkMode": "Dunkler Modus",
             "lightMode": "Heller Modus",
             "AmoledTheme": "Amoled-Thema",
-            "color": "Farbe"
+            "color": "Farbe",
+            "advanced": "Erweitertes Theming",
+            "borderRadius": {
+                "none": "Keine",
+                "modern": "Modern",
+                "rounded": "Abgerundet",
+                "slight": "Leicht",
+                "borderRadius": "Eckenabrundung"
+            }
         },
         "searchSuggestions": "Suchvorschläge",
         "previewVideoOnHover": "Video-Vorschau beim Hovern",
@@ -242,7 +250,8 @@
             "exportSub": "Abonnements exportieren",
             "exportToClipboard": "In die Zwischenablage exportieren",
             "exportToFile": "In eine Datei exportieren",
-            "importFromFile": "Von einer Datei importieren"
+            "importFromFile": "Von einer Datei importieren",
+            "exportToShareUrl": "Exportieren um URL zu teilen"
         }
     },
     "subscribe": "Abonnieren",

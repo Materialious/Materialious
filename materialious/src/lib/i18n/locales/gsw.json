@@ -70,7 +70,15 @@
             "darkMode": "Dunkle Modus",
             "lightMode": "Helle Modus",
             "AmoledTheme": "Amoled-Thema",
-            "color": "Farb"
+            "color": "Farb",
+            "advanced": "Erwiiterts Theming",
+            "borderRadius": {
+                "none": "Keini",
+                "slight": "Liecht",
+                "modern": "Modern",
+                "rounded": "Abgrundet",
+                "borderRadius": "Eggeabrundig"
+            }
         },
         "searchSuggestions": "Suechvorschläg",
         "previewVideoOnHover": "Video-Vorschau bim Hovere",
@@ -139,7 +147,8 @@
             "exportSub": "Abonnements exportiere",
             "exportToClipboard": "I d Zwüscheablaag exportiere",
             "exportToFile": "In e Datei exportiere",
-            "importFromFile": "Vonere Datei importiere"
+            "importFromFile": "Vonere Datei importiere",
+            "exportToShareUrl": "Exportiere zum d URL teile"
         }
     },
     "videos": "Videos",

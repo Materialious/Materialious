@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getBestThumbnail } from '$lib/images';
+	import { getBestThumbnail, imageHandleCors } from '$lib/images';
 	import { resolve } from '$app/paths';
 	import { letterCase } from '$lib/letterCasing';
 	import { _ } from '$lib/i18n';
@@ -23,7 +23,7 @@
 		thumbnailSrc = playlist.playlistThumbnail;
 	}
 
-	const thumbnail = new Avatar({ src: thumbnailSrc });
+	const thumbnail = new Avatar({ src: imageHandleCors(thumbnailSrc) });
 </script>
 
 <a href={playlistLink} style="width: 100%; overflow: hidden;min-height:100px;" class="wave">

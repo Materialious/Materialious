@@ -29,6 +29,7 @@
 	} from '../../store';
 	import { isOwnBackend } from '$lib/shared';
 	import ComboBox from '../ComboBox.svelte';
+	import { corsProxyUrl } from '$lib/fetchProxy';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 
@@ -59,9 +60,9 @@
 	interfaceAllowInsecureRequests.subscribe(async (isAllowed) => {
 		if (Capacitor.getPlatform() === 'android') {
 			if (isAllowed) {
-				await fetch('http://materialious__allow-insecure-requests');
+				await fetch(corsProxyUrl + 'allow-insecure-requests');
 			} else {
-				await fetch('http://materialious__deny-insecure-requests');
+				await fetch(corsProxyUrl + 'deny-insecure-requests');
 			}
 		} else if (Capacitor.getPlatform() === 'electron') {
 			await window.electronAPI.setAllowInsecureSSL(isAllowed);

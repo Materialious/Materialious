@@ -27,8 +27,11 @@ export function letterCase(text: string, caseTypeOverwrite?: TitleCase): string 
 			return text.toUpperCase();
 		case 'sentence case':
 			return sentenceCase(text);
-		default:
+		case 'title case':
 			return titleCase(text);
+		case 'original':
+		default:
+			return text;
 	}
 }
 

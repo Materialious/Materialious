@@ -51,19 +51,20 @@
 		try {
 			getDeArrow(video.videoId, { priority: 'low' }).then(async (deArrow) => {
 				for (const title of deArrow.titles) {
-					if (title.locked || title.votes > 0) {
+					if (title.locked || title.votes > 0 || !title.original) {
 						video.title = title.title.replace('>', '');
 						break;
 					}
 				}
 
 				for (const thumbnail of deArrow.thumbnails) {
-					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
-						if (thumbnail.timestamp !== null) {
-							thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
-								priority: 'low'
-							});
-						}
+					if (
+						thumbnail.timestamp !== null &&
+						(thumbnail.locked || thumbnail.votes > 0 || !thumbnail.original)
+					)  {
+						thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
+							priority: 'low'
+						});
 						break;
 					}
 				}

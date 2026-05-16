@@ -52,7 +52,10 @@
 			getDeArrow(video.videoId, { priority: 'low' }).then(async (deArrow) => {
 				for (const title of deArrow.titles) {
 					if (title.locked || title.votes > 0 || !title.original) {
-						video.title = title.title.replace('>', '');
+						video = {
+							...video,
+							title: title.title.replace('>', '')
+						};
 						break;
 					}
 				}

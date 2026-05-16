@@ -40,8 +40,27 @@
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
 	import { isItemFiltered } from '$lib/filtering/index';
-
+	import { getDeArrow } from '$lib/api/dearrow';
+	import { deArrowEnabledStore } from '$lib/store';
+	
 	let { data = $bindable() } = $props();
+
+	if (get(deArrowEnabledStore)) {
+		getDeArrow(data.video.videoId, { priority: 'low' }).then((deArrow) => {
+			for (const title of deArrow.titles) {
+				if (title.locked || title.votes > 0 || !title.original) {
+					data = {
+						...data,
+						video: {
+							...data.video,
+							title: title.title.replace('>', '')
+						}
+					};
+					break;
+				}
+			}
+		});
+	}
 
 	let playerElement: HTMLMediaElement | undefined = $state();
 

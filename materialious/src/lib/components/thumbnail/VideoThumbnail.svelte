@@ -195,7 +195,8 @@
 						{$_('layout.filter.addFilter')}
 					</span>
 					<menu class="max" data-ui="#hide-menu" id="hide-menu">
-						{#if 'authorId' in video}
+						{#if 'authorId' in video && video.authorId}
+							{@const authorId = video.authorId}
 							<li
 								onclick={() => {
 									$filterContentListStore?.push({
@@ -204,7 +205,7 @@
 											{
 												field: 'authorId',
 												operator: 'equals',
-												values: [video.authorId],
+												values: [authorId],
 												note: $_('layout.filter.channelFiltered', { authorName: video.author })
 											}
 										]

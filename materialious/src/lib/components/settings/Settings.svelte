@@ -9,11 +9,10 @@
 	import { rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
-	import { isUnrestrictedPlatform } from '$lib/misc';
+	import { isUnrestrictedPlatform, keyCodeMap } from '$lib/misc';
 	import { isOwnBackend } from '$lib/shared';
 	import InternalAccount from './InternalAccount.svelte';
-	import { Tabs } from 'melt/builders';
-	import { mergeAttrs } from 'melt';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import Filters from './Filters.svelte';
 	import ExportImport from './ExportImport.svelte';
 	import Theme from './Theme.svelte';
@@ -31,14 +30,29 @@
 		| 'export'
 		| 'theme';
 
-	const tabCategories: Tabs<TabCategories> = new Tabs({
-		value: 'interface',
-		orientation: 'vertical',
-		loop: true,
-		selectWhenFocused: true
-	});
+	let activeTab: TabCategories = $state('interface');
 
-	const isActive = (id: string) => tabCategories.value === id;
+	let triggerListElement: HTMLElement | undefined = $state();
+	let mobileTriggerListElement: HTMLElement | undefined = $state();
+
+	function handleTriggerKeyDown(event: KeyboardEvent, scope: HTMLElement | undefined) {
+		const keyCode = keyCodeMap[event.key];
+		if (!keyCode) return;
+
+		const currentFocus = (event.target as HTMLElement).closest(
+			'[id^="tab-trigger-"]'
+		) as HTMLElement;
+		const nextFocus = getNextFocus(currentFocus, keyCode, scope);
+
+		if (nextFocus && nextFocus.id) {
+			event.preventDefault();
+			const tabId = nextFocus.id.replace('tab-trigger-', '') as TabCategories;
+			activeTab = tabId;
+			nextFocus.focus();
+		}
+	}
+
+	const isActive = (id: string) => activeTab === id;
 
 	let mobileCategoriesButton: HTMLElement | undefined = $state();
 
@@ -117,7 +131,7 @@
 	<div style="height: 100%;">
 		<nav class="wrap s">
 			{#if tabs}
-				{@const currentTab = tabs.find((tab) => tab.id === tabCategories.value)}
+				{@const currentTab = tabs.find((tab) => tab.id === activeTab)}
 
 				{#if currentTab}
 					<button
@@ -131,15 +145,21 @@
 							style="width: 100%;"
 							data-ui="#tab-menu"
 							id="tab-menu"
-							{...tabCategories.triggerList}
+							bind:this={mobileTriggerListElement}
+							onkeydown={(e) => handleTriggerKeyDown(e, mobileTriggerListElement)}
+							role="tablist"
+							aria-orientation="vertical"
 						>
 							{#each tabs as tab (tab)}
 								<li
-									{...mergeAttrs(tabCategories.getTrigger(tab.id), {
-										onclick: () => {
-											mobileCategoriesButton?.click();
-										}
-									})}
+									id="tab-trigger-{tab.id}"
+									role="tab"
+									aria-selected={isActive(tab.id)}
+									tabindex="0"
+									onclick={() => {
+										activeTab = tab.id;
+										mobileCategoriesButton?.click();
+									}}
 								>
 									<i>{tab.icon}</i>
 									<span>{tab.label}</span>
@@ -158,13 +178,23 @@
 
 		<div class="grid">
 			<div class="s12 m4 l4 m l">
-				<div class="categories padding" {...tabCategories.triggerList}>
+				<div
+					class="categories padding"
+					bind:this={triggerListElement}
+					onkeydown={(e) => handleTriggerKeyDown(e, triggerListElement)}
+					role="tablist"
+					aria-orientation="vertical"
+				>
 					{#each tabs as tab (tab)}
 						<button
+							id="tab-trigger-{tab.id}"
 							class:active={isActive(tab.id)}
 							class:surface-container-lowest={isActive(tab.id)}
 							class:surface-container-highest={!isActive(tab.id)}
-							{...tabCategories.getTrigger(tab.id)}
+							role="tab"
+							aria-selected={isActive(tab.id)}
+							tabindex="0"
+							onclick={() => (activeTab = tab.id)}
 						>
 							<i>{tab.icon}</i>
 							<span>{tab.label}</span>
@@ -176,7 +206,7 @@
 			<div class="s12 m8 l8">
 				<div class="settings padding">
 					{#each tabs as tab (tab)}
-						<div {...tabCategories.getContent(tab.id)}>
+						<div role="tabpanel" aria-labelledby="tab-trigger-{tab.id}" hidden={!isActive(tab.id)}>
 							<tab.component />
 						</div>
 					{/each}

@@ -1,6 +1,7 @@
 import { getComments, getPersonalPlaylists, getVideo, saveWatchHistory } from '$lib/api/index';
 import { loadEntirePlaylist } from '$lib/playlist';
 import {
+	deArrowEnabledStore,
 	invidiousAuthStore,
 	playerProxyVideosStore,
 	playerState,
@@ -12,11 +13,13 @@ import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { _ } from './i18n';
 import { getDislikesRYD } from './api/ytd';
+import { getDeArrow } from './api/dearrow';
+import type { VideoPlay } from './api/model';
 
 export async function getWatchDetails(videoId: string, url: URL) {
 	const playerStateRetrieved = get(playerState);
 
-	let video;
+	let video: VideoPlay;
 
 	if (playerStateRetrieved && playerStateRetrieved.data.video.videoId === videoId) {
 		video = playerStateRetrieved.data.video;
@@ -63,6 +66,23 @@ export async function getWatchDetails(videoId: string, url: URL) {
 	const playlistId = url.searchParams.get('playlist');
 	if (playlistId) {
 		await loadEntirePlaylist(playlistId);
+	}
+
+	if (get(deArrowEnabledStore)) {
+		try {
+			const deArrow = await getDeArrow(videoId, { priority: 'low' });
+			for (const title of deArrow.titles) {
+				if (title.locked || title.votes > 0 || !title.original) {
+					video = {
+						...video,
+						title: title.title.replace('>', '')
+					};
+					break;
+				}
+			}
+		} catch {
+			// Continue regardless of error.
+		}
 	}
 
 	return {

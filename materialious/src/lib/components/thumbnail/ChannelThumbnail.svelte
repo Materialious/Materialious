@@ -7,6 +7,7 @@
 	import { truncate } from '$lib/misc';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
+	import { isAndroidTvStore } from '$lib/store';
 
 	interface Props {
 		channel: Channel;
@@ -42,6 +43,8 @@
 			{cleanNumber(channel.subCount)}
 			{$_('subscribers')}
 		</h6>
-		<p>{channel.description}</p>
+		{#if !$isAndroidTvStore}
+			<p>{truncate(channel.description, 24)}</p>
+		{/if}
 	</div>
 </a>

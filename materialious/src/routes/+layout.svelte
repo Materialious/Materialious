@@ -155,12 +155,12 @@
 		<style>
 			not(.item-select):focus {
 				outline: 2px solid var(--primary);
-				box-shadow: none !important;
+				box-shadow: none;
 			}
 
 			.item-select:focus {
-				outline: none !important;
-				box-shadow: none !important;
+				outline: none;
+				box-shadow: none;
 			}
 		</style>
 	{:else}

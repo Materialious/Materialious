@@ -32,6 +32,18 @@
 
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
 
+	function getRelativePublished() {
+		if (!('published' in video)) return '';
+		return video.published && video.published !== 0
+			? relativeTimestamp(
+					typeof video.published === 'string'
+						? new Date(video.published).getTime()
+						: video.published * 1000,
+					false
+				)
+			: video.publishedText;
+	}
+
 	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
 		videoId: video.videoId
 	});
@@ -51,19 +63,23 @@
 		try {
 			getDeArrow(video.videoId, { priority: 'low' }).then(async (deArrow) => {
 				for (const title of deArrow.titles) {
-					if (title.locked || title.votes > 0) {
-						video.title = title.title.replace('>', '');
+					if (title.locked || title.votes > 0 || !title.original) {
+						video = {
+							...video,
+							title: title.title.replace('>', '')
+						};
 						break;
 					}
 				}
 
 				for (const thumbnail of deArrow.thumbnails) {
-					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
-						if (thumbnail.timestamp !== null) {
-							thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
-								priority: 'low'
-							});
-						}
+					if (
+						thumbnail.timestamp !== null &&
+						(thumbnail.locked || thumbnail.votes > 0 || !thumbnail.original)
+					) {
+						thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
+							priority: 'low'
+						});
 						break;
 					}
 				}
@@ -191,7 +207,8 @@
 						{$_('layout.filter.addFilter')}
 					</span>
 					<menu class="max" data-ui="#hide-menu" id="hide-menu">
-						{#if 'authorId' in video}
+						{#if 'authorId' in video && video.authorId}
+							{@const authorId = video.authorId}
 							<li
 								onclick={() => {
 									$filterContentListStore?.push({
@@ -200,7 +217,7 @@
 											{
 												field: 'authorId',
 												operator: 'equals',
-												values: [video.authorId],
+												values: [authorId],
 												note: $_('layout.filter.channelFiltered', { authorName: video.author })
 											}
 										]
@@ -355,21 +372,19 @@
 							{/if}
 
 							{#if 'published' in video}
-								<span>
-									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
-									•
-									{video.published && video.published !== 0
-										? relativeTimestamp(
-												typeof video.published === 'string'
-													? new Date(video.published).getTime()
-													: video.published * 1000,
-												false
-											)
-										: video.publishedText}
-								</span>
+								{#if $isAndroidTvStore}
+									<span>{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}</span>
+									<span>{getRelativePublished()}</span>
+								{:else}
+									<span>
+										{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+										•
+										{getRelativePublished()}
+									</span>
+								{/if}
 							{/if}
 						</div>
-						{#if !sideways}
+						{#if !sideways && !$isAndroidTvStore}
 							<button
 								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
 								class="transparent circle"

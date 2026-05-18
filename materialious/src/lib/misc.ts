@@ -132,3 +132,10 @@ export function downloadStringAsFile(content: string, filename: string) {
 	document.body.removeChild(a);
 	URL.revokeObjectURL(url);
 }
+
+export const keyCodeMap: Record<string, number> = {
+	ArrowLeft: 37,
+	ArrowRight: 39,
+	ArrowUp: 38,
+	ArrowDown: 40
+};

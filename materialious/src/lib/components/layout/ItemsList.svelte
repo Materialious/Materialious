@@ -4,7 +4,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, type FeedItems } from '$lib/feed';
-	import { isMobile, timeout } from '$lib/misc';
+	import { isMobile, keyCodeMap, timeout } from '$lib/misc';
 	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
@@ -23,14 +23,13 @@
 	let gridElement: HTMLElement;
 	let focusedItemId: string | undefined = $state(undefined);
 
-	const keyCodeMap: Record<string, number> = {
-		ArrowLeft: 37,
-		ArrowRight: 39,
-		ArrowUp: 38,
-		ArrowDown: 40
-	};
-
 	function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Enter' && focusedItemId) {
+			event.preventDefault();
+			handleItemSelect(focusedItemId);
+			return;
+		}
+
 		const keyCode = keyCodeMap[event.key];
 		if (!keyCode) return;
 
@@ -57,12 +56,10 @@
 		feedLastItemId.set(uniqueItemId);
 		focusedItemId = uniqueItemId;
 
-		if ($isAndroidTvStore) goToItem(uniqueItemId);
+		goToItem(uniqueItemId);
 	}
 
 	onMount(async () => {
-		window.addEventListener('keydown', handleKeyDown);
-
 		if ($feedLastItemId) {
 			const element = document.getElementById($feedLastItemId);
 
@@ -85,10 +82,6 @@
 
 			feedLastItemId.set(undefined);
 		}
-	});
-
-	onDestroy(() => {
-		window.removeEventListener('keydown', handleKeyDown);
 	});
 </script>
 

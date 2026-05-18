@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { feedLastItemId, filterContentListStore, isAndroidTvStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, type FeedItems } from '$lib/feed';
 	import { isMobile, timeout } from '$lib/misc';
@@ -9,8 +9,7 @@
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
 	import NoResults from '$lib/components/NoResults.svelte';
-	import { SpatialMenu } from 'melt/builders';
-	import { mergeAttrs } from 'melt';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import { isItemFiltered } from '$lib/filtering/index';
 
 	interface Props {
@@ -21,28 +20,28 @@
 
 	let { items = [], playlistId = '', classes = 'page right active' }: Props = $props();
 
-	onMount(async () => {
-		if (!$feedLastItemId) return;
+	let gridElement: HTMLElement;
+	let focusedItemId: string | undefined = $state(undefined);
 
-		const element = document.getElementById($feedLastItemId);
+	const keyCodeMap: Record<string, number> = {
+		ArrowLeft: 37,
+		ArrowRight: 39,
+		ArrowUp: 38,
+		ArrowDown: 40
+	};
 
-		if (element) {
-			await timeout(100);
+	function handleKeyDown(event: KeyboardEvent) {
+		const keyCode = keyCodeMap[event.key];
+		if (!keyCode) return;
 
-			element.scrollIntoView({
-				behavior: 'instant',
-				block: 'start',
-				inline: 'nearest'
-			});
+		const nextFocus = getNextFocus(event.target as Element, keyCode, gridElement);
 
-			const lastItem = items.find((item) => extractUniqueId(item) === $feedLastItemId);
-			if (lastItem) {
-				spatialMenu.highlighted = lastItem;
-			}
+		if (nextFocus) {
+			event.preventDefault();
+			nextFocus.focus();
+			focusedItemId = nextFocus.id;
 		}
-
-		feedLastItemId.set(undefined);
-	});
+	}
 
 	function goToItem(uniqueItemId: string) {
 		const articleElement = document.getElementById(uniqueItemId);
@@ -54,10 +53,42 @@
 		}
 	}
 
-	const spatialMenu = new SpatialMenu({
-		wrap: false,
-		crossAxis: false,
-		scrollBehavior: 'instant'
+	function handleItemSelect(uniqueItemId: string) {
+		feedLastItemId.set(uniqueItemId);
+		focusedItemId = uniqueItemId;
+
+		if ($isAndroidTvStore) goToItem(uniqueItemId);
+	}
+
+	onMount(async () => {
+		window.addEventListener('keydown', handleKeyDown);
+
+		if ($feedLastItemId) {
+			const element = document.getElementById($feedLastItemId);
+
+			if (element) {
+				await timeout(100);
+
+				element.scrollIntoView({
+					behavior: 'instant',
+					block: 'start',
+					inline: 'nearest'
+				});
+
+				focusedItemId = $feedLastItemId;
+				await timeout(0);
+				const focusable = element.querySelector('a, button, [tabindex]');
+				if (focusable instanceof HTMLElement) {
+					focusable.focus();
+				}
+			}
+
+			feedLastItemId.set(undefined);
+		}
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('keydown', handleKeyDown);
 	});
 </script>
 
@@ -65,31 +96,25 @@
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
-	<div class="grid" {...spatialMenu.root}>
+	<div
+		class="grid"
+		bind:this={gridElement}
+		onkeydown={handleKeyDown}
+		role="navigation"
+		tabindex="-1"
+	>
 		{#key $filterContentListStore?.length}
 			{#each items as item, index (index)}
 				{#if !isItemFiltered(item)}
 					{@const uniqueItemId = extractUniqueId(item)}
-					{@const spatialItem = spatialMenu.getItem(item, {
-						onSelect: () => {
-							feedLastItemId.set(uniqueItemId);
-
-							if ($isAndroidTvStore) goToItem(uniqueItemId);
-						}
-					})}
 					<ContentColumn>
 						<article
-							{...mergeAttrs(spatialItem.attrs, {
-								onclick: () => {
-									feedLastItemId.set(uniqueItemId);
-
-									if ($isAndroidTvStore) goToItem(uniqueItemId);
-								},
-								id: uniqueItemId
-							})}
+							onclick={() => handleItemSelect(uniqueItemId)}
+							id={uniqueItemId}
 							class="no-padding item-select border"
-							class:item-select-focused={!isMobile() && spatialItem.highlighted}
+							class:item-select-focused={!isMobile() && focusedItemId === uniqueItemId}
 							style="height: 100%;"
+							tabindex="0"
 						>
 							{#if item.type === 'video' || item.type === 'shortVideo' || item.type === 'stream' || item.type === 'historyVideo'}
 								{#key item.videoId}
@@ -126,7 +151,7 @@
 		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		z-index: 10;
 		position: relative;
-		outline: 1px solid var(--primary);
+		outline: 1px solid var(--primary) !important;
 	}
 
 	.grid:focus {

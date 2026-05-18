@@ -88,7 +88,7 @@
 <div
 	onkeydown={handleKeyDown}
 	class={classes}
-	class:item-container={!isMobile() && !$isAndroidTvStore}
+	class:item-container={!isMobile() || $isAndroidTvStore}
 >
 	{#if items.length === 0}
 		<NoResults />

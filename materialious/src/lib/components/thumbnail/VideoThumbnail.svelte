@@ -32,6 +32,18 @@
 
 	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
 
+	function getRelativePublished() {
+		if (!('published' in video)) return '';
+		return video.published && video.published !== 0
+			? relativeTimestamp(
+					typeof video.published === 'string'
+						? new Date(video.published).getTime()
+						: video.published * 1000,
+					false
+				)
+			: video.publishedText;
+	}
+
 	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
 		videoId: video.videoId
 	});
@@ -64,7 +76,7 @@
 					if (
 						thumbnail.timestamp !== null &&
 						(thumbnail.locked || thumbnail.votes > 0 || !thumbnail.original)
-					)  {
+					) {
 						thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
 							priority: 'low'
 						});
@@ -360,21 +372,19 @@
 							{/if}
 
 							{#if 'published' in video}
-								<span>
-									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
-									•
-									{video.published && video.published !== 0
-										? relativeTimestamp(
-												typeof video.published === 'string'
-													? new Date(video.published).getTime()
-													: video.published * 1000,
-												false
-											)
-										: video.publishedText}
-								</span>
+								{#if $isAndroidTvStore}
+									<span>{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}</span>
+									<span>{getRelativePublished()}</span>
+								{:else}
+									<span>
+										{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
+										•
+										{getRelativePublished()}
+									</span>
+								{/if}
 							{/if}
 						</div>
-						{#if !sideways}
+						{#if !sideways && !$isAndroidTvStore}
 							<button
 								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
 								class="transparent circle"

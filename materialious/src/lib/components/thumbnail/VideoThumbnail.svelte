@@ -51,19 +51,23 @@
 		try {
 			getDeArrow(video.videoId, { priority: 'low' }).then(async (deArrow) => {
 				for (const title of deArrow.titles) {
-					if (title.locked || title.votes > 0) {
-						video.title = title.title.replace('>', '');
+					if (title.locked || title.votes > 0 || !title.original) {
+						video = {
+							...video,
+							title: title.title.replace('>', '')
+						};
 						break;
 					}
 				}
 
 				for (const thumbnail of deArrow.thumbnails) {
-					if (thumbnail.locked || thumbnail.original || thumbnail.votes > 0) {
-						if (thumbnail.timestamp !== null) {
-							thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
-								priority: 'low'
-							});
-						}
+					if (
+						thumbnail.timestamp !== null &&
+						(thumbnail.locked || thumbnail.votes > 0 || !thumbnail.original)
+					)  {
+						thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
+							priority: 'low'
+						});
 						break;
 					}
 				}
@@ -191,7 +195,8 @@
 						{$_('layout.filter.addFilter')}
 					</span>
 					<menu class="max" data-ui="#hide-menu" id="hide-menu">
-						{#if 'authorId' in video}
+						{#if 'authorId' in video && video.authorId}
+							{@const authorId = video.authorId}
 							<li
 								onclick={() => {
 									$filterContentListStore?.push({
@@ -200,7 +205,7 @@
 											{
 												field: 'authorId',
 												operator: 'equals',
-												values: [video.authorId],
+												values: [authorId],
 												note: $_('layout.filter.channelFiltered', { authorName: video.author })
 											}
 										]

@@ -85,17 +85,15 @@
 	});
 </script>
 
-<div class={classes} class:item-container={!isMobile() && !$isAndroidTvStore}>
+<div
+	onkeydown={handleKeyDown}
+	class={classes}
+	class:item-container={!isMobile() && !$isAndroidTvStore}
+>
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
-	<div
-		class="grid"
-		bind:this={gridElement}
-		onkeydown={handleKeyDown}
-		role="navigation"
-		tabindex="-1"
-	>
+	<div class="grid" bind:this={gridElement} role="navigation" tabindex="-1">
 		{#key $filterContentListStore?.length}
 			{#each items as item, index (index)}
 				{#if !isItemFiltered(item)}
@@ -105,7 +103,8 @@
 							onclick={() => handleItemSelect(uniqueItemId)}
 							id={uniqueItemId}
 							class="no-padding item-select border"
-							class:item-select-focused={!isMobile() && focusedItemId === uniqueItemId}
+							class:item-select-focused={(!isMobile() || $isAndroidTvStore) &&
+								focusedItemId === uniqueItemId}
 							style="height: 100%;"
 							tabindex="0"
 						>

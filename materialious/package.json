@@ -89,7 +89,7 @@
 		"papaparse": "^5.5.3",
 		"pg": "^8.20.0",
 		"pg-hstore": "^2.3.4",
-		"safe-regex2": "^5.1.0",
+		"safe-regex2": "^5.1.1",
 		"sequelize": "^6.37.8",
 		"shaka-player": "^4.16.14",
 		"sponsorblock-api": "^0.2.4",

@@ -85,7 +85,11 @@
     
     
     
-    <release version="1.16.26" date="2026-4-30">
+    
+    <release version="1.16.27" date="2026-5-18">
+      <url>https://github.com/Materialious/Materialious/releases/tag/1.16.27</url>
+    </release>
+<release version="1.16.26" date="2026-4-30">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.16.26</url>
     </release>
 <release version="1.16.25" date="2026-4-23">

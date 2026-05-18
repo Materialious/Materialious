@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { feedLastItemId, filterContentListStore, isAndroidTvStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, type FeedItems } from '$lib/feed';
 	import { isMobile, keyCodeMap, timeout } from '$lib/misc';

@@ -190,6 +190,12 @@ export interface PlayerState {
 }
 
 export const playerState: Writable<PlayerState | undefined> = writable(undefined);
+
+export interface SleepTimerState {
+	duration: number;
+	remaining: number;
+}
+export const sleepTimerStore = writable<SleepTimerState | undefined>(undefined);
 export const playerTheatreModeIsActive = writable(false);
 
 export const returnYtDislikesStore = persist(writable(false), createStorage(), 'returnYtDislikes');

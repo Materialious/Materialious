@@ -23,7 +23,9 @@
 		playerTheatreModeIsActive,
 		playlistCacheStore,
 		type PlayerState,
-		filterContentListStore
+		type SleepTimerState,
+		filterContentListStore,
+		sleepTimerStore
 	} from '$lib/store';
 	import ui from 'beercss';
 	import { onDestroy, onMount, tick } from 'svelte';
@@ -88,6 +90,14 @@
 		if (data.playlistId) {
 			await goToCurrentPlaylistItem();
 			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
+
+			if ($sleepTimerStore && $sleepTimerStore.remaining > 0) {
+				pauseTimerSeconds = $sleepTimerStore.duration;
+				pauseTimerRemaining = $sleepTimerStore.remaining;
+				setPauseTimer();
+			}
+		} else {
+			sleepTimerStore.set(undefined);
 		}
 
 		if ($interfaceAutoExpandChapters) {
@@ -136,6 +146,10 @@
 	onDestroy(() => {
 		// Reset title when page left.
 		document.title = 'Materialious';
+
+		if (data.playlistId && pauseTimerSeconds > 0) {
+			sleepTimerStore.set({ duration: pauseTimerSeconds, remaining: pauseTimerRemaining });
+		}
 
 		clearPauseTimer();
 
@@ -230,16 +244,15 @@
 		if (pauseTimeout) clearTimeout(pauseTimeout);
 		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
 
-		pauseTimerRemaining = pauseTimerSeconds;
-
-		if (pauseTimerSeconds > 0) {
+		if (pauseTimerRemaining > 0) {
 			pauseTimeout = setTimeout(() => {
 				playerElement?.pause();
 				addToast({ data: { text: $_('player.pauseTimerFinished'), icon: 'snooze' } });
 				pauseTimerSeconds = 0;
 				pauseTimerRemaining = 0;
 				if (pauseTimerInterval) clearInterval(pauseTimerInterval);
-			}, pauseTimerSeconds * 1000);
+				sleepTimerStore.set(undefined);
+			}, pauseTimerRemaining * 1000);
 
 			pauseTimerInterval = setInterval(() => {
 				pauseTimerRemaining = Math.max(0, pauseTimerRemaining - 1);
@@ -542,64 +555,86 @@
 
 		<div class="space"></div>
 
-		<nav class="group wrap">
-			<button
-				onclick={() => {
-					pauseTimerSeconds = 300;
-					setPauseTimer();
-				}}
-				class:primary={pauseTimerSeconds === 300}
-				class="left-round">5 min</button
-			>
-			<button
-				onclick={() => {
-					pauseTimerSeconds = 600;
-					setPauseTimer();
-				}}
-				class:primary={pauseTimerSeconds === 600}
-				class="no-round">10 min</button
-			>
-			<button
-				onclick={() => {
-					pauseTimerSeconds = 1800;
-					setPauseTimer();
-				}}
-				class:primary={pauseTimerSeconds === 1800}
-				class="no-round">30 min</button
-			>
-			<button
-				onclick={() => {
-					pauseTimerSeconds = 3600;
-					setPauseTimer();
-				}}
-				class:primary={pauseTimerSeconds === 3600}
-				class="no-round">1 hr</button
-			>
-			<button
-				onclick={() => {
-					pauseTimerSeconds = 7200;
-					setPauseTimer();
-				}}
-				class:primary={pauseTimerSeconds === 7200}
-				class="right-round">2 hr</button
-			>
-		</nav>
-
-		<div class="space"></div>
-
-		<nav class="wrap">
-			{#if pauseTimerSeconds > 0}
+		<div class="grid" style="gap: 0.5em;">
+			<div class="s4 m4 l4">
+				<button
+					onclick={() => {
+						pauseTimerSeconds = 300;
+						pauseTimerRemaining = pauseTimerSeconds;
+						setPauseTimer();
+						ui('#pause-timer');
+					}}
+					class:primary={pauseTimerSeconds === 300}
+					class="max"
+					style="width: 100%; padding: 0.75em 0;">5 min</button
+				>
+			</div>
+			<div class="s4 m4 l4">
+				<button
+					onclick={() => {
+						pauseTimerSeconds = 600;
+						pauseTimerRemaining = pauseTimerSeconds;
+						setPauseTimer();
+						ui('#pause-timer');
+					}}
+					class:primary={pauseTimerSeconds === 600}
+					class="max"
+					style="width: 100%; padding: 0.75em 0;">10 min</button
+				>
+			</div>
+			<div class="s4 m4 l4">
+				<button
+					onclick={() => {
+						pauseTimerSeconds = 1800;
+						pauseTimerRemaining = pauseTimerSeconds;
+						setPauseTimer();
+						ui('#pause-timer');
+					}}
+					class:primary={pauseTimerSeconds === 1800}
+					class="max"
+					style="width: 100%; padding: 0.75em 0;">30 min</button
+				>
+			</div>
+			<div class="s4 m4 l4">
+				<button
+					onclick={() => {
+						pauseTimerSeconds = 3600;
+						pauseTimerRemaining = pauseTimerSeconds;
+						setPauseTimer();
+						ui('#pause-timer');
+					}}
+					class:primary={pauseTimerSeconds === 3600}
+					class="max"
+					style="width: 100%; padding: 0.75em 0;">1 hr</button
+				>
+			</div>
+			<div class="s4 m4 l4">
+				<button
+					onclick={() => {
+						pauseTimerSeconds = 7200;
+						pauseTimerRemaining = pauseTimerSeconds;
+						setPauseTimer();
+						ui('#pause-timer');
+					}}
+					class:primary={pauseTimerSeconds === 7200}
+					class="max"
+					style="width: 100%; padding: 0.75em 0;">2 hr</button
+				>
+			</div>
+			<div class="s4 m4 l4">
 				<button
 					onclick={() => {
 						clearPauseTimer();
+						sleepTimerStore.set(undefined);
+						ui('#pause-timer');
 					}}
-					class="secondary max"
+					class="max"
+					style="width: 100%; padding: 0.75em 0;"
 				>
 					<i>delete</i>
-					<span>{$_('player.pauseTimerClear')}</span>
 				</button>
-			{/if}
-		</nav>
+			</div>
+		</div>
 	</div>
 </dialog>
 

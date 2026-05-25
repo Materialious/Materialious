@@ -61,5 +61,67 @@ export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Pla
 			videoCount: 0,
 			videos: []
 		};
+	} else if (item.is(YTNodes.LockupView) && item.content_type === 'VIDEO') {
+		let author = '';
+		let publishedText = '';
+		let viewCountText = '';
+		const rows = item.metadata?.metadata?.metadata_rows;
+		if (rows) {
+			for (const row of rows) {
+				if (!row.metadata_parts) continue;
+				for (const part of row.metadata_parts) {
+					const text = part.text?.text ?? '';
+					if (!text) continue;
+					if (/\bago\b/i.test(text)) {
+						publishedText = text;
+					} else if (/^[\d.]+[KMBkmb]?\s*view/i.test(text)) {
+						viewCountText = text;
+					} else if (!author) {
+						author = text;
+					}
+				}
+			}
+		}
+
+		const authorId =
+			item.metadata?.image?.renderer_context?.command_context?.on_tap?.payload?.browseId || '';
+
+		let lengthSeconds = 0;
+		if (item.content_image?.is(YTNodes.ThumbnailView)) {
+			item.content_image.overlays.forEach((overlay) => {
+				if (overlay.is(YTNodes.ThumbnailBottomOverlayView)) {
+					overlay.badges.forEach((badge) => {
+						if (
+							badge.is(YTNodes.ThumbnailBadgeView) &&
+							badge.badge_style === 'THUMBNAIL_OVERLAY_BADGE_STYLE_DEFAULT'
+						) {
+							lengthSeconds = convertToSeconds(badge.text);
+						}
+					});
+				}
+			});
+		}
+
+		return {
+			type: 'video',
+			title: item.metadata?.title.toString() ?? '',
+			videoId: item.content_id,
+			viewCountText: viewCountText,
+			videoThumbnails: (item.content_image?.is(YTNodes.ThumbnailView)
+				? item.content_image.image
+				: []) as Thumbnail[],
+			published: 0,
+			publishedText,
+			description: '',
+			descriptionHtml: '',
+			authorUrl: `/channel/${authorId}`,
+			authorId,
+			authorVerified: false,
+			liveNow: false,
+			isUpcoming: false,
+			premium: false,
+			author,
+			lengthSeconds
+		};
 	}
 }

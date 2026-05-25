@@ -21,6 +21,7 @@
 	} from '$lib/externalSettings';
 	import { downloadStringAsFile } from '$lib/misc';
 	import { zNumber, zThemeColors } from '$lib/externalSettings/settings';
+	import { Capacitor } from '@capacitor/core';
 
 	async function importInvidiousSubs() {
 		const importedSubs = await getSubscriptionsInvidious();
@@ -72,59 +73,61 @@
 	}
 </script>
 
-<h3>{$_('pages.subscriptions')}</h3>
-<div class="space"></div>
+{#if ($invidiousAuthStore && $backendInUseStore === 'ivg') || $backendInUseStore === 'yt'}
+	<h3>{$_('pages.subscriptions')}</h3>
+	<div class="space"></div>
 
-<div>
-	<button class="surface-container-highest">
-		<i>attach_file</i>
-		<span>{$_('layout.export.importSub')}</span>
-	</button>
-	<input
-		onchange={async (event: Event) => {
-			const files = (event.target as HTMLInputElement).files;
-			if (files?.length === 0 || !files) return;
+	<div>
+		<button class="surface-container-highest">
+			<i>attach_file</i>
+			<span>{$_('layout.export.importSub')}</span>
+		</button>
+		<input
+			onchange={async (event: Event) => {
+				const files = (event.target as HTMLInputElement).files;
+				if (files?.length === 0 || !files) return;
 
-			addToast({
-				data: {
-					text: $_('layout.export.importing')
-				},
-				id: 'importing-toast',
-				closeDelay: 0
-			});
+				addToast({
+					data: {
+						text: $_('layout.export.importing')
+					},
+					id: 'importing-toast',
+					closeDelay: 0
+				});
 
-			await importSubscriptionsFromFile(files[0]);
+				await importSubscriptionsFromFile(files[0]);
 
-			toaster.removeToast('importing-toast');
+				toaster.removeToast('importing-toast');
 
-			addToast({
-				data: {
-					text: $_('layout.export.importingCompleted')
-				}
-			});
-		}}
-		accept=".json,.opml,.csv,.db"
-		type="file"
-	/>
-</div>
-<p><i>info</i> {$_('layout.export.importSubSupported')}</p>
+				addToast({
+					data: {
+						text: $_('layout.export.importingCompleted')
+					}
+				});
+			}}
+			accept=".json,.opml,.csv,.db"
+			type="file"
+		/>
+	</div>
+	<p><i>info</i> {$_('layout.export.importSubSupported')}</p>
 
-<div class="space"></div>
+	<div class="space"></div>
 
-<div>
-	<button class="surface-container-highest">
-		<i>file_export</i>
-		<span>{$_('layout.export.exportSub')}</span>
-	</button>
-	<menu>
-		<li role="presentation" onclick={() => exportSubscriptionsAsFile('InvidiousJSON')}>
-			Invidious JSON
-		</li>
-		<li role="presentation" onclick={() => exportSubscriptionsAsFile('OPML')}>
-			FreeTube/NewPipe/YouTube OPML
-		</li>
-	</menu>
-</div>
+	<div>
+		<button class="surface-container-highest">
+			<i>file_export</i>
+			<span>{$_('layout.export.exportSub')}</span>
+		</button>
+		<menu>
+			<li role="presentation" onclick={() => exportSubscriptionsAsFile('InvidiousJSON')}>
+				Invidious JSON
+			</li>
+			<li role="presentation" onclick={() => exportSubscriptionsAsFile('OPML')}>
+				FreeTube/NewPipe/YouTube OPML
+			</li>
+		</menu>
+	</div>
+{/if}
 
 {#if $invidiousAuthStore && $invidiousInstanceStore && $backendInUseStore === 'yt'}
 	<div class="space"></div>
@@ -193,36 +196,37 @@
 
 <h3>{$_('layout.theme.theme')}</h3>
 <div class="space"></div>
-<button
-	class="no-margin surface-container-highest"
-	onclick={async () => {
-		await Clipboard.write({
-			string: bookmarkletSaveToUrl([
-				{
-					name: 'advancedTheming',
-					store: interfaceAdvancedThemingStore,
-					schema: zThemeColors,
-					serialize: JSON.stringify
-				},
-				{
-					name: 'borderRadius',
-					store: interfaceBorderRadiusStore,
-					schema: zNumber
+{#if Capacitor.getPlatform() === 'web'}
+	<button
+		class="no-margin surface-container-highest"
+		onclick={async () => {
+			await Clipboard.write({
+				string: bookmarkletSaveToUrl([
+					{
+						name: 'advancedTheming',
+						store: interfaceAdvancedThemingStore,
+						schema: zThemeColors,
+						serialize: JSON.stringify
+					},
+					{
+						name: 'borderRadius',
+						store: interfaceBorderRadiusStore,
+						schema: zNumber
+					}
+				])
+			});
+
+			addToast({
+				data: {
+					text: $_('player.share.copiedSuccess')
 				}
-			])
-		});
-
-		addToast({
-			data: {
-				text: $_('player.share.copiedSuccess')
-			}
-		});
-	}}
->
-	<i>content_copy</i>
-	<span>{$_('layout.export.exportToShareUrl')}</span>
-</button>
-
+			});
+		}}
+	>
+		<i>content_copy</i>
+		<span>{$_('layout.export.exportToShareUrl')}</span>
+	</button>
+{/if}
 <div class="space"></div>
 <button
 	class="no-margin surface-container-highest"

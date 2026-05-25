@@ -51,7 +51,7 @@
 		"@bbc/tv-lrud-spatial": "^0.0.16",
 		"@capacitor-community/electron": "^5.0.1",
 		"@capacitor/android": "^8.1.0",
-		"@capacitor/app": "^8.0.1",
+		"@capacitor/app": "^8.1.0",
 		"@capacitor/browser": "^8.0.1",
 		"@capacitor/clipboard": "^8.0.1",
 		"@capacitor/core": "^8.2.0",

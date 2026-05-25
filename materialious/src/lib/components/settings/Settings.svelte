@@ -16,6 +16,8 @@
 	import Filters from './Filters.svelte';
 	import ExportImport from './ExportImport.svelte';
 	import Theme from './Theme.svelte';
+	import Binds from './Binds.svelte';
+	import { Capacitor } from '@capacitor/core';
 
 	type TabCategories =
 		| 'interface'
@@ -28,7 +30,8 @@
 		| 'account'
 		| 'filters'
 		| 'export'
-		| 'theme';
+		| 'theme'
+		| 'binds';
 
 	let activeTab: TabCategories = $state('interface');
 
@@ -83,6 +86,15 @@
 			label: $_('layout.engine'),
 			icon: 'rocket_launch',
 			component: Engine
+		});
+	}
+
+	if (Capacitor.getPlatform() === 'web' || Capacitor.getPlatform() === 'electron') {
+		tabs.splice(tabs.length - 1, 0, {
+			id: 'binds',
+			label: $_('layout.binds.title'),
+			icon: 'keyboard',
+			component: Binds
 		});
 	}
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ParsedDescription, Timestamp } from '$lib/description';
-	import { invidiousInstanceStore, isAndroidTvStore, sponsorBlockTimelineStore } from '$lib/store';
+	import { invidiousInstanceStore, isAndroidTvStore, sponsorBlockTimelineStore, keybindStore } from '$lib/store';
 	import type { Segment } from 'sponsorblock-api';
 	import { Slider } from 'melt/builders';
 	import { _ } from '$lib/i18n';
@@ -103,10 +103,12 @@
 	});
 
 	onMount(async () => {
-		Mousetrap.bind('right', () => playerScrubbingStart(1));
-		Mousetrap.bind('left', () => playerScrubbingStart(-1));
-		Mousetrap.bind('right', playerScrubbingStop, 'keyup');
-		Mousetrap.bind('left', playerScrubbingStop, 'keyup');
+		const binds = $keybindStore;
+
+		Mousetrap.bind(binds.seekForward, () => playerScrubbingStart(1));
+		Mousetrap.bind(binds.seekBack, () => playerScrubbingStart(-1));
+		Mousetrap.bind(binds.seekForward, playerScrubbingStop, 'keyup');
+		Mousetrap.bind(binds.seekBack, playerScrubbingStop, 'keyup');
 
 		playerElement?.addEventListener('timeupdate', () => {
 			const buffered = playerElement.buffered;
@@ -164,7 +166,8 @@
 	onDestroy(() => {
 		playerTimelineThumbnailsCache.clear();
 
-		Mousetrap.unbind(['left', 'right']);
+		const binds = $keybindStore;
+		Mousetrap.unbind([binds.seekBack, binds.seekForward]);
 	});
 
 	function getScrubbingSpeeds(duration: number) {

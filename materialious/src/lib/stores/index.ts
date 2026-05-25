@@ -82,6 +82,8 @@ export {
 	deArrowTitlesOnly,
 	deArrowThumbnailInstanceStore
 } from './sponsorblock';
+export { keybindStore, defaultKeybinds } from './keybinds';
+export type { Keybinds } from './keybinds';
 export {
 	searchHistoryStore,
 	feedLoadingStore,

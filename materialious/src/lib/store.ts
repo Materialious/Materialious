@@ -69,6 +69,8 @@ export {
 	deArrowThumbnailInstanceStore,
 	searchHistoryStore,
 	feedLoadingStore,
+	keybindStore,
+	defaultKeybinds,
 	feedCacheStore,
 	searchCacheStore,
 	feedLastItemId,
@@ -76,4 +78,4 @@ export {
 	channelCacheStore
 } from './stores/index';
 export { isAndroidTv } from './misc';
-export type { PlayerState, SleepTimerState } from './stores/index';
+export type { PlayerState, SleepTimerState, Keybinds } from './stores/index';

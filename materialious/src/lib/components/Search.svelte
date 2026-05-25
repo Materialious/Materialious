@@ -6,7 +6,8 @@
 	import {
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
-		searchHistoryStore
+		searchHistoryStore,
+		keybindStore
 	} from '../store';
 	import { goToSearch } from '$lib/search';
 
@@ -99,7 +100,12 @@
 	}
 
 	onMount(async () => {
-		Mousetrap.bind(['ctrl+k', 'command+k'], () => {
+		const searchKey = $keybindStore.search;
+		const keys = searchKey.startsWith('ctrl')
+			? [searchKey, searchKey.replace('ctrl', 'command')]
+			: searchKey;
+
+		Mousetrap.bind(keys, () => {
 			document.getElementById('search-box')?.focus();
 			showSearchBox = !showSearchBox;
 			if (!showSearchBox) resetSearch();

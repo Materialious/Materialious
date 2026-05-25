@@ -32,7 +32,8 @@
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
 		sponsorBlockStore,
-		sponsorBlockUrlStore
+		sponsorBlockUrlStore,
+		keybindStore
 	} from '$lib/store';
 	import { setStatusBarColor } from '$lib/theme';
 	import { getVideoYTjs } from '$lib/api/youtubejs/video';
@@ -587,7 +588,9 @@
 			}
 		}
 
-		Mousetrap.bind('space', () => {
+		const binds = get(keybindStore);
+
+		Mousetrap.bind(binds.togglePlay, () => {
 			if (!playerElement) return;
 
 			if (playerElement.paused) {
@@ -602,7 +605,7 @@
 		});
 
 		if (!$isAndroidTvStore) {
-			Mousetrap.bind('enter', () => {
+			Mousetrap.bind(binds.skipSponsor, () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
 					showPlayerUI();
@@ -610,33 +613,33 @@
 			});
 		}
 
-		Mousetrap.bind('c', () => {
+		Mousetrap.bind(binds.toggleSubtitles, () => {
 			toggleSubtitles(player);
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind('f', () => {
+		Mousetrap.bind(binds.toggleFullscreen, () => {
 			toggleFullscreen();
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind('shift+left', () => {
+		Mousetrap.bind(binds.speedDown, () => {
 			if (!playerElement) return;
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind('shift+right', () => {
+		Mousetrap.bind(binds.speedUp, () => {
 			if (!playerElement) return;
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind(',', () => {
+		Mousetrap.bind(binds.frameBack, () => {
 			if (!playerElement) return;
 
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
@@ -646,7 +649,7 @@
 			showPlayerUI();
 		});
 
-		Mousetrap.bind('.', () => {
+		Mousetrap.bind(binds.frameForward, () => {
 			if (!playerElement) return;
 
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
@@ -766,7 +769,21 @@
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
-		Mousetrap.unbind(['space', 'c', 'f', 'shift+left', 'shift+right', 'enter']);
+		const binds = get(keybindStore);
+
+		Mousetrap.unbind([
+			binds.togglePlay,
+			binds.toggleSubtitles,
+			binds.toggleFullscreen,
+			binds.speedDown,
+			binds.speedUp,
+			binds.frameBack,
+			binds.frameForward
+		]);
+
+		if (!$isAndroidTvStore) {
+			Mousetrap.unbind(binds.skipSponsor);
+		}
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
 		if (sabrAdapter) sabrAdapter.dispose();

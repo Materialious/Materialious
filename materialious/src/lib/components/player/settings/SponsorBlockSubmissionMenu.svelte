@@ -92,7 +92,8 @@
 	}
 
 	function openSubmissionMenu() {
-		if (!isCreatingSegment && segments.length === 0) return;
+		if (segments.length === 0) return;
+
 		menuState = 'submission';
 	}
 
@@ -407,9 +408,9 @@
 		{:else}
 			<li
 				role="presentation"
-				class:disabled={segments.length > 0}
+				class:disabled={segments.length === 0}
 				onclick={() => {
-					if (isCreatingSegment || segments.length > 0) {
+					if (segments.length > 0) {
 						openSubmissionMenu();
 					}
 				}}

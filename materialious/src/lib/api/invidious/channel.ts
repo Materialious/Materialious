@@ -31,7 +31,13 @@ export async function getChannelContentInvidious(
 	if (typeof options.sortBy !== 'undefined') url.searchParams.set('sort_by', options.sortBy);
 
 	const resp = await fetchErrorHandle(await fetch(url.toString(), fetchOptions));
-	return await resp.json();
+	const json = await resp.json();
+
+	if (json.videos && Array.isArray(json.videos)) {
+		json.videos = json.videos.filter((v: Record<string, unknown>) => v.type !== 'parse-error');
+	}
+
+	return json;
 }
 
 export async function searchChannelContentInvidious(

@@ -200,6 +200,13 @@
 		"seekForward": "Seek forward",
 		"search": "Open search",
 		"clickToSet": "Click to set…",
+		"pageBack": "Go back",
+		"pageForward": "Go forward",
+		"closePlayer": "Exit fullscreen / Close player",
+		"tab1": "Tab 1",
+		"tab2": "Tab 2",
+		"tab3": "Tab 3",
+		"tab4": "Tab 4",
 		"reset": "Reset to defaults"
 	},
 	"about": "About",

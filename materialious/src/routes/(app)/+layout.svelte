@@ -21,11 +21,13 @@
 		playerTheatreModeIsActive,
 		rawMasterKeyStore,
 		backendInUseStore,
-		hideSearchStore
+		hideSearchStore,
+		keybindStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
 	import { isYTBackend, truncate } from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
@@ -148,6 +150,83 @@
 		}
 
 		resetScroll();
+	});
+
+	let fullscreenExited = false;
+
+	document.addEventListener('fullscreenchange', () => {
+		if (!document.fullscreenElement) {
+			fullscreenExited = true;
+			setTimeout(() => {
+				fullscreenExited = false;
+			}, 500);
+		}
+	});
+
+	Mousetrap.bind($keybindStore.closePlayer, () => {
+		if (fullscreenExited) return false;
+
+		if (document.fullscreenElement) {
+			document.exitFullscreen();
+			return false;
+		}
+
+		if (page.url.pathname.includes('/watch')) {
+			window.history.back();
+			return false;
+		}
+	});
+
+	Mousetrap.bind($keybindStore.pageBack, () => {
+		window.history.back();
+		return false;
+	});
+
+	Mousetrap.bind($keybindStore.pageForward, () => {
+		window.history.forward();
+		return false;
+	});
+
+	let tabBoundKeys: string[] = [];
+
+	$effect(() => {
+		const tabStoreKeys = [
+			$keybindStore.tab1,
+			$keybindStore.tab2,
+			$keybindStore.tab3,
+			$keybindStore.tab4
+		];
+
+		if (tabBoundKeys.length > 0) {
+			Mousetrap.unbind(tabBoundKeys);
+		}
+
+		tabBoundKeys = [];
+
+		tabStoreKeys.forEach((keyCombo, index) => {
+			if (!keyCombo) return;
+			if (index >= pages.length) return;
+
+			tabBoundKeys.push(keyCombo);
+			Mousetrap.bind(keyCombo, () => {
+				const p = getPages();
+				const tab = p[index];
+				if (tab) {
+					goto(resolve(tab.href, {}));
+				}
+				return false;
+			});
+		});
+	});
+
+	onDestroy(() => {
+		const unbindKeys = [
+			$keybindStore.closePlayer,
+			$keybindStore.pageBack,
+			$keybindStore.pageForward
+		];
+		if (tabBoundKeys.length > 0) unbindKeys.push(...tabBoundKeys);
+		Mousetrap.unbind(unbindKeys);
 	});
 </script>
 

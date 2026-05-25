@@ -14,6 +14,13 @@ export interface Keybinds {
 	seekBack: string;
 	seekForward: string;
 	search: string;
+	pageBack: string;
+	pageForward: string;
+	closePlayer: string;
+	tab1: string;
+	tab2: string;
+	tab3: string;
+	tab4: string;
 }
 
 export const defaultKeybinds: Keybinds = {
@@ -27,7 +34,14 @@ export const defaultKeybinds: Keybinds = {
 	frameForward: '.',
 	seekBack: 'left',
 	seekForward: 'right',
-	search: 'ctrl+k'
+	search: 'ctrl+k',
+	pageBack: 'ctrl+left',
+	pageForward: 'ctrl+right',
+	closePlayer: 'esc',
+	tab1: 'ctrl+1',
+	tab2: 'ctrl+2',
+	tab3: 'ctrl+3',
+	tab4: 'ctrl+4'
 };
 
 export const keybindStore: Writable<Keybinds> = persist(

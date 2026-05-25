@@ -35,6 +35,12 @@
 		}
 	}
 
+	function resetSingle(action: keyof Keybinds) {
+		binds[action] = defaultKeybinds[action];
+		keybindStore.set({ ...binds });
+		recording = null;
+	}
+
 	function resetDefaults() {
 		binds = { ...defaultKeybinds };
 		keybindStore.set({ ...defaultKeybinds });
@@ -51,7 +57,14 @@
 		{ key: 'frameForward', label: $_('layout.binds.frameForward') },
 		{ key: 'seekBack', label: $_('layout.binds.seekBack') },
 		{ key: 'seekForward', label: $_('layout.binds.seekForward') },
-		{ key: 'search', label: $_('layout.binds.search') }
+		{ key: 'search', label: $_('layout.binds.search') },
+		{ key: 'pageBack', label: $_('layout.binds.pageBack') },
+		{ key: 'pageForward', label: $_('layout.binds.pageForward') },
+		{ key: 'closePlayer', label: $_('layout.binds.closePlayer') },
+		{ key: 'tab1', label: $_('layout.binds.tab1') },
+		{ key: 'tab2', label: $_('layout.binds.tab2') },
+		{ key: 'tab3', label: $_('layout.binds.tab3') },
+		{ key: 'tab4', label: $_('layout.binds.tab4') }
 	];
 </script>
 
@@ -64,6 +77,11 @@
 		<div class="max">
 			<p>{label}</p>
 		</div>
+		{#if recording === key}
+			<button class="circle transparent" onclick={() => resetSingle(key)}>
+				<i>close</i>
+			</button>
+		{/if}
 		<button
 			class="chip"
 			class:primary={recording === key}

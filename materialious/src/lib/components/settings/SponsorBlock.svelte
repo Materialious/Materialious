@@ -16,7 +16,7 @@
 
 	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
 	let usernameUpdateTimeout: ReturnType<typeof setTimeout> | undefined = $state();
-		
+
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
 		{ name: $_('layout.sponsors.unpaidSelfPromotion'), category: 'selfpromo' },
@@ -40,7 +40,7 @@
 
 		sponsorBlockCategoriesStore.set(categories);
 	}
-		
+
 	function onSponsorBlockUsernameInput() {
 		clearTimeout(usernameUpdateTimeout);
 
@@ -62,7 +62,6 @@
 			clearTimeout(usernameUpdateTimeout);
 		};
 	});
-
 </script>
 
 <form

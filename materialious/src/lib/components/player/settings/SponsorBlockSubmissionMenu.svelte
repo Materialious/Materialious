@@ -32,7 +32,7 @@
 		onSegmentDelete,
 		onSegmentSelect,
 		onSegmentDeselect,
-		onSegmentUpdate,
+		onSegmentUpdate
 	}: {
 		playerElement: HTMLMediaElement;
 		videoID: string;
@@ -54,7 +54,7 @@
 	const allSegmentsDefined = $derived(
 		segments.length > 0 && segments.every((segment) => segment.category !== undefined)
 	);
-	
+
 	function formatTime(seconds: number) {
 		return `${seconds.toFixed(2)}s`;
 	}
@@ -160,10 +160,8 @@
 			});
 		} catch (error) {
 			submitError =
-				error instanceof Error
-					? error.message
-					: $_('layout.sponsors.failedToSubmitSegments');
-					
+				error instanceof Error ? error.message : $_('layout.sponsors.failedToSubmitSegments');
+
 			addToast({
 				data: {
 					text: submitError
@@ -230,7 +228,6 @@
 		onSegmentSelect(index);
 		playerElement.currentTime = segment.startTime;
 	}
-
 </script>
 
 <button class="surface-container-highest">
@@ -278,11 +275,9 @@
 
 						<span class="chip">
 							{#if segment.category}
-								{
-									sponsorCategories.find(
-										(sponsorCategory) => sponsorCategory.category === segment.category
-									)?.name
-								}
+								{sponsorCategories.find(
+									(sponsorCategory) => sponsorCategory.category === segment.category
+								)?.name}
 							{:else}
 								{$_('layout.sponsors.noCategorySelected')}
 							{/if}
@@ -313,11 +308,9 @@
 						<div class="max"></div>
 
 						<span class="chip">
-							{
-								sponsorCategories.find(
-									(sponsorCategory) => sponsorCategory.category === segment.category
-								)?.name
-							}
+							{sponsorCategories.find(
+								(sponsorCategory) => sponsorCategory.category === segment.category
+							)?.name}
 						</span>
 					</nav>
 				</li>

@@ -1,10 +1,6 @@
 import { SponsorBlock } from 'sponsorblock-api';
 import { get } from 'svelte/store';
-import {
-	sponsorBlockUrlStore,
-	sponsorBlockUserIDStore,
-	sponsorBlockUsernameStore
-} from './store';
+import { sponsorBlockUrlStore, sponsorBlockUserIDStore, sponsorBlockUsernameStore } from './store';
 
 export function generateSponsorBlockUUID64() {
 	return crypto.randomUUID().replaceAll('-', '') + crypto.randomUUID().replaceAll('-', '');
@@ -42,7 +38,7 @@ export function ensureSponsorBlockIdentity() {
 export function createSponsorBlockClient() {
 	const userID = getOrCreateSponsorBlockUserID();
 	const baseURL = get(sponsorBlockUrlStore);
-	
+
 	if (!baseURL) {
 		throw new Error('SponsorBlock URL is not configured');
 	}

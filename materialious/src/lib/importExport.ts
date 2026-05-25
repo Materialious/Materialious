@@ -55,10 +55,9 @@ export async function importSubscriptions(subscriptions: Subscription[]) {
 
 export async function importSubscriptionsFromFile(file: File) {
 	const fileContents = await file.text();
-
 	const subsToImport: Subscription[] = [];
 
-	if (file.name.endsWith('.opml')) {
+	const tryOpml = () => {
 		const parser = new DOMParser();
 		const xmlDoc = parser.parseFromString(fileContents, 'text/xml');
 
@@ -92,58 +91,62 @@ export async function importSubscriptionsFromFile(file: File) {
 				authorId: channelId
 			});
 		}
-	} else if (file.name.endsWith('.json')) {
+	};
+
+	const tryJson = async () => {
 		let fileJson: Record<any, any> | undefined;
 		try {
 			fileJson = JSON.parse(fileContents);
 		} catch {
-			// Continue regardless
+			return;
 		}
 
-		if (fileJson) {
-			const invidiousSubs = zInvidiousSubs.safeParse(fileJson);
-			const freetubeSubs = zFreetubeSubs.safeParse(fileJson);
-			const newPipeSubs = zNewPipeSubs.safeParse(fileJson);
-			const youtubeSubs = zYouTubeSubs.safeParse(fileJson);
+		if (!fileJson) return;
 
-			if (invidiousSubs.success) {
-				for (const authorId of invidiousSubs.data.subscriptions) {
-					try {
-						const channel = await getChannel(authorId);
-						subsToImport.push({
-							authorId,
-							author: channel.author
-						});
-					} catch {
-						// Continue regardless
-					}
-				}
-			} else if (freetubeSubs.success) {
-				for (const sub of freetubeSubs.data.subscriptions) {
+		const invidiousSubs = zInvidiousSubs.safeParse(fileJson);
+		const freetubeSubs = zFreetubeSubs.safeParse(fileJson);
+		const newPipeSubs = zNewPipeSubs.safeParse(fileJson);
+		const youtubeSubs = zYouTubeSubs.safeParse(fileJson);
+
+		if (invidiousSubs.success) {
+			for (const authorId of invidiousSubs.data.subscriptions) {
+				try {
+					const channel = await getChannel(authorId);
 					subsToImport.push({
-						author: sub.name,
-						authorId: sub.id
+						authorId,
+						author: channel.author
 					});
-				}
-			} else if (newPipeSubs.success) {
-				for (const sub of newPipeSubs.data.subscriptions) {
-					const authorId = sub.url.split('/')[4];
-					if (typeof authorId !== 'string') continue;
-					subsToImport.push({
-						author: sub.name,
-						authorId
-					});
-				}
-			} else if (youtubeSubs.success) {
-				for (const sub of youtubeSubs.data) {
-					subsToImport.push({
-						author: sub.snippet.title,
-						authorId: sub.snippet.channelId
-					});
+				} catch {
+					// Continue regardless
 				}
 			}
+		} else if (freetubeSubs.success) {
+			for (const sub of freetubeSubs.data.subscriptions) {
+				subsToImport.push({
+					author: sub.name,
+					authorId: sub.id
+				});
+			}
+		} else if (newPipeSubs.success) {
+			for (const sub of newPipeSubs.data.subscriptions) {
+				const authorId = sub.url.split('/')[4];
+				if (typeof authorId !== 'string') continue;
+				subsToImport.push({
+					author: sub.name,
+					authorId
+				});
+			}
+		} else if (youtubeSubs.success) {
+			for (const sub of youtubeSubs.data) {
+				subsToImport.push({
+					author: sub.snippet.title,
+					authorId: sub.snippet.channelId
+				});
+			}
 		}
-	} else if (file.name.endsWith('.csv')) {
+	};
+
+	const tryCsv = () => {
 		const csv = Papa.parse(fileContents, { header: true, skipEmptyLines: true });
 
 		if (csv.data.length > 0) {
@@ -157,6 +160,26 @@ export async function importSubscriptionsFromFile(file: File) {
 					});
 				}
 			}
+		}
+	};
+
+	const trimmed = fileContents.trim();
+
+	if (file.name.endsWith('.opml')) {
+		tryOpml();
+	} else if (file.name.endsWith('.json')) {
+		await tryJson();
+	} else if (file.name.endsWith('.csv')) {
+		tryCsv();
+	}
+
+	if (subsToImport.length === 0) {
+		if (trimmed.startsWith('<')) {
+			tryOpml();
+		} else if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+			await tryJson();
+		} else {
+			tryCsv();
 		}
 	}
 

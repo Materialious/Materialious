@@ -6,7 +6,7 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { rawMasterKeyStore } from '$lib/store';
+	import { isAndroidTvStore, rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
 	import { isUnrestrictedPlatform, keyCodeMap } from '$lib/misc';
@@ -70,12 +70,6 @@
 			component: DeArrow
 		},
 		{
-			id: 'export',
-			label: $_('layout.export.title'),
-			icon: 'file_export',
-			component: ExportImport
-		},
-		{
 			id: 'about',
 			label: $_('layout.about'),
 			icon: 'info',
@@ -84,7 +78,7 @@
 	]);
 
 	if (isUnrestrictedPlatform()) {
-		tabs.splice(1, 0, {
+		tabs.splice(tabs.length - 1, 0, {
 			id: 'engine',
 			label: $_('layout.engine'),
 			icon: 'rocket_launch',
@@ -92,9 +86,18 @@
 		});
 	}
 
+	if (!$isAndroidTvStore) {
+		tabs.splice(tabs.length - 1, 0, {
+			id: 'export',
+			label: $_('layout.export.title'),
+			icon: 'file_export',
+			component: ExportImport
+		});
+	}
+
 	rawMasterKeyStore.subscribe((value) => {
 		if (isOwnBackend()?.internalAuth && value) {
-			tabs.splice(1, 0, {
+			tabs.splice(tabs.length - 1, 0, {
 				id: 'account',
 				label: $_('layout.materialiousAccount'),
 				icon: 'person',

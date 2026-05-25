@@ -1,7 +1,7 @@
 import he from 'he';
 import { get } from 'svelte/store';
 import { env } from '$env/dynamic/public';
-import { backendInUseStore, interfaceAndroidUseNativeShare } from './store';
+import { backendInUseStore, interfaceAndroidUseNativeShare, isAndroidTvStore } from './store';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
@@ -117,6 +117,10 @@ export function isUnrestrictedPlatform(): boolean {
 
 export function isYTBackend(): boolean {
 	return get(backendInUseStore) === 'yt' && isUnrestrictedPlatform();
+}
+
+export function isAndroidTv(): boolean {
+	return get(isAndroidTvStore);
 }
 
 export function downloadStringAsFile(content: string, filename: string) {

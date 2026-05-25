@@ -16,6 +16,7 @@
 		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
 		interfaceBorderRadiusStore,
+		isAndroidTvStore,
 		themeColorStore
 	} from '../../store';
 	import { onMount, tick } from 'svelte';
@@ -199,22 +200,24 @@
 	</div>
 </div>
 
-<h5>{$_('layout.theme.advanced')}</h5>
-<div class="space"></div>
+{#if !$isAndroidTvStore}
+	<h5>{$_('layout.theme.advanced')}</h5>
+	<div class="space"></div>
 
-{#if currentThemeColors}
-	{#each Object.entries(currentThemeColors) as [themeVar, themeColor] (themeVar)}
-		<div class="color-picker">
-			<ColorPicker
-				hex={themeColor.toString()}
-				label={titleCase(themeVar.replaceAll('--', '').replaceAll('-', ' '))}
-				position="responsive"
-				textInputModes={['hex']}
-				sliderDirection="vertical"
-				onInput={async (color) => await colorOnInput(color, themeVar as ThemeKey)}
-			/>
-		</div>
-	{/each}
+	{#if currentThemeColors}
+		{#each Object.entries(currentThemeColors) as [themeVar, themeColor] (themeVar)}
+			<div class="color-picker">
+				<ColorPicker
+					hex={themeColor.toString()}
+					label={titleCase(themeVar.replaceAll('--', '').replaceAll('-', ' '))}
+					position="responsive"
+					textInputModes={['hex']}
+					sliderDirection="vertical"
+					onInput={async (color) => await colorOnInput(color, themeVar as ThemeKey)}
+				/>
+			</div>
+		{/each}
+	{/if}
 {/if}
 
 <style>

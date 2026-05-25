@@ -75,4 +75,5 @@ export {
 	playlistCacheStore,
 	channelCacheStore
 } from './stores/index';
+export { isAndroidTv } from './misc';
 export type { PlayerState, SleepTimerState } from './stores/index';

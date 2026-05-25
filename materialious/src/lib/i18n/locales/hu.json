@@ -325,5 +325,10 @@
         "watched": "Jelölés megtekintettként",
         "unwatched": "Jelölés nem megtekintettnek"
     },
-    "hideAuthor": "Szerző elrejtése"
+    "hideAuthor": "Szerző elrejtése",
+    "veryWeak": "Nagyon gyenge",
+    "weak": "Gyenge",
+    "fair": "Megfelelő",
+    "strong": "Erős",
+    "veryStrong": "Nagyon erős"
 }

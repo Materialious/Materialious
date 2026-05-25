@@ -29,9 +29,11 @@
 	class="circle small"
 	{...mergeAttrs(avatar.image, { onclick: goToChannel })}
 	alt="Channel profile"
+	tabindex="-1"
 />
 <button
 	class="circle secondary-container"
+	tabindex="-1"
 	onclick={goToChannel}
 	{...mergeAttrs(avatar.fallback, {
 		style: 'text-transform: uppercase;border-radius: 2.5rem !important;'

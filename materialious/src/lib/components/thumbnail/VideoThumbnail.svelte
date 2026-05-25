@@ -294,6 +294,14 @@
 						<i>check</i>
 					</div>
 				{/if}
+				{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
+					<div
+						class="chip primary"
+						style="position: absolute; top: 8px; left: 8px; right: auto; z-index: 2;"
+					>
+						<i>star</i>
+					</div>
+				{/if}
 			</div>
 			{#if progress}
 				<progress
@@ -358,10 +366,6 @@
 								</a>
 							{:else}
 								<p>{truncate(video.author, 20)}</p>
-							{/if}
-
-							{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
-								<i>star</i>
 							{/if}
 
 							{#if !('publishedText' in video) && 'viewCountText' in video}

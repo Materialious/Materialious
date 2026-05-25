@@ -10,6 +10,7 @@
 	import { _ } from '$lib/i18n';
 	import type { Captions, VideoPlay } from '$lib/api/model';
 	import { getCaptionUrl } from '$lib/player/captions';
+	import ComboBox from '$lib/components/ComboBox.svelte';
 
 	interface Props {
 		video: VideoPlay;
@@ -20,6 +21,21 @@
 
 	let selectedCaption: Captions | undefined = $state();
 	let autoScroll: boolean = $state(true);
+
+	const captionOptions = $derived(
+		[{ label: $_('selectLang'), value: '' }].concat(
+			video.captions.map((c, i) => ({ label: c.label, value: String(i) }))
+		)
+	);
+
+	function onCaptionChange(value: string) {
+		if (value === '') {
+			selectedCaption = undefined;
+		} else {
+			selectedCaption = video.captions[Number(value)];
+		}
+		loadTranscript();
+	}
 
 	let transcript: ParsedCaptionsResult | null = $state(null);
 	let transcriptCues: VTTCue[] = $state([]);
@@ -84,16 +100,7 @@
 <article class="scroll border no-padding" style="height: 75vh;" id="transcript">
 	<article class="no-elevate padding" style="position: sticky; top: 0; z-index: 3;">
 		<h6>{$_('transcript')}</h6>
-		<div class="field label suffix surface-container-highest">
-			<select bind:value={selectedCaption} onchange={loadTranscript} name="captions">
-				<option selected={true} value={null}>{$_('selectLang')}</option>
-				{#each video.captions as caption (caption)}
-					<option value={caption}>{caption.label}</option>
-				{/each}
-			</select>
-			<label for="captions">{$_('language')}</label>
-			<i>arrow_drop_down</i>
-		</div>
+		<ComboBox options={captionOptions} label={$_('language')} onChange={onCaptionChange} />
 		{#if transcriptCues.length > 0}
 			<div class="space"></div>
 			<div class="max field suffix prefix small round no-margin surface-container-highest">

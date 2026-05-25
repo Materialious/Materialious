@@ -193,7 +193,13 @@ export class ElectronCapacitorApp {
 		}
 		globalShortcut.register('Control+Shift+I', () => {
 			this.MainWindow?.webContents.toggleDevTools();
-    });
+		});
+		globalShortcut.register('Alt+F4', () => {
+			app.quit();
+		});
+		globalShortcut.register('CommandOrControl+Q', () => {
+			app.quit();
+		});
 		// Security
 		this.MainWindow.webContents.setWindowOpenHandler((details) => {
 			shell.openExternal(details.url);

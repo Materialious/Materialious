@@ -63,7 +63,8 @@
         "addToPlaylist": "إضافة إلى قائمة التشغيل",
         "youtubeJsFallBack": "يتم استخدام النسخة الاحتياطية المحلية للفيديو",
         "defaultLanguage": "اللغة الافتراضية",
-        "pauseVideoIn": "إيقاف الفيديو خلال "
+        "pauseVideoIn": "إيقاف الفيديو خلال ",
+        "pauseTimerClear": "مسح"
     },
     "layout": {
         "interface": "الواجهة",

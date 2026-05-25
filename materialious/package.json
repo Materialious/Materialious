@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.16.27",
+	"version": "1.16.28",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -51,7 +51,7 @@
 		"@bbc/tv-lrud-spatial": "^0.0.16",
 		"@capacitor-community/electron": "^5.0.1",
 		"@capacitor/android": "^8.1.0",
-		"@capacitor/app": "^8.0.1",
+		"@capacitor/app": "^8.1.0",
 		"@capacitor/browser": "^8.0.1",
 		"@capacitor/clipboard": "^8.0.1",
 		"@capacitor/core": "^8.2.0",
@@ -89,7 +89,7 @@
 		"media-captions": "^0.0.18",
 		"melt": "^0.44.0",
 		"mousetrap": "^1.6.5",
-		"mysql2": "^3.18.2",
+		"mysql2": "^3.22.3",
 		"papaparse": "^5.5.3",
 		"pg": "^8.20.0",
 		"pg-hstore": "^2.3.4",
@@ -103,6 +103,6 @@
 		"tldts": "^7.0.24",
 		"trystero": "^0.22.0",
 		"youtubei.js": "^17.0.1",
-		"zod": "^4.3.6"
+		"zod": "^4.4.3"
 	}
 }

@@ -19,13 +19,16 @@
 		isAndroidTvStore,
 		playerState,
 		playerTheatreModeIsActive,
+		playerIsInWindowFullscreen,
 		rawMasterKeyStore,
 		backendInUseStore,
-		hideSearchStore
+		hideSearchStore,
+		keybindStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
 	import { isYTBackend, truncate } from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
@@ -56,6 +59,9 @@
 
 	$effect(() => {
 		playerIsPip = !page.url.pathname.includes('/watch');
+		if (playerIsPip) {
+			playerIsInWindowFullscreen.set(false);
+		}
 		requestAnimationFrame(() => resetScroll());
 	});
 
@@ -149,6 +155,88 @@
 
 		resetScroll();
 	});
+
+	let fullscreenExited = false;
+
+	document.addEventListener('fullscreenchange', () => {
+		if (!document.fullscreenElement) {
+			fullscreenExited = true;
+			setTimeout(() => {
+				fullscreenExited = false;
+			}, 500);
+		}
+	});
+
+	Mousetrap.bind($keybindStore.closePlayer, () => {
+		if (fullscreenExited) return false;
+
+		if ($playerIsInWindowFullscreen) {
+			playerIsInWindowFullscreen.set(false);
+			return false;
+		}
+
+		if (document.fullscreenElement) {
+			document.exitFullscreen();
+			return false;
+		}
+
+		if (page.url.pathname.includes('/watch')) {
+			window.history.back();
+			return false;
+		}
+	});
+
+	Mousetrap.bind($keybindStore.pageBack, () => {
+		window.history.back();
+		return false;
+	});
+
+	Mousetrap.bind($keybindStore.pageForward, () => {
+		window.history.forward();
+		return false;
+	});
+
+	let tabBoundKeys: string[] = [];
+
+	$effect(() => {
+		const tabStoreKeys = [
+			$keybindStore.tab1,
+			$keybindStore.tab2,
+			$keybindStore.tab3,
+			$keybindStore.tab4
+		];
+
+		if (tabBoundKeys.length > 0) {
+			Mousetrap.unbind(tabBoundKeys);
+		}
+
+		tabBoundKeys = [];
+
+		tabStoreKeys.forEach((keyCombo, index) => {
+			if (!keyCombo) return;
+			if (index >= pages.length) return;
+
+			tabBoundKeys.push(keyCombo);
+			Mousetrap.bind(keyCombo, () => {
+				const p = getPages();
+				const tab = p[index];
+				if (tab) {
+					goto(resolve(tab.href, {}));
+				}
+				return false;
+			});
+		});
+	});
+
+	onDestroy(() => {
+		const unbindKeys = [
+			$keybindStore.closePlayer,
+			$keybindStore.pageBack,
+			$keybindStore.pageForward
+		];
+		if (tabBoundKeys.length > 0) unbindKeys.push(...tabBoundKeys);
+		Mousetrap.unbind(unbindKeys);
+	});
 </script>
 
 <div>
@@ -156,7 +244,7 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
-		class:hide-element={$playerTheatreModeIsActive}
+		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
 	>
 		<header class="small-padding">
 			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
@@ -197,7 +285,7 @@
 		{/if}
 	</nav>
 	{#if !$isAndroidTvStore}
-		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
+		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore} class:hide-element={$playerIsInWindowFullscreen}>
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
@@ -292,7 +380,7 @@
 		</nav>
 	{/if}
 
-	<nav class="bottom s">
+	<nav class="bottom s" class:hide-element={$playerIsInWindowFullscreen}>
 		{#each pages as navPage (navPage)}
 			<a
 				class="round"
@@ -323,7 +411,7 @@
 		{/if}
 	</dialog>
 
-	<main id="main-content" tabindex="0" class="responsive max root">
+	<main id="main-content" tabindex="0" class="responsive max root" class:full-window-main={$playerIsInWindowFullscreen}>
 		{#if showWatchParty}
 			<WatchParty />
 		{/if}
@@ -334,8 +422,8 @@
 					class:pip={playerIsPip}
 					class:s12={!playerIsPip}
 					class:m12={!playerIsPip}
-					class:l12={$playerTheatreModeIsActive && !playerIsPip}
-					class:l9={!$playerTheatreModeIsActive && !playerIsPip}
+				class:l12={($playerTheatreModeIsActive || $playerIsInWindowFullscreen) && !playerIsPip}
+				class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
 				>
 					<div class="pip-info">
 						{#if playerIsPip}
@@ -451,7 +539,12 @@
 	}
 
 	@media only screen and (max-width: 993px) {
-		.pip {
+	.full-window-main {
+		padding: 0;
+		max-width: 100%;
+	}
+
+	.pip {
 			width: 100%;
 			bottom: 100px;
 			right: 0px;

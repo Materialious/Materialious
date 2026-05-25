@@ -71,6 +71,7 @@
         "theatreMode": "Modo teatro",
         "pauseTimer": "Pausar temporizador",
         "pauseVideoIn": "Pausar video en ",
+        "pauseTimerClear": "Limpiar",
         "share": {
             "title": "Compartir",
             "materialiousLink": "Copiar enlace de Materialious",

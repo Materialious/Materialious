@@ -76,6 +76,7 @@
         "audioOnly": "音声のみ",
         "pauseTimer": "停止タイマー",
         "pauseVideoIn": "停止まで ",
+        "pauseTimerClear": "クリア",
         "chapters": "チャプター",
         "preferredQuality": "優先する画質",
         "share": {
@@ -325,5 +326,10 @@
         "watched": "視聴済みにする",
         "unwatched": "未視聴にする"
     },
-    "hideAuthor": "投稿者を非表示"
+    "hideAuthor": "投稿者を非表示",
+    "veryWeak": "非常に弱い",
+    "weak": "弱い",
+    "veryStrong": "非常に強い",
+    "fair": "普通",
+    "strong": "強い"
 }

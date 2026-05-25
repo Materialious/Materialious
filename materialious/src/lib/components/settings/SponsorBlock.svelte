@@ -5,14 +5,18 @@
 	import {
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
+		sponsorBlockSegmentSubmissionsEnabledStore,
 		sponsorBlockStore,
 		sponsorBlockTimelineStore,
-		sponsorBlockUrlStore
+		sponsorBlockUrlStore,
+		sponsorBlockUsernameStore
 	} from '../../store';
 	import ComboBox from '../ComboBox.svelte';
+	import { ensureSponsorBlockIdentity, setSponsorBlockUsername } from '$lib/sponsorblock';
 
 	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
-
+	let usernameUpdateTimeout: ReturnType<typeof setTimeout> | undefined = $state();
+		
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
 		{ name: $_('layout.sponsors.unpaidSelfPromotion'), category: 'selfpromo' },
@@ -36,6 +40,29 @@
 
 		sponsorBlockCategoriesStore.set(categories);
 	}
+		
+	function onSponsorBlockUsernameInput() {
+		clearTimeout(usernameUpdateTimeout);
+
+		usernameUpdateTimeout = setTimeout(() => {
+			setSponsorBlockUsername($sponsorBlockUsernameStore ?? '').catch((error) => {
+				console.error($_('layout.sponsors.failedToSetUsername'), error);
+			});
+		}, 500);
+	}
+
+	$effect(() => {
+		if ($sponsorBlockSegmentSubmissionsEnabledStore) {
+			ensureSponsorBlockIdentity();
+		}
+	});
+
+	$effect(() => {
+		return () => {
+			clearTimeout(usernameUpdateTimeout);
+		};
+	});
+
 </script>
 
 <form
@@ -96,14 +123,43 @@
 		<p>{$_('layout.sponsors.disableTimeline')}</p>
 	</div>
 	<label class="switch">
+		<input bind:checked={$sponsorBlockTimelineStore} type="checkbox" role="switch" />
+		<span></span>
+	</label>
+</nav>
+
+<nav class="no-padding">
+	<div class="max">
+		<p>{$_('layout.sponsors.enableSegmentSubmissions')}</p>
+	</div>
+	<label class="switch" tabindex="0">
 		<input
-			bind:checked={$sponsorBlockTimelineStore}
-			onclick={() => sponsorBlockTimelineStore.set(!$sponsorBlockTimelineStore)}
+			bind:checked={$sponsorBlockSegmentSubmissionsEnabledStore}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>
 </nav>
+
+{#if $sponsorBlockSegmentSubmissionsEnabledStore}
+	<nav>
+		<div class="field label surface-container-highest max">
+			<input
+				bind:value={$sponsorBlockUsernameStore}
+				oninput={onSponsorBlockUsernameInput}
+				name="sponsorblock-username"
+				type="text"
+				placeholder={$_('layout.sponsors.sponsorBlockUsername')}
+				autocomplete="off"
+				autocapitalize="off"
+				autocorrect="off"
+				spellcheck="false"
+			/>
+			<label for="sponsorblock-username">{$_('layout.sponsors.sponsorBlockUsername')}</label>
+		</div>
+	</nav>
+{/if}
 
 <hr style="margin: 1em 0;" />
 

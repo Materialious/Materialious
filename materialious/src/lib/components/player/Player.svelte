@@ -588,9 +588,7 @@
 			}
 		}
 
-		const binds = get(keybindStore);
-
-		Mousetrap.bind(binds.togglePlay, () => {
+		Mousetrap.bind($keybindStore.togglePlay, () => {
 			if (!playerElement) return;
 
 			if (playerElement.paused) {
@@ -605,7 +603,7 @@
 		});
 
 		if (!$isAndroidTvStore) {
-			Mousetrap.bind(binds.skipSponsor, () => {
+			Mousetrap.bind($keybindStore.skipSponsor, () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
 					showPlayerUI();
@@ -613,33 +611,33 @@
 			});
 		}
 
-		Mousetrap.bind(binds.toggleSubtitles, () => {
+		Mousetrap.bind($keybindStore.toggleSubtitles, () => {
 			toggleSubtitles(player);
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind(binds.toggleFullscreen, () => {
+		Mousetrap.bind($keybindStore.toggleFullscreen, () => {
 			toggleFullscreen();
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind(binds.speedDown, () => {
+		Mousetrap.bind($keybindStore.speedDown, () => {
 			if (!playerElement) return;
 			playerElement.playbackRate = playerElement.playbackRate - 0.25;
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind(binds.speedUp, () => {
+		Mousetrap.bind($keybindStore.speedUp, () => {
 			if (!playerElement) return;
 			playerElement.playbackRate = playerElement.playbackRate + 0.25;
 			showPlayerUI();
 			return false;
 		});
 
-		Mousetrap.bind(binds.frameBack, () => {
+		Mousetrap.bind($keybindStore.frameBack, () => {
 			if (!playerElement) return;
 
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
@@ -649,7 +647,7 @@
 			showPlayerUI();
 		});
 
-		Mousetrap.bind(binds.frameForward, () => {
+		Mousetrap.bind($keybindStore.frameForward, () => {
 			if (!playerElement) return;
 
 			const currentTrack = player.getVariantTracks().find((track) => track.active);
@@ -769,20 +767,18 @@
 
 		window.removeEventListener('resize', updateVideoPlayerHeight);
 
-		const binds = get(keybindStore);
-
 		Mousetrap.unbind([
-			binds.togglePlay,
-			binds.toggleSubtitles,
-			binds.toggleFullscreen,
-			binds.speedDown,
-			binds.speedUp,
-			binds.frameBack,
-			binds.frameForward
+			$keybindStore.togglePlay,
+			$keybindStore.toggleSubtitles,
+			$keybindStore.toggleFullscreen,
+			$keybindStore.speedDown,
+			$keybindStore.speedUp,
+			$keybindStore.frameBack,
+			$keybindStore.frameForward
 		]);
 
 		if (!$isAndroidTvStore) {
-			Mousetrap.unbind(binds.skipSponsor);
+			Mousetrap.unbind($keybindStore.skipSponsor);
 		}
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);

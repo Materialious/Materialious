@@ -44,8 +44,26 @@ export const defaultKeybinds: Keybinds = {
 	tab4: 'ctrl+4'
 };
 
-export const keybindStore: Writable<Keybinds> = persist(
-	writable<Keybinds>({ ...defaultKeybinds }),
-	createStorage(),
-	'keybinds'
-);
+function createKeybindStore(): Writable<Keybinds> {
+	const store = writable<Keybinds>({ ...defaultKeybinds });
+	const persisted = persist(store, createStorage(), 'keybinds');
+
+	const { subscribe, set, update } = persisted;
+
+	return {
+		subscribe(run, invalidate?) {
+			const unsub = subscribe((value) => {
+				run({ ...defaultKeybinds, ...(value ?? {}) });
+			}, invalidate);
+			return unsub;
+		},
+		set(value) {
+			set(value);
+		},
+		update(fn) {
+			update((value) => fn({ ...defaultKeybinds, ...(value ?? {}) }));
+		}
+	};
+}
+
+export const keybindStore: Writable<Keybinds> = createKeybindStore();

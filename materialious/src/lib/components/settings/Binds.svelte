@@ -9,19 +9,19 @@
 		recording = action;
 	}
 
-	function onKeyDown(e: KeyboardEvent) {
+	function onKeyDown(event: KeyboardEvent) {
 		if (!recording) return;
 
-		e.preventDefault();
-		e.stopPropagation();
+		event.preventDefault();
+		event.stopPropagation();
 
 		const parts: string[] = [];
-		if (e.ctrlKey) parts.push('ctrl');
-		if (e.altKey) parts.push('alt');
-		if (e.shiftKey) parts.push('shift');
-		if (e.metaKey) parts.push('command');
+		if (event.ctrlKey) parts.push('ctrl');
+		if (event.altKey) parts.push('alt');
+		if (event.shiftKey) parts.push('shift');
+		if (event.metaKey) parts.push('command');
 
-		const key = e.key;
+		const key = event.key;
 		if (!['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
 			const mapped = key === ' ' ? 'space' : key.toLowerCase();
 			parts.push(mapped);

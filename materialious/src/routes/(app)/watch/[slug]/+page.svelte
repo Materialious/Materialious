@@ -23,7 +23,6 @@
 		playerTheatreModeIsActive,
 		playlistCacheStore,
 		type PlayerState,
-		type SleepTimerState,
 		filterContentListStore,
 		sleepTimerStore
 	} from '$lib/store';

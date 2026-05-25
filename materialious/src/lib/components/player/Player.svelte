@@ -471,6 +471,7 @@
 					$playerAndroidPauseOnNetworkChange
 				) {
 					playerElement?.pause();
+					addToast({ data: { text: $_('player.pauseOnNetworkChange'), icon: 'wifi_off' } });
 				}
 			});
 

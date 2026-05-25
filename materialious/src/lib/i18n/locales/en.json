@@ -141,6 +141,7 @@
 		"pauseVideoIn": "Pause video in ",
 		"pauseTimerClear": "Clear",
 		"pauseTimerFinished": "Pause timer finished",
+		"pauseOnNetworkChange": "Video paused due to wifi network change",
 		"preferredQuality": "Preferred quality",
 		"premiere": "Video will be available",
 		"chapters": "Chapters",

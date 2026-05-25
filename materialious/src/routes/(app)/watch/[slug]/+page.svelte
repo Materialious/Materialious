@@ -35,6 +35,7 @@
 	import Comment from '$lib/components/watch/Comment.svelte';
 	import { expandSummery, isYTBackend } from '$lib/misc';
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
+	import { addToast } from '$lib/components/Toast.svelte';
 	import { getWatchDetails } from '$lib/watch';
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
@@ -55,7 +56,9 @@
 
 	playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
-	let pauseTimerSeconds: number = $state(-1);
+	let pauseTimerSeconds: number = $state(0);
+	let pauseTimerRemaining: number = $state(0);
+	let pauseTimerInterval: ReturnType<typeof setTimeout> | undefined;
 
 	let showTranscript = $state(false);
 
@@ -134,9 +137,7 @@
 		// Reset title when page left.
 		document.title = 'Materialious';
 
-		if (pauseTimeout) {
-			clearTimeout(pauseTimeout);
-		}
+		clearPauseTimer();
 
 		if (premiereUpdateInterval) {
 			clearInterval(premiereUpdateInterval);
@@ -226,14 +227,31 @@
 
 	let pauseTimeout: ReturnType<typeof setTimeout> | undefined = $state();
 	function setPauseTimer() {
-		if (pauseTimeout) {
-			clearTimeout(pauseTimeout);
+		if (pauseTimeout) clearTimeout(pauseTimeout);
+		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
+
+		pauseTimerRemaining = pauseTimerSeconds;
+
+		if (pauseTimerSeconds > 0) {
+			pauseTimeout = setTimeout(() => {
+				playerElement?.pause();
+				addToast({ data: { text: $_('player.pauseTimerFinished'), icon: 'snooze' } });
+				pauseTimerSeconds = 0;
+				pauseTimerRemaining = 0;
+				if (pauseTimerInterval) clearInterval(pauseTimerInterval);
+			}, pauseTimerSeconds * 1000);
+
+			pauseTimerInterval = setInterval(() => {
+				pauseTimerRemaining = Math.max(0, pauseTimerRemaining - 1);
+			}, 1000);
 		}
-		pauseTimeout = setTimeout(() => {
-			playerElement?.pause();
-			pauseTimerSeconds = 0;
-			clearTimeout(pauseTimeout);
-		}, pauseTimerSeconds * 1000);
+	}
+
+	function clearPauseTimer() {
+		if (pauseTimeout) clearTimeout(pauseTimeout);
+		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
+		pauseTimerSeconds = 0;
+		pauseTimerRemaining = 0;
 	}
 </script>
 
@@ -275,15 +293,14 @@
 					</button>
 					{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
 						<button
-							onclick={() => {
-								if (pauseTimerSeconds < 1) {
-									pauseTimerSeconds = 300;
-								}
-								ui('#pause-timer');
-							}}
-							class:surface-container-highest={pauseTimerSeconds < 1}
+							onclick={() => ui('#pause-timer')}
+							class:primary={pauseTimerSeconds > 0}
+							class:surface-container-highest={pauseTimerSeconds === 0}
 						>
 							<i>snooze</i>
+							{#if pauseTimerSeconds > 0}
+								<span class="small-text">{humanizeSeconds(pauseTimerRemaining)}</span>
+							{/if}
 							<div class="tooltip">{$_('player.pauseTimer')}</div>
 						</button>
 					{/if}
@@ -510,53 +527,78 @@
 
 <dialog id="pause-timer">
 	<div>
-		<h6>{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerSeconds)}</h6>
+		<nav class="no-space">
+			<h6 class="max">
+				{#if pauseTimerSeconds > 0}
+					{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerRemaining)}
+				{:else}
+					{$_('player.pauseTimer')}
+				{/if}
+			</h6>
+			<button onclick={() => ui('#pause-timer')} class="circle transparent">
+				<i>close</i>
+			</button>
+		</nav>
 
-		<nav class="group">
+		<div class="space"></div>
+
+		<nav class="group wrap">
 			<button
 				onclick={() => {
-					pauseTimerSeconds += 300;
+					pauseTimerSeconds = 300;
 					setPauseTimer();
 				}}
-				class="left-round">+5 mins</button
+				class:primary={pauseTimerSeconds === 300}
+				class="left-round">5 min</button
 			>
 			<button
 				onclick={() => {
-					pauseTimerSeconds += 1800;
+					pauseTimerSeconds = 600;
 					setPauseTimer();
 				}}
-				class="no-round">+30 mins</button
+				class:primary={pauseTimerSeconds === 600}
+				class="no-round">10 min</button
 			>
 			<button
 				onclick={() => {
-					pauseTimerSeconds += 3600;
+					pauseTimerSeconds = 1800;
 					setPauseTimer();
 				}}
-				class="no-round">+1 hr</button
+				class:primary={pauseTimerSeconds === 1800}
+				class="no-round">30 min</button
 			>
 			<button
 				onclick={() => {
-					pauseTimerSeconds += 7200;
+					pauseTimerSeconds = 3600;
 					setPauseTimer();
 				}}
-				class="right-round">+2 hrs</button
+				class:primary={pauseTimerSeconds === 3600}
+				class="no-round">1 hr</button
+			>
+			<button
+				onclick={() => {
+					pauseTimerSeconds = 7200;
+					setPauseTimer();
+				}}
+				class:primary={pauseTimerSeconds === 7200}
+				class="right-round">2 hr</button
 			>
 		</nav>
 
 		<div class="space"></div>
 
 		<nav class="wrap">
-			<button
-				onclick={() => {
-					pauseTimerSeconds = 0;
-					clearTimeout(pauseTimeout);
-					ui('#pause-timer');
-				}}
-				class="secondary max"
-			>
-				<i>delete</i>
-				<span>Clear</span>
-			</button>
+			{#if pauseTimerSeconds > 0}
+				<button
+					onclick={() => {
+						clearPauseTimer();
+					}}
+					class="secondary max"
+				>
+					<i>delete</i>
+					<span>{$_('player.pauseTimerClear')}</span>
+				</button>
+			{/if}
 		</nav>
 	</div>
 </dialog>

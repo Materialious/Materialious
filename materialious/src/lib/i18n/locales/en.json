@@ -139,6 +139,8 @@
 		"theatreMode": "Theatre mode",
 		"pauseTimer": "Pause timer",
 		"pauseVideoIn": "Pause video in ",
+		"pauseTimerClear": "Clear",
+		"pauseTimerFinished": "Pause timer finished",
 		"preferredQuality": "Preferred quality",
 		"premiere": "Video will be available",
 		"chapters": "Chapters",

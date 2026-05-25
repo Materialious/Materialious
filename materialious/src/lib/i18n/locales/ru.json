@@ -70,6 +70,7 @@
         "theatreMode": "Широкий экран",
         "pauseTimer": "Таймер паузы",
         "pauseVideoIn": "Приостановить видео на ",
+        "pauseTimerClear": "Очистить",
         "share": {
             "title": "Поделиться",
             "materialiousLink": "Скопировать ссылку на Materialious",

@@ -79,11 +79,9 @@ export function convertToSeconds(time: string): number {
 }
 
 export function humanizeSeconds(totalSeconds: number): string {
-	const secondsInMinute = 60;
-	const secondsInHour = 3600;
-
-	const hours = Math.floor(totalSeconds / secondsInHour);
-	const minutes = Math.floor((totalSeconds % secondsInHour) / secondsInMinute);
+	const totalMinutes = Math.ceil(totalSeconds / 60);
+	const hours = Math.floor(totalMinutes / 60);
+	const minutes = totalMinutes % 60;
 
 	const parts: string[] = [];
 

@@ -76,6 +76,7 @@
         "audioOnly": "音声のみ",
         "pauseTimer": "停止タイマー",
         "pauseVideoIn": "停止まで ",
+        "pauseTimerClear": "クリア",
         "chapters": "チャプター",
         "preferredQuality": "優先する画質",
         "share": {

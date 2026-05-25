@@ -193,6 +193,7 @@
         "theatreMode": "Szélesvásznú mód",
         "pauseTimer": "Időzítő szünteltetése",
         "pauseVideoIn": "Videó szünteltetése ekkor ",
+        "pauseTimerClear": "Törlés",
         "chapters": "Fejezetek",
         "download": "Letöltés",
         "downloadSteps": {

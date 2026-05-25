@@ -291,6 +291,16 @@
 			class:tv-nav={$isAndroidTvStore}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
+			<button
+				type="button"
+				class="transparent s circle large"
+				disabled={page.url.pathname === '/'}
+				onclick={() => history.back()}
+				aria-label="Back"
+			>
+				<i>keyboard_double_arrow_left</i>
+			</button>
+
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
@@ -330,8 +340,10 @@
 			{/if}
 
 			{#if mobileSearchShow}
-				<div style="width: 100%;">
-					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+				<div class="mobile-search-container">
+					<div style="width: 100%;">
+						<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+					</div>
 				</div>
 			{:else}
 				<!-- Watch parties only work in HTTPS environments -->
@@ -578,4 +590,10 @@
 			font-size: 1em;
 		}
 	}
+	
+	.mobile-search-container {
+		flex: 1;
+		min-width: 0;
+	}
+
 </style>

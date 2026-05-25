@@ -61,26 +61,42 @@ export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Pla
 			videoCount: 0,
 			videos: []
 		};
+	} else if (item.is(YTNodes.ShortsLockupView)) {
+		let viewCountText = '';
+		if (item.overlay_metadata?.secondary_text) {
+			viewCountText = item.overlay_metadata.secondary_text.toString();
+		}
+
+		const videoId = item.on_tap_endpoint?.command?.is(YTNodes.ReelWatchEndpoint)
+			? (item.on_tap_endpoint.command.buildRequest().playerRequest?.videoId ?? '')
+			: (item.entity_id?.split('-').pop() ?? '');
+
+		return {
+			type: 'shortVideo',
+			title: item.overlay_metadata?.primary_text?.toString() ?? '',
+			videoId,
+			viewCountText,
+			videoThumbnails: (item.thumbnail ?? []) as Thumbnail[],
+			published: 0,
+			publishedText: '',
+			description: '',
+			descriptionHtml: '',
+			authorUrl: '',
+			authorId: '',
+			authorVerified: false,
+			liveNow: false,
+			isUpcoming: false,
+			premium: false,
+			author: '',
+			lengthSeconds: 0
+		};
 	} else if (item.is(YTNodes.LockupView) && item.content_type === 'VIDEO') {
-		let author = '';
 		let publishedText = '';
 		let viewCountText = '';
 		const rows = item.metadata?.metadata?.metadata_rows;
 		if (rows) {
-			for (const row of rows) {
-				if (!row.metadata_parts) continue;
-				for (const part of row.metadata_parts) {
-					const text = part.text?.text ?? '';
-					if (!text) continue;
-					if (/\bago\b/i.test(text)) {
-						publishedText = text;
-					} else if (/^[\d.]+[KMBkmb]?\s*view/i.test(text)) {
-						viewCountText = text;
-					} else if (!author) {
-						author = text;
-					}
-				}
-			}
+			viewCountText = rows[0]?.metadata_parts?.[0]?.text?.text ?? '';
+			publishedText = rows[0]?.metadata_parts?.[1]?.text?.text ?? '';
 		}
 
 		const authorId =
@@ -120,7 +136,7 @@ export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Pla
 			liveNow: false,
 			isUpcoming: false,
 			premium: false,
-			author,
+			author: '',
 			lengthSeconds
 		};
 	}

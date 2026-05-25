@@ -21,6 +21,7 @@ export {
 	playerState,
 	sleepTimerStore,
 	playerTheatreModeIsActive,
+	playerIsInWindowFullscreen,
 	playlistSettingsStore,
 	darkModeStore,
 	themeColorStore,

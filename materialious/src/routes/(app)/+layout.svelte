@@ -19,6 +19,7 @@
 		isAndroidTvStore,
 		playerState,
 		playerTheatreModeIsActive,
+		playerIsInWindowFullscreen,
 		rawMasterKeyStore,
 		backendInUseStore,
 		hideSearchStore,
@@ -58,6 +59,9 @@
 
 	$effect(() => {
 		playerIsPip = !page.url.pathname.includes('/watch');
+		if (playerIsPip) {
+			playerIsInWindowFullscreen.set(false);
+		}
 		requestAnimationFrame(() => resetScroll());
 	});
 
@@ -166,6 +170,11 @@
 	Mousetrap.bind($keybindStore.closePlayer, () => {
 		if (fullscreenExited) return false;
 
+		if ($playerIsInWindowFullscreen) {
+			playerIsInWindowFullscreen.set(false);
+			return false;
+		}
+
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
 			return false;
@@ -235,7 +244,7 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={$isAndroidTvStore}
-		class:hide-element={$playerTheatreModeIsActive}
+		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
 	>
 		<header class="small-padding">
 			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
@@ -276,7 +285,7 @@
 		{/if}
 	</nav>
 	{#if !$isAndroidTvStore}
-		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore}>
+		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore} class:hide-element={$playerIsInWindowFullscreen}>
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
@@ -371,7 +380,7 @@
 		</nav>
 	{/if}
 
-	<nav class="bottom s">
+	<nav class="bottom s" class:hide-element={$playerIsInWindowFullscreen}>
 		{#each pages as navPage (navPage)}
 			<a
 				class="round"
@@ -402,7 +411,7 @@
 		{/if}
 	</dialog>
 
-	<main id="main-content" tabindex="0" class="responsive max root">
+	<main id="main-content" tabindex="0" class="responsive max root" class:full-window-main={$playerIsInWindowFullscreen}>
 		{#if showWatchParty}
 			<WatchParty />
 		{/if}
@@ -413,8 +422,8 @@
 					class:pip={playerIsPip}
 					class:s12={!playerIsPip}
 					class:m12={!playerIsPip}
-					class:l12={$playerTheatreModeIsActive && !playerIsPip}
-					class:l9={!$playerTheatreModeIsActive && !playerIsPip}
+				class:l12={($playerTheatreModeIsActive || $playerIsInWindowFullscreen) && !playerIsPip}
+				class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
 				>
 					<div class="pip-info">
 						{#if playerIsPip}
@@ -530,7 +539,12 @@
 	}
 
 	@media only screen and (max-width: 993px) {
-		.pip {
+	.full-window-main {
+		padding: 0;
+		max-width: 100%;
+	}
+
+	.pip {
 			width: 100%;
 			bottom: 100px;
 			right: 0px;

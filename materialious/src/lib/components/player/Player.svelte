@@ -28,6 +28,7 @@
 		playerSavePlaybackPositionStore,
 		playerState,
 		playerTheatreModeIsActive,
+		playerIsInWindowFullscreen,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
@@ -225,6 +226,10 @@
 			playerContainer.requestFullscreen();
 			playerIsFullscreen = true;
 		}
+	}
+
+	function toggleInWindowFullscreen() {
+		playerIsInWindowFullscreen.update((v) => !v);
 	}
 
 	async function loadVideo() {
@@ -795,6 +800,7 @@
 <div
 	id="player-container"
 	class:contain-video={!$isAndroidTvStore}
+	class:full-window={$playerIsInWindowFullscreen}
 	class:tv-contain-video={$isAndroidTvStore}
 	class:hide={showVideoRetry}
 	class:hide-cursor={!showControls}
@@ -900,6 +906,15 @@
 						<Airplay {playerElement} />
 						<Pip {playerElement} />
 					{/if}
+					{#if Capacitor.getPlatform() !== 'android'}
+						<button
+							class="surface-container-highest"
+							class:primary={$playerIsInWindowFullscreen}
+							onclick={toggleInWindowFullscreen}
+						>
+							<i>fit_screen</i>
+						</button>
+					{/if}
 					<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
 				{/if}
 			</nav>
@@ -931,6 +946,12 @@
 	#player-container {
 		position: relative;
 		width: 100%;
+	}
+
+	.full-window {
+		max-height: none !important;
+		max-width: none !important;
+		height: 100dvh;
 	}
 
 	#player-controls {

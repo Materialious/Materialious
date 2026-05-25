@@ -21,6 +21,7 @@
 		playerState,
 		playerTheatreModeByDefaultStore,
 		playerTheatreModeIsActive,
+		playerIsInWindowFullscreen,
 		playlistCacheStore,
 		type PlayerState,
 		filterContentListStore,
@@ -272,7 +273,7 @@
 </svelte:head>
 
 <div class="grid no-padding">
-	<div class={`s12 m12 l${$playerTheatreModeIsActive ? '12' : '9'}`}>
+	<div class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
 			{#if data.video.premiereTimestamp}
 				<article class="video-placeholder">
@@ -513,7 +514,7 @@
 			</article>
 		{/if}
 	</div>
-	{#if !$playerTheatreModeIsActive}
+	{#if !$playerTheatreModeIsActive && !$playerIsInWindowFullscreen}
 		<div class="s12 m12 l3 recommended">
 			{#if showTranscript}
 				<Transcript video={data.video} bind:currentTime={playerCurrentTime} />

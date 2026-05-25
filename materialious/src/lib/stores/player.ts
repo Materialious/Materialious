@@ -79,6 +79,7 @@ export interface SleepTimerState {
 }
 export const sleepTimerStore = writable<SleepTimerState | undefined>(undefined);
 export const playerTheatreModeIsActive = writable(false);
+export const playerIsInWindowFullscreen = writable(false);
 
 export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean }>> =
 	writable({});

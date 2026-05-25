@@ -20,6 +20,7 @@ export {
 	playerState,
 	sleepTimerStore,
 	playerTheatreModeIsActive,
+	playerIsInWindowFullscreen,
 	playlistSettingsStore
 } from './player';
 export type { PlayerState, SleepTimerState } from './player';

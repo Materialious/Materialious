@@ -188,9 +188,7 @@
 			addToast({
 				data: {
 					text: $_('layout.sponsors.cancelledSegment', {
-						values: {
-							time: formatTime(start)
-						}
+						time: formatTime(start)
 					})
 				}
 			});

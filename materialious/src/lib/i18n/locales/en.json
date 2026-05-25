@@ -344,8 +344,6 @@
 			"submit": "Submit",
 			"back": "Back",
 			"submitting": "Submitting...",
-			"reviewSubmission": "Review submission",
-			"segmentReviewTime": "{{start}} : {{end}}",
 			"confirmSubmit": "Confirm Submission",
 			"segmentsSubmitted": "SponsorBlock segments submitted",
 			"failedToSubmitSegments": "Failed to submit SponsorBlock segments",

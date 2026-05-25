@@ -91,7 +91,7 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch" tabindex="0">
+	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockStore}
 			onclick={() => sponsorBlockStore.set(!$sponsorBlockStore)}
@@ -106,7 +106,7 @@
 	<div class="max">
 		<p>{$_('layout.sponsors.disableToast')}</p>
 	</div>
-	<label class="switch" tabindex="0">
+	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockDisplayToastStore}
 			onclick={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
@@ -131,7 +131,7 @@
 	<div class="max">
 		<p>{$_('layout.sponsors.enableSegmentSubmissions')}</p>
 	</div>
-	<label class="switch" tabindex="0">
+	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockSegmentSubmissionsEnabledStore}
 			type="checkbox"

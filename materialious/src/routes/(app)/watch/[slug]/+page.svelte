@@ -49,6 +49,7 @@
 	let playerElement: HTMLMediaElement | undefined = $state();
 
 	let comments: Comments | null = $state(null);
+	let commentSort: 'top' | 'new' = $state('top');
 	data.streamed.comments?.then((streamedComments) => {
 		comments = streamedComments;
 	});
@@ -220,7 +221,8 @@
 				loadedComments = await comments.getContinuation();
 			} else if (comments.continuation) {
 				loadedComments = await getComments(data.video.videoId, {
-					continuation: comments.continuation
+					continuation: comments.continuation,
+					sort_by: commentSort
 				});
 			} else {
 				return;
@@ -232,6 +234,16 @@
 			}
 		} catch (error) {
 			console.error('Error loading more comments:', error);
+		}
+	}
+
+	async function reloadComments(sort: 'top' | 'new') {
+		commentSort = sort;
+		try {
+			const newComments = await getComments(data.video.videoId, { sort_by: sort });
+			comments = newComments;
+		} catch {
+			// Continue regardless of error
 		}
 	}
 
@@ -497,6 +509,15 @@
 					</summary>
 
 					<div class="space"></div>
+
+					<button class="surface-container-highest small" style="margin-bottom: 12px;">
+						<i>sort</i>
+						<span>{$_('commentSortBy')}: {commentSort === 'top' ? $_('commentSortTop') : $_('commentSortNewest')}</span>
+						<menu class="no-wrap" id="comment-sort" data-ui="#comment-sort">
+							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('top')}>{$_('commentSortTop')}</li>
+							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('new')}>{$_('commentSortNewest')}</li>
+						</menu>
+					</button>
 
 					<div class="comment-list">
 						{#each comments.comments as comment (comment)}

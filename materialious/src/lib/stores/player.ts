@@ -83,3 +83,23 @@ export const playerIsInWindowFullscreen = writable(false);
 
 export const playlistSettingsStore: Writable<Record<string, { shuffle: boolean; loop: boolean }>> =
 	writable({});
+
+export interface SubtitleSettings {
+	fontSize: number;
+	color: string;
+	backgroundColor: string;
+	textShadow: string;
+}
+
+export const defaultSubtitleSettings: SubtitleSettings = {
+	fontSize: 3,
+	color: '#ffffff',
+	backgroundColor: 'rgba(0, 0, 0, 0.8)',
+	textShadow: '2px 2px 2px rgba(0,0,0,0.8)'
+};
+
+export const subtitleSettings = persist(
+	writable<SubtitleSettings>(defaultSubtitleSettings),
+	createStorage(),
+	'subtitleSettings'
+);

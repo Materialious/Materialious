@@ -246,7 +246,7 @@
 		class:tv-nav={$isAndroidTvStore}
 		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
 	>
-		<header class="small-padding">
+		<header class="small-padding no-margin">
 			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
 				<Logo />
 			</a>
@@ -285,7 +285,12 @@
 		{/if}
 	</nav>
 	{#if !$isAndroidTvStore}
-		<nav class="top" id="top-content" class:tv-nav={$isAndroidTvStore} class:hide-element={$playerIsInWindowFullscreen}>
+		<nav
+			class="top"
+			id="top-content"
+			class:tv-nav={$isAndroidTvStore}
+			class:hide-element={$playerIsInWindowFullscreen}
+		>
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
@@ -411,7 +416,12 @@
 		{/if}
 	</dialog>
 
-	<main id="main-content" tabindex="0" class="responsive max root" class:full-window-main={$playerIsInWindowFullscreen}>
+	<main
+		id="main-content"
+		tabindex="0"
+		class="responsive max root"
+		class:full-window-main={$playerIsInWindowFullscreen}
+	>
 		{#if showWatchParty}
 			<WatchParty />
 		{/if}
@@ -422,8 +432,8 @@
 					class:pip={playerIsPip}
 					class:s12={!playerIsPip}
 					class:m12={!playerIsPip}
-				class:l12={($playerTheatreModeIsActive || $playerIsInWindowFullscreen) && !playerIsPip}
-				class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
+					class:l12={($playerTheatreModeIsActive || $playerIsInWindowFullscreen) && !playerIsPip}
+					class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
 				>
 					<div class="pip-info">
 						{#if playerIsPip}
@@ -539,12 +549,12 @@
 	}
 
 	@media only screen and (max-width: 993px) {
-	.full-window-main {
-		padding: 0;
-		max-width: 100%;
-	}
+		.full-window-main {
+			padding: 0;
+			max-width: 100%;
+		}
 
-	.pip {
+		.pip {
 			width: 100%;
 			bottom: 100px;
 			right: 0px;

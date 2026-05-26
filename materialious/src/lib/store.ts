@@ -23,6 +23,8 @@ export {
 	playerTheatreModeIsActive,
 	playerIsInWindowFullscreen,
 	playlistSettingsStore,
+	subtitleSettings,
+	defaultSubtitleSettings,
 	darkModeStore,
 	themeColorStore,
 	showWarningStore,
@@ -79,4 +81,4 @@ export {
 	channelCacheStore
 } from './stores/index';
 export { isAndroidTv } from './misc';
-export type { PlayerState, SleepTimerState, Keybinds } from './stores/index';
+export type { PlayerState, SleepTimerState, Keybinds, SubtitleSettings } from './stores/index';

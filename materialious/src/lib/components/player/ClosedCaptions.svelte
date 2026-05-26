@@ -29,6 +29,7 @@
 	import { addToast } from '../Toast.svelte';
 	import { parseResponse, CaptionsRenderer } from 'media-captions';
 	import { getCaptionUrl } from '$lib/player/captions';
+	import { subtitleSettings } from '$lib/store';
 	import 'media-captions/styles/captions.css';
 
 	let {
@@ -73,34 +74,27 @@
 <div
 	id="captions"
 	class:controls-shown={showControls}
-	bind:this={captionElement}
 	class:hide={!trackVisible}
+	bind:this={captionElement}
+	style="left: 50%;bottom: {showControls
+		? '80px'
+		: '30px'};transform: translateX(-50%);--cue-color: {$subtitleSettings.color};--cue-bg-color: {$subtitleSettings.backgroundColor};--cue-font-size: calc(var(--overlay-height) / 100 * {$subtitleSettings.fontSize});--cue-text-shadow: {$subtitleSettings.textShadow};"
 ></div>
 
 <style>
 	#captions {
 		--overlay-padding: 1%;
-		--cue-color: white;
-		--cue-bg-color: rgba(0, 0, 0, 0.8);
-		--cue-font-size: calc(var(--overlay-height) / 100 * 3);
 		--cue-line-height: calc(var(--cue-font-size) * 1.2);
 		--cue-padding-x: calc(var(--cue-font-size) * 0.6);
 		--cue-padding-y: calc(var(--cue-font-size) * 0.4);
 
-		bottom: 30px;
-		left: 55%;
-		transform: translateX(-50%); /* true horizontal centering */
-	}
-
-	#captions.controls-shown {
-		bottom: 80px;
+		position: absolute;
+		z-index: 1;
 	}
 
 	@media screen and (max-width: 1000px) {
 		#captions {
 			--cue-font-size: calc(var(--overlay-height) / 100 * 8);
-			bottom: 0px;
-			width: 100%;
 		}
 
 		#captions.controls-shown {

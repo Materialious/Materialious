@@ -95,15 +95,25 @@
 					closeDelay: 0
 				});
 
-				await importSubscriptionsFromFile(files[0]);
+				try {
+					await importSubscriptionsFromFile(files[0]);
 
-				toaster.removeToast('importing-toast');
+					toaster.removeToast('importing-toast');
 
-				addToast({
-					data: {
-						text: $_('layout.export.importingCompleted')
-					}
-				});
+					addToast({
+						data: {
+							text: $_('layout.export.importingCompleted')
+						}
+					});
+				} catch (errorMsg) {
+					toaster.removeToast('importing-toast');
+
+					addToast({
+						data: {
+							text: (errorMsg as Error).message
+						}
+					});
+				}
 			}}
 			accept=".json,.opml,.csv,.db"
 			type="file"
@@ -123,7 +133,7 @@
 				Invidious JSON
 			</li>
 			<li role="presentation" onclick={() => exportSubscriptionsAsFile('OPML')}>
-				FreeTube/NewPipe/YouTube OPML
+				FreeTube/NewPipe/YT OPML
 			</li>
 		</menu>
 	</div>

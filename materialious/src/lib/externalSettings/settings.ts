@@ -56,7 +56,8 @@ import {
 	filterContentUrlAutoUpdateStore,
 	interfaceAdvancedThemingStore,
 	interfaceBorderRadiusStore,
-	interfacePreserveTranslation
+	interfacePreserveTranslation,
+	subtitleSettings
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
 import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
@@ -87,6 +88,14 @@ export const zThemeColors = z.record(
 	}),
 	z.string().regex(/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/)
 );
+export const zSubtitles = z.object({
+	fontSize: z.number(),
+	color: z.string().regex(/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/),
+	backgroundColor: z.string().regex(/^rgba\(\d{1,3}, \d{1,3}, \d{1,3}, [01](\.\d+)?\)$/),
+	textShadow: z
+		.string()
+		.regex(/^(none|\d+px \d+px \d+px rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[01](\.\d+)?\))$/)
+});
 
 export const persistedStores: PersistedStore<any>[] = [
 	{
@@ -296,6 +305,12 @@ export const persistedStores: PersistedStore<any>[] = [
 		name: 'preserveTranslation',
 		store: interfacePreserveTranslation,
 		schema: zBoolean
+	},
+	{
+		name: 'subtitleSettings',
+		store: subtitleSettings,
+		schema: zSubtitles,
+		serialize: JSON.stringify
 	}
 ];
 

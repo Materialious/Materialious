@@ -210,6 +210,23 @@ export class ElectronCapacitorApp {
 				event.preventDefault();
 			}
 		});
+		// Zoom in/out with Ctrl/Cmd +/-
+		this.MainWindow.webContents.on('before-input-event', (event, input) => {
+			if (input.control || input.meta) {
+				if (input.key === '=' || input.key === '+' || input.key === 'Equal') {
+					event.preventDefault();
+					const zoom = this.MainWindow!.webContents.getZoomLevel();
+					this.MainWindow!.webContents.setZoomLevel(zoom + 0.5);
+				} else if (input.key === '-' || input.key === 'Minus') {
+					event.preventDefault();
+					const zoom = this.MainWindow!.webContents.getZoomLevel();
+					this.MainWindow!.webContents.setZoomLevel(zoom - 0.5);
+				} else if (input.key === '0' || input.key === 'Digit0') {
+					event.preventDefault();
+					this.MainWindow!.webContents.setZoomLevel(0);
+				}
+			}
+		});
 		// Link electron plugins into the system.
 		setupCapacitorElectronPlugins();
 

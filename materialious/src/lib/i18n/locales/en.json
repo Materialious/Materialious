@@ -68,6 +68,9 @@
 	"skip": "Skip",
 	"upcomingSegment": "Upcoming ",
 	"comments": "comments",
+	"commentSortBy": "Sort by",
+	"commentSortTop": "Top",
+	"commentSortNewest": "Newest",
 	"reply": "reply",
 	"replies": "replies",
 	"region": "Region",
@@ -179,7 +182,12 @@
 			"loop": "Loop",
 			"on": "On",
 			"off": "Off",
-			"language": "Language"
+			"language": "Language",
+			"fontSize": "Font size",
+			"textColor": "Text color",
+			"bgColor": "Background color",
+			"alignment": "Alignment",
+			"reset": "Reset defaults"
 		}
 	},
 	"layout": {

@@ -26,7 +26,7 @@
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter' && focusedItemId) {
 			event.preventDefault();
-			handleItemSelect(focusedItemId);
+			handleItemSelect(event, focusedItemId);
 			return;
 		}
 
@@ -52,11 +52,11 @@
 		}
 	}
 
-	function handleItemSelect(uniqueItemId: string) {
+	function handleItemSelect(event: Event, uniqueItemId: string) {
 		feedLastItemId.set(uniqueItemId);
 		focusedItemId = uniqueItemId;
 
-		goToItem(uniqueItemId);
+		if (event instanceof KeyboardEvent && event.key === 'Enter') goToItem(uniqueItemId);
 	}
 
 	onMount(async () => {
@@ -100,7 +100,7 @@
 					{@const uniqueItemId = extractUniqueId(item)}
 					<ContentColumn>
 						<article
-							onclick={() => handleItemSelect(uniqueItemId)}
+							onclick={(event) => handleItemSelect(event, uniqueItemId)}
 							id={uniqueItemId}
 							class="no-padding item-select border"
 							class:item-select-focused={(!isMobile() || $isAndroidTvStore) &&

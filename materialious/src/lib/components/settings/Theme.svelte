@@ -157,7 +157,7 @@
 			}}
 			class="surface-container-highest"
 			style="border-radius: 0 !important;width: 100%;box-sizing:border-box;"
-			class:border={$interfaceBorderRadiusStore == 0}
+			class:primary-border={$interfaceBorderRadiusStore == 0}
 		>
 			<p>{$_('layout.theme.borderRadius.none')}</p>
 		</button>
@@ -169,7 +169,7 @@
 			}}
 			class="surface-container-highest"
 			style="border-radius: 0.25rem !important;width: 100%;box-sizing:border-box;"
-			class:border={$interfaceBorderRadiusStore == 0.25}
+			class:primary-border={$interfaceBorderRadiusStore == 0.25}
 		>
 			<p>{$_('layout.theme.borderRadius.slight')}</p>
 		</button>
@@ -181,7 +181,7 @@
 			}}
 			class="surface-container-highest"
 			style="border-radius: 0.5rem !important;width: 100%;box-sizing:border-box;"
-			class:border={$interfaceBorderRadiusStore == 0.5}
+			class:primary-border={$interfaceBorderRadiusStore == 0.5}
 		>
 			<p>{$_('layout.theme.borderRadius.modern')}</p>
 		</button>
@@ -193,7 +193,7 @@
 			}}
 			class="surface-container-highest"
 			style="border-radius: 1rem !important;width: 100%;box-sizing:border-box;"
-			class:border={$interfaceBorderRadiusStore == 1}
+			class:primary-border={$interfaceBorderRadiusStore == 1}
 		>
 			<p>{$_('layout.theme.borderRadius.rounded')}</p>
 		</button>

@@ -50,7 +50,9 @@ export async function importSubscriptions(subscriptions: Subscription[]) {
 		subPromises.push(postSubscribe(sub.authorId, sub.author));
 	}
 
-	await Promise.all(subPromises);
+	await Promise.all(subPromises).catch(() => {
+		throw Error('Import failed, Unable to subscribe to given channel.');
+	});
 }
 
 export async function importSubscriptionsFromFile(file: File) {

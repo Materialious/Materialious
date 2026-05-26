@@ -31,7 +31,7 @@ export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
 	return {
 		type: 'channel',
 		allowedRegions: innerResults.metadata.available_countries ?? [],
-		tabs: innerResults.tabs.map((tab) => tab.toLowerCase()),
+		tabs: innerResults.tabs.map((tab) => tab.toLowerCase().replace('live', 'streams')),
 		latestVideos: [],
 		isFamilyFriendly: true,
 		author: innerResults.metadata.title ?? '',
@@ -139,6 +139,14 @@ export async function getChannelContentYTjs(
 		innerResults = await channel.getShorts();
 	} else {
 		innerResults = await channel.getLiveStreams();
+	}
+
+	if (options.sortBy && innerResults instanceof YT.Channel) {
+		try {
+			innerResults = await innerResults.applySort(options.sortBy);
+		} catch {
+			// sort filter not available for this tab
+		}
 	}
 
 	return fetchChannelContentWithContinuation(innerResults, author, channelId);

@@ -27,9 +27,12 @@ export function processYoutubeLink(line: string): string {
 
 	if (urlMatch) {
 		// Extract the YouTube redirect URL and get the actual URL from the `q` parameter
-		const redirectUrl = urlMatch[0]; // the full redirect URL with the `q` parameter
+		const redirectUrl = urlMatch[0];
 		const actualUrl = extractActualLink(redirectUrl);
-		return line.replace(urlRegex, `<a href="${actualUrl}"`);
+		return line.replace(
+			urlRegex,
+			`<a href="${actualUrl}" target="_blank" rel="noopener noreferrer" class="link"`
+		);
 	} else {
 		// If no match found, just return the original line
 		return line;
@@ -46,7 +49,7 @@ export function parseDescription(
 	content: string,
 	fallbackPatch?: 'youtubejs' | 'piped'
 ): ParsedDescription {
-	const timestamps: Timestamps = [];
+	let timestamps: Timestamps = [];
 	const lines = content.split('\n');
 	const filteredLines: string[] = [];
 
@@ -68,8 +71,9 @@ export function parseDescription(
 				const timeParam = url.searchParams.get('t') || '0';
 
 				const timePretty = link.textContent?.trim() || '';
-				const spans = doc.querySelectorAll('span');
-				const title = spans.length > 1 ? spans[1].textContent?.trim() || '' : '';
+
+				doc.querySelectorAll('a').forEach((a) => a.remove());
+				const title = doc.body.textContent?.trim() || '';
 
 				timestamps.push({
 					time: convertToSeconds(timeParam.replace('s', '')),
@@ -99,10 +103,7 @@ export function parseDescription(
 			}
 			// Normal link, modify to not use youtube redirect
 			else {
-				const modifiedLine = processYoutubeLink(line).replace(
-					/<a href="([^"]+)"/,
-					'<a href="$1" target="_blank" rel="noopener noreferrer" class="link"'
-				);
+				const modifiedLine = processYoutubeLink(line);
 				filteredLines.push(modifiedLine);
 			}
 		} else {
@@ -114,6 +115,9 @@ export function parseDescription(
 	timestamps.forEach((ts, idx) => {
 		ts.endTime = idx < timestamps.length - 1 ? timestamps[idx + 1].time : -1;
 	});
+
+	// No need displaying a single timestamp as a chapter.
+	if (timestamps.length === 1) timestamps = [];
 
 	const filteredContent = filteredLines.join('\n');
 

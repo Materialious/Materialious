@@ -21,9 +21,11 @@ export {
 	sleepTimerStore,
 	playerTheatreModeIsActive,
 	playerIsInWindowFullscreen,
-	playlistSettingsStore
+	playlistSettingsStore,
+	subtitleSettings,
+	defaultSubtitleSettings
 } from './player';
-export type { PlayerState, SleepTimerState } from './player';
+export type { PlayerState, SleepTimerState, SubtitleSettings } from './player';
 export {
 	darkModeStore,
 	themeColorStore,

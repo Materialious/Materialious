@@ -179,7 +179,12 @@
 			"loop": "Loop",
 			"on": "On",
 			"off": "Off",
-			"language": "Language"
+			"language": "Language",
+			"fontSize": "Font size",
+			"textColor": "Text color",
+			"bgColor": "Background color",
+			"alignment": "Alignment",
+			"reset": "Reset defaults"
 		}
 	},
 	"layout": {

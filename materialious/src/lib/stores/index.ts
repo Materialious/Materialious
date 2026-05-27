@@ -46,6 +46,7 @@ export {
 	interfaceAdvancedThemingStore,
 	interfaceBorderRadiusStore,
 	interfacePreserveTranslation,
+	interfaceMobileBackButtonStore,
 	hideSearchStore
 } from './interface';
 export {

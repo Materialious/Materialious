@@ -57,6 +57,7 @@ import {
 	interfaceAdvancedThemingStore,
 	interfaceBorderRadiusStore,
 	interfacePreserveTranslation,
+	interfaceMobileBackButtonStore,
 	subtitleSettings
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
@@ -304,6 +305,11 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'preserveTranslation',
 		store: interfacePreserveTranslation,
+		schema: zBoolean
+	},
+	{
+		name: 'showMobileBackButton',
+		store: interfaceMobileBackButtonStore,
 		schema: zBoolean
 	},
 	{

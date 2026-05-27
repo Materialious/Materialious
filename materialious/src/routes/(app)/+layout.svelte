@@ -23,7 +23,10 @@
 		rawMasterKeyStore,
 		backendInUseStore,
 		hideSearchStore,
-		keybindStore
+		keybindStore,
+
+		interfaceMobileBackButtonStore
+
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -291,15 +294,17 @@
 			class:tv-nav={$isAndroidTvStore}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
-			<button
-				type="button"
-				class="transparent s circle large"
-				disabled={page.url.pathname === '/'}
-				onclick={() => history.back()}
-				aria-label="Back"
-			>
-				<i>keyboard_double_arrow_left</i>
-			</button>
+			{#if $interfaceMobileBackButtonStore}
+				<button
+					type="button"
+					class="transparent s circle large"
+					disabled={page.url.pathname === '/'}
+					onclick={() => history.back()}
+					aria-label="Back"
+				>
+					<i>keyboard_double_arrow_left</i>
+				</button>
+			{/if}
 
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">

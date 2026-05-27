@@ -44,6 +44,7 @@ export {
 	interfaceAdvancedThemingStore,
 	interfaceBorderRadiusStore,
 	interfacePreserveTranslation,
+	interfaceMobileBackButtonStore,
 	hideSearchStore,
 	invidiousInstanceStore,
 	backendInUseStore,

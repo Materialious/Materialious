@@ -90,7 +90,7 @@ export const interfacePreserveTranslation: Writable<boolean> = persist(
 	'preserveTranslation'
 );
 
-export const interfaceMobileBackButtonStore: Writable<boolean>  = persist(
+export const interfaceMobileBackButtonStore: Writable<boolean> = persist(
 	writable(false),
 	createStorage(),
 	'showMobileBackButton'

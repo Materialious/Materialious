@@ -24,9 +24,7 @@
 		backendInUseStore,
 		hideSearchStore,
 		keybindStore,
-
 		interfaceMobileBackButtonStore
-
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -595,10 +593,9 @@
 			font-size: 1em;
 		}
 	}
-	
+
 	.mobile-search-container {
 		flex: 1;
 		min-width: 0;
 	}
-
 </style>

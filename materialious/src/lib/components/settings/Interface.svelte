@@ -286,10 +286,7 @@
 			<input
 				type="checkbox"
 				bind:checked={$interfaceMobileBackButtonStore}
-				onclick={() =>
-					interfaceMobileBackButtonStore.set(
-						!$interfaceMobileBackButtonStore
-					)}
+				onclick={() => interfaceMobileBackButtonStore.set(!$interfaceMobileBackButtonStore)}
 				role="switch"
 			/>
 			<span></span>

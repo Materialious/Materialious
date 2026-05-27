@@ -49,15 +49,8 @@ export {
 	interfaceMobileBackButtonStore,
 	hideSearchStore
 } from './interface';
-export {
-	invidiousInstanceStore,
-	backendInUseStore,
-	invidiousAuthStore
-} from './invidious';
-export {
-	returnYtDislikesStore,
-	returnYTDislikesInstanceStore
-} from './ryd';
+export { invidiousInstanceStore, backendInUseStore, invidiousAuthStore } from './invidious';
+export { returnYtDislikesStore, returnYTDislikesInstanceStore } from './ryd';
 export {
 	engineCullYTStore,
 	engineCooldownYTStore,

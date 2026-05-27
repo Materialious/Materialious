@@ -277,22 +277,24 @@
 	</nav>
 </div>
 
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.showMobileBackButton')}</div>
-		</div>
-		<label class="switch" tabindex="0">
-			<input
-				type="checkbox"
-				bind:checked={$interfaceMobileBackButtonStore}
-				onclick={() => interfaceMobileBackButtonStore.set(!$interfaceMobileBackButtonStore)}
-				role="switch"
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
+{#if Capacitor.getPlatform() !== 'electron'}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.showMobileBackButton')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$interfaceMobileBackButtonStore}
+					onclick={() => interfaceMobileBackButtonStore.set(!$interfaceMobileBackButtonStore)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+{/if}
 
 {#if Capacitor.getPlatform() == 'android'}
 	<div class="field no-margin">

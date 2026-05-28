@@ -5,7 +5,7 @@
 	import { iso31661 } from 'iso-3166';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { isUnrestrictedPlatform, timeout, shareURL } from '$lib/misc';
+	import { isUnrestrictedPlatform, timeout, shareURL, isMobile } from '$lib/misc';
 	import { getPages, type Pages } from '$lib/navPages';
 	import { setInvidiousInstance, goToInvidiousLogin, invidiousLogout } from '$lib/auth';
 	import {
@@ -277,7 +277,7 @@
 	</nav>
 </div>
 
-{#if Capacitor.getPlatform() !== 'electron'}
+{#if isMobile()}
 	<div class="field no-margin">
 		<nav class="no-padding">
 			<div class="max">

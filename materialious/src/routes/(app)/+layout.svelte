@@ -31,7 +31,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
-	import { isYTBackend, truncate } from '$lib/misc';
+	import { isMobile, isYTBackend, truncate } from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -292,7 +292,7 @@
 			class:tv-nav={$isAndroidTvStore}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
-			{#if $interfaceMobileBackButtonStore}
+			{#if $interfaceMobileBackButtonStore && isMobile()}
 				<button
 					type="button"
 					class="transparent s circle large"

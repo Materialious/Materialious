@@ -66,6 +66,15 @@ article {
 	margin: 0.3em;
 }
 
+.no-round,
+.square,
+.top-round,
+.bottom-round,
+.left-round,
+.right-round {
+	border-radius: var(--border-radius) !important;
+}
+
 nav.top {
 	padding-bottom: 1em;
 	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;

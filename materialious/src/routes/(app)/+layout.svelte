@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/state';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
@@ -292,18 +292,6 @@
 			class:tv-nav={$isAndroidTvStore}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
-			{#if $interfaceMobileBackButtonStore && isMobile()}
-				<button
-					type="button"
-					class="transparent s circle large"
-					disabled={page.url.pathname === '/'}
-					onclick={() => history.back()}
-					aria-label="Back"
-				>
-					<i>keyboard_double_arrow_left</i>
-				</button>
-			{/if}
-
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
@@ -311,6 +299,24 @@
 					</a>
 				</header>
 			{/if}
+
+			{#if Capacitor.getPlatform() === 'electron' || ($interfaceMobileBackButtonStore && isMobile() && !mobileSearchShow)}
+				<nav class="no-space connected">
+					<button
+						onclick={() => window.history.back()}
+						class="surface-container-highest left-round"
+					>
+						<i>arrow_back</i>
+					</button>
+					<button
+						onclick={() => window.history.forward()}
+						class="surface-container-highest right-round"
+					>
+						<i>arrow_forward</i>
+					</button>
+				</nav>
+			{/if}
+
 			{#if !mobileSearchShow}
 				<button
 					onclick={() => (mobileSearchShow = !mobileSearchShow)}
@@ -318,17 +324,6 @@
 				>
 					<i>search</i>
 				</button>
-			{/if}
-
-			{#if Capacitor.getPlatform() === 'electron'}
-				<nav class="no-space">
-					<button onclick={() => window.history.back()} class="border">
-						<i>arrow_back</i>
-					</button>
-					<button onclick={() => window.history.forward()} class="border">
-						<i>arrow_forward</i>
-					</button>
-				</nav>
 			{/if}
 
 			<div class="max m l"></div>
@@ -455,18 +450,24 @@
 							<div>
 								<nav>
 									<h6 class="max">{truncate($playerState.data.video.title, 25)}</h6>
-									<button class="border m l" onclick={() => playerState.set(undefined)}>
+									<button
+										class="surface-container-highest m l"
+										onclick={() => playerState.set(undefined)}
+									>
 										<i>close</i>
 									</button>
 								</nav>
 								<div class="space"></div>
 								<nav class="s">
 									<a
-										class="button border"
+										class="button surface-container-highest"
 										href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
 										><i>keyboard_arrow_right</i></a
 									>
-									<button class="border" onclick={() => playerState.set(undefined)}>
+									<button
+										class="surface-container-highest"
+										onclick={() => playerState.set(undefined)}
+									>
 										<i>close</i>
 									</button>
 								</nav>
@@ -483,7 +484,7 @@
 							<Author channel={$playerState.data.video} hideSubscribe={true} />
 							<div class="max"></div>
 							<a
-								class="button border"
+								class="button surface-container-highest"
 								href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
 								><i>keyboard_arrow_right</i></a
 							>

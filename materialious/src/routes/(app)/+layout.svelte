@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { afterNavigate, goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/state';
 	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';

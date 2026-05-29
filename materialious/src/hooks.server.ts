@@ -5,8 +5,10 @@ import { env } from '$env/dynamic/private';
 import sodium from 'libsodium-wrappers-sumo';
 
 let captchaKey = '';
+let captchaSignature = '';
 sodium.ready.then(() => {
 	captchaKey = sodium.to_base64(sodium.randombytes_buf(32));
+	captchaSignature = sodium.to_base64(sodium.randombytes_buf(32));
 });
 
 let sequelizeAuthenticated = false;
@@ -16,6 +18,7 @@ export async function handle({ event, resolve }) {
 	}
 
 	event.locals.captchaKey = captchaKey;
+	event.locals.captchaSignature = captchaSignature;
 
 	const sequelize = getSequelize();
 	if (!sequelizeAuthenticated) {

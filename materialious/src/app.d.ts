@@ -6,6 +6,7 @@ declare global {
 		interface Locals {
 			userId: string;
 			captchaKey: string;
+			captchaSignature: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

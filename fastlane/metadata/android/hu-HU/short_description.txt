@@ -1,1 +1,1 @@
-Modern és anyagszerű megjelenés a Youtube és Invidious számára.
+Modern Material Design megjelenés a Youtube és Invidious számára.

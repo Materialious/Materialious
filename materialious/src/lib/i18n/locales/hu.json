@@ -171,7 +171,30 @@
             "importFromFile": "Importálás fájlból",
             "exportToShareUrl": "Exportálás megosztási webcímre"
         },
-        "preserveTranslation": "Eredeti fordítás használata"
+        "preserveTranslation": "Eredeti fordítás használata",
+        "binds": {
+            "title": "Billentyűparancsok",
+            "togglePlay": "Lejátszás / Szünet",
+            "skipSponsor": "Szponzor szakasz kihagyása",
+            "toggleSubtitles": "Feliratok be/ki",
+            "toggleFullscreen": "Teljes képernyő be/ki",
+            "speedDown": "Lejátszási sebesség csökkentése",
+            "speedUp": "Lejátszási sebesség növelése",
+            "frameBack": "Visszalépés képkockánként",
+            "frameForward": "Előrelépés képkockánként",
+            "seekBack": "Ugrás visszafelé",
+            "seekForward": "Ugrás előre",
+            "search": "Keresés megnyitása",
+            "clickToSet": "Kattintson a beállításhoz…",
+            "pageBack": "Vissza",
+            "pageForward": "Előre",
+            "closePlayer": "Kilépés a teljes képernyőből / lejátszó bezárása",
+            "tab1": "1. lap",
+            "tab2": "2. lap",
+            "tab3": "3. lap",
+            "tab4": "4. lap",
+            "reset": "Visszaállítás alapértelmezésre"
+        }
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",
@@ -223,8 +246,15 @@
             "loop": "Folyamatos lejátszás",
             "on": "Be",
             "off": "Ki",
-            "language": "Nyelv"
-        }
+            "language": "Nyelv",
+            "fontSize": "Betűméret",
+            "textColor": "Szöveg színe",
+            "bgColor": "Háttér színe",
+            "alignment": "Igazítás",
+            "reset": "Alapértelmezések visszaállítása"
+        },
+        "pauseTimerFinished": "A szünetidő lejárt",
+        "pauseOnNetworkChange": "A videó megállt a Wi-Fi-hálózat változása miatt"
     },
     "title": "Cím",
     "subscriptions": {
@@ -257,7 +287,7 @@
     },
     "subscribers": "feliratkozók",
     "loginRequired": "Bejelentkezés szükséges",
-    "premium": "A prémium YouTube-tartalmak nem tekinthetők meg a Materialiouson.",
+    "premium": "A YouTube Premium tartalmak nem tekinthetők meg a Materialious alkalmazásban.",
     "invalidInstance": "Ellenőrizze a webcímet. Ha helyes, akkor a példány leállhatott, vagy nem támogatja a harmadik féltől származó klienseket.",
     "cancel": "Mégse",
     "delete": "Törlés",
@@ -331,5 +361,8 @@
     "weak": "Gyenge",
     "fair": "Megfelelő",
     "strong": "Erős",
-    "veryStrong": "Nagyon erős"
+    "veryStrong": "Nagyon erős",
+    "commentSortBy": "Rendezés:",
+    "commentSortTop": "Felkapottság",
+    "commentSortNewest": "Legújabb"
 }

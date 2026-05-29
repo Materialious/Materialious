@@ -15,24 +15,22 @@
 		event.preventDefault();
 		event.stopPropagation();
 
+		const key = event.key;
+		if (['Control', 'Alt', 'Shift', 'Meta'].includes(key)) return;
+
 		const parts: string[] = [];
 		if (event.ctrlKey) parts.push('ctrl');
 		if (event.altKey) parts.push('alt');
 		if (event.shiftKey) parts.push('shift');
 		if (event.metaKey) parts.push('command');
 
-		const key = event.key;
-		if (!['Control', 'Alt', 'Shift', 'Meta'].includes(key)) {
-			const mapped = key === ' ' ? 'space' : key.toLowerCase();
-			parts.push(mapped);
-		}
+		const mapped = key === ' ' ? 'space' : key.toLowerCase();
+		parts.push(mapped);
 
-		if (parts.length > 0) {
-			const combo = parts.join('+');
-			binds[recording] = combo;
-			keybindStore.set({ ...binds });
-			recording = null;
-		}
+		const combo = parts.join('+');
+		binds[recording] = combo;
+		keybindStore.set({ ...binds });
+		recording = null;
 	}
 
 	function resetSingle(action: keyof Keybinds) {
@@ -69,8 +67,6 @@
 </script>
 
 <svelte:window onkeydown={onKeyDown} />
-
-<div class="space"></div>
 
 {#each actions as { key, label } (key)}
 	<nav class="no-padding">

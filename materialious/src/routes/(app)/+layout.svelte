@@ -23,14 +23,15 @@
 		rawMasterKeyStore,
 		backendInUseStore,
 		hideSearchStore,
-		keybindStore
+		keybindStore,
+		interfaceMobileBackButtonStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { onDestroy, onMount } from 'svelte';
 	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
-	import { isYTBackend, truncate } from '$lib/misc';
+	import { isMobile, isYTBackend, truncate } from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -298,6 +299,24 @@
 					</a>
 				</header>
 			{/if}
+
+			{#if Capacitor.getPlatform() === 'electron' || ($interfaceMobileBackButtonStore && isMobile() && !mobileSearchShow)}
+				<nav class="no-space connected">
+					<button
+						onclick={() => window.history.back()}
+						class="surface-container-highest left-round"
+					>
+						<i>arrow_back</i>
+					</button>
+					<button
+						onclick={() => window.history.forward()}
+						class="surface-container-highest right-round"
+					>
+						<i>arrow_forward</i>
+					</button>
+				</nav>
+			{/if}
+
 			{#if !mobileSearchShow}
 				<button
 					onclick={() => (mobileSearchShow = !mobileSearchShow)}
@@ -305,17 +324,6 @@
 				>
 					<i>search</i>
 				</button>
-			{/if}
-
-			{#if Capacitor.getPlatform() === 'electron'}
-				<nav class="no-space">
-					<button onclick={() => window.history.back()} class="border">
-						<i>arrow_back</i>
-					</button>
-					<button onclick={() => window.history.forward()} class="border">
-						<i>arrow_forward</i>
-					</button>
-				</nav>
 			{/if}
 
 			<div class="max m l"></div>
@@ -330,8 +338,10 @@
 			{/if}
 
 			{#if mobileSearchShow}
-				<div style="width: 100%;">
-					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+				<div class="mobile-search-container">
+					<div style="width: 100%;">
+						<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+					</div>
 				</div>
 			{:else}
 				<!-- Watch parties only work in HTTPS environments -->
@@ -440,18 +450,24 @@
 							<div>
 								<nav>
 									<h6 class="max">{truncate($playerState.data.video.title, 25)}</h6>
-									<button class="border m l" onclick={() => playerState.set(undefined)}>
+									<button
+										class="surface-container-highest m l"
+										onclick={() => playerState.set(undefined)}
+									>
 										<i>close</i>
 									</button>
 								</nav>
 								<div class="space"></div>
 								<nav class="s">
 									<a
-										class="button border"
+										class="button surface-container-highest"
 										href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
 										><i>keyboard_arrow_right</i></a
 									>
-									<button class="border" onclick={() => playerState.set(undefined)}>
+									<button
+										class="surface-container-highest"
+										onclick={() => playerState.set(undefined)}
+									>
 										<i>close</i>
 									</button>
 								</nav>
@@ -468,7 +484,7 @@
 							<Author channel={$playerState.data.video} hideSubscribe={true} />
 							<div class="max"></div>
 							<a
-								class="button border"
+								class="button surface-container-highest"
 								href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
 								><i>keyboard_arrow_right</i></a
 							>
@@ -577,5 +593,10 @@
 		.pip h6 {
 			font-size: 1em;
 		}
+	}
+
+	.mobile-search-container {
+		flex: 1;
+		min-width: 0;
 	}
 </style>

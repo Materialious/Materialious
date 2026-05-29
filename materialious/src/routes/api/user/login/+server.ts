@@ -3,12 +3,12 @@ import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 import { isOwnBackend } from '$lib/shared';
 import { setAuthCookie } from '$lib/server/misc';
-import { verifyCaptcha } from '$lib/server/captcha';
+import { captchaPayload, verifyCaptcha } from '$lib/server/captcha';
 
 const zUserLogin = z.object({
 	username: z.string(),
 	passwordHash: z.string(),
-	captchaPayload: z.string().optional()
+	captchaPayload
 });
 
 export async function POST({ request, cookies, locals }) {
@@ -20,7 +20,12 @@ export async function POST({ request, cookies, locals }) {
 
 	if (!userLogin.success) throw error(401);
 
-	await verifyCaptcha(userLogin.data.captchaPayload ?? '', locals.captchaKey, 1);
+	await verifyCaptcha({
+		solution: userLogin.data.captchaPayload.solution,
+		challenge: userLogin.data.captchaPayload.challenge,
+		key: locals.captchaKey,
+		signature: locals.captchaSignature
+	});
 
 	const userModel = await authenticateUser(userLogin.data.username, userLogin.data.passwordHash);
 

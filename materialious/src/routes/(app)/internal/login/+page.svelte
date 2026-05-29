@@ -5,16 +5,21 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { _ } from '$lib/i18n';
 	import { isOwnBackend } from '$lib/shared';
-	import 'altcha';
 	import * as comlink from 'comlink';
 	import { onMount } from 'svelte';
 	import { zxcvbn } from '@zxcvbn-ts/core';
+	import { solveChallenge } from 'altcha-lib';
+	import type { Solution, Challenge } from 'altcha-lib/types';
+	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
 
 	let needToRegister = $state(false);
 
 	let username = $state('');
 	let rawPassword = $state('');
-	let captchaPayload = $state('');
+
+	type CaptchaPayload = { solution: Solution; challenge: Challenge };
+	let captchaPayload = $state<CaptchaPayload | null>(null);
+	let captchaState = $state<'idle' | 'solving' | 'solved' | 'error'>('idle');
 
 	let worker: Worker | undefined;
 	let derivePassword: DerivePassword;
@@ -28,7 +33,35 @@
 		const workerApi = comlink.wrap(worker);
 
 		derivePassword = (workerApi as any).derivePassword as DerivePassword;
+
+		if (!isOwnBackend()?.captchaDisabled) {
+			solveCaptchaChallenge();
+		}
 	});
+
+	async function solveCaptchaChallenge() {
+		captchaState = 'solving';
+
+		try {
+			const resp = await fetch('/api/captcha');
+			const challenge = await resp.json();
+
+			const solution = await solveChallenge({ challenge, deriveKey });
+
+			if (!solution) {
+				captchaState = 'error';
+				return;
+			}
+
+			captchaPayload = {
+				solution,
+				challenge
+			};
+			captchaState = 'solved';
+		} catch {
+			captchaState = 'error';
+		}
+	}
 
 	let failed = $state(false);
 	let passwordStrength = $state<{
@@ -62,12 +95,16 @@
 	async function onLogin(event: Event) {
 		event.preventDefault();
 
+		if (!captchaPayload && !isOwnBackend()?.captchaDisabled) {
+			return;
+		}
+
 		isLoading = true;
 
 		if (needToRegister) {
-			failed = !(await createUserBackend(username, rawPassword, captchaPayload, derivePassword));
+			failed = !(await createUserBackend(username, rawPassword, captchaPayload!, derivePassword));
 		} else {
-			failed = !(await loginUserBackend(username, rawPassword, captchaPayload, derivePassword));
+			failed = !(await loginUserBackend(username, rawPassword, captchaPayload!, derivePassword));
 		}
 
 		isLoading = false;
@@ -120,22 +157,32 @@
 				{/if}
 
 				{#if !isOwnBackend()?.captchaDisabled}
-					<article
-						class="surface-container-highest no-padding"
-						style="width: 100%;height: fit-content;"
-					>
-						<altcha-widget
-							challengeurl="/api/captcha"
-							hidelogo
-							hidefooter
-							onstatechange={(ev) => {
-								const { payload, state } = ev.detail;
-								if (state === 'verified' && payload) {
-									captchaPayload = payload;
-								}
-							}}
-						></altcha-widget>
-					</article>
+					<div class="space"></div>
+					<div class="surface-container-highest center-align small-padding max">
+						{#if captchaState === 'solving'}
+							<div class="center-align middle-align horizontal">
+								<progress class="circle indeterminate small" value="50" max="100"></progress>
+								<span class="small-text">{$_('verifyingCaptcha')}</span>
+							</div>
+						{:else if captchaState === 'solved'}
+							<div class="center-align horizontal">
+								<i class="green-text">check_circle</i>
+								<span>{$_('captchaVerified')}</span>
+							</div>
+						{:else if captchaState === 'error'}
+							<div class="center-align horizontal">
+								<i class="red-text">error</i>
+								<span>{$_('captchaFailed')}</span>
+								<button
+									type="button"
+									class="chip circle small red-text"
+									onclick={solveCaptchaChallenge}
+								>
+									<i>refresh</i>
+								</button>
+							</div>
+						{/if}
+					</div>
 				{/if}
 
 				<nav class="right-align">

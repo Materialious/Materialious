@@ -1,13 +1,17 @@
 import { json } from '@sveltejs/kit';
-import { createChallenge } from 'altcha-lib';
+import { createChallenge, randomInt } from 'altcha-lib';
+import { deriveKey } from 'altcha-lib/algorithms/pbkdf2';
 
 export async function GET({ locals }) {
-	const currentDate = new Date();
-
 	return json(
 		await createChallenge({
-			hmacKey: locals.captchaKey,
-			expires: new Date(currentDate.getTime() + 1 * 60 * 60 * 1000)
+			hmacSignatureSecret: locals.captchaSignature,
+			hmacKeySignatureSecret: locals.captchaKey,
+			expiresAt: new Date(Date.now() + 600_000),
+			algorithm: 'PBKDF2/SHA-256',
+			cost: 5_000,
+			counter: randomInt(5_000, 10_000),
+			deriveKey
 		})
 	);
 }

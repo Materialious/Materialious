@@ -117,8 +117,15 @@
             "loop": "ループ",
             "on": "オン",
             "off": "オフ",
-            "language": "言語"
-        }
+            "language": "言語",
+            "fontSize": "フォントサイズ",
+            "textColor": "文字色",
+            "bgColor": "背景色",
+            "alignment": "整列",
+            "reset": "既定値にリセット"
+        },
+        "pauseTimerFinished": "一時停止タイマーが終了しました",
+        "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました"
     },
     "layout": {
         "interface": "外観",
@@ -258,7 +265,30 @@
             "importFromFile": "ファイルからインポート",
             "exportToShareUrl": "共有URLにエクスポート"
         },
-        "preserveTranslation": "オリジナルの翻訳を使用する"
+        "preserveTranslation": "オリジナルの翻訳を使用する",
+        "binds": {
+            "title": "キーバインド",
+            "togglePlay": "再生 / 一時停止",
+            "skipSponsor": "スポンサー枠をスキップ",
+            "toggleSubtitles": "字幕の表示/非表示",
+            "toggleFullscreen": "全画面表示の切り替え",
+            "speedDown": "再生速度を落とす",
+            "speedUp": "再生速度を上げる",
+            "frameBack": "1フレーム戻る",
+            "frameForward": "1フレーム進む",
+            "seekBack": "巻き戻し",
+            "seekForward": "早送り",
+            "search": "検索を開く",
+            "clickToSet": "クリックして設定…",
+            "pageBack": "戻る",
+            "pageForward": "進む",
+            "closePlayer": "全画面表示を終了 / プレイヤーを閉じる",
+            "tab1": "タブ 1",
+            "tab2": "タブ 2",
+            "tab3": "タブ 3",
+            "tab4": "タブ 4",
+            "reset": "初期設定に戻す"
+        }
     },
     "subscribe": "チャンネル登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
@@ -331,5 +361,8 @@
     "weak": "弱い",
     "veryStrong": "非常に強い",
     "fair": "普通",
-    "strong": "強い"
+    "strong": "強い",
+    "commentSortBy": "並べ替え",
+    "commentSortTop": "上",
+    "commentSortNewest": "最新"
 }

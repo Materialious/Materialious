@@ -1,12 +1,14 @@
 import sodium from 'libsodium-wrappers-sumo';
 import { rawMasterKeyStore } from '$lib/store';
+import type { Solution, Challenge } from 'altcha-lib/types';
 
 export type DerivePassword = (rawPassword: string, passwordSalt: Uint8Array) => Promise<Uint8Array>;
+type captchaPayload = { solution: Solution; challenge: Challenge };
 
 export async function createUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: { solution: string; challenge: string },
+	captchaPayload: captchaPayload,
 	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;
@@ -62,7 +64,7 @@ export async function createUserBackend(
 export async function loginUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: { solution: string; challenge: string },
+	captchaPayload: captchaPayload,
 	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;

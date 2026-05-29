@@ -5,7 +5,7 @@
 	import { iso31661 } from 'iso-3166';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { isUnrestrictedPlatform, timeout, shareURL } from '$lib/misc';
+	import { isUnrestrictedPlatform, timeout, shareURL, isMobile } from '$lib/misc';
 	import { getPages, type Pages } from '$lib/navPages';
 	import { setInvidiousInstance, goToInvidiousLogin, invidiousLogout } from '$lib/auth';
 	import {
@@ -25,7 +25,8 @@
 		interfaceSearchSuggestionsStore,
 		searchHistoryStore,
 		watchHistoryEnabledStore,
-		interfacePreserveTranslation
+		interfacePreserveTranslation,
+		interfaceMobileBackButtonStore
 	} from '../../store';
 	import { isOwnBackend } from '$lib/shared';
 	import ComboBox from '../ComboBox.svelte';
@@ -275,6 +276,25 @@
 		</label>
 	</nav>
 </div>
+
+{#if isMobile()}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.showMobileBackButton')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$interfaceMobileBackButtonStore}
+					onclick={() => interfaceMobileBackButtonStore.set(!$interfaceMobileBackButtonStore)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+{/if}
 
 {#if Capacitor.getPlatform() == 'android'}
 	<div class="field no-margin">

@@ -23,14 +23,15 @@
 		rawMasterKeyStore,
 		backendInUseStore,
 		hideSearchStore,
-		keybindStore
+		keybindStore,
+		interfaceMobileBackButtonStore
 	} from '$lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { onDestroy, onMount } from 'svelte';
 	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
-	import { isYTBackend, truncate } from '$lib/misc';
+	import { isMobile, isYTBackend, truncate } from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
@@ -291,6 +292,18 @@
 			class:tv-nav={$isAndroidTvStore}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
+			{#if $interfaceMobileBackButtonStore && isMobile()}
+				<button
+					type="button"
+					class="transparent s circle large"
+					disabled={page.url.pathname === '/'}
+					onclick={() => history.back()}
+					aria-label="Back"
+				>
+					<i>keyboard_double_arrow_left</i>
+				</button>
+			{/if}
+
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
 					<a href={resolve($interfaceDefaultPage, {})}>
@@ -330,8 +343,10 @@
 			{/if}
 
 			{#if mobileSearchShow}
-				<div style="width: 100%;">
-					<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+				<div class="mobile-search-container">
+					<div style="width: 100%;">
+						<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+					</div>
 				</div>
 			{:else}
 				<!-- Watch parties only work in HTTPS environments -->
@@ -577,5 +592,10 @@
 		.pip h6 {
 			font-size: 1em;
 		}
+	}
+
+	.mobile-search-container {
+		flex: 1;
+		min-width: 0;
 	}
 </style>

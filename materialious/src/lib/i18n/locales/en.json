@@ -234,6 +234,7 @@
 		"clickXmoreTimesToDelete": "Click {{clicksTillDelete}} more time(s) to delete",
 		"historyEnabled": "Save watch history",
 		"preserveTranslation": "Use original traslation",
+		"showMobileBackButton": "Show back button on mobile",
 		"theme": {
 			"theme": "Theme",
 			"darkMode": "Dark mode",

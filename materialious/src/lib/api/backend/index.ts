@@ -6,7 +6,7 @@ export type DerivePassword = (rawPassword: string, passwordSalt: Uint8Array) => 
 export async function createUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: string,
+	captchaPayload: { solution: string; challenge: string },
 	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;
@@ -62,7 +62,7 @@ export async function createUserBackend(
 export async function loginUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: string,
+	captchaPayload: { solution: string; challenge: string },
 	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;

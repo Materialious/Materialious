@@ -103,7 +103,34 @@
         "noNewNotifications": "Nav jaunu paziņojumu",
         "previewVideoOnHover": "Priekšskatīt video, kad kursors ir virs tā",
         "allowInsecureRequests": "Atļaut nedrošus pieprasījumus",
-        "disableAutoUpdate": "Atspējot automātiskos atjauninājumus"
+        "disableAutoUpdate": "Atspējot automātiskos atjauninājumus",
+        "backendEngine": {
+            "importingToMaterialious": "Sāk ievietot Materialious",
+            "importingToMaterialiousFinished": "Pabeidza ievietot Materialious",
+            "exportToInvidious": "Izgūt Invidious formātu no Materialious",
+            "exportingToInvidious": "Sāk izgūt Invidious formātu",
+            "importToMaterialious": "Ievietot Invidious formātu Materialious",
+            "exportingToInvidiousFinished": "Pabeidza izgūt Invidious formātu"
+        },
+        "export": {
+            "title": "Izgūt/Ievietot",
+            "importSub": "Ievietot abonementus",
+            "importSubSupported": "Atbalsta YouTube CSV/OPML/JSON, Invidious OPML/JSON, NewPipe JSON formātus un FreeTube datubāzes",
+            "importing": "Ievieto abonementus (tas aizņems kādu laiku)",
+            "importingCompleted": "Abonementi veiksmīgi ievietoti",
+            "importFromFile": "Ievietot no datnes",
+            "exportSub": "Izgūt abonementus",
+            "exportToClipboard": "Izgūt starpliktuvē",
+            "exportToFile": "Izgūt datnē",
+            "exportToShareUrl": "Izgūt, lai kopīgotu URL adresi"
+        },
+        "filter": {
+            "value": "Vērtība",
+            "addConditional": "Pievienot nosacījumu",
+            "url": "Ievietot filtrus no URL adreses"
+        },
+        "exportToJson": "Izgūt JSON formātu",
+        "historyEnabled": "Saglabāt atskaņošanas vēsturi"
     },
     "channels": "kanāli",
     "copyUrl": "Kopēt URL saiti",
@@ -147,7 +174,8 @@
     "title": "Virsraksts",
     "defaultPage": "Noklusējuma lapa",
     "thumbnail": {
-        "failedToLoadImage": "Neizdevās ielādēt attēlu"
+        "failedToLoadImage": "Neizdevās ielādēt attēlu",
+        "live": "TIEŠRAIDĒ"
     },
     "unsubscribe": "Atcelt abonementu",
     "subscriptions": {
@@ -185,6 +213,22 @@
     "popularPageDisabled": "Administratori atspējojuši \"Populārs\" lapu",
     "skip": "Izlaist",
     "reply": "atbilde",
-    "contributors": "Dalībnieki, līdzautori, kas devuši savu artavu",
-    "loadMore": "Ielādēt vēl"
+    "contributors": "Cilvēki, kas devuši savu artavu",
+    "loadMore": "Ielādēt vēl",
+    "newest": "Jaunākos augšgalā",
+    "oldest": "Vecākos augšgalā",
+    "hideAuthor": "Paslēpt autoru",
+    "commentSortBy": "Kārtot pēc",
+    "commentSortTop": "Populārākie augšgalā",
+    "commentSortNewest": "Jaunākie augšgalā",
+    "initalSetup": {
+        "yes": "Jā",
+        "no": "Nē",
+        "unsure": "Neesmu drošs(-a)"
+    },
+    "verifyingCaptcha": "Pārbauda…",
+    "copy": "Kopēt starpliktuvē",
+    "username": "Lietotājvārds",
+    "password": "Parole",
+    "invalidPassword": "Nederīga parole"
 }

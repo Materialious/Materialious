@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"electron": "^42.2.0",
-		"electron-builder": "^26.0.12",
+		"electron-builder": "^26.15.2",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^6.0.3"
 	},

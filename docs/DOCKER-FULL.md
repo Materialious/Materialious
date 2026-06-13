@@ -61,6 +61,10 @@ services:
 
       # Allow anyone to register
       PUBLIC_REGISTRATION_ALLOWED: "false"
+
+      # Comma-separated list of usernames with admin privileges
+      # e.g. "user1,user2"
+      PUBLIC_ADMIN_USERNAMES: ""
       
       # Disable POW Captcha
       PUBLIC_CAPTCHA_DISABLED: "false"

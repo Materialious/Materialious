@@ -10,8 +10,9 @@
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
 	import { isUnrestrictedPlatform, keyCodeMap } from '$lib/misc';
-	import { isOwnBackend } from '$lib/shared';
+	import { isOwnBackend, isAdminUsername } from '$lib/shared';
 	import InternalAccount from './InternalAccount.svelte';
+	import Admin from './Admin.svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import Filters from './Filters.svelte';
 	import ExportImport from './ExportImport.svelte';
@@ -28,6 +29,7 @@
 		| 'about'
 		| 'engine'
 		| 'account'
+		| 'admin'
 		| 'filters'
 		| 'export'
 		| 'theme'
@@ -115,9 +117,27 @@
 				icon: 'person',
 				component: InternalAccount
 			});
+			fetch('/api/user/me').then(async (resp) => {
+				if (resp.ok) {
+					const me = await resp.json();
+					if (isAdminUsername(me.username)) {
+						const existingAdmin = tabs.find((tab) => tab.id === 'admin');
+						if (!existingAdmin) {
+							tabs.splice(tabs.length - 1, 0, {
+								id: 'admin',
+								label: $_('layout.admin'),
+								icon: 'admin_panel_settings',
+								component: Admin
+							});
+						}
+					} else {
+						tabs = tabs.filter((tab) => tab.id !== 'admin');
+					}
+				}
+			});
 		} else {
 			tabs = tabs.filter((tab) => {
-				return tab.id !== 'account';
+				return tab.id !== 'account' && tab.id !== 'admin';
 			});
 		}
 	});

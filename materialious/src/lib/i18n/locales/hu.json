@@ -194,7 +194,8 @@
             "tab3": "3. lap",
             "tab4": "4. lap",
             "reset": "Visszaállítás alapértelmezésre"
-        }
+        },
+        "showMobileBackButton": "Képernyőn megjelenő navigációs vezérlők"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",
@@ -364,5 +365,8 @@
     "veryStrong": "Nagyon erős",
     "commentSortBy": "Rendezés:",
     "commentSortTop": "Felkapottság",
-    "commentSortNewest": "Legújabb"
+    "commentSortNewest": "Legújabb",
+    "verifyingCaptcha": "Ellenőrzés...",
+    "captchaVerified": "Jóváhagyva",
+    "captchaFailed": "Sikertelen ellenőrzés"
 }

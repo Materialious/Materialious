@@ -89,6 +89,29 @@ export class User {
 		return subscriptions as unknown as ChannelSubscriptionModel[];
 	}
 
+	async resetPassword(
+		password: {
+			hash: string;
+			salt: string;
+		},
+		decryptionKeySalt: string,
+		masterKey: {
+			cipher: string;
+			nonce: string;
+		}
+	) {
+		await getSequelize().UserTable.update(
+			{
+				passwordHash: password.hash,
+				passwordSalt: password.salt,
+				decryptionKeySalt,
+				masterKeyCipher: masterKey.cipher,
+				masterKeyNonce: masterKey.nonce
+			},
+			{ where: { id: this.id } }
+		);
+	}
+
 	async getKeyValue(key: string): Promise<UserKeyStoreModel> {
 		const keyStore = await getSequelize().UserKeyValueTable.findOne({
 			where: {

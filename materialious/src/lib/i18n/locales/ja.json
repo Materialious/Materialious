@@ -288,7 +288,8 @@
             "tab3": "タブ 3",
             "tab4": "タブ 4",
             "reset": "初期設定に戻す"
-        }
+        },
+        "showMobileBackButton": "画面上のナビゲーションコントロール"
     },
     "subscribe": "チャンネル登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
@@ -364,5 +365,8 @@
     "strong": "強い",
     "commentSortBy": "並べ替え",
     "commentSortTop": "上",
-    "commentSortNewest": "最新"
+    "commentSortNewest": "最新",
+    "verifyingCaptcha": "検証中...",
+    "captchaVerified": "検証済み",
+    "captchaFailed": "検証に失敗"
 }

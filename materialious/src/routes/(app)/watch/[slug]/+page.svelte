@@ -71,7 +71,7 @@
 	let premiereUpdateInterval: ReturnType<typeof setTimeout>;
 
 	if (
-		!data.video.premiereTimestamp &&
+		(!data.video.premiereTimestamp || data.video.premiereTimestamp === 0) &&
 		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
 	) {
 		playerState.set({
@@ -114,7 +114,7 @@
 	}
 
 	onMount(async () => {
-		if (data.video.premiereTimestamp) {
+		if (data.video.premiereTimestamp && data.video.premiereTimestamp !== 0) {
 			premiereTime = relativeTimestamp(data.video.premiereTimestamp);
 			premiereUpdateInterval = setInterval(async () => {
 				data = await getWatchDetails(data.video.videoId, page.url);
@@ -287,7 +287,7 @@
 <div class="grid no-padding">
 	<div class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#if data.video.premiereTimestamp}
+			{#if data.video.premiereTimestamp && data.video.premiereTimestamp !== 0}
 				<article class="video-placeholder">
 					<p>{$_('player.premiere')}</p>
 					<h6 class="no-margin no-padding">
@@ -512,10 +512,18 @@
 
 					<button class="surface-container-highest small" style="margin-bottom: 12px;">
 						<i>sort</i>
-						<span>{$_('commentSortBy')}: {commentSort === 'top' ? $_('commentSortTop') : $_('commentSortNewest')}</span>
+						<span
+							>{$_('commentSortBy')}: {commentSort === 'top'
+								? $_('commentSortTop')
+								: $_('commentSortNewest')}</span
+						>
 						<menu class="no-wrap" id="comment-sort" data-ui="#comment-sort">
-							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('top')}>{$_('commentSortTop')}</li>
-							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('new')}>{$_('commentSortNewest')}</li>
+							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('top')}>
+								{$_('commentSortTop')}
+							</li>
+							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('new')}>
+								{$_('commentSortNewest')}
+							</li>
 						</menu>
 					</button>
 

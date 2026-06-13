@@ -43,7 +43,7 @@
 		"svelte-check": "^4.4.5",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.55.0",
+		"typescript-eslint": "^8.60.1",
 		"vite": "^7.3.2"
 	},
 	"type": "module",

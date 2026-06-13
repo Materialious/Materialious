@@ -94,14 +94,21 @@ export class User {
 			hash: string;
 			salt: string;
 		},
-		decryptionKeySalt: string
+		decryptionKeySalt: string,
+		masterKey: {
+			cipher: string;
+			nonce: string;
+		}
 	) {
 		await getSequelize().UserTable.update(
 			{
-				password,
-				decryptionKeySalt
+				passwordHash: password.hash,
+				passwordSalt: password.salt,
+				decryptionKeySalt,
+				masterKeyCipher: masterKey.cipher,
+				masterKeyNonce: masterKey.nonce
 			},
-			{ where: { UserId: this.id } }
+			{ where: { id: this.id } }
 		);
 	}
 

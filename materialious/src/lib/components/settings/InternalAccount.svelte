@@ -25,7 +25,7 @@
 	<i>warning</i>
 	<span>{$_('layout.deleteAccount')}</span>
 	{#if clicksToDelte - clickCount > 0}
-		<div class="tooltip">
+		<div class="tooltip bottom">
 			{$_('layout.clickXmoreTimesToDelete', {
 				clicksTillDelete: clicksToDelte - clickCount
 			})}

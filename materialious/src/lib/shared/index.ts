@@ -21,3 +21,13 @@ export function isOwnBackend(): IsOwnBackend | null {
 		captchaDisabled: env.PUBLIC_CAPTCHA_DISABLED === 'true'
 	};
 }
+
+function getAdminUsernames(): string[] {
+	return (env.PUBLIC_ADMIN_USERNAMES || '')
+		.split(',')
+		.map((s) => s.trim());
+}
+
+export function isAdminUsername(username: string): boolean {
+	return getAdminUsernames().includes(username);
+}

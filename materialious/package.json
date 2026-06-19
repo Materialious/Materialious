@@ -23,7 +23,7 @@
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.53.0",
-		"@sveltejs/vite-plugin-svelte": "^6.2.1",
+		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@types/cookie-signature": "^1.1.2",
 		"@types/event-source-polyfill": "^1.0.5",
 		"@types/he": "^1.2.3",
@@ -44,7 +44,7 @@
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.60.1",
-		"vite": "^7.3.2"
+		"vite": "^8.0.16"
 	},
 	"type": "module",
 	"dependencies": {

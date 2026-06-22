@@ -195,7 +195,21 @@
             "tab4": "4. lap",
             "reset": "Visszaállítás alapértelmezésre"
         },
-        "showMobileBackButton": "Képernyőn megjelenő navigációs vezérlők"
+        "showMobileBackButton": "Képernyőn megjelenő navigációs vezérlők",
+        "admin": "Admin",
+        "adminPanel": "Admin felület",
+        "totalUsers": "Összes felhasználó: {{count}}",
+        "confirmDeleteUser": "Biztosan törölni szeretné ezt a felhasználót?",
+        "userDeleted": "Felhasználó törölve",
+        "confirmDeleteUserBody": "Biztosan törölni szeretné a(z) „{{username}}” felhasználót? Ez a művelet nem vonható vissza.",
+        "resetPassword": "Jelszó visszaállítása",
+        "currentPassword": "Jelenlegi jelszó",
+        "newPassword": "Új jelszó",
+        "confirmPassword": "Jelszó megerősítése",
+        "passwordsDoNotMatch": "A jelszavak nem egyeznek",
+        "passwordResetFailed": "A jelszó visszaállítása sikertelen. Ellenőrizze a jelenlegi jelszavát.",
+        "passwordResetSuccess": "Jelszó sikeresen visszaállítva",
+        "changePassword": "Jelszó megváltoztatása"
     },
     "enabled": "Engedélyezve",
     "donate": "Adományozás",

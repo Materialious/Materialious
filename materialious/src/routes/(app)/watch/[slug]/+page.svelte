@@ -68,16 +68,17 @@
 	let playerCurrentTime: number = $state(0);
 
 	function hasPremiere() {
-		return data.video.premiereTimestamp && data.video.premiereTimestamp !== 0 && data.video.premiereTimestamp > Date.now();
+		return (
+			data.video.premiereTimestamp &&
+			data.video.premiereTimestamp !== 0 &&
+			data.video.premiereTimestamp > Date.now()
+		);
 	}
 
 	let premiereTime = $state('');
 	let premiereUpdateInterval: ReturnType<typeof setTimeout>;
 
-	if (
-		!hasPremiere() &&
-		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
-	) {
+	if (!hasPremiere() && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
 		playerState.set({
 			data: data
 		});
@@ -119,12 +120,12 @@
 
 	onMount(async () => {
 		if (hasPremiere()) {
-			premiereTime = relativeTimestamp(data.video.premiereTimestamp);
+			premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 			premiereUpdateInterval = setInterval(async () => {
 				data = await getWatchDetails(data.video.videoId, page.url);
 
 				if (hasPremiere()) {
-					premiereTime = relativeTimestamp(data.video.premiereTimestamp);
+					premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 				} else {
 					clearInterval(premiereUpdateInterval);
 					playerState.set({ ...$playerState, data: { ...data } });

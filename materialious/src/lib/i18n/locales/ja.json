@@ -289,7 +289,21 @@
             "tab4": "タブ 4",
             "reset": "初期設定に戻す"
         },
-        "showMobileBackButton": "画面上のナビゲーションコントロール"
+        "showMobileBackButton": "画面上のナビゲーションコントロール",
+        "admin": "管理者",
+        "adminPanel": "管理者パネル",
+        "totalUsers": "総ユーザー数 : {{count}}",
+        "confirmDeleteUser": "このユーザーを削除しますか？",
+        "userDeleted": "ユーザーを削除しました",
+        "confirmDeleteUserBody": "ユーザー \"{{username}}\" を削除しますか？この操作は元に戻せません。",
+        "resetPassword": "パスワードをリセット",
+        "currentPassword": "現在のパスワード",
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "パスワードの確認",
+        "passwordsDoNotMatch": "パスワードが一致しません",
+        "passwordResetFailed": "パスワードのリセットに失敗しました。現在のパスワードを確認してください。",
+        "passwordResetSuccess": "パスワードのリセットに成功しました",
+        "changePassword": "パスワードの変更"
     },
     "subscribe": "チャンネル登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",

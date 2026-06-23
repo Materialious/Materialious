@@ -67,13 +67,18 @@
 
 	let playerCurrentTime: number = $state(0);
 
+	function hasPremiere() {
+		return (
+			data.video.premiereTimestamp &&
+			data.video.premiereTimestamp !== 0 &&
+			data.video.premiereTimestamp > Date.now()
+		);
+	}
+
 	let premiereTime = $state('');
 	let premiereUpdateInterval: ReturnType<typeof setTimeout>;
 
-	if (
-		(!data.video.premiereTimestamp || data.video.premiereTimestamp === 0) &&
-		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
-	) {
+	if (!hasPremiere() && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
 		playerState.set({
 			data: data
 		});
@@ -114,13 +119,13 @@
 	}
 
 	onMount(async () => {
-		if (data.video.premiereTimestamp && data.video.premiereTimestamp !== 0) {
-			premiereTime = relativeTimestamp(data.video.premiereTimestamp);
+		if (hasPremiere()) {
+			premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 			premiereUpdateInterval = setInterval(async () => {
 				data = await getWatchDetails(data.video.videoId, page.url);
 
-				if (data.video.premiereTimestamp) {
-					premiereTime = relativeTimestamp(data.video.premiereTimestamp);
+				if (hasPremiere()) {
+					premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 				} else {
 					clearInterval(premiereUpdateInterval);
 					playerState.set({ ...$playerState, data: { ...data } });
@@ -287,7 +292,7 @@
 <div class="grid no-padding">
 	<div class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#if data.video.premiereTimestamp && data.video.premiereTimestamp !== 0}
+			{#if hasPremiere()}
 				<article class="video-placeholder">
 					<p>{$_('player.premiere')}</p>
 					<h6 class="no-margin no-padding">

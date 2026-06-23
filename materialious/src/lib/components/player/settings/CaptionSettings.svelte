@@ -6,6 +6,20 @@
 
 	let { video }: { video: VideoPlay } = $props();
 	let dialog: HTMLDialogElement;
+	let ccOpen = $state(false);
+	let ccButton: HTMLButtonElement | undefined = $state();
+
+	function onCCClick(e: MouseEvent) {
+		if ((e.target as HTMLElement).closest('menu')) return;
+		ccOpen = !ccOpen;
+		if (!ccOpen) {
+			ccButton?.blur();
+		}
+	}
+
+	function onCCBlur() {
+		ccOpen = false;
+	}
 
 	const sizeOptions = [
 		{ value: 2, label: 'Small' },
@@ -83,7 +97,7 @@
 </script>
 
 {#if video.captions.length > 0 && !video.liveNow}
-	<button class="surface-container-highest">
+	<button bind:this={ccButton} class="surface-container-highest" onclick={onCCClick} onblur={onCCBlur}>
 		<i>closed_caption</i>
 		<menu class="no-wrap mobile player-settings" id="cc-menu" data-ui="#cc-menu">
 			<li role="presentation" data-ui="#cc-menu" onclick={() => setTextTrackVisibility(false)}>

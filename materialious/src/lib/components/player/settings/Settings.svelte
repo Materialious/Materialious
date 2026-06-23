@@ -27,6 +27,20 @@
 
 	let playerSettings: 'quality' | 'speed' | 'language' | 'caption' | 'root' = $state('root');
 	let playerLoop = $state($playerAlwaysLoopStore);
+	let settingsOpen = $state(false);
+	let settingsButton: HTMLButtonElement | undefined = $state();
+
+	function onSettingsClick(e: MouseEvent) {
+		if ((e.target as HTMLElement).closest('menu')) return;
+		settingsOpen = !settingsOpen;
+		if (!settingsOpen) {
+			settingsButton?.blur();
+		}
+	}
+
+	function onSettingsBlur() {
+		settingsOpen = false;
+	}
 
 	function filterUniqueAudioTracks(tracks: shaka.extern.AudioTrack[]): shaka.extern.AudioTrack[] {
 		const uniqueTracks: shaka.extern.AudioTrack[] = [];
@@ -44,7 +58,7 @@
 	}
 </script>
 
-<button class="surface-container-highest">
+<button bind:this={settingsButton} class="surface-container-highest" onclick={onSettingsClick} onblur={onSettingsBlur}>
 	<i>settings</i>
 	<menu class="no-wrap mobile player-settings">
 		{#if playerSettings !== 'root'}

@@ -344,7 +344,13 @@
 	{...mergeAttrs(playerTimelineSlider.root, {
 		tabindex: -1
 	})}
-	onmouseleave={() => (playerShowTimelineThumbnail = false)}
+	onmouseleave={() => {
+		if (requestAnimationTooltip) {
+			cancelAnimationFrame(requestAnimationTooltip);
+			requestAnimationTooltip = undefined;
+		}
+		playerShowTimelineThumbnail = false;
+	}}
 	onmousemove={timelineMouseMove}
 	bind:this={playerSliderElement}
 >

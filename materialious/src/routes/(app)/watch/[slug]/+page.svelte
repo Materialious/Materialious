@@ -67,11 +67,15 @@
 
 	let playerCurrentTime: number = $state(0);
 
+	function hasPremiere() {
+		return data.video.premiereTimestamp && data.video.premiereTimestamp !== 0 && data.video.premiereTimestamp > Date.now();
+	}
+
 	let premiereTime = $state('');
 	let premiereUpdateInterval: ReturnType<typeof setTimeout>;
 
 	if (
-		(!data.video.premiereTimestamp || data.video.premiereTimestamp === 0) &&
+		!hasPremiere() &&
 		(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
 	) {
 		playerState.set({
@@ -114,12 +118,12 @@
 	}
 
 	onMount(async () => {
-		if (data.video.premiereTimestamp && data.video.premiereTimestamp !== 0) {
+		if (hasPremiere()) {
 			premiereTime = relativeTimestamp(data.video.premiereTimestamp);
 			premiereUpdateInterval = setInterval(async () => {
 				data = await getWatchDetails(data.video.videoId, page.url);
 
-				if (data.video.premiereTimestamp) {
+				if (hasPremiere()) {
 					premiereTime = relativeTimestamp(data.video.premiereTimestamp);
 				} else {
 					clearInterval(premiereUpdateInterval);
@@ -287,7 +291,7 @@
 <div class="grid no-padding">
 	<div class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#if data.video.premiereTimestamp && data.video.premiereTimestamp !== 0}
+			{#if hasPremiere()}
 				<article class="video-placeholder">
 					<p>{$_('player.premiere')}</p>
 					<h6 class="no-margin no-padding">

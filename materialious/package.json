@@ -94,7 +94,7 @@
 		"pg-hstore": "^2.3.4",
 		"safe-regex2": "^5.1.1",
 		"sequelize": "^6.37.8",
-		"shaka-player": "^4.16.14",
+		"shaka-player": "^5.1.10",
 		"sponsorblock-api": "^0.2.4",
 		"sqlite3": "^6.0.1",
 		"svelte-awesome-color-picker": "^4.1.3",

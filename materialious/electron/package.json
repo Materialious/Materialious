@@ -36,13 +36,8 @@
 		"youtubei.js": "^17.0.1"
 	},
 	"devDependencies": {
-<<<<<<< HEAD
 		"electron": "^42.4.1",
-		"electron-builder": "^26.15.2",
-=======
-		"electron": "^42.3.3",
 		"electron-builder": "^26.15.3",
->>>>>>> origin/dependabot/npm_and_yarn/materialious/electron/electron-builder-26.15.3
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^6.0.3"
 	},

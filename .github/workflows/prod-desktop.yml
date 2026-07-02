@@ -19,10 +19,13 @@ jobs:
       matrix:
         node-version: [latest]
         runtime:
+          - linux-x64
           - win-x64
           - osx-x64
 
         include:
+          - runtime: linux-x64
+            os: ubuntu-latest
           - runtime: osx-x64
             os: macOS-latest
           - runtime: win-x64
@@ -34,7 +37,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
 

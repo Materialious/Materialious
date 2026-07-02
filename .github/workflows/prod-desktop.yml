@@ -17,7 +17,7 @@ jobs:
   desktop-build:
     strategy:
       matrix:
-        node-version: [latest]
+        node-version: [24]
         runtime:
           - linux-x64
           - win-x64

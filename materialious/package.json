@@ -99,7 +99,7 @@
 		"sqlite3": "^6.0.1",
 		"svelte-awesome-color-picker": "^4.1.3",
 		"svelte-infinite-loading": "^1.4.0",
-		"tldts": "^7.0.24",
+		"tldts": "^7.4.5",
 		"trystero": "^0.22.0",
 		"youtubei.js": "^17.1.0",
 		"zod": "^4.4.3"

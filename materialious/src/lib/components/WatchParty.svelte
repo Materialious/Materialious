@@ -118,7 +118,7 @@
 				{
 					event: 'goToVideo',
 					videoId: player.data.video.videoId,
-					sent: new Date(),
+					sent: new Date().toISOString(),
 					currentTime: player.playerElement.currentTime
 				},
 				peerId
@@ -157,7 +157,7 @@
 			sendEvent({
 				event,
 				videoId: player.data.video.videoId,
-				sent: new Date(),
+				sent: new Date().toISOString(),
 				currentTime: playerElement.currentTime
 			});
 		}

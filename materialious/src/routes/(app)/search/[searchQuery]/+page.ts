@@ -42,7 +42,7 @@ export async function load({ params, url }) {
 	}
 
 	return {
-		slug: params.slug,
+		slug: params.searchQuery,
 		searchType: type,
 		searchStoreId: searchStoreId
 	};

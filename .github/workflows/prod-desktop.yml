@@ -19,7 +19,6 @@ jobs:
       matrix:
         node-version: [latest]
         runtime:
-          - linux-x64
           - win-x64
           - osx-x64
 

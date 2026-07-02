@@ -127,40 +127,39 @@ export function restoreQualityPreference(player: shaka.Player) {
 
 export function restoreDefaultLanguage(player: shaka.Player) {
 	if (!get(playerDefaultLanguage) || get(playerDefaultLanguage) === 'original') {
-		const languageAndRole = player.getAudioLanguagesAndRoles().find(({ role }) => role === 'main');
-		if (languageAndRole !== undefined) {
-			player.selectAudioLanguage(languageAndRole.language);
+		const audioTrack = player.getAudioTracks().find(({ roles }) => roles.includes('main'));
+		if (audioTrack !== undefined) {
+			player.selectAudioTrack(audioTrack);
 			return;
 		}
 	} else if (get(playerDefaultLanguage)) {
-		const audioLanguages = player.getAudioLanguages();
+		const audioTracks = player.getAudioTracks();
 		const langCode = ISO6391.getCode(get(playerDefaultLanguage));
 
-		for (const audioLanguage of audioLanguages) {
-			if (audioLanguage.startsWith(langCode)) {
-				player.selectAudioLanguage(audioLanguage);
-				break;
-			}
+		const audioTrack = audioTracks.find((audioTrack) =>
+			audioTrack.language.startsWith(langCode)
+		);
+
+		if (audioTrack) {
+			player.selectAudioTrack(audioTrack);
 		}
 	}
 }
 
 export function toggleSubtitles(player: shaka.Player) {
-	const isVisible = player.isTextTrackVisible();
+	const isVisible = player.getTextTracks().some((t) => t.active);
 	if (isVisible) {
-		player.setTextTrackVisibility(false);
+		player.selectTextTrack(null);
 	} else {
 		let langCode: string;
 		if (get(playerDefaultLanguage) === 'original') {
-			const languageAndRole = player
-				.getAudioLanguagesAndRoles()
-				.find(({ role }) => role === 'main');
+			const audioTrack = player.getAudioTracks().find(({ roles }) => roles.includes('main'));
 
-			if (!languageAndRole) {
+			if (!audioTrack) {
 				return;
 			}
 
-			langCode = languageAndRole.language;
+			langCode = audioTrack.language;
 		} else {
 			const defaultLanguage = get(playerDefaultLanguage);
 			langCode = ISO6391.getCode(defaultLanguage);
@@ -172,7 +171,6 @@ export function toggleSubtitles(player: shaka.Player) {
 
 		if (subtitleTrack) {
 			player.selectTextTrack(subtitleTrack);
-			player.setTextTrackVisibility(true);
 		}
 	}
 }

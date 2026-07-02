@@ -15,20 +15,20 @@ export async function load({ params, url }) {
 		type = 'all';
 	}
 
-	const searchStoreId = type + params.slug;
+	const searchStoreId = type + params.searchQuery;
 	const search = get(searchCacheStore)[searchStoreId];
 
 	if (!search) {
 		try {
 			searchCacheStore.set({
 				...get(searchCacheStore),
-				[searchStoreId]: await getSearch(params.slug, { type: type })
+				[searchStoreId]: await getSearch(params.searchQuery, { type: type })
 			});
 		} catch (errorMessage: any) {
 			error(500, errorMessage);
 		}
 	} else {
-		getSearch(params.slug, { type: type }).then((newSearch) => {
+		getSearch(params.searchQuery, { type: type }).then((newSearch) => {
 			searchCacheStore.set({
 				[searchStoreId]: excludeDuplicateFeeds(search, newSearch) as (
 					| Channel

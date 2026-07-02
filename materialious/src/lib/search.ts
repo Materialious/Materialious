@@ -31,7 +31,7 @@ export function goToSearch(searchValue: string) {
 		return;
 	}
 
-	goto(resolve(`/search/[search]`, { search: encodeURIComponent(searchTrimmed) }));
+	goto(resolve(`/search/[searchQuery]`, { searchQuery: encodeURIComponent(searchTrimmed) }));
 
 	if (get(interfaceSearchHistoryEnabled)) {
 		const pastHistory = get(searchHistoryStore);

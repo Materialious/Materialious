@@ -16,7 +16,6 @@
 		}
 	],
 	"icon": "appIcon.png",
-	"files": ["assets/**/*", "build/**/*", "capacitor.config.*", "app/**/*"],
 	"electronDownload": {
 		"cache": "./.electron-cache"
 	},

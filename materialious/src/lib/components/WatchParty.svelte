@@ -8,7 +8,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { get } from 'svelte/store';
-	import { joinRoom, type ActionReceiver, type DataPayload, type Room } from 'trystero/mqtt';
+	import { joinRoom, type Room } from '@trystero-p2p/mqtt';
 	import z from 'zod';
 	import { addToast } from './Toast.svelte';
 
@@ -20,7 +20,7 @@
 			z.literal('goToVideo')
 		]),
 		videoId: z.string().regex(/^[a-zA-Z0-9_-]{11}$/),
-		sent: z.date(),
+		sent: z.string().datetime(),
 		currentTime: z.number().min(0)
 	});
 
@@ -40,54 +40,56 @@
 
 	onDestroy(() => room?.leave());
 
-	function actionReceiver(receiver: ActionReceiver<DataPayload>) {
-		receiver((data) => {
-			const dataParsed = zWatchPartyEvent.safeParse(data);
-			if (!dataParsed.success) return;
+	function handleActionData(data: unknown) {
+		const dataParsed = zWatchPartyEvent.safeParse(data);
+		if (!dataParsed.success) return;
 
-			if (dataParsed.data.event === 'goToVideo') {
-				goto(resolve('/watch/[videoId]', { videoId: dataParsed.data.videoId }));
-				return;
-			}
+		if (dataParsed.data.event === 'goToVideo') {
+			goto(resolve('/watch/[videoId]', { videoId: dataParsed.data.videoId }));
+			return;
+		}
 
-			const player = $playerState;
-			if (!player?.playerElement) return;
+		const player = $playerState;
+		if (!player?.playerElement) return;
 
-			const playerElement = player.playerElement;
+		const playerElement = player.playerElement;
 
-			const currentTime = playerElement.currentTime;
-			const sentTime = dataParsed.data.sent.getTime();
-			const timeDifference = Math.abs(currentTime - sentTime);
+		const currentTime = playerElement.currentTime;
+		const sentTime = new Date(dataParsed.data.sent).getTime();
+		const timeDifference = Math.abs(currentTime - sentTime);
 
-			if (timeDifference > 5000) return;
+		if (timeDifference > 5000) return;
 
-			const currentTimeWithDifference = Math.max(
-				0,
-				Math.min(dataParsed.data.currentTime + timeDifference, playerElement.duration)
-			);
+		const currentTimeWithDifference = Math.max(
+			0,
+			Math.min(dataParsed.data.currentTime + timeDifference, playerElement.duration)
+		);
 
-			switch (dataParsed.data.event) {
-				case 'play':
-					playerElement.play();
-					playerElement.currentTime = currentTimeWithDifference;
-					break;
-				case 'pause':
-					playerElement.pause();
-					playerElement.currentTime = currentTimeWithDifference;
-					break;
-				case 'seek':
-					playerElement.currentTime = currentTimeWithDifference;
-					break;
-			}
-		});
+		switch (dataParsed.data.event) {
+			case 'play':
+				playerElement.play();
+				playerElement.currentTime = currentTimeWithDifference;
+				break;
+			case 'pause':
+				playerElement.pause();
+				playerElement.currentTime = currentTimeWithDifference;
+				break;
+			case 'seek':
+				playerElement.currentTime = currentTimeWithDifference;
+				break;
+		}
 	}
 
 	function setupRoom(room: Room) {
-		const [sendAction, getAction] = room.makeAction('watchParty');
+		const action = room.makeAction('watchParty');
 
-		sendEvent = sendAction as unknown as SendEvent;
+		sendEvent = (message, peerToSendTo) => {
+			action.send(message, peerToSendTo ? { target: peerToSendTo } : undefined);
+		};
 
-		actionReceiver(getAction);
+		action.onMessage = (data) => {
+			handleActionData(data);
+		};
 	}
 
 	async function createRoom() {
@@ -102,7 +104,7 @@
 
 		currentSearchParams.set('room', roomId);
 
-		room.onPeerJoin((peerId) => {
+		room.onPeerJoin = (peerId) => {
 			const player = get(playerState);
 			if (!player || !player.data || !player.playerElement) return;
 
@@ -116,20 +118,20 @@
 				{
 					event: 'goToVideo',
 					videoId: player.data.video.videoId,
-					sent: new Date(),
+					sent: new Date().toISOString(),
 					currentTime: player.playerElement.currentTime
 				},
 				peerId
 			);
-		});
+		};
 
-		room.onPeerLeave(() => {
+		room.onPeerLeave = () => {
 			addToast({
 				data: {
 					text: $_('watchParty.userLeft')
 				}
 			});
-		});
+		};
 
 		pushState(`?${currentSearchParams.toString()}`, { replaceState: false }); // eslint-disable-line svelte/no-navigation-without-resolve
 	}
@@ -155,7 +157,7 @@
 			sendEvent({
 				event,
 				videoId: player.data.video.videoId,
-				sent: new Date(),
+				sent: new Date().toISOString(),
 				currentTime: playerElement.currentTime
 			});
 		}

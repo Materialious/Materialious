@@ -2,7 +2,7 @@
 	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
-	import { ui } from 'beercss';
+	import ui from 'beercss';
 	import { _ } from '$lib/i18n';
 
 	let { data } = $props();

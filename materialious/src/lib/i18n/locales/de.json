@@ -72,7 +72,7 @@
         "theatreMode": "Theatermodus",
         "pauseTimer": "Timer pausieren",
         "pauseVideoIn": "Video pausieren in ",
-        "pauseTimerClear": "Löschen",
+        "pauseTimerClear": "Bereinigen",
         "share": {
             "title": "Teilen",
             "materialiousLink": "Materialious-Link kopieren",
@@ -113,8 +113,15 @@
             "loop": "Schleife",
             "on": "An",
             "off": "Aus",
-            "language": "Sprache"
-        }
+            "language": "Sprache",
+            "fontSize": "Schriftgröße",
+            "textColor": "Textfarbe",
+            "bgColor": "Hintergrundfarbe",
+            "alignment": "Ausrichtung",
+            "reset": "Auf die Standardeinstellungen zurücksetzen"
+        },
+        "pauseTimerFinished": "Der Pausentimer ist abgelaufen",
+        "pauseOnNetworkChange": "Das Video wurde aufgrund eines Wechsels des WLAN-Netzwerks angehalten"
     },
     "layout": {
         "interface": "Bedienoberfläche",
@@ -217,7 +224,7 @@
             "cull": "Maximale Feed-Elemente",
             "cooldown": "Cooldown der stündlichen Kanalabfrage",
             "concurrent": "Maximale Anzahl der Kanäle, die vor der Feed-Rückgabe geparsed werden",
-            "fallbacks": "Fallbacks",
+            "fallbacks": "Ausweichlösungen",
             "importExport": "Automatischer Export/Import",
             "exportToInvidious": "Von Materialious nach Invidious exportieren",
             "importToMaterialious": "Von Invidious nach Materialious importieren",
@@ -253,7 +260,46 @@
             "exportToFile": "In eine Datei exportieren",
             "importFromFile": "Von einer Datei importieren",
             "exportToShareUrl": "Exportieren um URL zu teilen"
-        }
+        },
+        "binds": {
+            "title": "Tastenbelegung",
+            "togglePlay": "Wiedergabe / Pause",
+            "skipSponsor": "Sponsorenblock überspringen",
+            "toggleSubtitles": "Untertitel ein-/ausschalten",
+            "toggleFullscreen": "Vollbildmodus ein/aus",
+            "speedDown": "Wiedergabegeschwindigkeit verringern",
+            "speedUp": "Wiedergabegeschwindigkeit erhöhen",
+            "frameBack": "Ein Bild zurück",
+            "frameForward": "Ein Schritt nach vorne",
+            "seekBack": "Rückwärts suchen",
+            "seekForward": "Blick nach vorn",
+            "search": "Suche öffnen",
+            "clickToSet": "Zum Einstellen hier klicken…",
+            "pageBack": "Zurückmachen",
+            "pageForward": "Weitermachen",
+            "closePlayer": "Vollbildmodus beenden / Player schließen",
+            "tab1": "Tab 1",
+            "tab2": "Tab 2",
+            "tab3": "Tab 3",
+            "tab4": "Registerkarte 4",
+            "reset": "Auf Standard zurücksetzen"
+        },
+        "admin": "Admin",
+        "adminPanel": "Admin Panel",
+        "totalUsers": "Gesamtzahl der Nutzer: {{count}}",
+        "confirmDeleteUser": "Sind Sie sicher, dass Sie diese*n Benutzer*in löschen wollen?",
+        "userDeleted": "Benutzer gelöscht",
+        "confirmDeleteUserBody": "Möchten Sie den Benutzer „{{username}}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "resetPassword": "Passwort zurücksetzen",
+        "currentPassword": "Aktuelles Passwort",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Passwort bestätigen",
+        "passwordsDoNotMatch": "Passwörter stimmen nicht überein",
+        "passwordResetFailed": "Das Zurücksetzen des Passworts ist fehlgeschlagen. Bitte überprüfen Sie Ihr aktuelles Passwort.",
+        "passwordResetSuccess": "Passwort-Reset erfolgreich",
+        "changePassword": "Passwort ändern",
+        "preserveTranslation": "Originalübersetzung verwenden",
+        "showMobileBackButton": "Navigationselemente auf dem Bildschirm"
     },
     "subscribe": "Abonnieren",
     "recommendedVideos": "Vorgeschlagene Videos",
@@ -297,7 +343,7 @@
     "needLogin": "Ich muss mich anmelden",
     "materialiousLogin": "Bitte melde dich mit deinem Materialious-Konto an.",
     "materialiousCreate": "Bitte erstelle dein Materialious-Konto.",
-    "backend": "Backend",
+    "backend": "Hintergrund",
     "initalSetup": {
         "useInvidious": "Ich möchte Invidious nutzen",
         "useLocalFallback": "Ich möchte den lokalen Video-Fallback nutzen",
@@ -325,5 +371,16 @@
         "leaveRoom": "Raum verlassen",
         "userJoin": "Nutzer ist dem Raum beigetreten",
         "userLeft": "Nutzer hat den Raum verlassen"
-    }
+    },
+    "veryWeak": "Sehr schwach",
+    "weak": "Schwach",
+    "fair": "Messe",
+    "strong": "Stark",
+    "veryStrong": "Sehr stark",
+    "verifyingCaptcha": "Überprüfe...",
+    "captchaVerified": "Verifiziert",
+    "captchaFailed": "Überprüfung fehlgeschlagen",
+    "commentSortBy": "Sortieren nach",
+    "commentSortTop": "Oben",
+    "commentSortNewest": "Neueste"
 }

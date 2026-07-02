@@ -10,6 +10,7 @@
 		keybindStore
 	} from '../store';
 	import { goToSearch } from '$lib/search';
+	import { page } from '$app/state';
 
 	let {
 		autoFocus = false,
@@ -20,10 +21,16 @@
 	} = $props();
 
 	const dispatch = createEventDispatcher();
-	let search: string = $state('');
+	let search: string = $derived(page.params.searchQuery ?? '');
 	let selectedSuggestionIndex: number = $state(-1);
 
 	let showSearchBox = $state(false);
+	let searchBoxEl: HTMLInputElement;
+	let searchEl: HTMLInputElement | undefined = $state();
+
+	$effect(() => {
+		search = page.params.searchQuery ?? '';
+	});
 
 	let debounceTimer: ReturnType<typeof setTimeout>;
 	function debouncedSearch(event: any) {
@@ -106,7 +113,7 @@
 			: searchKey;
 
 		Mousetrap.bind(keys, () => {
-			document.getElementById('search-box')?.focus();
+			searchBoxEl?.focus();
 			showSearchBox = !showSearchBox;
 			if (!showSearchBox) resetSearch();
 			return false;
@@ -115,7 +122,7 @@
 		if (autoFocus) {
 			showSearchBox = true;
 			await tick();
-			document.getElementById('search')?.focus();
+			searchEl?.focus();
 		}
 	});
 </script>
@@ -125,13 +132,18 @@
 	onclick={async () => {
 		showSearchBox = true;
 		await tick();
-		document.getElementById('search')?.focus();
+		searchEl?.focus();
 	}}
 	role="presentation"
 >
 	<div class="field prefix fill no-margin search round">
 		<i class="front" tabindex="-1">search</i>
-		<input tabindex="0" id="search-box" placeholder={$_('searchPlaceholder')} bind:value={search} />
+		<input
+			tabindex="0"
+			placeholder={$_('searchPlaceholder')}
+			bind:value={search}
+			bind:this={searchBoxEl}
+		/>
 		{#if showSearchBox}
 			<menu class="min suggestions-container fill">
 				<div class="field large prefix fill suffix no-margin fixed round">
@@ -142,9 +154,9 @@
 						tabindex="0"
 						placeholder={$_('searchPlaceholder')}
 						type="text"
-						id="search"
 						required
 						bind:value={search}
+						bind:this={searchEl}
 						onkeydown={handleKeyDown}
 						onkeyup={(event) => {
 							event.preventDefault();

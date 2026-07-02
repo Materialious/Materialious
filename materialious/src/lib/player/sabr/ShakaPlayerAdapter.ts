@@ -60,7 +60,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 		this.cacheManager = cacheManager;
 
 		const networkingEngine = shaka.net.NetworkingEngine;
-		const schemes = ['http', 'https'];
+		const schemes = ['http', 'https', 'sabr'];
 
 		if (!shaka.net.HttpFetchPlugin.isSupported())
 			throw new Error('The Fetch API is not supported in this browser.');

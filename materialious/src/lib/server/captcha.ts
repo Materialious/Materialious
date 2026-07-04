@@ -45,11 +45,16 @@ export async function verifyCaptcha(captcha: {
 	challenge: z.infer<typeof zCaptchaChallenge>;
 	key: string;
 	signature: string;
-	maxUses?: number;
 }) {
 	if (isOwnBackend()?.captchaDisabled) return;
 
-	if (!captcha.maxUses) captcha.maxUses = -1;
+	if (
+		(await getSequelize().CaptchaTable.count({
+			where: { signature: captcha.challenge.signature }
+		})) > 0
+	) {
+		throw error(400, 'Unsupported payload');
+	}
 
 	const captchaVerified = await verifySolution({
 		deriveKey,
@@ -63,18 +68,8 @@ export async function verifyCaptcha(captcha: {
 		throw error(400, 'Unsupported payload');
 	}
 
-	if (captcha.maxUses !== -1) {
-		if (
-			(await getSequelize().CaptchaTable.count({
-				where: { signature: captcha.challenge.signature }
-			})) >= captcha.maxUses
-		) {
-			throw error(400, 'Unsupported payload');
-		}
-
-		await getSequelize().CaptchaTable.create({
-			signature: captcha.challenge.signature,
-			created: new Date()
-		});
-	}
+	await getSequelize().CaptchaTable.create({
+		signature: captcha.challenge.signature,
+		created: new Date()
+	});
 }

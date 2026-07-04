@@ -84,6 +84,8 @@
 
 		if (!failed) {
 			goto(resolve('/', {}), { replaceState: true });
+		} else {
+			solveCaptchaChallenge();
 		}
 	}
 </script>
@@ -167,7 +169,10 @@
 						<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
 					</button>
 
-					<button type="submit">
+					<button
+						type="submit"
+						disabled={captchaState !== 'solved' && !isOwnBackend()?.captchaDisabled}
+					>
 						<i>done</i>
 						<span>{$_(needToRegister ? 'createAccount' : 'login')}</span>
 					</button>

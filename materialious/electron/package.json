@@ -2,6 +2,12 @@
 	"name": "Materialious",
 	"version": "1.17.2",
 	"description": "Modern material design for YouTube and Invidious.",
+  "desktopName": "us.materialio.Materialious",
+  "build": {
+    "linux": {
+      "syncDesktopName": true
+    }
+  },
 	"author": {
 		"name": "Ward Pearce",
 		"email": "wardpearce@pm.me"

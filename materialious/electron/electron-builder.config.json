@@ -4,6 +4,13 @@
 	"directories": {
 		"buildResources": "resources"
 	},
+	"files": [
+    "assets/**/*",
+    "build/**/*",
+    "capacitor.config.*",
+    "app/**/*",
+    "!**/.electron-cache/**"
+	],
 	"publish": [
 		{
 			"provider": "github",
@@ -16,7 +23,6 @@
 		}
 	],
 	"icon": "appIcon.png",
-	"files": ["assets/**/*", "build/**/*", "capacitor.config.*", "app/**/*"],
 	"electronDownload": {
 		"cache": "./.electron-cache"
 	},
@@ -79,10 +85,6 @@
 			},
 			{
 				"target": "zip",
-				"arch": ["x64", "arm64"]
-			},
-			{
-				"target": "7z",
 				"arch": ["x64", "arm64"]
 			},
 			{

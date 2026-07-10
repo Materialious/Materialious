@@ -31,12 +31,6 @@ export const sponsorBlockSegmentSubmissionsEnabledStore: Writable<boolean> = per
 	'sponsorBlockSegmentSubmissionsEnabled'
 );
 
-export const sponsorBlockUsernameStore: Writable<string | undefined> = persist(
-	writable(undefined),
-	createStorage(),
-	'sponsorBlockUsername'
-);
-
 export const sponsorBlockUserIDStore: Writable<string | undefined> = persist(
 	writable(undefined),
 	createStorage(),

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { _ } from '$lib/i18n';
-	import { createSponsorBlockClient, ensureSponsorBlockIdentity } from '$lib/sponsorblock';
+	import { createSponsorBlockClient, getOrCreateSponsorBlockUserID } from '$lib/sponsorblock';
 	import { type Category, type LocalSegment } from 'sponsorblock-api';
 
 	type DraftSegment = {
@@ -128,9 +128,8 @@
 		isSubmitting = true;
 
 		try {
-			ensureSponsorBlockIdentity();
-
-			const sponsorBlock = createSponsorBlockClient();
+			const userID = getOrCreateSponsorBlockUserID();
+			const sponsorBlock = createSponsorBlockClient(userID);
 
 			const localSegments: LocalSegment[] = segments.map((segment) => {
 				if (!segment.category) {

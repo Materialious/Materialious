@@ -76,7 +76,6 @@ export {
 	sponsorBlockDisplayToastStore,
 	sponsorBlockTimelineStore,
 	sponsorBlockSegmentSubmissionsEnabledStore,
-	sponsorBlockUsernameStore,
 	sponsorBlockUserIDStore,
 	deArrowInstanceStore,
 	deArrowEnabledStore,

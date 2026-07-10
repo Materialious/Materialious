@@ -331,6 +331,8 @@
 			"disableTimeline": "Disable segments on timeline",
 			"enableSegmentSubmissions": "Enable segment submissions",
 			"sponsorBlockUsername": "SponsorBlock Username",
+			"failedToSetUsername": "Failed to set SponsorBlock username",
+			"failedToRetrieveUsername": "Failed to retrieve SponsorBlock username",
 			"openSubmissionMenu": "Open submission menu",
 			"clearSegments": "Clear segments",
 			"cancelSegmentCreation": "Cancel creating segment",

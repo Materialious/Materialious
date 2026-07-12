@@ -107,7 +107,7 @@
             "playerStatistics": "Lejátszási statisztikák megjelenítése alapértelmezetten",
             "savePlaybackPosition": "Lejátszási pozíció mentése",
             "localVideoFallback": "Helyi videó visszatérés",
-            "theatreModeByDefault": "Szélesvásznú mód alapértelmezetten",
+            "theatreModeByDefault": "Mozi mód alapértelmezés szerint",
             "youtubeJsFallback": "Helyi videó visszatérés feldolgozása",
             "networkChangePause": "Szünet a hálózati változáskor"
         },
@@ -149,7 +149,7 @@
             "title": "Tartalomszűrők",
             "url": "Szűrők importálása webcímből",
             "autoUpdate": "Szűrő automatikus frissítése webcímből",
-            "contentType": "Tartalomtípus",
+            "contentType": "Tartalom típusa",
             "field": "Mező",
             "operator": "Üzemeltető",
             "optionPlaceholder": "Válassza ki a lehetőséget",
@@ -175,7 +175,7 @@
         "binds": {
             "title": "Billentyűparancsok",
             "togglePlay": "Lejátszás / Szünet",
-            "skipSponsor": "Szponzor szakasz kihagyása",
+            "skipSponsor": "Szponzorszakasz kihagyása",
             "toggleSubtitles": "Feliratok be/ki",
             "toggleFullscreen": "Teljes képernyő be/ki",
             "speedDown": "Lejátszási sebesség csökkentése",
@@ -212,7 +212,7 @@
         "changePassword": "Jelszó megváltoztatása"
     },
     "enabled": "Engedélyezve",
-    "donate": "Adományozás",
+    "donate": "Adakozás",
     "hideReplies": "Válaszok elrejtése",
     "defaultPage": "Alapértelmezett oldal",
     "player": {
@@ -228,7 +228,7 @@
             "copyXLink": "{{linkType}} hivatkozás másolása"
         },
         "audioOnly": "Csak hang",
-        "theatreMode": "Szélesvásznú mód",
+        "theatreMode": "Mozi mód",
         "pauseTimer": "Időzítő szünteltetése",
         "pauseVideoIn": "Videó szünteltetése ekkor ",
         "pauseTimerClear": "Törlés",

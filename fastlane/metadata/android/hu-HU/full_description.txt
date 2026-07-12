@@ -16,7 +16,7 @@ Lehetővé teszi a videók böngészését és megtekintését, a lejátszási l
   <li>Nincs nyomonkövetés</li>
   <li>Világos/ Sötét témák</li>
   <li>Egyedi színválasztási témák</li>
-  <li>Integrálódik az Invidious feliratkozásokkal, megtekintési előzményekkel és egyebekkel</li>
+  <li>Támogatja az Invidious feliratkozásait, megtekintési előzményeit és további funkcióit</li>
   <li>Élő közvetítések támogatása</li>
   <li>Dash támogatása</li>
   <li>Fejezetek</li>

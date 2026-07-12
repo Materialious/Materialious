@@ -74,7 +74,7 @@
 		"comlink": "^4.4.2",
 		"cookie-signature": "^1.2.2",
 		"dayjs": "^1.11.19",
-		"dexie": "^4.4.2",
+		"dexie": "^4.4.4",
 		"fuse.js": "^7.0.0",
 		"googlevideo": "^4.0.4",
 		"he": "^1.2.0",

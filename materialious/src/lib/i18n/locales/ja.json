@@ -178,7 +178,7 @@
             "miniPlayer": "ミニプレイヤー",
             "proxyVideos": "動画のプロキシ",
             "backgroundPlay": "バックグラウンドで音声を再生",
-            "dash": "DASH",
+            "dash": "Dash",
             "listenByDefault": "既定で音声再生",
             "silenceSkipper": "無音部分をスキップ (実験的機能)",
             "localVideoFallback": "動画の接続エラーで直接接続に切替",

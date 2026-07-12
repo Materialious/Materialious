@@ -8,7 +8,7 @@ import { captchaPayload, verifyCaptcha } from '$lib/server/captcha';
 const zUserLogin = z.object({
 	username: z.string(),
 	passwordHash: z.string(),
-	captchaPayload
+	captchaPayload: captchaPayload.nullable()
 });
 
 export async function POST({ request, cookies, locals }) {
@@ -16,16 +16,20 @@ export async function POST({ request, cookies, locals }) {
 		throw error(500);
 	}
 
-	const userLogin = zUserLogin.safeParse(await request.json());
+  const userLogin = zUserLogin.safeParse(await request.json());
+
+  console.log(userLogin.error);
 
 	if (!userLogin.success) throw error(401);
 
-	await verifyCaptcha({
-		solution: userLogin.data.captchaPayload.solution,
-		challenge: userLogin.data.captchaPayload.challenge,
-		key: locals.captchaKey,
-		signature: locals.captchaSignature
-	});
+	await verifyCaptcha(
+		userLogin.data.captchaPayload && {
+			solution: userLogin.data.captchaPayload.solution,
+			challenge: userLogin.data.captchaPayload.challenge,
+			key: locals.captchaKey,
+			signature: locals.captchaSignature
+		}
+	);
 
 	const userModel = await authenticateUser(userLogin.data.username, userLogin.data.passwordHash);
 

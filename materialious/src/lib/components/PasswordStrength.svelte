@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import { zxcvbn, zxcvbnOptions } from '@zxcvbn-ts/core';
+	import { ZxcvbnFactory } from '@zxcvbn-ts/core';
 	import { dictionary as commonDictionary, adjacencyGraphs } from '@zxcvbn-ts/language-common';
 	import { dictionary as enDictionary, translations } from '@zxcvbn-ts/language-en';
 
-	zxcvbnOptions.setOptions({
+	const zxcvbn = new ZxcvbnFactory({
 		dictionary: {
 			...commonDictionary,
 			...enDictionary
@@ -33,7 +33,7 @@
 
 	$effect(() => {
 		if (password) {
-			const result = zxcvbn(password);
+			const result = zxcvbn.check(password);
 			score = result.score;
 		} else {
 			score = null;
@@ -44,7 +44,9 @@
 {#if show && score !== null}
 	<div class="password-strength">
 		<div class="strength-bar">
-			<div class={`score-${score} strength-fill`}></div>
+			{#each [0, 1, 2, 3, 4] as i (i)}
+				<div class="strength-segment" class:filled={score !== null && i <= score}></div>
+			{/each}
 		</div>
 		<span class="strength-label">{$_(strengthLabelKey)}</span>
 	</div>
@@ -58,38 +60,20 @@
 	}
 
 	.strength-bar {
+		display: flex;
+		gap: 4px;
+	}
+
+	.strength-segment {
+		flex: 1;
 		height: 4px;
-		background: var(--secondary);
 		border-radius: 2px;
-		overflow: hidden;
+		background: var(--secondary);
+		transition: background-color 0.2s ease;
 	}
 
-	.strength-fill {
-		height: 100%;
-		transition:
-			width 0.2s ease,
-			background-color 0.2s ease;
-	}
-
-	.strength-fill.score-0 {
-		width: 20%;
-		background: #f44336;
-	}
-	.strength-fill.score-1 {
-		width: 40%;
-		background: #ff9800;
-	}
-	.strength-fill.score-2 {
-		width: 60%;
-		background: #ffeb3b;
-	}
-	.strength-fill.score-3 {
-		width: 80%;
-		background: #8bc34a;
-	}
-	.strength-fill.score-4 {
-		width: 100%;
-		background: #4caf50;
+	.strength-segment.filled {
+		background: var(--primary);
 	}
 
 	.strength-label {

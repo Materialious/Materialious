@@ -1,13 +1,13 @@
 {
 	"name": "Materialious",
-	"version": "1.17.2",
+	"version": "1.17.3",
 	"description": "Modern material design for YouTube and Invidious.",
-  "desktopName": "us.materialio.Materialious",
-  "build": {
-    "linux": {
-      "syncDesktopName": true
-    }
-  },
+	"desktopName": "us.materialio.Materialious",
+	"build": {
+		"linux": {
+			"syncDesktopName": true
+		}
+	},
 	"author": {
 		"name": "Ward Pearce",
 		"email": "wardpearce@pm.me"
@@ -42,7 +42,7 @@
 		"youtubei.js": "^17.2.0"
 	},
 	"devDependencies": {
-		"electron": "^42.5.1",
+		"electron": "^43.0.0",
 		"electron-builder": "^26.15.3",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^6.0.3"

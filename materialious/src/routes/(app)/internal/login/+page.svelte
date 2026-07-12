@@ -34,12 +34,14 @@
 
 		derivePassword = (workerApi as any).derivePassword as DerivePassword;
 
-		if (!isOwnBackend()?.captchaDisabled) {
-			solveCaptchaChallenge();
-		}
+		solveCaptchaChallenge();
 	});
 
 	async function solveCaptchaChallenge() {
+     	if (isOwnBackend()?.captchaDisabled) {
+      		return;
+     	}
+
 		captchaState = 'solving';
 
 		try {

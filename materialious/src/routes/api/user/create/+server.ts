@@ -16,7 +16,7 @@ const zUserCreate = z.object({
 		cipher: z.string().max(255),
 		nonce: z.string().max(255)
 	}),
-	captchaPayload
+	captchaPayload: captchaPayload.nullable()
 });
 
 export async function POST({ request, cookies, locals }) {
@@ -28,12 +28,14 @@ export async function POST({ request, cookies, locals }) {
 
 	if (!userToCreate.success) throw error(400);
 
-	await verifyCaptcha({
-		solution: userToCreate.data.captchaPayload.solution,
-		challenge: userToCreate.data.captchaPayload.challenge,
-		key: locals.captchaKey,
-		signature: locals.captchaSignature
-	});
+	await verifyCaptcha(
+		userToCreate.data.captchaPayload && {
+			solution: userToCreate.data.captchaPayload.solution,
+			challenge: userToCreate.data.captchaPayload.challenge,
+			key: locals.captchaKey,
+			signature: locals.captchaSignature
+		}
+	);
 
 	const createdUser = await createUser({
 		username: userToCreate.data.username,

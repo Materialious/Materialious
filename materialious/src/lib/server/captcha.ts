@@ -27,7 +27,7 @@ const zCaptchaChallenge = z.object({
 		data: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional()
 	}),
 	signature: z.string()
-});
+}).nullable();
 
 const zCaptchaSolution = z.object({
 	counter: z.number(),
@@ -45,8 +45,10 @@ export async function verifyCaptcha(captcha: {
 	challenge: z.infer<typeof zCaptchaChallenge>;
 	key: string;
 	signature: string;
-}) {
-	if (isOwnBackend()?.captchaDisabled) return;
+} | null) {
+  if (isOwnBackend()?.captchaDisabled) return;
+
+  if (!captcha || !captcha.challenge) throw error(400, 'Unsupported payload');
 
 	if (
 		(await getSequelize().CaptchaTable.count({

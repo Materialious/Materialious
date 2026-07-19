@@ -3,6 +3,9 @@ apply plugin: 'com.android.application'
 android {
     namespace = "us.materialio.app"
     compileSdk = rootProject.ext.compileSdkVersion
+    packaging {
+        useLegacyPackaging true
+    }
     defaultConfig {
         applicationId "us.materialio.app"
         minSdkVersion rootProject.ext.minSdkVersion

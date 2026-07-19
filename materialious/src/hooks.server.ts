@@ -14,22 +14,11 @@ sodium.ready.then(() => {
 
 let sequelizeAuthenticated = false;
 
-const limiter = new RateLimiter({
-	IP: [240, 'm']
-});
-
 const strictLimiter = new RateLimiter({
-	IP: [5, 'm']
+	IP: [10, 'm']
 });
 
 const sensitivePaths = [/^\/api\/user\/create$/, /^\/api\/user\/login$/];
-
-function getLimiter(pathname: string): RateLimiter {
-	if (sensitivePaths.some((p) => p.test(pathname))) {
-		return strictLimiter;
-	}
-	return limiter;
-}
 
 export async function handle({ event, resolve }) {
 	if (!isOwnBackend()?.internalAuth) {
@@ -63,9 +52,8 @@ export async function handle({ event, resolve }) {
 	}
 
 	if (!env.PUBLIC_RATE_LIMIT_DISABLED) {
-		if (event.url.pathname.startsWith('/api/')) {
-			const limiter = getLimiter(event.url.pathname);
-			if (await limiter.isLimited(event)) {
+		if (sensitivePaths.some((p) => p.test(event.url.pathname))) {
+			if (await strictLimiter.isLimited(event)) {
 				return new Response(JSON.stringify({ error: 'Too Many Requests' }), {
 					status: 429,
 					headers: { 'Content-Type': 'application/json' }

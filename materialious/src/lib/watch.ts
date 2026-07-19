@@ -11,7 +11,6 @@ import {
 import { parseDescription } from '$lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import { _ } from './i18n';
 import { getDislikesRYD } from './api/ytd';
 import { getDeArrow } from './api/dearrow';
 import type { VideoPlay } from './api/model';
@@ -29,10 +28,6 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		} catch (errorMessage: any) {
 			error(500, errorMessage);
 		}
-	}
-
-	if (video.premium) {
-		error(400, get(_)('premium'));
 	}
 
 	let personalPlaylists;

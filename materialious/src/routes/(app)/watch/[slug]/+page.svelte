@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import {
-		addPlaylistVideo,
-		getComments,
-		getPersonalPlaylists,
-		removePlaylistVideo
+		getComments
 	} from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
@@ -13,9 +10,9 @@
 	import { letterCase } from '$lib/letterCasing';
 	import { numberWithCommas } from '$lib/numbers';
 	import {
-		invidiousAuthStore,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
+		personalPlaylistsCacheStore,
 		playerMiniplayerEnabled,
 		playerPlaylistHistory,
 		playerState,
@@ -28,34 +25,32 @@
 		sleepTimerStore
 	} from '$lib/store';
 	import ui from 'beercss';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import Author from '$lib/components/Author.svelte';
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
-	import { expandSummery, isYTBackend } from '$lib/misc';
+	import { expandSummery } from '$lib/misc';
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { getWatchDetails } from '$lib/watch';
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
+	import PlaylistManager from '$lib/components/PlaylistManager.svelte';
 	import { isItemFiltered } from '$lib/filtering/index';
+	import PageLoading from '$lib/components/PageLoading.svelte';
 
-	let { data = $bindable() } = $props();
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let { data = $bindable() }: { data: any } = $props();
 
 	let playerElement: HTMLMediaElement | undefined = $state();
+	let loaded = $state(false);
 
 	let comments: Comments | null = $state(null);
 	let commentSort: 'top' | 'new' = $state('top');
-	data.streamed.comments?.then((streamedComments) => {
-		comments = streamedComments;
-	});
-
-	let personalPlaylists: PlaylistPage[] | null = $state(null);
-	data.streamed.personalPlaylists?.then((streamPlaylists) => (personalPlaylists = streamPlaylists));
 
 	playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
@@ -69,7 +64,7 @@
 
 	function hasPremiere() {
 		return (
-			data.video.premiereTimestamp &&
+			data.video?.premiereTimestamp &&
 			data.video.premiereTimestamp !== 0 &&
 			data.video.premiereTimestamp > Date.now()
 		);
@@ -77,18 +72,6 @@
 
 	let premiereTime = $state('');
 	let premiereUpdateInterval: ReturnType<typeof setTimeout>;
-
-	if (!hasPremiere() && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
-		playerState.set({
-			data: data
-		});
-	}
-
-	$effect(() => {
-		if ($interfaceAutoExpandComments && comments) {
-			expandSummery('comment-section');
-		}
-	});
 
 	async function load(state: PlayerState) {
 		playerElement = state.playerElement;
@@ -118,7 +101,24 @@
 		}
 	}
 
-	onMount(async () => {
+	data.streamed.details?.then((result: any) => {
+		data = result;
+		loaded = true;
+
+		data.streamed.comments?.then((streamedComments: Comments) => {
+			comments = streamedComments;
+		});
+
+		data.streamed.personalPlaylists?.then((streamPlaylists: PlaylistPage[]) => {
+			personalPlaylistsCacheStore.set(streamPlaylists);
+		});
+
+		if (!hasPremiere() && !data.video.premium && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
+			playerState.set({
+				data: data
+			});
+		}
+
 		if (hasPremiere()) {
 			premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 			premiereUpdateInterval = setInterval(async () => {
@@ -133,9 +133,8 @@
 			}, 60000);
 		}
 
-		// Required due to needing the playerElement
 		if ($playerState?.playerElement) {
-			await load($playerState);
+			load($playerState);
 		} else {
 			let loadedPlayer = false;
 			playerState.subscribe(async (updatedPlayerState) => {
@@ -146,6 +145,12 @@
 
 				await load(updatedPlayerState);
 			});
+		}
+	});
+
+	$effect(() => {
+		if ($interfaceAutoExpandComments && comments) {
+			expandSummery('comment-section');
 		}
 	});
 
@@ -186,32 +191,6 @@
 			playlistScrollable.scrollTop =
 				playlistCurrentVideo.offsetTop - playlistScrollable.offsetTop - 200;
 		}
-	}
-
-	async function toggleVideoToPlaylist(playlistId: string) {
-		if (!personalPlaylists) return;
-
-		const selectedPlaylist = personalPlaylists.filter((item) => {
-			return item.playlistId === playlistId;
-		});
-
-		if (selectedPlaylist.length === 0) {
-			return;
-		}
-
-		const videosToDelete = selectedPlaylist[0].videos.filter((item) => {
-			return item.videoId === data.video.videoId;
-		});
-
-		if (videosToDelete.length > 0) {
-			videosToDelete.forEach(async (toDelete) => {
-				await removePlaylistVideo(playlistId, toDelete.indexId);
-			});
-		} else {
-			await addPlaylistVideo(playlistId, data.video.videoId);
-		}
-
-		personalPlaylists = await getPersonalPlaylists();
 	}
 
 	async function loadMoreComments() {
@@ -286,13 +265,23 @@
 </script>
 
 <svelte:head>
-	<title>{data.video.title}</title>
+	{#if loaded}
+		<title>{data.video.title}</title>
+	{/if}
 </svelte:head>
 
+{#if !loaded}
+	<PageLoading />
+{:else}
 <div class="grid no-padding">
 	<div class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}>
 		<div style="display: flex;justify-content: center;">
-			{#if hasPremiere()}
+			{#if data.video.premium}
+				<article class="video-placeholder">
+					<p>{$_('premium')}</p>
+				</article>
+				<div class="space"></div>
+			{:else if hasPremiere()}
 				<article class="video-placeholder">
 					<p>{$_('player.premiere')}</p>
 					<h6 class="no-margin no-padding">
@@ -385,46 +374,10 @@
 						iconOnly={true}
 						style="margin-left: 0;"
 					/>
-					{#if personalPlaylists && personalPlaylists.length > 0}
-						<button class="surface-container-highest">
-							<i>add</i>
-							<div class="tooltip">{$_('player.addToPlaylist')}</div>
-							<menu class="no-wrap mobile">
-								{#each personalPlaylists as personalPlaylist (personalPlaylist.playlistId)}
-									<li
-										role="presentation"
-										class="row"
-										onclick={async () => {
-											await toggleVideoToPlaylist(personalPlaylist.playlistId);
-											(document.activeElement as HTMLElement)?.blur();
-										}}
-									>
-										<nav>
-											<span class="max">{personalPlaylist.title}</span>
-											{#if personalPlaylist.videos.filter((item) => {
-												return item.videoId === data.video.videoId;
-											}).length > 0}
-												<i>close</i>
-											{:else}
-												<i>add</i>
-											{/if}
-										</nav>
-									</li>
-								{/each}
-							</menu>
-						</button>
-					{:else}
-						<button disabled class="surface-container-highest">
-							<i>add</i>
-							<div class="tooltip">
-								{#if $invidiousAuthStore || isYTBackend()}
-									{$_('player.noPlaylists')}
-								{:else}
-									{$_('loginRequired')}
-								{/if}
-							</div>
-						</button>
-					{/if}
+					<PlaylistManager
+						mode="toggle"
+						videoId={data.video.videoId}
+					/>
 				</div>
 			</div>
 		</div>
@@ -671,6 +624,7 @@
 		</div>
 	</div>
 </dialog>
+{/if}
 
 <style>
 	.chapter-list,

@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.17.3",
+	"version": "1.17.4",
 	"description": "Modern material design for YouTube and Invidious.",
 	"desktopName": "us.materialio.Materialious",
 	"build": {
@@ -42,10 +42,10 @@
 		"youtubei.js": "^17.2.0"
 	},
 	"devDependencies": {
-		"electron": "^43.0.0",
+		"electron": "^43.1.0",
 		"electron-builder": "^26.15.3",
 		"electron-rebuild": "^3.2.9",
-		"typescript": "^6.0.3"
+		"typescript": "^7.0.2"
 	},
 	"keywords": [
 		"capacitor",

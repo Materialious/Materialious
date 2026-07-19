@@ -8,6 +8,7 @@
 	import Mousetrap from 'mousetrap';
 	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
+	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
@@ -71,11 +72,13 @@
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 		showControls?: boolean;
+		playerIsPip?: boolean;
 	}
 
 	let {
 		data,
 		isEmbed = false,
+		playerIsPip = false,
 		playerElement = $bindable(undefined),
 		currentTime = $bindable(0),
 		userManualSeeking = $bindable(false),
@@ -85,6 +88,26 @@
 	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
 	let watchProgressInterval: ReturnType<typeof setInterval>;
+	let keepAwakeSupported = $state(false);
+
+	async function requestKeepAwake() {
+		if (!keepAwakeSupported) return;
+		try {
+			await KeepAwake.keepAwake();
+		} catch {
+		    // Continue regardless
+		}
+	}
+
+	async function releaseKeepAwake() {
+		if (!keepAwakeSupported) return;
+		try {
+			await KeepAwake.allowSleep();
+		} catch {
+		    // Continue regardless
+		}
+	}
+
 	let showVideoRetry = $state(false);
 
 	let player: shaka.Player;
@@ -466,6 +489,15 @@
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
+		const { isSupported } = await KeepAwake.isSupported();
+		keepAwakeSupported = isSupported;
+
+		document.addEventListener('visibilitychange', async () => {
+			if (document.visibilityState === 'visible' && !playerElement?.paused) {
+				await requestKeepAwake();
+			}
+		});
+
 		if (Capacitor.getPlatform() === 'android') {
 			await androidHandleRotate();
 
@@ -666,18 +698,21 @@
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
 			savePlayerbackHistory();
+			await releaseKeepAwake();
 			showPlayerUI();
 		});
 
 		playerElement?.addEventListener('ended', async () => {
 			playerCurrentPlaybackState = false;
 			playerIsBuffering = false;
+			await releaseKeepAwake();
 			await goToNextVideo(data.video, data.playlistId);
 		});
 
-		playerElement?.addEventListener('playing', () => {
+		playerElement?.addEventListener('playing', async () => {
 			playerCurrentPlaybackState = true;
 			playerIsBuffering = false;
+			await requestKeepAwake();
 		});
 
 		playerElement?.addEventListener('waiting', () => {
@@ -749,6 +784,8 @@
 	}
 
 	onDestroy(async () => {
+		await releaseKeepAwake();
+
 		if (Capacitor.getPlatform() === 'android') {
 			await setStatusBarColor();
 			await CapacitorMusicControls.destroy();
@@ -861,6 +898,7 @@
 			{currentTime}
 			{showPlayerUI}
 			{segments}
+			{playerIsPip}
 			video={data.video}
 			content={data.content}
 			bind:userManualSeeking
@@ -878,7 +916,7 @@
 							{/if}
 						</i>
 					</button>
-					{#if !isMobile()}
+					{#if !isMobile() && !playerIsPip}
 						<div class="player-slider volume m l" {...playerVolumeSlider.root}>
 							<div class="track">
 								<div class="range"></div>
@@ -899,7 +937,7 @@
 						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
 					{/if}
 				</p>
-				{#if !$isAndroidTvStore}
+				{#if !$isAndroidTvStore && !playerIsPip}
 					<CaptionSettings video={data.video} />
 					{#if playerElement}
 						<Settings {player} {playerElement} />
@@ -922,7 +960,14 @@
 	</div>
 </div>
 
-{#if showVideoRetry}
+{console.log('data.video.premium', data.video.premium)}
+
+{#if data.video.premium}
+	<article class="video-placeholder">
+		<p>{$_('premium')}</p>
+	</article>
+	<div class="space"></div>
+{:else if showVideoRetry}
 	<article class="video-placeholder">
 		{#if $playerYouTubeJsFallback}
 			<p>{$_('player.youtubeJsLoading')}</p>
@@ -940,6 +985,7 @@
 			>
 		{/if}
 	</article>
+	<div class="space"></div>
 {/if}
 
 <style>

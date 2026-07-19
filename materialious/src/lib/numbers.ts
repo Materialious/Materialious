@@ -21,6 +21,11 @@ export function videoLength(lengthSeconds: number): string {
 	let minutes: number | string = Math.floor((lengthSeconds % 3600) / 60);
 	let seconds: number | string = Math.round(lengthSeconds % 60);
 
+	if (seconds === 60) {
+		seconds = 0;
+		minutes = Number(minutes) + 1;
+	}
+
 	if (minutes < 10) {
 		minutes = `0${minutes}`;
 	}

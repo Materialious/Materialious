@@ -1,15 +1,9 @@
 import { loadEntirePlaylist } from '$lib/playlist';
-import { error } from '@sveltejs/kit';
 
-export async function load({ params }) {
-	let playlist;
-
-	try {
-		playlist = await loadEntirePlaylist(params.slug);
-	} catch (errorMessage: any) {
-		error(500, errorMessage);
-	}
+export function load({ params }) {
 	return {
-		playlist: playlist
+		streamed: {
+			details: loadEntirePlaylist(params.slug)
+		}
 	};
 }

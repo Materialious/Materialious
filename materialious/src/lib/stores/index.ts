@@ -88,5 +88,6 @@ export {
 	searchCacheStore,
 	feedLastItemId,
 	playlistCacheStore,
-	channelCacheStore
+	channelCacheStore,
+	personalPlaylistsCacheStore
 } from './cache';

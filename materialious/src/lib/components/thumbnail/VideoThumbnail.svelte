@@ -20,7 +20,11 @@
 	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
 	import AuthorAvatar from '../AuthorAvatar.svelte';
 	import Share from '../Share.svelte';
-	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
+	import PlaylistManager from '../PlaylistManager.svelte';
+	import {
+		deleteWatchHistoryItem,
+		saveWatchHistory
+	} from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
 	import { truncate } from '$lib/misc';
 
@@ -261,6 +265,18 @@
 						</li>
 					</menu>
 				</button>
+			</li>
+			<li>
+				<PlaylistManager
+					mode="toggle"
+					videoId={video.videoId}
+					inline={true}
+					buttonIcon="playlist_add"
+					buttonText={$_('player.addToPlaylist')}
+					buttonClasses="transparent max"
+					menuClasses="max no-wrap"
+					onComplete={() => (thumbnailActionsVisible = false)}
+				/>
 			</li>
 		</menu>
 	{/if}

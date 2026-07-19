@@ -79,7 +79,8 @@ export {
 	searchCacheStore,
 	feedLastItemId,
 	playlistCacheStore,
-	channelCacheStore
+	channelCacheStore,
+	personalPlaylistsCacheStore
 } from './stores/index';
 export { isAndroidTv } from './misc';
 export type { PlayerState, SleepTimerState, Keybinds, SubtitleSettings } from './stores/index';

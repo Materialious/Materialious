@@ -27,3 +27,5 @@ export const channelCacheStore: Writable<{
 		displayContent: { [key: string]: ChannelContent };
 	};
 }> = writable({});
+
+export const personalPlaylistsCacheStore: Writable<PlaylistPage[] | null> = writable(null);

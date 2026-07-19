@@ -22,7 +22,7 @@
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.53.0",
+		"@sveltejs/kit": "^2.69.2",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@types/cookie-signature": "^1.1.2",
 		"@types/event-source-polyfill": "^1.0.5",

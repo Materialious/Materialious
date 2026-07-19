@@ -11,7 +11,6 @@ import {
 import { parseDescription } from '$lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import { _ } from './i18n';
 import { getDislikesRYD } from './api/ytd';
 import { getDeArrow } from './api/dearrow';
 import type { VideoPlay } from './api/model';

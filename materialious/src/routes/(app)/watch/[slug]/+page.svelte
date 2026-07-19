@@ -25,7 +25,7 @@
 		sleepTimerStore
 	} from '$lib/store';
 	import ui from 'beercss';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import Author from '$lib/components/Author.svelte';

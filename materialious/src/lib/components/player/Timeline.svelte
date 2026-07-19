@@ -25,6 +25,7 @@
 		video,
 		content,
 		segments,
+		playerIsPip,
 		userManualSeeking = $bindable(false),
 		playerMaxKnownTime = $bindable()
 	}: {
@@ -36,6 +37,7 @@
 		content: ParsedDescription;
 		segments: Segment[];
 		playerMaxKnownTime: number;
+		playerIsPip: boolean
 	} = $props();
 
 	let playerSliderInteracted = $state(false);
@@ -355,7 +357,7 @@
 	bind:this={playerSliderElement}
 >
 	{#snippet timelineTooltip(key: 'thumb' | 'timeline', timeInSeconds: number)}
-		{#if playerTimelineThumbnails.length > 0}
+		{#if playerTimelineThumbnails.length > 0 && !playerIsPip}
 			<canvas
 				bind:this={playerTimelineThumbnailCanvas[key]}
 				width={playerTimelineThumbnails[0].width}

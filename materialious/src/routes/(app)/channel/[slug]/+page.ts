@@ -5,7 +5,7 @@ import { channelCacheStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
-export async function load({ params }) {
+export function load({ params }) {
 	const currentChannelCache = get(channelCacheStore);
 
 	if (params.slug in currentChannelCache) {
@@ -23,23 +23,29 @@ export async function load({ params }) {
 		return;
 	}
 
-	let channel;
+	return {
+		streamed: {
+			details: (async () => {
+				let channel;
 
-	try {
-		channel = await getChannel(params.slug);
-	} catch (errorMessage: any) {
-		error(500, errorMessage);
-	}
+				try {
+					channel = await getChannel(params.slug);
+				} catch (errorMessage: any) {
+					error(500, errorMessage);
+				}
 
-	const displayContent = await getChannelContent(params.slug, {
-		type: 'videos'
-	});
+				const displayContent = await getChannelContent(params.slug, {
+					type: 'videos'
+				});
 
-	channelCacheStore.set({
-		...currentChannelCache,
-		[params.slug]: {
-			channel: channel,
-			displayContent: { videos: displayContent }
+				channelCacheStore.set({
+					...currentChannelCache,
+					[params.slug]: {
+						channel: channel,
+						displayContent: { videos: displayContent }
+					}
+				});
+			})()
 		}
-	});
+	};
 }

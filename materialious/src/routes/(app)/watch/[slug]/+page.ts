@@ -1,5 +1,9 @@
 import { getWatchDetails } from '$lib/watch';
 
-export async function load({ params, url }) {
-	return getWatchDetails(params.slug, url);
+export function load({ params, url }) {
+	return {
+		streamed: {
+			details: getWatchDetails(params.slug, url)
+		}
+	};
 }

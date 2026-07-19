@@ -475,7 +475,7 @@
 						{/if}
 						<div class="player">
 							{#key $playerState.data.video.videoId}
-								<Player data={$playerState.data} />
+								<Player data={$playerState.data} {playerIsPip} />
 							{/key}
 						</div>
 					</div>

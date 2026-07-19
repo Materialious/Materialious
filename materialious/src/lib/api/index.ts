@@ -2,6 +2,7 @@ import { getVideoYTjs } from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
 import {
 	invidiousAuthStore,
+	personalPlaylistsCacheStore,
 	playerYouTubeJsAlways,
 	rawMasterKeyStore,
 	watchHistoryEnabledStore
@@ -402,18 +403,38 @@ export async function getPlaylist(
 	return getPlaylistInvidious(playlistId, page, fetchOptions);
 }
 
+export function invalidatePersonalPlaylists() {
+	personalPlaylistsCacheStore.set(null);
+}
+
+export async function ensurePersonalPlaylists(): Promise<void> {
+	if (get(personalPlaylistsCacheStore)) return;
+	if (!get(invidiousAuthStore) || isYTBackend()) return;
+	try {
+		personalPlaylistsCacheStore.set(await getPersonalPlaylists({ priority: 'low' }));
+	} catch {
+		personalPlaylistsCacheStore.set([]);
+	}
+}
+
 export async function getPersonalPlaylists(
 	fetchOptions: RequestInit = {}
 ): Promise<PlaylistPage[]> {
 	if (isYTBackend()) return [];
 
-	return getPersonalPlaylistsInvidious(fetchOptions);
+	const cached = get(personalPlaylistsCacheStore);
+	if (cached) return cached;
+
+	const playlists = await getPersonalPlaylistsInvidious(fetchOptions);
+	personalPlaylistsCacheStore.set(playlists);
+	return playlists;
 }
 
 export async function deletePersonalPlaylist(playlistId: string) {
 	if (isYTBackend()) return;
 
-	return deletePersonalPlaylistInvidious(playlistId);
+	await deletePersonalPlaylistInvidious(playlistId);
+	invalidatePersonalPlaylists();
 }
 
 export async function postPersonalPlaylist(
@@ -422,7 +443,8 @@ export async function postPersonalPlaylist(
 	fetchOptions: RequestInit = {}
 ) {
 	if (isYTBackend()) return;
-	return postPersonalPlaylistInvidious(title, privacy, fetchOptions);
+	await postPersonalPlaylistInvidious(title, privacy, fetchOptions);
+	invalidatePersonalPlaylists();
 }
 
 export async function addPlaylistVideo(
@@ -431,7 +453,8 @@ export async function addPlaylistVideo(
 	fetchOptions: RequestInit = {}
 ) {
 	if (isYTBackend()) return;
-	return addPlaylistVideoInvidious(playlistId, videoId, fetchOptions);
+	await addPlaylistVideoInvidious(playlistId, videoId, fetchOptions);
+	invalidatePersonalPlaylists();
 }
 
 export async function removePlaylistVideo(
@@ -441,5 +464,6 @@ export async function removePlaylistVideo(
 ) {
 	if (isYTBackend()) return;
 
-	return removePlaylistVideoInvidious(playlistId, indexId, fetchOptions);
+	await removePlaylistVideoInvidious(playlistId, indexId, fetchOptions);
+	invalidatePersonalPlaylists();
 }

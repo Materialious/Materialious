@@ -9,12 +9,10 @@
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Author from '$lib/components/Author.svelte';
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { isYTBackend } from '$lib/misc';
 	import Share from '$lib/components/Share.svelte';
 	import { resolve } from '$app/paths';
-	import { Avatar } from 'melt/builders';
 
 	let tab: ChannelContentTypes = $state('videos');
 
@@ -28,8 +26,10 @@
 
 	let channelSearchDebounce: ReturnType<typeof setTimeout>;
 
-	onMount(() => {
-		displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
+	$effect(() => {
+		if ($channelCacheStore[page.params.slug]) {
+			displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
+		}
 	});
 
 	async function searchChannel() {
@@ -99,13 +99,14 @@
 		displayContent = await getChannelContent(page.params.slug, { type: tab });
 	}
 
-	const banner = new Avatar({
-		src: proxyGoogleImage($channelCacheStore[page.params.slug].channel.authorBanners[0]?.url ?? '')
-	});
+	let bannerSrc = $derived(
+		proxyGoogleImage($channelCacheStore[page.params.slug]?.channel?.authorBanners?.[0]?.url ?? '')
+	);
 </script>
 
+{#if $channelCacheStore[page.params.slug]}
 <div class="padding">
-	<img {...banner.image} width="100%" alt="Channel banner" />
+	<img src={bannerSrc} width="100%" alt="Channel banner" />
 	<div class="description">
 		<div>
 			<Author
@@ -213,6 +214,7 @@
 		{/if}
 	</div>
 </div>
+{/if}
 
 {#if displayContent}
 	{#if 'videos' in displayContent}

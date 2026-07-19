@@ -2,19 +2,32 @@
 	import { resolve } from '$app/paths';
 	import { unsafeRandomItem } from '$lib/misc';
 	import { cleanNumber } from '$lib/numbers';
-	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
+	import {
+		isAndroidTvStore,
+		playlistSettingsStore
+	} from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Share from '$lib/components/Share.svelte';
+	import PlaylistManager from '$lib/components/PlaylistManager.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import type { VideoWatchHistory } from '$lib/api/model.js';
 	import { getWatchHistory } from '$lib/api/index.js';
+	import PageLoading from '$lib/components/PageLoading.svelte';
 
-	let { data } = $props();
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let { data = $bindable() }: { data: any } = $props();
+	let loaded = $state(false);
+	let playlist: any = $state(null);
+
+	data.streamed.details?.then((result: any) => {
+		playlist = result;
+		loaded = true;
+	});
 
 	async function loadLastWatched() {
-		const videoIds = data.playlist.videos.map((video) => video.videoId);
+		const videoIds = playlist.videos.map((video: any) => video.videoId);
 
 		let lastHistory: VideoWatchHistory[] = [];
 
@@ -33,8 +46,8 @@
 			goto(
 				resolve(
 					$isAndroidTvStore
-						? `/tv/[videoId]?playlist=${data.playlist.info.playlistId}`
-						: `/watch/[videoId]?playlist=${data.playlist.info.playlistId}`,
+						? `/tv/[videoId]?playlist=${playlist.info.playlistId}`
+						: `/watch/[videoId]?playlist=${playlist.info.playlistId}`,
 					{
 						videoId: lastHistory[0].videoId
 					}
@@ -44,10 +57,10 @@
 			goto(
 				resolve(
 					$isAndroidTvStore
-						? `/tv/[videoId]?playlist=${data.playlist.info.playlistId}`
-						: `/watch/[videoId]?playlist=${data.playlist.info.playlistId}`,
+						? `/tv/[videoId]?playlist=${playlist.info.playlistId}`
+						: `/watch/[videoId]?playlist=${playlist.info.playlistId}`,
 					{
-						videoId: data.playlist.videos[0].videoId
+						videoId: playlist.videos[0].videoId
 					}
 				)
 			);
@@ -55,8 +68,11 @@
 	}
 </script>
 
+{#if !loaded}
+	<PageLoading />
+{:else}
 <article class="border padding">
-	{#if data.playlist.videos.length > 0}
+	{#if playlist.videos.length > 0}
 		<nav>
 			<button onclick={loadLastWatched} class="button circle extra no-margin">
 				<i>play_arrow</i>
@@ -68,15 +84,15 @@
 			<a
 				href={resolve(
 					$isAndroidTvStore
-						? `/tv/[playlistId]?playlist=${data.playlist.info.playlistId}`
-						: `/watch/[playlistId]?playlist=${data.playlist.info.playlistId}`,
+						? `/tv/[playlistId]?playlist=${playlist.info.playlistId}`
+						: `/watch/[playlistId]?playlist=${playlist.info.playlistId}`,
 					{
-						playlistId: unsafeRandomItem(data.playlist.videos).videoId
+						playlistId: unsafeRandomItem(playlist.videos).videoId
 					}
 				)}
 				onclick={() =>
 					playlistSettingsStore.set({
-						[data.playlist.info.playlistId]: { shuffle: true, loop: false }
+						[playlist.info.playlistId]: { shuffle: true, loop: false }
 					})}
 				class="button circle extra no-margin surface-container-highest"
 			>
@@ -87,22 +103,30 @@
 			</a>
 		</nav>
 	{/if}
-	<h3>{data.playlist.info.title}</h3>
+	<h3>{playlist.info.title}</h3>
 	<p>
-		{cleanNumber(data.playlist.info.viewCount)}
-		{$_('views')} • {data.playlist.info.videoCount}
+		{cleanNumber(playlist.info.viewCount)}
+		{$_('views')} • {playlist.info.videoCount}
 		{$_('videos')}
 	</p>
 	<div class="divider" style="margin-bottom: 1em;"></div>
 
 	<article style="max-height: 200px;" class="scroll no-padding no-elevate no-round">
-		<p style="white-space: pre-line;word-wrap: break-word;">{data.playlist.info.description}</p>
+		<p style="white-space: pre-line;word-wrap: break-word;">{playlist.info.description}</p>
 	</article>
 
 	<div class="space"></div>
 
 	{#if !$isAndroidTvStore}
 		<nav class="right-align">
+			{#if playlist.videos.length > 0}
+				<PlaylistManager
+					mode="clone"
+					videoIds={playlist.videos.map((v: any) => v.videoId)}
+					buttonIcon="content_copy"
+					buttonText={$_('playlist.cloneToPlaylist')}
+				/>
+			{/if}
 			<Share
 				iconOnly={false}
 				shares={[
@@ -130,4 +154,5 @@
 
 <div class="space"></div>
 
-<ItemsList items={data.playlist.videos} playlistId={data.playlist.info.playlistId} />
+<ItemsList items={playlist.videos} playlistId={playlist.info.playlistId} />
+{/if}

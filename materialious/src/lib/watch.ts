@@ -31,10 +31,6 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		}
 	}
 
-	if (video.premium) {
-		error(400, get(_)('premium'));
-	}
-
 	let personalPlaylists;
 	if (get(invidiousAuthStore)) {
 		personalPlaylists = getPersonalPlaylists({ priority: 'low' });

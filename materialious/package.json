@@ -77,7 +77,7 @@
 		"dayjs": "^1.11.19",
 		"dexie": "^4.4.4",
 		"fuse.js": "^7.0.0",
-		"googlevideo": "^4.0.4",
+		"googlevideo": "^4.1.1",
 		"he": "^1.2.0",
 		"human-number": "^2.0.8",
 		"i18next": "^26.3.0",

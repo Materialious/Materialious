@@ -306,9 +306,34 @@
 				></div>
 
 				{#if progress}
-					<div class="chip surface-container-highest">
-						<i>check</i>
-					</div>
+                    <button
+                        class="chip surface-container-highest"
+                        onclick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            (async () => {
+                                await deleteWatchHistoryItem(video.videoId);
+                                progress = undefined;
+                                thumbnailActionsVisible = false;
+                            })();
+                        }}
+                    >
+                        <i>check</i>
+                    </button>
+          		{:else}
+                    <button
+                        class="chip surface-container-highest"
+                        onclick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            (async () => {
+                                await saveWatchHistory(video, 1);
+                                progress = '0';
+                            })();
+                        }}
+                    >
+                        <i>visibility</i>
+                    </button>
 				{/if}
 				{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
 					<div

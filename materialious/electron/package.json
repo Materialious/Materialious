@@ -37,7 +37,7 @@
 		"electron-unhandled": "^4.0.1",
 		"electron-updater": "^6.8.9",
 		"electron-window-state": "^5.0.3",
-		"jsdom": "^29.1.1",
+		"jsdom": "^30.0.0",
 		"jsonfile": "^6.2.1",
 		"youtubei.js": "^17.2.0"
 	},

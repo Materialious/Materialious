@@ -1,0 +1,25 @@
+<i>Materialious</i> <a href='https://github.com/iv-org'>Invidious</a>-erako bezero bat da, material design erabiliz.
+Bideoak arakatu eta ikusteko, erreprodukzio-zerrendak kudeatzeko eta kanalak erabiltzeko aukera ematen dizu.
+
+<b>Ezaugarriak:</b>
+<ul>
+  <li>Invidious companion euskarria</li>
+  <li>Invidious APIaren integrazio hedatua</li>
+  <li>YouTube.js ordezkoa, Invidiousek Mahaigainerako eta Androiderako bideoak kargatzen ez baditu</li>
+  <li>Ziurtagiri-balioztatzea desgaitzeko aukera (homelab erabiltzaileentzat)</li>
+  <li>Ikuste-aurrerapena Invidious saioen artean sinkronizatu</li>
+  <li>Ikuste-festa sinkronizatuak</li>
+  <li>Sponsorblock integratua</li>
+  <li>Return YouTube Dislike integratua</li>
+  <li>DeArrow integratua (tokiko prozesamendu ordezkoarekin)</li>
+  <li>Iragarkirik ez</li>
+  <li>Jarraipenik ez</li>
+  <li>Tema argi/ilunak</li>
+  <li>Kolore-tema pertsonalizatuak</li>
+  <li>Invidious harpidetzekin, ikuste-historiarekin eta gehiagorekin integratzen da</li>
+  <li>Zuzeneko emanaldien euskarria</li>
+  <li>Dash euskarria</li>
+  <li>Kapituluak</li>
+  <li>Audio hutseko modua</li>
+  <li>Erreprodukzio-zerrendak</li>
+</ul>

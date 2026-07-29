@@ -56,7 +56,10 @@
         "shuffleVideos": "シャッフルして動画再生",
         "loopPlaylist": "再生リストをループ",
         "next": "次へ",
-        "previous": "前へ"
+        "previous": "前へ",
+        "cloneToPlaylist": "プレイリストに複製",
+        "cloning": "複製中...",
+        "clonedSuccess": "プレイリストの複製に成功しました"
     },
     "thumbnail": {
         "live": "ライブ",

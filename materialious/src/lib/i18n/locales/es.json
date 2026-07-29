@@ -50,7 +50,10 @@
         "shuffleVideos": "Reproducir videos en aleatorio",
         "loopPlaylist": "Repetir lista de reproducción",
         "next": "Siguiente",
-        "previous": "Anterior"
+        "previous": "Anterior",
+        "cloneToPlaylist": "Clonar a lista de reproducción",
+        "cloning": "Clonando...",
+        "clonedSuccess": "Lista de reproducción clonada correctamente"
     },
     "thumbnail": {
         "live": "EN VIVO",
@@ -112,8 +115,15 @@
             "loop": "Repetir",
             "on": "Encendido",
             "off": "Apagado",
-            "language": "Lenguaje"
-        }
+            "language": "Lenguaje",
+            "fontSize": "Tamaño de letra",
+            "textColor": "Color de texto",
+            "bgColor": "Color de fondo",
+            "alignment": "Alineación",
+            "reset": "Restablecer valores predeterminados"
+        },
+        "pauseTimerFinished": "Temporizador de pausa finalizado",
+        "pauseOnNetworkChange": "Video pausado por cambio de red wifi"
     },
     "layout": {
         "interface": "Interfaz",
@@ -136,7 +146,15 @@
             "darkMode": "Modo oscuro",
             "lightMode": "Modo claro",
             "AmoledTheme": "Tema Amoled",
-            "color": "Color"
+            "color": "Color",
+            "advanced": "Personalización avanzada",
+            "borderRadius": {
+                "none": "Ninguno",
+                "slight": "Ligero",
+                "modern": "Moderno",
+                "rounded": "Redondeado",
+                "borderRadius": "Radio del borde"
+            }
         },
         "searchSuggestions": "Sugerencias de búsqueda",
         "previewVideoOnHover": "Vista previa del video al pasar por encima",
@@ -161,7 +179,12 @@
             "silenceSkipper": "Omitir silencio (Experimental)",
             "youtubeJsFallback": "Procesar video localmente",
             "youtubeJsAlways": "Utilizar siempre",
-            "lockOrientation": "Bloquear orientación de pantalla"
+            "lockOrientation": "Bloquear orientación de pantalla",
+            "ccByDefault": "Subtítulos activados por defecto",
+            "localVideoFallback": "Opción de video local",
+            "networkChangePause": "Pausar al cambiar de red",
+            "defaultPlaybackSpeed": "Velocidad de reproducción predeterminada",
+            "playerStatistics": "Mostrar estadísticas del reproductor por defecto"
         },
         "bookmarklet": "Favoritos",
         "instanceUrl": "URL de la instancia",
@@ -175,7 +198,11 @@
             "intermissionIntroAnimation": "Pausa / Animación de introducción",
             "credits": "Elementos finales / Créditos",
             "preViewRecapHook": "Avance/Repetición/Enganche",
-            "tangentJokes": "Contenido de relleno/Chistes"
+            "tangentJokes": "Contenido de relleno/Chistes",
+            "musicOffTopic": "Segmento no musical",
+            "automatic": "Omitir automáticamente",
+            "manual": "Omitir manualmente",
+            "timeline": "Solo en la línea de tiempo"
         },
         "deArrow": {
             "title": "DeArrow",
@@ -196,7 +223,83 @@
         "androidNativeShare": "Usar el \"compartir\" nativo",
         "backendEngine": {
             "warning": "Opciones avanzadas! Solo para usuarios avanzados. Se recomienda no cambiar nada, excepto que entiendas lo que haces.",
-            "cull": "Elementos máximos en el feed"
+            "cull": "Elementos máximos en el feed",
+            "cooldown": "Tiempo de espera para volver a consultar un canal (horas)",
+            "concurrent": "Cantidad máxima de canales a procesar antes de devolver el feed",
+            "fallbacks": "Alternativas",
+            "importExport": "Exportación/importación automática",
+            "exportToInvidious": "Exportar a Invidious desde Materialious",
+            "importToMaterialious": "Importar de Invidious a Materialious",
+            "importingToMaterialious": "Importación a Materialious iniciada",
+            "importingToMaterialiousFinished": "Importación a Materialious finalizada",
+            "exportingToInvidious": "Exportación a Invidious iniciada",
+            "exportingToInvidiousFinished": "Exportación a Invidious finalizada"
+        },
+        "binds": {
+            "title": "Atajos de teclado",
+            "togglePlay": "Reproducir / Pausar",
+            "skipSponsor": "Omitir segmento de patrocinio",
+            "toggleSubtitles": "Alternar subtítulos",
+            "toggleFullscreen": "Alternar pantalla completa",
+            "speedDown": "Disminuir velocidad de reproducción",
+            "speedUp": "Aumentar velocidad de reproducción",
+            "frameBack": "Retroceder un fotograma",
+            "frameForward": "Avanzar un fotograma",
+            "seekBack": "Retroceder",
+            "seekForward": "Avanzar",
+            "search": "Abrir búsqueda",
+            "clickToSet": "Haz clic para configurar…",
+            "pageBack": "Volver atrás",
+            "pageForward": "Avanzar",
+            "closePlayer": "Salir de pantalla completa / Cerrar reproductor",
+            "tab1": "Pestaña 1",
+            "tab2": "Pestaña 2",
+            "tab3": "Pestaña 3",
+            "tab4": "Pestaña 4",
+            "reset": "Restablecer valores predeterminados"
+        },
+        "admin": "Administrador",
+        "adminPanel": "Panel de administración",
+        "totalUsers": "Usuarios totales: {{count}}",
+        "confirmDeleteUser": "¿Seguro que quieres eliminar este usuario?",
+        "userDeleted": "Usuario eliminado",
+        "confirmDeleteUserBody": "¿Seguro que quieres eliminar al usuario \"{{username}}\"? Esta acción no se puede deshacer.",
+        "resetPassword": "Restablecer contraseña",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar contraseña",
+        "passwordsDoNotMatch": "Las contraseñas no coinciden",
+        "passwordResetFailed": "No se pudo restablecer la contraseña. Verifica tu contraseña actual.",
+        "passwordResetSuccess": "Contraseña restablecida correctamente",
+        "changePassword": "Cambiar contraseña",
+        "preserveTranslation": "Usar traducción original",
+        "showMobileBackButton": "Controles de navegación en pantalla",
+        "exportToJson": "Exportar a JSON",
+        "filter": {
+            "title": "Filtros de contenido",
+            "url": "Importar filtros desde URL",
+            "autoUpdate": "Actualizar filtro automáticamente desde la URL",
+            "contentType": "Tipo de contenido",
+            "field": "Campo",
+            "operator": "Operador",
+            "optionPlaceholder": "Selecciona tu opción",
+            "value": "Valor",
+            "addConditional": "Añadir condición",
+            "addFilter": "Añadir filtro",
+            "videoFiltered": "\"{{videoTitle}}\" de \"{{authorName}}\" filtrado",
+            "channelFiltered": "\"{{authorName}}\" filtrado"
+        },
+        "export": {
+            "title": "Exportar/Importar",
+            "importSub": "Importar suscripciones",
+            "importSubSupported": "Compatible con YouTube CSV/OPML/JSON, Invidious OPML/JSON, base de datos de Freetube y NewPipe JSON",
+            "importing": "Importando suscripciones (esto tardará un momento)",
+            "importingCompleted": "Suscripciones importadas correctamente",
+            "exportSub": "Exportar suscripciones",
+            "exportToClipboard": "Exportar al portapapeles",
+            "exportToFile": "Exportar a archivo",
+            "importFromFile": "Importar desde archivo",
+            "exportToShareUrl": "Exportar a URL para compartir"
         }
     },
     "subscribe": "Suscríbete",
@@ -262,5 +365,23 @@
         "leaveRoom": "Abandonar sala",
         "userJoin": "Un usuario se ha unido a la sala",
         "userLeft": "Un usuario ha abandonado la sala"
-    }
+    },
+    "veryWeak": "Muy débil",
+    "weak": "Débil",
+    "fair": "Aceptable",
+    "strong": "Segura",
+    "veryStrong": "Muy segura",
+    "verifyingCaptcha": "Verificando...",
+    "captchaVerified": "Verificado",
+    "captchaFailed": "Verificación fallida",
+    "markAs": {
+        "watched": "Marcar como visto",
+        "unwatched": "Marcar como no visto"
+    },
+    "commentSortBy": "Ordenar por",
+    "commentSortTop": "Destacados",
+    "commentSortNewest": "Más recientes",
+    "hideAuthor": "Ocultar autor",
+    "favouriteChannel": "Añadir a favoritos",
+    "unfavouriteChannel": "Quitar de favoritos"
 }

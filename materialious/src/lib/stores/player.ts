@@ -72,6 +72,7 @@ export interface PlayerState {
 }
 
 export const playerState: Writable<PlayerState | undefined> = writable(undefined);
+export const playerLoadingStore: Writable<boolean> = writable(false);
 
 export interface SleepTimerState {
 	duration: number;

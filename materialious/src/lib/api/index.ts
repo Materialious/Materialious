@@ -1,4 +1,8 @@
-import { getVideoYTjs } from '$lib/api/youtubejs/video';
+import {
+	getVideoYTjs,
+	getVideoPageYTjs,
+	continueVideoPlayerYTjs
+} from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
 import {
 	invidiousAuthStore,
@@ -116,6 +120,34 @@ export async function getVideo(
 	}
 
 	return getVideoInvidious(videoId, local, fetchOptions);
+}
+
+export async function getVideoPage(
+	videoId: string,
+	local: boolean = false,
+	fetchOptions?: RequestInit
+): Promise<VideoPlay> {
+	if (
+		(get(playerYouTubeJsAlways) && isUnrestrictedPlatform()) ||
+		isYTBackend() ||
+		useEngineFallback('Video')
+	) {
+		return getVideoPageYTjs(videoId);
+	}
+
+	return getVideoInvidious(videoId, local, fetchOptions);
+}
+
+export async function continueVideoPlayer(videoId: string) {
+	if (
+		(get(playerYouTubeJsAlways) && isUnrestrictedPlatform()) ||
+		isYTBackend() ||
+		useEngineFallback('Video')
+	) {
+		return continueVideoPlayerYTjs(videoId);
+	}
+
+	return null;
 }
 
 export async function getComments(

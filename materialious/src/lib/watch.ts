@@ -1,4 +1,4 @@
-import { getComments, getPersonalPlaylists, getVideo, saveWatchHistory } from '$lib/api/index';
+import { getComments, getPersonalPlaylists, getVideoPage, continueVideoPlayer, saveWatchHistory } from '$lib/api/index';
 import { loadEntirePlaylist } from '$lib/playlist';
 import {
 	deArrowEnabledStore,
@@ -15,7 +15,7 @@ import { getDislikesRYD } from './api/ytd';
 import { getDeArrow } from './api/dearrow';
 import type { VideoPlay } from './api/model';
 
-export async function getWatchDetails(videoId: string, url: URL) {
+export async function getWatchPage(videoId: string, url: URL) {
 	const playerStateRetrieved = get(playerState);
 
 	let video: VideoPlay;
@@ -24,44 +24,13 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		video = playerStateRetrieved.data.video;
 	} else {
 		try {
-			video = await getVideo(videoId, get(playerProxyVideosStore), { priority: 'high' });
+			video = await getVideoPage(videoId, get(playerProxyVideosStore), { priority: 'high' });
 		} catch (errorMessage: any) {
 			error(500, errorMessage);
 		}
 	}
 
-	let personalPlaylists;
-	if (get(invidiousAuthStore)) {
-		personalPlaylists = getPersonalPlaylists({ priority: 'low' });
-	} else {
-		personalPlaylists = null;
-	}
-
 	saveWatchHistory(video);
-
-	let comments;
-	try {
-		comments = video.liveNow ? null : getComments(videoId, { sort_by: 'top' }, { priority: 'low' });
-	} catch {
-		comments = null;
-	}
-
-	let returnYTDislikes;
-	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
-	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
-		try {
-			returnYTDislikes = get(returnYtDislikesStore)
-				? getDislikesRYD(videoId, { priority: 'low' })
-				: null;
-		} catch {
-			// Continue regardless of error
-		}
-	}
-
-	const playlistId = url.searchParams.get('playlist');
-	if (playlistId) {
-		await loadEntirePlaylist(playlistId);
-	}
 
 	if (get(deArrowEnabledStore)) {
 		try {
@@ -80,14 +49,79 @@ export async function getWatchDetails(videoId: string, url: URL) {
 		}
 	}
 
+	let comments;
+	try {
+		comments = video.liveNow ? null : getComments(videoId, { sort_by: 'top' }, { priority: 'low' });
+	} catch {
+		comments = null;
+	}
+
 	return {
 		video: video,
 		content: parseDescription(video.videoId, video.descriptionHtml, video.fallbackPatch),
-		playlistId: playlistId,
+		playlistId: url.searchParams.get('playlist'),
 		streamed: {
-			personalPlaylists: personalPlaylists,
-			returnYTDislikes: returnYTDislikes,
 			comments: comments
+		}
+	};
+}
+
+export async function getWatchPlayer(videoId: string, url: URL) {
+	const playlistId = url.searchParams.get('playlist');
+
+	if (playlistId) {
+		await loadEntirePlaylist(playlistId);
+	}
+
+	let personalPlaylists;
+	if (get(invidiousAuthStore)) {
+		personalPlaylists = getPersonalPlaylists({ priority: 'low' });
+	} else {
+		personalPlaylists = null;
+	}
+
+	let returnYTDislikes;
+	const returnYTDislikesInstance = get(returnYTDislikesInstanceStore);
+	if (returnYTDislikesInstance && returnYTDislikesInstance !== '') {
+		try {
+			returnYTDislikes = get(returnYtDislikesStore)
+				? getDislikesRYD(videoId, { priority: 'low' })
+				: null;
+		} catch {
+			// Continue regardless of error
+		}
+	}
+
+	const playerData = await continueVideoPlayer(videoId);
+
+	return {
+		playerData,
+		personalPlaylists,
+		returnYTDislikes,
+		playlistId
+	};
+}
+
+export async function getWatchDetails(videoId: string, url: URL) {
+	const page = await getWatchPage(videoId, url);
+	const player = await getWatchPlayer(videoId, url);
+
+	if (player.playerData) {
+		page.video.dashUrl = player.playerData.dashUrl ?? page.video.dashUrl;
+		page.video.adaptiveFormats = player.playerData.adaptiveFormats;
+		page.video.captions = player.playerData.captions;
+		page.video.hlsUrl = player.playerData.hlsUrl ?? page.video.hlsUrl;
+		page.video.ytjs = player.playerData.ytjs;
+	}
+
+	return {
+		video: page.video,
+		content: page.content,
+		playlistId: page.playlistId,
+		streamed: {
+			personalPlaylists: player.personalPlaylists,
+			returnYTDislikes: player.returnYTDislikes,
+			comments: page.streamed.comments
 		}
 	};
 }

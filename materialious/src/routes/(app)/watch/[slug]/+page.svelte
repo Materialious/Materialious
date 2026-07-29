@@ -13,6 +13,7 @@
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
 		personalPlaylistsCacheStore,
+		playerLoadingStore,
 		playerMiniplayerEnabled,
 		playerPlaylistHistory,
 		playerState,
@@ -35,7 +36,7 @@
 	import { expandSummery } from '$lib/misc';
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
 	import { addToast } from '$lib/components/Toast.svelte';
-	import { getWatchDetails } from '$lib/watch';
+	import { getWatchPage } from '$lib/watch';
 	import { page } from '$app/state';
 	import Share from '$lib/components/Share.svelte';
 	import Playlist from '$lib/components/watch/Playlist.svelte';
@@ -51,6 +52,7 @@
 
 	let comments: Comments | null = $state(null);
 	let commentSort: 'top' | 'new' = $state('top');
+	let returnYTDislikes: Promise<any> | null = $state(null);
 
 	playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
 
@@ -101,36 +103,63 @@
 		}
 	}
 
-	data.streamed.details?.then((result: any) => {
-		data = result;
+	let playerReady = $state(false);
+
+	const playerStream = data.streamed.player;
+
+	data.streamed.page?.then((pageResult: any) => {
+		data = pageResult;
 		loaded = true;
+		playerLoadingStore.set(true);
 
 		data.streamed.comments?.then((streamedComments: Comments) => {
 			comments = streamedComments;
 		});
 
-		data.streamed.personalPlaylists?.then((streamPlaylists: PlaylistPage[]) => {
-			personalPlaylistsCacheStore.set(streamPlaylists);
-		});
-
-		if (!hasPremiere() && !data.video.premium && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
-			playerState.set({
-				data: data
-			});
-		}
-
 		if (hasPremiere()) {
 			premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 			premiereUpdateInterval = setInterval(async () => {
-				data = await getWatchDetails(data.video.videoId, page.url);
+				const refreshed = await getWatchPage(data.video.videoId, page.url);
+				data.video = refreshed.video;
+				data.content = refreshed.content;
 
 				if (hasPremiere()) {
 					premiereTime = relativeTimestamp(data.video.premiereTimestamp as number);
 				} else {
 					clearInterval(premiereUpdateInterval);
-					playerState.set({ ...$playerState, data: { ...data } });
+					if (playerReady) {
+						playerState.set({ ...$playerState, data: { ...data } });
+					}
 				}
 			}, 60000);
+		}
+	});
+
+	playerStream?.then((playerResult: any) => {
+		if (playerResult.playerData) {
+			data.video.dashUrl = playerResult.playerData.dashUrl ?? data.video.dashUrl;
+			data.video.adaptiveFormats = playerResult.playerData.adaptiveFormats;
+			data.video.captions = playerResult.playerData.captions;
+			data.video.hlsUrl = playerResult.playerData.hlsUrl ?? data.video.hlsUrl;
+			data.video.ytjs = playerResult.playerData.ytjs;
+		}
+
+		if (playerResult.personalPlaylists) {
+			playerResult.personalPlaylists.then((streamPlaylists: PlaylistPage[]) => {
+				personalPlaylistsCacheStore.set(streamPlaylists);
+			});
+		}
+
+		returnYTDislikes = playerResult.returnYTDislikes;
+		playerReady = true;
+
+		if (!hasPremiere() && !data.video.premium && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
+			playerLoadingStore.set(false);
+			playerState.set({
+				data: data
+			});
+		} else {
+			playerLoadingStore.set(false);
 		}
 
 		if ($playerState?.playerElement) {
@@ -179,6 +208,7 @@
 			playerState.set(undefined);
 		}
 
+		playerLoadingStore.set(false);
 		playerTheatreModeIsActive.set(false);
 	});
 
@@ -300,7 +330,7 @@
 			</div>
 			<div class="s12 m12 l5 video-actions">
 				<div>
-					<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
+					<LikesDislikes video={data.video} returnYTDislikes={returnYTDislikes} />
 
 					<button
 						onclick={toggleTheatreMode}

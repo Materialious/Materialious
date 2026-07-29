@@ -17,6 +17,7 @@
 		invidiousInstanceStore,
 		interfaceDefaultPage,
 		isAndroidTvStore,
+		playerLoadingStore,
 		playerState,
 		playerTheatreModeIsActive,
 		playerIsInWindowFullscreen,
@@ -436,6 +437,25 @@
 			<WatchParty />
 		{/if}
 
+		{#if $playerLoadingStore && !$playerState}
+			<div class="grid">
+				<div
+					class:pip={playerIsPip}
+					class:s12={!playerIsPip}
+					class:m12={!playerIsPip}
+					class:l12={($playerTheatreModeIsActive || $playerIsInWindowFullscreen) && !playerIsPip}
+					class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
+				>
+					<div class="pip-info">
+						<div class="player">
+							<div class="player-placeholder">
+								<progress class="circle large indeterminate"></progress>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{/if}
 		{#if $playerState}
 			<div class="grid">
 				<div
@@ -598,5 +618,17 @@
 	.mobile-search-container {
 		flex: 1;
 		min-width: 0;
+	}
+
+	.player-placeholder {
+		aspect-ratio: 16 / 9;
+		max-height: 80vh;
+		max-width: calc(80vh * 16 / 9);
+		width: 100%;
+		background-color: black;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--border-radius);
 	}
 </style>

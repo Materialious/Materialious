@@ -372,7 +372,7 @@
 							}
 						]}
 						iconOnly={true}
-						style="margin-left: 0;"
+						style="margin: 0;"
 					/>
 					<PlaylistManager
 						mode="toggle"

@@ -21,7 +21,7 @@ import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
-import { isYTBackend } from '$lib/misc';
+import { getPublicEnv, isYTBackend } from '$lib/misc';
 import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
 import { loadContentFilterFromURL } from '$lib/filtering/index.js';
@@ -33,7 +33,7 @@ export const prerender = false;
 export async function load({ url }) {
 	if (browser) {
 		await initI18n();
-	}
+  }
 
 	if (get(rawMasterKeyStore)) {
 		const authTokenFromCloud = await getKeyValue('authToken');

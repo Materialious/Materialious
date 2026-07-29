@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.17.5",
+	"version": "1.17.6",
 	"private": true,
 	"scripts": {
 		"dev": "npm run patch:github && vite dev",
@@ -68,7 +68,7 @@
 		"@zxcvbn-ts/language-en": "^4.1.1",
 		"altcha-lib": "^2.2.0",
 		"beercss": "^4.0.23",
-		"bgutils-js": "^3.2.0",
+		"bgutils-js": "^4.0.2",
 		"buffer": "^6.0.3",
 		"capacitor-music-controls-plugin": "^6.1.0",
 		"capacitor-nodejs": "https://github.com/hampoelz/capacitor-nodejs/releases/download/v1.0.0-beta.9/capacitor-nodejs.tgz",
@@ -84,6 +84,7 @@
 		"iso-3166": "^4.4.0",
 		"iso-639-1": "^3.1.6",
 		"jsdom": "^28.1.0",
+		"jsonfile": "^6.2.1",
 		"libsodium-wrappers-sumo": "^0.8.4",
 		"mariadb": "^3.5.3",
 		"material-dynamic-colors": "^1.1.1",

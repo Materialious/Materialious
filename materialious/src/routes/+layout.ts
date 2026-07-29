@@ -33,7 +33,7 @@ export const prerender = false;
 export async function load({ url }) {
 	if (browser) {
 		await initI18n();
-	}
+  }
 
 	if (get(rawMasterKeyStore)) {
 		const authTokenFromCloud = await getKeyValue('authToken');

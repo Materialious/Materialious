@@ -1,4 +1,7 @@
-import { BG, buildURL, GOOG_API_KEY, USER_AGENT, type WebPoSignalOutput } from 'bgutils-js';
+import { BotGuardClient } from 'bgutils-js/botguard';
+import { WebPoMinter } from 'bgutils-js/webpo';
+import { buildURL, GOOG_API_KEY, USER_AGENT } from 'bgutils-js/utils';
+import type { WebPoSignalOutput } from 'bgutils-js/shared-types';
 import type { IGetChallengeResponse } from 'youtubei.js';
 
 export async function androidPoTokenMinter(
@@ -40,10 +43,10 @@ export async function androidPoTokenMinter(
 		document.head.appendChild(script);
 	}
 
-	const botguardClient = await BG.BotGuardClient.create({
+	const botguardClient = await BotGuardClient.create({
 		program: challenge.bg_challenge.program,
 		globalName: challenge.bg_challenge.global_name,
-		globalObj: globalThis
+		globalObject: globalThis
 	});
 
 	const webPoSignalOutput: WebPoSignalOutput = [];
@@ -66,7 +69,7 @@ export async function androidPoTokenMinter(
 		throw new Error(`Could not get integrity token. Interpreter Hash: ${interpreterHash}`);
 	}
 
-	const integrityTokenBasedMinter = await BG.WebPoMinter.create(
+	const integrityTokenBasedMinter = await WebPoMinter.create(
 		{ integrityToken },
 		webPoSignalOutput
 	);

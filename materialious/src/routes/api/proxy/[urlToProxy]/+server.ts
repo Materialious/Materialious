@@ -7,7 +7,7 @@ import tls from 'tls';
 
 import { error } from '@sveltejs/kit';
 import { parse as tldParse } from 'tldts';
-import { USER_AGENT } from 'bgutils-js';
+import { USER_AGENT } from 'bgutils-js/utils';
 import sodium from 'libsodium-wrappers-sumo';
 
 const ALLOWED_HEADERS = [

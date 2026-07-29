@@ -10,7 +10,10 @@ import { autoUpdater } from 'electron-updater';
 import { JSDOM } from 'jsdom';
 import type { IGetChallengeResponse } from 'youtubei.js';
 
-import BG, { buildURL, GOOG_API_KEY, USER_AGENT, WebPoSignalOutput } from 'bgutils-js';
+import { BotGuardClient } from 'bgutils-js/botguard';
+import { WebPoMinter } from 'bgutils-js/webpo';
+import { buildURL, GOOG_API_KEY, USER_AGENT } from 'bgutils-js/utils';
+import type { WebPoSignalOutput } from 'bgutils-js/shared-types';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
@@ -130,10 +133,10 @@ ipcMain.handle(
 			new Function(interpreterJavascript)();
 		} else throw new Error('Could not load VM');
 
-		const botguardClient = await BG.BotGuardClient.create({
+		const botguardClient = await BotGuardClient.create({
 			program: challenge.bg_challenge.program,
 			globalName: challenge.bg_challenge.global_name,
-			globalObj: globalThis
+			globalObject: globalThis
 		});
 
 		const webPoSignalOutput: WebPoSignalOutput = [];
@@ -156,7 +159,7 @@ ipcMain.handle(
 			throw new Error(`Could not get integrity token. Interpreter Hash: ${interpreterHash}`);
 		}
 
-		const integrityTokenBasedMinter = await BG.WebPoMinter.create(
+		const integrityTokenBasedMinter = await WebPoMinter.create(
 			{ integrityToken },
 			webPoSignalOutput
 		);

@@ -4,7 +4,7 @@ import {
 	CapElectronEventEmitter,
 	setupCapacitorElectronPlugins
 } from '@capacitor-community/electron';
-import { USER_AGENT } from 'bgutils-js';
+import { USER_AGENT } from 'bgutils-js/utils';
 import path from 'node:path';
 import chokidar, { FSWatcher } from 'chokidar';
 import type { MenuItemConstructorOptions } from 'electron';

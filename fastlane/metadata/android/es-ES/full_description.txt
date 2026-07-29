@@ -1,0 +1,25 @@
+<i>Materialious</i> es un cliente para <a href='https://github.com/iv-org'>Invidious</a> que usa material design.
+Te permite explorar y ver vídeos, gestionar listas de reproducción y usar canales.
+
+<b>Características:</b>
+<ul>
+  <li>Compatible con Invidious companion</li>
+  <li>Integración ampliada de la API de Invidious</li>
+  <li>Alternativa YouTube.js si Invidious falla al cargar vídeos en Escritorio y Android</li>
+  <li>Permite desactivar la validación de certificados (para usuarios de homelab)</li>
+  <li>Sincroniza tu progreso de visualización entre sesiones de Invidious</li>
+  <li>Fiestas de visualización sincronizada</li>
+  <li>Sponsorblock integrado</li>
+  <li>Return YouTube Dislike integrado</li>
+  <li>DeArrow integrado (con alternativa de procesamiento local)</li>
+  <li>Sin anuncios</li>
+  <li>Sin rastreo</li>
+  <li>Temas claro/oscuro</li>
+  <li>Temas de color personalizados</li>
+  <li>Se integra con suscripciones, historial de visualización y más de Invidious</li>
+  <li>Compatible con retransmisiones en directo</li>
+  <li>Compatible con Dash</li>
+  <li>Capítulos</li>
+  <li>Modo solo audio</li>
+  <li>Listas de reproducción</li>
+</ul>

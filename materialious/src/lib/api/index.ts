@@ -1,4 +1,8 @@
-import { getVideoYTjs } from '$lib/api/youtubejs/video';
+import {
+	getVideoYTjs,
+	getVideoPageYTjs,
+	continueVideoPlayerYTjs
+} from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
 import {
 	invidiousAuthStore,
@@ -116,6 +120,34 @@ export async function getVideo(
 	}
 
 	return getVideoInvidious(videoId, local, fetchOptions);
+}
+
+export async function getVideoPage(
+	videoId: string,
+	local: boolean = false,
+	fetchOptions?: RequestInit
+): Promise<VideoPlay> {
+	if (
+		(get(playerYouTubeJsAlways) && isUnrestrictedPlatform()) ||
+		isYTBackend() ||
+		useEngineFallback('Video')
+	) {
+		return getVideoPageYTjs(videoId);
+	}
+
+	return getVideoInvidious(videoId, local, fetchOptions);
+}
+
+export async function continueVideoPlayer(videoId: string) {
+	if (
+		(get(playerYouTubeJsAlways) && isUnrestrictedPlatform()) ||
+		isYTBackend() ||
+		useEngineFallback('Video')
+	) {
+		return continueVideoPlayerYTjs(videoId);
+	}
+
+	return null;
 }
 
 export async function getComments(
@@ -333,7 +365,7 @@ export async function getVideoWatchHistory(
 		return getVideoWatchHistoryBackend(videoId);
 	}
 
-	return await localDb.watchHistory.get({ videoId });
+	return await localDb.watchHistory.get(videoId);
 }
 
 export async function deleteWatchHistory() {
@@ -349,7 +381,7 @@ export async function deleteWatchHistoryItem(videoId: string) {
 		return deleteWatchHistoryItemBackend(videoId);
 	}
 
-	await localDb.watchHistory.delete({ videoId });
+	await localDb.watchHistory.delete(videoId);
 }
 
 export async function updateWatchHistory(
@@ -365,7 +397,7 @@ export async function updateWatchHistory(
 
 	if (get(invidiousAuthStore)) postHistoryInvidious(videoId, fetchOptions);
 
-	await localDb.watchHistory.update({ videoId }, { progress, watched: new Date() });
+	await localDb.watchHistory.update(videoId, { progress, watched: new Date() });
 }
 
 export async function saveWatchHistory(video: ThumbnailVideo, progress: number = 0) {
@@ -375,7 +407,7 @@ export async function saveWatchHistory(video: ThumbnailVideo, progress: number =
 		return saveWatchHistoryBackend(video, progress);
 	}
 
-	if (await localDb.watchHistory.get({ videoId: video.videoId })) return;
+	if (await localDb.watchHistory.get(video.videoId)) return;
 
 	await localDb.watchHistory.add({
 		author: video.author,

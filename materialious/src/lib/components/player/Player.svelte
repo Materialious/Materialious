@@ -119,7 +119,7 @@
 	let playerContainer: HTMLElement;
 	let playerCurrentPlaybackState = $state(false);
 	let playerMaxKnownTime = $state(data.video.lengthSeconds);
-	let playerIsBuffering = $state(true);
+	let playerIsBuffering = $state(false);
 	let playerVolume = $state($playerPreferredVolumeStore);
 	let playerVideoEndTimePretty: string = $state('');
 	let playerIsFullscreen = $state(false);

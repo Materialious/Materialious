@@ -27,7 +27,7 @@ export async function associateAvatar(channelId: string, avatars: Image[]) {
 			avatarUrl: getBestThumbnail(avatars),
 			updated: new Date()
 		},
-		{ channelId: channelId }
+		channelId
 	);
 
 	if (isInitial) {
@@ -40,7 +40,7 @@ export async function associateAvatar(channelId: string, avatars: Image[]) {
 }
 
 export async function avatarFromChannelId(channelId: string): Promise<void | string> {
-	const result = await localDb.channelAvatars.get({ channelId });
+	const result = await localDb.channelAvatars.get(channelId);
 	if (result) {
 		return result.avatarUrl;
 	}

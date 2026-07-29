@@ -73,6 +73,17 @@
 		music_offtopic: $_('layout.sponsors.musicOffTopic')
 	};
 
+	const segmentCategoryColors: Record<string, { color: string; alt: string }> = {
+		sponsor: { color: 'var(--error)', alt: 'var(--error-container)' },
+		selfpromo: { color: 'var(--tertiary)', alt: 'var(--tertiary-container)' },
+		interaction: { color: 'var(--primary)', alt: 'var(--primary-container)' },
+		intro: { color: 'var(--secondary)', alt: 'var(--secondary-container)' },
+		outro: { color: 'var(--tertiary-container)', alt: 'var(--tertiary)' },
+		preview: { color: 'var(--secondary-container)', alt: 'var(--secondary)' },
+		filler: { color: 'var(--outline)', alt: 'var(--outline-variant)' },
+		music_offtopic: { color: 'var(--surface-variant)', alt: 'var(--outline-variant)' }
+	};
+
 	const playerTimelineSlider = new Slider({
 		min: 0,
 		step: 0.1,
@@ -408,11 +419,14 @@
 	{/each}
 	{#if !$sponsorBlockTimelineStore}
 		{#each segments as segment (segment)}
-			<div
-				class="chapter-marker segment-marker"
-				style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
-				style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
-			></div>
+			{@const colors = segmentCategoryColors[segment.category] ?? segmentCategoryColors.sponsor}
+				<div
+					class="chapter-marker segment-marker"
+					style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+					style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
+					style:--sg-color={colors.color}
+					style:--sg-color-alt={colors.alt}
+				></div>
 		{/each}
 	{/if}
 </div>
@@ -480,10 +494,11 @@
 	}
 
 	.segment-marker {
+		opacity: 1;
 		background: repeating-linear-gradient(
 			-45deg,
-			var(--inverse-primary) 0 10px,
-			var(--primary) 10px 15px
+			var(--sg-color) 0 10px,
+			var(--sg-color-alt) 10px 15px
 		);
 	}
 

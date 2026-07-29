@@ -18,6 +18,7 @@ export {
 	playerPreferredVolumeStore,
 	playerPlaylistHistory,
 	playerState,
+	playerLoadingStore,
 	sleepTimerStore,
 	playerTheatreModeIsActive,
 	playerIsInWindowFullscreen,

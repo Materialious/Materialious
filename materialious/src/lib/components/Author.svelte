@@ -10,6 +10,7 @@
 	import { onMount } from 'svelte';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
+	import { addToast } from '$lib/components/Toast.svelte';
 
 	let {
 		channel,
@@ -34,9 +35,15 @@
 
 	async function toggleSubscribed() {
 		if (subscribed) {
-			await deleteUnsubscribe(channel.authorId);
+			deleteUnsubscribe(channel.authorId).catch(() => {
+				subscribed = true;
+				addToast({ data: { text: $_('unsubscribeFailed'), icon: 'error' } });
+			});
 		} else {
-			await postSubscribe(channel.authorId);
+			postSubscribe(channel.authorId).catch(() => {
+				subscribed = false;
+				addToast({ data: { text: $_('subscribeFailed'), icon: 'error' } });
+			});
 		}
 
 		subscribed = !subscribed;

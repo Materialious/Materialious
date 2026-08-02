@@ -366,6 +366,8 @@
 		}
 	},
 	"subscribe": "Subscribe",
+	"subscribeFailed": "Failed to subscribe",
+	"unsubscribeFailed": "Failed to unsubscribe",
 	"favouriteChannel": "Favourite channel",
 	"unfavouriteChannel": "Unfavourite channel"
 }

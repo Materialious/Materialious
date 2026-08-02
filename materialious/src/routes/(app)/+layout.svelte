@@ -374,11 +374,12 @@
 						<div class="tooltip bottom">{$_('layout.notifications')}</div>
 					</button>
 				{/if}
-				<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
-					<i>settings</i>
-					<div class="tooltip bottom">{$_('layout.settings')}</div>
-				</button>
-
+				{#if !isOwnBackend()?.requireAuth || $rawMasterKeyStore}
+    				<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
+    					<i>settings</i>
+    					<div class="tooltip bottom">{$_('layout.settings')}</div>
+    				</button>
+				{/if}
 				{#if showLogin}
 					{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
 						<button onclick={login} class="circle large transparent">

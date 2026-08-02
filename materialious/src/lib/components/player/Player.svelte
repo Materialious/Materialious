@@ -960,8 +960,6 @@
 	</div>
 </div>
 
-{console.log('data.video.premium', data.video.premium)}
-
 {#if data.video.premium}
 	<article class="video-placeholder">
 		<p>{$_('premium')}</p>

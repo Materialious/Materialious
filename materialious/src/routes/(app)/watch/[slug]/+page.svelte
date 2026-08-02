@@ -106,8 +106,9 @@
 	let playerReady = $state(false);
 
 	const playerStream = data.streamed.player;
+	const pageStream = data.streamed.page;
 
-	data.streamed.page?.then((pageResult: any) => {
+	pageStream?.then((pageResult: any) => {
 		data = pageResult;
 		loaded = true;
 		playerLoadingStore.set(true);
@@ -135,8 +136,16 @@
 		}
 	});
 
-	playerStream?.then((playerResult: any) => {
-		if (playerResult.playerData) {
+	playerStream?.then(async (playerResult: any) => {
+		if (!data.video) {
+			try {
+				await pageStream;
+			} catch {
+				// Page failed to load, there is nothing to play.
+			}
+		}
+
+		if (data.video && playerResult.playerData) {
 			data.video.dashUrl = playerResult.playerData.dashUrl ?? data.video.dashUrl;
 			data.video.adaptiveFormats = playerResult.playerData.adaptiveFormats;
 			data.video.captions = playerResult.playerData.captions;
@@ -153,7 +162,7 @@
 		returnYTDislikes = playerResult.returnYTDislikes;
 		playerReady = true;
 
-		if (!hasPremiere() && !data.video.premium && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
+		if (data.video && !hasPremiere() && !data.video.premium && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
 			playerLoadingStore.set(false);
 			playerState.set({
 				data: data
@@ -162,18 +171,20 @@
 			playerLoadingStore.set(false);
 		}
 
-		if ($playerState?.playerElement) {
-			load($playerState);
-		} else {
-			let loadedPlayer = false;
-			playerState.subscribe(async (updatedPlayerState) => {
-				if (!updatedPlayerState?.playerElement || loadedPlayer) {
-					return;
-				}
-				loadedPlayer = true;
+		if (data.video) {
+			if ($playerState?.playerElement) {
+				load($playerState);
+			} else {
+				let loadedPlayer = false;
+				playerState.subscribe(async (updatedPlayerState) => {
+					if (!updatedPlayerState?.playerElement || loadedPlayer) {
+						return;
+					}
+					loadedPlayer = true;
 
-				await load(updatedPlayerState);
-			});
+					await load(updatedPlayerState);
+				});
+			}
 		}
 	});
 

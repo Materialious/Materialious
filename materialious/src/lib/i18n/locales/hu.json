@@ -287,7 +287,10 @@
         "loopPlaylist": "Lejátszási lista folyamatos lejátszása",
         "shuffleVideos": "Videók lejátszása keverten",
         "next": "Következő",
-        "previous": "Előző"
+        "previous": "Előző",
+        "cloneToPlaylist": "Másolás lejátszási listába",
+        "cloning": "Másolás...",
+        "clonedSuccess": "A lejátszási lista másolása sikeresen megtörtént"
     },
     "thumbnail": {
         "live": "ÉLŐ",

@@ -36,7 +36,8 @@ const allowedBaseDomains: string[] = [
 	'ytimg.com',
 	'googlevideo.com',
 	'returnyoutubedislikeapi.com',
-	'ajay.app'
+  'ajay.app',
+	'googleapis.com'
 ];
 
 if (privateEnv.WHITELIST_BASE_DOMAIN) {

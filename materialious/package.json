@@ -93,7 +93,7 @@
 		"melt": "^0.44.0",
 		"mousetrap": "^1.6.5",
 		"mysql2": "^3.22.5",
-		"papaparse": "^5.5.3",
+		"papaparse": "^5.5.4",
 		"pg": "^8.22.0",
 		"pg-hstore": "^2.3.4",
 		"safe-regex2": "^5.1.1",

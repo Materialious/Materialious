@@ -1,41 +1,13 @@
-import { BotGuardClient } from 'bgutils-js/botguard';
-import { WebPoMinter } from 'bgutils-js/webpo';
-import { buildURL, GOOG_API_KEY, USER_AGENT } from 'bgutils-js/utils';
-import type { WebPoSignalOutput } from 'bgutils-js/shared-types';
-import type { IGetChallengeResponse } from 'youtubei.js';
+import { fetchInnerTubeChallenge, mintPoToken } from '$lib/youtube/poToken';
 
-export async function androidPoTokenMinter(
-	requestKey: string,
-	visitorData: string,
-	challenge: IGetChallengeResponse
-): Promise<string> {
-	if (!challenge.bg_challenge) {
-		throw new Error('No BotGuard Token');
-	}
+export async function androidPoTokenMinter(requestKey: string, visitorData: string): Promise<string> {
+	const { ytConfig, challengeResponse, interpreterJavascript } = await fetchInnerTubeChallenge();
 
-	const interpreterUrl =
-		challenge.bg_challenge.interpreter_url
-			.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
-	const interpreterHash = challenge.bg_challenge.interpreter_hash;
+	window.yt = { config_: JSON.parse(ytConfig) };
 
-	if (!interpreterUrl || !interpreterHash) {
-		throw new Error(
-			`Could not get integrity token. Interpreter Hash: ${challenge.bg_challenge?.interpreter_hash}`
-		);
-	}
+	const interpreterHash = challengeResponse.bgChallenge?.interpreterHash;
 
-	if (!document.getElementById(interpreterHash)) {
-		const interpreterResponse = await fetch(`https:${interpreterUrl}`, {
-			headers: {
-				'user-agent': USER_AGENT
-			}
-		});
-		if (!interpreterResponse.ok) {
-			throw new Error('Unable to fetch interpreter');
-		}
-
-		const interpreterJavascript = await interpreterResponse.text();
-
+	if (interpreterHash && !document.getElementById(interpreterHash)) {
 		const script = document.createElement('script');
 		script.type = 'text/javascript';
 		script.id = interpreterHash;
@@ -43,35 +15,5 @@ export async function androidPoTokenMinter(
 		document.head.appendChild(script);
 	}
 
-	const botguardClient = await BotGuardClient.create({
-		program: challenge.bg_challenge.program,
-		globalName: challenge.bg_challenge.global_name,
-		globalObject: globalThis
-	});
-
-	const webPoSignalOutput: WebPoSignalOutput = [];
-	const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
-
-	const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
-		method: 'POST',
-		headers: {
-			'content-type': 'application/json+protobuf',
-			'x-goog-api-key': GOOG_API_KEY,
-			'x-user-agent': 'grpc-web-javacript/0.1'
-		},
-		body: JSON.stringify([requestKey, botguardResponse])
-	});
-
-	const integrityTokenResponseData = await integrityTokenResponse.json();
-	const integrityToken = integrityTokenResponseData[0] as string | undefined;
-
-	if (!integrityToken) {
-		throw new Error(`Could not get integrity token. Interpreter Hash: ${interpreterHash}`);
-	}
-
-	const integrityTokenBasedMinter = await WebPoMinter.create(
-		{ integrityToken },
-		webPoSignalOutput
-	);
-	return await integrityTokenBasedMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
+	return await mintPoToken(requestKey, visitorData, challengeResponse);
 }

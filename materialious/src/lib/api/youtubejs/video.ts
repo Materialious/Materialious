@@ -13,30 +13,13 @@ import { convertToSeconds } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
-import { Innertube, Utils, YT, YTNodes, Platform, type IGetChallengeResponse } from 'youtubei.js';
+import { Innertube, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
 import { isUnrestrictedPlatform } from '$lib/misc';
 import { webPoTokenMinter } from '$lib/web/youtube/minter';
 import { associateAvatar } from '$lib/thumbnail';
 
-Platform.shim.eval = async (
-	data: Types.BuildScriptResult,
-	env: Record<string, Types.VMPrimative>
-) => {
-	const properties = [];
-
-	if (env.n) {
-		properties.push(`n: exportedVars.nFunction("${env.n}")`);
-	}
-
-	if (env.sig) {
-		properties.push(`sig: exportedVars.sigFunction("${env.sig}")`);
-	}
-
-	const code = `${data.output}\nreturn { ${properties.join(', ')} }`;
-
-	return new Function(code)();
-};
+Platform.shim.eval = async (data: Types.BuildScriptResult) => new Function(data.output)();
 
 export interface VideoIntermediate {
 	innertube: Innertube;
@@ -241,11 +224,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 
 	const requestKey = 'O43z0dpjhgX20SCx4KAo';
 
-	let platformMinter: (
-		requestKey: string,
-		visitorData: string,
-		challenge: IGetChallengeResponse
-	) => Promise<string>;
+	let platformMinter: (requestKey: string, visitorData: string) => Promise<string>;
 
 	switch (Capacitor.getPlatform()) {
 		case 'electron':
@@ -259,8 +238,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 			break;
 	}
 
-	const challengeResponse = await innertube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
-	poTokenCacheStore.set(await platformMinter(requestKey, videoId, challengeResponse));
+	poTokenCacheStore.set(await platformMinter(requestKey, videoId));
 
 	let dashUri: string | undefined;
 

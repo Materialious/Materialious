@@ -8,12 +8,12 @@ import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
 import { JSDOM } from 'jsdom';
-import type { IGetChallengeResponse } from 'youtubei.js';
 
 import { BotGuardClient } from 'bgutils-js/botguard';
 import { WebPoMinter } from 'bgutils-js/webpo';
-import { buildURL, GOOG_API_KEY, USER_AGENT } from 'bgutils-js/utils';
+import { buildURL, getHeaders, parseLooseJSON, USER_AGENT } from 'bgutils-js/utils';
 import type { WebPoSignalOutput } from 'bgutils-js/shared-types';
+import type { IRawResponse } from 'youtubei.js';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
@@ -80,7 +80,7 @@ app.on('activate', async function () {
 // Place all ipc or other electron api calls and custom functionality under this line
 ipcMain.handle(
 	'generatePoToken',
-	async (_, requestKey: string, visitorData: string, challenge: IGetChallengeResponse) => {
+	async (_, requestKey: string, visitorData: string) => {
 		const youtubeUrl = 'https://www.youtube.com/';
 
 		const dom = new JSDOM(
@@ -102,40 +102,59 @@ ipcMain.handle(
 			Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator });
 		}
 
-		if (!challenge.bg_challenge) {
-			throw new Error('No BotGuard Token');
-		}
-
-		const interpreterUrl =
-			challenge.bg_challenge.interpreter_url
-				.private_do_not_access_or_else_trusted_resource_url_wrapped_value;
-		const interpreterHash = challenge.bg_challenge.interpreter_hash;
-
-		if (!interpreterUrl || !interpreterHash) {
-			throw new Error(
-				`Could not get integrity token. Interpreter Hash: ${challenge.bg_challenge?.interpreter_hash}`
-			);
-		}
-
-		const interpreterResponse = await fetch(`https:${interpreterUrl}`, {
+		const pageResponse = await fetch('https://www.youtube.com', {
 			headers: {
+				accept: '*/*',
+				'accept-language': 'en-US,en;q=0.7',
 				'user-agent': USER_AGENT
 			}
 		});
 
-		if (!interpreterResponse.ok) {
+		if (!pageResponse.ok) {
+			throw new Error('Unable to fetch YouTube page');
+		}
+
+		const pageHtml = await pageResponse.text();
+
+		const ytConfig = pageHtml.match(/ytcfg\.set\(({[\s\S]+?})\);/)?.[1];
+		if (!ytConfig) {
+			throw new Error('Could not find ytcfg in page HTML');
+		}
+
+		dom.window.yt = { config_: JSON.parse(ytConfig) };
+		Object.assign(globalThis, { yt: dom.window.yt });
+
+		const initialAttestationData = pageHtml.match(/window\.ytAtN\(\s*({[\s\S]*?})\s*\)/);
+		if (!initialAttestationData) {
+			throw new Error('Could not find challenge in page HTML');
+		}
+
+		const initialAttestationDataJson = parseLooseJSON(initialAttestationData[1]);
+		const challengeResponse = initialAttestationDataJson.R as IRawResponse;
+
+		if (!challengeResponse.bgChallenge) {
+			throw new Error('Could not get challenge');
+		}
+
+		const interpreterUrl =
+			challengeResponse.bgChallenge.interpreterUrl
+				.privateDoNotAccessOrElseTrustedResourceUrlWrappedValue;
+
+		const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
+
+		if (!bgScriptResponse.ok) {
 			throw new Error('Unable to fetch interpreter');
 		}
 
-		const interpreterJavascript = await interpreterResponse.text();
+		const interpreterJavascript = await bgScriptResponse.text();
 
 		if (interpreterJavascript) {
 			new Function(interpreterJavascript)();
 		} else throw new Error('Could not load VM');
 
 		const botguardClient = await BotGuardClient.create({
-			program: challenge.bg_challenge.program,
-			globalName: challenge.bg_challenge.global_name,
+			program: challengeResponse.bgChallenge.program,
+			globalName: challengeResponse.bgChallenge.globalName,
 			globalObject: globalThis
 		});
 
@@ -144,26 +163,30 @@ ipcMain.handle(
 
 		const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
 			method: 'POST',
-			headers: {
-				'content-type': 'application/json+protobuf',
-				'x-goog-api-key': GOOG_API_KEY,
-				'x-user-agent': 'grpc-web-javacript/0.1'
-			},
+			headers: getHeaders(),
 			body: JSON.stringify([requestKey, botguardResponse])
 		});
 
-		const integrityTokenResponseData = await integrityTokenResponse.json();
-		const integrityToken = integrityTokenResponseData[0] as string | undefined;
+		const integrityTokenJson = (await integrityTokenResponse.json()) as [
+			string,
+			number,
+			number,
+			string
+		];
+
+		const [integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken] =
+			integrityTokenJson;
 
 		if (!integrityToken) {
-			throw new Error(`Could not get integrity token. Interpreter Hash: ${interpreterHash}`);
+			throw new Error('Could not get integrity token');
 		}
 
-		const integrityTokenBasedMinter = await WebPoMinter.create(
-			{ integrityToken },
+		const webPoMinter = await WebPoMinter.create(
+			{ integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken },
 			webPoSignalOutput
 		);
-		return await integrityTokenBasedMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
+
+		return await webPoMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
 	}
 );
 

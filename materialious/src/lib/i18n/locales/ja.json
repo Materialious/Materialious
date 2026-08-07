@@ -385,5 +385,7 @@
     "commentSortNewest": "最新",
     "verifyingCaptcha": "検証中...",
     "captchaVerified": "検証済み",
-    "captchaFailed": "検証に失敗"
+    "captchaFailed": "検証に失敗",
+    "subscribeFailed": "登録に失敗しました",
+    "unsubscribeFailed": "登録解除に失敗しました"
 }

@@ -1,5 +1,3 @@
-import type { IGetChallengeResponse } from 'youtubei.js';
-
 declare global {
 	namespace App {
 		// interface Error {}
@@ -13,12 +11,11 @@ declare global {
 		// interface Platform {}
 	}
 	interface Window {
+		yt?: {
+			config_: { [key: string]: unknown };
+		};
 		electronAPI: {
-			generatePoToken: (
-				requestKey: string,
-				visitorData: string,
-				challenge: IGetChallengeResponse
-			) => Promise<string>;
+			generatePoToken: (requestKey: string, visitorData: string) => Promise<string>;
 			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promoise<boolean>;
 			doUpdateCheck: (disableAutoUpdate: boolean) => Promise<void>;
 		};

@@ -385,5 +385,7 @@
     "commentSortNewest": "Legújabb",
     "verifyingCaptcha": "Ellenőrzés...",
     "captchaVerified": "Jóváhagyva",
-    "captchaFailed": "Sikertelen ellenőrzés"
+    "captchaFailed": "Sikertelen ellenőrzés",
+    "subscribeFailed": "Feliratkozás sikertelen",
+    "unsubscribeFailed": "Leiratkozás sikertelen"
 }

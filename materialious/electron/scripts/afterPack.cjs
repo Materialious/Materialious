@@ -46,4 +46,10 @@ exports.default = async function (context) {
 		'Contents/Resources/app.asar.unpacked/node_modules/ffmpeg-static'
 	);
 	fs.copyFileSync(binary, path.join(unpackedDir, 'ffmpeg'));
+
+	// install.js overwrites ffmpeg.LICENSE / ffmpeg.README per-arch, which breaks
+	// @electron/universal's identical-SHA check. Replace them with the package's
+	// static files so both arch bundles match.
+	fs.rmSync(path.join(unpackedDir, 'ffmpeg.README'), { force: true });
+	fs.copyFileSync(path.join(ffmpegStaticDir, 'LICENSE'), path.join(unpackedDir, 'ffmpeg.LICENSE'));
 };

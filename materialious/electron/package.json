@@ -19,7 +19,8 @@
 	"license": "MIT",
 	"main": "build/src/index.js",
 	"scripts": {
-		"build": "tsc && electron-rebuild",
+		"build": "npm run build:shared && tsc && electron-rebuild",
+		"build:shared": "tsc -p ../shared/tsconfig.json",
 		"electron:start-live": "node ./live-runner.js",
 		"electron:start": "npm run build && electron --inspect=5858 ./",
 		"electron:pack": "npm run build && electron-builder build --dir -c ./electron-builder.config.json",
@@ -29,6 +30,7 @@
 	},
 	"dependencies": {
 		"@capacitor-community/electron": "^5.0.0",
+		"@materialious/shared": "file:../shared",
 		"@types/jsdom": "^28.0.3",
 		"bgutils-js": "^4.0.3",
 		"chokidar": "~5.0.0",

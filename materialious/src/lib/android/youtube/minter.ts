@@ -1,4 +1,4 @@
-import { fetchInnerTubeChallenge, mintPoToken } from '$lib/youtube/poToken';
+import { fetchInnerTubeChallenge, mintPoToken } from '@materialious/shared';
 
 export async function androidPoTokenMinter(requestKey: string, visitorData: string): Promise<string> {
 	const { ytConfig, challengeResponse, interpreterJavascript } = await fetchInnerTubeChallenge();

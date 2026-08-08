@@ -16,17 +16,24 @@
 
 	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
 
-	let thumbnailSrc = '';
-	if (playlist.videos && playlist.videos.length > 0) {
-		thumbnailSrc = getBestThumbnail(playlist.videos[0].videoThumbnails) || '';
-	} else if (playlist.playlistThumbnail) {
-		thumbnailSrc = playlist.playlistThumbnail;
+	function getThumbnailSrc(): string {
+		if (playlist.videos && playlist.videos.length > 0) {
+			return getBestThumbnail(playlist.videos[0].videoThumbnails, 9999, 9999);
+		}
+
+		return playlist.playlistThumbnail;
 	}
+
+	let thumbnailSrc = $state(getThumbnailSrc());
 
 	const thumbnail = new Avatar({ src: imageHandleCors(thumbnailSrc) });
 </script>
 
-<a href={playlistLink} style="width: 100%; overflow: hidden;min-height:100px;" class="wave">
+<a
+	href={playlistLink}
+	style="width: 100%; overflow: hidden;min-height:100px;"
+	class="wave"
+>
 	<img
 		class="responsive"
 		{...mergeAttrs(thumbnail.image, {

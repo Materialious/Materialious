@@ -1,0 +1,30 @@
+{
+	"name": "@materialious/shared",
+	"version": "1.0.0",
+	"description": "Shared code between the Materialious web app and its Electron wrapper.",
+	"private": true,
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./jsdom": {
+			"types": "./dist/jsdom.d.ts",
+			"default": "./dist/jsdom.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
+	},
+	"peerDependencies": {
+		"bgutils-js": "^4.0.3",
+		"jsdom": "^28.0.0 || ^30.0.1",
+		"youtubei.js": "^17.2.0"
+	}
+}

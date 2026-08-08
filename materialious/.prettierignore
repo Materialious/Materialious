@@ -6,3 +6,4 @@ android/
 electron/
 node_modules/
 .svelte-kit/
+shared/dist/

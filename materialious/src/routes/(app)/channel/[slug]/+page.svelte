@@ -44,7 +44,6 @@
 			displayContent = {
 				videos: await searchChannelContent(page.params.slug, channelSearch)
 			};
-			console.log(displayContent);
 		}, 200);
 	}
 

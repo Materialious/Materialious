@@ -161,6 +161,12 @@
 			"copiedSuccess": "Copied to clipboard"
 		},
 		"download": "Download",
+		"downloadLoading": "Loading formats…",
+		"downloadBest": "Best quality",
+		"downloadAudio": "Audio only",
+		"downloadCanceled": "Download canceled",
+		"downloadComplete": "Download complete",
+		"downloadFailed": "Download failed",
 		"downloadSteps": {
 			"merging": "Merging video & audio together",
 			"video": "Downloading video",

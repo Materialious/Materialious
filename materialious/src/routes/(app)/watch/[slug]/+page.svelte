@@ -43,6 +43,7 @@
 	import PlaylistManager from '$lib/components/PlaylistManager.svelte';
 	import { isItemFiltered } from '$lib/filtering/index';
 	import PageLoading from '$lib/components/PageLoading.svelte';
+	import Download from '$lib/components/watch/Download.svelte';
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let { data = $bindable() }: { data: any } = $props();
@@ -415,6 +416,7 @@
 						iconOnly={true}
 						style="margin: 0;"
 					/>
+					<Download videoId={data.video.videoId} />
 					<PlaylistManager
 						mode="toggle"
 						videoId={data.video.videoId}

@@ -18,8 +18,6 @@ export async function POST({ request, cookies, locals }) {
 
   const userLogin = zUserLogin.safeParse(await request.json());
 
-  console.log(userLogin.error);
-
 	if (!userLogin.success) throw error(401);
 
 	await verifyCaptcha(

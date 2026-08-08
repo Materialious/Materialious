@@ -43,6 +43,12 @@ import {
 	postSubscribeYTjs
 } from './youtubejs/subscriptions';
 import { getPlaylistYTjs } from './youtubejs/playlist';
+import {
+	buildDownloadURL,
+	getDownloadFormats,
+	isDownloadSupported,
+	startDownload
+} from './youtubejs/download';
 import { isOwnBackend } from '$lib/shared';
 import {
 	amSubscribedBackend,
@@ -499,3 +505,15 @@ export async function removePlaylistVideo(
 	await removePlaylistVideoInvidious(playlistId, indexId, fetchOptions);
 	invalidatePersonalPlaylists();
 }
+
+export {
+	buildDownloadURL,
+	getDownloadFormats,
+	isDownloadSupported,
+	startDownload
+} from './youtubejs/download';
+export type {
+	AvailableFormats,
+	DownloadResult,
+	DownloadSelection
+} from './youtubejs/download';

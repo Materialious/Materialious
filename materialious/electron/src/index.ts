@@ -4,10 +4,19 @@ import {
 	setupElectronDeepLinking
 } from '@capacitor-community/electron';
 import { mintPoTokenInJSDOM } from '@materialious/shared/jsdom';
-import { app, ipcMain, session } from 'electron';
+import {
+	createDownload,
+	getDownloadSession,
+	SabrStream,
+	type DownloadFormatSelection
+} from '@materialious/shared/download';
+import { app, BrowserWindow, dialog, ipcMain, session } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
+import { createWriteStream } from 'node:fs';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
@@ -98,3 +107,66 @@ ipcMain.handle('doUpdateCheck', async (_, disableAutoUpdate) => {
 		await autoUpdater.checkForUpdatesAndNotify();
 	}
 });
+
+ipcMain.handle('getDownloadFormats', async (_, videoId: string) => {
+	const session = await getDownloadSession(videoId);
+	const video = await session.getInfo(videoId);
+	const sabrStream = new SabrStream(video);
+
+	return {
+		title: sabrStream.getTitle(),
+		formats: sabrStream.getFormats().filter((format) => !format.hasText)
+	};
+});
+
+ipcMain.handle(
+	'downloadVideo',
+	async (
+		event,
+		payload: { videoId: string; selection: DownloadFormatSelection }
+	) => {
+		const { videoId, selection } = payload;
+
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (!win) throw new Error('No window found');
+
+		const session = await getDownloadSession(videoId);
+		const video = await session.getInfo(videoId);
+
+		const resolved = await createDownload({
+			media: video,
+			selection,
+			onProgress: (progress) => {
+				event.sender.send('download-progress', { videoId, progress });
+			}
+		});
+
+		const { canceled, filePath } = await dialog.showSaveDialog(win, {
+			title: 'Download video',
+			defaultPath: resolved.filename,
+			filters: [
+				{ name: 'Media', extensions: [resolved.container] },
+				{ name: 'All files', extensions: ['*'] }
+			]
+		});
+
+		if (canceled || !filePath) {
+			await resolved.close?.();
+			return { canceled: true };
+		}
+
+		try {
+			const nodeStream = Readable.fromWeb(
+				resolved.stream as unknown as import('node:stream/web').ReadableStream
+			);
+			await pipeline(nodeStream, createWriteStream(filePath));
+		} catch (err) {
+			await resolved.close?.();
+			throw err;
+		} finally {
+			await resolved.close?.();
+		}
+
+		return { path: filePath };
+	}
+);

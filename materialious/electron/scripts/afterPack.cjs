@@ -48,8 +48,9 @@ exports.default = async function (context) {
 	fs.copyFileSync(binary, path.join(unpackedDir, 'ffmpeg'));
 
 	// install.js overwrites ffmpeg.LICENSE / ffmpeg.README per-arch, which breaks
-	// @electron/universal's identical-SHA check. Replace them with the package's
-	// static files so both arch bundles match.
-	fs.rmSync(path.join(unpackedDir, 'ffmpeg.README'), { force: true });
+	// @electron/universal's identical-SHA check (and its non-Mach-O reconciliation).
+	// Replace them with the package's static files so both arch bundles match, and
+	// keep ffmpeg.README present because the asar header still references it.
 	fs.copyFileSync(path.join(ffmpegStaticDir, 'LICENSE'), path.join(unpackedDir, 'ffmpeg.LICENSE'));
+	fs.copyFileSync(path.join(ffmpegStaticDir, 'README.md'), path.join(unpackedDir, 'ffmpeg.README'));
 };

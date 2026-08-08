@@ -8,8 +8,9 @@
 		type AvailableFormats
 	} from '$lib/api';
 	import { _ } from '$lib/i18n';
+	import type { VideoPlay } from '$lib/api/model';
 
-	let { videoId }: { videoId: string } = $props();
+	let { video }: { video: VideoPlay } = $props();
 
 	const isElectron = Capacitor.getPlatform() === 'electron';
 
@@ -45,7 +46,7 @@
 		loadError = false;
 
 		try {
-			formats = await getDownloadFormats(videoId);
+			formats = await getDownloadFormats(video);
 		} catch {
 			loadError = true;
 		} finally {
@@ -61,7 +62,7 @@
 
 		if (isElectron) {
 			try {
-				const result = await startDownload(videoId, selection, (value) => {
+				const result = await startDownload(video, selection, (value) => {
 					progress = value;
 				});
 
@@ -83,7 +84,7 @@
 				downloading = false;
 			}
 		} else {
-			await startDownload(videoId, selection);
+			await startDownload(video, selection);
 			downloading = false;
 		}
 	}
@@ -98,6 +99,7 @@
 	>
 		{#if downloading}
 			<progress class="circle small" value={progress} max="100"></progress>
+			<span class="small-text">{Math.round(progress)}%</span>
 		{:else}
 			<i>download</i>
 			<div class="tooltip">

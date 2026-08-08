@@ -1,5 +1,4 @@
 import { Capacitor } from '@capacitor/core';
-import { isOwnBackend } from '$lib/shared/index';
 import type { DownloadFormatSelection, SabrFormat } from '@materialious/shared/download';
 
 export type DownloadSelection = DownloadFormatSelection;
@@ -15,30 +14,8 @@ export type AvailableFormats = {
 	formats: SabrFormat[];
 };
 
-function isElectron(): boolean {
+export function isElectron(): boolean {
 	return Capacitor.getPlatform() === 'electron';
-}
-
-export function isDownloadSupported(): boolean {
-	return isElectron() || isOwnBackend() !== null;
-}
-
-export async function getDownloadFormats(videoId: string): Promise<AvailableFormats> {
-	if (isElectron()) {
-		return await window.electronAPI.getDownloadFormats(videoId);
-	}
-
-	const resp = await fetch('/api/download/formats', {
-		method: 'POST',
-		body: JSON.stringify({ videoId }),
-		credentials: 'same-origin'
-	});
-
-	if (!resp.ok) {
-		throw new Error('Failed to fetch download formats');
-	}
-
-	return await resp.json();
 }
 
 export function buildDownloadURL(videoId: string, selection: DownloadSelection): string {
@@ -51,24 +28,11 @@ export function buildDownloadURL(videoId: string, selection: DownloadSelection):
 	return `/api/download?${params.toString()}`;
 }
 
-export async function startDownload(
-	videoId: string,
-	selection: DownloadSelection,
-	onProgress?: (progress: number) => void
-): Promise<DownloadResult> {
-	if (isElectron()) {
-		return await startElectronDownload(videoId, selection, onProgress);
-	}
-
-	if (isOwnBackend()) {
-		window.open(buildDownloadURL(videoId, selection), '_blank', 'noopener');
-		return {};
-	}
-
-	throw new Error('Downloads are not supported in this environment');
+export async function getDownloadFormatsElectron(videoId: string): Promise<AvailableFormats> {
+	return await window.electronAPI.getDownloadFormats(videoId);
 }
 
-async function startElectronDownload(
+export async function startElectronDownload(
 	videoId: string,
 	selection: DownloadSelection,
 	onProgress?: (progress: number) => void

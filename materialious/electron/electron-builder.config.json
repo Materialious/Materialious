@@ -26,6 +26,7 @@
 	"electronDownload": {
 		"cache": "./.electron-cache"
 	},
+	"afterPack": "scripts/afterPack.cjs",
 	"nsis": {
 		"allowElevation": true,
 		"oneClick": false,

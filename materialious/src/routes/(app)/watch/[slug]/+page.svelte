@@ -416,7 +416,7 @@
 						iconOnly={true}
 						style="margin: 0;"
 					/>
-					<Download videoId={data.video.videoId} />
+					<Download video={data.video} />
 					<PlaylistManager
 						mode="toggle"
 						videoId={data.video.videoId}

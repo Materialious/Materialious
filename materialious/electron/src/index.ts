@@ -3,17 +3,21 @@ import {
 	getCapacitorElectronConfig,
 	setupElectronDeepLinking
 } from '@capacitor-community/electron';
-import { app, ipcMain, session } from 'electron';
+import { mintPoTokenInJSDOM } from '@materialious/shared/jsdom';
+import {
+	createDownload,
+	getDownloadSession,
+	SabrStream,
+	type DownloadFormatSelection
+} from '@materialious/shared/download';
+import { app, BrowserWindow, dialog, ipcMain, session } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
-import { JSDOM } from 'jsdom';
+import { createWriteStream } from 'node:fs';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 
-import { BotGuardClient } from 'bgutils-js/botguard';
-import { WebPoMinter } from 'bgutils-js/webpo';
-import { buildURL, getHeaders, parseLooseJSON, USER_AGENT } from 'bgutils-js/utils';
-import type { WebPoSignalOutput } from 'bgutils-js/shared-types';
-import type { IRawResponse } from 'youtubei.js';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
@@ -78,117 +82,9 @@ app.on('activate', async function () {
 });
 
 // Place all ipc or other electron api calls and custom functionality under this line
-ipcMain.handle(
-	'generatePoToken',
-	async (_, requestKey: string, visitorData: string) => {
-		const youtubeUrl = 'https://www.youtube.com/';
-
-		const dom = new JSDOM(
-			'<!DOCTYPE html><html lang="en"><head><title>YouTube</title></head><body></body></html>',
-			{
-				url: youtubeUrl,
-				referrer: youtubeUrl,
-			}
-		);
-
-		Object.assign(globalThis, {
-			window: dom.window,
-			document: dom.window.document,
-			location: dom.window.location,
-			origin: dom.window.origin
-		});
-
-		if (!Reflect.has(globalThis, 'navigator')) {
-			Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator });
-		}
-
-		const pageResponse = await fetch('https://www.youtube.com', {
-			headers: {
-				accept: '*/*',
-				'accept-language': 'en-US,en;q=0.7',
-				'user-agent': USER_AGENT
-			}
-		});
-
-		if (!pageResponse.ok) {
-			throw new Error('Unable to fetch YouTube page');
-		}
-
-		const pageHtml = await pageResponse.text();
-
-		const ytConfig = pageHtml.match(/ytcfg\.set\(({[\s\S]+?})\);/)?.[1];
-		if (!ytConfig) {
-			throw new Error('Could not find ytcfg in page HTML');
-		}
-
-		dom.window.yt = { config_: JSON.parse(ytConfig) };
-		Object.assign(globalThis, { yt: dom.window.yt });
-
-		const initialAttestationData = pageHtml.match(/window\.ytAtN\(\s*({[\s\S]*?})\s*\)/);
-		if (!initialAttestationData) {
-			throw new Error('Could not find challenge in page HTML');
-		}
-
-		const initialAttestationDataJson = parseLooseJSON(initialAttestationData[1]);
-		const challengeResponse = initialAttestationDataJson.R as IRawResponse;
-
-		if (!challengeResponse.bgChallenge) {
-			throw new Error('Could not get challenge');
-		}
-
-		const interpreterUrl =
-			challengeResponse.bgChallenge.interpreterUrl
-				.privateDoNotAccessOrElseTrustedResourceUrlWrappedValue;
-
-		const bgScriptResponse = await fetch(`https:${interpreterUrl}`);
-
-		if (!bgScriptResponse.ok) {
-			throw new Error('Unable to fetch interpreter');
-		}
-
-		const interpreterJavascript = await bgScriptResponse.text();
-
-		if (interpreterJavascript) {
-			new Function(interpreterJavascript)();
-		} else throw new Error('Could not load VM');
-
-		const botguardClient = await BotGuardClient.create({
-			program: challengeResponse.bgChallenge.program,
-			globalName: challengeResponse.bgChallenge.globalName,
-			globalObject: globalThis
-		});
-
-		const webPoSignalOutput: WebPoSignalOutput = [];
-		const botguardResponse = await botguardClient.snapshot({ webPoSignalOutput });
-
-		const integrityTokenResponse = await fetch(buildURL('GenerateIT', true), {
-			method: 'POST',
-			headers: getHeaders(),
-			body: JSON.stringify([requestKey, botguardResponse])
-		});
-
-		const integrityTokenJson = (await integrityTokenResponse.json()) as [
-			string,
-			number,
-			number,
-			string
-		];
-
-		const [integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken] =
-			integrityTokenJson;
-
-		if (!integrityToken) {
-			throw new Error('Could not get integrity token');
-		}
-
-		const webPoMinter = await WebPoMinter.create(
-			{ integrityToken, estimatedTtlSecs, mintRefreshThreshold, websafeFallbackToken },
-			webPoSignalOutput
-		);
-
-		return await webPoMinter.mintAsWebsafeString(decodeURIComponent(visitorData));
-	}
-);
+ipcMain.handle('generatePoToken', async (_, requestKey: string, visitorData: string) => {
+	return await mintPoTokenInJSDOM(requestKey, visitorData);
+});
 
 ipcMain.handle('setAllowInsecureSSL', async (_, allow) => {
 	allowInsecureSSL = allow;
@@ -211,3 +107,66 @@ ipcMain.handle('doUpdateCheck', async (_, disableAutoUpdate) => {
 		await autoUpdater.checkForUpdatesAndNotify();
 	}
 });
+
+ipcMain.handle('getDownloadFormats', async (_, videoId: string) => {
+	const session = await getDownloadSession(videoId);
+	const video = await session.getInfo(videoId);
+	const sabrStream = new SabrStream(video);
+
+	return {
+		title: sabrStream.getTitle(),
+		formats: sabrStream.getFormats().filter((format) => !format.hasText)
+	};
+});
+
+ipcMain.handle(
+	'downloadVideo',
+	async (
+		event,
+		payload: { videoId: string; selection: DownloadFormatSelection }
+	) => {
+		const { videoId, selection } = payload;
+
+		const win = BrowserWindow.fromWebContents(event.sender);
+		if (!win) throw new Error('No window found');
+
+		const session = await getDownloadSession(videoId);
+		const video = await session.getInfo(videoId);
+
+		const resolved = await createDownload({
+			media: video,
+			selection,
+			onProgress: (progress) => {
+				event.sender.send('download-progress', { videoId, progress });
+			}
+		});
+
+		const { canceled, filePath } = await dialog.showSaveDialog(win, {
+			title: 'Download video',
+			defaultPath: resolved.filename,
+			filters: [
+				{ name: 'Media', extensions: [resolved.container] },
+				{ name: 'All files', extensions: ['*'] }
+			]
+		});
+
+		if (canceled || !filePath) {
+			await resolved.close?.();
+			return { canceled: true };
+		}
+
+		try {
+			const nodeStream = Readable.fromWeb(
+				resolved.stream as unknown as import('node:stream/web').ReadableStream
+			);
+			await pipeline(nodeStream, createWriteStream(filePath));
+		} catch (err) {
+			await resolved.close?.();
+			throw err;
+		} finally {
+			await resolved.close?.();
+		}
+
+		return { path: filePath };
+	}
+);

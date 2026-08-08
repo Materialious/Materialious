@@ -16,3 +16,4 @@ resources/android/**/*
 android/release.jks*
 .electron-cache
 **/.settings/**
+/shared/dist

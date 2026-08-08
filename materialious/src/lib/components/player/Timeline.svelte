@@ -346,6 +346,13 @@
 			playerTimelineTooltip.style.top = `${-tooltipHeight - 5}px`;
 		}
 
+		// The cursor may have left the timeline while we were drawing; don't
+		// re-show the tooltip in that case (onmouseleave resets this to undefined).
+		if (requestAnimationTooltip === undefined) {
+			playerShowTimelineThumbnail = false;
+			return;
+		}
+
 		playerShowTimelineThumbnail = true;
 		requestAnimationTooltip = undefined;
 	}

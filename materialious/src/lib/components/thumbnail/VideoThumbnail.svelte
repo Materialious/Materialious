@@ -21,10 +21,7 @@
 	import AuthorAvatar from '../AuthorAvatar.svelte';
 	import Share from '../Share.svelte';
 	import PlaylistManager from '../PlaylistManager.svelte';
-	import {
-		deleteWatchHistoryItem,
-		saveWatchHistory
-	} from '$lib/api';
+	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
 	import { truncate } from '$lib/misc';
 
@@ -60,7 +57,7 @@
 	let progress: string | undefined = $state();
 
 	let thumbnailSrc = $state(
-		'thumbnail' in video ? video.thumbnail : (getBestThumbnail(video.videoThumbnails) as string)
+		'thumbnail' in video ? video.thumbnail : getBestThumbnail(video.videoThumbnails, 9999, 9999)
 	);
 
 	if (get(deArrowEnabledStore)) {
@@ -94,13 +91,17 @@
 	}
 
 	let thumbnailHeight = $state(0);
+	let thumbnailWidth = $state(0);
 	let thumbnailImageElement: HTMLImageElement | undefined = $state();
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
 		src: () => imageHandleCors(thumbnailSrc),
 		onLoadingStatusChange: () => {
-			if (thumbnailImageElement) thumbnailHeight = thumbnailImageElement.naturalHeight;
+			if (thumbnailImageElement) {
+				thumbnailHeight = thumbnailImageElement.naturalHeight;
+				thumbnailWidth = thumbnailImageElement.naturalWidth;
+			}
 		}
 	});
 
@@ -290,7 +291,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={thumbnailHeight > 300}>
+				<div class:crop={thumbnailHeight > thumbnailWidth}>
 					<img
 						class="responsive"
 						class:watched={progress}
@@ -306,34 +307,34 @@
 				></div>
 
 				{#if progress}
-                    <button
-                        class="chip surface-container-highest"
-                        onclick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            (async () => {
-                                await deleteWatchHistoryItem(video.videoId);
-                                progress = undefined;
-                                thumbnailActionsVisible = false;
-                            })();
-                        }}
-                    >
-                        <i>check</i>
-                    </button>
-          		{:else}
-                    <button
-                        class="chip surface-container-highest"
-                        onclick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            (async () => {
-                                await saveWatchHistory(video, 1);
-                                progress = '0';
-                            })();
-                        }}
-                    >
-                        <i>visibility</i>
-                    </button>
+					<button
+						class="chip surface-container-highest"
+						onclick={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+							(async () => {
+								await deleteWatchHistoryItem(video.videoId);
+								progress = undefined;
+								thumbnailActionsVisible = false;
+							})();
+						}}
+					>
+						<i>check</i>
+					</button>
+				{:else}
+					<button
+						class="chip surface-container-highest"
+						onclick={(e) => {
+							e.stopPropagation();
+							e.preventDefault();
+							(async () => {
+								await saveWatchHistory(video, 1);
+								progress = '0';
+							})();
+						}}
+					>
+						<i>visibility</i>
+					</button>
 				{/if}
 				{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
 					<div

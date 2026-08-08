@@ -16,8 +16,37 @@ declare global {
 		};
 		electronAPI: {
 			generatePoToken: (requestKey: string, visitorData: string) => Promise<string>;
-			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promoise<boolean>;
+			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promise<boolean>;
 			doUpdateCheck: (disableAutoUpdate: boolean) => Promise<void>;
+			getDownloadFormats: (videoId: string) => Promise<{
+				title: string;
+				formats: {
+					itag: number;
+					mimeType: string;
+					codec: string | null;
+					container: string;
+					qualityLabel?: string;
+					width?: number;
+					height?: number;
+					bitrate: number;
+					hasAudio: boolean;
+					hasVideo: boolean;
+					hasText: boolean;
+				}[];
+			}>;
+			downloadVideo: (payload: {
+				videoId: string;
+				selection: {
+					type: 'video' | 'audio' | 'video+audio' | 'merged';
+					quality?: string;
+					format?: string;
+					codec?: string;
+				};
+			}) => Promise<{ canceled?: boolean; path?: string; error?: string }>;
+			onDownloadProgress: (
+				callback: (videoId: string, progress: number) => void
+			) => void;
+			removeDownloadProgressListener: () => void;
 		};
 	}
 }

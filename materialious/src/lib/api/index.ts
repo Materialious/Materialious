@@ -43,6 +43,18 @@ import {
 	postSubscribeYTjs
 } from './youtubejs/subscriptions';
 import { getPlaylistYTjs } from './youtubejs/playlist';
+import {
+	buildDownloadURL,
+	getDownloadFormatsElectron,
+	isElectron,
+	startElectronDownload
+} from './youtubejs/download';
+import type { AvailableFormats, DownloadResult, DownloadSelection } from './youtubejs/download';
+import {
+	getCompanionFormats,
+	isCompanionAvailable,
+	startCompanionDownload
+} from './invidious/download';
 import { isOwnBackend } from '$lib/shared';
 import {
 	amSubscribedBackend,
@@ -499,3 +511,61 @@ export async function removePlaylistVideo(
 	await removePlaylistVideoInvidious(playlistId, indexId, fetchOptions);
 	invalidatePersonalPlaylists();
 }
+
+export async function getDownloadFormats(video: VideoPlay): Promise<AvailableFormats> {
+	if (isElectron()) {
+		return await getDownloadFormatsElectron(video.videoId);
+	}
+
+	if (isOwnBackend()) {
+		const resp = await fetch('/api/download/formats', {
+			method: 'POST',
+			body: JSON.stringify({ videoId: video.videoId }),
+			credentials: 'same-origin'
+		});
+
+		if (!resp.ok) {
+			throw new Error('Failed to fetch download formats');
+		}
+
+		return await resp.json();
+	}
+
+	if (isCompanionAvailable()) {
+		return getCompanionFormats(video);
+	}
+
+	throw new Error('Downloads are not supported in this environment');
+}
+
+export function isDownloadSupported(): boolean {
+	return isElectron() || isOwnBackend() !== null || isCompanionAvailable();
+}
+
+export async function startDownload(
+	video: VideoPlay,
+	selection: DownloadSelection,
+	onProgress?: (progress: number) => void
+): Promise<DownloadResult> {
+	if (isElectron()) {
+		return await startElectronDownload(video.videoId, selection, onProgress);
+	}
+
+	if (isOwnBackend()) {
+		window.open(buildDownloadURL(video.videoId, selection), '_blank', 'noopener');
+		return {};
+	}
+
+	if (isCompanionAvailable()) {
+		return startCompanionDownload(video, selection);
+	}
+
+	throw new Error('Downloads are not supported in this environment');
+}
+
+export { buildDownloadURL };
+export type {
+	AvailableFormats,
+	DownloadResult,
+	DownloadSelection
+} from './youtubejs/download';

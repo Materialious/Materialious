@@ -8,5 +8,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
 		return await ipcRenderer.invoke('setAllowInsecureSSL', allow);
 	},
 	doUpdateCheck: (disableAutoUpdate: boolean) =>
-		ipcRenderer.invoke('doUpdateCheck', disableAutoUpdate)
+		ipcRenderer.invoke('doUpdateCheck', disableAutoUpdate),
+	getDownloadFormats: (videoId: string) => ipcRenderer.invoke('getDownloadFormats', videoId),
+	downloadVideo: (payload: unknown) => ipcRenderer.invoke('downloadVideo', payload),
+	onDownloadProgress: (callback: (videoId: string, progress: number) => void) => {
+		ipcRenderer.on('download-progress', (_event: unknown, data: { videoId: string; progress: number }) => {
+			callback(data.videoId, data.progress);
+		});
+	},
+	removeDownloadProgressListener: () => {
+		ipcRenderer.removeAllListeners('download-progress');
+	}
 });

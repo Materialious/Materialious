@@ -56,7 +56,18 @@
 	);
 
 	function formatTime(seconds: number) {
-		return `${seconds.toFixed(2)}s`;
+		const totalMilliseconds = Math.round(seconds * 1000);
+		const hours = Math.floor(totalMilliseconds / 3600000);
+		const minutes = Math.floor((totalMilliseconds % 3600000) / 60000);
+		const remainingMilliseconds = totalMilliseconds % 60000;
+		const remainingSeconds = Math.floor(remainingMilliseconds / 1000);
+		const milliseconds = remainingMilliseconds % 1000;
+		const formattedMinutes = hours > 0 ? minutes.toString().padStart(2, '0') : minutes;
+		const formattedTime = `${formattedMinutes}:${remainingSeconds
+			.toString()
+			.padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+
+		return hours > 0 ? `${hours}:${formattedTime}` : formattedTime;
 	}
 
 	function updateSelectedSegment(updater: (segment: DraftSegment) => DraftSegment) {
@@ -294,7 +305,10 @@
 				<li role="presentation" onclick={() => previewSegment(index)}>
 					<nav class="no-wrap" style="width: 100%;">
 						<span>
-							{formatTime(segment.startTime)} : {formatTime(segment.endTime)}
+							{$_('layout.sponsors.segmentTimeRange', {
+								start: formatTime(segment.startTime),
+								end: formatTime(segment.endTime)
+							})}
 						</span>
 
 						<div class="max"></div>

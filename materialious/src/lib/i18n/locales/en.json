@@ -339,6 +339,7 @@
 			"startSegmentNow": "Start segment now",
 			"stopSegmentNow": "Stop segment now",
 			"segmentLabel": "Segment {{index}}",
+			"segmentTimeRange": "{{start}} to {{end}}",
 			"noCategorySelected": "Category missing",
 			"setSegmentStart": "Start",
 			"setSegmentEnd": "Stop",

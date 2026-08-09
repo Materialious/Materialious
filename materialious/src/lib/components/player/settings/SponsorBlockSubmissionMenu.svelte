@@ -236,7 +236,7 @@
 <button class="surface-container-highest">
 	<i>block</i>
 
-	<menu class="no-wrap mobile player-settings">
+	<menu class="no-wrap mobile player-settings sponsorblock-menu">
 		{#if menuState === 'submission'}
 			<li role="presentation" onclick={() => (menuState = 'root')}>
 				<i>arrow_back</i>
@@ -493,5 +493,13 @@
 	.disabled {
 		opacity: 0.5;
 		pointer-events: none;
+	}
+
+	@media screen and (min-width: 1001px) {
+		.sponsorblock-menu {
+			width: max-content !important;
+			min-width: 300px;
+			max-width: min(500px, calc(100vw - 2rem));
+		}
 	}
 </style>

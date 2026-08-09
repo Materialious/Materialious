@@ -128,7 +128,13 @@
             "reset": "既定値にリセット"
         },
         "pauseTimerFinished": "一時停止タイマーが終了しました",
-        "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました"
+        "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
+        "downloadLoading": "フォーマットの読み込み中…",
+        "downloadBest": "最高品質",
+        "downloadAudio": "音声のみ",
+        "downloadCanceled": "ダウンロードがキャンセルされました",
+        "downloadComplete": "ダウンロード完了",
+        "downloadFailed": "ダウンロード失敗"
     },
     "layout": {
         "interface": "外観",

@@ -59,12 +59,6 @@
 		return `${seconds.toFixed(2)}s`;
 	}
 
-	function getSegmentLabel(index: number) {
-		return $_('layout.sponsors.segmentLabel', {
-			index: index + 1
-		});
-	}
-
 	function updateSelectedSegment(updater: (segment: DraftSegment) => DraftSegment) {
 		if (selectedSegmentIndex === undefined) return;
 
@@ -256,7 +250,7 @@
 				</nav>
 			</li>
 
-			{#each segments as segment, index}
+			{#each segments as segment, index (segment)}
 				<li role="presentation" onclick={() => openSegmentMenu(index)}>
 					<nav class="no-wrap" style="width: 100%;">
 						{#if !segment.category}
@@ -296,7 +290,7 @@
 				{$_('layout.sponsors.back')}
 			</li>
 
-			{#each segments as segment, index}
+			{#each segments as segment, index (segment)}
 				<li role="presentation" onclick={() => previewSegment(index)}>
 					<nav class="no-wrap" style="width: 100%;">
 						<span>
@@ -389,7 +383,7 @@
 				{$_('layout.sponsors.back')}
 			</li>
 
-			{#each sponsorCategories as sponsorCategory}
+			{#each sponsorCategories as sponsorCategory (sponsorCategory.category)}
 				<li
 					role="presentation"
 					onclick={() => {

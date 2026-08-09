@@ -443,7 +443,7 @@
 		{/each}
 	{/if}
 
-	{#each draftSegments as segment, index}
+	{#each draftSegments as segment, index (segment)}
 		<div
 			class="chapter-marker segment-marker draft-segment-marker"
 			class:selected-segment-marker={selectedDraftSegmentIndex === index}

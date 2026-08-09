@@ -109,7 +109,7 @@ ipcMain.handle('doUpdateCheck', async (_, disableAutoUpdate) => {
 });
 
 ipcMain.handle('getDownloadFormats', async (_, videoId: string) => {
-	const session = await getDownloadSession(videoId);
+	const session = await getDownloadSession(videoId, app.getPath('userData'));
 	const video = await session.getInfo(videoId);
 	const sabrStream = new SabrStream(video);
 
@@ -130,7 +130,7 @@ ipcMain.handle(
 		const win = BrowserWindow.fromWebContents(event.sender);
 		if (!win) throw new Error('No window found');
 
-		const session = await getDownloadSession(videoId);
+		const session = await getDownloadSession(videoId, app.getPath('userData'));
 		const video = await session.getInfo(videoId);
 
 		const resolved = await createDownload({

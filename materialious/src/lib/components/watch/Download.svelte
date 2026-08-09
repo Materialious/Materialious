@@ -5,10 +5,16 @@
 		getDownloadFormats,
 		isDownloadSupported,
 		startDownload,
-		type AvailableFormats
+		type AvailableFormats,
+		type DownloadSelection
 	} from '$lib/api';
 	import { _ } from '$lib/i18n';
+	import { isOwnBackend } from '$lib/shared';
 	import type { VideoPlay } from '$lib/api/model';
+	import { Progress } from 'melt/builders';
+	import { SvelteSet } from 'svelte/reactivity';
+	import ui from 'beercss';
+	import ISO6391 from 'iso-639-1';
 
 	let { video }: { video: VideoPlay } = $props();
 
@@ -18,7 +24,19 @@
 	let loading = $state(false);
 	let loadError = $state(false);
 	let downloading = $state(false);
-	let progress = $state(0);
+	let progress = $state(-1);
+
+	let downloadType = $state<'merged' | 'audio'>('merged');
+	let selectedQuality = $state<string | undefined>(undefined);
+	let selectedContainer = $state<'mp4' | 'webm'>('mp4');
+	let selectedAudioItag = $state<number | undefined>(undefined);
+
+	const downloadProgress = new Progress({
+		value: () => (progress >= 0 ? progress : undefined),
+		max: 100
+	});
+
+	const containerOptions = ['mp4', 'webm'] as const;
 
 	const qualityOptions: string[] = $derived.by(() => {
 		if (!formats) return [];
@@ -39,6 +57,44 @@
 		});
 	});
 
+	const audioOptions = $derived.by(() => {
+		if (!formats) return [];
+
+		const seen = new SvelteSet<string>();
+
+		return formats.formats
+			.filter((format) => format.hasAudio && !format.hasVideo)
+			.filter((format) => {
+				const key = `${format.language ?? 'x'}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
+				if (seen.has(key)) return false;
+				seen.add(key);
+				return true;
+			})
+			.sort((a, b) => {
+				const langCompare = (a.language ?? '').localeCompare(b.language ?? '');
+				if (langCompare !== 0) return langCompare;
+				return (b.bitrate ?? 0) - (a.bitrate ?? 0);
+			});
+	});
+
+	function audioFormatKey(format: AvailableFormats['formats'][number]): string {
+		return `${format.itag}-${format.language ?? ''}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
+	}
+
+	function audioLabel(format: AvailableFormats['formats'][number]): string {
+		const parts: string[] = [];
+
+		if (format.language) {
+			parts.push(ISO6391.getName(format.language) || format.language);
+		}
+		if (format.bitrate) parts.push(`${Math.round(format.bitrate / 1000)} kbps`);
+		if (format.container && format.container !== 'unknown') {
+			parts.push(format.container.toUpperCase());
+		}
+
+		return parts.join(' · ');
+	}
+
 	async function loadFormats() {
 		if (formats || loading || downloading) return;
 
@@ -54,18 +110,52 @@
 		}
 	}
 
-	async function download(selection: Parameters<typeof startDownload>[1]) {
+	function buildSelection(): DownloadSelection {
+		if (downloadType === 'audio') {
+			return {
+				type: 'audio',
+				itag: selectedAudioItag,
+				format: selectedContainer
+			};
+		}
+
+		return {
+			type: 'merged',
+			quality: selectedQuality,
+			itag: selectedAudioItag,
+			format: selectedContainer
+		};
+	}
+
+	async function onDownloadButtonClick() {
+		await loadFormats();
+
+		downloadType = 'merged';
+		selectedQuality = undefined;
+		selectedContainer = 'mp4';
+		selectedAudioItag = undefined;
+	}
+
+	async function startDialogDownload() {
+		if (downloading || !formats) return;
+
+		ui('#download-dialog');
+
+		await download(buildSelection());
+	}
+
+	async function download(selection: DownloadSelection) {
 		if (downloading) return;
 
 		downloading = true;
-		progress = 0;
+		progress = -1;
 
-		if (isElectron) {
-			try {
-				const result = await startDownload(video, selection, (value) => {
-					progress = value;
-				});
+		try {
+			const result = await startDownload(video, selection, (value) => {
+				progress = value;
+			});
 
+			if (isElectron || isOwnBackend()) {
 				if (result.error) {
 					addToast({ data: { text: result.error, icon: 'error' } });
 				} else if (result.canceled) {
@@ -73,18 +163,15 @@
 				} else {
 					addToast({ data: { text: $_('player.downloadComplete'), icon: 'download_done' } });
 				}
-			} catch (err) {
-				addToast({
-					data: {
-						text: err instanceof Error ? err.message : $_('player.downloadFailed'),
-						icon: 'error'
-					}
-				});
-			} finally {
-				downloading = false;
 			}
-		} else {
-			await startDownload(video, selection);
+		} catch (err) {
+			addToast({
+				data: {
+					text: err instanceof Error ? err.message : $_('player.downloadFailed'),
+					icon: 'error'
+				}
+			});
+		} finally {
 			downloading = false;
 		}
 	}
@@ -93,60 +180,179 @@
 {#if isDownloadSupported()}
 	<button
 		class="surface-container-highest"
-		onclick={loadFormats}
-		data-ui="#download-menu"
+		onclick={onDownloadButtonClick}
+		data-ui="#download-dialog"
 		disabled={downloading}
 	>
 		{#if downloading}
-			<progress class="circle small" value={progress} max="100"></progress>
-			<span class="small-text">{Math.round(progress)}%</span>
+			<div class="download-progress" class:indeterminate={progress < 0} {...downloadProgress.root}>
+				<div {...downloadProgress.progress}></div>
+			</div>
+			{#if progress >= 0}
+				<span class="small-text">{Math.round(progress)}%</span>
+			{/if}
 		{:else}
 			<i>download</i>
 			<div class="tooltip">
 				{$_('player.download')}
 			</div>
 		{/if}
-
-		<menu id="download-menu" class="mobile no-wrap" data-ui="#download-menu">
-			{#if loading}
-				<li>
-					<div class="small-text">{$_('player.downloadLoading')}</div>
-				</li>
-			{:else if loadError}
-				<li>
-					<div class="small-text">{$_('player.downloadFailed')}</div>
-				</li>
-			{:else if formats}
-				{#if qualityOptions.length > 0}
-					<li
-						class="row"
-						role="presentation"
-						data-ui="#download-menu"
-						onclick={() => download({ type: 'merged', quality: undefined })}
-					>
-						<div class="min">{$_('player.downloadBest')}</div>
-					</li>
-					{#each qualityOptions as quality (quality)}
-						<li
-							class="row"
-							role="presentation"
-							data-ui="#download-menu"
-							onclick={() => download({ type: 'merged', quality })}
-						>
-							<div class="min">{quality}</div>
-						</li>
-					{/each}
-					<div class="divider"></div>
-				{/if}
-				<li
-					class="row"
-					role="presentation"
-					data-ui="#download-menu"
-					onclick={() => download({ type: 'audio' })}
-				>
-					<div class="min">{$_('player.downloadAudio')}</div>
-				</li>
-			{/if}
-		</menu>
 	</button>
+
+	<dialog id="download-dialog" class="modal">
+		<header>
+			<nav class="no-wrap">
+				<h6 class="max no-margin">{$_('player.download')}</h6>
+				<button class="circle transparent" data-ui="#download-dialog"><i>close</i></button>
+			</nav>
+		</header>
+
+		{#if loading}
+			<nav class="row">
+				<progress class="circle indeterminate small"></progress>
+				<div class="small-text">{$_('player.downloadLoading')}</div>
+			</nav>
+		{:else if loadError}
+			<div class="row">
+				<div class="max small-text">{$_('player.downloadFailed')}</div>
+				<button class="small border" onclick={loadFormats}><i>refresh</i></button>
+			</div>
+		{:else if formats}
+			<main>
+				<nav class="chips">
+					<button
+						class:primary={downloadType === 'merged'}
+						class:surface-container-highest={downloadType !== 'merged'}
+						onclick={() => (downloadType = 'merged')}
+					>
+						<i>video_call</i>
+						{$_('player.downloadVideoAudio')}
+					</button>
+					<button
+						class:primary={downloadType === 'audio'}
+						class:surface-container-highest={downloadType !== 'audio'}
+						onclick={() => (downloadType = 'audio')}
+					>
+						<i>music_note</i>
+						{$_('player.downloadAudio')}
+					</button>
+				</nav>
+
+				{#if downloadType === 'merged'}
+					{#if qualityOptions.length > 0}
+						<h6>{$_('player.controls.quality')}</h6>
+						<nav class="chips wrap">
+							<button
+								class:primary={selectedQuality === undefined}
+								class:surface-container-highest={selectedQuality !== undefined}
+								onclick={() => (selectedQuality = undefined)}
+							>
+								{$_('player.downloadBest')}
+							</button>
+							{#each qualityOptions as quality (quality)}
+								<button
+									class:primary={selectedQuality === quality}
+									class:surface-container-highest={selectedQuality !== quality}
+									onclick={() => (selectedQuality = quality)}
+								>
+									{quality}
+								</button>
+							{/each}
+						</nav>
+					{/if}
+				{/if}
+
+				{#if audioOptions.length > 0}
+					<h6>{$_('player.controls.language')}</h6>
+					<nav class="chips wrap">
+						<button
+							class:primary={selectedAudioItag === undefined}
+							class:surface-container-highest={selectedAudioItag !== undefined}
+							onclick={() => (selectedAudioItag = undefined)}
+						>
+							{$_('player.downloadBest')}
+						</button>
+						{#each audioOptions as format (audioFormatKey(format))}
+							<button
+								class:primary={selectedAudioItag === format.itag}
+								class:surface-container-highest={selectedAudioItag !== format.itag}
+								onclick={() => (selectedAudioItag = format.itag)}
+							>
+								{audioLabel(format)}
+							</button>
+						{/each}
+					</nav>
+				{/if}
+
+				<h6>{$_('player.downloadFormat')}</h6>
+				<nav class="chips wrap">
+					{#each containerOptions as container (container)}
+						<button
+							class:primary={selectedContainer === container}
+							class:surface-container-highest={selectedContainer !== container}
+							onclick={() => (selectedContainer = container)}
+						>
+							{container.toUpperCase()}
+						</button>
+					{/each}
+				</nav>
+			</main>
+
+			<footer>
+				<button class="primary" onclick={startDialogDownload} disabled={downloading}>
+					<i>download</i>
+					{$_('player.download')}
+				</button>
+			</footer>
+		{/if}
+	</dialog>
 {/if}
+
+<style>
+	.download-progress {
+		position: relative;
+		inline-size: 1.5rem;
+		block-size: 1.5rem;
+		flex: none;
+		color: inherit;
+	}
+
+	.download-progress [data-melt-progress-progress] {
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		background: conic-gradient(currentColor calc(100% - var(--progress)), var(--active) 0);
+		mask-image: radial-gradient(circle at center, transparent 57%, currentColor 60%);
+	}
+
+	.download-progress.indeterminate [data-melt-progress-progress] {
+		background: conic-gradient(currentColor 25%, transparent 0);
+		animation: to-rotate 1s infinite linear;
+	}
+
+	#download-dialog {
+		display: flex;
+		flex-direction: column;
+		max-inline-size: 28rem;
+		max-block-size: min(80dvh, 80%);
+		overflow-y: auto;
+	}
+
+	#download-dialog main {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		min-block-size: 0;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	#download-dialog main h6 {
+		margin: 0.75rem 0 0.25rem;
+	}
+
+	#download-dialog footer {
+		margin-block-start: 1.5rem;
+		text-align: right;
+	}
+</style>

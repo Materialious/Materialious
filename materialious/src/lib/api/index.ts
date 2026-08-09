@@ -1,8 +1,4 @@
-import {
-	getVideoYTjs,
-	getVideoPageYTjs,
-	continueVideoPlayerYTjs
-} from '$lib/api/youtubejs/video';
+import { getVideoYTjs, getVideoPageYTjs, continueVideoPlayerYTjs } from '$lib/api/youtubejs/video';
 import { get } from 'svelte/store';
 import {
 	invidiousAuthStore,
@@ -47,7 +43,8 @@ import {
 	buildDownloadURL,
 	getDownloadFormatsElectron,
 	isElectron,
-	startElectronDownload
+	startElectronDownload,
+	startWebDownload
 } from './youtubejs/download';
 import type { AvailableFormats, DownloadResult, DownloadSelection } from './youtubejs/download';
 import {
@@ -552,8 +549,7 @@ export async function startDownload(
 	}
 
 	if (isOwnBackend()) {
-		window.open(buildDownloadURL(video.videoId, selection), '_blank', 'noopener');
-		return {};
+		return await startWebDownload(video.videoId, selection, onProgress);
 	}
 
 	if (isCompanionAvailable()) {
@@ -564,8 +560,4 @@ export async function startDownload(
 }
 
 export { buildDownloadURL };
-export type {
-	AvailableFormats,
-	DownloadResult,
-	DownloadSelection
-} from './youtubejs/download';
+export type { AvailableFormats, DownloadResult, DownloadSelection } from './youtubejs/download';

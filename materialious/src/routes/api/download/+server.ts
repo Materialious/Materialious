@@ -2,11 +2,14 @@ import { createDownload, getDownloadSession } from '@materialious/shared/downloa
 import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { isOwnBackend } from '$lib/shared/index';
+import { clearDownloadProgress, setDownloadProgress } from '$lib/server/downloadProgress';
 
 const zDownloadSchema = z.object({
 	videoId: z.string().length(11),
+	downloadId: z.string().optional(),
 	type: z.enum(['video', 'audio', 'video+audio', 'merged']).default('merged'),
 	quality: z.string().optional(),
+	itag: z.coerce.number().int().positive().optional(),
 	format: z.string().optional(),
 	codec: z.string().optional()
 });
@@ -22,6 +25,12 @@ export async function GET({ request, url, locals }) {
 		throw error(400, data.error.message);
 	}
 
+	const { downloadId } = data.data;
+
+	if (downloadId) {
+		setDownloadProgress(downloadId, 0);
+	}
+
 	let resolved;
 	try {
 		const session = await getDownloadSession(data.data.videoId);
@@ -30,9 +39,11 @@ export async function GET({ request, url, locals }) {
 		resolved = await createDownload({
 			media: video,
 			selection: data.data,
-			abortSignal: request.signal
+			abortSignal: request.signal,
+			...(downloadId ? { onProgress: (progress) => setDownloadProgress(downloadId, progress) } : {})
 		});
 	} catch (err) {
+		if (downloadId) clearDownloadProgress(downloadId);
 		throw error(500, err instanceof Error ? err.message : 'Failed to prepare download');
 	}
 
@@ -67,12 +78,14 @@ export async function GET({ request, url, locals }) {
 					controller.error(err);
 				} finally {
 					await resolved.close?.();
+					if (downloadId) clearDownloadProgress(downloadId);
 				}
 			})();
 		},
 		cancel() {
 			void reader?.cancel();
 			void resolved.close?.();
+			if (downloadId) clearDownloadProgress(downloadId);
 		}
 	});
 

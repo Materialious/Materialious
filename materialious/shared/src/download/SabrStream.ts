@@ -126,6 +126,7 @@ export class SabrStream {
 		const { videoStream, audioStream, selectedFormats } = await stream.start({
 			enabledTrackTypes: EnabledTrackTypes.VIDEO_AND_AUDIO,
 			videoQuality: selection.quality,
+			...(selection.itag ? { audioFormat: selection.itag } : {}),
 			...this.getPreferenceOptions(selection)
 		});
 

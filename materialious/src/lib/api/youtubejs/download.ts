@@ -49,3 +49,106 @@ export async function startElectronDownload(
 		window.electronAPI.removeDownloadProgressListener();
 	}
 }
+
+function filenameFromDisposition(disposition: string): string | undefined {
+	const quoted = /filename="([^"]*)"/i.exec(disposition)?.[1];
+	if (quoted !== undefined) return quoted;
+	return /filename=([^;]+)/i.exec(disposition)?.[1]?.trim();
+}
+
+async function pollDownloadProgress(
+	downloadId: string,
+	onProgress: (progress: number) => void
+): Promise<() => Promise<void>> {
+	let stopped = false;
+
+	const poll = async () => {
+		while (!stopped) {
+			try {
+				const resp = await fetch(`/api/download/progress?downloadId=${downloadId}`, {
+					credentials: 'same-origin'
+				});
+
+				if (resp.ok) {
+					const { progress } = (await resp.json()) as { progress: number };
+					if (progress >= 0) onProgress(progress);
+				}
+			} catch {
+				// Ignore transient polling errors; the download still proceeds.
+			}
+
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+		}
+	};
+
+	const promise = poll();
+
+	return async () => {
+		stopped = true;
+		await promise;
+	};
+}
+
+export async function startWebDownload(
+	videoId: string,
+	selection: DownloadSelection,
+	onProgress?: (progress: number) => void
+): Promise<DownloadResult> {
+	const downloadId = crypto.randomUUID();
+	const url = `${buildDownloadURL(videoId, selection)}&downloadId=${downloadId}`;
+
+	const stopProgress = onProgress ? await pollDownloadProgress(downloadId, onProgress) : undefined;
+
+	try {
+		const resp = await fetch(url, {
+			credentials: 'same-origin'
+		});
+
+		if (!resp.ok) {
+			const body = await resp.text().catch(() => '');
+			let message = body || 'Download failed';
+			try {
+				const parsed = JSON.parse(body) as { message?: unknown };
+				if (typeof parsed.message === 'string') message = parsed.message;
+			} catch {
+				// Not JSON; the raw body is already used as the message.
+			}
+			throw new Error(message);
+		}
+
+		const filename =
+			filenameFromDisposition(resp.headers.get('Content-Disposition') ?? '') ?? 'download';
+
+		const reader = resp.body?.getReader();
+		if (!reader) throw new Error('Download stream unavailable');
+
+		const chunks: BlobPart[] = [];
+
+		try {
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				if (value) chunks.push(value);
+			}
+		} finally {
+			reader.releaseLock();
+		}
+
+		const blob = new Blob(chunks);
+		const objectUrl = URL.createObjectURL(blob);
+
+		const a = document.createElement('a');
+		a.href = objectUrl;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(objectUrl);
+
+		onProgress?.(100);
+
+		return {};
+	} finally {
+		await stopProgress?.();
+	}
+}

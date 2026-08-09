@@ -8,7 +8,9 @@
 		type AvailableFormats
 	} from '$lib/api';
 	import { _ } from '$lib/i18n';
+	import { isOwnBackend } from '$lib/shared';
 	import type { VideoPlay } from '$lib/api/model';
+	import { Progress } from 'melt/builders';
 
 	let { video }: { video: VideoPlay } = $props();
 
@@ -18,7 +20,12 @@
 	let loading = $state(false);
 	let loadError = $state(false);
 	let downloading = $state(false);
-	let progress = $state(0);
+	let progress = $state(-1);
+
+	const downloadProgress = new Progress({
+		value: () => (progress >= 0 ? progress : undefined),
+		max: 100
+	});
 
 	const qualityOptions: string[] = $derived.by(() => {
 		if (!formats) return [];
@@ -58,14 +65,14 @@
 		if (downloading) return;
 
 		downloading = true;
-		progress = 0;
+		progress = -1;
 
-		if (isElectron) {
-			try {
-				const result = await startDownload(video, selection, (value) => {
-					progress = value;
-				});
+		try {
+			const result = await startDownload(video, selection, (value) => {
+				progress = value;
+			});
 
+			if (isElectron || isOwnBackend()) {
 				if (result.error) {
 					addToast({ data: { text: result.error, icon: 'error' } });
 				} else if (result.canceled) {
@@ -73,18 +80,15 @@
 				} else {
 					addToast({ data: { text: $_('player.downloadComplete'), icon: 'download_done' } });
 				}
-			} catch (err) {
-				addToast({
-					data: {
-						text: err instanceof Error ? err.message : $_('player.downloadFailed'),
-						icon: 'error'
-					}
-				});
-			} finally {
-				downloading = false;
 			}
-		} else {
-			await startDownload(video, selection);
+		} catch (err) {
+			addToast({
+				data: {
+					text: err instanceof Error ? err.message : $_('player.downloadFailed'),
+					icon: 'error'
+				}
+			});
+		} finally {
 			downloading = false;
 		}
 	}
@@ -98,8 +102,12 @@
 		disabled={downloading}
 	>
 		{#if downloading}
-			<progress class="circle small" value={progress} max="100"></progress>
-			<span class="small-text">{Math.round(progress)}%</span>
+			<div class="download-progress" class:indeterminate={progress < 0} {...downloadProgress.root}>
+				<div {...downloadProgress.progress}></div>
+			</div>
+			{#if progress >= 0}
+				<span class="small-text">{Math.round(progress)}%</span>
+			{/if}
 		{:else}
 			<i>download</i>
 			<div class="tooltip">
@@ -150,3 +158,26 @@
 		</menu>
 	</button>
 {/if}
+
+<style>
+	.download-progress {
+		position: relative;
+		inline-size: 1.5rem;
+		block-size: 1.5rem;
+		flex: none;
+		color: inherit;
+	}
+
+	.download-progress [data-melt-progress-progress] {
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		background: conic-gradient(currentColor calc(100% - var(--progress)), var(--active) 0);
+		mask-image: radial-gradient(circle at center, transparent 57%, currentColor 60%);
+	}
+
+	.download-progress.indeterminate [data-melt-progress-progress] {
+		background: conic-gradient(currentColor 25%, transparent 0);
+		animation: to-rotate 1s infinite linear;
+	}
+</style>

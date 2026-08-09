@@ -22,6 +22,7 @@ export function buildDownloadURL(videoId: string, selection: DownloadSelection):
 	const params = new URLSearchParams({ videoId, type: selection.type });
 
 	if (selection.quality) params.set('quality', selection.quality);
+	if (selection.itag) params.set('itag', String(selection.itag));
 	if (selection.format) params.set('format', selection.format);
 	if (selection.codec) params.set('codec', selection.codec);
 

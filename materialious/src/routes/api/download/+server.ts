@@ -9,6 +9,7 @@ const zDownloadSchema = z.object({
 	downloadId: z.string().optional(),
 	type: z.enum(['video', 'audio', 'video+audio', 'merged']).default('merged'),
 	quality: z.string().optional(),
+	itag: z.coerce.number().int().positive().optional(),
 	format: z.string().optional(),
 	codec: z.string().optional()
 });

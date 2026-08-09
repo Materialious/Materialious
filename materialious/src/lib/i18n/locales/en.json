@@ -164,6 +164,8 @@
 		"downloadLoading": "Loading formats…",
 		"downloadBest": "Best quality",
 		"downloadAudio": "Audio only",
+		"downloadVideoAudio": "Video & Audio",
+		"downloadFormat": "Format",
 		"downloadCanceled": "Download canceled",
 		"downloadComplete": "Download complete",
 		"downloadFailed": "Download failed",

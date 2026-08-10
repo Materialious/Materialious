@@ -69,7 +69,7 @@
 		"@zxcvbn-ts/core": "^4.1.2",
 		"@zxcvbn-ts/language-common": "^4.1.2",
 		"@zxcvbn-ts/language-en": "^4.1.1",
-		"altcha-lib": "^2.2.0",
+		"altcha-lib": "^2.3.2",
 		"beercss": "^4.0.23",
 		"bgutils-js": "^4.0.3",
 		"buffer": "^6.0.3",

@@ -134,7 +134,9 @@
         "downloadAudio": "音声のみ",
         "downloadCanceled": "ダウンロードがキャンセルされました",
         "downloadComplete": "ダウンロード完了",
-        "downloadFailed": "ダウンロード失敗"
+        "downloadFailed": "ダウンロード失敗",
+        "downloadVideoAudio": "動画と音声",
+        "downloadFormat": "フォーマット"
     },
     "layout": {
         "interface": "外観",

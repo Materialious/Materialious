@@ -52,6 +52,15 @@ export async function startElectronDownload(
 }
 
 function filenameFromDisposition(disposition: string): string | undefined {
+	const encoded = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(disposition)?.[1];
+	if (encoded !== undefined) {
+		try {
+			return decodeURIComponent(encoded);
+		} catch {
+			// Fall through to the legacy filename parameter below.
+		}
+	}
+
 	const quoted = /filename="([^"]*)"/i.exec(disposition)?.[1];
 	if (quoted !== undefined) return quoted;
 	return /filename=([^;]+)/i.exec(disposition)?.[1]?.trim();

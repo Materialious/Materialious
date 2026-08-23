@@ -89,14 +89,25 @@ export class SabrStream {
 
 	private getPreferenceOptions(
 		selection: Pick<DownloadFormatSelection, 'format' | 'codec'>
-	): Pick<SabrPlaybackOptions, 'preferH264' | 'preferMP4' | 'preferWebM'> {
+	): Pick<SabrPlaybackOptions, 'preferH264' | 'preferMP4' | 'preferWebM' | 'preferOpus'> {
 		const format = selection.format?.toLowerCase() ?? '';
 		const codec = selection.codec?.toLowerCase() ?? '';
 
+		const wantsMp4 = format.includes('mp4') || codec.includes('avc') || codec.includes('mp4a');
+		const wantsWebm =
+			format.includes('webm') ||
+			codec.includes('vp8') ||
+			codec.includes('vp9') ||
+			codec.includes('vp09') ||
+			codec.includes('av01') ||
+			codec.includes('opus') ||
+			codec.includes('vorbis');
+
 		return {
-			preferH264: codec.includes('avc'),
-			preferMP4: format.includes('mp4') || codec.includes('mp4a'),
-			preferWebM: format.includes('webm')
+			preferH264: wantsMp4,
+			preferMP4: wantsMp4,
+			preferWebM: wantsWebm,
+			preferOpus: wantsWebm
 		};
 	}
 

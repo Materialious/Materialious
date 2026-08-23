@@ -56,11 +56,14 @@ export function inferMergeContainer(
 		return 'mp4';
 	}
 
-	if (
+	const webmVideo =
 		videoCodec.startsWith('vp9') ||
+		videoCodec.startsWith('vp09') ||
 		videoCodec.startsWith('vp8') ||
-		videoCodec.startsWith('av01')
-	) {
+		videoCodec.startsWith('av01');
+	const webmAudio = audioCodec.startsWith('opus') || audioCodec.startsWith('vorbis');
+
+	if (webmVideo && webmAudio) {
 		return 'webm';
 	}
 

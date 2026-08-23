@@ -11,7 +11,8 @@ const zDownloadSchema = z.object({
 	quality: z.string().optional(),
 	itag: z.coerce.number().int().positive().optional(),
 	format: z.string().optional(),
-	codec: z.string().optional()
+	codec: z.string().optional(),
+	language: z.string().optional()
 });
 
 function contentDisposition(filename: string): string {

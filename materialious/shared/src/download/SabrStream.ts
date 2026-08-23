@@ -110,6 +110,7 @@ export class SabrStream {
 			...(isAudio
 				? { audioFormat: selection.itag, audioQuality: selection.quality }
 				: { videoFormat: selection.itag, videoQuality: selection.quality }),
+			...(selection.language ? { audioLanguage: selection.language } : {}),
 			...this.getPreferenceOptions(selection)
 		});
 
@@ -120,13 +121,14 @@ export class SabrStream {
 	}
 
 	async downloadBoth(
-		selection: Pick<DownloadFormatSelection, 'quality' | 'itag' | 'format' | 'codec'>
+		selection: Pick<DownloadFormatSelection, 'quality' | 'itag' | 'format' | 'codec' | 'language'>
 	): Promise<SabrDownloadBothResult> {
 		const stream = await this.createGoogleStream();
 		const { videoStream, audioStream, selectedFormats } = await stream.start({
 			enabledTrackTypes: EnabledTrackTypes.VIDEO_AND_AUDIO,
 			videoQuality: selection.quality,
 			...(selection.itag ? { audioFormat: selection.itag } : {}),
+			...(selection.language ? { audioLanguage: selection.language } : {}),
 			...this.getPreferenceOptions(selection)
 		});
 

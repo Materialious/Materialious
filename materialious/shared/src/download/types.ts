@@ -29,6 +29,7 @@ export type DownloadFormatSelection = {
 	itag?: number;
 	format?: string;
 	codec?: string;
+	language?: string;
 };
 
 export type MergeContainer = 'mp4' | 'webm' | 'mkv';

@@ -29,7 +29,7 @@
 	let downloadType = $state<'merged' | 'audio'>('merged');
 	let selectedQuality = $state<string | undefined>(undefined);
 	let selectedContainer = $state<'mp4' | 'webm'>('mp4');
-	let selectedAudioItag = $state<number | undefined>(undefined);
+	let selectedAudioKey = $state<string | undefined>(undefined);
 
 	const downloadProgress = new Progress({
 		value: () => (progress >= 0 ? progress : undefined),
@@ -111,10 +111,15 @@
 	}
 
 	function buildSelection(): DownloadSelection {
+		const audioFormat = selectedAudioKey
+			? formats?.formats.find((format) => audioFormatKey(format) === selectedAudioKey)
+			: undefined;
+
 		if (downloadType === 'audio') {
 			return {
 				type: 'audio',
-				itag: selectedAudioItag,
+				itag: audioFormat?.itag,
+				language: audioFormat?.language ?? undefined,
 				format: selectedContainer
 			};
 		}
@@ -122,7 +127,8 @@
 		return {
 			type: 'merged',
 			quality: selectedQuality,
-			itag: selectedAudioItag,
+			itag: audioFormat?.itag,
+			language: audioFormat?.language ?? undefined,
 			format: selectedContainer
 		};
 	}
@@ -133,7 +139,7 @@
 		downloadType = 'merged';
 		selectedQuality = undefined;
 		selectedContainer = 'mp4';
-		selectedAudioItag = undefined;
+		selectedAudioKey = undefined;
 	}
 
 	async function startDialogDownload() {
@@ -266,17 +272,17 @@
 					<h6>{$_('player.controls.language')}</h6>
 					<nav class="chips wrap">
 						<button
-							class:primary={selectedAudioItag === undefined}
-							class:surface-container-highest={selectedAudioItag !== undefined}
-							onclick={() => (selectedAudioItag = undefined)}
+							class:primary={selectedAudioKey === undefined}
+							class:surface-container-highest={selectedAudioKey !== undefined}
+							onclick={() => (selectedAudioKey = undefined)}
 						>
 							{$_('player.downloadBest')}
 						</button>
 						{#each audioOptions as format (audioFormatKey(format))}
 							<button
-								class:primary={selectedAudioItag === format.itag}
-								class:surface-container-highest={selectedAudioItag !== format.itag}
-								onclick={() => (selectedAudioItag = format.itag)}
+								class:primary={selectedAudioKey === audioFormatKey(format)}
+								class:surface-container-highest={selectedAudioKey !== audioFormatKey(format)}
+								onclick={() => (selectedAudioKey = audioFormatKey(format))}
 							>
 								{audioLabel(format)}
 							</button>

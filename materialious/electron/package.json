@@ -44,7 +44,7 @@
 		"googlevideo": "^4.1.1",
 		"jsdom": "^30.0.1",
 		"jsonfile": "^6.2.1",
-		"youtubei.js": "^17.2.0"
+		"youtubei.js": "^18.0.0"
 	},
 	"devDependencies": {
 		"@types/fluent-ffmpeg": "^2.1.28",

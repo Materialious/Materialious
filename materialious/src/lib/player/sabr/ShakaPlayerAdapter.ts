@@ -591,6 +591,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 
 			shaka.net.NetworkingEngine.unregisterScheme('http');
 			shaka.net.NetworkingEngine.unregisterScheme('https');
+			shaka.net.NetworkingEngine.unregisterScheme('sabr');
 
 			this.player = null;
 		}

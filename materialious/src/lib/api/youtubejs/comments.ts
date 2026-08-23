@@ -43,7 +43,11 @@ function invidiousCommentSchema(innerResults: YT.Comments, videoId: string) {
 						if (!replies.replies) return { videoId: '', comments: [], commentCount: 0 };
 
 						const comments: Comment[] = replies.replies
-							.map((reply) => invidiousCommentContentSchema(reply))
+							.map((replyThread) =>
+								replyThread.comment
+									? invidiousCommentContentSchema(replyThread.comment)
+									: undefined
+							)
 							.filter((comment): comment is Comment => !!comment);
 
 						return {

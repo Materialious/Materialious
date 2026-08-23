@@ -29,14 +29,51 @@
 	let downloadType = $state<'merged' | 'audio'>('merged');
 	let selectedQuality = $state<string | undefined>(undefined);
 	let selectedContainer = $state<'mp4' | 'webm'>('mp4');
-	let selectedAudioItag = $state<number | undefined>(undefined);
+	let selectedAudioKey = $state<string | undefined>(undefined);
 
 	const downloadProgress = new Progress({
 		value: () => (progress >= 0 ? progress : undefined),
 		max: 100
 	});
 
-	const containerOptions = ['mp4', 'webm'] as const;
+	type FormatRow = AvailableFormats['formats'][number];
+
+	const WEBM_VIDEO_CODECS = ['vp8', 'vp9', 'vp09', 'av01'];
+	const WEBM_AUDIO_CODECS = ['opus', 'vorbis'];
+
+	// MP4 only reliably holds H.264/AAC, WebM holds VP8/VP9/AV1 with
+	// Opus/Vorbis; merging anything else produces broken files.
+	function formatFamily(format: FormatRow): 'mp4' | 'webm' | null {
+		const codec = format.codec?.toLowerCase() ?? '';
+
+		if (codec) {
+			if (codec.startsWith('avc') || codec.startsWith('mp4a')) return 'mp4';
+			if (
+				WEBM_VIDEO_CODECS.some((prefix) => codec.startsWith(prefix)) ||
+				WEBM_AUDIO_CODECS.some((prefix) => codec.startsWith(prefix))
+			) {
+				return 'webm';
+			}
+			return null;
+		}
+
+		if (format.container === 'mp4') return 'mp4';
+		if (format.container === 'webm') return 'webm';
+		return null;
+	}
+
+	const containerOptions = $derived.by(() => {
+		const all: ('mp4' | 'webm')[] = ['mp4', 'webm'];
+		if (!formats) return all;
+
+		const options = all.filter((container) =>
+			formats!.formats.some(
+				(format) => format.hasVideo && format.qualityLabel && formatFamily(format) === container
+			)
+		);
+
+		return options.length > 0 ? options : all;
+	});
 
 	const qualityOptions: string[] = $derived.by(() => {
 		if (!formats) return [];
@@ -45,6 +82,7 @@
 			new Set(
 				formats.formats
 					.filter((format) => format.hasVideo && format.qualityLabel)
+					.filter((format) => formatFamily(format) === selectedContainer)
 					.map((format) => format.qualityLabel as string)
 			)
 		).sort((a, b) => {
@@ -60,10 +98,12 @@
 	const audioOptions = $derived.by(() => {
 		if (!formats) return [];
 
+		const candidates = formats.formats.filter((format) => format.hasAudio && !format.hasVideo);
+		const compatible = candidates.filter((format) => formatFamily(format) === selectedContainer);
+
 		const seen = new SvelteSet<string>();
 
-		return formats.formats
-			.filter((format) => format.hasAudio && !format.hasVideo)
+		return (compatible.length > 0 ? compatible : candidates)
 			.filter((format) => {
 				const key = `${format.language ?? 'x'}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
 				if (seen.has(key)) return false;
@@ -75,6 +115,23 @@
 				if (langCompare !== 0) return langCompare;
 				return (b.bitrate ?? 0) - (a.bitrate ?? 0);
 			});
+	});
+
+	$effect(() => {
+		if (!formats) return;
+
+		if (!containerOptions.includes(selectedContainer)) {
+			selectedContainer = containerOptions[0];
+		}
+		if (selectedQuality !== undefined && !qualityOptions.includes(selectedQuality)) {
+			selectedQuality = undefined;
+		}
+		if (
+			selectedAudioKey !== undefined &&
+			!audioOptions.some((format) => audioFormatKey(format) === selectedAudioKey)
+		) {
+			selectedAudioKey = undefined;
+		}
 	});
 
 	function audioFormatKey(format: AvailableFormats['formats'][number]): string {
@@ -111,10 +168,15 @@
 	}
 
 	function buildSelection(): DownloadSelection {
+		const audioFormat = selectedAudioKey
+			? formats?.formats.find((format) => audioFormatKey(format) === selectedAudioKey)
+			: undefined;
+
 		if (downloadType === 'audio') {
 			return {
 				type: 'audio',
-				itag: selectedAudioItag,
+				itag: audioFormat?.itag,
+				language: audioFormat?.language ?? undefined,
 				format: selectedContainer
 			};
 		}
@@ -122,8 +184,10 @@
 		return {
 			type: 'merged',
 			quality: selectedQuality,
-			itag: selectedAudioItag,
-			format: selectedContainer
+			itag: audioFormat?.itag,
+			language: audioFormat?.language ?? undefined,
+			format: selectedContainer,
+			codec: selectedContainer === 'webm' ? 'vp9' : 'avc1'
 		};
 	}
 
@@ -133,7 +197,7 @@
 		downloadType = 'merged';
 		selectedQuality = undefined;
 		selectedContainer = 'mp4';
-		selectedAudioItag = undefined;
+		selectedAudioKey = undefined;
 	}
 
 	async function startDialogDownload() {
@@ -266,17 +330,17 @@
 					<h6>{$_('player.controls.language')}</h6>
 					<nav class="chips wrap">
 						<button
-							class:primary={selectedAudioItag === undefined}
-							class:surface-container-highest={selectedAudioItag !== undefined}
-							onclick={() => (selectedAudioItag = undefined)}
+							class:primary={selectedAudioKey === undefined}
+							class:surface-container-highest={selectedAudioKey !== undefined}
+							onclick={() => (selectedAudioKey = undefined)}
 						>
 							{$_('player.downloadBest')}
 						</button>
 						{#each audioOptions as format (audioFormatKey(format))}
 							<button
-								class:primary={selectedAudioItag === format.itag}
-								class:surface-container-highest={selectedAudioItag !== format.itag}
-								onclick={() => (selectedAudioItag = format.itag)}
+								class:primary={selectedAudioKey === audioFormatKey(format)}
+								class:surface-container-highest={selectedAudioKey !== audioFormatKey(format)}
+								onclick={() => (selectedAudioKey = audioFormatKey(format))}
 							>
 								{audioLabel(format)}
 							</button>

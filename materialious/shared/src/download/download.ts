@@ -114,7 +114,7 @@ export async function createDownload(options: CreateDownloadOptions): Promise<Re
 
 	// 'video+audio' or 'merged': download both tracks and merge them.
 	const { videoStream, audioStream, videoFormat, audioFormat } = await sabr.downloadBoth(selection);
-	const container: MergeContainer = inferMergeContainer(videoFormat, audioFormat);
+	const container: MergeContainer = inferMergeContainer(videoFormat, audioFormat, selection.format);
 
 	const totalBytes =
 		videoFormat.contentLength && audioFormat.contentLength

@@ -14,6 +14,15 @@ export async function injectSabr(
 ): Promise<SabrStreamingAdapter | null> {
 	if (!video.ytjs || !isUnrestrictedPlatform()) return null;
 
+	// Primes BotGuard attestation state, without it SABR servers may
+	// silently stop sending media mid-playback until the user seeks.
+	// https://github.com/LuanRT/YouTube.js/issues/1121
+	try {
+		await video.ytjs.innertube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
+	} catch {
+		// Continue regardless
+	}
+
 	const sabrAdapter = new SabrStreamingAdapter({
 		playerAdapter: new ShakaPlayerAdapter(),
 		clientInfo: {

@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.17.10",
+	"version": "1.17.11",
 	"description": "Modern material design for YouTube and Invidious.",
 	"desktopName": "us.materialio.Materialious",
 	"build": {
@@ -44,11 +44,11 @@
 		"googlevideo": "^4.1.1",
 		"jsdom": "^30.0.1",
 		"jsonfile": "^6.2.1",
-		"youtubei.js": "^17.2.0"
+		"youtubei.js": "^18.0.0"
 	},
 	"devDependencies": {
 		"@types/fluent-ffmpeg": "^2.1.28",
-		"electron": "^43.2.0",
+		"electron": "^43.4.0",
 		"electron-builder": "^26.15.3",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^7.0.2"

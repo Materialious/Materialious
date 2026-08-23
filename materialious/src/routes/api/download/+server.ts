@@ -11,8 +11,17 @@ const zDownloadSchema = z.object({
 	quality: z.string().optional(),
 	itag: z.coerce.number().int().positive().optional(),
 	format: z.string().optional(),
-	codec: z.string().optional()
+	codec: z.string().optional(),
+	language: z.string().optional()
 });
+
+function contentDisposition(filename: string): string {
+	// `filename` is an ASCII fallback for older clients. `filename*` preserves
+	// the original Unicode title without putting non-ByteString characters in a
+	// Node response header.
+	const fallback = filename.replace(/[^\x20-\x7e]/g, '_').replace(/[;"\\]/g, '_');
+	return `attachment; filename="${fallback}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+}
 
 export async function GET({ request, url, locals }) {
 	if (isOwnBackend()?.requireAuth && !locals.userId) {
@@ -49,7 +58,7 @@ export async function GET({ request, url, locals }) {
 
 	const headers = new Headers({
 		'Content-Type': resolved.mimeType,
-		'Content-Disposition': `attachment; filename="${resolved.filename}"`,
+		'Content-Disposition': contentDisposition(resolved.filename),
 		'Cache-Control': 'no-store'
 	});
 

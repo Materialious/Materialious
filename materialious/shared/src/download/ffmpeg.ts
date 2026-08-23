@@ -47,23 +47,29 @@ function getCodecs(mimeType?: string): string[] {
 
 export function inferMergeContainer(
 	videoFormat: { mimeType?: string },
-	audioFormat: { mimeType?: string }
+	audioFormat: { mimeType?: string },
+	preferredContainer?: string
 ): MergeContainer {
 	const videoCodec = getCodecs(videoFormat.mimeType)[0] ?? '';
 	const audioCodec = getCodecs(audioFormat.mimeType)[0] ?? '';
 
-	if (videoCodec.startsWith('avc') && audioCodec.startsWith('mp4a')) {
-		return 'mp4';
-	}
+	const fitsMp4 = videoCodec.startsWith('avc') && audioCodec.startsWith('mp4a');
 
-	if (
+	const webmVideo =
 		videoCodec.startsWith('vp9') ||
+		videoCodec.startsWith('vp09') ||
 		videoCodec.startsWith('vp8') ||
-		videoCodec.startsWith('av01')
-	) {
-		return 'webm';
-	}
+		videoCodec.startsWith('av01');
+	const webmAudio = audioCodec.startsWith('opus') || audioCodec.startsWith('vorbis');
 
+	// Only honour the requested container when both tracks genuinely fit it;
+	// muxing anything else produces broken files (e.g. green screens).
+	if (preferredContainer === 'mp4' && fitsMp4) return 'mp4';
+	if (preferredContainer === 'webm' && webmVideo && webmAudio) return 'webm';
+	if (preferredContainer === 'mkv') return 'mkv';
+
+	if (fitsMp4) return 'mp4';
+	if (webmVideo && webmAudio) return 'webm';
 	return 'mkv';
 }
 

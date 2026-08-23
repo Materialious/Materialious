@@ -89,14 +89,25 @@ export class SabrStream {
 
 	private getPreferenceOptions(
 		selection: Pick<DownloadFormatSelection, 'format' | 'codec'>
-	): Pick<SabrPlaybackOptions, 'preferH264' | 'preferMP4' | 'preferWebM'> {
+	): Pick<SabrPlaybackOptions, 'preferH264' | 'preferMP4' | 'preferWebM' | 'preferOpus'> {
 		const format = selection.format?.toLowerCase() ?? '';
 		const codec = selection.codec?.toLowerCase() ?? '';
 
+		const wantsMp4 = format.includes('mp4') || codec.includes('avc') || codec.includes('mp4a');
+		const wantsWebm =
+			format.includes('webm') ||
+			codec.includes('vp8') ||
+			codec.includes('vp9') ||
+			codec.includes('vp09') ||
+			codec.includes('av01') ||
+			codec.includes('opus') ||
+			codec.includes('vorbis');
+
 		return {
-			preferH264: codec.includes('avc'),
-			preferMP4: format.includes('mp4') || codec.includes('mp4a'),
-			preferWebM: format.includes('webm')
+			preferH264: wantsMp4,
+			preferMP4: wantsMp4,
+			preferWebM: wantsWebm,
+			preferOpus: wantsWebm
 		};
 	}
 
@@ -110,6 +121,7 @@ export class SabrStream {
 			...(isAudio
 				? { audioFormat: selection.itag, audioQuality: selection.quality }
 				: { videoFormat: selection.itag, videoQuality: selection.quality }),
+			...(selection.language ? { audioLanguage: selection.language } : {}),
 			...this.getPreferenceOptions(selection)
 		});
 
@@ -120,13 +132,14 @@ export class SabrStream {
 	}
 
 	async downloadBoth(
-		selection: Pick<DownloadFormatSelection, 'quality' | 'itag' | 'format' | 'codec'>
+		selection: Pick<DownloadFormatSelection, 'quality' | 'itag' | 'format' | 'codec' | 'language'>
 	): Promise<SabrDownloadBothResult> {
 		const stream = await this.createGoogleStream();
 		const { videoStream, audioStream, selectedFormats } = await stream.start({
 			enabledTrackTypes: EnabledTrackTypes.VIDEO_AND_AUDIO,
 			videoQuality: selection.quality,
 			...(selection.itag ? { audioFormat: selection.itag } : {}),
+			...(selection.language ? { audioLanguage: selection.language } : {}),
 			...this.getPreferenceOptions(selection)
 		});
 

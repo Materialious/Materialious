@@ -306,43 +306,45 @@
 					style="height: 200px;"
 				></div>
 
-				{#if progress}
-					<button
-						class="chip surface-container-highest"
-						onclick={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							(async () => {
-								await deleteWatchHistoryItem(video.videoId);
-								progress = undefined;
-								thumbnailActionsVisible = false;
-							})();
-						}}
-					>
-						<i>check</i>
-					</button>
-				{:else}
-					<button
-						class="chip surface-container-highest"
-						onclick={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							(async () => {
-								await saveWatchHistory(video, 1);
-								progress = '0';
-							})();
-						}}
-					>
-						<i>visibility</i>
-					</button>
-				{/if}
-				{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
-					<div
-						class="chip primary"
-						style="position: absolute; top: 8px; left: 8px; right: auto; z-index: 2;"
-					>
-						<i>star</i>
-					</div>
+				{#if !$isAndroidTvStore}
+    				{#if progress}
+    					<button
+    						class="chip surface-container-highest"
+    						onclick={(e) => {
+    							e.stopPropagation();
+    							e.preventDefault();
+    							(async () => {
+    								await deleteWatchHistoryItem(video.videoId);
+    								progress = undefined;
+    								thumbnailActionsVisible = false;
+    							})();
+    						}}
+    					>
+    						<i>check</i>
+    					</button>
+    				{:else}
+    					<button
+    						class="chip surface-container-highest"
+    						onclick={(e) => {
+    							e.stopPropagation();
+    							e.preventDefault();
+    							(async () => {
+    								await saveWatchHistory(video, 1);
+    								progress = '0';
+    							})();
+    						}}
+    					>
+    						<i>visibility</i>
+    					</button>
+    				{/if}
+    				{#if 'promotedBy' in video && video.promotedBy === 'favourited'}
+    					<div
+    						class="chip primary"
+    						style="position: absolute; top: 8px; left: 8px; right: auto; z-index: 2;"
+    					>
+    						<i>star</i>
+    					</div>
+    				{/if}
 				{/if}
 			</div>
 			{#if progress}

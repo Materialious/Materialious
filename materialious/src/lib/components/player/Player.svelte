@@ -790,9 +790,7 @@
 			await setStatusBarColor();
 			await CapacitorMusicControls.destroy();
 
-			if ($isAndroidTvStore) {
-				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
-			}
+			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 
 			if (androidOriginalOrigination) {
 				await ScreenOrientation.lock({

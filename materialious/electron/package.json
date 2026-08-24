@@ -48,7 +48,7 @@
 	},
 	"devDependencies": {
 		"@types/fluent-ffmpeg": "^2.1.28",
-		"electron": "^43.4.0",
+		"electron": "^43.4.1",
 		"electron-builder": "^26.15.3",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^7.0.2"

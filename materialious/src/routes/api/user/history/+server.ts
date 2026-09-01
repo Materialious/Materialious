@@ -73,15 +73,19 @@ export async function POST({ locals, request }) {
 		});
 	}
 
-	// Cull any history older then 12 months.
-	const twelveMonthsAgo = new Date();
-	twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-	if (!env.HISTORY_CULLING_DISABLED) {
+
+  // Cull any history older than HISTORY_CULLING days.
+  // -1 disables culling, defaults to 365 days.
+  const cullingDays = env.HISTORY_CULLING ? Number(env.HISTORY_CULLING) : 365;
+  if (cullingDays >= 0) {
+  	const cullingDate = new Date();
+    cullingDate.setDate(cullingDate.getDate() - cullingDays);
+
 		getSequelize().UserHistoryTable.destroy({
 			where: {
 				UserId: locals.userId,
 				watched: {
-					[Op.lt]: twelveMonthsAgo
+					[Op.lt]: cullingDate
 				}
 			}
 		});

@@ -74,8 +74,9 @@ services:
       # PUBLIC_RATE_LIMIT_DISABLED also still supported
       RATE_LIMIT_DISABLED: "false"
 
-      # Disable history culling (delete history older than 12 months)
-      HISTORY_CULLING_DISABLED: "false"
+      # Number of days history is kept before culled.
+      # -1 disables history culling. Defaults to 365.
+      HISTORY_CULLING: "365"
       
       # Allows you to whitelist additional domains in proxy.
       # Should be comma separated and be the base domain

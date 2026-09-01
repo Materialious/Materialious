@@ -27,7 +27,10 @@
 		segments,
 		playerIsPip,
 		userManualSeeking = $bindable(false),
-		playerMaxKnownTime = $bindable()
+		playerMaxKnownTime = $bindable(),
+		draftSegments = [],
+		draftSegmentStartTime = undefined,
+		selectedDraftSegmentIndex = undefined
 	}: {
 		currentTime: number;
 		showPlayerUI: () => void;
@@ -37,6 +40,9 @@
 		content: ParsedDescription;
 		segments: Segment[];
 		playerMaxKnownTime: number;
+		draftSegments?: { startTime: number; endTime: number }[];
+		draftSegmentStartTime?: number;
+		selectedDraftSegmentIndex?: number;
 		playerIsPip: boolean
 	} = $props();
 
@@ -436,6 +442,23 @@
 				></div>
 		{/each}
 	{/if}
+
+	{#each draftSegments as segment, index (segment)}
+		<div
+			class="chapter-marker segment-marker draft-segment-marker"
+			class:selected-segment-marker={selectedDraftSegmentIndex === index}
+			style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+			style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
+		></div>
+	{/each}
+
+	{#if draftSegmentStartTime !== undefined}
+		<div
+			class="chapter-marker draft-segment-start-marker"
+			style:left="{(draftSegmentStartTime / playerMaxKnownTime) * 100}%"
+			style:width="2px"
+		></div>
+	{/if}
 </div>
 
 <style>
@@ -506,6 +529,23 @@
 			-45deg,
 			var(--sg-color) 0 10px,
 			var(--sg-color-alt) 10px 15px
+		);
+	}
+
+	.draft-segment-marker,
+	.draft-segment-start-marker {
+		background: repeating-linear-gradient(
+			-45deg,
+			var(--tertiary-container) 0 10px,
+			var(--tertiary) 10px 15px
+		);
+	}
+
+	.selected-segment-marker {
+		background: repeating-linear-gradient(
+			-45deg,
+			var(--error-container) 0 10px,
+			var(--error) 10px 15px
 		);
 	}
 

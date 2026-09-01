@@ -25,6 +25,18 @@ export const sponsorBlockTimelineStore: Writable<boolean> = persist(
 	'sponsorBlockTimeline'
 );
 
+export const sponsorBlockSegmentSubmissionsEnabledStore: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'sponsorBlockSegmentSubmissionsEnabled'
+);
+
+export const sponsorBlockUserIDStore: Writable<string | undefined> = persist(
+	writable(undefined),
+	createStorage(),
+	'sponsorBlockUserID'
+);
+
 export const deArrowInstanceStore = persist(
 	writable(getPublicEnv('DEFAULT_DEARROW_INSTANCE') || 'https://sponsor.ajay.app'),
 	createStorage(),

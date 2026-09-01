@@ -32,6 +32,7 @@
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
+		sponsorBlockSegmentSubmissionsEnabledStore,
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		keybindStore
@@ -52,6 +53,7 @@
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
 	import { isOwnBackend } from '$lib/shared';
+	import SponsorBlockSubmissionMenu from './settings/SponsorBlockSubmissionMenu.svelte';
 	import Settings, { setActiveAudioTrack, setActiveVideoTrack } from './settings/Settings.svelte';
 	import CaptionSettings from './settings/CaptionSettings.svelte';
 	import Airplay from './settings/Airplay.svelte';
@@ -86,6 +88,18 @@
 
 	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
+	let draftSegments: { startTime: number; endTime: number }[] = $state([]);
+	let draftSegmentStartTime: number | undefined = $state(undefined);
+	let selectedDraftSegmentIndex: number | undefined = $state(undefined);
+
+	$effect(() => {
+		if (!$sponsorBlockSegmentSubmissionsEnabledStore) {
+			draftSegments = [];
+			draftSegmentStartTime = undefined;
+			selectedDraftSegmentIndex = undefined;
+		}
+	});
+
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let keepAwakeSupported = $state(false);
 
@@ -894,6 +908,9 @@
 			{currentTime}
 			{showPlayerUI}
 			{segments}
+			{draftSegments}
+			{draftSegmentStartTime}
+			{selectedDraftSegmentIndex}
 			{playerIsPip}
 			video={data.video}
 			content={data.content}
@@ -935,7 +952,41 @@
 				</p>
 				{#if !$isAndroidTvStore && !playerIsPip}
 					<CaptionSettings video={data.video} />
+
 					{#if playerElement}
+						{#if $sponsorBlockSegmentSubmissionsEnabledStore}
+							<SponsorBlockSubmissionMenu
+								{playerElement}
+								videoID={data.video.videoId}
+								onSegmentStart={(startTime) => {
+									draftSegmentStartTime = startTime;
+								}}
+								onSegmentStop={(segment) => {
+									draftSegments = [...draftSegments, segment];
+									draftSegmentStartTime = undefined;
+								}}
+								onSegmentsClear={() => {
+									draftSegments = [];
+									draftSegmentStartTime = undefined;
+									selectedDraftSegmentIndex = undefined;
+								}}
+								onSegmentDelete={(index) => {
+									draftSegments = draftSegments.filter((_, segmentIndex) => segmentIndex !== index);
+									selectedDraftSegmentIndex = undefined;
+								}}
+								onSegmentUpdate={(index, segment) => {
+									draftSegments = draftSegments.map((draftSegment, draftSegmentIndex) =>
+										draftSegmentIndex === index ? segment : draftSegment
+									);
+								}}
+								onSegmentSelect={(index: number | undefined) => {
+									selectedDraftSegmentIndex = index;
+								}}
+								onSegmentDeselect={() => {
+									selectedDraftSegmentIndex = undefined;
+								}}
+							/>
+						{/if}
 						<Settings {player} {playerElement} />
 						<Airplay {playerElement} />
 						<Pip {playerElement} />

@@ -5,13 +5,23 @@
 	import {
 		sponsorBlockCategoriesStore,
 		sponsorBlockDisplayToastStore,
+		sponsorBlockSegmentSubmissionsEnabledStore,
 		sponsorBlockStore,
 		sponsorBlockTimelineStore,
-		sponsorBlockUrlStore
+		sponsorBlockUrlStore,
 	} from '../../store';
 	import ComboBox from '../ComboBox.svelte';
-
+	import {
+		getSponsorBlockUsername,
+		setSponsorBlockUsername
+	} from '$lib/sponsorblock';
+	
 	let sponsorBlockInstance = $state(get(sponsorBlockUrlStore));
+	let sponsorBlockUsername = $state('');
+	let usernameLoading = $state(false);
+	let usernameSubmitting = $state(false);
+	let usernameError = $state<string | undefined>();
+	let loadedIdentityKey = $state<string | null | undefined>();
 
 	const sponsorCategories = [
 		{ name: $_('layout.sponsors.sponsor'), category: 'sponsor' },
@@ -36,6 +46,70 @@
 
 		sponsorBlockCategoriesStore.set(categories);
 	}
+
+	async function loadSponsorBlockUsername(): Promise<void> {
+		usernameLoading = true;
+		usernameError = undefined;
+
+		try {
+			sponsorBlockUsername = await getSponsorBlockUsername();
+		} catch (error) {
+			usernameError =
+				error instanceof Error
+					? error.message
+					: $_('layout.sponsors.failedToRetrieveUsername');
+
+			console.error(
+				$_('layout.sponsors.failedToRetrieveUsername'),
+				error
+			);
+		} finally {
+			usernameLoading = false;
+		}
+	}
+
+	async function submitSponsorBlockUsername(): Promise<void> {
+		if (usernameSubmitting) return;
+
+		const username = sponsorBlockUsername.trim();
+
+		if (!username) return;
+
+		usernameSubmitting = true;
+		usernameError = undefined;
+
+		try {
+			sponsorBlockUsername =
+				await setSponsorBlockUsername(username);
+		} catch (error) {
+			usernameError =
+				error instanceof Error
+					? error.message
+					: $_('layout.sponsors.failedToSetUsername');
+
+			console.error(
+				$_('layout.sponsors.failedToSetUsername'),
+				error
+			);
+		} finally {
+			usernameSubmitting = false;
+		}
+	}
+
+	$effect(() => {
+		if (!$sponsorBlockSegmentSubmissionsEnabledStore) {
+			loadedIdentityKey = undefined;
+			return;
+		}
+
+		const identityKey = $sponsorBlockUrlStore;
+
+		if (loadedIdentityKey === identityKey) return;
+
+		loadedIdentityKey = identityKey;
+
+		void loadSponsorBlockUsername();
+	});
 </script>
 
 <form
@@ -65,7 +139,7 @@
 	<div class="max">
 		<p>{$_('enabled')}</p>
 	</div>
-	<label class="switch" tabindex="0">
+	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockStore}
 			onclick={() => sponsorBlockStore.set(!$sponsorBlockStore)}
@@ -80,7 +154,7 @@
 	<div class="max">
 		<p>{$_('layout.sponsors.disableToast')}</p>
 	</div>
-	<label class="switch" tabindex="0">
+	<label class="switch">
 		<input
 			bind:checked={$sponsorBlockDisplayToastStore}
 			onclick={() => sponsorBlockDisplayToastStore.set(!$sponsorBlockDisplayToastStore)}
@@ -96,14 +170,73 @@
 		<p>{$_('layout.sponsors.disableTimeline')}</p>
 	</div>
 	<label class="switch">
+		<input bind:checked={$sponsorBlockTimelineStore} type="checkbox" role="switch" />
+		<span></span>
+	</label>
+</nav>
+
+<nav class="no-padding">
+	<div class="max">
+		<p>{$_('layout.sponsors.enableSegmentSubmissions')}</p>
+	</div>
+	<label class="switch">
 		<input
-			bind:checked={$sponsorBlockTimelineStore}
-			onclick={() => sponsorBlockTimelineStore.set(!$sponsorBlockTimelineStore)}
+			bind:checked={$sponsorBlockSegmentSubmissionsEnabledStore}
 			type="checkbox"
+			role="switch"
 		/>
 		<span></span>
 	</label>
 </nav>
+
+{#if $sponsorBlockSegmentSubmissionsEnabledStore}
+	<form
+		onsubmit={(event: SubmitEvent) => {
+			event.preventDefault();
+			void submitSponsorBlockUsername();
+		}}
+	>
+		<nav>
+			<div class="field label surface-container-highest max">
+				<input
+					bind:value={sponsorBlockUsername}
+					name="sponsorblock-username"
+					type="text"
+					placeholder={$_('layout.sponsors.sponsorBlockUsername')}
+					autocomplete="off"
+					autocapitalize="off"
+					autocorrect="off"
+					spellcheck="false"
+					disabled={usernameLoading || usernameSubmitting}
+				/>
+				<label for="sponsorblock-username">
+					{$_('layout.sponsors.sponsorBlockUsername')}
+				</label>
+			</div>
+
+			<button
+				class="circle"
+				type="submit"
+				disabled={
+					usernameLoading ||
+					usernameSubmitting ||
+					!sponsorBlockUsername.trim()
+				}
+				aria-label={$_('layout.sponsors.setSponsorBlockUsername')}
+			>
+				{#if usernameLoading || usernameSubmitting}
+					<progress class="circle small"></progress>
+				{:else}
+					<i>done</i>
+				{/if}
+			</button>
+		</nav>
+
+		{#if usernameError}
+			<p class="error">{usernameError}</p>
+		{/if}
+	</form>
+{/if}
 
 <hr style="margin: 1em 0;" />
 

@@ -13,6 +13,7 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { loadEntirePlaylist } from '$lib/playlist';
 import { unsafeRandomItem } from '$lib/misc';
+import { isItemFiltered } from '$lib/filtering';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';
 
@@ -41,14 +42,17 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 
 	if (!playlistId) {
 		if (get(playerAutoplayNextByDefaultStore)) {
-			goto(
-				resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]`, {
-					videoId: video.recommendedVideos[0].videoId
-				}),
-				{
-					replaceState: isAndroidTv
-				}
-			);
+			const nextVideo = video.recommendedVideos.find((v) => !isItemFiltered(v));
+			if (nextVideo) {
+				goto(
+					resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]`, {
+						videoId: nextVideo.videoId
+					}),
+					{
+						replaceState: isAndroidTv
+					}
+				);
+			}
 		}
 		return;
 	}

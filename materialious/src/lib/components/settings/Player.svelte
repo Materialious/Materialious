@@ -12,6 +12,7 @@
 		playerAutoplayNextByDefaultStore,
 		playerCCByDefault,
 		playerDefaultLanguage,
+		playerDefaultSubtitleLanguage,
 		playerDefaultPlaybackSpeed,
 		playerDefaultQualityStore,
 		playerMiniplayerEnabled,
@@ -67,6 +68,18 @@
 		};
 	})}
 	onChange={(value) => playerDefaultLanguage.set(value)}
+/>
+
+<ComboBox
+	label={$_('player.defaultSubtitleLanguage')}
+	defaultValue={$playerDefaultSubtitleLanguage}
+	options={languageNames.map((language) => {
+		return {
+			label: titleCase(language),
+			value: language
+		};
+	})}
+	onChange={(value) => playerDefaultSubtitleLanguage.set(value)}
 />
 
 <ComboBox

@@ -21,7 +21,6 @@
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
 		playerAutoPlayStore,
-		playerCCByDefault,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
 		playerPreferredVolumeStore,
@@ -273,10 +272,6 @@
 
 			setActiveAudioTrack(player);
 			setActiveVideoTrack(player);
-
-			if ($playerCCByDefault) {
-				toggleSubtitles(player);
-			}
 
 			if ($playerAutoPlayStore) playerElement?.play();
 		});
@@ -652,7 +647,7 @@
 		}
 
 		Mousetrap.bind($keybindStore.toggleSubtitles, () => {
-			toggleSubtitles(player);
+			toggleSubtitles();
 			showPlayerUI();
 			return false;
 		});

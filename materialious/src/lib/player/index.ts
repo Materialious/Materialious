@@ -3,8 +3,10 @@ import type { PlaylistPageVideo, VideoPlay } from '$lib/api/model';
 import {
 	isAndroidTvStore,
 	playerAutoplayNextByDefaultStore,
+	activeCaptionTrack,
 	playerDefaultLanguage,
 	playerDefaultQualityStore,
+	playerDefaultSubtitleLanguage,
 	playerPlaylistHistory,
 	playerState,
 	playlistSettingsStore
@@ -16,6 +18,7 @@ import { unsafeRandomItem } from '$lib/misc';
 import { isItemFiltered } from '$lib/filtering';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';
+import { selectTextTrack } from '$lib/components/player/ClosedCaptions.svelte';
 
 export const playbackRates = [
 	0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4
@@ -140,9 +143,7 @@ export function restoreDefaultLanguage(player: shaka.Player) {
 		const audioTracks = player.getAudioTracks();
 		const langCode = ISO6391.getCode(get(playerDefaultLanguage));
 
-		const audioTrack = audioTracks.find((audioTrack) =>
-			audioTrack.language.startsWith(langCode)
-		);
+		const audioTrack = audioTracks.find((audioTrack) => audioTrack.language.startsWith(langCode));
 
 		if (audioTrack) {
 			player.selectAudioTrack(audioTrack);
@@ -150,31 +151,18 @@ export function restoreDefaultLanguage(player: shaka.Player) {
 	}
 }
 
-export function toggleSubtitles(player: shaka.Player) {
-	const isVisible = player.getTextTracks().some((t) => t.active);
-	if (isVisible) {
-		player.selectTextTrack(null);
-	} else {
-		let langCode: string;
-		if (get(playerDefaultLanguage) === 'original') {
-			const audioTrack = player.getAudioTracks().find(({ roles }) => roles.includes('main'));
+export function toggleSubtitles() {
+	const active = get(activeCaptionTrack);
 
-			if (!audioTrack) {
-				return;
-			}
-
-			langCode = audioTrack.language;
-		} else {
-			const defaultLanguage = get(playerDefaultLanguage);
-			langCode = ISO6391.getCode(defaultLanguage);
-		}
-
-		const tracks = player.getTextTracks();
-
-		const subtitleTrack = tracks.find((track) => track.language === langCode);
-
-		if (subtitleTrack) {
-			player.selectTextTrack(subtitleTrack);
-		}
+	if (active !== null) {
+		// Subtitles currently visible -> turn them off.
+		activeCaptionTrack.set(null);
+		return;
 	}
+
+	// Subtitles hidden -> enable them using the default subtitle language.
+	const defaultLang = get(playerDefaultSubtitleLanguage);
+	const langCode =
+		defaultLang === 'original' || defaultLang === '' ? '' : ISO6391.getCode(defaultLang);
+	void selectTextTrack(langCode);
 }

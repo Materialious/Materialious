@@ -13,6 +13,7 @@ export {
 	playerAndroidLockOrientation,
 	playerDefaultLanguage,
 	playerCCByDefault,
+	playerDefaultSubtitleLanguage,
 	playerDefaultPlaybackSpeed,
 	playerMiniplayerEnabled,
 	playerAndroidPauseOnNetworkChange,
@@ -26,6 +27,7 @@ export {
 	playlistSettingsStore,
 	subtitleSettings,
 	defaultSubtitleSettings,
+	activeCaptionTrack,
 	darkModeStore,
 	themeColorStore,
 	showWarningStore,
@@ -84,4 +86,10 @@ export {
 	personalPlaylistsCacheStore
 } from './stores/index';
 export { isAndroidTv } from './misc';
-export type { PlayerState, SleepTimerState, Keybinds, SubtitleSettings } from './stores/index';
+export type {
+	PlayerState,
+	SleepTimerState,
+	Keybinds,
+	SubtitleSettings,
+	ActiveCaptionTrack
+} from './stores/index';

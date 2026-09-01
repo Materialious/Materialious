@@ -394,7 +394,7 @@
 				{#if !sideways}
 					<AuthorAvatar
 						author={video.author}
-						authorId={'authorId' in video ? video.authorId : ''}
+						authorId={'authorId' in video ? (video.authorId ?? '') : ''}
 					/>
 				{/if}
 				<div class="author-details" class:not-sideways={!sideways}>

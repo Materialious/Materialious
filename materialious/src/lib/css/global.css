@@ -168,7 +168,18 @@ menu {
 menu.player-settings {
 	transform: scale(1) translateY(-40%) translateX(0) !important;
 	width: 300px !important;
-	height: 200px !important;
+	max-height: 320px !important;
+	height: auto !important;
+	overflow-y: auto;
+}
+
+menu.player-settings li.selected {
+	background-color: var(--secondary-container);
+	color: var(--on-secondary-container);
+}
+
+menu.player-settings li.selected i {
+	color: var(--on-secondary-container);
 }
 
 .player-slider {

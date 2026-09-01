@@ -28,11 +28,11 @@ export class MaterialiousDb extends Dexie {
 
 	constructor() {
 		super('materialious');
-		this.version(4).stores({
+		this.version(5).stores({
 			favouriteChannels: 'channelId',
 			channelSubscriptions: 'channelId',
 			subscriptionFeed: 'videoId, authorId, published',
-			watchHistory: 'videoId',
+			watchHistory: 'videoId, authorId',
 			channelAvatars: 'channelId'
 		});
 	}

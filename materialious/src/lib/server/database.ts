@@ -9,6 +9,28 @@ let UserHistoryTable: ModelCtor<Model<any, any>>;
 
 let sequelizeInstance: Sequelize | null = null;
 
+export async function runSequelizeMigrations() {
+	if (!sequelizeInstance) throw new Error('Database not initialized');
+
+	const queryInterface = sequelizeInstance.getQueryInterface();
+
+	const historyColumns = await queryInterface.describeTable('UserHistories');
+
+	if (!('authorIdCipher' in historyColumns)) {
+		await queryInterface.addColumn('UserHistories', 'authorIdCipher', {
+			type: DataTypes.STRING,
+			allowNull: true
+		});
+	}
+
+	if (!('authorIdNonce' in historyColumns)) {
+		await queryInterface.addColumn('UserHistories', 'authorIdNonce', {
+			type: DataTypes.STRING,
+			allowNull: true
+		});
+	}
+}
+
 // Don't want to make our Sequelize instance always
 export function getSequelize(): {
 	sequelize: Sequelize;
@@ -151,6 +173,14 @@ export function getSequelize(): {
 		authorNonce: {
 			type: DataTypes.STRING,
 			allowNull: false
+		},
+		authorIdCipher: {
+			type: DataTypes.STRING,
+			allowNull: true
+		},
+		authorIdNonce: {
+			type: DataTypes.STRING,
+			allowNull: true
 		},
 		thumbnailCipher: {
 			type: DataTypes.STRING,

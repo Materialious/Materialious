@@ -16,6 +16,12 @@ const zUserHistory = z.object({
 		cipher: z.string().max(255),
 		nonce: z.string().max(255)
 	}),
+	authorId: z
+		.object({
+			cipher: z.string().max(255),
+			nonce: z.string().max(255)
+		})
+		.optional(),
 	thumbnail: z.object({
 		cipher: z.string().max(1000),
 		nonce: z.string().max(255)
@@ -47,6 +53,8 @@ export async function POST({ locals, request }) {
 		titleNonce: data.data.title.nonce,
 		authorCipher: data.data.author.cipher,
 		authorNonce: data.data.author.nonce,
+		authorIdCipher: data.data.authorId?.cipher ?? null,
+		authorIdNonce: data.data.authorId?.nonce ?? null,
 		thumbnailCipher: data.data.thumbnail.cipher,
 		thumbnailNonce: data.data.thumbnail.nonce,
 		videoIdCipher: data.data.videoId.cipher,

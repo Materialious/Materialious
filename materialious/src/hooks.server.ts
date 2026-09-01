@@ -1,5 +1,5 @@
 import { isOwnBackend } from '$lib/shared';
-import { getSequelize } from '$lib/server/database';
+import { getSequelize, runSequelizeMigrations } from '$lib/server/database';
 import { unsign } from 'cookie-signature';
 import { env } from '$env/dynamic/private';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
@@ -31,7 +31,8 @@ export async function handle({ event, resolve }) {
 	const sequelize = getSequelize();
 	if (!sequelizeAuthenticated) {
 		await sequelize.sequelize.sync();
-		await sequelize.sequelize.authenticate();
+    await sequelize.sequelize.authenticate();
+    await runSequelizeMigrations();
 		sequelizeAuthenticated = true;
 	}
 

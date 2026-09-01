@@ -28,6 +28,13 @@ async function decryptWatchHistory(
 		history.authorNonce as string,
 		history.authorCipher as string
 	)) as string;
+	const authorId =
+		history.authorIdNonce && history.authorIdCipher
+			? ((await decryptWithMasterKey(
+					history.authorIdNonce as string,
+					history.authorIdCipher as string
+				)) as string)
+			: undefined;
 	const title = (await decryptWithMasterKey(
 		history.titleNonce as string,
 		history.titleCipher as string
@@ -43,6 +50,7 @@ async function decryptWatchHistory(
 
 	return {
 		author,
+		authorId,
 		title,
 		thumbnail,
 		videoId,
@@ -138,6 +146,7 @@ export async function saveWatchHistoryBackend(video: ThumbnailVideo, progress: n
 
 	const title = await encryptWithMasterKey(video.title);
 	const author = await encryptWithMasterKey(video.author);
+	const authorId = video.authorId ? await encryptWithMasterKey(video.authorId) : undefined;
 	const thumbnail = await encryptWithMasterKey(
 		'videoThumbnails' in video ? getBestThumbnail(video.videoThumbnails) : video.thumbnail
 	);
@@ -158,6 +167,12 @@ export async function saveWatchHistoryBackend(video: ThumbnailVideo, progress: n
 				cipher: author?.cipher,
 				nonce: author?.nonce
 			},
+			...(authorId && {
+				authorId: {
+					cipher: authorId.cipher,
+					nonce: authorId.nonce
+				}
+			}),
 			thumbnail: {
 				cipher: thumbnail?.cipher,
 				nonce: thumbnail?.nonce

@@ -2,6 +2,7 @@ import { getSequelize } from '$lib/server/database';
 import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 import { Op } from 'sequelize';
+import { env } from '$env/dynamic/private';
 
 const zUserHistory = z.object({
 	id: z.string().max(255),
@@ -72,17 +73,19 @@ export async function POST({ locals, request }) {
 		});
 	}
 
-	// Cull any history older then 3 months.
-	const threeMonthsAgo = new Date();
-	threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-	getSequelize().UserHistoryTable.destroy({
-		where: {
-			UserId: locals.userId,
-			watched: {
-				[Op.lt]: threeMonthsAgo
+	// Cull any history older then 12 months.
+	const twelveMonthsAgo = new Date();
+	twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+	if (!env.HISTORY_CULLING_DISABLED) {
+		getSequelize().UserHistoryTable.destroy({
+			where: {
+				UserId: locals.userId,
+				watched: {
+					[Op.lt]: twelveMonthsAgo
+				}
 			}
-		}
-	});
+		});
+	}
 
 	return new Response();
 }

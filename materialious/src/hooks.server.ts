@@ -52,7 +52,7 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	if (!env.PUBLIC_RATE_LIMIT_DISABLED) {
+	if (!env.RATE_LIMIT_DISABLED && !env.PUBLIC_RATE_LIMIT_DISABLED) {
 		if (sensitivePaths.some((p) => p.test(event.url.pathname))) {
 			if (await strictLimiter.isLimited(event)) {
 				return new Response(JSON.stringify({ error: 'Too Many Requests' }), {

@@ -71,7 +71,11 @@ services:
 
       # Disable rate limiting
       # Not recommended for public instances
-      PUBLIC_RATE_LIMIT_DISABLED: "false"
+      # PUBLIC_RATE_LIMIT_DISABLED also still supported
+      RATE_LIMIT_DISABLED: "false"
+
+      # Disable history culling (delete history older than 12 months)
+      HISTORY_CULLING_DISABLED: "false"
       
       # Allows you to whitelist additional domains in proxy.
       # Should be comma separated and be the base domain

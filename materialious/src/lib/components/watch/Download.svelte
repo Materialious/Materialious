@@ -41,8 +41,6 @@
 	const WEBM_VIDEO_CODECS = ['vp8', 'vp9', 'vp09', 'av01'];
 	const WEBM_AUDIO_CODECS = ['opus', 'vorbis'];
 
-	// MP4 only reliably holds H.264/AAC, WebM holds VP8/VP9/AV1 with
-	// Opus/Vorbis; merging anything else produces broken files.
 	function formatFamily(format: FormatRow): 'mp4' | 'webm' | null {
 		const codec = format.codec?.toLowerCase() ?? '';
 
@@ -272,39 +270,50 @@
 		</header>
 
 		{#if loading}
-			<nav class="row">
-				<progress class="circle indeterminate small"></progress>
-				<div class="small-text">{$_('player.downloadLoading')}</div>
-			</nav>
+			<div class="center-align middle-align">
+				<progress class="circle indeterminate"></progress>
+			</div>
 		{:else if loadError}
-			<div class="row">
-				<div class="max small-text">{$_('player.downloadFailed')}</div>
-				<button class="small border" onclick={loadFormats}><i>refresh</i></button>
+			<div class="row middle-align">
+				<i class="large">error_outline</i>
+				<div class="max">{$_('player.downloadFailed')}</div>
+				<button class="small border" onclick={loadFormats}>
+					<i>refresh</i>
+				</button>
 			</div>
 		{:else if formats}
 			<main>
-				<nav class="chips">
-					<button
-						class:primary={downloadType === 'merged'}
-						class:surface-container-highest={downloadType !== 'merged'}
-						onclick={() => (downloadType = 'merged')}
-					>
-						<i>video_call</i>
-						{$_('player.downloadVideoAudio')}
-					</button>
-					<button
-						class:primary={downloadType === 'audio'}
-						class:surface-container-highest={downloadType !== 'audio'}
-						onclick={() => (downloadType = 'audio')}
-					>
-						<i>music_note</i>
-						{$_('player.downloadAudio')}
-					</button>
-				</nav>
+				<section class="download-section">
+					<h6 class="no-margin">{$_('player.downloadType')}</h6>
+					<div class="field middle-align">
+						<nav>
+							<label class="radio">
+								<input
+									type="radio"
+									name="download-type"
+									checked={downloadType === 'merged'}
+									onchange={() => (downloadType = 'merged')}
+								/>
+								<span>{$_('player.downloadVideoAudio')}</span>
+							</label>
+							<label class="radio">
+								<input
+									type="radio"
+									name="download-type"
+									checked={downloadType === 'audio'}
+									onchange={() => (downloadType = 'audio')}
+								/>
+								<span>{$_('player.downloadAudio')}</span>
+							</label>
+						</nav>
+					</div>
+				</section>
 
-				{#if downloadType === 'merged'}
-					{#if qualityOptions.length > 0}
-						<h6>{$_('player.controls.quality')}</h6>
+				<div class="divider"></div>
+
+				{#if downloadType === 'merged' && qualityOptions.length > 0}
+					<section class="download-section">
+						<h6 class="no-margin">{$_('player.controls.quality')}</h6>
 						<nav class="chips wrap">
 							<button
 								class:primary={selectedQuality === undefined}
@@ -323,49 +332,55 @@
 								</button>
 							{/each}
 						</nav>
-					{/if}
+					</section>
+
+					<div class="divider"></div>
 				{/if}
 
 				{#if audioOptions.length > 0}
-					<h6>{$_('player.controls.language')}</h6>
-					<nav class="chips wrap">
-						<button
-							class:primary={selectedAudioKey === undefined}
-							class:surface-container-highest={selectedAudioKey !== undefined}
-							onclick={() => (selectedAudioKey = undefined)}
-						>
-							{$_('player.downloadBest')}
-						</button>
-						{#each audioOptions as format (audioFormatKey(format))}
+					<section class="download-section">
+						<h6 class="no-margin">{$_('player.controls.language')}</h6>
+						<nav class="chips wrap">
 							<button
-								class:primary={selectedAudioKey === audioFormatKey(format)}
-								class:surface-container-highest={selectedAudioKey !== audioFormatKey(format)}
-								onclick={() => (selectedAudioKey = audioFormatKey(format))}
+								class:primary={selectedAudioKey === undefined}
+								class:surface-container-highest={selectedAudioKey !== undefined}
+								onclick={() => (selectedAudioKey = undefined)}
 							>
-								{audioLabel(format)}
+								{$_('player.downloadBest')}
 							</button>
-						{/each}
-					</nav>
+							{#each audioOptions as format (audioFormatKey(format))}
+								<button
+									class:primary={selectedAudioKey === audioFormatKey(format)}
+									class:surface-container-highest={selectedAudioKey !== audioFormatKey(format)}
+									onclick={() => (selectedAudioKey = audioFormatKey(format))}
+								>
+									{audioLabel(format)}
+								</button>
+							{/each}
+						</nav>
+					</section>
+
+					<div class="divider"></div>
 				{/if}
 
-				<h6>{$_('player.downloadFormat')}</h6>
-				<nav class="chips wrap">
-					{#each containerOptions as container (container)}
-						<button
-							class:primary={selectedContainer === container}
-							class:surface-container-highest={selectedContainer !== container}
-							onclick={() => (selectedContainer = container)}
-						>
-							{container.toUpperCase()}
-						</button>
-					{/each}
-				</nav>
+				<section class="download-section">
+					<h6 class="no-margin">{$_('player.downloadFormat')}</h6>
+					<div class="field suffix label border">
+						<select id="download-format" bind:value={selectedContainer}>
+							{#each containerOptions as container (container)}
+								<option value={container}>{container.toUpperCase()}</option>
+							{/each}
+						</select>
+						<label for="download-format">{$_('player.downloadFormat')}</label>
+						<i>arrow_drop_down</i>
+					</div>
+				</section>
 			</main>
 
 			<footer>
-				<button class="primary" onclick={startDialogDownload} disabled={downloading}>
+				<button class="primary large" onclick={startDialogDownload} disabled={downloading}>
 					<i>download</i>
-					{$_('player.download')}
+					<span>{$_('player.download')}</span>
 				</button>
 			</footer>
 		{/if}
@@ -397,26 +412,90 @@
 	#download-dialog {
 		display: flex;
 		flex-direction: column;
-		max-inline-size: 28rem;
-		max-block-size: min(80dvh, 80%);
-		overflow-y: auto;
+		max-inline-size: min(28rem, calc(100vw - 2rem));
+		max-block-size: min(calc(100dvh - 4rem), 80vh);
+		padding: 0.75rem 1rem;
+	}
+
+	#download-dialog:has(> main) {
+		height: auto;
+	}
+
+	#download-dialog > header {
+		padding: 0;
+		margin-block-end: 0.25rem;
 	}
 
 	#download-dialog main {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 0;
 		min-block-size: 0;
 		overflow-y: auto;
 		overscroll-behavior: contain;
 	}
 
-	#download-dialog main h6 {
-		margin: 0.75rem 0 0.25rem;
+	.download-section {
+		padding: 0.5rem 0;
+	}
+
+	.download-section h6 {
+		margin: 0;
+		margin-block-end: 0.5rem;
+		padding: 0;
+		line-height: 1.5;
+	}
+
+	#download-dialog .field {
+		margin: 0;
+	}
+
+	:global(#download-dialog nav.chips) {
+		gap: 0.25rem;
+	}
+
+	:global(#download-dialog nav.chips button) {
+		min-block-size: 2rem;
+		min-inline-size: 2rem;
+		padding: 0.25rem 0.625rem;
+		font-size: 0.8rem;
 	}
 
 	#download-dialog footer {
-		margin-block-start: 1.5rem;
-		text-align: right;
+		margin-block-start: 0.5rem;
+		padding-block-start: 0.5rem;
+		border-block-start: 1px solid var(--active);
+		text-align: center;
+	}
+
+	#download-dialog footer button {
+		min-block-size: 3rem;
+		padding-inline: 2rem;
+	}
+
+	@media (max-width: 360px) {
+		#download-dialog {
+			max-inline-size: 100vw;
+			max-block-size: 100dvh;
+			inline-size: 100vw;
+			block-size: 100dvh;
+			margin: 0;
+			max-height: 100dvh;
+			inset: 0;
+			transform: none;
+			padding: 0.5rem 0.75rem;
+		}
+
+		:global(#download-dialog nav.chips button) {
+			min-block-size: 1.75rem;
+			min-inline-size: 1.75rem;
+			padding: 0.25rem 0.5rem;
+			font-size: 0.75rem;
+		}
+
+		#download-dialog footer button {
+			min-block-size: 2.5rem;
+			padding-inline: 1.5rem;
+		}
 	}
 </style>

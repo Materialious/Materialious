@@ -420,6 +420,7 @@ export async function saveWatchHistory(video: ThumbnailVideo, progress: number =
 
 	await localDb.watchHistory.add({
 		author: video.author,
+		authorId: video.authorId,
 		watched: new Date(),
 		lengthSeconds: video.lengthSeconds,
 		progress,

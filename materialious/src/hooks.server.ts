@@ -1,5 +1,5 @@
 import { isOwnBackend } from '$lib/shared';
-import { getSequelize } from '$lib/server/database';
+import { getSequelize, runSequelizeMigrations } from '$lib/server/database';
 import { unsign } from 'cookie-signature';
 import { env } from '$env/dynamic/private';
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
@@ -31,7 +31,8 @@ export async function handle({ event, resolve }) {
 	const sequelize = getSequelize();
 	if (!sequelizeAuthenticated) {
 		await sequelize.sequelize.sync();
-		await sequelize.sequelize.authenticate();
+    await sequelize.sequelize.authenticate();
+    await runSequelizeMigrations();
 		sequelizeAuthenticated = true;
 	}
 
@@ -51,7 +52,7 @@ export async function handle({ event, resolve }) {
 		}
 	}
 
-	if (!env.PUBLIC_RATE_LIMIT_DISABLED) {
+	if (!env.RATE_LIMIT_DISABLED && !env.PUBLIC_RATE_LIMIT_DISABLED) {
 		if (sensitivePaths.some((p) => p.test(event.url.pathname))) {
 			if (await strictLimiter.isLimited(event)) {
 				return new Response(JSON.stringify({ error: 'Too Many Requests' }), {

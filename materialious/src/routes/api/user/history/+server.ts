@@ -2,6 +2,7 @@ import { getSequelize } from '$lib/server/database';
 import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 import { Op } from 'sequelize';
+import { env } from '$env/dynamic/private';
 
 const zUserHistory = z.object({
 	id: z.string().max(255),
@@ -16,6 +17,12 @@ const zUserHistory = z.object({
 		cipher: z.string().max(255),
 		nonce: z.string().max(255)
 	}),
+	authorId: z
+		.object({
+			cipher: z.string().max(255),
+			nonce: z.string().max(255)
+		})
+		.optional(),
 	thumbnail: z.object({
 		cipher: z.string().max(1000),
 		nonce: z.string().max(255)
@@ -47,6 +54,8 @@ export async function POST({ locals, request }) {
 		titleNonce: data.data.title.nonce,
 		authorCipher: data.data.author.cipher,
 		authorNonce: data.data.author.nonce,
+		authorIdCipher: data.data.authorId?.cipher ?? null,
+		authorIdNonce: data.data.authorId?.nonce ?? null,
 		thumbnailCipher: data.data.thumbnail.cipher,
 		thumbnailNonce: data.data.thumbnail.nonce,
 		videoIdCipher: data.data.videoId.cipher,
@@ -64,17 +73,23 @@ export async function POST({ locals, request }) {
 		});
 	}
 
-	// Cull any history older then 3 months.
-	const threeMonthsAgo = new Date();
-	threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-	getSequelize().UserHistoryTable.destroy({
-		where: {
-			UserId: locals.userId,
-			watched: {
-				[Op.lt]: threeMonthsAgo
+
+  // Cull any history older than HISTORY_CULLING days.
+  // -1 disables culling, defaults to 365 days.
+  const cullingDays = env.HISTORY_CULLING ? Number(env.HISTORY_CULLING) : 365;
+  if (cullingDays >= 0) {
+  	const cullingDate = new Date();
+    cullingDate.setDate(cullingDate.getDate() - cullingDays);
+
+		getSequelize().UserHistoryTable.destroy({
+			where: {
+				UserId: locals.userId,
+				watched: {
+					[Op.lt]: cullingDate
+				}
 			}
-		}
-	});
+		});
+	}
 
 	return new Response();
 }

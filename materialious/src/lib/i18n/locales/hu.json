@@ -269,7 +269,15 @@
             "reset": "Alapértelmezések visszaállítása"
         },
         "pauseTimerFinished": "A szünetidő lejárt",
-        "pauseOnNetworkChange": "A videó megállt a Wi-Fi-hálózat változása miatt"
+        "pauseOnNetworkChange": "A videó megállt a Wi-Fi-hálózat változása miatt",
+        "downloadLoading": "Formátumok betöltése…",
+        "downloadBest": "Legjobb felbontás",
+        "downloadAudio": "Csak hang",
+        "downloadVideoAudio": "Videó és hang",
+        "downloadFormat": "Formátum",
+        "downloadCanceled": "Letöltés megszakítva",
+        "downloadComplete": "Letöltés befejeződött",
+        "downloadFailed": "Letöltés meghiúsult"
     },
     "title": "Cím",
     "subscriptions": {

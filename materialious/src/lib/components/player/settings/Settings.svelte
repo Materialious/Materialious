@@ -25,7 +25,7 @@
 	let { player, playerElement }: { player: shaka.Player; playerElement: HTMLMediaElement } =
 		$props();
 
-	let playerSettings: 'quality' | 'speed' | 'language' | 'caption' | 'root' = $state('root');
+	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerLoop = $state($playerAlwaysLoopStore);
 	let settingsOpen = $state(false);
 	let settingsButton: HTMLButtonElement | undefined = $state();
@@ -58,7 +58,12 @@
 	}
 </script>
 
-<button bind:this={settingsButton} class="surface-container-highest" onclick={onSettingsClick} onblur={onSettingsBlur}>
+<button
+	bind:this={settingsButton}
+	class="surface-container-highest"
+	onclick={onSettingsClick}
+	onblur={onSettingsBlur}
+>
 	<i>settings</i>
 	<menu class="no-wrap mobile player-settings">
 		{#if playerSettings !== 'root'}
@@ -116,6 +121,7 @@
 			{/if}
 			<li
 				role="presentation"
+				class:selected={playerLoop}
 				onclick={() => {
 					if (playerElement) playerElement.loop = !playerLoop;
 					playerLoop = !playerLoop;
@@ -135,6 +141,7 @@
 		{:else if playerSettings === 'quality'}
 			<li
 				role="presentation"
+				class:selected={playerCurrentVideoTrack === undefined}
 				onclick={() => {
 					playerSettings = 'root';
 					player.configure({ abr: true });
@@ -152,12 +159,15 @@
 			}) as track (track)}
 				<li
 					role="presentation"
+					class:selected={playerCurrentVideoTrack?.height === track.height &&
+						playerCurrentVideoTrack?.width === track.width}
 					onclick={() => {
 						playerSettings = 'root';
 						player.selectVideoTrack(track, true);
 						setActiveVideoTrack(player);
 					}}
 				>
+					<i>high_quality</i>
 					{track.height}p
 				</li>
 			{/each}
@@ -165,24 +175,29 @@
 			{#each playbackRates as playbackRate (playbackRate)}
 				<li
 					role="presentation"
+					class:selected={playerElement?.playbackRate === playbackRate}
 					onclick={() => {
 						playerSettings = 'root';
 						if (playerElement) playerElement.playbackRate = playbackRate;
 					}}
 				>
-					{playbackRate}
+					<i>speed</i>
+					{playbackRate}x
 				</li>
 			{/each}
 		{:else if playerSettings === 'language'}
 			{#each filterUniqueAudioTracks(player.getAudioTracks()) as track (track)}
 				<li
 					role="presentation"
+					class:selected={playerCurrentAudioTrack?.language === track.language &&
+						playerCurrentAudioTrack?.label === track.label}
 					onclick={() => {
 						playerSettings = 'root';
 						player.selectAudioTrack(track);
 						setActiveAudioTrack(player);
 					}}
 				>
+					<i>language</i>
 					{#if track.language !== 'und'}
 						{ISO6391.getName(track.language)} -
 					{/if}

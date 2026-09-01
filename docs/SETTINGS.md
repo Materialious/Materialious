@@ -33,6 +33,8 @@ Materialious allows you to customize various settings by overwriting the default
     * [Default video quality](#default-video-quality)
     * [Default playback speed](#default-playback-speed)
     * [Default language](#default-language)
+    * [Default subtitle language](#default-subtitle-language)
+    * [Subtitle settings](#subtitle-settings)
     * [Captions enabled by default](#captions-enabled-by-default)
     * [Miniplayer enabled](#miniplayer-enabled)
   * [Return YouTube Dislikes](#return-youtube-dislikes)
@@ -254,6 +256,42 @@ Sets the preferred audio language for videos.
 
 ```json
 "defaultLanguage": true
+```
+
+### Default subtitle language
+
+Sets the preferred language for subtitles, independently of the audio language. When
+subtitles are enabled (e.g. via "Captions enabled by default" or the CC button), this
+language is selected automatically.
+
+```json
+"defaultSubtitleLanguage": "original"
+```
+
+### Subtitle settings
+
+Controls the on-video caption styling and timing. `subtitleSettings` includes:
+
+- `fontSize` (number): caption size (1-6)
+- `color` (hex): caption text color
+- `backgroundColor` (rgba/hex): caption background color
+- `backgroundOpacity` (0-1): opacity of the caption background
+- `textShadow` (string): caption text shadow
+- `fontFamily` (string): caption font family (e.g. `sans-serif`)
+- `alignment` (`start`|`center`|`end`): caption text alignment
+- `offset` (number, seconds): subtitle timing offset. Positive values delay subtitles.
+
+```json
+"subtitleSettings": {
+	"fontSize": 3,
+	"color": "#ffffff",
+	"backgroundColor": "rgba(0, 0, 0, 0.8)",
+	"backgroundOpacity": 0.8,
+	"textShadow": "2px 2px 2px rgba(0,0,0,0.8)",
+	"fontFamily": "inherit",
+	"alignment": "center",
+	"offset": 0
+}
 ```
 
 ### Captions enabled by default

@@ -324,6 +324,7 @@ export type ChannelOptions = {
 
 export interface VideoWatchHistory {
 	author: string;
+	authorId?: string;
 	watched: Date;
 	lengthSeconds: number;
 	progress: number;

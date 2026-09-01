@@ -44,6 +44,11 @@ export const playerDefaultLanguage = persist(
 	'defaultLanguage'
 );
 export const playerCCByDefault = persist(writable(false), createStorage(), 'CCByDefault');
+export const playerDefaultSubtitleLanguage = persist(
+	writable('original'),
+	createStorage(),
+	'defaultSubtitleLanguage'
+);
 export const playerDefaultPlaybackSpeed: Writable<number> = persist(
 	writable(1),
 	createStorage(),
@@ -90,13 +95,21 @@ export interface SubtitleSettings {
 	color: string;
 	backgroundColor: string;
 	textShadow: string;
+	offset: number;
+	fontFamily?: string;
+	alignment?: 'start' | 'center' | 'end';
+	backgroundOpacity: number;
 }
 
 export const defaultSubtitleSettings: SubtitleSettings = {
 	fontSize: 3,
 	color: '#ffffff',
 	backgroundColor: 'rgba(0, 0, 0, 0.8)',
-	textShadow: '2px 2px 2px rgba(0,0,0,0.8)'
+	textShadow: '2px 2px 2px rgba(0,0,0,0.8)',
+	offset: 0,
+	fontFamily: 'inherit',
+	alignment: 'center',
+	backgroundOpacity: 0.8
 };
 
 export const subtitleSettings = persist(
@@ -104,3 +117,6 @@ export const subtitleSettings = persist(
 	createStorage(),
 	'subtitleSettings'
 );
+
+export type ActiveCaptionTrack = string | null;
+export const activeCaptionTrack = writable<ActiveCaptionTrack>(null);

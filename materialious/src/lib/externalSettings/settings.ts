@@ -92,10 +92,14 @@ export const zThemeColors = z.record(
 export const zSubtitles = z.object({
 	fontSize: z.number(),
 	color: z.string().regex(/^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/),
-	backgroundColor: z.string().regex(/^rgba\(\d{1,3}, \d{1,3}, \d{1,3}, [01](\.\d+)?\)$/),
+	backgroundColor: z.string().regex(/^rgba?\([\d\s.,%]*\)|^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/),
 	textShadow: z
 		.string()
-		.regex(/^(none|\d+px \d+px \d+px rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[01](\.\d+)?\))$/)
+		.regex(/^(none|\d+px \d+px \d+px rgba\(\d{1,3},\s*\d{1,3},\s*\d{1,3},\s*[01]?(\.\d+)?\))$/),
+	offset: z.number().default(0),
+	fontFamily: z.string().optional().default('inherit'),
+	alignment: z.enum(['start', 'center', 'end']).optional().default('center'),
+	backgroundOpacity: z.number().min(0).max(1).optional().default(0.8)
 });
 
 export const persistedStores: PersistedStore<any>[] = [

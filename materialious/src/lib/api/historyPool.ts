@@ -47,6 +47,10 @@ export function queueGetWatchHistory(videoId: string): Promise<VideoWatchHistory
 	timeout = setTimeout(() => {
 		processBatches().catch((e) => {
 			console.error('Failed to process batches:', e);
+			for (const resolve of pendingResolves) {
+				resolve[1](undefined);
+			}
+			pendingResolves.clear();
 		});
 	}, DEBOUNCE_MS);
 

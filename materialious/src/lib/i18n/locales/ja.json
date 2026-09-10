@@ -125,7 +125,11 @@
             "textColor": "文字色",
             "bgColor": "背景色",
             "alignment": "整列",
-            "reset": "既定値にリセット"
+            "reset": "既定値にリセット",
+            "fontFamily": "フォント",
+            "opacity": "不透明度",
+            "subtitleOffset": "字幕のタイミング",
+            "textShadow": "テキストの影"
         },
         "pauseTimerFinished": "一時停止タイマーが終了しました",
         "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
@@ -136,7 +140,9 @@
         "downloadComplete": "ダウンロード完了",
         "downloadFailed": "ダウンロード失敗",
         "downloadVideoAudio": "動画と音声",
-        "downloadFormat": "フォーマット"
+        "downloadFormat": "フォーマット",
+        "downloadType": "ダウンロードタイプ",
+        "defaultSubtitleLanguage": "デフォルトの字幕言語"
     },
     "layout": {
         "interface": "外観",

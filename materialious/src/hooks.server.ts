@@ -28,27 +28,29 @@ export async function handle({ event, resolve }) {
 	event.locals.captchaKey = captchaKey;
 	event.locals.captchaSignature = captchaSignature;
 
-	const sequelize = getSequelize();
-	if (!sequelizeAuthenticated) {
-		await sequelize.sequelize.sync();
-    await sequelize.sequelize.authenticate();
-    await runSequelizeMigrations();
-		sequelizeAuthenticated = true;
-	}
+	if (env.DATABASE_CONNECTION_URI) {
+		const sequelize = getSequelize();
+		if (!sequelizeAuthenticated) {
+			await sequelize.sequelize.sync();
+			await sequelize.sequelize.authenticate();
+			await runSequelizeMigrations();
+			sequelizeAuthenticated = true;
+		}
 
-	if (!env.COOKIE_SECRET) {
-		throw new Error('Cookie secret must be set');
-	}
+		if (!env.COOKIE_SECRET) {
+			throw new Error('Cookie secret must be set');
+		}
 
-	if (env.COOKIE_SECRET.length < 16) {
-		throw new Error('COOKIE_SECRET must be at least 16 characters long');
-	}
+		if (env.COOKIE_SECRET.length < 16) {
+			throw new Error('COOKIE_SECRET must be at least 16 characters long');
+		}
 
-	const signedUserId = event.cookies.get('userid');
-	if (signedUserId) {
-		const userId = unsign(signedUserId, env.COOKIE_SECRET);
-		if (userId) {
-			event.locals.userId = userId;
+		const signedUserId = event.cookies.get('userid');
+		if (signedUserId) {
+			const userId = unsign(signedUserId, env.COOKIE_SECRET);
+			if (userId) {
+				event.locals.userId = userId;
+			}
 		}
 	}
 

@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.17.13",
+	"version": "1.17.14",
 	"description": "Modern material design for YouTube and Invidious.",
 	"desktopName": "us.materialio.Materialious",
 	"build": {
@@ -34,7 +34,7 @@
 		"@types/jsdom": "^28.0.3",
 		"bgutils-js": "^4.0.3",
 		"chokidar": "~5.0.0",
-		"electron-is-dev": "~2.0.0",
+		"electron-is-dev": "~3.0.1",
 		"electron-serve": "~3.0.0",
 		"electron-unhandled": "^4.0.1",
 		"electron-updater": "^6.8.9",

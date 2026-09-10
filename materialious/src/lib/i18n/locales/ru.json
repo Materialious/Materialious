@@ -49,7 +49,10 @@
         "shuffleVideos": "Воспроизвести видео в случайном порядке",
         "loopPlaylist": "Зациклить плейлист",
         "next": "Следующее",
-        "previous": "Предыдущее"
+        "previous": "Предыдущее",
+        "cloneToPlaylist": "Скопировать плейлист",
+        "cloning": "Копирование...",
+        "clonedSuccess": "Плейлист скопирован успешно"
     },
     "thumbnail": {
         "live": "В ЭФИРЕ",
@@ -101,7 +104,28 @@
         "chapters": "Главы",
         "enableYoutubejsPerm": "Всегда использовать резервное локальное видео",
         "preferredQuality": "Желаемое качество",
-        "premiere": "Видео будет доступно"
+        "premiere": "Видео будет доступно",
+        "pauseTimerFinished": "Таймер паузы закончился",
+        "downloadLoading": "Загрузка форматов…",
+        "downloadBest": "Лучшее качество",
+        "downloadAudio": "Только звук",
+        "downloadVideoAudio": "Видео и звук",
+        "downloadFormat": "Формат",
+        "downloadCanceled": "Загрузка отменена",
+        "downloadComplete": "Загрузка завершена",
+        "controls": {
+            "quality": "Качество",
+            "auto": "Авто",
+            "on": "Включить",
+            "off": "Выключить",
+            "language": "Язык",
+            "fontSize": "Размер шрифта",
+            "textColor": "Цвет текста",
+            "bgColor": "Цвет заднего фона",
+            "opacity": "Прозрачность",
+            "textShadow": "Тень текста",
+            "reset": "Сбросить к стандартным"
+        }
     },
     "layout": {
         "interface": "Интерфейс",
@@ -179,7 +203,18 @@
         "expandChapters": "Раскрывать главы по умолчанию",
         "disableAutoUpdate": "Отключить автоматические обновления",
         "about": "О приложении",
-        "androidNativeShare": "Использовать native share"
+        "androidNativeShare": "Использовать native share",
+        "binds": {
+            "skipSponsor": "Пропустить спонсорский сегмент",
+            "search": "Открыть поиск",
+            "clickToSet": "Нажать, чтобы назначить",
+            "pageBack": "Назад",
+            "pageForward": "Вперёд"
+        },
+        "materialiousAccount": "Учетная запись",
+        "shareURL": "Поделится URL",
+        "admin": "Администратор",
+        "adminPanel": "Панель администратора"
     },
     "subscribe": "Подписаться",
     "invalidInstance": "Проверьте URL-адрес. Если он правильный, то возможно сервер сейчас недоступен или не поддерживает сторонние клиенты.",
@@ -208,5 +243,48 @@
     "oldest": "Сначала старые",
     "popular": "Популярные",
     "favouriteChannel": "Любимый канал",
-    "unfavouriteChannel": "Нелюбимый канал"
+    "unfavouriteChannel": "Нелюбимый канал",
+    "copy": "Скопировать в буфер обмена",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "invalidPassword": "Неверный пароль",
+    "usernameTaken": "Имя пользователя занято",
+    "fair": "Справедливый",
+    "strong": "Сильный",
+    "veryStrong": "Очень сильный",
+    "createAccount": "Создать учетную запись",
+    "needRegister": "Мне нужно зарегестрироваться",
+    "needLogin": "Мне нужно войти",
+    "materialiousLogin": "Пожалуйста войдите с своей учетной записью Materialious.",
+    "materialiousCreate": "Пожалуйста создайте свою учетную запись Materialious.",
+    "verifyingCaptcha": "Проверяем...",
+    "captchaVerified": "Проверено",
+    "captchaFailed": "Проверка провалена",
+    "backend": "Бэкенд",
+    "markAs": {
+        "watched": "Пометить как просмотренное",
+        "unwatched": "Пометить как непросмотренное"
+    },
+    "initalSetup": {
+        "useInvidious": "Я хочу использовать Invidious",
+        "yes": "Да",
+        "no": "Нет",
+        "unsure": "Не уверен",
+        "localFallbackInfo": "Когда видео не загрузилось от Invidious, Materialious загружает его локально.",
+        "configureInstance": "Конфигурация экземпляра",
+        "done": "Выполнено"
+    },
+    "skip": "Пропустить",
+    "commentSortBy": "Сортировать по",
+    "commentSortNewest": "Новейшее",
+    "hideAuthor": "Скрыть автора",
+    "watchParty": {
+        "createRoom": "Создать комнату",
+        "joinRoom": "Присоединиться к комнате",
+        "roomID": "ID комнаты",
+        "shareRoom": "Поделится комнатой",
+        "leaveRoom": "Покинуть комнату",
+        "userJoin": "Пользователь присоединился к комнате",
+        "userLeft": "Пользователь покинул комнату"
+    }
 }

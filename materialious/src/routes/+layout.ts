@@ -35,7 +35,7 @@ export async function load({ url }) {
 		await initI18n();
   }
 
-	if (get(rawMasterKeyStore)) {
+	if (get(rawMasterKeyStore) && isOwnBackend()?.internalAuth) {
 		const authTokenFromCloud = await getKeyValue('authToken');
 		if (typeof authTokenFromCloud === 'string')
 			invidiousAuthStore.set(JSON.parse(authTokenFromCloud));

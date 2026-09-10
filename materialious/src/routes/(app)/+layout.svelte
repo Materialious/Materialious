@@ -147,7 +147,7 @@
 			});
 		}
 
-		if ($rawMasterKeyStore) {
+		if ($rawMasterKeyStore && isOwnBackend()?.internalAuth) {
 			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' })
 				.then((resp) => {
 					if (!resp.ok) materialiousLogout();

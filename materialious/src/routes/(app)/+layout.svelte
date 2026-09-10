@@ -21,19 +21,22 @@
 		playerState,
 		playerTheatreModeIsActive,
 		playerIsInWindowFullscreen,
+		materialiousBackendStore,
 		rawMasterKeyStore,
 		backendInUseStore,
 		hideSearchStore,
 		keybindStore,
 		interfaceMobileBackButtonStore
 	} from '$lib/store';
-	import { Capacitor } from '@capacitor/core';
-	import ui from 'beercss';
-	import { onDestroy, onMount } from 'svelte';
-	import Mousetrap from 'mousetrap';
-	import { _ } from '$lib/i18n';
-	import { isMobile, isYTBackend, truncate } from '$lib/misc';
+import { get } from 'svelte/store';
+import { Capacitor } from '@capacitor/core';
+import ui from 'beercss';
+import { onDestroy, onMount } from 'svelte';
+import Mousetrap from 'mousetrap';
+import { _ } from '$lib/i18n';
+import { isMaterialiousAccountActive, isMobile, isYTBackend, remoteMaterialiousSupported, truncate } from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
+	import { backendFetch } from '$lib/api/backend/request';
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
@@ -41,7 +44,17 @@
 
 	let { children } = $props();
 
-	const showLogin = !isYTBackend() || isOwnBackend()?.internalAuth;
+	const showLogin = $derived(
+		(!!isOwnBackend()?.internalAuth ||
+			remoteMaterialiousSupported() ||
+			($rawMasterKeyStore && $materialiousBackendStore)) &&
+		(!isYTBackend() || !!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)
+	);
+
+	const accountLoggedIn = $derived(
+		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
+			(!!$invidiousAuthStore && !$materialiousBackendStore)
+	);
 
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);
@@ -68,7 +81,7 @@
 	});
 
 	async function login() {
-		if (isOwnBackend()?.internalAuth) {
+		if (isOwnBackend()?.internalAuth || get(materialiousBackendStore)) {
 			goto(resolve('/internal/login', {}));
 			return;
 		}
@@ -147,8 +160,8 @@
 			});
 		}
 
-		if ($rawMasterKeyStore && isOwnBackend()?.internalAuth) {
-			fetch('/api/user/isLoggedIn', { method: 'GET', credentials: 'same-origin' })
+		if (isMaterialiousAccountActive()) {
+			backendFetch('/api/user/isLoggedIn', { method: 'GET' })
 				.then((resp) => {
 					if (!resp.ok) materialiousLogout();
 				})
@@ -272,7 +285,7 @@
 				<div>{$_('layout.settings')}</div>
 			</a>
 			{#if showLogin}
-				{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
+				{#if !accountLoggedIn}
 					<a onclick={login} href="#login">
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
@@ -381,7 +394,7 @@
     				</button>
 				{/if}
 				{#if showLogin}
-					{#if (!$invidiousAuthStore && !isOwnBackend()?.internalAuth) || (!$rawMasterKeyStore && isOwnBackend()?.internalAuth)}
+					{#if !accountLoggedIn}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>

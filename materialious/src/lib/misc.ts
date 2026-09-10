@@ -1,7 +1,7 @@
 import he from 'he';
 import { get } from 'svelte/store';
 import { env } from '$env/dynamic/public';
-import { backendInUseStore, interfaceAndroidUseNativeShare, isAndroidTvStore } from './store';
+import { authTokenStore, backendInUseStore, interfaceAndroidUseNativeShare, isAndroidTvStore, materialiousBackendStore, rawMasterKeyStore } from './store';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
@@ -113,6 +113,27 @@ export function findElementForTime<T>(
 
 export function isUnrestrictedPlatform(): boolean {
 	return isOwnBackend() !== null || Capacitor.isNativePlatform();
+}
+
+export function getMaterialiousBackendUrl(): string {
+	const remote = get(materialiousBackendStore);
+	if (remote) return ensureNoTrailingSlash(remote);
+	return '';
+}
+
+export function getMaterialiousAuthHeaders(): HeadersInit {
+	const token = get(authTokenStore);
+	return token !== undefined ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export function isMaterialiousAccountActive(): boolean {
+	if (!get(rawMasterKeyStore)) return false;
+	return !!isOwnBackend()?.internalAuth || !!get(materialiousBackendStore);
+}
+
+export function remoteMaterialiousSupported(): boolean {
+	if (isOwnBackend()) return true;
+	return Capacitor.getPlatform() === 'electron' || Capacitor.getPlatform() === 'android';
 }
 
 export function isYTBackend(): boolean {

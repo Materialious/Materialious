@@ -67,6 +67,8 @@ export {
 } from './filtering';
 export {
 	rawMasterKeyStore,
+	materialiousBackendStore,
+	authTokenStore,
 	watchHistoryEnabledStore,
 	poTokenCacheStore,
 	isAndroidTvStore

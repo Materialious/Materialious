@@ -5,13 +5,26 @@
 	import { iso31661 } from 'iso-3166';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { isUnrestrictedPlatform, timeout, shareURL, isMobile } from '$lib/misc';
+	import {
+		getMaterialiousBackendUrl,
+		isUnrestrictedPlatform,
+		remoteMaterialiousSupported,
+		timeout,
+		shareURL,
+		isMobile
+	} from '$lib/misc';
 	import { getPages, type Pages } from '$lib/navPages';
-	import { setInvidiousInstance, goToInvidiousLogin, invidiousLogout } from '$lib/auth';
+	import {
+		setInvidiousInstance,
+		goToInvidiousLogin,
+		invidiousLogout,
+		setMaterialiousBackend
+	} from '$lib/auth';
 	import {
 		invidiousAuthStore,
 		backendInUseStore,
 		invidiousInstanceStore,
+		materialiousBackendStore,
 		interfaceAllowInsecureRequests,
 		interfaceAndroidUseNativeShare,
 		interfaceAutoExpandChapters,
@@ -35,6 +48,20 @@
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 
 	let invalidInstance = $state(false);
+
+	let materialiousBackend = $state(get(materialiousBackendStore) ?? getMaterialiousBackendUrl());
+
+	let invalidMaterialiousBackend = $state(false);
+
+	async function setMaterialiousInstance(event: Event) {
+		event.preventDefault();
+		invalidMaterialiousBackend = !(await setMaterialiousBackend(materialiousBackend));
+
+		if (invalidMaterialiousBackend) return;
+
+		await timeout(100);
+		location.reload();
+	}
 
 	async function setInstance(event: Event) {
 		event.preventDefault();
@@ -117,7 +144,7 @@
 				</button>
 			</nav>
 		</form>
-		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
+		{#if (isOwnBackend()?.internalAuth || get(materialiousBackendStore)) && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
 				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
 					<i>link</i>
@@ -153,6 +180,34 @@
 			</nav>
 		</div>
 	{/if}
+{/if}
+
+{#if remoteMaterialiousSupported() && !isOwnBackend()}
+	<div class="settings">
+		<form onsubmit={setMaterialiousInstance}>
+			<nav>
+				<div
+					class="field prefix label surface-container-highest max"
+					class:invalid={invalidMaterialiousBackend}
+				>
+				    <i>link</i>
+					<input
+						tabindex="0"
+						bind:value={materialiousBackend}
+						name="materialious-backend"
+						type="text"
+					/>
+					<label tabindex="-1" for="materialious-backend">{$_('materialiousBackendUrl')}</label>
+					{#if invalidMaterialiousBackend}
+						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+				</div>
+				<button class="circle">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+	</div>
 {/if}
 
 <div class="field no-margin">

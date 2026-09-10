@@ -3,10 +3,18 @@
 	import { resolve } from '$app/paths';
 	import Question from '$lib/components/Question.svelte';
 	import { _ } from '$lib/i18n';
-	import { isUnrestrictedPlatform } from '$lib/misc';
-	import { setInvidiousInstance, clearCaches } from '$lib/auth';
+	import {
+		isUnrestrictedPlatform,
+		getMaterialiousBackendUrl,
+		remoteMaterialiousSupported
+	} from '$lib/misc';
+	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '$lib/auth';
 	import { isOwnBackend } from '$lib/shared';
-	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '$lib/store';
+	import {
+		backendInUseStore,
+		invidiousInstanceStore,
+		playerYouTubeJsFallback
+	} from '$lib/store';
 
 	const defaultInstance = !isOwnBackend()
 		? 'https://invidious.materialio.us'
@@ -15,6 +23,9 @@
 	let usingInvidious: boolean = $state(false);
 	let invidiousInstanceValid: boolean = $state(true);
 	let invidiousInstance: string = $state(defaultInstance ?? '');
+
+	let materialiousBackend: string = $state(getMaterialiousBackendUrl());
+	let invalidMaterialiousBackend: boolean = $state(false);
 
 	async function setupCompleted() {
 		clearCaches();
@@ -36,6 +47,15 @@
 	function setYTBackend() {
 		usingInvidious = false;
 		backendInUseStore.set('yt');
+		setupCompleted();
+	}
+
+	async function setMaterialiousInstance(event: Event) {
+		event.preventDefault();
+		invalidMaterialiousBackend = !(await setMaterialiousBackend(materialiousBackend));
+
+		if (invalidMaterialiousBackend) return;
+
 		setupCompleted();
 	}
 </script>
@@ -128,6 +148,34 @@
 						</button>
 					</nav>
 				</form>
+
+				{#if remoteMaterialiousSupported() && !isOwnBackend()}
+					<div class="space"></div>
+					<h3>{$_('materialiousBackendUrl')}</h3>
+					<form onsubmit={setMaterialiousInstance}>
+						<nav class="center-align">
+							<div
+								class="field label prefix surface-container-highest"
+								class:invalid={invalidMaterialiousBackend}
+							>
+								<i>link</i>
+								<input
+									bind:value={materialiousBackend}
+									name="materialiousBackendUrl"
+									type="text"
+									tabindex="0"
+								/>
+								<label for="materialiousBackendUrl" tabindex="-1"
+									>{$_('materialiousBackendUrl')}</label
+								>
+							</div>
+
+							<button type="submit">
+								<i>done_all</i>
+							</button>
+						</nav>
+					</form>
+				{/if}
 			{/if}
 		{/if}
 	</div>

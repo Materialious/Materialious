@@ -2,17 +2,18 @@ import { page } from '$app/state';
 import { get } from 'svelte/store';
 import { z } from 'zod';
 
-import { persistedStores, type PersistedStore } from './settings';
+import { persistedStores, ensureBackendPersistedStores, type PersistedStore } from './settings';
 
-import { isOwnBackend } from '$lib/shared';
+import { getPublicEnv, isMaterialiousAccountActive } from '$lib/misc';
 import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend/keyvalue';
 import { rawMasterKeyStore } from '$lib/store';
-import { getPublicEnv } from '$lib/misc';
 
 const dontAutoSync = ['authToken'];
 
 export async function syncSettingsToBackend() {
-	if (!isOwnBackend()?.internalAuth || !get(rawMasterKeyStore)) return;
+	if (!isMaterialiousAccountActive() || !get(rawMasterKeyStore)) return;
+
+	ensureBackendPersistedStores();
 
 	await Promise.all(
 		persistedStores.map(async (store) => {
@@ -25,6 +26,8 @@ export async function syncSettingsToBackend() {
 						store.store.set(currentKeyValueParsed);
 					}
 				}
+			}).catch(() => {
+				// Remote instance unreachable, keep local value.
 			});
 
 			let initialLoad = true;
@@ -41,7 +44,9 @@ export async function syncSettingsToBackend() {
 				return addOrUpdateKeyValue(
 					store.name,
 					store.serialize ? store.serialize(value) : value?.toString()
-				);
+				).catch(() => {
+					// Remote instance unreachable while syncing.
+				});
 			});
 		})
 	);

@@ -59,6 +59,8 @@ export {
 	engineMaxConcurrentChannelsStore,
 	engineFallbacksStore,
 	rawMasterKeyStore,
+	materialiousBackendStore,
+	authTokenStore,
 	watchHistoryEnabledStore,
 	poTokenCacheStore,
 	filterContentListStore,

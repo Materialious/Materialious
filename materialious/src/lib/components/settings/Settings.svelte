@@ -6,11 +6,12 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { isAndroidTvStore, rawMasterKeyStore } from '$lib/store';
+	import { isAndroidTvStore, materialiousBackendStore, rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
-	import { isUnrestrictedPlatform, keyCodeMap } from '$lib/misc';
-	import { isOwnBackend, isAdminUsername } from '$lib/shared';
+	import { isUnrestrictedPlatform, isMaterialiousAccountActive, keyCodeMap, remoteMaterialiousSupported } from '$lib/misc';
+	import { isAdminUsername } from '$lib/shared';
+	import { backendFetch } from '$lib/api/backend/request';
 	import InternalAccount from './InternalAccount.svelte';
 	import Admin from './Admin.svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
@@ -109,15 +110,25 @@
 		});
 	}
 
-	rawMasterKeyStore.subscribe((value) => {
-		if (isOwnBackend()?.internalAuth && value) {
-			tabs.splice(tabs.length - 1, 0, {
-				id: 'account',
-				label: $_('layout.materialiousAccount'),
-				icon: 'person',
-				component: InternalAccount
-			});
-			fetch('/api/user/me').then(async (resp) => {
+	rawMasterKeyStore.subscribe(() => {
+		updateAccountTabs();
+	});
+
+	materialiousBackendStore.subscribe(() => {
+		updateAccountTabs();
+	});
+
+	function updateAccountTabs() {
+		if (isMaterialiousAccountActive() && remoteMaterialiousSupported()) {
+			if (!tabs.find((tab) => tab.id === 'account')) {
+				tabs.splice(tabs.length - 1, 0, {
+					id: 'account',
+					label: $_('layout.materialiousAccount'),
+					icon: 'person',
+					component: InternalAccount
+				});
+			}
+			backendFetch('/api/user/me').then(async (resp) => {
 				if (resp.ok) {
 					const me = await resp.json();
 					if (isAdminUsername(me.username)) {
@@ -140,7 +151,7 @@
 				return tab.id !== 'account' && tab.id !== 'admin';
 			});
 		}
-	});
+	}
 
 	let dialogType = $state('');
 	function checkWidth() {

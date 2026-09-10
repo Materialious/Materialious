@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { get } from 'svelte/store';
 	import { createUserBackend, loginUserBackend, type DerivePassword } from '$lib/api/backend';
+	import { backendFetch } from '$lib/api/backend/request';
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { _ } from '$lib/i18n';
 	import { isOwnBackend } from '$lib/shared';
@@ -11,6 +13,11 @@
 	import { solveChallenge } from 'altcha-lib';
 	import type { Solution, Challenge } from 'altcha-lib/types';
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
+	import { materialiousBackendStore } from '$lib/store';
+
+	const isRemoteBackend = $derived(!!get(materialiousBackendStore));
+	const registrationAllowed = $derived(isRemoteBackend ? false : !!isOwnBackend()?.registrationAllowed);
+	const captchaDisabled = $derived(isRemoteBackend ? false : !!isOwnBackend()?.captchaDisabled);
 
 	let needToRegister = $state(false);
 
@@ -38,15 +45,21 @@
 	});
 
 	async function solveCaptchaChallenge() {
-     	if (isOwnBackend()?.captchaDisabled) {
-      		return;
-     	}
+		if (captchaDisabled) {
+			return;
+		}
 
 		captchaState = 'solving';
 
 		try {
-			const resp = await fetch('/api/captcha');
+			const resp = await backendFetch('/api/captcha');
 			const challenge = await resp.json();
+
+			// If the remote backend has captcha disabled, it returns an empty body.
+			if (Object.keys(challenge).length === 0) {
+				captchaState = 'solved';
+				return;
+			}
 
 			const solution = await solveChallenge({ challenge, deriveKey });
 
@@ -70,13 +83,13 @@
 	async function onLogin(event: Event) {
 		event.preventDefault();
 
-		if (!captchaPayload && !isOwnBackend()?.captchaDisabled) {
+		if (!captchaPayload && !captchaDisabled) {
 			return;
 		}
 
 		isLoading = true;
 
-		if (needToRegister) {
+		if (needToRegister && !isRemoteBackend) {
 			failed = !(await createUserBackend(username, rawPassword, captchaPayload!, derivePassword));
 		} else {
 			failed = !(await loginUserBackend(username, rawPassword, captchaPayload!, derivePassword));
@@ -126,7 +139,7 @@
 
 				<PasswordStrength password={rawPassword} show={needToRegister} />
 
-				{#if !isOwnBackend()?.captchaDisabled}
+				{#if !captchaDisabled}
 					<div class="space"></div>
 					<div class="surface-container-highest center-align small-padding max">
 						{#if captchaState === 'solving'}
@@ -155,25 +168,27 @@
 					</div>
 				{/if}
 
-				<nav class="right-align">
+<nav class="right-align">
+				{#if !isRemoteBackend}
 					<button
 						type="button"
 						class="secondary"
-						disabled={!isOwnBackend()?.registrationAllowed}
+						disabled={!registrationAllowed}
 						onclick={() => {
 							needToRegister = !needToRegister;
 							failed = false;
 						}}
 					>
-						{#if !isOwnBackend()?.registrationAllowed}
+						{#if !registrationAllowed}
 							<div class="tooltip bottom">{$_('registrationDisabled')}</div>
 						{/if}
 						<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
 					</button>
+				{/if}
 
 					<button
 						type="submit"
-						disabled={captchaState !== 'solved' && !isOwnBackend()?.captchaDisabled}
+						disabled={captchaState !== 'solved' && !captchaDisabled}
 					>
 						<i>done</i>
 						<span>{$_(needToRegister ? 'createAccount' : 'login')}</span>

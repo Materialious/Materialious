@@ -52,6 +52,15 @@ export async function handle({ event, resolve }) {
 				event.locals.userId = userId;
 			}
 		}
+
+		const authorization = event.request.headers.get('authorization');
+		if (!event.locals.userId && authorization?.startsWith('Bearer ')) {
+			const token = authorization.slice(7);
+			const userId = unsign(token, env.COOKIE_SECRET);
+			if (userId) {
+				event.locals.userId = userId;
+			}
+		}
 	}
 
 	if (!env.RATE_LIMIT_DISABLED && !env.PUBLIC_RATE_LIMIT_DISABLED) {

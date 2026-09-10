@@ -2,6 +2,7 @@
 	import { _ } from '$lib/i18n';
 	import { materialiousLogout } from '$lib/auth';
 	import { resetPasswordBackend, type DerivePassword } from '$lib/api/backend';
+	import { backendFetch } from '$lib/api/backend/request';
 	import PasswordStrength from '$lib/components/PasswordStrength.svelte';
 	import { onMount } from 'svelte';
 	import * as comlink from 'comlink';
@@ -19,7 +20,7 @@
 		}, 10000);
 
 		if (clicksToDelte - clickCount === 0) {
-			await fetch('/api/user/delete', { method: 'DELETE' });
+			await backendFetch('/api/user/delete', { method: 'DELETE' });
 			materialiousLogout();
 		}
 	}

@@ -2,10 +2,12 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { get } from 'svelte/store';
 import {
+	authTokenStore,
 	invidiousAuthStore,
 	channelCacheStore,
 	feedCacheStore,
 	invidiousInstanceStore,
+	materialiousBackendStore,
 	playlistCacheStore,
 	rawMasterKeyStore,
 	searchCacheStore
@@ -16,6 +18,8 @@ import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 import { ensureNoTrailingSlash, isYTBackend } from './misc';
 import { deleteKeyValue } from './api/backend/keyvalue';
+import semver from 'semver';
+import { backendFetch } from './api/backend/request';
 
 export function clearCaches() {
 	feedCacheStore.set({});
@@ -105,10 +109,66 @@ export async function materialiousLogout() {
 		await clearFeedYTjs();
 	}
 
-	if (isOwnBackend()?.internalAuth) {
-		fetch('/api/user/logout', { method: 'DELETE' });
+	if (isOwnBackend()?.internalAuth || get(materialiousBackendStore)) {
+		backendFetch('/api/user/logout', { method: 'DELETE' }).catch(() => {
+			// Remote instance unreachable.
+		});
+		authTokenStore.set(undefined);
 		rawMasterKeyStore.set(undefined);
+		clearCaches();
 	}
 
 	goto(resolve('/', {}));
+}
+
+export async function setMaterialiousBackend(
+	instanceUrl: string | undefined | null
+): Promise<boolean> {
+	if (typeof instanceUrl !== 'string') {
+		return false;
+	}
+
+	let invalid = false;
+
+	const backend = ensureNoTrailingSlash(instanceUrl);
+
+	try {
+		new URL(backend);
+	} catch {
+		invalid = true;
+	}
+
+	if (invalid) return false;
+
+	let resp;
+	try {
+		resp = await fetch(`${backend}/api/config`);
+	} catch {
+		invalid = true;
+	}
+
+	if (invalid) return false;
+
+	if (resp && !resp.ok) {
+		return false;
+	}
+
+	try {
+		const config = await resp?.json();
+		if (config?.backend !== 'materialious' || !config?.internalAuth) {
+			return false;
+		}
+		if (!config?.version || !semver.gte(config.version, '1.17.15')) {
+			return false;
+		}
+	} catch {
+		return false;
+	}
+
+	materialiousBackendStore.set(backend);
+	await removeAuthFromBackend();
+	authTokenStore.set(undefined);
+	rawMasterKeyStore.set(undefined);
+
+	return true;
 }

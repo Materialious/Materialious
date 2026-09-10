@@ -57,7 +57,7 @@
 	let progress: string | undefined = $state();
 
 	let thumbnailSrc = $state(
-		'thumbnail' in video ? video.thumbnail : getBestThumbnail(video.videoThumbnails, 9999, 9999)
+		'thumbnail' in video ? video.thumbnail : getBestThumbnail(video.videoThumbnails, 500, 500)
 	);
 
 	if (get(deArrowEnabledStore)) {
@@ -90,19 +90,11 @@
 		}
 	}
 
-	let thumbnailHeight = $state(0);
-	let thumbnailWidth = $state(0);
 	let thumbnailImageElement: HTMLImageElement | undefined = $state();
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
-		src: () => imageHandleCors(thumbnailSrc),
-		onLoadingStatusChange: () => {
-			if (thumbnailImageElement) {
-				thumbnailHeight = thumbnailImageElement.naturalHeight;
-				thumbnailWidth = thumbnailImageElement.naturalWidth;
-			}
-		}
+		src: () => imageHandleCors(thumbnailSrc)
 	});
 
 	let startedSideways = sideways === true;
@@ -291,7 +283,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={thumbnailHeight > thumbnailWidth}>
+				<div class="crop">
 					<img
 						class="responsive"
 						class:watched={progress}

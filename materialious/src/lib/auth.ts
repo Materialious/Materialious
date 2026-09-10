@@ -18,6 +18,7 @@ import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 import { ensureNoTrailingSlash, isYTBackend } from './misc';
 import { deleteKeyValue } from './api/backend/keyvalue';
+import semver from 'semver';
 import { backendFetch } from './api/backend/request';
 
 export function clearCaches() {
@@ -155,6 +156,9 @@ export async function setMaterialiousBackend(
 	try {
 		const config = await resp?.json();
 		if (config?.backend !== 'materialious' || !config?.internalAuth) {
+			return false;
+		}
+		if (!config?.version || !semver.gte(config.version, '1.17.15')) {
 			return false;
 		}
 	} catch {

@@ -102,6 +102,7 @@
 		"pg": "^8.22.0",
 		"pg-hstore": "^2.3.4",
 		"safe-regex2": "^5.1.1",
+		"semver": "^7.8.5",
 		"sequelize": "^6.37.8",
 		"shaka-player": "^5.2.0",
 		"sponsorblock-api": "^0.2.4",

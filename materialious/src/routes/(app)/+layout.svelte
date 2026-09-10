@@ -58,7 +58,7 @@
 
 	const accountLoggedIn = $derived(
 		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
-			(!!$invidiousAuthStore && !$materialiousBackendStore)
+			(!!$invidiousAuthStore && !isOwnBackend()?.internalAuth)
 	);
 
 	let mobileSearchShow = $state(false);

@@ -12,7 +12,7 @@ import { getPublicEnv } from '$lib/misc';
 const dontAutoSync = ['authToken'];
 
 export async function syncSettingsToBackend() {
-	if (!isOwnBackend() || !get(rawMasterKeyStore)) return;
+	if (!isOwnBackend()?.internalAuth || !get(rawMasterKeyStore)) return;
 
 	await Promise.all(
 		persistedStores.map(async (store) => {

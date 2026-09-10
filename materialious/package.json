@@ -97,7 +97,7 @@
 		"media-captions": "^0.0.18",
 		"melt": "^0.44.0",
 		"mousetrap": "^1.6.5",
-		"mysql2": "^3.22.5",
+		"mysql2": "^3.23.1",
 		"papaparse": "^5.5.4",
 		"pg": "^8.22.0",
 		"pg-hstore": "^2.3.4",

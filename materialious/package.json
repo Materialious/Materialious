@@ -92,7 +92,7 @@
 		"jsom": "^1.0.0",
 		"jsonfile": "^6.2.1",
 		"libsodium-wrappers-sumo": "^0.8.4",
-		"mariadb": "^3.5.3",
+		"mariadb": "^3.5.4",
 		"material-dynamic-colors": "^1.1.1",
 		"media-captions": "^0.0.18",
 		"melt": "^0.44.0",

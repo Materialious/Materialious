@@ -181,7 +181,7 @@
 	{/if}
 {/if}
 
-{#if remoteMaterialiousSupported() && !isOwnBackend()}
+{#if remoteMaterialiousSupported()}
 	<div class="settings">
 		<form onsubmit={setMaterialiousInstance}>
 			<nav>

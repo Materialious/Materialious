@@ -139,7 +139,6 @@ export function isMaterialiousAccountActive(): boolean {
 }
 
 export function remoteMaterialiousSupported(): boolean {
-	if (isOwnBackend()) return true;
 	return Capacitor.getPlatform() === 'electron' || Capacitor.getPlatform() === 'android';
 }
 

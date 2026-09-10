@@ -16,7 +16,10 @@ export type IsOwnBackend = {
 export function isOwnBackend(): IsOwnBackend | null {
 	if (browser && get(materialiousBackendStore)) {
 		const cache = get(configBackendCache);
-		if (cache) return cache;
+		if (cache) return {
+			...cache,
+			requireAuth: false,
+		};
 		else return null;
 	}
 

@@ -24,7 +24,6 @@
 		invidiousAuthStore,
 		backendInUseStore,
 		invidiousInstanceStore,
-		materialiousBackendStore,
 		interfaceAllowInsecureRequests,
 		interfaceAndroidUseNativeShare,
 		interfaceAutoExpandChapters,

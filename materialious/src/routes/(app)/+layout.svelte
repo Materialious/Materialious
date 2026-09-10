@@ -28,7 +28,6 @@
 		keybindStore,
 		interfaceMobileBackButtonStore
 	} from '$lib/store';
-	import { get } from 'svelte/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { onDestroy, onMount } from 'svelte';

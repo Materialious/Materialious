@@ -13,7 +13,6 @@
 	import {
 		backendInUseStore,
 		invidiousInstanceStore,
-		materialiousBackendStore,
 		playerYouTubeJsFallback
 	} from '$lib/store';
 

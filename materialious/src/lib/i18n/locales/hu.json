@@ -266,7 +266,11 @@
             "textColor": "Szöveg színe",
             "bgColor": "Háttér színe",
             "alignment": "Igazítás",
-            "reset": "Alapértelmezések visszaállítása"
+            "reset": "Alapértelmezések visszaállítása",
+            "fontFamily": "Betűcsalád",
+            "opacity": "Átlátszatlanság",
+            "subtitleOffset": "Felirat időzítése",
+            "textShadow": "Szövegárnyék"
         },
         "pauseTimerFinished": "A szünetidő lejárt",
         "pauseOnNetworkChange": "A videó megállt a Wi-Fi-hálózat változása miatt",
@@ -277,7 +281,9 @@
         "downloadFormat": "Formátum",
         "downloadCanceled": "Letöltés megszakítva",
         "downloadComplete": "Letöltés befejeződött",
-        "downloadFailed": "Letöltés meghiúsult"
+        "downloadFailed": "Letöltés meghiúsult",
+        "downloadType": "Letöltés típusa",
+        "defaultSubtitleLanguage": "Alapértelmezett feliratnyelv"
     },
     "title": "Cím",
     "subscriptions": {

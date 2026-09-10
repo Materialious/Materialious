@@ -145,7 +145,7 @@
 					</nav>
 				</form>
 
-				{#if remoteMaterialiousSupported() && !isOwnBackend()}
+				{#if remoteMaterialiousSupported()}
 					<div class="space"></div>
 					<h3>{$_('materialiousBackendUrl')}</h3>
 					<form onsubmit={setMaterialiousInstance}>

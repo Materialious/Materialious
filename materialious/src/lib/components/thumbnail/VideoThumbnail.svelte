@@ -24,6 +24,7 @@
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
 	import { truncate } from '$lib/misc';
+	import { page } from '$app/state';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -283,7 +284,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class="crop">
+				<div class:crop={page.url.pathname !== '/history'}>
 					<img
 						class="responsive"
 						class:watched={progress}

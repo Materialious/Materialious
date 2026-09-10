@@ -87,8 +87,7 @@ services:
       PROXY_TRUST_CA: ""
 
       # When enabled, proxying is DISABLED. Meaning CORS must be respected.
-      # Useful if you want to use Materialious full without a Database and don't want to enable
-      # PUBLIC_DANGEROUS_ALLOW_ANY_PROXY.
+      # Most likely you'll never want to enable this.
       PUBLIC_PROXY_DISABLED: "false"
 
       # Allow any domain in proxy

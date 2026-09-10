@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { get } from 'svelte/store';
 import { type Writable } from 'svelte/store';
 
 import {
@@ -61,6 +62,7 @@ import {
 	subtitleSettings
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
+import { materialiousBackendStore } from '$lib/store';
 import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
 
 export type PersistedStore<T> = {
@@ -324,8 +326,12 @@ export const persistedStores: PersistedStore<any>[] = [
 	}
 ];
 
-// If using own backend with can support more externalSettings.
-if (isOwnBackend()) {
+// If using own backend or a remote Materialious backend we can sync more externalSettings.
+let backendStoresRegistered = false;
+function registerBackendStores() {
+	if (backendStoresRegistered) return;
+	backendStoresRegistered = true;
+
 	persistedStores.push({
 		name: 'authToken',
 		store: invidiousAuthStore,
@@ -404,5 +410,13 @@ if (isOwnBackend()) {
 		schema: zBoolean
 	});
 }
+
+export function ensureBackendPersistedStores() {
+	if (isOwnBackend() || get(materialiousBackendStore)) {
+		registerBackendStores();
+	}
+}
+
+ensureBackendPersistedStores();
 
 export const persistedStoreKeys = persistedStores.map((store) => store.name);

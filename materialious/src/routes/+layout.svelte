@@ -17,7 +17,13 @@
 	import 'beercss';
 	import 'material-dynamic-colors';
 
-	import { setAmoledTheme, setStatusBarColor, setTheme, setThemeColors } from '$lib/theme';
+	import {
+		clearThemeColors,
+		setAmoledTheme,
+		setStatusBarColor,
+		setTheme,
+		setThemeColors
+	} from '$lib/theme';
 
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';
@@ -38,7 +44,11 @@
 	});
 
 	interfaceAdvancedThemingStore.subscribe(async (colors) => {
-		setThemeColors(colors);
+		if (Object.keys(colors).length === 0) {
+			clearThemeColors();
+		} else {
+			setThemeColors(colors);
+		}
 		await setStatusBarColor();
 	});
 

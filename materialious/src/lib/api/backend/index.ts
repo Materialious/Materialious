@@ -1,7 +1,8 @@
 import { get } from 'svelte/store';
 import sodium from 'libsodium-wrappers-sumo';
-import { rawMasterKeyStore } from '$lib/store';
+import { authTokenStore, rawMasterKeyStore } from '$lib/store';
 import type { Solution, Challenge } from 'altcha-lib/types';
+import { backendFetch } from './request';
 
 export type DerivePassword = (rawPassword: string, passwordSalt: Uint8Array) => Promise<Uint8Array>;
 type captchaPayload = { solution: Solution; challenge: Challenge };
@@ -30,7 +31,7 @@ export async function createUserBackend(
 		rawDecryptionKey
 	);
 
-	const userCreateResp = await fetch('/api/user/create', {
+	const userCreateResp = await backendFetch('/api/user/create', {
 		method: 'POST',
 		body: JSON.stringify({
 			username: username,
@@ -44,11 +45,15 @@ export async function createUserBackend(
 				nonce: sodium.to_base64(decryptionMasterKeyNonce)
 			},
 			captchaPayload
-		}),
-		credentials: 'same-origin'
+		})
 	});
 
 	if (!userCreateResp.ok) return false;
+
+	const createJson = await userCreateResp.json().catch(() => null);
+	if (createJson?.token) {
+		authTokenStore.set(createJson.token);
+	}
 
 	rawMasterKeyStore.set(sodium.to_base64(rawDecryptionMasterKey));
 
@@ -63,7 +68,7 @@ export async function loginUserBackend(
 ): Promise<boolean> {
 	await sodium.ready;
 
-	const passwordSaltsResp = await fetch(`/api/user/${username}/public`);
+	const passwordSaltsResp = await backendFetch(`/api/user/${username}/public`);
 	if (!passwordSaltsResp.ok) return false;
 
 	const passwordSalts = await passwordSaltsResp.json();
@@ -73,14 +78,13 @@ export async function loginUserBackend(
 		sodium.from_base64(passwordSalts.passwordSalt)
 	);
 
-	const loginResp = await fetch('/api/user/login', {
+	const loginResp = await backendFetch('/api/user/login', {
 		method: 'POST',
 		body: JSON.stringify({
 			username,
 			passwordHash: sodium.to_base64(loginHash),
 			captchaPayload
-		}),
-		credentials: 'same-origin'
+		})
 	});
 
 	if (!loginResp.ok) return false;
@@ -97,6 +101,10 @@ export async function loginUserBackend(
 		sodium.from_base64(loginJson.masterKeyNonce),
 		rawDecryptionKey
 	);
+
+	if (loginJson.token) {
+		authTokenStore.set(loginJson.token);
+	}
 
 	rawMasterKeyStore.set(sodium.to_base64(rawDecryptionMasterKey));
 
@@ -126,7 +134,7 @@ export async function resetPasswordBackend(
 ): Promise<boolean> {
 	await sodium.ready;
 
-	const meResp = await fetch('/api/user/me');
+	const meResp = await backendFetch('/api/user/me');
 	if (!meResp.ok) return false;
 	const me = await meResp.json();
 
@@ -150,7 +158,7 @@ export async function resetPasswordBackend(
 		newRawDecryptionKey
 	);
 
-	const resp = await fetch('/api/user/passwordReset', {
+	const resp = await backendFetch('/api/user/passwordReset', {
 		method: 'POST',
 		body: JSON.stringify({
 			currentPasswordHash: sodium.to_base64(currentLoginHash),
@@ -163,8 +171,7 @@ export async function resetPasswordBackend(
 				cipher: sodium.to_base64(newMasterKeyCipher),
 				nonce: sodium.to_base64(newNonce)
 			}
-		}),
-		credentials: 'same-origin'
+		})
 	});
 
 	if (!resp.ok) return false;

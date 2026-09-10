@@ -122,6 +122,51 @@ export function setThemeColors(theme: ThemeColors) {
 	}
 }
 
+export function clearThemeColors() {
+	const allKeys: ThemeKey[] = [
+		'--primary',
+		'--on-primary',
+		'--primary-container',
+		'--on-primary-container',
+		'--secondary',
+		'--on-secondary',
+		'--secondary-container',
+		'--on-secondary-container',
+		'--tertiary',
+		'--on-tertiary',
+		'--tertiary-container',
+		'--on-tertiary-container',
+		'--error',
+		'--on-error',
+		'--error-container',
+		'--on-error-container',
+		'--background',
+		'--on-background',
+		'--surface',
+		'--on-surface',
+		'--surface-variant',
+		'--on-surface-variant',
+		'--outline',
+		'--outline-variant',
+		'--shadow',
+		'--scrim',
+		'--inverse-surface',
+		'--inverse-on-surface',
+		'--inverse-primary',
+		'--surface-dim',
+		'--surface-bright',
+		'--surface-container-lowest',
+		'--surface-container-low',
+		'--surface-container',
+		'--surface-container-high',
+		'--surface-container-highest'
+	];
+	for (const key of allKeys) {
+		document.documentElement.style.removeProperty(key);
+		document.body.style.removeProperty(key);
+	}
+}
+
 export function setThemeColor(theme: ThemeKey, color: string) {
 	document.documentElement.style.setProperty(theme, color.trim());
 	document.body.style.setProperty(theme, color.trim());

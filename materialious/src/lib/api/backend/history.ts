@@ -3,6 +3,7 @@ import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } 
 import type { VideoWatchHistory } from '../model';
 import { getBestThumbnail } from '$lib/images';
 import type { ThumbnailVideo } from '$lib/thumbnail';
+import { backendFetch } from './request';
 
 export async function updateWatchHistoryBackend(videoId: string, progress: number) {
 	await sodium.ready;
@@ -11,9 +12,8 @@ export async function updateWatchHistoryBackend(videoId: string, progress: numbe
 
 	const videoHash = await getSecureHash(videoId, rawKey);
 
-	await fetch(`/api/user/history/${videoHash}`, {
+	await backendFetch(`/api/user/history/${videoHash}`, {
 		method: 'POST',
-		credentials: 'same-origin',
 		body: JSON.stringify({
 			watched: new Date(),
 			progress
@@ -71,9 +71,8 @@ export async function getVideoWatchHistoryBackend(
 
 	const videoHash = await getSecureHash(videoId, rawKey);
 
-	const resp = await fetch(`/api/user/history/${videoHash}`, {
-		method: 'GET',
-		credentials: 'same-origin'
+	const resp = await backendFetch(`/api/user/history/${videoHash}`, {
+		method: 'GET'
 	});
 
 	if (!resp.ok) return;
@@ -109,7 +108,7 @@ export async function getWatchHistoryBackend(
 		params.set('videoHashes', videoHashes.join(','));
 	}
 
-	const resp = await fetch(`/api/user/history?${params.toString()}`, options.fetchOptions);
+	const resp = await backendFetch(`/api/user/history?${params.toString()}`, options.fetchOptions);
 	if (!resp.ok) return [];
 
 	const rawHistory = await resp.json();
@@ -124,7 +123,7 @@ export async function getWatchHistoryBackend(
 }
 
 export async function deleteWatchHistoryBackend() {
-	await fetch('/api/user/history', { method: 'DELETE' });
+	await backendFetch('/api/user/history', { method: 'DELETE' });
 }
 
 export async function deleteWatchHistoryItemBackend(videoId: string) {
@@ -134,7 +133,7 @@ export async function deleteWatchHistoryItemBackend(videoId: string) {
 
 	const videoHash = await getSecureHash(videoId, rawKey);
 
-	await fetch(`/api/user/history/${videoHash}`, { method: 'DELETE' });
+	await backendFetch(`/api/user/history/${videoHash}`, { method: 'DELETE' });
 }
 
 export async function saveWatchHistoryBackend(video: ThumbnailVideo, progress: number = 0) {
@@ -152,9 +151,8 @@ export async function saveWatchHistoryBackend(video: ThumbnailVideo, progress: n
 	);
 	const videoId = await encryptWithMasterKey(video.videoId);
 
-	await fetch('/api/user/history', {
+	await backendFetch('/api/user/history', {
 		method: 'POST',
-		credentials: 'same-origin',
 		body: JSON.stringify({
 			id: videoHash,
 			watched: new Date(),

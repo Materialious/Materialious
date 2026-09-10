@@ -8,6 +8,18 @@ export const rawMasterKeyStore: Writable<string | undefined> = persist(
 	'rawMasterKey'
 );
 
+export const materialiousBackendStore: Writable<string | undefined> = persist(
+	writable(),
+	createStorage(),
+	'materialiousBackendUrl'
+);
+
+export const authTokenStore: Writable<string | undefined> = persist(
+	writable(),
+	createStorage(),
+	'materialiousAuthToken'
+);
+
 export const watchHistoryEnabledStore: Writable<boolean> = persist(
 	writable(true),
 	createStorage(),

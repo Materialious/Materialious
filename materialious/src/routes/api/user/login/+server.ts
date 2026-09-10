@@ -2,7 +2,7 @@ import { authenticateUser } from '$lib/server/user';
 import { error, json } from '@sveltejs/kit';
 import z from 'zod';
 import { isOwnBackend } from '$lib/shared';
-import { setAuthCookie } from '$lib/server/misc';
+import { generateAuthToken, setAuthCookie } from '$lib/server/misc';
 import { captchaPayload, verifyCaptcha } from '$lib/server/captcha';
 
 const zUserLogin = z.object({
@@ -34,6 +34,7 @@ export async function POST({ request, cookies, locals }) {
 	setAuthCookie(userModel.id, cookies);
 
 	return json({
+		token: generateAuthToken(userModel.id),
 		masterKeyCipher: userModel.data.masterKeyCipher,
 		masterKeyNonce: userModel.data.masterKeyNonce
 	});

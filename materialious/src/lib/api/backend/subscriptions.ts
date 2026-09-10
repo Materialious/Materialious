@@ -2,11 +2,11 @@ import { parseChannelRSS } from '$lib/api/youtubejs/subscriptions';
 import { getChannelYTjs } from '$lib/api/youtubejs/channel';
 import type { ChannelSubscriptions } from '$lib/dexie';
 import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } from './encryption';
+import { backendFetch } from './request';
 
 export async function getSubscriptionsBackend(): Promise<ChannelSubscriptions[]> {
-	const resp = await fetch(`/api/user/subscriptions`, {
-		method: 'GET',
-		credentials: 'same-origin'
+	const resp = await backendFetch(`/api/user/subscriptions`, {
+		method: 'GET'
 	});
 
 	if (!resp.ok) return [];
@@ -32,9 +32,8 @@ export async function updateRSSLastUpdated(authorId: string) {
 
 	const internalAuthorId = await getSecureHash(authorId, rawKey);
 
-	await fetch(`/api/user/subscriptions/${internalAuthorId}`, {
-		method: 'PATCH',
-		credentials: 'same-origin'
+	await backendFetch(`/api/user/subscriptions/${internalAuthorId}`, {
+		method: 'PATCH'
 	});
 }
 
@@ -44,9 +43,8 @@ export async function amSubscribedBackend(authorId: string): Promise<boolean> {
 
 	const internalAuthorId = await getSecureHash(authorId, rawKey);
 
-	const resp = await fetch(`/api/user/subscriptions/${internalAuthorId}`, {
-		method: 'GET',
-		credentials: 'same-origin'
+	const resp = await backendFetch(`/api/user/subscriptions/${internalAuthorId}`, {
+		method: 'GET'
 	});
 	if (!resp.ok) return false;
 
@@ -61,9 +59,8 @@ export async function deleteUnsubscribeBackend(authorId: string) {
 
 	const internalAuthorId = await getSecureHash(authorId, rawKey);
 
-	await fetch(`/api/user/subscriptions/${internalAuthorId}`, {
-		method: 'DELETE',
-		credentials: 'same-origin'
+	await backendFetch(`/api/user/subscriptions/${internalAuthorId}`, {
+		method: 'DELETE'
 	});
 }
 
@@ -84,15 +81,14 @@ export async function postSubscribeBackend(
 	const channelId = await encryptWithMasterKey(authorId);
 	const channelName = await encryptWithMasterKey(authorName);
 
-	const resp = await fetch(`/api/user/subscriptions/${internalAuthorId}`, {
+	const resp = await backendFetch(`/api/user/subscriptions/${internalAuthorId}`, {
 		method: 'POST',
 		body: JSON.stringify({
 			channelIdCipher: channelId?.cipher,
 			channelIdNonce: channelId?.nonce,
 			channelNameCipher: channelName?.cipher,
 			channelNameNonce: channelName?.nonce
-		}),
-		credentials: 'same-origin'
+		})
 	});
 
 	if (resp.ok) parseChannelRSS(authorId);

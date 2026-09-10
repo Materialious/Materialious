@@ -86,6 +86,11 @@ services:
       # Specify a path to a certificate to trust, useful when using self-signed certificates.
       PROXY_TRUST_CA: ""
 
+      # When enabled, proxying is DISABLED. Meaning CORS must be respected.
+      # Useful if you want to use Materialious full without a Database and don't want to enable
+      # PUBLIC_DANGEROUS_ALLOW_ANY_PROXY.
+      PUBLIC_PROXY_DISABLED: "false"
+
       # Allow any domain in proxy
       # This shouldn't be used unless you KNOW what your doing
       # requires PUBLIC_REGISTRATION_ALLOWED to be false

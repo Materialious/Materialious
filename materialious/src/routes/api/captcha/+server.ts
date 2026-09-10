@@ -4,7 +4,7 @@ import { createChallenge, randomInt } from 'altcha-lib';
 import { deriveKey } from 'altcha-lib/algorithms/pbkdf2';
 
 export async function GET({ locals }) {
-  if (isOwnBackend()?.captchaDisabled) return json({});
+	if (isOwnBackend()?.captchaDisabled) return json({});
 
 	return json(
 		await createChallenge({

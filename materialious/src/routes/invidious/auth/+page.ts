@@ -13,7 +13,7 @@ export async function load({ url }) {
 			username: username,
 			token: token
 		};
-invidiousAuthStore.set(authToken);
+		invidiousAuthStore.set(authToken);
 		if (isMaterialiousAccountActive()) {
 			await addOrUpdateKeyValue('authToken', JSON.stringify(authToken));
 		}

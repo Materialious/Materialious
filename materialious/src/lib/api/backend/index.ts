@@ -3,6 +3,7 @@ import sodium from 'libsodium-wrappers-sumo';
 import { authTokenStore, rawMasterKeyStore } from '$lib/store';
 import type { Solution, Challenge } from 'altcha-lib/types';
 import { backendFetch } from './request';
+import type { IsOwnBackend } from '$lib/shared';
 
 export type DerivePassword = (rawPassword: string, passwordSalt: Uint8Array) => Promise<Uint8Array>;
 type captchaPayload = { solution: Solution; challenge: Challenge };
@@ -180,4 +181,20 @@ export async function resetPasswordBackend(
 	rawMasterKeyStore.set(rawMasterKeyBase64);
 
 	return true;
+}
+
+export async function configBackend(): Promise<IsOwnBackend | null> {
+	const resp = await backendFetch('/api/config');
+	if (!resp.ok) return null;
+
+	let configJson: IsOwnBackend | undefined
+	try {
+		configJson = await resp.json()
+	} catch {
+		// Continue regardless
+	}
+
+	if (!configJson) return null;
+
+	return configJson
 }

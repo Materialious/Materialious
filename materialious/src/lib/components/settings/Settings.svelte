@@ -9,7 +9,12 @@
 	import { isAndroidTvStore, materialiousBackendStore, rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
-	import { isUnrestrictedPlatform, isMaterialiousAccountActive, keyCodeMap, remoteMaterialiousSupported } from '$lib/misc';
+	import {
+		isUnrestrictedPlatform,
+		isMaterialiousAccountActive,
+		keyCodeMap,
+		remoteMaterialiousSupported
+	} from '$lib/misc';
 	import { isAdminUsername } from '$lib/shared';
 	import { backendFetch } from '$lib/api/backend/request';
 	import InternalAccount from './InternalAccount.svelte';

@@ -7,3 +7,4 @@ electron/
 node_modules/
 .svelte-kit/
 shared/dist/
+static/localApi/ghContributors.json

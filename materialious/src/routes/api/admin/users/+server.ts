@@ -16,9 +16,11 @@ export async function GET({ locals }) {
 		attributes: ['id', 'username', 'created']
 	});
 
-	return json(allUsers.map((u: any) => ({
-		id: u.id,
-		username: u.username,
-		created: u.created
-	})));
+	return json(
+		allUsers.map((u: any) => ({
+			id: u.id,
+			username: u.username,
+			created: u.created
+		}))
+	);
 }

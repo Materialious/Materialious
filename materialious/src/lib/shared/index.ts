@@ -1,4 +1,8 @@
 import { env } from '$env/dynamic/public';
+import { browser } from '$app/environment';
+import { get } from 'svelte/store';
+import { materialiousBackendStore } from '$lib/stores';
+import { configBackendCache } from '$lib/stores/misc';
 
 export type IsOwnBackend = {
 	builtWithBackend: boolean;
@@ -10,6 +14,12 @@ export type IsOwnBackend = {
 };
 
 export function isOwnBackend(): IsOwnBackend | null {
+	if (browser && get(materialiousBackendStore)) {
+		const cache = get(configBackendCache);
+		if (cache) return cache;
+		else return null;
+	}
+
 	if (env.PUBLIC_BUILD_WITH_BACKEND !== 'true') return null;
 
 	return {
@@ -23,9 +33,7 @@ export function isOwnBackend(): IsOwnBackend | null {
 }
 
 function getAdminUsernames(): string[] {
-	return (env.PUBLIC_ADMIN_USERNAMES || '')
-		.split(',')
-		.map((s) => s.trim());
+	return (env.PUBLIC_ADMIN_USERNAMES || '').split(',').map((s) => s.trim());
 }
 
 export function isAdminUsername(username: string): boolean {

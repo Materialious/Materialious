@@ -24,7 +24,6 @@
 		invidiousAuthStore,
 		backendInUseStore,
 		invidiousInstanceStore,
-		materialiousBackendStore,
 		interfaceAllowInsecureRequests,
 		interfaceAndroidUseNativeShare,
 		interfaceAutoExpandChapters,
@@ -49,7 +48,7 @@
 
 	let invalidInstance = $state(false);
 
-	let materialiousBackend = $state(get(materialiousBackendStore) ?? getMaterialiousBackendUrl());
+	let materialiousBackend = $state(getMaterialiousBackendUrl());
 
 	let invalidMaterialiousBackend = $state(false);
 
@@ -144,7 +143,7 @@
 				</button>
 			</nav>
 		</form>
-		{#if (isOwnBackend()?.internalAuth || get(materialiousBackendStore)) && $invidiousInstanceStore}
+		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
 				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
 					<i>link</i>
@@ -190,7 +189,7 @@
 					class="field prefix label surface-container-highest max"
 					class:invalid={invalidMaterialiousBackend}
 				>
-				    <i>link</i>
+					<i>link</i>
 					<input
 						tabindex="0"
 						bind:value={materialiousBackend}

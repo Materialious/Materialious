@@ -28,13 +28,18 @@
 		keybindStore,
 		interfaceMobileBackButtonStore
 	} from '$lib/store';
-import { get } from 'svelte/store';
-import { Capacitor } from '@capacitor/core';
-import ui from 'beercss';
-import { onDestroy, onMount } from 'svelte';
-import Mousetrap from 'mousetrap';
-import { _ } from '$lib/i18n';
-import { isMaterialiousAccountActive, isMobile, isYTBackend, remoteMaterialiousSupported, truncate } from '$lib/misc';
+	import { Capacitor } from '@capacitor/core';
+	import ui from 'beercss';
+	import { onDestroy, onMount } from 'svelte';
+	import Mousetrap from 'mousetrap';
+	import { _ } from '$lib/i18n';
+	import {
+		isMaterialiousAccountActive,
+		isMobile,
+		isYTBackend,
+		remoteMaterialiousSupported,
+		truncate
+	} from '$lib/misc';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import { backendFetch } from '$lib/api/backend/request';
 	import Author from '$lib/components/Author.svelte';
@@ -48,7 +53,7 @@ import { isMaterialiousAccountActive, isMobile, isYTBackend, remoteMaterialiousS
 		(!!isOwnBackend()?.internalAuth ||
 			remoteMaterialiousSupported() ||
 			($rawMasterKeyStore && $materialiousBackendStore)) &&
-		(!isYTBackend() || !!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)
+			(!isYTBackend() || !!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)
 	);
 
 	const accountLoggedIn = $derived(
@@ -81,7 +86,7 @@ import { isMaterialiousAccountActive, isMobile, isYTBackend, remoteMaterialiousS
 	});
 
 	async function login() {
-		if (isOwnBackend()?.internalAuth || get(materialiousBackendStore)) {
+		if (isOwnBackend()?.internalAuth) {
 			goto(resolve('/internal/login', {}));
 			return;
 		}
@@ -388,10 +393,10 @@ import { isMaterialiousAccountActive, isMobile, isYTBackend, remoteMaterialiousS
 					</button>
 				{/if}
 				{#if !isOwnBackend()?.requireAuth || $rawMasterKeyStore}
-    				<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
-    					<i>settings</i>
-    					<div class="tooltip bottom">{$_('layout.settings')}</div>
-    				</button>
+					<button class="circle large transparent" onclick={() => ui('#dialog-settings')}>
+						<i>settings</i>
+						<div class="tooltip bottom">{$_('layout.settings')}</div>
+					</button>
 				{/if}
 				{#if showLogin}
 					{#if !accountLoggedIn}

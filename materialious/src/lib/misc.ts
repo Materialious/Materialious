@@ -1,7 +1,14 @@
 import he from 'he';
 import { get } from 'svelte/store';
 import { env } from '$env/dynamic/public';
-import { authTokenStore, backendInUseStore, interfaceAndroidUseNativeShare, isAndroidTvStore, materialiousBackendStore, rawMasterKeyStore } from './store';
+import {
+	authTokenStore,
+	backendInUseStore,
+	interfaceAndroidUseNativeShare,
+	isAndroidTvStore,
+	materialiousBackendStore,
+	rawMasterKeyStore
+} from './store';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Clipboard } from '@capacitor/clipboard';
@@ -128,7 +135,7 @@ export function getMaterialiousAuthHeaders(): HeadersInit {
 
 export function isMaterialiousAccountActive(): boolean {
 	if (!get(rawMasterKeyStore)) return false;
-	return !!isOwnBackend()?.internalAuth || !!get(materialiousBackendStore);
+	return !!isOwnBackend()?.internalAuth;
 }
 
 export function remoteMaterialiousSupported(): boolean {

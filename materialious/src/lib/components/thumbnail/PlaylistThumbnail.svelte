@@ -29,11 +29,7 @@
 	const thumbnail = new Avatar({ src: imageHandleCors(thumbnailSrc) });
 </script>
 
-<a
-	href={playlistLink}
-	style="width: 100%; overflow: hidden;min-height:100px;"
-	class="wave"
->
+<a href={playlistLink} style="width: 100%; overflow: hidden;min-height:100px;" class="wave">
 	<img
 		class="responsive"
 		{...mergeAttrs(thumbnail.image, {

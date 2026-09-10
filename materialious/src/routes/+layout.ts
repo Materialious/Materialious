@@ -35,7 +35,7 @@ export const prerender = false;
 export async function load({ url }) {
 	if (browser) {
 		await initI18n();
-  }
+	}
 
 	if (isMaterialiousAccountActive()) {
 		try {

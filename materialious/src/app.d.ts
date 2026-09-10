@@ -43,9 +43,7 @@ declare global {
 					codec?: string;
 				};
 			}) => Promise<{ canceled?: boolean; path?: string; error?: string }>;
-			onDownloadProgress: (
-				callback: (videoId: string, progress: number) => void
-			) => void;
+			onDownloadProgress: (callback: (videoId: string, progress: number) => void) => void;
 			removeDownloadProgressListener: () => void;
 		};
 	}

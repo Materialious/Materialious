@@ -7,10 +7,7 @@
 	} from '$lib/api';
 	import type { PlaylistPage } from '$lib/api/model';
 	import { _ } from '$lib/i18n';
-	import {
-		invidiousAuthStore,
-		personalPlaylistsCacheStore
-	} from '$lib/store';
+	import { invidiousAuthStore, personalPlaylistsCacheStore } from '$lib/store';
 	import { isYTBackend } from '$lib/misc';
 
 	interface Props {
@@ -106,9 +103,7 @@
 		working = true;
 		workingPlaylistId = playlist.playlistId;
 		try {
-			await Promise.all(
-				videoIds.map((id) => addPlaylistVideo(playlist.playlistId, id))
-			);
+			await Promise.all(videoIds.map((id) => addPlaylistVideo(playlist.playlistId, id)));
 			personalPlaylistsCacheStore.set(await getPersonalPlaylists());
 		} catch {
 			// Continue regardless of error
@@ -133,9 +128,7 @@
 							role="presentation"
 							class="row"
 							onclick={() =>
-								mode === 'toggle'
-									? handleToggle(personalPlaylist)
-									: handleClone(personalPlaylist)}
+								mode === 'toggle' ? handleToggle(personalPlaylist) : handleClone(personalPlaylist)}
 						>
 							<span class="max">{personalPlaylist.title}</span>
 							{#if working && workingPlaylistId === personalPlaylist.playlistId}
@@ -176,7 +169,9 @@
 
 	<dialog id={dialogId} bind:this={dialogEl} onclick={onBackdropClick} class="padding">
 		<nav class="no-space">
-			<h6 class="max">{mode === 'toggle' ? $_('player.addToPlaylist') : $_('playlist.cloneToPlaylist')}</h6>
+			<h6 class="max">
+				{mode === 'toggle' ? $_('player.addToPlaylist') : $_('playlist.cloneToPlaylist')}
+			</h6>
 			<button onclick={close} class="circle transparent">
 				<i>close</i>
 			</button>
@@ -186,10 +181,7 @@
 
 		<div class="field prefix fill no-margin round">
 			<i class="front">search</i>
-			<input
-				placeholder={$_('searchPlaceholder')}
-				bind:value={searchQuery}
-			/>
+			<input placeholder={$_('searchPlaceholder')} bind:value={searchQuery} />
 		</div>
 
 		<div class="space"></div>
@@ -201,9 +193,7 @@
 						class="transparent row max"
 						disabled={working && workingPlaylistId !== personalPlaylist.playlistId}
 						onclick={() =>
-							mode === 'toggle'
-								? handleToggle(personalPlaylist)
-								: handleClone(personalPlaylist)}
+							mode === 'toggle' ? handleToggle(personalPlaylist) : handleClone(personalPlaylist)}
 					>
 						<nav class="max">
 							<span class="max">{personalPlaylist.title}</span>

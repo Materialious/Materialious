@@ -261,7 +261,7 @@
 		{/if}
 	</button>
 
-	<dialog id="download-dialog" class="modal">
+	<dialog class="surface-container-high" id="download-dialog">
 		<header>
 			<nav class="no-wrap">
 				<h6 class="max no-margin">{$_('player.download')}</h6>
@@ -314,7 +314,7 @@
 				{#if downloadType === 'merged' && qualityOptions.length > 0}
 					<section class="download-section">
 						<h6 class="no-margin">{$_('player.controls.quality')}</h6>
-						<nav class="chips wrap">
+						<nav class="chips wrap no-margin">
 							<button
 								class:primary={selectedQuality === undefined}
 								class:surface-container-highest={selectedQuality !== undefined}
@@ -340,7 +340,7 @@
 				{#if audioOptions.length > 0}
 					<section class="download-section">
 						<h6 class="no-margin">{$_('player.controls.language')}</h6>
-						<nav class="chips wrap">
+						<nav class="chips wrap no-margin">
 							<button
 								class:primary={selectedAudioKey === undefined}
 								class:surface-container-highest={selectedAudioKey !== undefined}
@@ -473,29 +473,9 @@
 		padding-inline: 2rem;
 	}
 
-	@media (max-width: 360px) {
+	@media only screen and (max-width: 993px) {
 		#download-dialog {
-			max-inline-size: 100vw;
-			max-block-size: 100dvh;
-			inline-size: 100vw;
-			block-size: 100dvh;
-			margin: 0;
-			max-height: 100dvh;
-			inset: 0;
-			transform: none;
-			padding: 0.5rem 0.75rem;
-		}
-
-		:global(#download-dialog nav.chips button) {
-			min-block-size: 1.75rem;
-			min-inline-size: 1.75rem;
-			padding: 0.25rem 0.5rem;
-			font-size: 0.75rem;
-		}
-
-		#download-dialog footer button {
-			min-block-size: 2.5rem;
-			padding-inline: 1.5rem;
+			width: 100%;
 		}
 	}
 </style>

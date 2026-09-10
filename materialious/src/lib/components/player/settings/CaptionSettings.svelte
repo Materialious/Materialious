@@ -169,16 +169,14 @@
 	</button>
 {/if}
 
-<dialog
-	bind:this={dialog}
-	class="surface-container cc-dialog"
-	onclick={(e) => e.target === dialog && dialog.close()}
->
+<dialog bind:this={dialog} class="cc-dialog" onclick={(e) => e.target === dialog && dialog.close()}>
 	<div class="cc-dialog-inner">
-		<nav class="no-wrap cc-dialog-head">
-			<h6 class="max no-margin">{$_('layout.customize')}</h6>
-			<button class="circle transparent" onclick={() => dialog.close()}><i>close</i></button>
-		</nav>
+		<header>
+			<nav class="no-wrap">
+				<h6 class="max no-margin">{$_('layout.customize')}</h6>
+				<button class="circle transparent" onclick={() => dialog.close()}><i>close</i></button>
+			</nav>
+		</header>
 
 		<div class="cc-preview">
 			<span
@@ -331,7 +329,8 @@
 		width: min(400px, calc(100vw - 24px));
 		border-radius: 16px;
 		padding: 0;
-		overflow: visible;
+		overflow-x: hidden;
+		overflow-y: auto;
 		border: none;
 		max-width: calc(100vw - 24px);
 	}
@@ -348,23 +347,15 @@
 			transform: none;
 			border-radius: 0;
 		}
-
-		.cc-dialog-inner {
-			max-height: 100dvh;
-		}
 	}
 
 	.cc-dialog-inner {
 		padding: 20px;
-		max-height: calc(100dvh - 48px);
-		overflow-y: auto;
 	}
 
-	.cc-dialog-head {
-		align-items: center;
+	header {
 		margin-bottom: 16px;
-		padding-bottom: 16px;
-		border-bottom: 1px solid var(--outline-variant);
+		padding: 0;
 	}
 
 	.cc-preview {

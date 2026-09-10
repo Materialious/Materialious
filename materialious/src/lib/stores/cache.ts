@@ -1,7 +1,15 @@
 import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
-import type { ChannelContent, ChannelPage, PlaylistPage, PlaylistPageVideo, SearchResults, Video, VideoBase } from '../api/model';
+import type {
+	ChannelContent,
+	ChannelPage,
+	PlaylistPage,
+	PlaylistPageVideo,
+	SearchResults,
+	Video,
+	VideoBase
+} from '../api/model';
 
 export const searchHistoryStore: Writable<string[]> = persist(
 	writable([]),

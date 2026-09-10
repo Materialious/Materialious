@@ -10,11 +10,7 @@
 	} from '$lib/misc';
 	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '$lib/auth';
 	import { isOwnBackend } from '$lib/shared';
-	import {
-		backendInUseStore,
-		invidiousInstanceStore,
-		playerYouTubeJsFallback
-	} from '$lib/store';
+	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '$lib/store';
 
 	const defaultInstance = !isOwnBackend()
 		? 'https://invidious.materialio.us'

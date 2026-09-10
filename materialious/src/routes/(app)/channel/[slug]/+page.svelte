@@ -104,115 +104,119 @@
 </script>
 
 {#if $channelCacheStore[page.params.slug]}
-<div class="padding">
-	<img src={bannerSrc} width="100%" alt="Channel banner" />
-	<div class="description">
-		<div>
-			<Author
-				channel={{
-					...$channelCacheStore[page.params.slug].channel,
-					subCountText: cleanNumber($channelCacheStore[page.params.slug].channel.subCount)
-				}}
-			/>
-			<p style="width: 60vw;max-height: 150px;overflow: scroll;">
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html $channelCacheStore[page.params.slug].channel.description}
-			</p>
-		</div>
-		{#if !$isAndroidTvStore}
-			<Share
-				iconOnly={false}
-				shares={[
-					{
-						type: 'materialious',
-						path: resolve('/channel/[channelId]', {
-							channelId: page.params.slug
-						})
-					},
-					{
-						type: 'youtube',
-						path: `/channel/${page.params.slug}`
-					},
-					{
-						type: 'invidious',
-						path: `/channel/${page.params.slug}`
-					},
-					{
-						type: 'invidious redirect',
-						path: `/channel/${page.params.slug}`
-					}
-				]}
-			/>
-		{/if}
-	</div>
-
-	<div class="tabs left-align scroll">
-		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('videos')}
-			<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href="#video">
-				<i>movie</i>
-				<span>{$_('videoTabs.videos')}</span>
-			</a>
-		{/if}
-		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('shorts')}
-			<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href="#short">
-				<i>smartphone</i>
-				<span>{$_('videoTabs.shorts')}</span>
-			</a>
-		{/if}
-		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('streams')}
-			<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href="#stream">
-				<i>stream</i>
-				<span>{$_('videoTabs.streams')}</span>
-			</a>
-		{/if}
-		{#if $channelCacheStore[page.params.slug].channel.tabs.includes('playlists')}
-			<a class:active={tab === 'playlists'} onclick={() => changeTab('playlists')} href="#playlist">
-				<i>playlist_add_check</i>
-				<span>{$_('videoTabs.playlists')}</span>
-			</a>
-		{/if}
-	</div>
-
-	<div class="grid">
-		<div class="s12 m9 l9">
-			<nav class="group">
-				{#each sortByOptions as sortingOption (sortingOption)}
-					<button
-						class="no-round"
-						onclick={async () => {
-							sortBy = sortingOption;
-
-							displayContent = await getChannelContent(page.params.slug, {
-								type: tab,
-								sortBy: sortBy
-							});
-						}}
-						class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
-					>
-				{/each}
-			</nav>
-		</div>
-		{#if !isYTBackend()}
-			<div class="s12 m3 l3">
-				{#if showSearch}
-					<div class="field suffix prefix suffix small no-margin surface-variant">
-						<i class="front">search</i><input
-							bind:value={channelSearch}
-							oninput={searchChannel}
-							type="text"
-							placeholder={$_('searchPlaceholder')}
-						/>
-					</div>
-				{:else}
-					<nav class="right-align m l">
-						<button onclick={() => (showSearch = true)}><i>search</i></button>
-					</nav>
-					<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
-				{/if}
+	<div class="padding">
+		<img src={bannerSrc} width="100%" alt="Channel banner" />
+		<div class="description">
+			<div>
+				<Author
+					channel={{
+						...$channelCacheStore[page.params.slug].channel,
+						subCountText: cleanNumber($channelCacheStore[page.params.slug].channel.subCount)
+					}}
+				/>
+				<p style="width: 60vw;max-height: 150px;overflow: scroll;">
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+					{@html $channelCacheStore[page.params.slug].channel.description}
+				</p>
 			</div>
-		{/if}
+			{#if !$isAndroidTvStore}
+				<Share
+					iconOnly={false}
+					shares={[
+						{
+							type: 'materialious',
+							path: resolve('/channel/[channelId]', {
+								channelId: page.params.slug
+							})
+						},
+						{
+							type: 'youtube',
+							path: `/channel/${page.params.slug}`
+						},
+						{
+							type: 'invidious',
+							path: `/channel/${page.params.slug}`
+						},
+						{
+							type: 'invidious redirect',
+							path: `/channel/${page.params.slug}`
+						}
+					]}
+				/>
+			{/if}
+		</div>
+
+		<div class="tabs left-align scroll">
+			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('videos')}
+				<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href="#video">
+					<i>movie</i>
+					<span>{$_('videoTabs.videos')}</span>
+				</a>
+			{/if}
+			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('shorts')}
+				<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href="#short">
+					<i>smartphone</i>
+					<span>{$_('videoTabs.shorts')}</span>
+				</a>
+			{/if}
+			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('streams')}
+				<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href="#stream">
+					<i>stream</i>
+					<span>{$_('videoTabs.streams')}</span>
+				</a>
+			{/if}
+			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('playlists')}
+				<a
+					class:active={tab === 'playlists'}
+					onclick={() => changeTab('playlists')}
+					href="#playlist"
+				>
+					<i>playlist_add_check</i>
+					<span>{$_('videoTabs.playlists')}</span>
+				</a>
+			{/if}
+		</div>
+
+		<div class="grid">
+			<div class="s12 m9 l9">
+				<nav class="group">
+					{#each sortByOptions as sortingOption (sortingOption)}
+						<button
+							class="no-round"
+							onclick={async () => {
+								sortBy = sortingOption;
+
+								displayContent = await getChannelContent(page.params.slug, {
+									type: tab,
+									sortBy: sortBy
+								});
+							}}
+							class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
+						>
+					{/each}
+				</nav>
+			</div>
+			{#if !isYTBackend()}
+				<div class="s12 m3 l3">
+					{#if showSearch}
+						<div class="field suffix prefix suffix small no-margin surface-variant">
+							<i class="front">search</i><input
+								bind:value={channelSearch}
+								oninput={searchChannel}
+								type="text"
+								placeholder={$_('searchPlaceholder')}
+							/>
+						</div>
+					{:else}
+						<nav class="right-align m l">
+							<button onclick={() => (showSearch = true)}><i>search</i></button>
+						</nav>
+						<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
+					{/if}
+				</div>
+			{/if}
+		</div>
 	</div>
-</div>
 {/if}
 
 {#if displayContent}

@@ -1,6 +1,11 @@
 <script lang="ts">
 	import type { ParsedDescription, Timestamp } from '$lib/description';
-	import { invidiousInstanceStore, isAndroidTvStore, sponsorBlockTimelineStore, keybindStore } from '$lib/store';
+	import {
+		invidiousInstanceStore,
+		isAndroidTvStore,
+		sponsorBlockTimelineStore,
+		keybindStore
+	} from '$lib/store';
 	import type { Segment } from 'sponsorblock-api';
 	import { Slider } from 'melt/builders';
 	import { _ } from '$lib/i18n';
@@ -37,7 +42,7 @@
 		content: ParsedDescription;
 		segments: Segment[];
 		playerMaxKnownTime: number;
-		playerIsPip: boolean
+		playerIsPip: boolean;
 	} = $props();
 
 	let playerSliderInteracted = $state(false);
@@ -427,13 +432,13 @@
 	{#if !$sponsorBlockTimelineStore}
 		{#each segments as segment (segment)}
 			{@const colors = segmentCategoryColors[segment.category] ?? segmentCategoryColors.sponsor}
-				<div
-					class="chapter-marker segment-marker"
-					style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
-					style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
-					style:--sg-color={colors.color}
-					style:--sg-color-alt={colors.alt}
-				></div>
+			<div
+				class="chapter-marker segment-marker"
+				style:left="{(segment.startTime / playerMaxKnownTime) * 100}%"
+				style:width={timelineMarkerWidth(segment.startTime, segment.endTime)}
+				style:--sg-color={colors.color}
+				style:--sg-color-alt={colors.alt}
+			></div>
 		{/each}
 	{/if}
 </div>

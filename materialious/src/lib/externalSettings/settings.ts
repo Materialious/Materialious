@@ -62,7 +62,6 @@ import {
 	subtitleSettings
 } from '$lib/store';
 import { isOwnBackend } from '$lib/shared';
-import { materialiousBackendStore } from '$lib/store';
 import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
 
 export type PersistedStore<T> = {
@@ -412,7 +411,7 @@ function registerBackendStores() {
 }
 
 export function ensureBackendPersistedStores() {
-	if (isOwnBackend() || get(materialiousBackendStore)) {
+	if (isOwnBackend()) {
 		registerBackendStores();
 	}
 }

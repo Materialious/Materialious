@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { get } from 'svelte/store';
 	import { createUserBackend, loginUserBackend, type DerivePassword } from '$lib/api/backend';
 	import { backendFetch } from '$lib/api/backend/request';
 	import PageLoading from '$lib/components/PageLoading.svelte';
@@ -13,11 +12,9 @@
 	import { solveChallenge } from 'altcha-lib';
 	import type { Solution, Challenge } from 'altcha-lib/types';
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
-	import { materialiousBackendStore } from '$lib/store';
 
-	const isRemoteBackend = $derived(!!get(materialiousBackendStore));
-	const registrationAllowed = $derived(isRemoteBackend ? false : !!isOwnBackend()?.registrationAllowed);
-	const captchaDisabled = $derived(isRemoteBackend ? false : !!isOwnBackend()?.captchaDisabled);
+	const registrationAllowed = $derived(!!isOwnBackend()?.registrationAllowed);
+	const captchaDisabled = $derived(!!isOwnBackend()?.captchaDisabled);
 
 	let needToRegister = $state(false);
 
@@ -89,7 +86,7 @@
 
 		isLoading = true;
 
-		if (needToRegister && !isRemoteBackend) {
+		if (needToRegister) {
 			failed = !(await createUserBackend(username, rawPassword, captchaPayload!, derivePassword));
 		} else {
 			failed = !(await loginUserBackend(username, rawPassword, captchaPayload!, derivePassword));
@@ -168,8 +165,7 @@
 					</div>
 				{/if}
 
-<nav class="right-align">
-				{#if !isRemoteBackend}
+				<nav class="right-align">
 					<button
 						type="button"
 						class="secondary"
@@ -184,12 +180,7 @@
 						{/if}
 						<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
 					</button>
-				{/if}
-
-					<button
-						type="submit"
-						disabled={captchaState !== 'solved' && !captchaDisabled}
-					>
+					<button type="submit" disabled={captchaState !== 'solved' && !captchaDisabled}>
 						<i>done</i>
 						<span>{$_(needToRegister ? 'createAccount' : 'login')}</span>
 					</button>

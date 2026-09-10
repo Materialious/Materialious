@@ -1,6 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
+import type { IsOwnBackend } from '$lib/shared';
 
 export const rawMasterKeyStore: Writable<string | undefined> = persist(
 	writable(),
@@ -29,3 +30,5 @@ export const watchHistoryEnabledStore: Writable<boolean> = persist(
 export const poTokenCacheStore: Writable<string | undefined> = writable();
 
 export const isAndroidTvStore: Writable<boolean> = writable(false);
+
+export const configBackendCache: Writable<IsOwnBackend | undefined> = writable();

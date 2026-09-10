@@ -1,4 +1,10 @@
-import { getComments, getPersonalPlaylists, getVideoPage, continueVideoPlayer, saveWatchHistory } from '$lib/api/index';
+import {
+	getComments,
+	getPersonalPlaylists,
+	getVideoPage,
+	continueVideoPlayer,
+	saveWatchHistory
+} from '$lib/api/index';
 import { loadEntirePlaylist } from '$lib/playlist';
 import {
 	deArrowEnabledStore,

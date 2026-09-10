@@ -6,6 +6,7 @@
 		interfaceBorderRadiusStore,
 		invidiousAuthStore,
 		isAndroidTvStore,
+		materialiousBackendStore,
 		rawMasterKeyStore,
 		themeColorStore
 	} from '$lib/store';
@@ -35,8 +36,17 @@
 		loadSettingsFromEnv,
 		syncSettingsToBackend
 	} from '$lib/externalSettings';
+	import { configBackend } from '$lib/api/backend';
+	import { configBackendCache } from '$lib/stores/misc';
 
 	let { children } = $props();
+
+	materialiousBackendStore.subscribe(async () => {
+		const config = await configBackend();
+		if (!config) return;
+
+		configBackendCache.set(config);
+	});
 
 	themeColorStore.subscribe(async (hex) => {
 		if (!hex || Object.keys($interfaceAdvancedThemingStore).length > 0) return;

@@ -19,16 +19,18 @@ export async function syncSettingsToBackend() {
 		persistedStores.map(async (store) => {
 			if (store.excludeFromBackendSync || dontAutoSync.includes(store.name)) return;
 
-			getKeyValue(store.name).then((currentKeyValue) => {
-				if (currentKeyValue !== null) {
-					const currentKeyValueParsed = parseWithSchema(store.schema, currentKeyValue);
-					if (currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) {
-						store.store.set(currentKeyValueParsed);
+			getKeyValue(store.name)
+				.then((currentKeyValue) => {
+					if (currentKeyValue !== null) {
+						const currentKeyValueParsed = parseWithSchema(store.schema, currentKeyValue);
+						if (currentKeyValueParsed !== null && currentKeyValueParsed !== undefined) {
+							store.store.set(currentKeyValueParsed);
+						}
 					}
-				}
-			}).catch(() => {
-				// Remote instance unreachable, keep local value.
-			});
+				})
+				.catch(() => {
+					// Remote instance unreachable, keep local value.
+				});
 
 			let initialLoad = true;
 			store.store.subscribe((value) => {

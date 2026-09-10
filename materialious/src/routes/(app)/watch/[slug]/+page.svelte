@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import {
-		getComments
-	} from '$lib/api/index';
+	import { getComments } from '$lib/api/index';
 	import type { Comments, PlaylistPage } from '$lib/api/model';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import Transcript from '$lib/components/watch/Transcript.svelte';
@@ -163,7 +161,12 @@
 		returnYTDislikes = playerResult.returnYTDislikes;
 		playerReady = true;
 
-		if (data.video && !hasPremiere() && !data.video.premium && (!$playerState || $playerState.data.video.videoId !== data.video.videoId)) {
+		if (
+			data.video &&
+			!hasPremiere() &&
+			!data.video.premium &&
+			(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
+		) {
 			playerLoadingStore.set(false);
 			playerState.set({
 				data: data
@@ -315,358 +318,365 @@
 {#if !loaded}
 	<PageLoading />
 {:else}
-<div class="grid no-padding">
-	<div class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}>
-		<div style="display: flex;justify-content: center;">
-			{#if data.video.premium}
-				<article class="video-placeholder">
-					<p>{$_('premium')}</p>
+	<div class="grid no-padding">
+		<div
+			class={`s12 m12 l${$playerTheatreModeIsActive || $playerIsInWindowFullscreen ? '12' : '9'}`}
+		>
+			<div style="display: flex;justify-content: center;">
+				{#if data.video.premium}
+					<article class="video-placeholder">
+						<p>{$_('premium')}</p>
+					</article>
+					<div class="space"></div>
+				{:else if hasPremiere()}
+					<article class="video-placeholder">
+						<p>{$_('player.premiere')}</p>
+						<h6 class="no-margin no-padding">
+							{premiereTime}
+						</h6>
+					</article>
+					<div class="space"></div>
+				{/if}
+			</div>
+
+			<h5 class="no-margin">{letterCase(data.video.title)}</h5>
+
+			<div class="grid no-padding">
+				<div class="s12 m12 l7" style="height: 100%;display: flex;align-items: center;">
+					<Author channel={data.video} />
+				</div>
+				<div class="s12 m12 l5 video-actions">
+					<div>
+						<LikesDislikes video={data.video} {returnYTDislikes} />
+
+						<button
+							onclick={toggleTheatreMode}
+							class="m l"
+							class:surface-container-highest={!$playerTheatreModeIsActive}
+						>
+							<i>width_wide</i>
+							<div class="tooltip">{$_('player.theatreMode')}</div>
+						</button>
+						{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
+							<button
+								onclick={() => ui('#pause-timer')}
+								class:primary={pauseTimerSeconds > 0}
+								class:surface-container-highest={pauseTimerSeconds === 0}
+							>
+								<i>snooze</i>
+								{#if pauseTimerSeconds > 0}
+									<span class="small-text">{humanizeSeconds(pauseTimerRemaining)}</span>
+								{/if}
+								<div class="tooltip">{$_('player.pauseTimer')}</div>
+							</button>
+						{/if}
+						<button
+							onclick={() => (
+								(showTranscript = !showTranscript),
+								playerTheatreModeIsActive.set(false)
+							)}
+							class:surface-container-highest={!showTranscript}
+						>
+							<i>description</i>
+							<div class="tooltip">
+								{$_('transcript')}
+							</div>
+						</button>
+						<Share
+							includePromptText={$_('player.share.includeTimestamp')}
+							shares={[
+								{
+									type: 'materialious',
+									path: resolve('/watch/[videoId]', { videoId: data.video.videoId }),
+									param: {
+										key: 'time',
+										value: () => Math.round(playerCurrentTime)
+									}
+								},
+								{
+									type: 'invidious',
+									path: `/watch?v=${data.video.videoId}`,
+									param: {
+										key: 't',
+										value: () => Math.round(playerCurrentTime)
+									}
+								},
+								{
+									type: 'invidious redirect',
+									path: `/watch?v=${data.video.videoId}`,
+									param: {
+										key: 't',
+										value: () => Math.round(playerCurrentTime)
+									}
+								},
+								{
+									type: 'youtube',
+									path: `/watch?v=${data.video.videoId}`,
+									param: {
+										key: 't',
+										value: () => Math.round(playerCurrentTime)
+									}
+								}
+							]}
+							iconOnly={true}
+							style="margin: 0;"
+						/>
+						<Download video={data.video} />
+						<PlaylistManager mode="toggle" videoId={data.video.videoId} />
+					</div>
+				</div>
+			</div>
+
+			<article class="border">
+				<Description video={data.video} description={data.content.description} />
+			</article>
+
+			{#if data.content.timestamps.length > 0}
+				<article class="border">
+					<details>
+						<summary id="chapter-section" class="bold none">
+							<nav>
+								<div class="max">
+									<p>{$_('player.chapters')}</p>
+								</div>
+							</nav>
+						</summary>
+						<div class="space"></div>
+						<div class="chapter-list" id="chapters">
+							<ul class="list">
+								{#each data.content.timestamps as timestamp (timestamp)}
+									<li>
+										<img
+											class="round large"
+											loading="lazy"
+											src={getBestThumbnail(data.video.videoThumbnails) as string}
+											alt="Thumbnail for current video"
+											role="presentation"
+											onclick={() => {
+												if (playerElement) playerElement.currentTime = timestamp.time;
+											}}
+										/>
+										<div
+											role="presentation"
+											onclick={() => {
+												if (playerElement) playerElement.currentTime = timestamp.time;
+											}}
+											class="max"
+											style="white-space: pre-line; overflow-wrap: break-word;"
+										>
+											<p style="margin: 0;">{timestamp.title}</p>
+											<span
+												class:primary={playerCurrentTime >= timestamp.time &&
+													(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
+												class="chip no-margin">{timestamp.timePretty}</span
+											>
+										</div>
+										<Share
+											shares={[
+												{
+													type: 'materialious',
+													path: resolve(`/watch/[videoId]?time=${Math.round(timestamp.time)}`, {
+														videoId: data.video.videoId
+													})
+												},
+												{
+													type: 'invidious',
+													path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+												},
+												{
+													type: 'invidious redirect',
+													path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+												},
+												{
+													type: 'youtube',
+													path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
+												}
+											]}
+											iconOnly={true}
+										/>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					</details>
 				</article>
-				<div class="space"></div>
-			{:else if hasPremiere()}
-				<article class="video-placeholder">
-					<p>{$_('player.premiere')}</p>
-					<h6 class="no-margin no-padding">
-						{premiereTime}
-					</h6>
+			{/if}
+
+			{#if comments && comments.comments.length > 0}
+				<article class="border">
+					<details>
+						<summary id="comment-section" class="none bold">
+							<nav>
+								<div class="max">{numberWithCommas(comments.commentCount)} {$_('comments')}</div>
+							</nav>
+						</summary>
+
+						<div class="space"></div>
+
+						<button class="surface-container-highest small" style="margin-bottom: 12px;">
+							<i>sort</i>
+							<span
+								>{$_('commentSortBy')}: {commentSort === 'top'
+									? $_('commentSortTop')
+									: $_('commentSortNewest')}</span
+							>
+							<menu class="no-wrap" id="comment-sort" data-ui="#comment-sort">
+								<li
+									role="presentation"
+									data-ui="#comment-sort"
+									onclick={() => reloadComments('top')}
+								>
+									{$_('commentSortTop')}
+								</li>
+								<li
+									role="presentation"
+									data-ui="#comment-sort"
+									onclick={() => reloadComments('new')}
+								>
+									{$_('commentSortNewest')}
+								</li>
+							</menu>
+						</button>
+
+						<div class="comment-list">
+							{#each comments.comments as comment (comment)}
+								<Comment {comment} videoId={data.video.videoId}></Comment>
+							{/each}
+							{#if comments.continuation}
+								<div class="space"></div>
+								<button onclick={loadMoreComments} class="secondary">
+									<i>read_more</i>
+									<span>{$_('loadMore')}</span>
+								</button>
+							{/if}
+						</div>
+					</details>
 				</article>
-				<div class="space"></div>
 			{/if}
 		</div>
-
-		<h5 class="no-margin">{letterCase(data.video.title)}</h5>
-
-		<div class="grid no-padding">
-			<div class="s12 m12 l7" style="height: 100%;display: flex;align-items: center;">
-				<Author channel={data.video} />
-			</div>
-			<div class="s12 m12 l5 video-actions">
-				<div>
-					<LikesDislikes video={data.video} returnYTDislikes={returnYTDislikes} />
-
-					<button
-						onclick={toggleTheatreMode}
-						class="m l"
-						class:surface-container-highest={!$playerTheatreModeIsActive}
-					>
-						<i>width_wide</i>
-						<div class="tooltip">{$_('player.theatreMode')}</div>
-					</button>
-					{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
-						<button
-							onclick={() => ui('#pause-timer')}
-							class:primary={pauseTimerSeconds > 0}
-							class:surface-container-highest={pauseTimerSeconds === 0}
-						>
-							<i>snooze</i>
-							{#if pauseTimerSeconds > 0}
-								<span class="small-text">{humanizeSeconds(pauseTimerRemaining)}</span>
+		{#if !$playerTheatreModeIsActive && !$playerIsInWindowFullscreen}
+			<div class="s12 m12 l3 recommended">
+				{#if showTranscript}
+					<Transcript video={data.video} bind:currentTime={playerCurrentTime} />
+				{/if}
+				{#if data.playlistId && data.playlistId in $playlistCacheStore}
+					<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />
+				{:else if data.video.recommendedVideos}
+					{#key $filterContentListStore?.length}
+						{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
+							{#if !isItemFiltered(recommendedVideo)}
+								<article class="no-padding border">
+									{#key recommendedVideo.videoId}
+										<Thumbnail video={recommendedVideo} sideways={true} />
+									{/key}
+								</article>
 							{/if}
-							<div class="tooltip">{$_('player.pauseTimer')}</div>
-						</button>
+						{/each}
+					{/key}
+				{/if}
+			</div>
+		{/if}
+	</div>
+
+	<dialog id="pause-timer">
+		<div>
+			<nav class="no-space">
+				<h6 class="max">
+					{#if pauseTimerSeconds > 0}
+						{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerRemaining)}
+					{:else}
+						{$_('player.pauseTimer')}
 					{/if}
+				</h6>
+				<button onclick={() => ui('#pause-timer')} class="circle transparent">
+					<i>close</i>
+				</button>
+			</nav>
+
+			<div class="space"></div>
+
+			<div class="grid" style="gap: 0.5em;">
+				<div class="s4 m4 l4">
 					<button
-						onclick={() => (
-							(showTranscript = !showTranscript),
-							playerTheatreModeIsActive.set(false)
-						)}
-						class:surface-container-highest={!showTranscript}
+						onclick={() => {
+							pauseTimerSeconds = 300;
+							pauseTimerRemaining = pauseTimerSeconds;
+							setPauseTimer();
+							ui('#pause-timer');
+						}}
+						class:primary={pauseTimerSeconds === 300}
+						class="max"
+						style="width: 100%; padding: 0.75em 0;">5 min</button
 					>
-						<i>description</i>
-						<div class="tooltip">
-							{$_('transcript')}
-						</div>
+				</div>
+				<div class="s4 m4 l4">
+					<button
+						onclick={() => {
+							pauseTimerSeconds = 600;
+							pauseTimerRemaining = pauseTimerSeconds;
+							setPauseTimer();
+							ui('#pause-timer');
+						}}
+						class:primary={pauseTimerSeconds === 600}
+						class="max"
+						style="width: 100%; padding: 0.75em 0;">10 min</button
+					>
+				</div>
+				<div class="s4 m4 l4">
+					<button
+						onclick={() => {
+							pauseTimerSeconds = 1800;
+							pauseTimerRemaining = pauseTimerSeconds;
+							setPauseTimer();
+							ui('#pause-timer');
+						}}
+						class:primary={pauseTimerSeconds === 1800}
+						class="max"
+						style="width: 100%; padding: 0.75em 0;">30 min</button
+					>
+				</div>
+				<div class="s4 m4 l4">
+					<button
+						onclick={() => {
+							pauseTimerSeconds = 3600;
+							pauseTimerRemaining = pauseTimerSeconds;
+							setPauseTimer();
+							ui('#pause-timer');
+						}}
+						class:primary={pauseTimerSeconds === 3600}
+						class="max"
+						style="width: 100%; padding: 0.75em 0;">1 hr</button
+					>
+				</div>
+				<div class="s4 m4 l4">
+					<button
+						onclick={() => {
+							pauseTimerSeconds = 7200;
+							pauseTimerRemaining = pauseTimerSeconds;
+							setPauseTimer();
+							ui('#pause-timer');
+						}}
+						class:primary={pauseTimerSeconds === 7200}
+						class="max"
+						style="width: 100%; padding: 0.75em 0;">2 hr</button
+					>
+				</div>
+				<div class="s4 m4 l4">
+					<button
+						onclick={() => {
+							clearPauseTimer();
+							sleepTimerStore.set(undefined);
+							ui('#pause-timer');
+						}}
+						class="max"
+						style="width: 100%; padding: 0.75em 0;"
+					>
+						<i>delete</i>
 					</button>
-					<Share
-						includePromptText={$_('player.share.includeTimestamp')}
-						shares={[
-							{
-								type: 'materialious',
-								path: resolve('/watch/[videoId]', { videoId: data.video.videoId }),
-								param: {
-									key: 'time',
-									value: () => Math.round(playerCurrentTime)
-								}
-							},
-							{
-								type: 'invidious',
-								path: `/watch?v=${data.video.videoId}`,
-								param: {
-									key: 't',
-									value: () => Math.round(playerCurrentTime)
-								}
-							},
-							{
-								type: 'invidious redirect',
-								path: `/watch?v=${data.video.videoId}`,
-								param: {
-									key: 't',
-									value: () => Math.round(playerCurrentTime)
-								}
-							},
-							{
-								type: 'youtube',
-								path: `/watch?v=${data.video.videoId}`,
-								param: {
-									key: 't',
-									value: () => Math.round(playerCurrentTime)
-								}
-							}
-						]}
-						iconOnly={true}
-						style="margin: 0;"
-					/>
-					<Download video={data.video} />
-					<PlaylistManager
-						mode="toggle"
-						videoId={data.video.videoId}
-					/>
 				</div>
 			</div>
 		</div>
-
-		<article class="border">
-			<Description video={data.video} description={data.content.description} />
-		</article>
-
-		{#if data.content.timestamps.length > 0}
-			<article class="border">
-				<details>
-					<summary id="chapter-section" class="bold none">
-						<nav>
-							<div class="max">
-								<p>{$_('player.chapters')}</p>
-							</div>
-						</nav>
-					</summary>
-					<div class="space"></div>
-					<div class="chapter-list" id="chapters">
-						<ul class="list">
-							{#each data.content.timestamps as timestamp (timestamp)}
-								<li>
-									<img
-										class="round large"
-										loading="lazy"
-										src={getBestThumbnail(data.video.videoThumbnails) as string}
-										alt="Thumbnail for current video"
-										role="presentation"
-										onclick={() => {
-											if (playerElement) playerElement.currentTime = timestamp.time;
-										}}
-									/>
-									<div
-										role="presentation"
-										onclick={() => {
-											if (playerElement) playerElement.currentTime = timestamp.time;
-										}}
-										class="max"
-										style="white-space: pre-line; overflow-wrap: break-word;"
-									>
-										<p style="margin: 0;">{timestamp.title}</p>
-										<span
-											class:primary={playerCurrentTime >= timestamp.time &&
-												(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
-											class="chip no-margin">{timestamp.timePretty}</span
-										>
-									</div>
-									<Share
-										shares={[
-											{
-												type: 'materialious',
-												path: resolve(`/watch/[videoId]?time=${Math.round(timestamp.time)}`, {
-													videoId: data.video.videoId
-												})
-											},
-											{
-												type: 'invidious',
-												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
-											},
-											{
-												type: 'invidious redirect',
-												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
-											},
-											{
-												type: 'youtube',
-												path: `/watch?v=${data.video.videoId}&t=${Math.round(timestamp.time)}`
-											}
-										]}
-										iconOnly={true}
-									/>
-								</li>
-							{/each}
-						</ul>
-					</div>
-				</details>
-			</article>
-		{/if}
-
-		{#if comments && comments.comments.length > 0}
-			<article class="border">
-				<details>
-					<summary id="comment-section" class="none bold">
-						<nav>
-							<div class="max">{numberWithCommas(comments.commentCount)} {$_('comments')}</div>
-						</nav>
-					</summary>
-
-					<div class="space"></div>
-
-					<button class="surface-container-highest small" style="margin-bottom: 12px;">
-						<i>sort</i>
-						<span
-							>{$_('commentSortBy')}: {commentSort === 'top'
-								? $_('commentSortTop')
-								: $_('commentSortNewest')}</span
-						>
-						<menu class="no-wrap" id="comment-sort" data-ui="#comment-sort">
-							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('top')}>
-								{$_('commentSortTop')}
-							</li>
-							<li role="presentation" data-ui="#comment-sort" onclick={() => reloadComments('new')}>
-								{$_('commentSortNewest')}
-							</li>
-						</menu>
-					</button>
-
-					<div class="comment-list">
-						{#each comments.comments as comment (comment)}
-							<Comment {comment} videoId={data.video.videoId}></Comment>
-						{/each}
-						{#if comments.continuation}
-							<div class="space"></div>
-							<button onclick={loadMoreComments} class="secondary">
-								<i>read_more</i>
-								<span>{$_('loadMore')}</span>
-							</button>
-						{/if}
-					</div>
-				</details>
-			</article>
-		{/if}
-	</div>
-	{#if !$playerTheatreModeIsActive && !$playerIsInWindowFullscreen}
-		<div class="s12 m12 l3 recommended">
-			{#if showTranscript}
-				<Transcript video={data.video} bind:currentTime={playerCurrentTime} />
-			{/if}
-			{#if data.playlistId && data.playlistId in $playlistCacheStore}
-				<Playlist video={data.video} playlist={$playlistCacheStore[data.playlistId]} />
-			{:else if data.video.recommendedVideos}
-				{#key $filterContentListStore?.length}
-					{#each data.video.recommendedVideos as recommendedVideo (recommendedVideo.videoId)}
-						{#if !isItemFiltered(recommendedVideo)}
-							<article class="no-padding border">
-								{#key recommendedVideo.videoId}
-									<Thumbnail video={recommendedVideo} sideways={true} />
-								{/key}
-							</article>
-						{/if}
-					{/each}
-				{/key}
-			{/if}
-		</div>
-	{/if}
-</div>
-
-<dialog id="pause-timer">
-	<div>
-		<nav class="no-space">
-			<h6 class="max">
-				{#if pauseTimerSeconds > 0}
-					{$_('player.pauseVideoIn')} {humanizeSeconds(pauseTimerRemaining)}
-				{:else}
-					{$_('player.pauseTimer')}
-				{/if}
-			</h6>
-			<button onclick={() => ui('#pause-timer')} class="circle transparent">
-				<i>close</i>
-			</button>
-		</nav>
-
-		<div class="space"></div>
-
-		<div class="grid" style="gap: 0.5em;">
-			<div class="s4 m4 l4">
-				<button
-					onclick={() => {
-						pauseTimerSeconds = 300;
-						pauseTimerRemaining = pauseTimerSeconds;
-						setPauseTimer();
-						ui('#pause-timer');
-					}}
-					class:primary={pauseTimerSeconds === 300}
-					class="max"
-					style="width: 100%; padding: 0.75em 0;">5 min</button
-				>
-			</div>
-			<div class="s4 m4 l4">
-				<button
-					onclick={() => {
-						pauseTimerSeconds = 600;
-						pauseTimerRemaining = pauseTimerSeconds;
-						setPauseTimer();
-						ui('#pause-timer');
-					}}
-					class:primary={pauseTimerSeconds === 600}
-					class="max"
-					style="width: 100%; padding: 0.75em 0;">10 min</button
-				>
-			</div>
-			<div class="s4 m4 l4">
-				<button
-					onclick={() => {
-						pauseTimerSeconds = 1800;
-						pauseTimerRemaining = pauseTimerSeconds;
-						setPauseTimer();
-						ui('#pause-timer');
-					}}
-					class:primary={pauseTimerSeconds === 1800}
-					class="max"
-					style="width: 100%; padding: 0.75em 0;">30 min</button
-				>
-			</div>
-			<div class="s4 m4 l4">
-				<button
-					onclick={() => {
-						pauseTimerSeconds = 3600;
-						pauseTimerRemaining = pauseTimerSeconds;
-						setPauseTimer();
-						ui('#pause-timer');
-					}}
-					class:primary={pauseTimerSeconds === 3600}
-					class="max"
-					style="width: 100%; padding: 0.75em 0;">1 hr</button
-				>
-			</div>
-			<div class="s4 m4 l4">
-				<button
-					onclick={() => {
-						pauseTimerSeconds = 7200;
-						pauseTimerRemaining = pauseTimerSeconds;
-						setPauseTimer();
-						ui('#pause-timer');
-					}}
-					class:primary={pauseTimerSeconds === 7200}
-					class="max"
-					style="width: 100%; padding: 0.75em 0;">2 hr</button
-				>
-			</div>
-			<div class="s4 m4 l4">
-				<button
-					onclick={() => {
-						clearPauseTimer();
-						sleepTimerStore.set(undefined);
-						ui('#pause-timer');
-					}}
-					class="max"
-					style="width: 100%; padding: 0.75em 0;"
-				>
-					<i>delete</i>
-				</button>
-			</div>
-		</div>
-	</div>
-</dialog>
+	</dialog>
 {/if}
 
 <style>

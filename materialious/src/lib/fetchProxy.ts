@@ -84,7 +84,11 @@ export const fetchProxied = async (
 	return originalFetch(requestInput, requestOptions);
 };
 
-if (isUnrestrictedPlatform() && Capacitor.getPlatform() !== 'electron' && getPublicEnv('PROXY_DISABLED') !== 'true') {
+if (
+	isUnrestrictedPlatform() &&
+	Capacitor.getPlatform() !== 'electron' &&
+	getPublicEnv('PROXY_DISABLED') !== 'true'
+) {
 	window.fetch = fetchProxied;
 
 	const originalXhrOpen = XMLHttpRequest.prototype.open;

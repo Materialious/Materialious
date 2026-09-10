@@ -5,29 +5,33 @@ import { isOwnBackend } from '$lib/shared';
 import { deriveKey } from 'altcha-lib/algorithms/pbkdf2';
 import z from 'zod';
 
-const zCaptchaChallenge = z.object({
-	codeChallenge: z
-		.object({
-			image: z.string(),
-			audio: z.string().optional(),
-			length: z.number().optional()
-		})
-		.optional(),
-	parameters: z.object({
-		algorithm: z.string(),
-		nonce: z.string(),
-		salt: z.string(),
-		cost: z.number(),
-		keyLength: z.number(),
-		keyPrefix: z.string(),
-		keySignature: z.string().optional(),
-		memoryCost: z.number().optional(),
-		parallelism: z.number().optional(),
-		expiresAt: z.number().optional(),
-		data: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).optional()
-	}),
-	signature: z.string()
-}).nullable();
+const zCaptchaChallenge = z
+	.object({
+		codeChallenge: z
+			.object({
+				image: z.string(),
+				audio: z.string().optional(),
+				length: z.number().optional()
+			})
+			.optional(),
+		parameters: z.object({
+			algorithm: z.string(),
+			nonce: z.string(),
+			salt: z.string(),
+			cost: z.number(),
+			keyLength: z.number(),
+			keyPrefix: z.string(),
+			keySignature: z.string().optional(),
+			memoryCost: z.number().optional(),
+			parallelism: z.number().optional(),
+			expiresAt: z.number().optional(),
+			data: z
+				.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
+				.optional()
+		}),
+		signature: z.string()
+	})
+	.nullable();
 
 const zCaptchaSolution = z.object({
 	counter: z.number(),
@@ -40,15 +44,17 @@ export const captchaPayload = z.object({
 	challenge: zCaptchaChallenge
 });
 
-export async function verifyCaptcha(captcha: {
-	solution: z.infer<typeof zCaptchaSolution>;
-	challenge: z.infer<typeof zCaptchaChallenge>;
-	key: string;
-	signature: string;
-} | null) {
-  if (isOwnBackend()?.captchaDisabled) return;
+export async function verifyCaptcha(
+	captcha: {
+		solution: z.infer<typeof zCaptchaSolution>;
+		challenge: z.infer<typeof zCaptchaChallenge>;
+		key: string;
+		signature: string;
+	} | null
+) {
+	if (isOwnBackend()?.captchaDisabled) return;
 
-  if (!captcha || !captcha.challenge) throw error(400, 'Unsupported payload');
+	if (!captcha || !captcha.challenge) throw error(400, 'Unsupported payload');
 
 	if (
 		(await getSequelize().CaptchaTable.count({

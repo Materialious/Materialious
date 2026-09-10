@@ -109,7 +109,7 @@ export async function materialiousLogout() {
 		await clearFeedYTjs();
 	}
 
-	if (isOwnBackend()?.internalAuth || get(materialiousBackendStore)) {
+	if (isOwnBackend()?.internalAuth) {
 		backendFetch('/api/user/logout', { method: 'DELETE' }).catch(() => {
 			// Remote instance unreachable.
 		});

@@ -9,7 +9,6 @@ RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
 
 ROOT_PACKAGE = os.path.join(WORKING_DIR, "package.json")
-SHARED_PACKAGE = os.path.join(WORKING_DIR, "shared", "package.json")
 ELECTRON_PACKAGE = os.path.join(WORKING_DIR, "electron", "package.json")
 ANDROID_PACKAGE = os.path.join(WORKING_DIR, "android", "app", "build.gradle")
 METAINFO_FILE = os.path.join(WORKING_DIR, "electron", "materialious.metainfo.xml")
@@ -68,7 +67,7 @@ def update_metainfo_release() -> None:
 
 
 if __name__ == "__main__":
-    for location in (ROOT_PACKAGE, SHARED_PACKAGE, ELECTRON_PACKAGE):
+    for location in (ROOT_PACKAGE, ELECTRON_PACKAGE):
         package_json_update_ver(location)
 
     update_android_version()

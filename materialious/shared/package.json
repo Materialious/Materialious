@@ -1,6 +1,6 @@
 {
 	"name": "@materialious/shared",
-	"version": "1.0.0",
+	"version": "1.17.13",
 	"description": "Shared code between the Materialious web app and its Electron wrapper.",
 	"private": true,
 	"type": "module",

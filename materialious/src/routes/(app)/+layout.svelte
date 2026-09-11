@@ -49,7 +49,7 @@
 			remoteMaterialiousSupported() ||
 			($rawMasterKeyStore && $materialiousBackendStore)) &&
 			(!isYTBackend() || !!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)
-	)
+	);
 
     const showLogin = $derived(
 	    !isYTBackend() || !!isOwnBackend()?.internalAuth

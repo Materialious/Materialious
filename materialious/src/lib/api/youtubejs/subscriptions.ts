@@ -12,6 +12,8 @@ import {
 } from '$lib/store';
 import { getSubscriptionsBackend } from '../backend/subscriptions';
 
+let refreshPromise: Promise<void> | null = null;
+
 export async function getSubscriptionsYTjs(): Promise<Subscription[]> {
 	const subscriptions: Subscription[] = [];
 
@@ -57,11 +59,11 @@ export async function deleteUnsubscribeYTjs(authorId: string) {
 	await localDb.subscriptionFeed.where('authorId').equals(authorId).delete();
 }
 
-export async function parseChannelRSS(channelId: string): Promise<void> {
+export async function parseChannelRSS(channelId: string): Promise<boolean> {
 	const feedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
 	const response = await fetch(feedUrl, { priority: 'low' });
-	if (!response.ok) return;
+	if (!response.ok) return false;
 
 	const text = await response.text();
 
@@ -94,7 +96,6 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 		const authorUrl = authorId ? `/channel/${authorId}` : '';
 		const authorVerified = false;
 
-		// Extracting video thumbnails
 		const videoThumbnails: Thumbnail[] = Array.from(
 			entry.getElementsByTagName('media:group')[0]?.getElementsByTagName('media:thumbnail') || []
 		).map((thumbElement) => ({
@@ -138,6 +139,7 @@ export async function parseChannelRSS(channelId: string): Promise<void> {
 	}
 
 	await updateLastRssFetch(channelId, channelName ?? 'Unknown');
+	return true;
 }
 
 async function updateLastRssFetch(channelId: string, channelName: string) {
@@ -162,7 +164,7 @@ export async function clearFeedYTjs() {
 	await localDb.subscriptionFeed.clear();
 }
 
-export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
+async function getStaleSubscriptions(): Promise<ChannelSubscriptions[]> {
 	let channelSubscriptions: ChannelSubscriptions[];
 
 	if (!get(rawMasterKeyStore)) {
@@ -171,16 +173,13 @@ export async function getFeedYTjs(maxResults: number, page: number): Promise<Fee
 		channelSubscriptions = await getSubscriptionsBackend();
 	}
 
-	const toUpdatePromises: Promise<void>[] = [];
-
 	const now = new Date();
+	const cooldownTime = get(engineCooldownYTStore) * 60 * 60 * 1000;
+	const stale: ChannelSubscriptions[] = [];
 
-	let totalChannelsToParse = 0;
 	for (const channel of channelSubscriptions) {
 		let lastRSSFetch = new Date(channel.lastRSSFetch);
 
-		// If using our own backend we still need to keep
-		// RSS feed updates per device.
 		if (get(rawMasterKeyStore)) {
 			const localSub = await localDb.channelSubscriptions
 				.where('channelId')
@@ -195,41 +194,62 @@ export async function getFeedYTjs(maxResults: number, page: number): Promise<Fee
 		}
 
 		const timeDifference = now.getTime() - lastRSSFetch.getTime();
-		const cooldownTime = get(engineCooldownYTStore) * 60 * 60 * 1000;
-
 		if (timeDifference > cooldownTime) {
-			if (totalChannelsToParse < get(engineMaxConcurrentChannelsStore)) {
-				toUpdatePromises.push(parseChannelRSS(channel.channelId));
-			} else {
-				parseChannelRSS(channel.channelId);
-			}
+			stale.push(channel);
 		}
-
-		totalChannelsToParse++;
 	}
 
-	if (toUpdatePromises) {
-		await Promise.all(toUpdatePromises);
-	}
+	stale.sort((a, b) => {
+		const aTime = new Date(a.lastRSSFetch).getTime();
+		const bTime = new Date(b.lastRSSFetch).getTime();
+		return aTime - bTime;
+	});
 
-	let videos = await localDb.subscriptionFeed.toArray();
+	return stale;
+}
+
+async function refreshStaleChannels(): Promise<void> {
+	const staleChannels = await getStaleSubscriptions();
+	if (staleChannels.length === 0) return;
+
+	const maxConcurrent = get(engineMaxConcurrentChannelsStore);
+
+	for (let i = 0; i < staleChannels.length; i += maxConcurrent) {
+		const batch = staleChannels.slice(i, i + maxConcurrent);
+		await Promise.allSettled(batch.map((ch) => parseChannelRSS(ch.channelId)));
+	}
+}
+
+function ensureRefreshRunning(): Promise<void> {
+	if (!refreshPromise) {
+		refreshPromise = refreshStaleChannels().finally(() => {
+			refreshPromise = null;
+		});
+	}
+	return refreshPromise;
+}
+
+export async function getFeedYTjs(maxResults: number, page: number): Promise<Feed> {
+	ensureRefreshRunning();
+
+	const videos = await localDb.subscriptionFeed.toArray();
 	videos.sort((a, b) => b.published - a.published);
-
-	const cullAfter = get(engineCullYTStore);
-	if (videos.length > cullAfter) {
-		const videosToDelete = videos.slice(cullAfter);
-		const videoIdsToDelete = videosToDelete.map((video) => video.videoId);
-		await localDb.subscriptionFeed.where('videoId').anyOf(videoIdsToDelete).delete();
-
-		// Don't display culled videos.
-		videos = videos.slice(0, cullAfter);
-	}
 
 	const start = (page - 1) * maxResults;
 	const end = start + maxResults;
+	const sliced = videos.slice(start, end);
+
+	if (page === 1) {
+		const cullAfter = get(engineCullYTStore);
+		if (videos.length > cullAfter) {
+			const videosToDelete = videos.slice(cullAfter);
+			const videoIdsToDelete = videosToDelete.map((video) => video.videoId);
+			await localDb.subscriptionFeed.where('videoId').anyOf(videoIdsToDelete).delete();
+		}
+	}
 
 	return {
 		notifications: [],
-		videos: videos.slice(start, end)
+		videos: sliced
 	};
 }

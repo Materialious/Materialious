@@ -162,7 +162,7 @@
         "export": {
             "title": "Exportálás és importálás",
             "importSub": "Feliratkozások importálása",
-            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube adatbázis és NewPipe JSON támogatott",
+            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, FreeTube-adatbázis és NewPipe JSON támogatott. (Az Invidious JSON lassú.)",
             "importing": "Feliratkozások importálása (ez eltarthat egy ideig)",
             "importingCompleted": "Feliratkozások sikeresen importálva",
             "exportSub": "Feliratkozások exportálása",
@@ -405,5 +405,6 @@
     "materialiousBackend": "Materialious háttérprogram",
     "materialiousBackendUrl": "Materialious webcím",
     "materialiousLoginButton": "Bejelentkezés Materialious-fiókkal",
-    "materialiousLogout": "Kijelentkezés a Materialious-fiókból"
+    "materialiousLogout": "Kijelentkezés a Materialious-fiókból",
+    "downloadedCompletedAndroid": "Fájl mentve az Android „Letöltések” mappába"
 }

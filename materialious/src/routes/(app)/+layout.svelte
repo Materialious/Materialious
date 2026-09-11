@@ -33,7 +33,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
-	import { isMaterialiousAccountActive, isYTBackend, remoteMaterialiousSupported } from '$lib/backend';
+	import { isMaterialiousAccountActive, isYTBackend } from '$lib/backend';
 	import { isMobile, truncate } from '$lib/utils';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import { backendFetch } from '$lib/api/backend/request';

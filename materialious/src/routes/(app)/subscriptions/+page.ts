@@ -1,7 +1,6 @@
 import { getFeed } from '$lib/api/index';
 import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
 import { localDb } from '$lib/dexie';
-import { excludeDuplicateFeeds } from '$lib/feed';
 import { authProtected } from '$lib/auth';
 import { feedCacheStore, feedLoadingStore } from '$lib/store';
 import { error } from '@sveltejs/kit';
@@ -38,40 +37,15 @@ async function sortVideosByFavourites(videos: supportedVideos): Promise<supporte
 export async function load() {
 	authProtected();
 
-	let videos = get(feedCacheStore).subscription;
+	feedLoadingStore.set(true);
 
-	if (!videos) {
-		feedCacheStore.set({ ...get(feedCacheStore), subscription: [] });
-
-		feedLoadingStore.set(true);
-		getFeed(100, 1)
-			.then(async (feed) => {
-				videos = await sortVideosByFavourites([...feed.notifications, ...feed.videos]);
-				feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
-			})
-			.catch((errorMsg) => {
-				error(500, errorMsg);
-			})
-			.finally(() => {
-				feedLoadingStore.set(false);
-			});
-	} else {
+	try {
+		const feed = await getFeed(100, 1);
+		const videos = await sortVideosByFavourites([...feed.notifications, ...feed.videos]);
+		feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
+	} catch (e) {
+		error(500, e instanceof Error ? e : String(e));
+	} finally {
 		feedLoadingStore.set(false);
-
-		await getFeed(100, 1).then(async (feeds) => {
-			const newVideos = await sortVideosByFavourites([
-				...feeds.notifications,
-				...feeds.videos,
-				...videos
-			]);
-			feedCacheStore.set({
-				...get(feedCacheStore),
-				subscription: excludeDuplicateFeeds(videos, newVideos) as (
-					| VideoBase
-					| Video
-					| PlaylistPageVideo
-				)[]
-			});
-		});
 	}
 }

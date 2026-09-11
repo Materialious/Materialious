@@ -1,5 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 import type { DownloadFormatSelection, SabrFormat } from '@materialious/shared/download';
+import { backendFetch } from '../backend/request';
+import { addToast } from '$lib/components/Toast.svelte';
+import { FileSharer } from '@capgo/capacitor-file-sharer';
+import { get } from 'svelte/store';
+import { _ } from '$lib/i18n';
+import { blobToBase64 } from '$lib/misc';
 
 export type DownloadSelection = DownloadFormatSelection;
 
@@ -76,7 +82,7 @@ async function pollDownloadProgress(
 	const poll = async () => {
 		while (!stopped) {
 			try {
-				const resp = await fetch(`/api/download/progress?downloadId=${downloadId}`, {
+				const resp = await backendFetch(`/api/download/progress?downloadId=${downloadId}`, {
 					credentials: 'same-origin'
 				});
 
@@ -111,7 +117,7 @@ export async function startWebDownload(
 	const stopProgress = onProgress ? await pollDownloadProgress(downloadId, onProgress) : undefined;
 
 	try {
-		const resp = await fetch(url, {
+		const resp = await backendFetch(url, {
 			credentials: 'same-origin'
 		});
 
@@ -146,6 +152,34 @@ export async function startWebDownload(
 		}
 
 		const blob = new Blob(chunks);
+
+		if (Capacitor.getPlatform() === 'android') {
+			try {
+				await FileSharer.save({
+					filename: filename,
+					base64Data: await blobToBase64(blob) as string,
+					android: {
+						saveDirectory: 'downloads',
+					},
+				});
+
+				addToast({
+					data: {
+						text: get(_)('downloadedCompletedAndroid')
+					}
+				});
+			} catch (errorMsg) {
+				addToast({
+					data: {
+						text: errorMsg instanceof Error ? errorMsg.message : String(errorMsg)
+					}
+				});
+			}
+
+			onProgress?.(100);
+			return {};
+		}
+
 		const objectUrl = URL.createObjectURL(blob);
 
 		const a = document.createElement('a');

@@ -18,8 +18,6 @@
 
 	let { video }: { video: VideoPlay } = $props();
 
-	const isElectron = Capacitor.getPlatform() === 'electron';
-
 	let formats: AvailableFormats | null = $state(null);
 	let loading = $state(false);
 	let loadError = $state(false);
@@ -217,7 +215,7 @@
 				progress = value;
 			});
 
-			if (isElectron || isOwnBackend()) {
+			if (Capacitor.getPlatform() === 'electron' || isOwnBackend()) {
 				if (result.error) {
 					addToast({ data: { text: result.error, icon: 'error' } });
 				} else if (result.canceled) {

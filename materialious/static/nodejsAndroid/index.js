@@ -27,6 +27,7 @@ const CORS_HEADERS = [
 	'Range',
 	'Referer',
 	'Cookie',
+	'Content-Disposition',
 	'__redirect',
 	'__custom_return',
 	'__sid_auth'

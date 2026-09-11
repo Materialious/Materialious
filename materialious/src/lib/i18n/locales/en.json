@@ -1,6 +1,7 @@
 {
 	"enabled": "Enabled",
 	"disabled": "Disabled",
+	"downloadedCompletedAndroid": "File saved to Android Downloads folder",
 	"popularPageDisabled": "Popular page has been disabled by Admins",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
 	"copyUrl": "Copy URL",
@@ -368,7 +369,7 @@
 		"export": {
 			"title": "Export/Import",
 			"importSub": "Import subscriptions",
-			"importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube database & NewPipe JSON supported",
+			"importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube database & NewPipe JSON supported. (Invidious JSON is slow)",
 			"importing": "Importing subscriptions (this will take a moment)",
 			"importingCompleted": "Subscriptions successfully imported",
 			"exportSub": "Export subscriptions",

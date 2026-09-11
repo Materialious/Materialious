@@ -49,7 +49,7 @@ export async function setInvidiousInstance(
 
 	let invalidInstance = false;
 
-	const instance = ensureNoTrailingSlash(instanceUrl);
+	const instance = ensureNoTrailingSlash(instanceUrl).toLowerCase();
 
 	try {
 		new URL(instance);
@@ -130,7 +130,7 @@ export async function setMaterialiousBackend(
 
 	let invalid = false;
 
-	const backend = ensureNoTrailingSlash(instanceUrl);
+	const backend = ensureNoTrailingSlash(instanceUrl).toLowerCase();
 
 	try {
 		new URL(backend);

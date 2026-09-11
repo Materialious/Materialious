@@ -23,6 +23,9 @@ project(':capacitor-screen-orientation').projectDir = new File('../node_modules/
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/share/android')
 
+include ':capgo-capacitor-file-sharer'
+project(':capgo-capacitor-file-sharer').projectDir = new File('../node_modules/@capgo/capacitor-file-sharer/android')
+
 include ':capgo-capacitor-keep-awake'
 project(':capgo-capacitor-keep-awake').projectDir = new File('../node_modules/@capgo/capacitor-keep-awake/android')
 

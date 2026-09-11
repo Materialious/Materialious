@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.18.0",
+	"version": "1.18.1",
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && npm run patch:github && vite dev",
@@ -62,6 +62,7 @@
 		"@capacitor/preferences": "^8.0.1",
 		"@capacitor/screen-orientation": "^8.0.1",
 		"@capacitor/share": "^8.0.0",
+		"@capgo/capacitor-file-sharer": "^8.1.9",
 		"@capgo/capacitor-keep-awake": "^8.1.15",
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",

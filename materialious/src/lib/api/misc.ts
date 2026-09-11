@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import type { CommentsOptions, SearchOptions } from './model';
 import { engineFallbacksStore } from '$lib/store';
-import { isUnrestrictedPlatform } from '$lib/misc';
+import { isUnrestrictedPlatform } from '$lib/backend';
 
 export function searchSetDefaults(options: SearchOptions) {
 	if (typeof options.sort_by === 'undefined') {

@@ -1,7 +1,8 @@
 import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
-import { ensureNoTrailingSlash, getPublicEnv } from '../misc';
+import { ensureNoTrailingSlash } from '../utils';
+import { getPublicEnv } from '../env';
 
 export const invidiousInstanceStore: Writable<string | undefined> = persist(
 	writable(

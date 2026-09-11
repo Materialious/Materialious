@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { ensureNoTrailingSlash } from '../../misc';
+	import { ensureNoTrailingSlash } from '$lib/utils';
 	import { returnYTDislikesInstanceStore, returnYtDislikesStore } from '../../store';
 
 	let returnYTInstance = $state(get(returnYTDislikesInstanceStore));

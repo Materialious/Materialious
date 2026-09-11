@@ -3,7 +3,7 @@ import os
 import re
 from datetime import datetime
 
-LATEST_VERSION = "1.18.1"
+LATEST_VERSION = "1.18.2"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
@@ -55,13 +55,18 @@ def update_metainfo_release() -> None:
         print(f"Release version {LATEST_VERSION} already exists.")
         return
 
-    new_release = f"""
-    <release version="{LATEST_VERSION}" date="{RELEASE_DATE}">
+    new_release = f"""    <release version="{LATEST_VERSION}" date="{RELEASE_DATE}">
       <url>https://github.com/Materialious/Materialious/releases/tag/{LATEST_VERSION}</url>
     </release>"""
 
-    # Insert the new release after the opening <releases> tag
-    updated_contents = re.sub(r"(<releases>\s*)", rf"\1{new_release}\n", contents)
+    # Insert the new release right after the opening <releases> tag,
+    # collapsing any stray whitespace so no blank lines accumulate
+    updated_contents = re.sub(
+        r"(?P<tag><releases>)\s*",
+        rf"\g<tag>\n{new_release}\n",
+        contents,
+        count=1,
+    )
 
     with open(METAINFO_FILE, "w") as f_:
         f_.write(updated_contents)

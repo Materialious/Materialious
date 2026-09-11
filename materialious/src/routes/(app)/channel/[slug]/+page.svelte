@@ -10,7 +10,7 @@
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Author from '$lib/components/Author.svelte';
 	import { page } from '$app/state';
-	import { isYTBackend } from '$lib/misc';
+	import { isYTBackend } from '$lib/backend';
 	import Share from '$lib/components/Share.svelte';
 	import { resolve } from '$app/paths';
 

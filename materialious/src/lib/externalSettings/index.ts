@@ -4,7 +4,8 @@ import { z } from 'zod';
 
 import { persistedStores, ensureBackendPersistedStores, type PersistedStore } from './settings';
 
-import { getPublicEnv, isMaterialiousAccountActive } from '$lib/misc';
+import { getPublicEnv } from '$lib/env';
+import { isMaterialiousAccountActive } from '$lib/backend';
 import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend/keyvalue';
 import { rawMasterKeyStore } from '$lib/store';
 
@@ -70,10 +71,18 @@ export function parseWithSchema<T>(schema: z.ZodType<T>, raw: unknown): T | unde
 	}
 }
 
-function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
+function setStores(
+	toSet: Record<string, unknown>,
+	overwriteExisting = false,
+	allowedNames?: Set<string>
+) {
 	if (!overwriteExisting) return;
 
-	for (const { name, store, schema } of persistedStores) {
+	const stores = allowedNames
+		? persistedStores.filter((s) => allowedNames.has(s.name))
+		: persistedStores;
+
+	for (const { name, store, schema } of stores) {
 		const raw = toSet[name];
 		if (raw === undefined) continue;
 
@@ -84,7 +93,10 @@ function setStores(toSet: Record<string, unknown>, overwriteExisting = false) {
 	}
 }
 
-export async function loadSettingsFromFile(file: File) {
+export async function loadSettingsFromFile(
+	file: File,
+	storeNames?: string[]
+) {
 	const fileContents = await file.text();
 
 	let fileJson: Record<any, any> | undefined;
@@ -96,7 +108,8 @@ export async function loadSettingsFromFile(file: File) {
 
 	if (!fileJson) return;
 
-	setStores(fileJson, true);
+	const allowedNames = storeNames ? new Set(storeNames) : undefined;
+	setStores(fileJson, true, allowedNames);
 }
 
 export function loadSettingsFromEnv() {

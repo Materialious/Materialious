@@ -1,6 +1,6 @@
 import { _ } from '$lib/i18n';
 import { get } from 'svelte/store';
-import { isYTBackend } from './misc';
+import { isYTBackend } from './backend';
 import { invidiousAuthStore } from './store';
 
 export type Pages = { icon: string; href: string; name: string; requiresAuth: boolean }[];

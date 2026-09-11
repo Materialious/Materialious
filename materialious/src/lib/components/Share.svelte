@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { shareURL } from '$lib/misc';
+	import { shareURL } from '$lib/download';
 	import { _ } from '$lib/i18n';
 	import { invidiousInstanceStore } from '$lib/store';
 	import { Capacitor } from '@capacitor/core';

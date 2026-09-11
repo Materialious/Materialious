@@ -1,4 +1,4 @@
-import { getPublicEnv } from '$lib/misc';
+import { getPublicEnv } from '$lib/env';
 import { interfaceRegionStore } from '$lib/store';
 import { USER_AGENT } from 'bgutils-js/utils';
 import { get } from 'svelte/store';

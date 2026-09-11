@@ -2,7 +2,7 @@ import z from 'zod';
 import type { Subscription } from './api/model';
 import { getChannel, getSubscriptions, postSubscribe } from './api';
 import Papa from 'papaparse';
-import { downloadStringAsFile } from './misc';
+import { downloadStringAsFile } from './download';
 
 const zInvidiousSubs = z.object({
 	subscriptions: z.array(z.string())

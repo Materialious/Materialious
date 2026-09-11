@@ -3,11 +3,7 @@
 	import { resolve } from '$app/paths';
 	import Question from '$lib/components/Question.svelte';
 	import { _ } from '$lib/i18n';
-	import {
-		isUnrestrictedPlatform,
-		getMaterialiousBackendUrl,
-		remoteMaterialiousSupported
-	} from '$lib/misc';
+	import { isUnrestrictedPlatform, getMaterialiousBackendUrl, remoteMaterialiousSupported } from '$lib/backend';
 	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '$lib/auth';
 	import { isOwnBackend } from '$lib/shared';
 	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '$lib/store';

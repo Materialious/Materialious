@@ -4,7 +4,7 @@
 	import { _ } from '$lib/i18n';
 	import type { VideoPlay } from '$lib/api/model';
 	import { onMount } from 'svelte';
-	import { expandSummery } from '$lib/misc';
+	import { expandSummery } from '$lib/utils';
 	import { interfaceAutoExpandDesc } from '$lib/store';
 	import { humanizeTimestamp } from '$lib/time';
 

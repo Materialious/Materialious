@@ -23,7 +23,7 @@
 	import PlaylistManager from '../PlaylistManager.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
-	import { truncate } from '$lib/misc';
+	import { truncate } from '$lib/utils';
 	import { page } from '$app/state';
 
 	interface Props {

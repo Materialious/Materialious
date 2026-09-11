@@ -1,7 +1,7 @@
 import { resolve } from '$app/paths';
 import { getPopular } from '$lib/api/index';
 import { HTTPError } from '$lib/api/invidious/request';
-import { isYTBackend } from '$lib/misc';
+import { isYTBackend } from '$lib/backend';
 import { feedCacheStore, invidiousInstanceStore } from '$lib/store';
 import { error, redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';

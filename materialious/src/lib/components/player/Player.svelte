@@ -49,7 +49,9 @@
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '$lib/components/Toast.svelte';
-	import { getPublicEnv, isMobile, isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
+	import { getPublicEnv } from '$lib/env';
+	import { isMobile } from '$lib/utils';
+	import { isUnrestrictedPlatform, isYTBackend } from '$lib/backend';
 	import { isOwnBackend } from '$lib/shared';
 	import Settings, { setActiveAudioTrack, setActiveVideoTrack } from './settings/Settings.svelte';
 	import CaptionSettings from './settings/CaptionSettings.svelte';

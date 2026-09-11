@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isMobile } from '$lib/misc';
+	import { isMobile } from '$lib/utils';
 	import { playerDoubleTapSeek } from '$lib/player';
 	import { onDestroy } from 'svelte';
 

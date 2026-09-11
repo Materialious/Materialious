@@ -19,7 +19,7 @@
 		loadSettingsFromFile,
 		settingsToJson
 	} from '$lib/externalSettings';
-	import { downloadStringAsFile } from '$lib/misc';
+	import { downloadStringAsFile } from '$lib/download';
 	import { zNumber, zThemeColors } from '$lib/externalSettings/settings';
 	import { Capacitor } from '@capacitor/core';
 
@@ -274,7 +274,7 @@
 			const files = (event.target as HTMLInputElement).files;
 			if (files?.length === 0 || !files) return;
 
-			await loadSettingsFromFile(files[0]);
+			await loadSettingsFromFile(files[0], ['advancedTheming', 'borderRadius']);
 		}}
 		accept=".json"
 		type="file"

@@ -3,7 +3,8 @@
 	import { amSubscribed, deleteUnsubscribe, postSubscribe } from '$lib/api';
 	import type { Image } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
-	import { isYTBackend, truncate } from '$lib/misc';
+	import { isYTBackend } from '$lib/backend';
+	import { truncate } from '$lib/utils';
 	import { invidiousAuthStore, isAndroidTvStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { localDb } from '$lib/dexie';

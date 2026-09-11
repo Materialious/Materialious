@@ -23,7 +23,7 @@
 		playerYouTubeJsFallback
 	} from '../../store';
 	import { playbackRates } from '$lib/player/index';
-	import { isUnrestrictedPlatform } from '$lib/misc';
+	import { isUnrestrictedPlatform } from '$lib/backend';
 	import ComboBox from '../ComboBox.svelte';
 
 	let localVideoFallback: 'enabled' | 'disabled' | 'always' = $state('enabled');

@@ -69,10 +69,9 @@ export {
 	rawMasterKeyStore,
 	materialiousBackendStore,
 	authTokenStore,
-	watchHistoryEnabledStore,
-	poTokenCacheStore,
-	isAndroidTvStore
-} from './misc';
+	configBackendCache
+} from './backend';
+export { watchHistoryEnabledStore, poTokenCacheStore, isAndroidTvStore } from './misc';
 export {
 	sponsorBlockStore,
 	sponsorBlockUrlStore,

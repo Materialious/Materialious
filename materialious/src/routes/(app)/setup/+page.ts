@@ -1,6 +1,6 @@
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
-import { isYTBackend } from '$lib/misc';
+import { isYTBackend } from '$lib/backend';
 import { invidiousInstanceStore } from '$lib/store';
 import { get } from 'svelte/store';
 

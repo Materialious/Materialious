@@ -15,7 +15,7 @@ import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
 import { Innertube, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
-import { isUnrestrictedPlatform } from '$lib/misc';
+import { isUnrestrictedPlatform } from '$lib/backend';
 import { webPoTokenMinter } from '$lib/web/youtube/minter';
 import { associateAvatar } from '$lib/thumbnail';
 

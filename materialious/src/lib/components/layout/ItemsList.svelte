@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, type FeedItems } from '$lib/feed';
-	import { isMobile, keyCodeMap, timeout } from '$lib/misc';
+	import { isMobile, keyCodeMap, timeout } from '$lib/utils';
 	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';

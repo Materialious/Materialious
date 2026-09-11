@@ -5,7 +5,7 @@
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { numberWithCommas } from '$lib/numbers';
 	import CommentSelf from './Comment.svelte';
-	import { truncate } from '$lib/misc';
+	import { truncate } from '$lib/utils';
 	import { _ } from '$lib/i18n';
 	import { extractActualLink } from '$lib/description';
 	import { Avatar } from 'melt/builders';

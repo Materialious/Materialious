@@ -1,4 +1,4 @@
-import { getPublicEnv } from '$lib/misc';
+import { getPublicEnv } from '$lib/env';
 import type { AdaptiveFormats, VideoPlay } from '$lib/api/model';
 import { sanitizeFilename } from '@materialious/shared';
 import type { SabrFormat } from '@materialious/shared/download';

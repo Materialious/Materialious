@@ -49,12 +49,11 @@
 			remoteMaterialiousSupported() ||
 			($rawMasterKeyStore && $materialiousBackendStore)) &&
 			(!isYTBackend() || !!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)
-	);
+	)
 
-	const accountLoggedIn = $derived(
-		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
-			(!!$invidiousAuthStore && !isOwnBackend()?.internalAuth)
-	);
+    const showLogin = $derived(
+	    !isYTBackend() || !!isOwnBackend()?.internalAuth
+    );
 
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);

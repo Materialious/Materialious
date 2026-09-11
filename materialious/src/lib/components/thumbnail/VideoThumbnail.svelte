@@ -284,7 +284,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={page.url.pathname !== '/history' && !sideways}>
+				<div class:crop={page.url.pathname !== '/history' && !sideways && !page.url.pathname.startsWith('/watch')}>
 					<img
 						class="responsive"
 						class:watched={progress}

@@ -10,7 +10,7 @@
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
 	import { Slider } from 'melt/builders';
@@ -27,7 +27,6 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerState,
-		playerTheatreModeIsActive,
 		playerIsInWindowFullscreen,
 		playerYouTubeJsFallback,
 		sponsorBlockCategoriesStore,
@@ -136,11 +135,6 @@
 		step: 0.01
 	});
 
-	playerTheatreModeIsActive.subscribe(async () => {
-		await tick();
-		updateVideoPlayerHeight();
-	});
-
 	function saveVolumePreference() {
 		if (!playerElement) return;
 		playerVolume = playerElement.volume;
@@ -242,8 +236,6 @@
 		if (document.fullscreenElement) {
 			document.exitFullscreen();
 			playerIsFullscreen = false;
-
-			setTimeout(() => updateVideoPlayerHeight(), 100);
 		} else {
 			playerContainer.requestFullscreen();
 			playerIsFullscreen = true;
@@ -268,7 +260,6 @@
 		player.addEventListener('loaded', () => {
 			restoreQualityPreference(player);
 			restoreDefaultLanguage(player);
-			updateVideoPlayerHeight();
 
 			setActiveAudioTrack(player);
 			setActiveVideoTrack(player);
@@ -352,18 +343,6 @@
 		} else {
 			playerElement?.play();
 		}
-	}
-
-	// Due to how our player is rendered in layout for stateful pip
-	// we calaculate player height to then allow children pages
-	// to wrap around it.
-	function updateVideoPlayerHeight() {
-		if (!playerContainer) {
-			return;
-		}
-
-		const height = playerContainer.getBoundingClientRect().height;
-		document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
 	}
 
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
@@ -474,9 +453,6 @@
 
 		// Change instantly to stop video from being loud for a second
 		restoreVolumePreference();
-
-		window.addEventListener('resize', updateVideoPlayerHeight);
-		updateVideoPlayerHeight();
 
 		if (playerElement) await player.attach(playerElement);
 
@@ -757,9 +733,6 @@
 				await reloadVideo();
 			}
 		}
-
-		// Update video player height again on video loaded.
-		updateVideoPlayerHeight();
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
@@ -802,8 +775,6 @@
 		} catch {
 			// Continue regardless of error
 		}
-
-		window.removeEventListener('resize', updateVideoPlayerHeight);
 
 		Mousetrap.unbind([
 			$keybindStore.togglePlay,

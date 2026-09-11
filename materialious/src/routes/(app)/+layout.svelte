@@ -176,6 +176,25 @@
 		resetScroll();
 	});
 
+	let playerPlaceholderArea: HTMLDivElement | undefined = $state();
+	let playerActiveArea: HTMLDivElement | undefined = $state();
+
+	$effect(() => {
+		const el = playerPlaceholderArea ?? playerActiveArea;
+		if (!el) return;
+
+		const observer = new ResizeObserver((entries) => {
+			for (const entry of entries) {
+				const height = entry.contentBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
+				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+			}
+		});
+
+		observer.observe(el);
+
+		return () => observer.disconnect();
+	});
+
 	let fullscreenExited = false;
 
 	document.addEventListener('fullscreenchange', () => {
@@ -466,7 +485,7 @@
 					class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
 				>
 					<div class="pip-info">
-						<div class="player">
+						<div class="player" bind:this={playerPlaceholderArea}>
 							<div class="player-placeholder">
 								<progress class="circle large indeterminate"></progress>
 							</div>
@@ -512,7 +531,7 @@
 								</nav>
 							</div>
 						{/if}
-						<div class="player">
+						<div class="player" bind:this={playerActiveArea}>
 							{#key $playerState.data.video.videoId}
 								<Player data={$playerState.data} {playerIsPip} />
 							{/key}

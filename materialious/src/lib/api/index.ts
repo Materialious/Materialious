@@ -96,6 +96,7 @@ import {
 import { localDb } from '$lib/dexie';
 import { getBestThumbnail } from '$lib/images';
 import type { ThumbnailVideo } from '$lib/thumbnail';
+import { backendFetch } from './backend/request';
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {
 	// Doesn't exist in YTjs.
@@ -515,7 +516,7 @@ export async function getDownloadFormats(video: VideoPlay): Promise<AvailableFor
 	}
 
 	if (isOwnBackend()) {
-		const resp = await fetch('/api/download/formats', {
+		const resp = await backendFetch('/api/download/formats', {
 			method: 'POST',
 			body: JSON.stringify({ videoId: video.videoId }),
 			credentials: 'same-origin'

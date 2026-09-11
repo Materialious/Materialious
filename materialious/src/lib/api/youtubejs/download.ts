@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import type { DownloadFormatSelection, SabrFormat } from '@materialious/shared/download';
+import { backendFetch } from '../backend/request';
 
 export type DownloadSelection = DownloadFormatSelection;
 
@@ -76,7 +77,7 @@ async function pollDownloadProgress(
 	const poll = async () => {
 		while (!stopped) {
 			try {
-				const resp = await fetch(`/api/download/progress?downloadId=${downloadId}`, {
+				const resp = await backendFetch(`/api/download/progress?downloadId=${downloadId}`, {
 					credentials: 'same-origin'
 				});
 
@@ -111,7 +112,7 @@ export async function startWebDownload(
 	const stopProgress = onProgress ? await pollDownloadProgress(downloadId, onProgress) : undefined;
 
 	try {
-		const resp = await fetch(url, {
+		const resp = await backendFetch(url, {
 			credentials: 'same-origin'
 		});
 

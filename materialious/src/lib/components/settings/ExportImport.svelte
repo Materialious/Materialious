@@ -274,7 +274,7 @@
 			const files = (event.target as HTMLInputElement).files;
 			if (files?.length === 0 || !files) return;
 
-			await loadSettingsFromFile(files[0]);
+			await loadSettingsFromFile(files[0], ['advancedTheming', 'borderRadius']);
 		}}
 		accept=".json"
 		type="file"

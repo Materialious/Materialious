@@ -44,12 +44,9 @@
 
 	let { children } = $props();
 
-	const showLogin = $derived(
-		(!!isOwnBackend()?.internalAuth ||
-			remoteMaterialiousSupported() ||
-			($rawMasterKeyStore && $materialiousBackendStore)) &&
-			(!isYTBackend() || !!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)
-	);
+    const showLogin = $derived(
+	    !isYTBackend() || !!isOwnBackend()?.internalAuth
+    );
 
 	const accountLoggedIn = $derived(
 		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||

@@ -1,6 +1,7 @@
 {
 	"enabled": "Enabled",
 	"disabled": "Disabled",
+	"downloadedCompletedAndroid": "File saved to Android Downloads folder",
 	"popularPageDisabled": "Popular page has been disabled by Admins",
 	"premium": "Premium YouTube content can't be watched on Materialious.",
 	"copyUrl": "Copy URL",

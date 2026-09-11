@@ -28,6 +28,8 @@ import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
 import { loadContentFilterFromURL } from '$lib/filtering/index.js';
 import { getKeyValue } from '$lib/api/backend/keyvalue.js';
+import { configBackend } from '$lib/api/backend';
+import { configBackendCache } from '$lib/stores/misc.js';
 
 export const ssr = false;
 export const prerender = false;
@@ -72,6 +74,13 @@ export async function load({ url }) {
 				store.set(deserialize(result.value));
 			}
 		}
+	}
+
+	if (get(materialiousBackendStore)) {
+		const config = await configBackend();
+		if (!config) return;
+
+		configBackendCache.set(config);
 	}
 
 	if (get(filterContentUrlAutoUpdateStore)) {

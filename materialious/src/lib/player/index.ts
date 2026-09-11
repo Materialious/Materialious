@@ -14,7 +14,7 @@ import {
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { loadEntirePlaylist } from '$lib/playlist';
-import { unsafeRandomItem } from '$lib/misc';
+import { unsafeRandomItem } from '$lib/utils';
 import { isItemFiltered } from '$lib/filtering';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';

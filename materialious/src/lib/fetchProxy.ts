@@ -1,4 +1,6 @@
-import { getPublicEnv, isUnrestrictedPlatform, timeout } from '$lib/misc';
+import { getPublicEnv } from '$lib/env';
+import { isUnrestrictedPlatform } from '$lib/backend';
+import { timeout } from '$lib/utils';
 import { Capacitor } from '@capacitor/core';
 import sodium from 'libsodium-wrappers-sumo';
 import { isOwnBackend } from './shared';

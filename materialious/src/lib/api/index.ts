@@ -25,7 +25,7 @@ import type {
 } from './model';
 import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
-import { isMaterialiousAccountActive, isUnrestrictedPlatform, isYTBackend } from '$lib/misc';
+import { isMaterialiousAccountActive, isUnrestrictedPlatform, isYTBackend } from '$lib/backend';
 import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
 import { getResolveUrlYTjs } from './youtubejs/misc';
 import { getCommentsYTjs } from './youtubejs/comments';

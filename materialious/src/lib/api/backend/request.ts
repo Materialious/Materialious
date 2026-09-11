@@ -1,4 +1,4 @@
-import { getMaterialiousAuthHeaders, getMaterialiousBackendUrl } from '$lib/misc';
+import { getMaterialiousAuthHeaders, getMaterialiousBackendUrl } from '$lib/backend';
 
 export function backendFetch(path: string, options: RequestInit = {}): Promise<Response> {
 	const url = `${getMaterialiousBackendUrl()}${path}`;

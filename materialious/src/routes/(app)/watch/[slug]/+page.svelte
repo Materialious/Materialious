@@ -31,7 +31,7 @@
 	import Description from '$lib/components/watch/Description.svelte';
 	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
 	import Comment from '$lib/components/watch/Comment.svelte';
-	import { expandSummery } from '$lib/misc';
+	import { expandSummery } from '$lib/utils';
 	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { getWatchPage } from '$lib/watch';

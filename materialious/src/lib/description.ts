@@ -1,4 +1,4 @@
-import { decodeHtmlCharCodes } from './misc';
+import { decodeHtmlCharCodes } from './utils';
 import { videoLength } from './numbers';
 import { convertToSeconds, padTime } from './time';
 

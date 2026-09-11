@@ -4,7 +4,8 @@ import { z } from 'zod';
 
 import { persistedStores, ensureBackendPersistedStores, type PersistedStore } from './settings';
 
-import { getPublicEnv, isMaterialiousAccountActive } from '$lib/misc';
+import { getPublicEnv } from '$lib/env';
+import { isMaterialiousAccountActive } from '$lib/backend';
 import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend/keyvalue';
 import { rawMasterKeyStore } from '$lib/store';
 

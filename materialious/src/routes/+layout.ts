@@ -23,13 +23,13 @@ import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
-import { isMaterialiousAccountActive, isYTBackend } from '$lib/misc';
+import { isMaterialiousAccountActive, isYTBackend } from '$lib/backend';
 import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
 import { loadContentFilterFromURL } from '$lib/filtering/index.js';
 import { getKeyValue } from '$lib/api/backend/keyvalue.js';
 import { configBackend } from '$lib/api/backend';
-import { configBackendCache } from '$lib/stores/misc.js';
+import { configBackendCache } from '$lib/stores/backend.js';
 
 export const ssr = false;
 export const prerender = false;

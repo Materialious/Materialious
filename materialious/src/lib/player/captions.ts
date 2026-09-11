@@ -1,5 +1,5 @@
 import type { Captions, FallbackPatches } from '$lib/api/model';
-import { getPublicEnv } from '$lib/misc';
+import { getPublicEnv } from '$lib/env';
 import { invidiousInstanceStore } from '$lib/store';
 import { get } from 'svelte/store';
 

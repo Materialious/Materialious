@@ -19,7 +19,7 @@
 	} from '$lib/player/thumbnails';
 	import { onDestroy, onMount } from 'svelte';
 	import { videoLength } from '$lib/numbers';
-	import { truncate } from '$lib/misc';
+	import { truncate } from '$lib/utils';
 	import { mergeAttrs } from 'melt';
 	import Mousetrap from 'mousetrap';
 

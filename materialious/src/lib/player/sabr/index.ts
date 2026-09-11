@@ -6,7 +6,7 @@ import { Constants, YT } from 'youtubei.js';
 import { get } from 'svelte/store';
 import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
-import { isUnrestrictedPlatform } from '$lib/misc';
+import { isUnrestrictedPlatform } from '$lib/backend';
 
 export async function injectSabr(
 	video: VideoPlay,

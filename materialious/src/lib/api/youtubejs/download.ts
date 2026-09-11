@@ -5,7 +5,7 @@ import { addToast } from '$lib/components/Toast.svelte';
 import { FileSharer } from '@capgo/capacitor-file-sharer';
 import { get } from 'svelte/store';
 import { _ } from '$lib/i18n';
-import { blobToBase64 } from '$lib/misc';
+import { blobToBase64 } from '$lib/download';
 
 export type DownloadSelection = DownloadFormatSelection;
 

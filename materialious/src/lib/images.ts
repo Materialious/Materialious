@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import type { Image } from './api/model';
 import { invidiousInstanceStore } from './store';
-import { isYTBackend } from './misc';
+import { isYTBackend } from './backend';
 import { Capacitor } from '@capacitor/core';
 import { corsProxyUrl } from './fetchProxy';
 

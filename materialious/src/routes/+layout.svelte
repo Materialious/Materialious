@@ -37,7 +37,7 @@
 		syncSettingsToBackend
 	} from '$lib/externalSettings';
 	import { configBackend } from '$lib/api/backend';
-	import { configBackendCache } from '$lib/stores/misc';
+	import { configBackendCache } from '$lib/stores/backend';
 
 	let { children } = $props();
 

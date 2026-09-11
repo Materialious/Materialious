@@ -5,14 +5,9 @@
 	import { iso31661 } from 'iso-3166';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import {
-		getMaterialiousBackendUrl,
-		isUnrestrictedPlatform,
-		remoteMaterialiousSupported,
-		timeout,
-		shareURL,
-		isMobile
-	} from '$lib/misc';
+	import { getMaterialiousBackendUrl, isUnrestrictedPlatform, remoteMaterialiousSupported } from '$lib/backend';
+	import { timeout, isMobile } from '$lib/utils';
+	import { shareURL } from '$lib/download';
 	import { getPages, type Pages } from '$lib/navPages';
 	import {
 		setInvidiousInstance,

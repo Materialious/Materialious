@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { unsafeRandomItem } from '$lib/misc';
+	import { unsafeRandomItem } from '$lib/utils';
 	import { cleanNumber } from '$lib/numbers';
 	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
 	import { _ } from '$lib/i18n';

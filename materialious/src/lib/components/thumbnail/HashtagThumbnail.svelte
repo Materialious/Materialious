@@ -3,7 +3,7 @@
 	import { cleanNumber } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { HashTag } from '$lib/api/model';
-	import { truncate } from '$lib/misc';
+	import { truncate } from '$lib/utils';
 
 	interface Props {
 		hashtag: HashTag;

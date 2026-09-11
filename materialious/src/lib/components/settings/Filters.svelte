@@ -11,7 +11,7 @@
 	import type z from 'zod';
 	import { addToast } from '../Toast.svelte';
 	import { Clipboard } from '@capacitor/clipboard';
-	import { downloadStringAsFile } from '$lib/misc';
+	import { downloadStringAsFile } from '$lib/download';
 	import ComboBox from '../ComboBox.svelte';
 
 	let remoteFilterListUrl: string = $state($filterContentUrlStore ?? '');

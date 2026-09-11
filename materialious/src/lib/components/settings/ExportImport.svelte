@@ -19,7 +19,7 @@
 		loadSettingsFromFile,
 		settingsToJson
 	} from '$lib/externalSettings';
-	import { downloadStringAsFile } from '$lib/misc';
+	import { downloadStringAsFile } from '$lib/download';
 	import { zNumber, zThemeColors } from '$lib/externalSettings/settings';
 	import { Capacitor } from '@capacitor/core';
 

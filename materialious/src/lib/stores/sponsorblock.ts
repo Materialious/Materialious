@@ -1,7 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
-import { getPublicEnv } from '../misc';
+import { getPublicEnv } from '../env';
 
 export const sponsorBlockStore = persist(writable(true), createStorage(), 'sponsorBlock');
 export const sponsorBlockUrlStore: Writable<string | null | undefined> = persist(

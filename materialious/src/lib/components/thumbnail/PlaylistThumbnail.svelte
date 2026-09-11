@@ -4,7 +4,7 @@
 	import { letterCase } from '$lib/letterCasing';
 	import { _ } from '$lib/i18n';
 	import type { Playlist, PlaylistPage } from '$lib/api/model';
-	import { truncate } from '$lib/misc';
+	import { truncate } from '$lib/utils';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 

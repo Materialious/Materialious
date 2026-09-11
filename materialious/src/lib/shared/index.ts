@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/public';
 import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 import { materialiousBackendStore } from '$lib/stores';
-import { configBackendCache } from '$lib/stores/misc';
+import { configBackendCache } from '$lib/stores/backend';
 
 export type IsOwnBackend = {
 	builtWithBackend: boolean;

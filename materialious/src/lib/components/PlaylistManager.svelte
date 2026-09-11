@@ -8,7 +8,7 @@
 	import type { PlaylistPage } from '$lib/api/model';
 	import { _ } from '$lib/i18n';
 	import { invidiousAuthStore, personalPlaylistsCacheStore } from '$lib/store';
-	import { isYTBackend } from '$lib/misc';
+	import { isYTBackend } from '$lib/backend';
 
 	interface Props {
 		mode: 'toggle' | 'clone';

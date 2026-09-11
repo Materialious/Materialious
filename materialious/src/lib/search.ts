@@ -2,7 +2,7 @@ import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { get } from 'svelte/store';
 import { interfaceSearchHistoryEnabled, searchHistoryStore } from './store';
-import { isVideoID } from './misc';
+import { isVideoID } from './utils';
 
 function extractVideoId(url: string): string | null {
 	const urlObj = new URL(url, 'http://example.com'); // Using a base URL in case searchValue is just a query parameter

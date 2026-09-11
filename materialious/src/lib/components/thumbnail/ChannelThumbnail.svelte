@@ -4,7 +4,7 @@
 	import { cleanNumber } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { Channel } from '$lib/api/model';
-	import { truncate } from '$lib/misc';
+	import { truncate } from '$lib/utils';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 	import { isAndroidTvStore } from '$lib/store';

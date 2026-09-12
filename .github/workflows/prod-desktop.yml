@@ -1,8 +1,9 @@
 name: Build desktop
 
 on:
-  push:
+  pull_request:
     branches: [main]
+    types: [closed]
     paths-ignore:
       - "**/*.md"
       - "./fastline/**"
@@ -15,6 +16,7 @@ permissions:
 
 jobs:
   desktop-build:
+    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
     strategy:
       matrix:
         node-version: [24]

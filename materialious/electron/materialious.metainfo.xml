@@ -39,23 +39,23 @@
   <screenshots>
     <screenshot type="default">
       <caption>Popular videos</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/home-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/home-preview.png</image>
     </screenshot>
     <screenshot>
       <caption>Watching a video</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Materialious/Materialious/43e6eb78edae030ffd372af5b9a8dcf92564be46/previews/player-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/43e6eb78edae030ffd372af5b9a8dcf92564be46/previews/player-preview.png</image>
     </screenshot>
     <screenshot>
       <caption>Modifying settings</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Materialious/Materialious/43e6eb78edae030ffd372af5b9a8dcf92564be46/previews/setting-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/43e6eb78edae030ffd372af5b9a8dcf92564be46/previews/setting-preview.png</image>
     </screenshot>
     <screenshot>
       <caption>Browsing a channel</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/channel-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/channel-preview.png</image>
     </screenshot>
     <screenshot>
       <caption>Browsing a playlist</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/playlist-preview.png</image>
+      <image>https://raw.githubusercontent.com/Materialious/Materialious/4baa7b897a46d4e71aaca7d322e4f7dafc870a33/previews/playlist-preview.png</image>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1">

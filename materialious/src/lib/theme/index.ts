@@ -2,7 +2,7 @@ import { Capacitor, SystemBarType } from '@capacitor/core';
 import ui from 'beercss';
 import { get } from 'svelte/store';
 import { SystemBars, SystemBarsStyle } from '@capacitor/core';
-import { darkModeStore, interfaceAmoledTheme } from './store';
+import { darkModeStore, interfaceAmoledTheme } from '../store';
 
 export type ThemeKey =
 	| '--primary'

@@ -24,7 +24,7 @@
 		setStatusBarColor,
 		setTheme,
 		setThemeColors
-	} from '$lib/theme';
+	} from '$lib/theme/index';
 
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';

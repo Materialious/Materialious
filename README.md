@@ -1,4 +1,4 @@
-<div align="center">  <img src="./materialious/static/logo.svg" width="200px" />
+<div align="center">  <img src="./branding/MaterialiousAppIcon.svg" width="200px" />
   <br />
   <br />
   <h1>Materialious</h1>
@@ -9,22 +9,21 @@
 
 &nbsp;
 
--------
-
+---
 
 ![Preview of homepage](./previews/home-preview.png)
 
-
 # Features
+
 - Internal account system (Optional).
-  * Subscriptions are end-to-end encrypted.
-  * History & watch progress syncing.
-  * [Proof-of-work Captcha](https://github.com/altcha-org/altcha).
+  - Subscriptions are end-to-end encrypted.
+  - History & watch progress syncing.
+  - [Proof-of-work Captcha](https://github.com/altcha-org/altcha).
 - Subscription importing/exporting
-  * Automatically import/export Invidious/Materialious.
+  - Automatically import/export Invidious/Materialious.
 - Invidious is optional.
-  * Enjoy Materialious without a Invidious instance via our YouTube backend.
-  * Local video fallback if Invidious fails loading videos.
+  - Enjoy Materialious without a Invidious instance via our YouTube backend.
+  - Local video fallback if Invidious fails loading videos.
 - Invidious companion support.
 - Android TV support.
 - Support for disabling certificate validation for homelab users.
@@ -46,16 +45,19 @@
 - YT path redirects.
 
 # Docker deployment
+
 This version of Materialious is feature rich, has its own account system (optional) & is easier to setup.
 
 [Please read the guide here](./docs/DOCKER-FULL.md)
 
 # Legacy Docker deployment, Invidious only.
+
 This version of Materialious is still **fully** supported, but is purely just a Invidious frontend without any fancy bells and whistles, this version is harder to deploy...
 
 [Please read the guide here](./docs/DOCKER.md)
 
 # Installing as a app
+
 <!--This layout is taken from spotube's README as I really liked its layout.
 I've commented out places what aren't relevant but might be in the future.-->
 <table>
@@ -169,37 +171,48 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 # Previews
 
 ## Mobile
+
 <img src="./previews/mobile-preview.png" style="height: 500px"/>
 
 ## Android TV Home
+
 ![Preview of subscriptions page on Android TV](./previews/android-tv-home.png)
 
 ## Android TV Player
+
 ![Preview of player on Android TV](./previews/android-tv-player.png)
 
 ## Login
+
 ![Preview of Login page](./previews/login-previews.png)
 
 ## Player
+
 ![Preview of player](./previews/player-preview.png)
 
 ## Settings
+
 ![Preview of settings](./previews/setting-preview.png)
 
 ## Channel
+
 ![Preview of channel](./previews/channel-preview.png)
 
 ## Chapters
+
 ![Preview of chapters](./previews/chapter-previews.png)
 
 ## Playlists
+
 ![Preview of playlist page](./previews/playlist-preview.png)
 ![Preview of playlist on video page](./previews/playlist-preview-2.png)
 
 # Have any questions?
+
 [Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
 
 # Special thanks to
+
 - [SecularSteve](https://github.com/SecularSteve) for creating Materialious' logo.
 - [Invidious](https://github.com/iv-org).
 - [Clipious](https://github.com/lamarios/clipious) for inspiration & references to undocumented Invidious routes.
@@ -210,5 +223,6 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 - Every dependency in [package.json](/materialious/package.json).
 
 # Developers
+
 - [How Materialious is built](./docs/BUILDING.md)
 - [How to contribute to Materialious](./docs/DEV.md)

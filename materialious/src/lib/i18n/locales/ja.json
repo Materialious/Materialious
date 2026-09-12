@@ -171,7 +171,8 @@
                 "slight": "小",
                 "modern": "中",
                 "rounded": "大"
-            }
+            },
+            "presets": "プリセット"
         },
         "searchSuggestions": "検索候補を表示",
         "previewVideoOnHover": "マウスを乗せるとプレビュー",
@@ -273,7 +274,7 @@
         "export": {
             "title": "エクスポート/インポート",
             "importSub": "登録チャンネルをインポート",
-            "importSubSupported": "YouTube CSV/OPML/JSON、Invidious OPML/JSON、Freetube データベース、NewPipe JSON をサポート",
+            "importSubSupported": "YouTube (CSV/OPML/JSON）、Invidious (OPML/JSON）、FreeTubeデータベース、NewPipe (JSON) に対応しています。（Invidious JSONは低速です)",
             "importing": "登録チャンネルをインポートしています (少し時間がかかります)",
             "importingCompleted": "登録チャンネルを正常にインポートしました",
             "exportSub": "登録チャンネルをエクスポート",
@@ -405,5 +406,7 @@
     "materialiousBackend": "Materialious バックエンド",
     "materialiousBackendUrl": "Materialious URL",
     "materialiousLoginButton": "Materialious アカウントでログイン",
-    "materialiousLogout": "Materialious アカウントからログアウト"
+    "materialiousLogout": "Materialious アカウントからログアウト",
+    "downloadedCompletedAndroid": "ファイルが Android のダウンロードフォルダーに保存されました",
+    "removeMaterialiousBackend": "Materialious インスタンスを削除する"
 }

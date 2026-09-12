@@ -16,13 +16,16 @@ jobs:
   desktop-build-1:
     if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
     uses: ./.github/workflows/reusable-desktop-build.yml
+    secrets: inherit
 
   desktop-build-2:
     needs: desktop-build-1
     if: failure()
     uses: ./.github/workflows/reusable-desktop-build.yml
+    secrets: inherit
 
   desktop-build-3:
     needs: desktop-build-2
     if: failure()
     uses: ./.github/workflows/reusable-desktop-build.yml
+    secrets: inherit

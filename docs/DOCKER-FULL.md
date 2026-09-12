@@ -1,6 +1,31 @@
-## Step 1: Docker
+# Materialious-full
 
-This Guide is for the docker image `wardpearce/materialious-full` **NOT** `wardpearce/materialious`
+This guide is for the docker image `wardpearce/materialious-full`. It is **not** for `wardpearce/materialious`, the front-end only image documented in [DOCKER](./DOCKER.md).
+
+## Overview
+
+`materialious-full` ships Materialious with a bundled backend and account system:
+
+- Built-in users, subscriptions, watch history, and settings stored in a database.
+- A built-in CORS proxy, so no reverse-proxy CORS configuration is needed for Invidious.
+- Server-side fetches for video data, dislikes, SponsorBlock, and DeArrow.
+
+## Prerequisites
+
+- Docker and Docker Compose installed on your host.
+- Recommended: a reverse proxy with HTTPS in front of this container. HTTPS is required only for the proof-of-work captcha (see below); without it, set `PUBLIC_CAPTCHA_DISABLED: "true"`.
+- The URL of your Invidious instance (only if you use Invidious).
+
+## TOC
+
+* [Step 1: Deploy the container](#step-1-deploy-the-container)
+  * [Invidious configuration](#invidious-configuration-if-using-invidious)
+  * [Proof-of-work Captcha](#proof-of-work-captcha)
+  * [Docker Compose](#docker-compose)
+* [Step 2 (Optional, but recommended): Self-host RYD-Proxy](#step-2-optional-but-recommended-self-host-ryd-proxy)
+* [Troubleshooting](#troubleshooting)
+
+## Step 1: Deploy the container
 
 ### Invidious configuration (If using Invidious)
 #### Configuration
@@ -23,10 +48,6 @@ invidious_companion:
 ### Proof-of-work Captcha
 Will only work while using HTTPS. If in HTTP set `PUBLIC_CAPTCHA_DISABLED` to `true`
 
-### Request to Invidious/RYD/DeArrow fails at proxy level.
-Ensure the environmental variable for the relavent service is set or whitelist addtional domains using `WHITELIST_BASE_DOMAIN`, what should be comma separated and be the base domain
-e.g. `"youtube.com,google.com"` NOT `"https://youtube.com,https://videos.google.com"`
-
 ### Docker Compose
 
 ```yaml
@@ -36,10 +57,17 @@ services:
     restart: unless-stopped
     ports:
       - 3000:3000
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     environment:
       # Secret key used to sign authentication cookies (minimum 16 characters).
       # Required only when PUBLIC_INTERNAL_AUTH is "true" (the default).
-      # Use a long, random string for security.
+      # Use a long, random string. Generate one with:
+      #   openssl rand -hex 32
       COOKIE_SECRET: ""
 
       # Database connection URI for storing users, subscriptions, history, and settings.
@@ -139,7 +167,6 @@ services:
       # Only applies on first visit; won't override existing browser settings.
       # Use Settings → Export/Import to generate valid JSON.
       # See SETTINGS.md for all available options.
-      # This domain is automatically whitelisted in the proxy.
       PUBLIC_DEFAULT_SETTINGS: '{"themeColor": "#2596be","region": "US"}'
 
     volumes:
@@ -155,6 +182,8 @@ Materialious lets you customize the default settings by overriding them with `PU
 **Please note:** These overwrites only apply on 1st load & won't replace existing configuration stored in browser local storage.
 
 ## Step 2 (Optional, but recommended): Self-host RYD-Proxy
+The snippets below are **fragments**: add them under `services:` in the same compose file you created in [Step 1](#step-1-deploy-the-container).
+
 #### With TOR (Recommended)
 ```yml
 tor-proxy:
@@ -182,4 +211,36 @@ ryd-proxy:
     - 3003:3000
 ```
 
-Modify/add `PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy.
+Modify/add `PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE` for Materialious to be the reverse proxied URL of RYD-Proxy (e.g. `https://ryd-proxy.example.com`), then restart the container:
+
+```bash
+docker compose up -d
+```
+
+## Troubleshooting
+
+### "COOKIE_SECRET must be at least 16 characters long"
+The container refuses to start. Generate a long, random secret and set it in your compose file configuration:
+
+```bash
+openssl rand -hex 32
+```
+
+### Captcha fails / registration or login is blocked
+The proof-of-work captcha only works over HTTPS. Either put this container behind an HTTPS reverse proxy, or if you are running plain HTTP set `PUBLIC_CAPTCHA_DISABLED: "true"`.
+
+### Requests to Invidious/RYD/DeArrow are blocked at the proxy level
+The proxy only allows known base domains, plus whatever you configure:
+
+- Every `PUBLIC_DEFAULT_*_INSTANCE` URL is automatically whitelisted for you.
+- Add any other service through `WHITELIST_BASE_DOMAIN`, a comma-separated list of **base domains only**.
+  - Correct: `"youtube.com,google.com"`
+  - Incorrect: `"https://youtube.com,https://videos.google.com"`
+- After changing any `PUBLIC_*` or `WHITELIST_BASE_DOMAIN` value, restart the container:
+
+```bash
+docker compose up -d
+```
+
+### Changing a `PUBLIC_*` environment variable does nothing
+In `materialious-full` the `PUBLIC_*` variables are read at runtime, not at build time. Restart the container after editing them as above.

@@ -1,4 +1,4 @@
-<div align="center">  <img src="./materialious/static/logo.svg" width="200px" />
+<div align="center">  <img src="./branding/MaterialiousAppIcon.svg" width="200px" />
   <br />
   <br />
   <h1>Materialious</h1>
@@ -9,53 +9,81 @@
 
 &nbsp;
 
--------
+<p align="center">
+  <a href="./LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/github/license/Materialious/Materialious?color=33a34e" /></a>
+  <a href="https://github.com/Materialious/Materialious/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Materialious/Materialious" /></a>
+  <a href="https://github.com/Materialious/Materialious/releases"><img alt="Downloads" src="https://img.shields.io/github/downloads/Materialious/Materialious/total" /></a>
+  <a href="https://github.com/Materialious/Materialious/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/Materialious/Materialious?logo=github" /></a>
+  <a href="https://f-droid.org/packages/us.materialio.app/"><img alt="F-Droid" src="https://img.shields.io/f-droid/v/us.materialio.app?logo=f-droid" /></a>
+  <a href="https://matrix.to/#/#ward:matrix.org"><img alt="Matrix" src="https://img.shields.io/badge/matrix-%23ward%3Amatrix.org-0dbd8b?logo=matrix" /></a>
+</p>
 
+&nbsp;
+
+---
 
 ![Preview of homepage](./previews/home-preview.png)
 
+## Table of Contents
+
+- [Features](#features)
+- [Docker deployment](#docker-deployment)
+- [Legacy Docker deployment, Invidious only](#legacy-docker-deployment-invidious-only)
+- [Installing as a app](#installing-as-a-app)
+- [Translations](#translations)
+- [Previews](#previews)
+- [Have any questions?](#have-any-questions)
+- [Special thanks to](#special-thanks-to)
+- [Contributing](#contributing)
+- [License](#license)
 
 # Features
-- Internal account system (Optional).
-  * Subscriptions are end-to-end encrypted.
-  * History & watch progress syncing.
-  * [Proof-of-work Captcha](https://github.com/altcha-org/altcha).
-- Subscription importing/exporting
-  * Automatically import/export Invidious/Materialious.
-- Invidious is optional.
-  * Enjoy Materialious without a Invidious instance via our YouTube backend.
-  * Local video fallback if Invidious fails loading videos.
-- Invidious companion support.
-- Android TV support.
-- Support for disabling certificate validation for homelab users.
-- Sync your watch progress between Invidious sessions.
-- Sponsorblock built-in.
-- [Return YouTube Dislike](https://github.com/Anarios/return-youtube-dislike) (RYD) built-in.
-- [DeArrow](https://github.com/ajayyy/DeArrow) built-in.
-- No ads.
-- No tracking.
-- Light/Dark themes.
-- Custom colour themes.
-- Integrates with Invidious subscriptions.
-- Live stream support.
-- Dash support.
-- Chapters.
-- Mini player (PIP.)
-- Playlists.
-- PWA support.
-- YT path redirects.
+
+- **Accounts & Syncing**
+  - Internal account system (optional).
+    - Subscriptions are end-to-end encrypted.
+    - History & watch progress syncing.
+    - [Proof-of-work Captcha](https://github.com/altcha-org/altcha).
+  - Subscription importing/exporting, with automatic Invidious/Materialious import & export.
+  - Sync your watch progress between Invidious sessions.
+- **Invidious & Subscriptions**
+  - Invidious is optional.
+    - Enjoy Materialious without an Invidious instance via our YouTube backend.
+    - Local video fallback if Invidious fails loading videos.
+  - Invidious companion support.
+  - Integrates with Invidious subscriptions.
+- **Integrations**
+  - SponsorBlock built-in.
+  - [Return YouTube Dislike](https://github.com/Anarios/return-youtube-dislike) (RYD) built-in.
+  - [DeArrow](https://github.com/ajayyy/DeArrow) built-in.
+- **Player**
+  - Chapters.
+  - Mini player (PIP).
+  - Playlists.
+- **Platform & Privacy**
+  - Android TV support.
+  - Support for disabling certificate validation for homelab users.
+  - No ads.
+  - No tracking.
+  - Light/Dark themes.
+  - Custom colour themes.
+  - PWA support.
+  - YT path redirects.
 
 # Docker deployment
+
 This version of Materialious is feature rich, has its own account system (optional) & is easier to setup.
 
 [Please read the guide here](./docs/DOCKER-FULL.md)
 
 # Legacy Docker deployment, Invidious only.
+
 This version of Materialious is still **fully** supported, but is purely just a Invidious frontend without any fancy bells and whistles, this version is harder to deploy...
 
 [Please read the guide here](./docs/DOCKER.md)
 
 # Installing as a app
+
 <!--This layout is taken from spotube's README as I really liked its layout.
 I've commented out places what aren't relevant but might be in the future.-->
 <table>
@@ -168,38 +196,54 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 
 # Previews
 
+<details>
+<summary><b>More screenshots</b></summary>
+
 ## Mobile
-<img src="./previews/mobile-preview.png" style="height: 500px"/>
+
+<p align="center"><img src="./previews/mobile-preview.png" width="260" alt="Preview of the mobile app" /></p>
 
 ## Android TV Home
-![Preview of subscriptions page on Android TV](./previews/android-tv-home.png)
+
+<p align="center"><img src="./previews/android-tv-home.png" width="640" alt="Preview of subscriptions page on Android TV" /></p>
 
 ## Android TV Player
-![Preview of player on Android TV](./previews/android-tv-player.png)
+
+<p align="center"><img src="./previews/android-tv-player.png" width="640" alt="Preview of player on Android TV" /></p>
 
 ## Login
-![Preview of Login page](./previews/login-previews.png)
+
+<p align="center"><img src="./previews/login-previews.png" width="640" alt="Preview of Login page" /></p>
 
 ## Player
-![Preview of player](./previews/player-preview.png)
+
+<p align="center"><img src="./previews/player-preview.png" width="640" alt="Preview of player" /></p>
 
 ## Settings
-![Preview of settings](./previews/setting-preview.png)
+
+<p align="center"><img src="./previews/setting-preview.png" width="640" alt="Preview of settings" /></p>
 
 ## Channel
-![Preview of channel](./previews/channel-preview.png)
+
+<p align="center"><img src="./previews/channel-preview.png" width="640" alt="Preview of channel" /></p>
 
 ## Chapters
-![Preview of chapters](./previews/chapter-previews.png)
+
+<p align="center"><img src="./previews/chapter-previews.png" width="640" alt="Preview of chapters" /></p>
 
 ## Playlists
-![Preview of playlist page](./previews/playlist-preview.png)
-![Preview of playlist on video page](./previews/playlist-preview-2.png)
+
+<p align="center"><img src="./previews/playlist-preview.png" width="640" alt="Preview of playlist page" /></p>
+<p align="center"><img src="./previews/playlist-preview-2.png" width="640" alt="Preview of playlist on video page" /></p>
+
+</details>
 
 # Have any questions?
+
 [Join our Matrix space](https://matrix.to/#/#ward:matrix.org)
 
 # Special thanks to
+
 - [SecularSteve](https://github.com/SecularSteve) for creating Materialious' logo.
 - [Invidious](https://github.com/iv-org).
 - [Clipious](https://github.com/lamarios/clipious) for inspiration & references to undocumented Invidious routes.
@@ -209,6 +253,14 @@ Help [translate Materialious via Weblate](https://toolate.othing.xyz/projects/ma
 - [spotube](https://github.com/KRTirtho/spotube) for using their README layout for local installation.
 - Every dependency in [package.json](/materialious/package.json).
 
-# Developers
+# Contributing
+
+Contributions are welcome! Please read the guidelines below before getting started.
+
 - [How Materialious is built](./docs/BUILDING.md)
 - [How to contribute to Materialious](./docs/DEV.md)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+
+# License
+
+[Materialious](LICENSE) is licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.en.html) (AGPL-3.0).

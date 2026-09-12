@@ -1,9 +1,11 @@
 name: Build web
 
 on:
-    push:
+    pull_request:
         branches:
             - main
+        types:
+            - closed
         paths-ignore:
             - "**/*.md"
             - "./fastline/**"
@@ -11,6 +13,7 @@ on:
 
 jobs:
     web-build:
+        if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
         runs-on: ubuntu-latest
 
         steps:

@@ -1,12 +1,10 @@
 name: Build Android
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - "**/*.md"
-      - "./fastline/**"
-      - "./materialious/src/lib/i18n/**"
+  workflow_run:
+    workflows: ["Build desktop"]
+    types:
+      - completed
 
   workflow_dispatch:
 
@@ -14,7 +12,30 @@ permissions:
   contents: write
 
 jobs:
+  check-skip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - name: Check for skip-release label
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SKIP="false"
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            LABELS=$(gh api "/repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }}/pulls" --jq '.[].labels[].name' 2>/dev/null || true)
+            if printf '%s\n' "$LABELS" | grep -q "skip-release"; then
+              SKIP="true"
+            fi
+          fi
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+
   android-build:
+    needs: check-skip
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && needs.check-skip.outputs.skip == 'false')
     runs-on: ubuntu-latest
     defaults:
       run:

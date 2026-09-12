@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestThumbnail, imageHandleCors } from '$lib/images';
+	import { getBestLandscapeThumbnail, imageHandleCors } from '$lib/images';
 	import { letterCase } from '$lib/letterCasing';
 	import { cleanNumber, videoLength } from '$lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
@@ -24,7 +24,6 @@
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
 	import { truncate } from '$lib/utils';
-	import { page } from '$app/state';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -58,7 +57,7 @@
 	let progress: string | undefined = $state();
 
 	let thumbnailSrc = $state(
-		'thumbnail' in video ? video.thumbnail : getBestThumbnail(video.videoThumbnails, 500, 500)
+		'thumbnail' in video ? video.thumbnail : getBestLandscapeThumbnail(video.videoThumbnails)
 	);
 
 	if (get(deArrowEnabledStore)) {
@@ -91,11 +90,19 @@
 		}
 	}
 
+	let thumbnailHeight = $state(0);
+	let thumbnailWidth = $state(0);
 	let thumbnailImageElement: HTMLImageElement | undefined = $state();
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
-		src: () => imageHandleCors(thumbnailSrc)
+		src: () => imageHandleCors(thumbnailSrc),
+		onLoadingStatusChange: () => {
+			if (thumbnailImageElement) {
+				thumbnailHeight = thumbnailImageElement.naturalHeight;
+				thumbnailWidth = thumbnailImageElement.naturalWidth;
+			}
+		}
 	});
 
 	let startedSideways = sideways === true;
@@ -284,7 +291,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={page.url.pathname !== '/history' && !sideways && !page.url.pathname.startsWith('/watch')}>
+				<div class:crop={thumbnailHeight > thumbnailWidth}>
 					<img
 						class="responsive"
 						class:watched={progress}

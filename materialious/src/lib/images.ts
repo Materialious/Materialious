@@ -53,6 +53,20 @@ export function getBestThumbnail(
 	}
 }
 
+export function getBestLandscapeThumbnail(images: Image[] | null): string {
+	if (!images || images.length === 0) return '';
+
+	const landscape = images.filter(
+		(image) =>
+			image.width > 0 && image.height > 0 && Math.abs(image.width / image.height - 16 / 9) < 0.15
+	);
+
+	if (landscape.length === 0) return getBestThumbnail(images, 500, 500);
+
+	landscape.sort((a, b) => b.width * b.height - a.width * a.height);
+	return landscape[0].url;
+}
+
 export function proxyGoogleImage(source: string): string {
 	if (source.startsWith('//')) source = `https:${source}`;
 

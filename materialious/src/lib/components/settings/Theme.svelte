@@ -5,7 +5,7 @@
 		setThemeColor,
 		type ThemeColors,
 		type ThemeKey
-	} from '$lib/theme';
+	} from '$lib/theme/index';
 	import ui from 'beercss';
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
 	import { _ } from '$lib/i18n';
@@ -21,11 +21,13 @@
 	} from '../../store';
 	import { onMount, tick } from 'svelte';
 	import { titleCase } from '$lib/letterCasing';
+	import { presets, type Preset } from '$lib/theme/presets';
 
 	let colorPickerOpen = $state(false);
 	let colorPickerDebounce: ReturnType<typeof setTimeout>;
 
 	let currentThemeColors: ThemeColors | undefined = $state();
+	let activePresetId: Preset['id'] | undefined = $state();
 
 	onMount(async () => {
 		currentThemeColors = await getDynamicTheme();
@@ -47,6 +49,7 @@
 		},
 		propetyKey: ThemeKey
 	) {
+		activePresetId = undefined;
 		if (colorPickerDebounce) clearTimeout(colorPickerDebounce);
 
 		colorPickerDebounce = setTimeout(async () => {
@@ -62,6 +65,7 @@
 		hex: string | null;
 		color: Colord | null;
 	}) {
+		activePresetId = undefined;
 		if (!color.hex) return;
 		if (colorPickerDebounce) clearTimeout(colorPickerDebounce);
 
@@ -77,6 +81,7 @@
 	}
 
 	async function toggleDarkMode() {
+		activePresetId = undefined;
 		const isDark = get(darkModeStore);
 
 		interfaceAdvancedThemingStore.set({});
@@ -90,6 +95,16 @@
 		}
 
 		currentThemeColors = await getDynamicTheme();
+	}
+
+	async function applyPreset(preset: Preset) {
+		activePresetId = preset.id;
+
+		ui('mode', preset.dark ? 'dark' : 'light');
+		darkModeStore.set(preset.dark);
+		interfaceAdvancedThemingStore.set(preset.colors);
+
+		await setThemeColors();
 	}
 </script>
 
@@ -136,6 +151,7 @@
 					type="checkbox"
 					bind:checked={$interfaceAmoledTheme}
 					onclick={async () => {
+						activePresetId = undefined;
 						interfaceAdvancedThemingStore.set({});
 						interfaceAmoledTheme.set(!$interfaceAmoledTheme);
 						await setThemeColors();
@@ -201,7 +217,35 @@
 </div>
 
 {#if !$isAndroidTvStore}
-	<h5>{$_('layout.theme.advanced')}</h5>
+	<h5 class="theme-header">{$_('layout.theme.presets')}</h5>
+	<div class="grid presets-grid">
+		{#each presets as preset (preset.id)}
+			<div class="s6 m3 l3">
+				<button
+					onclick={() => applyPreset(preset)}
+					class="surface-container-highest preset-button"
+					class:primary-border={activePresetId == preset.id}
+					style="width: 100%;box-sizing:border-box;"
+				>
+					<div
+						class="preset-preview"
+						style="background-color: {preset.colors['--surface-container-lowest'] ?? '#000'};"
+					>
+						<span class="preset-dot" style="background: {preset.colors['--primary'] ?? '#000'};"
+						></span>
+						<span class="preset-dot" style="background: {preset.colors['--secondary'] ?? '#000'};"
+						></span>
+						<span class="preset-dot" style="background: {preset.colors['--on-surface'] ?? '#fff'};"
+						></span>
+					</div>
+					<p>{preset.label}</p>
+				</button>
+			</div>
+		{/each}
+	</div>
+	<div class="space"></div>
+
+	<h5 class="theme-header">{$_('layout.theme.advanced')}</h5>
 	<div class="space"></div>
 
 	{#if currentThemeColors}
@@ -221,6 +265,49 @@
 {/if}
 
 <style>
+	.theme-header {
+		margin: 0 0 0.5rem;
+	}
+
+	.presets-grid {
+		max-height: 10rem;
+		overflow-y: auto;
+		margin-right: -0.5rem;
+		padding-right: 0.5rem;
+	}
+
+	.preset-button {
+		block-size: 100% !important;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: flex-start;
+		gap: 0.5rem;
+		padding: 0.5rem;
+		border-radius: var(--border-radius) !important;
+		overflow: hidden;
+	}
+
+	.preset-button p {
+		margin: 0;
+		text-align: center;
+	}
+
+	.preset-preview {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border-radius: var(--border-radius);
+		padding: 0 0.5rem;
+		height: 2rem;
+	}
+
+	.preset-dot {
+		width: 1rem;
+		height: 1rem;
+		border-radius: 50%;
+		display: inline-block;
+	}
+
 	.color-picker {
 		--cp-bg-color: var(--surface-container);
 		--cp-border-color: transparent;

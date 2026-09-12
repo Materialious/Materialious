@@ -23,6 +23,7 @@
 	"unlinkInvidious": "Unlink Invidious account",
 	"materialiousBackend": "Materialious backend",
 	"materialiousBackendUrl": "Materialious URL",
+	"removeMaterialiousBackend": "Remove Materialious instance",
 	"materialiousLoginButton": "Login with Materialious account",
 	"materialiousLogout": "Logout of Materialious account",
 	"createAccount": "Create account",
@@ -281,6 +282,7 @@
 			"AmoledTheme": "Amoled theme",
 			"color": "Color",
 			"advanced": "Advanced theming",
+			"presets": "Presets",
 			"borderRadius": {
 				"none": "None",
 				"slight": "Slight",

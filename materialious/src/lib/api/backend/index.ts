@@ -184,7 +184,13 @@ export async function resetPasswordBackend(
 }
 
 export async function configBackend(): Promise<IsOwnBackend | null> {
-	const resp = await backendFetch('/api/config');
+	let resp: Response;
+	try {
+		resp = await backendFetch('/api/config');
+	} catch {
+		return null;
+	}
+
 	if (!resp.ok) return null;
 
 	let configJson: IsOwnBackend | undefined

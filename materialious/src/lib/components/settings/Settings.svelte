@@ -146,6 +146,8 @@
 						tabs = tabs.filter((tab) => tab.id !== 'admin');
 					}
 				}
+			}).catch(() => {
+				// Remote instance unreachable.
 			});
 		} else {
 			tabs = tabs.filter((tab) => {

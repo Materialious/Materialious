@@ -9,14 +9,12 @@ on:
       - "./fastline/**"
       - "./materialious/src/lib/i18n/**"
 
-  workflow_dispatch:
-
 permissions:
   contents: write
 
 jobs:
   desktop-build-1:
-    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release'))
+    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
     uses: ./.github/workflows/reusable-desktop-build.yml
 
   desktop-build-2:

@@ -2,7 +2,7 @@
 	import ui from 'beercss';
 	import { onMount } from 'svelte';
 	import { darkModeStore, themeColorStore } from '../store';
-	import { getDynamicTheme } from '../theme';
+	import { getDynamicTheme } from '../theme/index';
 
 	interface Props {
 		classes?: string;

@@ -210,6 +210,7 @@
 <style>
 	.search {
 		width: 500px;
+		--_background: var(--surface-container-highest);
 	}
 
 	.selected {

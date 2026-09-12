@@ -2,7 +2,7 @@ import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
 import type { TitleCase } from '../letterCasing';
-import type { ThemeColors } from '../theme';
+import type { ThemeColors } from '../theme/index';
 
 export const darkModeStore: Writable<null | boolean> = persist(
 	writable(null),

@@ -42,7 +42,12 @@
 	let { children } = $props();
 
 	materialiousBackendStore.subscribe(async () => {
-		const config = await configBackend();
+		let config;
+		try {
+			config = await configBackend();
+		} catch {
+			config = null;
+		}
 		if (!config) return;
 
 		configBackendCache.set(config);

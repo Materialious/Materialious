@@ -5,7 +5,11 @@
 	import { iso31661 } from 'iso-3166';
 	import { _ } from '$lib/i18n';
 	import { get } from 'svelte/store';
-	import { getMaterialiousBackendUrl, isUnrestrictedPlatform, remoteMaterialiousSupported } from '$lib/backend';
+	import {
+		getMaterialiousBackendUrl,
+		isUnrestrictedPlatform,
+		remoteMaterialiousSupported
+	} from '$lib/backend';
 	import { timeout, isMobile } from '$lib/utils';
 	import { shareURL } from '$lib/download';
 	import { getPages, type Pages } from '$lib/navPages';
@@ -13,7 +17,8 @@
 		setInvidiousInstance,
 		goToInvidiousLogin,
 		invidiousLogout,
-		setMaterialiousBackend
+		setMaterialiousBackend,
+		removeMaterialiousBackend
 	} from '$lib/auth';
 	import {
 		invidiousAuthStore,
@@ -52,6 +57,13 @@
 		invalidMaterialiousBackend = !(await setMaterialiousBackend(materialiousBackend));
 
 		if (invalidMaterialiousBackend) return;
+
+		await timeout(100);
+		location.reload();
+	}
+
+	async function removeMaterialiousInstance() {
+		await removeMaterialiousBackend();
 
 		await timeout(100);
 		location.reload();
@@ -181,7 +193,7 @@
 		<form onsubmit={setMaterialiousInstance}>
 			<nav>
 				<div
-					class="field prefix label surface-container-highest max"
+					class="field prefix label suffix surface-container-highest max"
 					class:invalid={invalidMaterialiousBackend}
 				>
 					<i>link</i>
@@ -194,6 +206,14 @@
 					<label tabindex="-1" for="materialious-backend">{$_('materialiousBackendUrl')}</label>
 					{#if invalidMaterialiousBackend}
 						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+					{#if materialiousBackend}
+						<i
+							class="front"
+							role="presentation"
+							title={$_('removeMaterialiousBackend')}
+							onclick={removeMaterialiousInstance}>close</i
+						>
 					{/if}
 				</div>
 				<button class="circle">

@@ -21,6 +21,7 @@ import { isYTBackend } from './backend';
 import { deleteKeyValue } from './api/backend/keyvalue';
 import semver from 'semver';
 import { backendFetch } from './api/backend/request';
+import { configBackendCache } from './stores/backend';
 
 export function clearCaches() {
 	feedCacheStore.set({});
@@ -172,4 +173,18 @@ export async function setMaterialiousBackend(
 	rawMasterKeyStore.set(undefined);
 
 	return true;
+}
+
+export async function removeMaterialiousBackend() {
+	if (isOwnBackend()?.internalAuth) {
+		backendFetch('/api/user/logout', { method: 'DELETE' }).catch(() => {
+			// Remote instance unreachable.
+		});
+	}
+
+	configBackendCache.set(undefined);
+	materialiousBackendStore.set(undefined);
+	authTokenStore.set(undefined);
+	rawMasterKeyStore.set(undefined);
+	clearCaches();
 }

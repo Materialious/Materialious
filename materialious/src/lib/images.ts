@@ -58,9 +58,7 @@ export function getBestLandscapeThumbnail(images: Image[] | null): string {
 
 	const landscape = images.filter(
 		(image) =>
-			image.width > 0 &&
-			image.height > 0 &&
-			Math.abs(image.width / image.height - 16 / 9) < 0.15
+			image.width > 0 && image.height > 0 && Math.abs(image.width / image.height - 16 / 9) < 0.15
 	);
 
 	if (landscape.length === 0) return getBestThumbnail(images, 500, 500);

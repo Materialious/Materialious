@@ -8,6 +8,9 @@ permissions:
 
 jobs:
   desktop-build:
+    env:
+      PUBLISH_FOR_PULL_REQUEST: true
+
     strategy:
       matrix:
         node-version: [24]

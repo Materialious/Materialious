@@ -6,8 +6,6 @@ on:
     types:
       - completed
 
-  workflow_dispatch:
-
 permissions:
   contents: write
 
@@ -24,18 +22,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          SKIP="false"
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            LABELS=$(gh api "/repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }}/pulls" --jq '.[].labels[].name' 2>/dev/null || true)
-            if printf '%s\n' "$LABELS" | grep -q "skip-release"; then
-              SKIP="true"
-            fi
+          LABELS=$(gh api "/repos/${{ github.repository }}/commits/${{ github.event.workflow_run.head_sha }}/pulls" --jq '.[].labels[].name' 2>/dev/null || true)
+          if printf '%s\n' "$LABELS" | grep -q "skip-release"; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
 
   android-build:
     needs: check-skip
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && needs.check-skip.outputs.skip == 'false')
+    if: needs.check-skip.outputs.skip == 'false'
     runs-on: ubuntu-latest
     defaults:
       run:

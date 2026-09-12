@@ -217,7 +217,7 @@
 </div>
 
 {#if !$isAndroidTvStore}
-	<h6 class="theme-header">{$_('layout.theme.presets')}</h6>
+	<h5 class="theme-header">{$_('layout.theme.presets')}</h5>
 	<div class="grid presets-grid">
 		{#each presets as preset (preset.id)}
 			<div class="s6 m3 l3">

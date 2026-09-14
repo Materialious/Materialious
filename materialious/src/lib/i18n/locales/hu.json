@@ -77,7 +77,8 @@
                 "modern": "Modern",
                 "rounded": "Lekerekített",
                 "borderRadius": "Szegélysugár"
-            }
+            },
+            "presets": "Előre beállított"
         },
         "searchSuggestions": "Keresési javaslatok",
         "previewVideoOnHover": "Videó előnézete az egérmutatóval",
@@ -406,5 +407,6 @@
     "materialiousBackendUrl": "Materialious webcím",
     "materialiousLoginButton": "Bejelentkezés Materialious-fiókkal",
     "materialiousLogout": "Kijelentkezés a Materialious-fiókból",
-    "downloadedCompletedAndroid": "Fájl mentve az Android „Letöltések” mappába"
+    "downloadedCompletedAndroid": "Fájl mentve az Android „Letöltések” mappába",
+    "removeMaterialiousBackend": "Materialious példány eltávolítása"
 }

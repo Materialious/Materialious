@@ -12,6 +12,7 @@
 	import { get } from 'svelte/store';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
+		customThemesStore,
 		darkModeStore,
 		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
@@ -21,13 +22,19 @@
 	} from '../../store';
 	import { onMount, tick } from 'svelte';
 	import { titleCase } from '$lib/letterCasing';
-	import { presets, type Preset } from '$lib/theme/presets';
+	import { presets, type CustomPreset, type Preset } from '$lib/theme/presets';
+	import { parseThemeFile, serializeThemeFile } from '$lib/theme/themeFile';
+	import { downloadStringAsFile } from '$lib/download';
+	import { addToast } from '../Toast.svelte';
 
 	let colorPickerOpen = $state(false);
 	let colorPickerDebounce: ReturnType<typeof setTimeout>;
 
 	let currentThemeColors: ThemeColors | undefined = $state();
 	let activePresetId: Preset['id'] | undefined = $state();
+	let nameDialogOpen = $state<'save' | 'export' | null>(null);
+	let themeName = $state('');
+	let allPresets = $derived([...$customThemesStore, ...presets]);
 
 	onMount(async () => {
 		currentThemeColors = await getDynamicTheme();
@@ -97,14 +104,122 @@
 		currentThemeColors = await getDynamicTheme();
 	}
 
-	async function applyPreset(preset: Preset) {
+	async function applyPreset(preset: Preset | CustomPreset) {
 		activePresetId = preset.id;
 
 		ui('mode', preset.dark ? 'dark' : 'light');
 		darkModeStore.set(preset.dark);
 		interfaceAdvancedThemingStore.set(preset.colors);
 
+		if ('borderRadius' in preset) {
+			interfaceBorderRadiusStore.set(preset.borderRadius);
+		}
+
 		await setThemeColors();
+	}
+
+	function getCurrentThemeColors(): ThemeColors {
+		const stored = get(interfaceAdvancedThemingStore);
+		if (Object.keys(stored).length > 0) return stored;
+		return currentThemeColors ?? {};
+	}
+
+	async function saveCustomPreset(name: string) {
+		const preset: CustomPreset = {
+			id: crypto.randomUUID(),
+			family: 'Custom',
+			label: name,
+			dark: get(darkModeStore) ?? false,
+			colors: getCurrentThemeColors(),
+			borderRadius: get(interfaceBorderRadiusStore)
+		};
+
+		customThemesStore.set([preset, ...get(customThemesStore)]);
+		activePresetId = preset.id;
+
+		addToast({
+			data: {
+				text: $_('layout.theme.themeSaved')
+			}
+		});
+	}
+
+	function exportTheme(name: string) {
+		downloadStringAsFile(
+			serializeThemeFile(
+				name,
+				getCurrentThemeColors(),
+				get(darkModeStore) ?? false,
+				get(interfaceBorderRadiusStore)
+			),
+			`materialious-theme-${name.replaceAll(' ', '-').toLowerCase()}.json`
+		);
+
+		addToast({
+			data: {
+				text: $_('layout.theme.themeExported')
+			}
+		});
+	}
+
+	function onExportClick() {
+		const activeCustom = get(customThemesStore).find((preset) => preset.id === activePresetId);
+		if (activeCustom) {
+			exportTheme(activeCustom.label);
+			return;
+		}
+
+		themeName = '';
+		nameDialogOpen = 'export';
+	}
+
+	async function confirmName() {
+		const name = themeName.trim() || 'My Theme';
+
+		if (nameDialogOpen === 'save') {
+			await saveCustomPreset(name);
+		} else if (nameDialogOpen === 'export') {
+			exportTheme(name);
+		}
+
+		nameDialogOpen = null;
+	}
+
+	async function importThemeFromFile(file: File) {
+		const parsed = parseThemeFile(await file.text());
+
+		if (!parsed) {
+			addToast({
+				data: {
+					text: $_('layout.theme.themeImportFailed')
+				}
+			});
+			return;
+		}
+
+		const preset: CustomPreset = {
+			id: crypto.randomUUID(),
+			family: 'Custom',
+			...parsed
+		};
+
+		customThemesStore.set([preset, ...get(customThemesStore)]);
+
+		await applyPreset(preset);
+
+		addToast({
+			data: {
+				text: $_('layout.theme.themeImported')
+			}
+		});
+	}
+
+	function deleteCustomPreset(preset: CustomPreset) {
+		customThemesStore.set(get(customThemesStore).filter((p) => p.id !== preset.id));
+
+		if (activePresetId === preset.id) {
+			activePresetId = undefined;
+		}
 	}
 </script>
 
@@ -217,29 +332,105 @@
 </div>
 
 {#if !$isAndroidTvStore}
-	<h5 class="theme-header">{$_('layout.theme.presets')}</h5>
+	<div class="space"></div>
+	<div class="presets-header">
+		<h5 class="theme-header">{$_('layout.theme.presets')}</h5>
+		<nav class="no-space no-margin">
+			<button
+				class="circle surface-container-highest"
+				onclick={() => {
+					themeName = '';
+					nameDialogOpen = 'save';
+				}}
+			>
+				<i>bookmark_add</i>
+				<div class="tooltip bottom">{$_('layout.theme.saveAsPreset')}</div>
+			</button>
+			<button class="circle surface-container-highest" onclick={onExportClick}>
+				<i>file_export</i>
+				<div class="tooltip bottom">{$_('layout.theme.exportTheme')}</div>
+			</button>
+			<button
+				class="circle surface-container-highest"
+				onclick={() => document.getElementById('theme-import-input')?.click()}
+			>
+				<i>attach_file</i>
+				<div class="tooltip bottom">{$_('layout.theme.importTheme')}</div>
+			</button>
+			<input
+				id="theme-import-input"
+				hidden
+				accept=".json"
+				type="file"
+				onchange={async (event: Event) => {
+					const files = (event.target as HTMLInputElement).files;
+					if (files?.length === 0 || !files) return;
+
+					await importThemeFromFile(files[0]);
+					(event.target as HTMLInputElement).value = '';
+				}}
+			/>
+		</nav>
+	</div>
+
+	{#if nameDialogOpen}
+		<div class="space"></div>
+		<div class="field no-margin">
+			<input
+				placeholder={$_('layout.theme.themeName')}
+				bind:value={themeName}
+				onkeydown={(event) => {
+					if (event.key === 'Enter') confirmName();
+				}}
+			/>
+		</div>
+		<div class="space"></div>
+		<button class="no-margin surface-container-highest" onclick={confirmName}>
+			<i>check</i>
+			<span>
+				{nameDialogOpen === 'save'
+					? $_('layout.theme.saveAsPreset')
+					: $_('layout.theme.exportTheme')}
+			</span>
+		</button>
+		<div class="space"></div>
+	{/if}
+
 	<div class="grid presets-grid">
-		{#each presets as preset (preset.id)}
+		{#each allPresets as preset (preset.id)}
 			<div class="s6 m3 l3">
-				<button
-					onclick={() => applyPreset(preset)}
-					class="surface-container-highest preset-button"
-					class:primary-border={activePresetId == preset.id}
-					style="width: 100%;box-sizing:border-box;"
-				>
-					<div
-						class="preset-preview"
-						style="background-color: {preset.colors['--surface-container-lowest'] ?? '#000'};"
+				<div class="preset-card">
+					<button
+						onclick={() => applyPreset(preset)}
+						class="surface-container-highest preset-button"
+						class:primary-border={activePresetId == preset.id}
+						style="width: 100%;box-sizing:border-box;"
 					>
-						<span class="preset-dot" style="background: {preset.colors['--primary'] ?? '#000'};"
-						></span>
-						<span class="preset-dot" style="background: {preset.colors['--secondary'] ?? '#000'};"
-						></span>
-						<span class="preset-dot" style="background: {preset.colors['--on-surface'] ?? '#fff'};"
-						></span>
-					</div>
-					<p>{preset.label}</p>
-				</button>
+						<div
+							class="preset-preview"
+							style="background-color: {preset.colors['--surface-container-lowest'] ?? '#000'};"
+						>
+							<span class="preset-dot" style="background: {preset.colors['--primary'] ?? '#000'};"
+							></span>
+							<span class="preset-dot" style="background: {preset.colors['--secondary'] ?? '#000'};"
+							></span>
+							<span
+								class="preset-dot"
+								style="background: {preset.colors['--on-surface'] ?? '#fff'};"
+							></span>
+						</div>
+						<p>{preset.label}</p>
+					</button>
+					{#if preset.family === 'Custom'}
+						<button
+							class="preset-delete"
+							title={$_('layout.theme.deletePreset')}
+							onclick={() => deleteCustomPreset(preset as CustomPreset)}
+						>
+							<i>close</i>
+						</button>
+					{/if}
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -269,6 +460,25 @@
 		margin: 0 0 0.5rem;
 	}
 
+	.presets-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.presets-header .theme-header {
+		display: flex;
+		align-items: center;
+		margin: 0;
+	}
+
+	.presets-header nav {
+		margin: 0;
+		padding: 0;
+		gap: 0.25rem;
+	}
+
 	.presets-grid {
 		max-height: 10rem;
 		overflow-y: auto;
@@ -285,6 +495,26 @@
 		padding: 0.5rem;
 		border-radius: var(--border-radius) !important;
 		overflow: hidden;
+	}
+
+	.preset-card {
+		position: relative;
+		height: 100%;
+	}
+
+	.preset-delete {
+		position: absolute;
+		top: 0.25rem;
+		right: 0.25rem;
+		width: 1.75rem;
+		height: 1.75rem;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background-color: var(--surface-container-highest);
+		color: var(--on-surface-variant);
 	}
 
 	.preset-button p {

@@ -7,7 +7,7 @@ import { rosepinePresets } from './rosepine';
 import { solarizedPresets } from './solarized';
 import { tokyoNightPresets } from './tokyo-night';
 
-export { buildTheme, type MaterialSeed, type Preset } from './shared';
+export { buildTheme, type CustomPreset, type MaterialSeed, type Preset } from './shared';
 
 export const presets = [
 	...catppuccinPresets,

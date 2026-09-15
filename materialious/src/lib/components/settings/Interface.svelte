@@ -195,6 +195,7 @@
 				<div
 					class="field prefix label suffix surface-container-highest max"
 					class:invalid={invalidMaterialiousBackend}
+					style="min-width: 0"
 				>
 					<i>link</i>
 					<input
@@ -216,7 +217,7 @@
 						>
 					{/if}
 				</div>
-				<button class="circle">
+				<button class="circle" style="flex-shrink: 0">
 					<i>done</i>
 				</button>
 			</nav>

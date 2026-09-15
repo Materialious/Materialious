@@ -8,6 +8,10 @@ export type Preset = {
 	colors: ThemeColors;
 };
 
+export type CustomPreset = Preset & {
+	borderRadius: number;
+};
+
 export type MaterialSeed = {
 	primary: string;
 	primaryContainer: string;

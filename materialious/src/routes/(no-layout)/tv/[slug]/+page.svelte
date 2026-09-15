@@ -212,11 +212,11 @@
 		{/if}
 
 		{#if data.playlistId && data.playlistId in $playlistCacheStore}
-			<h5 style="margin-bottom: 0;">{$_('playlistVideos')}</h5>
+			<h5>{$_('playlistVideos')}</h5>
 			<ItemsList classes="" items={$playlistCacheStore[data.playlistId].videos} />
 		{/if}
 		{#if data.video.recommendedVideos.length > 0}
-			<h5 style="margin-bottom: 0;">{$_('recommendedVideos')}</h5>
+			<h5>{$_('recommendedVideos')}</h5>
 			<ItemsList classes="" items={data.video.recommendedVideos} />
 		{/if}
 	</article>

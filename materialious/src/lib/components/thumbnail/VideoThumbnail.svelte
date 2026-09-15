@@ -390,7 +390,7 @@
 			{/if}
 
 			<nav class="align-end no-margin">
-				{#if !sideways}
+				{#if !sideways && !isAndroidTv()}
 					<AuthorAvatar
 						author={video.author}
 						authorId={'authorId' in video ? (video.authorId ?? '') : ''}

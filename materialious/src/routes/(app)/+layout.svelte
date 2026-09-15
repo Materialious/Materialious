@@ -274,11 +274,17 @@
 		class:tv-nav={isAndroidTv()}
 		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
 	>
-		<header class="small-padding no-margin">
-			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
-				<Logo />
-			</a>
-		</header>
+		{#if !isAndroidTv()}
+			<header class="small-padding no-margin">
+				<a
+					href={resolve($interfaceDefaultPage, {})}
+					tabindex="-1"
+					data-sveltekit-preload-data="off"
+				>
+					<Logo />
+				</a>
+			</header>
+		{/if}
 		{#if isAndroidTv()}
 			<a href={resolve('/search', {})} class:active={page.url.href.endsWith('/search')}>
 				<i>search</i>
@@ -586,7 +592,7 @@
 
 	.tv-nav {
 		min-inline-size: 0.5rem;
-		padding: 0;
+		padding: 0.5rem 1.5rem;
 	}
 
 	.pip {

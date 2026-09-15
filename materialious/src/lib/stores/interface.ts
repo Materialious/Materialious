@@ -2,6 +2,7 @@ import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
 import type { TitleCase } from '../letterCasing';
+import type { CustomPreset } from '../theme/presets';
 import type { ThemeColors } from '../theme/index';
 
 export const darkModeStore: Writable<null | boolean> = persist(
@@ -83,6 +84,11 @@ export const interfaceBorderRadiusStore: Writable<number> = persist(
 	writable(0.5),
 	createStorage(),
 	'borderRadius'
+);
+export const customThemesStore: Writable<CustomPreset[]> = persist(
+	writable([]),
+	createStorage(),
+	'customThemes'
 );
 export const interfacePreserveTranslation: Writable<boolean> = persist(
 	writable(false),

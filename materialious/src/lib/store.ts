@@ -46,6 +46,7 @@ export {
 	interfaceAndroidUseNativeShare,
 	interfaceAdvancedThemingStore,
 	interfaceBorderRadiusStore,
+	customThemesStore,
 	interfacePreserveTranslation,
 	interfaceMobileBackButtonStore,
 	hideSearchStore,

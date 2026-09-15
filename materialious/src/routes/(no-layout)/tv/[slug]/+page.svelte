@@ -30,6 +30,11 @@
 	let isSeeking = false;
 	let lastUpdate = 0;
 	let infoClosedByEnter = false;
+	let keydownHandledMovement = false;
+
+	const hasChapters = $derived(data.content.timestamps.length > 0);
+	const hasPlaylist = $derived(!!data.playlistId && data.playlistId in $playlistCacheStore);
+	const hasRecommended = $derived(data.video.recommendedVideos.length > 0);
 
 	function startSeeking(direction: 'left' | 'right') {
 		showControls = true;
@@ -87,12 +92,22 @@
 		}
 	}
 
+	function focusElement(el: HTMLElement | null | undefined) {
+		if (!el) return;
+		el.focus();
+		el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+	}
+
 	function openInfo() {
 		showInfo = true;
 
 		tick().then(() => {
-			if (infoPanel) infoPanel.scrollTop = 0;
-			document.getElementById('info-close')?.focus();
+			if (infoScope) infoScope.scrollTop = 0;
+
+			const first = infoScope?.querySelector<HTMLElement>(
+				'[tabindex]:not([tabindex="-1"]), a, button, summary'
+			);
+			focusElement(first ?? infoPanel);
 		});
 	}
 
@@ -102,19 +117,35 @@
 	}
 
 	function handleInfoKeyDown(event: KeyboardEvent) {
-		if (event.defaultPrevented) return;
+		if (event.defaultPrevented) {
+			keydownHandledMovement = true;
+			return;
+		}
+
+		keydownHandledMovement = false;
 		if (event.key === 'Enter') return;
 
 		const keyCode = keyCodeMap[event.key];
-		if (!keyCode || !infoScope) return;
+		if (!keyCode) return;
 
-		const nextFocus = getNextFocus(event.target as Element, keyCode, infoScope);
+		const target = event.target;
+		if (!(target instanceof Element)) return;
 
-		if (nextFocus) {
-			event.preventDefault();
-			nextFocus.focus();
-			nextFocus.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-		}
+		const scope = infoScope;
+		if (!scope) return;
+
+		const nextFocus = getNextFocus(target, keyCode, scope);
+		if (!nextFocus) return;
+
+		const isFocusable =
+			parseInt(nextFocus.getAttribute?.('tabindex') ?? '0', 10) > -1 ||
+			['INPUT', 'SELECT', 'TEXTAREA'].includes(nextFocus.tagName);
+
+		if (!isFocusable) return;
+
+		event.preventDefault();
+		keydownHandledMovement = true;
+		focusElement(nextFocus);
 	}
 
 	function activateChapter(timestamp: { time: number }) {
@@ -151,8 +182,13 @@
 					return false;
 				}
 
-				const atTop =
-					!infoPanel || infoPanel.scrollTop === 0 || document.activeElement?.id === 'info-close';
+				const moved = keydownHandledMovement;
+				keydownHandledMovement = false;
+
+				if (moved) return true;
+
+				const activeElement = document.activeElement;
+				const atTop = activeElement?.id === 'info-close' || !infoScope || infoScope.scrollTop === 0;
 
 				if (atTop) {
 					closeInfo();
@@ -249,61 +285,70 @@
 			</button>
 		</nav>
 
-		<main bind:this={infoScope} class="info-body">
-			<Author channel={data.video} />
-			<div class="space"></div>
-			<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
-			<article class="border">
-				<Description video={data.video} description={data.content.description} />
-			</article>
+		<div bind:this={infoScope} class="info-body" tabindex="-1">
+			<section class="info-section">
+				<Author channel={data.video} />
+				<div class="space"></div>
+				<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
+				<article class="border">
+					<Description video={data.video} description={data.content.description} />
+				</article>
+			</section>
 
-			{#if data.content.timestamps.length > 0}
-				<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
-				<div class="grid">
-					{#each data.content.timestamps as timestamp, index (timestamp)}
-						{@const isCurrent =
-							playerCurrentTime >= timestamp.time &&
-							(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
-						<ContentColumn>
-							<article
-								tabindex="0"
-								id={`chapter-${index}`}
-								aria-label={timestamp.title}
-								class:chapter-current={isCurrent}
-								style="cursor: pointer;height: 100%;"
-								onclick={() => activateChapter(timestamp)}
-								onkeydown={(event) => {
-									if (event.key === 'Enter') {
-										event.preventDefault();
-										activateChapter(timestamp);
-									}
-								}}
-							>
-								<div
-									style="white-space: pre-line; overflow-wrap: anywhere; word-break: break-word; text-align: center; min-width: 0;"
+			{#if hasChapters}
+				<section class="info-section">
+					<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
+					<div class="grid">
+						{#each data.content.timestamps as timestamp, index (timestamp)}
+							{@const isCurrent =
+								playerCurrentTime >= timestamp.time &&
+								(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
+							<ContentColumn>
+								<article
+									tabindex="0"
+									id={`chapter-${index}`}
+									aria-label={timestamp.title}
+									class:chapter-current={isCurrent}
+									style="cursor: pointer;height: 100%;"
+									onclick={() => activateChapter(timestamp)}
+									onkeydown={(event) => {
+										if (event.key === 'Enter') {
+											event.preventDefault();
+											activateChapter(timestamp);
+										}
+									}}
 								>
-									<p style="no-margin no-padding">{timestamp.title}</p>
-									<span
-										class="chip no-margin"
-										class:primary={isCurrent}
-										class:surface-container-highest={!isCurrent}>{timestamp.timePretty}</span
+									<div
+										style="white-space: pre-line; overflow-wrap: anywhere; word-break: break-word; text-align: center; min-width: 0;"
 									>
-								</div>
-							</article>
-						</ContentColumn>
-					{/each}
-				</div>
+										<p style="no-margin no-padding">{timestamp.title}</p>
+										<span
+											class="chip no-margin"
+											class:primary={isCurrent}
+											class:surface-container-highest={!isCurrent}>{timestamp.timePretty}</span
+										>
+									</div>
+								</article>
+							</ContentColumn>
+						{/each}
+					</div>
+				</section>
 			{/if}
 
-			{#if data.playlistId && data.playlistId in $playlistCacheStore}
-				<h5>{$_('playlistVideos')}</h5>
-				<ItemsList classes="" items={$playlistCacheStore[data.playlistId].videos} />
+			{#if hasPlaylist}
+				<section class="info-section">
+					<h5>{$_('playlistVideos')}</h5>
+					<ItemsList classes="" items={$playlistCacheStore[data.playlistId!].videos} />
+				</section>
 			{/if}
-			{#if data.video.recommendedVideos.length > 0}
-				<h5>{$_('recommendedVideos')}</h5>
-				<ItemsList classes="" items={data.video.recommendedVideos} />
+
+			{#if hasRecommended}
+				<section class="info-section">
+					<h5>{$_('recommendedVideos')}</h5>
+					<ItemsList classes="" items={data.video.recommendedVideos} />
+				</section>
 			{/if}
-		</main>
+		</div>
 	</article>
 {/if}
 
@@ -343,12 +388,17 @@
 
 	.info-body {
 		flex: 1;
+		min-height: 0;
 		overflow-y: auto;
 		padding: 1em;
 	}
 
 	.info-body:focus {
 		outline: none !important;
+	}
+
+	.info-section {
+		margin-bottom: 1.5em;
 	}
 
 	.chapter-current {

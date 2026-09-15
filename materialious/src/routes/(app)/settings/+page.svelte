@@ -30,43 +30,139 @@
 
 	const isActive = (id: string) => activeTab === id;
 
+	const KEYBOARD_INPUT_TYPES = [
+		'text',
+		'url',
+		'email',
+		'search',
+		'tel',
+		'password',
+		'number',
+		'date',
+		'time',
+		'datetime-local',
+		'month',
+		'week'
+	];
+
+	const isKeyboardInput = (el: Element | null): el is HTMLInputElement | HTMLTextAreaElement => {
+		if (el instanceof HTMLTextAreaElement) return true;
+		if (el instanceof HTMLInputElement) return KEYBOARD_INPUT_TYPES.includes(el.type);
+		return false;
+	};
+
+	function lockInput(input: HTMLInputElement | HTMLTextAreaElement) {
+		input.readOnly = true;
+	}
+
+	function unlockInput(input: HTMLInputElement | HTMLTextAreaElement) {
+		input.readOnly = false;
+		input.focus();
+	}
+
+	// Re-lock text fields whenever they lose focus so browsing past them never
+	// summons the on-screen keyboard.
+	function onSettingsFocusOut(event: FocusEvent) {
+		const el = event.target as Element;
+		if (isKeyboardInput(el) && !el.readOnly) lockInput(el);
+	}
+
+	// A click/press opens the field and pulls up the keyboard.
+	function onSettingsClick(event: MouseEvent) {
+		const el = (event.target as Element).closest('input, textarea');
+		if (el && isKeyboardInput(el) && el.readOnly) unlockInput(el);
+	}
+
 	function handleKeyDown(event: KeyboardEvent) {
 		const keyCode = keyCodeMap[event.key];
 		if (!keyCode) return;
 
 		const target = event.target as HTMLElement;
 
-		// Let native controls handle arrows themselves (inputs, selects).
+		// OK/Enter on a locked text field opens it and pulls up the keyboard.
+		if (event.key === 'Enter' && isKeyboardInput(target) && target.readOnly) {
+			event.preventDefault();
+			unlockInput(target);
+			return;
+		}
+
+		const isArrow = keyCode === 37 || keyCode === 38 || keyCode === 39 || keyCode === 40;
+		if (!isArrow) return;
+
+		// Let open/native controls handle arrows themselves (inputs, selects).
 		if (
 			target instanceof HTMLSelectElement ||
-			target instanceof HTMLInputElement ||
-			target instanceof HTMLTextAreaElement
+			((target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) &&
+				!target.readOnly)
 		) {
 			return;
 		}
 
 		// If focus is stranded inside a hidden panel, return to the active category.
 		if (target.closest('.lrud-ignore') || !settingsContainer?.contains(target)) {
+			event.preventDefault();
 			document.getElementById(`tv-settings-tab-${activeTab}`)?.focus();
 			return;
 		}
 
-		const nextFocus = getNextFocus(target, keyCode, settingsContainer);
-		if (nextFocus) {
+		// From the categories column, LEFT continues out into the app side nav.
+		if (keyCode === 37 && target.closest('.categories')) {
 			event.preventDefault();
-			nextFocus.focus();
-			nextFocus.scrollIntoView({
-				behavior: 'instant',
-				block: 'nearest',
-				inline: 'nearest'
-			});
+			const settingsNavLink = document.querySelector(
+				'#left-nav a[href="/settings"]'
+			) as HTMLElement | null;
+			const navLinks = Array.from(document.querySelectorAll('#left-nav a')) as HTMLElement[];
+			const targetLink = settingsNavLink ?? navLinks.at(-1);
+			targetLink?.focus();
+			return;
 		}
+
+		// Keep vertical navigation within the current column so LRUD doesn't
+		// pick spatially-nearer buttons from the other column. Up from the
+		// categories column keeps the full scope so the header close button
+		// stays reachable.
+		const isVertical = keyCode === 40 || keyCode === 38;
+		let scope: HTMLElement | undefined = settingsContainer;
+		if (isVertical) {
+			const panel = target.closest('[role="tabpanel"]');
+			if (panel) {
+				scope = panel as HTMLElement;
+			} else if (target.closest('.categories') && keyCode === 40) {
+				scope = target.closest('.categories') as HTMLElement;
+			}
+		}
+
+		const nextFocus = getNextFocus(target, keyCode, scope);
+
+		// Own the navigation on TV so focus never leaks out to the app's nav.
+		if (!nextFocus) {
+			event.preventDefault();
+			return;
+		}
+
+		event.preventDefault();
+
+		// Land on text fields without summoning the keyboard; OK/Enter opens them.
+		if (isKeyboardInput(nextFocus)) lockInput(nextFocus);
+
+		nextFocus.focus();
+		nextFocus.scrollIntoView({
+			behavior: 'instant',
+			block: 'nearest',
+			inline: 'nearest'
+		});
 	}
 
 	onMount(() => {
 		if (!isAndroidTv()) {
 			void goto(resolve('/', {}), { replaceState: true });
 			return;
+		}
+
+		const container = settingsContainer;
+		if (container) {
+			container.addEventListener('focusout', onSettingsFocusOut, true);
+			container.addEventListener('click', onSettingsClick, true);
 		}
 
 		document.getElementById(`tv-settings-tab-${activeTab}`)?.focus();

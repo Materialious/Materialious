@@ -61,7 +61,7 @@
 
 {#if isAndroidTv()}
 	<div class="field suffix surface-container-highest" class:label={typeof label === 'string'}>
-		<select onchange={handleNativeSelect}>
+		<select tabindex="0" onchange={handleNativeSelect}>
 			{#each options as option (option.value)}
 				<option value={option.value} selected={option.value === defaultValue}>
 					{option.label}

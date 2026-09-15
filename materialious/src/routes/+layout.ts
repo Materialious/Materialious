@@ -131,12 +131,13 @@ export async function load({ url }) {
 		}
 	}
 
-	const isLoginPage = url.pathname.endsWith('/internal/login');
+	const isLoginPage =
+		url.pathname.endsWith('/login/internal') || url.pathname.endsWith('/login/tv');
 	const isSetupPage = url.pathname.endsWith('/setup');
 
 	if (!isLoginPage) {
 		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
-			throw redirect(302, resolve('/internal/login', {}));
+			throw redirect(302, resolve('/login/internal', {}));
 		}
 
 		if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {

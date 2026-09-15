@@ -72,7 +72,7 @@ export {
 	authTokenStore,
 	configBackendCache
 } from './backend';
-export { watchHistoryEnabledStore, poTokenCacheStore, isAndroidTvStore } from './misc';
+export { watchHistoryEnabledStore, poTokenCacheStore } from './misc';
 export {
 	sponsorBlockStore,
 	sponsorBlockUrlStore,

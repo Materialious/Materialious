@@ -4,12 +4,8 @@
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	import Search from '$lib/components/Search.svelte';
-	import {
-		feedCacheStore,
-		hideSearchStore,
-		invidiousAuthStore,
-		isAndroidTvStore
-	} from '$lib/store';
+	import { feedCacheStore, hideSearchStore, invidiousAuthStore } from '$lib/store';
+	import { isAndroidTv } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
@@ -17,7 +13,7 @@
 
 	onMount(() => {
 		if (data.popularDisabled) {
-			if ($isAndroidTvStore) {
+			if (isAndroidTv()) {
 				if (get(invidiousAuthStore)) {
 					goto(resolve('/subscriptions', {}), { replaceState: true });
 					return;

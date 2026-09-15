@@ -2,7 +2,7 @@
 	import { _ } from '$lib/i18n';
 	import { mergeAttrs } from 'melt';
 	import { Combobox } from 'melt/builders';
-	import { isAndroidTvStore } from '$lib/store';
+	import { isAndroidTv } from '$lib/utils';
 
 	type ComboOption = { label: string; value: any };
 
@@ -59,7 +59,7 @@
 	}
 </script>
 
-{#if $isAndroidTvStore}
+{#if isAndroidTv()}
 	<div class="field suffix surface-container-highest" class:label={typeof label === 'string'}>
 		<select onchange={handleNativeSelect}>
 			{#each options as option (option.value)}

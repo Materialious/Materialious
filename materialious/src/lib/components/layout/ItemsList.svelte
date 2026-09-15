@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { feedLastItemId, filterContentListStore, isAndroidTvStore } from '$lib/store';
+	import { feedLastItemId, filterContentListStore } from '$lib/store';
 	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
 	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
 	import { extractUniqueId, type FeedItems } from '$lib/feed';
-	import { isMobile, keyCodeMap, timeout } from '$lib/utils';
+	import { isAndroidTv, isMobile, keyCodeMap, timeout } from '$lib/utils';
 	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
 	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
@@ -85,11 +85,7 @@
 	});
 </script>
 
-<div
-	onkeydown={handleKeyDown}
-	class={classes}
-	class:item-container={!isMobile() || $isAndroidTvStore}
->
+<div onkeydown={handleKeyDown} class={classes} class:item-container={!isMobile() || isAndroidTv()}>
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
@@ -103,7 +99,7 @@
 							onclick={(event) => handleItemSelect(event, uniqueItemId)}
 							id={uniqueItemId}
 							class="no-padding item-select border"
-							class:item-select-focused={(!isMobile() || $isAndroidTvStore) &&
+							class:item-select-focused={(!isMobile() || isAndroidTv()) &&
 								focusedItemId === uniqueItemId}
 							style="height: 100%;"
 							tabindex="0"

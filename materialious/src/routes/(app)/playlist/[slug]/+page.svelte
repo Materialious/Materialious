@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { unsafeRandomItem } from '$lib/utils';
+	import { isAndroidTv, unsafeRandomItem } from '$lib/utils';
 	import { cleanNumber } from '$lib/numbers';
-	import { isAndroidTvStore, playlistSettingsStore } from '$lib/store';
+	import { playlistSettingsStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
 	import Share from '$lib/components/Share.svelte';
@@ -42,7 +42,7 @@
 		if (lastHistory.length > 0) {
 			goto(
 				resolve(
-					$isAndroidTvStore
+					isAndroidTv()
 						? `/tv/[videoId]?playlist=${playlist.info.playlistId}`
 						: `/watch/[videoId]?playlist=${playlist.info.playlistId}`,
 					{
@@ -53,7 +53,7 @@
 		} else {
 			goto(
 				resolve(
-					$isAndroidTvStore
+					isAndroidTv()
 						? `/tv/[videoId]?playlist=${playlist.info.playlistId}`
 						: `/watch/[videoId]?playlist=${playlist.info.playlistId}`,
 					{
@@ -80,7 +80,7 @@
 
 				<a
 					href={resolve(
-						$isAndroidTvStore
+						isAndroidTv()
 							? `/tv/[playlistId]?playlist=${playlist.info.playlistId}`
 							: `/watch/[playlistId]?playlist=${playlist.info.playlistId}`,
 						{
@@ -114,7 +114,7 @@
 
 		<div class="space"></div>
 
-		{#if !$isAndroidTvStore}
+		{#if !isAndroidTv()}
 			<nav class="right-align">
 				{#if playlist.videos.length > 0}
 					<PlaylistManager

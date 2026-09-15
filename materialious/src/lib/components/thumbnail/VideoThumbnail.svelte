@@ -12,7 +12,6 @@
 		deArrowEnabledStore,
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
-		isAndroidTvStore,
 		playerState
 	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
@@ -23,7 +22,7 @@
 	import PlaylistManager from '../PlaylistManager.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
-	import { truncate } from '$lib/utils';
+	import { isAndroidTv, truncate } from '$lib/utils';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -45,7 +44,7 @@
 			: video.publishedText;
 	}
 
-	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
+	const watchPath = resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]`, {
 		videoId: video.videoId
 	});
 	const watchUrl = new URL(`${location.origin}${watchPath}`);
@@ -306,7 +305,7 @@
 					style="height: 200px;"
 				></div>
 
-				{#if !$isAndroidTvStore}
+				{#if !isAndroidTv()}
 					{#if progress}
 						<button
 							class="chip surface-container-highest"
@@ -420,7 +419,7 @@
 							{/if}
 
 							{#if 'published' in video}
-								{#if $isAndroidTvStore}
+								{#if isAndroidTv()}
 									<span>{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}</span>
 									<span>{getRelativePublished()}</span>
 								{:else}
@@ -432,7 +431,7 @@
 								{/if}
 							{/if}
 						</div>
-						{#if !sideways && !$isAndroidTvStore}
+						{#if !sideways && !isAndroidTv()}
 							<button
 								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
 								class="transparent circle"

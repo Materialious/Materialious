@@ -6,11 +6,15 @@
 	import Player from './Player.svelte';
 	import Ryd from './RYD.svelte';
 	import SponsorBlock from './SponsorBlock.svelte';
-	import { isAndroidTvStore, materialiousBackendStore, rawMasterKeyStore } from '$lib/store';
+	import { materialiousBackendStore, rawMasterKeyStore } from '$lib/store';
 	import About from './About.svelte';
 	import Engine from './Engine.svelte';
-	import { isUnrestrictedPlatform, isMaterialiousAccountActive, remoteMaterialiousSupported } from '$lib/backend';
-	import { keyCodeMap } from '$lib/utils';
+	import {
+		isUnrestrictedPlatform,
+		isMaterialiousAccountActive,
+		remoteMaterialiousSupported
+	} from '$lib/backend';
+	import { isAndroidTv, keyCodeMap } from '$lib/utils';
 	import { isAdminUsername } from '$lib/shared';
 	import { backendFetch } from '$lib/api/backend/request';
 	import InternalAccount from './InternalAccount.svelte';
@@ -102,7 +106,7 @@
 		});
 	}
 
-	if (!$isAndroidTvStore) {
+	if (!isAndroidTv()) {
 		tabs.splice(tabs.length - 1, 0, {
 			id: 'export',
 			label: $_('layout.export.title'),
@@ -129,26 +133,28 @@
 					component: InternalAccount
 				});
 			}
-			backendFetch('/api/user/me').then(async (resp) => {
-				if (resp.ok) {
-					const me = await resp.json();
-					if (isAdminUsername(me.username)) {
-						const existingAdmin = tabs.find((tab) => tab.id === 'admin');
-						if (!existingAdmin) {
-							tabs.splice(tabs.length - 1, 0, {
-								id: 'admin',
-								label: $_('layout.admin'),
-								icon: 'admin_panel_settings',
-								component: Admin
-							});
+			backendFetch('/api/user/me')
+				.then(async (resp) => {
+					if (resp.ok) {
+						const me = await resp.json();
+						if (isAdminUsername(me.username)) {
+							const existingAdmin = tabs.find((tab) => tab.id === 'admin');
+							if (!existingAdmin) {
+								tabs.splice(tabs.length - 1, 0, {
+									id: 'admin',
+									label: $_('layout.admin'),
+									icon: 'admin_panel_settings',
+									component: Admin
+								});
+							}
+						} else {
+							tabs = tabs.filter((tab) => tab.id !== 'admin');
 						}
-					} else {
-						tabs = tabs.filter((tab) => tab.id !== 'admin');
 					}
-				}
-			}).catch(() => {
-				// Remote instance unreachable.
-			});
+				})
+				.catch(() => {
+					// Remote instance unreachable.
+				});
 		} else {
 			tabs = tabs.filter((tab) => {
 				return tab.id !== 'account' && tab.id !== 'admin';

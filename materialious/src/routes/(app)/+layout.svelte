@@ -16,7 +16,6 @@
 		invidiousAuthStore,
 		invidiousInstanceStore,
 		interfaceDefaultPage,
-		isAndroidTvStore,
 		playerLoadingStore,
 		playerState,
 		playerTheatreModeIsActive,
@@ -34,7 +33,7 @@
 	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
 	import { isMaterialiousAccountActive, isYTBackend } from '$lib/backend';
-	import { isMobile, truncate } from '$lib/utils';
+	import { isAndroidTv, isMobile, truncate } from '$lib/utils';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import { backendFetch } from '$lib/api/backend/request';
 	import Author from '$lib/components/Author.svelte';
@@ -44,9 +43,7 @@
 
 	let { children } = $props();
 
-    const showLogin = $derived(
-	    !isYTBackend() || !!isOwnBackend()?.internalAuth
-    );
+	const showLogin = $derived(!isYTBackend() || !!isOwnBackend()?.internalAuth);
 
 	const accountLoggedIn = $derived(
 		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
@@ -83,7 +80,7 @@
 			return;
 		}
 
-		if (!$isAndroidTvStore) {
+		if (!isAndroidTv()) {
 			await goToInvidiousLogin();
 		} else {
 			await ui('#tv-login');
@@ -101,7 +98,7 @@
 	async function usernamePasswordLogin(event: Event) {
 		event.preventDefault();
 
-		if (!$isAndroidTvStore) return;
+		if (!isAndroidTv()) return;
 
 		loginError = false;
 
@@ -274,7 +271,7 @@
 	<nav
 		id="left-nav"
 		class="left m l surface-container"
-		class:tv-nav={$isAndroidTvStore}
+		class:tv-nav={isAndroidTv()}
 		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
 	>
 		<header class="small-padding no-margin">
@@ -282,7 +279,7 @@
 				<Logo />
 			</a>
 		</header>
-		{#if $isAndroidTvStore}
+		{#if isAndroidTv()}
 			<a href={resolve('/search', {})} class:active={page.url.href.endsWith('/search')}>
 				<i>search</i>
 				<div>{$_('searchPlaceholder')}</div>
@@ -294,7 +291,7 @@
 				<div>{navPage.name}</div>
 			</a>
 		{/each}
-		{#if $isAndroidTvStore}
+		{#if isAndroidTv()}
 			<div class="divider"></div>
 			<a href="#settings" onclick={() => ui('#dialog-settings')}>
 				<i>settings</i>
@@ -315,11 +312,11 @@
 			{/if}
 		{/if}
 	</nav>
-	{#if !$isAndroidTvStore}
+	{#if !isAndroidTv()}
 		<nav
 			class="top"
 			id="top-content"
-			class:tv-nav={$isAndroidTvStore}
+			class:tv-nav={isAndroidTv()}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
 			{#if $playerTheatreModeIsActive}

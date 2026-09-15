@@ -1,7 +1,6 @@
 import he from 'he';
 import { Capacitor } from '@capacitor/core';
-import { isAndroidTvStore } from '$lib/store';
-import { get } from 'svelte/store';
+import { getPlatform } from '$lib/platform';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
@@ -14,7 +13,7 @@ export function isMobile(): boolean {
 }
 
 export function isAndroidTv(): boolean {
-	return get(isAndroidTvStore);
+	return getPlatform() === 'androidTV';
 }
 
 export function isVideoID(videoId: string): boolean {

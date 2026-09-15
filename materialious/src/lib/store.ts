@@ -67,7 +67,6 @@ export {
 	filterContentListStore,
 	filterContentUrlStore,
 	filterContentUrlAutoUpdateStore,
-	isAndroidTvStore,
 	sponsorBlockStore,
 	sponsorBlockUrlStore,
 	sponsorBlockCategoriesStore,

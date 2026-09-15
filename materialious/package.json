@@ -35,7 +35,7 @@
 		"@types/papaparse": "^5.5.2",
 		"@types/semver": "^7.8.0",
 		"@vite-pwa/sveltekit": "^1.0.0",
-		"eslint": "^10.8.0",
+		"eslint": "^10.10.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.20.0",
 		"globals": "^17.11.0",

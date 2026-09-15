@@ -299,7 +299,7 @@
 		{/each}
 		{#if isAndroidTv()}
 			<div class="divider"></div>
-			<a href="#settings" onclick={() => ui('#dialog-settings')}>
+			<a href={resolve('/settings', {})} class:active={page.url.href.endsWith('/settings')}>
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
@@ -442,7 +442,9 @@
 		{/each}
 	</nav>
 
-	<Settings />
+	{#if !isAndroidTv()}
+		<Settings />
+	{/if}
 
 	<dialog class="right" id="dialog-notifications">
 		<nav>

@@ -172,7 +172,16 @@
                 "modern": "中",
                 "rounded": "大"
             },
-            "presets": "プリセット"
+            "presets": "プリセット",
+            "saveAsPreset": "プリセットとして保存",
+            "exportTheme": "テーマをエクスポート",
+            "importTheme": "テーマをインポート",
+            "themeName": "テーマ名",
+            "themeImported": "テーマがインポートされました",
+            "themeImportFailed": "テーマのインポートに失敗しました",
+            "themeExported": "テーマをエクスポートしました",
+            "themeSaved": "テーマを保存しました",
+            "deletePreset": "プリセットを削除"
         },
         "searchSuggestions": "検索候補を表示",
         "previewVideoOnHover": "マウスを乗せるとプレビュー",

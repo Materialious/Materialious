@@ -1,6 +1,4 @@
 <div align="center">  <img src="./branding/MaterialiousAppIcon.svg" width="200px" />
-  <br />
-  <br />
   <h1>Materialious</h1>
   <quote>
     Modern Material design for YouTube and Invidious.

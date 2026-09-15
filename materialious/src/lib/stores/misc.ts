@@ -9,5 +9,3 @@ export const watchHistoryEnabledStore: Writable<boolean> = persist(
 );
 
 export const poTokenCacheStore: Writable<string | undefined> = writable();
-
-export const isAndroidTvStore: Writable<boolean> = writable(false);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isAndroidTvStore } from '$lib/store';
+	import { isAndroidTv } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 
 	let { children } = $props();
@@ -9,8 +9,9 @@
 	let mediumCol = $state('6');
 
 	function checkWidth() {
-		if ($isAndroidTvStore) {
-			mediumCol = '3';
+		if (isAndroidTv()) {
+			mediumCol = '4';
+			largeCol = '4';
 		} else if (innerWidth <= 1750) {
 			largeCol = '4';
 		} else {

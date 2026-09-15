@@ -5,11 +5,11 @@
 		interfaceAmoledTheme,
 		interfaceBorderRadiusStore,
 		invidiousAuthStore,
-		isAndroidTvStore,
 		materialiousBackendStore,
 		rawMasterKeyStore,
 		themeColorStore
 	} from '$lib/store';
+	import { isAndroidTv } from '$lib/utils';
 	import ui from 'beercss';
 	import { App } from '@capacitor/app';
 	import { goto } from '$app/navigation';
@@ -176,7 +176,7 @@
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html webManifestLink}
 
-	{#if $isAndroidTvStore}
+	{#if isAndroidTv()}
 		<style>
 			not(.item-select):focus {
 				outline: 2px solid var(--primary);

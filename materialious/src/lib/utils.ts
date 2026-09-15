@@ -1,7 +1,6 @@
 import he from 'he';
 import { Capacitor } from '@capacitor/core';
-import { isAndroidTvStore } from '$lib/store';
-import { get } from 'svelte/store';
+export { isAndroidTv } from '$lib/platform';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;
@@ -11,10 +10,6 @@ export function isMobile(): boolean {
 		/Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
 
 	return (hasTouchSupport && isUserAgentMobile) || Capacitor.getPlatform() === 'android';
-}
-
-export function isAndroidTv(): boolean {
-	return get(isAndroidTvStore);
 }
 
 export function isVideoID(videoId: string): boolean {

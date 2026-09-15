@@ -16,6 +16,8 @@
 
 	let playerElement: HTMLMediaElement | undefined = $state();
 	let showInfo = $state(false);
+	let infoPanel: HTMLElement | undefined = $state();
+	let infoScope: HTMLElement | undefined = $state();
 	let playerCurrentTime: number = $state(0);
 	let showControls = $state(false);
 	let currentTime = $state(0);
@@ -25,6 +27,12 @@
 	let seekStartTime = 0;
 	let isSeeking = false;
 	let lastUpdate = 0;
+	let infoClosedByEnter = false;
+	let keydownHandledMovement = false;
+
+	const hasChapters = $derived(data.content.timestamps.length > 0);
+	const hasPlaylist = $derived(!!data.playlistId && data.playlistId in $playlistCacheStore);
+	const hasRecommended = $derived(data.video.recommendedVideos.length > 0);
 
 	function startSeeking(direction: 'left' | 'right') {
 		showControls = true;
@@ -77,9 +85,88 @@
 			seekRaf = null;
 		}
 
-		if (playerElement) {
+		if (playerElement && !showInfo) {
 			playerElement.currentTime = currentTime;
 		}
+	}
+
+	function focusElement(el: HTMLElement | null | undefined) {
+		if (!el) return;
+		el.focus();
+		el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+	}
+
+	function openInfo() {
+		showInfo = true;
+
+		tick().then(() => {
+			if (infoScope) infoScope.scrollTop = 0;
+
+			const first = infoScope?.querySelector<HTMLElement>(
+				'[tabindex]:not([tabindex="-1"]), a, button, summary'
+			);
+			focusElement(first ?? infoPanel);
+		});
+	}
+
+	function closeInfo() {
+		showInfo = false;
+		(document.activeElement as HTMLElement | null)?.blur();
+	}
+
+	function getInfoFocusables() {
+		return Array.from(
+			infoScope?.querySelectorAll<HTMLElement>(
+				'[tabindex]:not([tabindex="-1"]), a, button, summary'
+			) ?? []
+		);
+	}
+
+	function moveInfoFocus(direction: 1 | -1) {
+		const focusables = getInfoFocusables();
+		if (focusables.length === 0) return false;
+
+		const current = document.activeElement as HTMLElement | null;
+		const index = current ? focusables.indexOf(current) : -1;
+		let cursor;
+		if (index === -1) cursor = direction === 1 ? 0 : focusables.length - 1;
+		else cursor = index + direction;
+
+		while (cursor >= 0 && cursor < focusables.length) {
+			const el = focusables[cursor];
+			el.focus();
+			el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+
+			if (document.activeElement === el) return true;
+			cursor += direction;
+		}
+
+		return false;
+	}
+
+	function handleInfoKeyDown(event: KeyboardEvent) {
+		if (event.defaultPrevented) {
+			keydownHandledMovement = true;
+			return;
+		}
+
+		keydownHandledMovement = false;
+		if (event.key === 'Enter') return;
+
+		const isNext = event.key === 'ArrowDown' || event.key === 'ArrowRight';
+		const isPrev = event.key === 'ArrowUp' || event.key === 'ArrowLeft';
+		if (!isNext && !isPrev) return;
+
+		if (moveInfoFocus(isNext ? 1 : -1)) {
+			event.preventDefault();
+			keydownHandledMovement = true;
+		}
+	}
+
+	function activateChapter(timestamp: { time: number }) {
+		if (playerElement) playerElement.currentTime = timestamp.time;
+		infoClosedByEnter = true;
+		closeInfo();
 	}
 
 	onMount(() => {
@@ -95,10 +182,7 @@
 			() => {
 				if (showInfo) return true;
 
-				showInfo = true;
-				tick().then(() => {
-					document.getElementById('shown-info')?.focus();
-				});
+				openInfo();
 
 				return false;
 			},
@@ -108,21 +192,21 @@
 		Mousetrap.bind(
 			'up',
 			() => {
-				const infoElement = document.getElementById('shown-info');
-
-				if (showInfo && infoElement) {
-					if (infoElement.scrollTop === 0) {
-						showInfo = false;
-						return false;
-					}
-					return true;
+				if (!showInfo) {
+					openInfo();
+					return false;
 				}
 
-				if (!showInfo) {
-					showInfo = true;
-					tick().then(() => {
-						document.getElementById('shown-info')?.focus();
-					});
+				const moved = keydownHandledMovement;
+				keydownHandledMovement = false;
+
+				if (moved) return true;
+
+				const activeElement = document.activeElement;
+				const atTop = activeElement?.id === 'info-close' || !infoScope || infoScope.scrollTop === 0;
+
+				if (atTop) {
+					closeInfo();
 					return false;
 				}
 
@@ -138,8 +222,26 @@
 		Mousetrap.bind('left', stopSeeking, 'keyup');
 
 		Mousetrap.bind(
+			'esc',
+			() => {
+				if (showInfo) {
+					closeInfo();
+					return false;
+				}
+
+				return true;
+			},
+			'keyup'
+		);
+
+		Mousetrap.bind(
 			'enter',
 			() => {
+				if (infoClosedByEnter) {
+					infoClosedByEnter = false;
+					return true;
+				}
+
 				if (!showInfo) {
 					if (playerElement?.paused) {
 						showControls = false;
@@ -159,7 +261,7 @@
 	});
 
 	onDestroy(() => {
-		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter']);
+		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc']);
 	});
 </script>
 
@@ -175,50 +277,93 @@
 {/key}
 
 {#if showInfo}
-	<article id="shown-info" transition:fade>
-		<h5>{letterCase(data.video.title)}</h5>
-		<Author channel={data.video} />
-		<div class="space"></div>
-		<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
-		<article class="border">
-			<Description video={data.video} description={data.content.description} />
-		</article>
+	<article
+		id="shown-info"
+		transition:fade
+		bind:this={infoPanel}
+		onkeydown={handleInfoKeyDown}
+		role="dialog"
+		aria-label={data.video.title}
+	>
+		<nav class="info-header">
+			<h5>{letterCase(data.video.title)}</h5>
+			<button
+				id="info-close"
+				class="circle surface-container-highest"
+				aria-label={$_('player.closePlayer')}
+				onclick={(event) => {
+					if (event.detail === 0) infoClosedByEnter = true;
+					closeInfo();
+				}}
+			>
+				<i>close</i>
+			</button>
+		</nav>
 
-		{#if data.content.timestamps.length > 0}
-			<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
-			<div class="grid">
-				{#each data.content.timestamps as timestamp (timestamp)}
-					<ContentColumn>
-						<article
-							role="presentation"
-							style="cursor: pointer;height: 100%;"
-							onclick={() => {
-								if (playerElement) playerElement.currentTime = timestamp.time;
-								showInfo = false;
-							}}
-						>
-							<div style="white-space: pre-line; overflow-wrap: break-word;text-align: center;">
-								<p style="no-margin no-padding">{timestamp.title}</p>
-								<span
-									class:primary={playerCurrentTime >= timestamp.time &&
-										(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
-									class="chip no-margin">{timestamp.timePretty}</span
+		<div bind:this={infoScope} class="info-body" tabindex="-1">
+			<section class="info-section">
+				<Author channel={data.video} />
+				<div class="space"></div>
+				<LikesDislikes video={data.video} returnYTDislikes={data.streamed.returnYTDislikes} />
+				<article class="border">
+					<Description video={data.video} description={data.content.description} />
+				</article>
+			</section>
+
+			{#if hasChapters}
+				<section class="info-section">
+					<h5 style="margin-bottom: 0;">{$_('player.chapters')}</h5>
+					<div class="grid">
+						{#each data.content.timestamps as timestamp, index (timestamp)}
+							{@const isCurrent =
+								playerCurrentTime >= timestamp.time &&
+								(playerCurrentTime <= timestamp.endTime || timestamp.endTime === -1)}
+							<ContentColumn>
+								<article
+									tabindex="0"
+									id={`chapter-${index}`}
+									aria-label={timestamp.title}
+									class:chapter-current={isCurrent}
+									style="cursor: pointer;height: 100%;"
+									onclick={() => activateChapter(timestamp)}
+									onkeydown={(event) => {
+										if (event.key === 'Enter') {
+											event.preventDefault();
+											activateChapter(timestamp);
+										}
+									}}
 								>
-							</div>
-						</article>
-					</ContentColumn>
-				{/each}
-			</div>
-		{/if}
+									<div
+										style="white-space: pre-line; overflow-wrap: anywhere; word-break: break-word; text-align: center; min-width: 0;"
+									>
+										<p style="no-margin no-padding">{timestamp.title}</p>
+										<span
+											class="chip no-margin"
+											class:primary={isCurrent}
+											class:surface-container-highest={!isCurrent}>{timestamp.timePretty}</span
+										>
+									</div>
+								</article>
+							</ContentColumn>
+						{/each}
+					</div>
+				</section>
+			{/if}
 
-		{#if data.playlistId && data.playlistId in $playlistCacheStore}
-			<h5 style="margin-bottom: 0;">{$_('playlistVideos')}</h5>
-			<ItemsList classes="" items={$playlistCacheStore[data.playlistId].videos} />
-		{/if}
-		{#if data.video.recommendedVideos.length > 0}
-			<h5 style="margin-bottom: 0;">{$_('recommendedVideos')}</h5>
-			<ItemsList classes="" items={data.video.recommendedVideos} />
-		{/if}
+			{#if hasPlaylist}
+				<section class="info-section">
+					<h5>{$_('playlistVideos')}</h5>
+					<ItemsList classes="" items={$playlistCacheStore[data.playlistId!].videos} />
+				</section>
+			{/if}
+
+			{#if hasRecommended}
+				<section class="info-section">
+					<h5>{$_('recommendedVideos')}</h5>
+					<ItemsList classes="" items={data.video.recommendedVideos} />
+				</section>
+			{/if}
+		</div>
 	</article>
 {/if}
 
@@ -228,10 +373,51 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		height: 50%;
+		height: 75%;
 		z-index: 101;
-		overflow-y: scroll;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--surface);
+		box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4);
 		border-bottom-left-radius: 0px;
 		border-bottom-right-radius: 0px;
+	}
+
+	.info-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1em;
+		padding: 0.75em 1em;
+		border-bottom: 1px solid var(--outline-variant);
+		flex-shrink: 0;
+	}
+
+	.info-header h5 {
+		margin: 0;
+		flex: 1;
+		min-width: 0;
+		overflow-wrap: anywhere;
+		white-space: normal;
+	}
+
+	.info-body {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding: 1em;
+	}
+
+	.info-body:focus {
+		outline: none !important;
+	}
+
+	.info-section {
+		margin-bottom: 1.5em;
+	}
+
+	.chapter-current {
+		background-color: var(--primary-container);
+		color: var(--on-primary-container);
 	}
 </style>

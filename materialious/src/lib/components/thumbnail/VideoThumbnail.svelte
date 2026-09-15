@@ -12,7 +12,6 @@
 		deArrowEnabledStore,
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
-		isAndroidTvStore,
 		playerState
 	} from '$lib/store';
 	import { relativeTimestamp } from '$lib/time';
@@ -23,7 +22,7 @@
 	import PlaylistManager from '../PlaylistManager.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
 	import type { ThumbnailVideo } from '$lib/thumbnail';
-	import { truncate } from '$lib/utils';
+	import { isAndroidTv, truncate } from '$lib/utils';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -45,7 +44,7 @@
 			: video.publishedText;
 	}
 
-	const watchPath = resolve(`/${get(isAndroidTvStore) ? 'tv' : 'watch'}/[videoId]`, {
+	const watchPath = resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]`, {
 		videoId: video.videoId
 	});
 	const watchUrl = new URL(`${location.origin}${watchPath}`);
@@ -148,6 +147,7 @@
 <div
 	class:sideways-root={sideways}
 	class:use-flex-column={!sideways}
+	class:tv-root={isAndroidTv()}
 	bind:this={thumbnailElement}
 	tabindex="0"
 	role="button"
@@ -306,7 +306,11 @@
 					style="height: 200px;"
 				></div>
 
-				{#if !$isAndroidTvStore}
+				{#if isAndroidTv()}
+					<div class="tv-play"><i>play_arrow</i></div>
+				{/if}
+
+				{#if !isAndroidTv()}
 					{#if progress}
 						<button
 							class="chip surface-container-highest"
@@ -391,7 +395,7 @@
 			{/if}
 
 			<nav class="align-end no-margin">
-				{#if !sideways}
+				{#if !sideways && !isAndroidTv()}
 					<AuthorAvatar
 						author={video.author}
 						authorId={'authorId' in video ? (video.authorId ?? '') : ''}
@@ -420,7 +424,7 @@
 							{/if}
 
 							{#if 'published' in video}
-								{#if $isAndroidTvStore}
+								{#if isAndroidTv()}
 									<span>{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}</span>
 									<span>{getRelativePublished()}</span>
 								{:else}
@@ -432,7 +436,7 @@
 								{/if}
 							{/if}
 						</div>
-						{#if !sideways && !$isAndroidTvStore}
+						{#if !sideways && !isAndroidTv()}
 							<button
 								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
 								class="transparent circle"
@@ -562,6 +566,41 @@
 	.sideways-root,
 	.thumbnail-details {
 		container-type: inline-size;
+	}
+
+	.tv-root .bold {
+		font-size: clamp(1rem, 3.5cqw + 0.4rem, 1.75rem);
+	}
+
+	.tv-root .author-details span,
+	.tv-root .author-details p,
+	.tv-root .author-details a {
+		font-size: clamp(1rem, 2.6cqw + 0.35rem, 1.4rem);
+	}
+
+	.tv-play {
+		position: absolute;
+		inset: 0;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		z-index: 3;
+	}
+
+	.tv-play i {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		padding: 0.9rem 1rem;
+		background-color: var(--surface);
+		color: var(--on-surface);
+		font-size: 2rem;
+		box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.35);
+	}
+
+	:global(.item-select-focused) .tv-root .tv-play {
+		display: flex;
 	}
 
 	@media screen and (max-width: 1800px) {

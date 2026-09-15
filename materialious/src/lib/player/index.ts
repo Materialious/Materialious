@@ -1,7 +1,6 @@
 import { get } from 'svelte/store';
 import type { PlaylistPageVideo, VideoPlay } from '$lib/api/model';
 import {
-	isAndroidTvStore,
 	playerAutoplayNextByDefaultStore,
 	activeCaptionTrack,
 	playerDefaultLanguage,
@@ -14,7 +13,7 @@ import {
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { loadEntirePlaylist } from '$lib/playlist';
-import { unsafeRandomItem } from '$lib/utils';
+import { isAndroidTv, unsafeRandomItem } from '$lib/utils';
 import { isItemFiltered } from '$lib/filtering';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';
@@ -41,18 +40,16 @@ export function goToPreviousVideo(playlistId: string | null) {
 }
 
 export async function goToNextVideo(video: VideoPlay, playlistId: string | null) {
-	const isAndroidTv = get(isAndroidTvStore);
-
 	if (!playlistId) {
 		if (get(playerAutoplayNextByDefaultStore)) {
 			const nextVideo = video.recommendedVideos.find((v) => !isItemFiltered(v));
 			if (nextVideo) {
 				goto(
-					resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]`, {
+					resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]`, {
 						videoId: nextVideo.videoId
 					}),
 					{
-						replaceState: isAndroidTv
+						replaceState: isAndroidTv()
 					}
 				);
 			}
@@ -87,11 +84,11 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 
 	if (typeof goToVideo !== 'undefined') {
 		goto(
-			resolve(`/${isAndroidTv ? 'tv' : 'watch'}/[videoId]?playlist=${playlistId}`, {
+			resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]?playlist=${playlistId}`, {
 				videoId: goToVideo.videoId
 			}),
 			{
-				replaceState: isAndroidTv
+				replaceState: isAndroidTv()
 			}
 		);
 	}

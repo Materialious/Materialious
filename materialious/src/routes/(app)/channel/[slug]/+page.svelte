@@ -4,7 +4,8 @@
 	import PageLoading from '$lib/components/PageLoading.svelte';
 	import { proxyGoogleImage } from '$lib/images';
 	import { cleanNumber } from '$lib/numbers';
-	import { channelCacheStore, isAndroidTvStore } from '$lib/store';
+	import { channelCacheStore } from '$lib/store';
+	import { isAndroidTv } from '$lib/utils';
 	import { _ } from '$lib/i18n';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
 	import ItemsList from '$lib/components/layout/ItemsList.svelte';
@@ -119,7 +120,7 @@
 					{@html $channelCacheStore[page.params.slug].channel.description}
 				</p>
 			</div>
-			{#if !$isAndroidTvStore}
+			{#if !isAndroidTv()}
 				<Share
 					iconOnly={false}
 					shares={[

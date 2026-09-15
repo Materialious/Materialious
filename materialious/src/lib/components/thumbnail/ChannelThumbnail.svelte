@@ -4,10 +4,9 @@
 	import { cleanNumber } from '$lib/numbers';
 	import { _ } from '$lib/i18n';
 	import type { Channel } from '$lib/api/model';
-	import { truncate } from '$lib/utils';
+	import { isAndroidTv, truncate } from '$lib/utils';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
-	import { isAndroidTvStore } from '$lib/store';
 
 	interface Props {
 		channel: Channel;
@@ -43,7 +42,7 @@
 			{cleanNumber(channel.subCount)}
 			{$_('subscribers')}
 		</h6>
-		{#if !$isAndroidTvStore}
+		{#if !isAndroidTv()}
 			<p>{truncate(channel.description, 24)}</p>
 		{/if}
 	</div>

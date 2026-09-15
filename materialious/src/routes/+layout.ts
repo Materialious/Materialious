@@ -1,8 +1,8 @@
 import { browser } from '$app/environment';
 import { resolve } from '$app/paths';
 import { redirect } from '@sveltejs/kit';
-import androidTv from '$lib/android/plugins/androidTv';
 import { getResolveUrl } from '$lib/api';
+import { resolvePlatform } from '$lib/platform';
 import '$lib/i18n';
 import { initI18n } from '$lib/i18n';
 import { getPages } from '$lib/navPages';
@@ -11,7 +11,6 @@ import {
 	backendInUseStore,
 	invidiousInstanceStore,
 	interfaceDefaultPage,
-	isAndroidTvStore,
 	authTokenStore,
 	materialiousBackendStore,
 	rawMasterKeyStore,
@@ -53,7 +52,7 @@ export async function load({ url }) {
 		}
 	}
 
-	isAndroidTvStore.set((await androidTv.isAndroidTv()).value);
+	await resolvePlatform();
 
 	if (Capacitor.getPlatform() === 'android') {
 		const preferenceKey: Record<string, Writable<any>> = {
@@ -132,12 +131,13 @@ export async function load({ url }) {
 		}
 	}
 
-	const isLoginPage = url.pathname.endsWith('/internal/login');
+	const isLoginPage =
+		url.pathname.endsWith('/login/internal') || url.pathname.endsWith('/login/tv');
 	const isSetupPage = url.pathname.endsWith('/setup');
 
 	if (!isLoginPage) {
 		if (isOwnBackend()?.requireAuth && !get(rawMasterKeyStore)) {
-			throw redirect(302, resolve('/internal/login', {}));
+			throw redirect(302, resolve('/login/internal', {}));
 		}
 
 		if (!get(invidiousInstanceStore) && !isYTBackend() && !isSetupPage) {

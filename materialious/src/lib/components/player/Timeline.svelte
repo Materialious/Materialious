@@ -1,11 +1,6 @@
 <script lang="ts">
 	import type { ParsedDescription, Timestamp } from '$lib/description';
-	import {
-		invidiousInstanceStore,
-		isAndroidTvStore,
-		sponsorBlockTimelineStore,
-		keybindStore
-	} from '$lib/store';
+	import { invidiousInstanceStore, sponsorBlockTimelineStore, keybindStore } from '$lib/store';
 	import type { Segment } from 'sponsorblock-api';
 	import { Slider } from 'melt/builders';
 	import { _ } from '$lib/i18n';
@@ -19,7 +14,7 @@
 	} from '$lib/player/thumbnails';
 	import { onDestroy, onMount } from 'svelte';
 	import { videoLength } from '$lib/numbers';
-	import { truncate } from '$lib/utils';
+	import { isAndroidTv, truncate } from '$lib/utils';
 	import { mergeAttrs } from 'melt';
 	import Mousetrap from 'mousetrap';
 
@@ -365,7 +360,7 @@
 
 <div
 	class="player-slider full-width"
-	class:disable-tv={$isAndroidTvStore}
+	class:disable-tv={isAndroidTv()}
 	{...mergeAttrs(playerTimelineSlider.root, {
 		tabindex: -1
 	})}

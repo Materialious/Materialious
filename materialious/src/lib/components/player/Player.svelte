@@ -16,7 +16,6 @@
 	import { Slider } from 'melt/builders';
 	import type { VideoPlay } from '$lib/api/model';
 	import {
-		isAndroidTvStore,
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
@@ -50,7 +49,7 @@
 	import { fade } from 'svelte/transition';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { getPublicEnv } from '$lib/env';
-	import { isMobile } from '$lib/utils';
+	import { isAndroidTv, isMobile } from '$lib/utils';
 	import { isUnrestrictedPlatform, isYTBackend } from '$lib/backend';
 	import { isOwnBackend } from '$lib/shared';
 	import Settings, { setActiveAudioTrack, setActiveVideoTrack } from './settings/Settings.svelte';
@@ -402,7 +401,7 @@
 		if (
 			Capacitor.getPlatform() !== 'android' ||
 			data.video.adaptiveFormats.length === 0 ||
-			$isAndroidTvStore
+			isAndroidTv()
 		)
 			return;
 
@@ -615,7 +614,7 @@
 			return false;
 		});
 
-		if (!$isAndroidTvStore) {
+		if (!isAndroidTv()) {
 			Mousetrap.bind($keybindStore.skipSponsor, () => {
 				if (segmentManualSkip) {
 					skipSegment(segmentManualSkip);
@@ -788,7 +787,7 @@
 			$keybindStore.frameForward
 		]);
 
-		if (!$isAndroidTvStore) {
+		if (!isAndroidTv()) {
 			Mousetrap.unbind($keybindStore.skipSponsor);
 		}
 
@@ -805,9 +804,9 @@
 
 <div
 	id="player-container"
-	class:contain-video={!$isAndroidTvStore}
+	class:contain-video={!isAndroidTv()}
 	class:full-window={$playerIsInWindowFullscreen}
-	class:tv-contain-video={$isAndroidTvStore}
+	class:tv-contain-video={isAndroidTv()}
 	class:hide={showVideoRetry}
 	class:hide-cursor={!showControls}
 	role="presentation"
@@ -827,7 +826,7 @@
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !$isAndroidTvStore}
+	{#if isEmbed && !isAndroidTv()}
 		<div
 			class="chip surface-container-highest"
 			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
@@ -874,7 +873,7 @@
 			bind:playerMaxKnownTime
 		/>
 		<nav>
-			{#if !$isAndroidTvStore}
+			{#if !isAndroidTv()}
 				<nav class="no-wrap">
 					<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
 						<i>
@@ -906,7 +905,7 @@
 						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
 					{/if}
 				</p>
-				{#if !$isAndroidTvStore && !playerIsPip}
+				{#if !isAndroidTv() && !playerIsPip}
 					<CaptionSettings video={data.video} />
 					{#if playerElement}
 						<Settings {player} {playerElement} />

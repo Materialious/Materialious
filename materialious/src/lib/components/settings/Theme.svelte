@@ -17,9 +17,9 @@
 		interfaceAdvancedThemingStore,
 		interfaceAmoledTheme,
 		interfaceBorderRadiusStore,
-		isAndroidTvStore,
 		themeColorStore
 	} from '../../store';
+	import { isAndroidTv } from '$lib/utils';
 	import { onMount, tick } from 'svelte';
 	import { titleCase } from '$lib/letterCasing';
 	import { presets, type CustomPreset, type Preset } from '$lib/theme/presets';
@@ -331,7 +331,7 @@
 	</div>
 </div>
 
-{#if !$isAndroidTvStore}
+{#if !isAndroidTv()}
 	<div class="space"></div>
 	<div class="presets-header">
 		<h5 class="theme-header">{$_('layout.theme.presets')}</h5>

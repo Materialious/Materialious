@@ -4,8 +4,8 @@
 	import type { Image } from '$lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
 	import { isYTBackend } from '$lib/backend';
-	import { truncate } from '$lib/utils';
-	import { invidiousAuthStore, isAndroidTvStore } from '$lib/store';
+	import { isAndroidTv, truncate } from '$lib/utils';
+	import { invidiousAuthStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import { localDb } from '$lib/dexie';
 	import { onMount } from 'svelte';
@@ -75,7 +75,7 @@
 			>
 			<div>
 				<p style="margin: 0;" class="bold">
-					{$isAndroidTvStore ? channel.author : truncate(channel.author, 14)}
+					{isAndroidTv() ? channel.author : truncate(channel.author, 14)}
 				</p>
 				<p style="margin: 0;">{channel.subCountText}</p>
 			</div>

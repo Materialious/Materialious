@@ -14,9 +14,7 @@
 	import { getPages } from '$lib/navPages';
 	import {
 		invidiousAuthStore,
-		invidiousInstanceStore,
 		interfaceDefaultPage,
-		isAndroidTvStore,
 		playerLoadingStore,
 		playerState,
 		playerTheatreModeIsActive,
@@ -34,7 +32,8 @@
 	import Mousetrap from 'mousetrap';
 	import { _ } from '$lib/i18n';
 	import { isMaterialiousAccountActive, isYTBackend } from '$lib/backend';
-	import { isMobile, truncate } from '$lib/utils';
+	import { isAndroidTv, isMobile, truncate, keyCodeMap } from '$lib/utils';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
 	import { backendFetch } from '$lib/api/backend/request';
 	import Author from '$lib/components/Author.svelte';
@@ -44,9 +43,7 @@
 
 	let { children } = $props();
 
-    const showLogin = $derived(
-	    !isYTBackend() || !!isOwnBackend()?.internalAuth
-    );
+	const showLogin = $derived(!isYTBackend() || !!isOwnBackend()?.internalAuth);
 
 	const accountLoggedIn = $derived(
 		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
@@ -57,6 +54,7 @@
 	let notifications: Notification[] = $state([]);
 	let playerIsPip = $state(false);
 	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
+	let leftNavElement: HTMLElement | undefined = $state();
 
 	let pages = $state(getPages());
 	invidiousAuthStore.subscribe(() => {
@@ -79,63 +77,19 @@
 
 	async function login() {
 		if (isOwnBackend()?.internalAuth) {
-			goto(resolve('/internal/login', {}));
+			goto(resolve('/login/internal', {}));
 			return;
 		}
 
-		if (!$isAndroidTvStore) {
+		if (!isAndroidTv()) {
 			await goToInvidiousLogin();
 		} else {
-			await ui('#tv-login');
-			document.getElementById('username')?.focus();
+			goto(resolve('/login/tv', {}));
 		}
 	}
 
 	async function logout() {
 		await ($rawMasterKeyStore ? materialiousLogout : invidiousLogout)();
-	}
-
-	let loginError: boolean = $state(false);
-	let rawUsername: string = $state('');
-	let rawPassword: string = $state('');
-	async function usernamePasswordLogin(event: Event) {
-		event.preventDefault();
-
-		if (!$isAndroidTvStore) return;
-
-		loginError = false;
-
-		const body = new FormData();
-		body.append('email', rawUsername);
-		body.append('password', rawPassword);
-		body.append('action', 'signin');
-
-		const response = await fetch(`${$invidiousInstanceStore}/login?type=invidious`, {
-			method: 'POST',
-			body: body,
-			headers: {
-				__redirect: 'manual',
-				__custom_return: 'json-headers'
-			}
-		});
-
-		if (response.ok) {
-			const headers = await response.json();
-			if ('set-cookie' in headers) {
-				const sid = (headers['set-cookie'][0].split(';') as string[]).find((cookie) =>
-					cookie.startsWith('SID=')
-				);
-
-				if (sid) {
-					invidiousAuthStore.set({ username: rawUsername, token: sid });
-					await ui('#tv-login');
-					goto(resolve('/', {}), { replaceState: true });
-					return;
-				}
-			}
-		}
-
-		loginError = true;
 	}
 
 	async function loadNotifications() {
@@ -268,21 +222,57 @@
 		if (tabBoundKeys.length > 0) unbindKeys.push(...tabBoundKeys);
 		Mousetrap.unbind(unbindKeys);
 	});
+
+	function handleLeftNavKeyDown(event: KeyboardEvent) {
+		if (!isAndroidTv()) return;
+		const keyCode = keyCodeMap[event.key];
+		if (!keyCode) return;
+		const target = event.target as HTMLElement;
+		if (!leftNavElement?.contains(target)) return;
+
+		if (keyCode === 38 || keyCode === 40) {
+			const next = getNextFocus(target, keyCode, leftNavElement);
+			if (next) {
+				event.preventDefault();
+				next.focus();
+			}
+			return;
+		}
+
+		if (keyCode === 39) {
+			event.preventDefault();
+			const settingsTab = document.querySelector('.tv-settings .categories [aria-selected="true"]');
+			if (settingsTab instanceof HTMLElement) {
+				settingsTab.focus();
+				return;
+			}
+			const main = document.getElementById('main-content');
+			main?.querySelector<HTMLElement>('[tabindex], a, input, button')?.focus();
+		}
+	}
 </script>
 
 <div>
 	<nav
 		id="left-nav"
 		class="left m l surface-container"
-		class:tv-nav={$isAndroidTvStore}
+		class:tv-nav={isAndroidTv()}
 		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
+		bind:this={leftNavElement}
+		onkeydown={handleLeftNavKeyDown}
 	>
-		<header class="small-padding no-margin">
-			<a href={resolve($interfaceDefaultPage, {})} tabindex="-1" data-sveltekit-preload-data="off">
-				<Logo />
-			</a>
-		</header>
-		{#if $isAndroidTvStore}
+		{#if !isAndroidTv()}
+			<header class="small-padding no-margin">
+				<a
+					href={resolve($interfaceDefaultPage, {})}
+					tabindex="-1"
+					data-sveltekit-preload-data="off"
+				>
+					<Logo />
+				</a>
+			</header>
+		{/if}
+		{#if isAndroidTv()}
 			<a href={resolve('/search', {})} class:active={page.url.href.endsWith('/search')}>
 				<i>search</i>
 				<div>{$_('searchPlaceholder')}</div>
@@ -294,9 +284,9 @@
 				<div>{navPage.name}</div>
 			</a>
 		{/each}
-		{#if $isAndroidTvStore}
+		{#if isAndroidTv()}
 			<div class="divider"></div>
-			<a href="#settings" onclick={() => ui('#dialog-settings')}>
+			<a href={resolve('/settings', {})} class:active={page.url.href.endsWith('/settings')}>
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
@@ -315,11 +305,11 @@
 			{/if}
 		{/if}
 	</nav>
-	{#if !$isAndroidTvStore}
+	{#if !isAndroidTv()}
 		<nav
 			class="top"
 			id="top-content"
-			class:tv-nav={$isAndroidTvStore}
+			class:tv-nav={isAndroidTv()}
 			class:hide-element={$playerIsInWindowFullscreen}
 		>
 			{#if $playerTheatreModeIsActive}
@@ -439,7 +429,9 @@
 		{/each}
 	</nav>
 
-	<Settings />
+	{#if !isAndroidTv()}
+		<Settings />
+	{/if}
 
 	<dialog class="right" id="dialog-notifications">
 		<nav>
@@ -555,33 +547,6 @@
 	</main>
 </div>
 
-<dialog class="modal" id="tv-login">
-	<h5>{$_('loginRequired')}</h5>
-	<div>{$_('invidiousLogin')}</div>
-
-	<form onsubmit={usernamePasswordLogin}>
-		<div class="field label border" class:invalid={loginError}>
-			<input id="username" bind:value={rawUsername} name="username" type="text" />
-			<label for="username">{$_('username')}</label>
-		</div>
-		<div class="field label border" class:invalid={loginError}>
-			<input bind:value={rawPassword} name="password" type="password" />
-			<label for="password">{$_('password')}</label>
-		</div>
-
-		<nav class="right-align no-space">
-			<button
-				class="transparent link"
-				type="button"
-				onclick={async () => {
-					await ui('#tv-login');
-				}}>{$_('cancel')}</button
-			>
-			<button class="transparent link" type="submit">{$_('login')}</button>
-		</nav>
-	</form>
-</dialog>
-
 <style>
 	.hide-element {
 		display: none;
@@ -589,7 +554,7 @@
 
 	.tv-nav {
 		min-inline-size: 0.5rem;
-		padding: 0;
+		padding: 0.5rem 1.5rem;
 	}
 
 	.pip {

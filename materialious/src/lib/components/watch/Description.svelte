@@ -18,7 +18,7 @@
 </script>
 
 <details>
-	<summary id="description" class="bold none">
+	<summary id="description" tabindex="0" class="bold none">
 		<nav>
 			<div class="max">
 				<span>

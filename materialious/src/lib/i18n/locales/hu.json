@@ -78,7 +78,16 @@
                 "rounded": "Lekerekített",
                 "borderRadius": "Szegélysugár"
             },
-            "presets": "Előre beállított"
+            "presets": "Előre beállított",
+            "saveAsPreset": "Mentés előbeállításként",
+            "exportTheme": "Téma exportálása",
+            "importTheme": "Téma importálása",
+            "themeName": "Téma neve",
+            "themeImported": "Téma importálva",
+            "themeImportFailed": "A téma importálása sikertelen",
+            "themeExported": "Téma exportálva",
+            "themeSaved": "Téma mentve",
+            "deletePreset": "Előbeállítás törlése"
         },
         "searchSuggestions": "Keresési javaslatok",
         "previewVideoOnHover": "Videó előnézete az egérmutatóval",

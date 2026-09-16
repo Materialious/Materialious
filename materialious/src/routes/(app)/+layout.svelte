@@ -129,16 +129,27 @@
 		const el = playerPlaceholderArea ?? playerActiveArea;
 		if (!el) return;
 
-		const observer = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				const height = entry.contentBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
-				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
-			}
-		});
+		// In native fullscreen the player container leaves the normal flow,
+		// collapsing this wrapper. Use the fullscreen element's height instead
+		// so dependants like double-tap zones keep their correct sizing.
+		const updateHeight = () => {
+			const height = document.fullscreenElement
+				? document.fullscreenElement.getBoundingClientRect().height
+				: el.getBoundingClientRect().height;
 
+			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+		};
+
+		const observer = new ResizeObserver(updateHeight);
 		observer.observe(el);
+		updateHeight();
 
-		return () => observer.disconnect();
+		document.addEventListener('fullscreenchange', updateHeight);
+
+		return () => {
+			observer.disconnect();
+			document.removeEventListener('fullscreenchange', updateHeight);
+		};
 	});
 
 	let fullscreenExited = false;

@@ -12,6 +12,11 @@
 
 	let room: { id: string; source: EventSource; clientId?: string } | undefined = $state();
 	let creating = $state(false);
+	let pending: WatchPartyEvent | undefined = $state();
+	let lastSentVideoId: string | undefined;
+	let lastRemoteVideoId: string | undefined;
+	let baselineVideoId: string | undefined;
+	let suppressUntil = 0;
 
 	onMount(() => joinRoomFromUrl());
 
@@ -28,7 +33,19 @@
 		);
 	}
 
-	function connect(roomId: string) {
+	function currentWatchVideoId(): string | undefined {
+		return /\/watch\/([a-zA-Z0-9_-]{11})/.exec(page.url.pathname)?.[1];
+	}
+
+	function watchPartyUrl(videoId: string): string {
+		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
+		if (room) currentSearchParams.set('room', room.id);
+		return `${resolve('/watch/[videoId]', { videoId })}?${currentSearchParams.toString()}`;
+	}
+
+	function connect(roomId: string, announceCurrent: boolean) {
+		baselineVideoId = announceCurrent ? undefined : currentWatchVideoId();
+
 		const source = new EventSource(`${getMaterialiousBackendUrl()}/api/watchParty/${roomId}`);
 
 		source.onmessage = (event) => {
@@ -41,6 +58,7 @@
 
 			if (isHello(payload)) {
 				room = { id: roomId, source, clientId: payload.clientId };
+				suppressUntil = Date.now() + 4000;
 				return;
 			}
 
@@ -50,47 +68,113 @@
 		room = { id: roomId, source };
 	}
 
+	function applyPlayback(playerElement: HTMLMediaElement, event: WatchPartyEvent) {
+		const apply = () => {
+			const duration = playerElement.duration;
+			const targetTime = Number.isFinite(duration)
+				? Math.max(0, Math.min(event.currentTime, duration))
+				: Math.max(0, event.currentTime);
+
+			switch (event.event) {
+				case 'play':
+					if (Math.abs(playerElement.currentTime - targetTime) > 2) {
+						playerElement.currentTime = targetTime;
+					}
+					playerElement.play();
+					break;
+				case 'pause':
+					if (Math.abs(playerElement.currentTime - targetTime) > 0.5) {
+						playerElement.currentTime = targetTime;
+					}
+					playerElement.pause();
+					break;
+				case 'seek':
+					playerElement.currentTime = targetTime;
+					break;
+			}
+		};
+
+		if (Number.isFinite(playerElement.duration)) {
+			apply();
+		} else {
+			playerElement.addEventListener('loadedmetadata', apply, { once: true });
+		}
+	}
+
 	function handleActionData(data: unknown) {
 		const dataParsed = watchPartyEventSchema.safeParse(data);
 		if (!dataParsed.success) return;
 
-		if (dataParsed.data.event === 'goToVideo') {
-			goto(resolve('/watch/[videoId]', { videoId: dataParsed.data.videoId }));
+		const event = dataParsed.data;
+
+		if (event.event === 'goToVideo') {
+			lastRemoteVideoId = event.videoId;
+			pending = {
+				event: 'seek',
+				videoId: event.videoId,
+				sent: event.sent,
+				currentTime: event.currentTime
+			};
+			suppressUntil = Math.max(suppressUntil, Date.now() + 2500);
+			goto(watchPartyUrl(event.videoId));
 			return;
 		}
 
 		const player = $playerState;
-		if (!player?.playerElement) return;
+		const playerElement = player?.playerElement;
 
-		const playerElement = player.playerElement;
-
-		const duration = playerElement.duration;
-		const targetTime = Number.isFinite(duration)
-			? Math.max(0, Math.min(dataParsed.data.currentTime, duration))
-			: Math.max(0, dataParsed.data.currentTime);
-
-		switch (dataParsed.data.event) {
-			case 'play':
-				if (Math.abs(playerElement.currentTime - targetTime) > 2) {
-					playerElement.currentTime = targetTime;
-				}
-				playerElement.play();
-				break;
-			case 'pause':
-				if (Math.abs(playerElement.currentTime - targetTime) > 0.5) {
-					playerElement.currentTime = targetTime;
-				}
-				playerElement.pause();
-				break;
-			case 'seek':
-				playerElement.currentTime = targetTime;
-				break;
+		if (!playerElement || player.data.video.videoId !== event.videoId) {
+			pending = event;
+			return;
 		}
+
+		applyPlayback(playerElement, event);
 	}
+
+	function sendGoToVideo(videoId: string) {
+		if (!room?.clientId || !videoId) return;
+		if (videoId === lastSentVideoId || videoId === lastRemoteVideoId) return;
+
+		lastSentVideoId = videoId;
+
+		const currentTime =
+			$playerState?.playerElement && $playerState.data.video.videoId === videoId
+				? $playerState.playerElement.currentTime
+				: 0;
+
+		sendEvent({
+			event: 'goToVideo',
+			videoId,
+			sent: new Date().toISOString(),
+			currentTime
+		});
+	}
+
+	$effect(() => {
+		if (!room?.clientId) return;
+
+		const videoId = currentWatchVideoId();
+		if (!videoId || videoId === baselineVideoId) return;
+
+		sendGoToVideo(videoId);
+	});
+
+	$effect(() => {
+		const player = $playerState;
+		const playerElement = player?.playerElement;
+		const pendingEvent = pending;
+
+		if (!playerElement || !pendingEvent) return;
+		if (pendingEvent.event === 'goToVideo' || pendingEvent.videoId !== player.data.video.videoId)
+			return;
+
+		applyPlayback(playerElement, pendingEvent);
+		pending = undefined;
+	});
 
 	function sendEvent(message: WatchPartyEvent) {
 		const currentRoom = room;
-		if (!currentRoom) return;
+		if (!currentRoom?.clientId) return;
 
 		fetch(`${getMaterialiousBackendUrl()}/api/watchParty/${currentRoom.id}`, {
 			method: 'POST',
@@ -110,7 +194,7 @@
 				sodium.base64_variants.URLSAFE_NO_PADDING
 			);
 
-			connect(roomId);
+			connect(roomId, true);
 
 			const currentSearchParams = new SvelteURLSearchParams(window.location.search);
 			currentSearchParams.set('room', roomId);
@@ -126,12 +210,17 @@
 
 		if (!givenRoomId) return;
 
-		connect(givenRoomId);
+		connect(givenRoomId, false);
 	}
 
 	function leaveRoom() {
 		room?.source.close();
 		room = undefined;
+		pending = undefined;
+		lastSentVideoId = undefined;
+		lastRemoteVideoId = undefined;
+		baselineVideoId = undefined;
+		suppressUntil = 0;
 
 		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
 		currentSearchParams.delete('room');
@@ -153,6 +242,7 @@
 
 		function sendPlayerEvent(event: WatchPartyEvent['event']) {
 			if (!room || !playerElement || !player?.data?.video?.videoId) return;
+			if (Date.now() < suppressUntil) return;
 
 			const currentTime = playerElement.currentTime;
 			const now = Date.now();

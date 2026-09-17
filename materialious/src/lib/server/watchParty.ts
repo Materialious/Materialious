@@ -10,6 +10,7 @@ interface WatchPartyRoom {
 	id: string;
 	clients: Map<string, WatchPartyClient>;
 	recent: WatchPartyEvent[];
+	current?: WatchPartyEvent;
 	lastActive: number;
 }
 
@@ -49,6 +50,19 @@ export function joinWatchParty(roomId: string, client: WatchPartyClient): WatchP
 	room.clients.set(client.id, client);
 	room.lastActive = Date.now();
 
+	if (room.current) {
+		client.send({
+			event: 'goToVideo',
+			videoId: room.current.videoId,
+			sent: new Date().toISOString(),
+			currentTime: room.current.currentTime
+		});
+
+		if (room.current.event !== 'goToVideo') {
+			client.send(room.current);
+		}
+	}
+
 	return room.recent;
 }
 
@@ -69,6 +83,8 @@ export function broadcastWatchParty(
 	if (room.recent.length > RECENT_LIMIT) {
 		room.recent.shift();
 	}
+
+	room.current = event;
 
 	for (const [clientId, client] of room.clients) {
 		if (clientId === fromClientId) continue;

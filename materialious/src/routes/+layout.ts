@@ -26,7 +26,6 @@ import { isYTBackend } from '$lib/backend';
 import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
 import { loadContentFilterFromURL } from '$lib/filtering/index.js';
-import { syncAuthTokenFromCloud } from '$lib/auth.js';
 import { configBackend } from '$lib/api/backend';
 import { configBackendCache } from '$lib/stores/backend.js';
 
@@ -37,8 +36,6 @@ export async function load({ url }) {
 	if (browser) {
 		await initI18n();
 	}
-
-	await syncAuthTokenFromCloud();
 
 	await resolvePlatform();
 

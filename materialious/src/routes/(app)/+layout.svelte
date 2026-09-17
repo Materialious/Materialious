@@ -114,8 +114,11 @@
 
 	onMount(async () => {
 		if ($invidiousAuthStore && !isYTBackend()) {
-			loadNotifications().catch(() => {
-				invidiousLogout();
+			loadNotifications().catch((error) => {
+				console.error('Failed to load invidious feed', error);
+				// A rejected token is only invalid on this device. Don't delete the
+				// synchronized cloud copy, which other (or future) sessions rely on.
+				invidiousAuthStore.set(null);
 			});
 		}
 

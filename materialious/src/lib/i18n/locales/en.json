@@ -216,6 +216,29 @@
 			"reset": "Reset defaults"
 		}
 	},
+	"quickConnect": {
+		"title": "Quick connect",
+		"subtitle": "No password needed. Enter the 8-character code shown on your signed-in device.",
+		"useQuickConnect": "Use quick connect",
+		"connecting": "Connecting…",
+		"waiting": "Waiting for the other device to send sign-in details…",
+		"success": "Signed in!",
+		"invalidCode": "That code isn't valid. Check it and try again.",
+		"alreadyUsed": "That code has already been used.",
+		"expired": "That code has expired. Ask for a new one.",
+		"tryAgain": "Try again",
+		"senderTitle": "Quick connect",
+		"senderDescription": "Sign in on another device without a password.",
+		"generate": "Show code",
+		"generateFailed": "Couldn't create a code. Try again.",
+		"waitingForDevice": "Waiting for a device to enter this code…",
+		"deviceConnected": "A device connected. Send your sign-in details?",
+		"send": "Send sign-in details",
+		"sendFailed": "Couldn't send sign-in details. Try again.",
+		"sent": "Sign-in details sent.",
+		"expiresIn": "Expires in {{seconds}} seconds",
+		"done": "Done"
+	},
 	"layout": {
 		"interface": "Interface",
 		"star": "Star us on Github!",

@@ -6,7 +6,7 @@ import {
 	remoteMaterialiousSupported
 } from '$lib/backend';
 import { isAndroidTv } from '$lib/utils';
-import { isAdminUsername } from '$lib/shared';
+import { isAdminUsername, isOwnBackend } from '$lib/shared';
 import { backendFetch } from '$lib/api/backend/request';
 import Interface from './Interface.svelte';
 import Theme from './Theme.svelte';
@@ -125,7 +125,7 @@ export function getSettingsTabs(): SettingsTab[] {
 }
 
 export function updateAccountTabs(tabs: SettingsTab[]): SettingsTab[] {
-	if (isMaterialiousAccountActive() && remoteMaterialiousSupported()) {
+	if (isMaterialiousAccountActive() && isOwnBackend()) {
 		if (!tabs.find((tab) => tab.id === 'account')) {
 			tabs.splice(tabs.length - 1, 0, {
 				id: 'account',

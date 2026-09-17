@@ -9,6 +9,7 @@
 	import * as comlink from 'comlink';
 	import { onMount } from 'svelte';
 	import PasswordStrength from '$lib/components/PasswordStrength.svelte';
+	import QuickConnectReceiver from '$lib/components/QuickConnectReceiver.svelte';
 	import { solveChallenge } from 'altcha-lib';
 	import type { Solution, Challenge } from 'altcha-lib/types';
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
@@ -17,6 +18,7 @@
 	const captchaDisabled = $derived(!!isOwnBackend()?.captchaDisabled);
 
 	let needToRegister = $state(false);
+	let quickConnectMode = $state(false);
 
 	let username = $state('');
 	let rawPassword = $state('');
@@ -100,6 +102,10 @@
 			solveCaptchaChallenge();
 		}
 	}
+
+	function onQuickConnected() {
+		goto(resolve('/', {}), { replaceState: true });
+	}
 </script>
 
 {#if isLoading}
@@ -107,85 +113,105 @@
 {:else}
 	<nav class="center-align">
 		<article class="padding left-align">
-			<h3>{$_(needToRegister ? 'createAccount' : 'login')}</h3>
-			<p class="no-margin">{$_(needToRegister ? 'materialiousCreate' : 'materialiousLogin')}</p>
+			{#if !quickConnectMode}
+				<h3>{$_(needToRegister ? 'createAccount' : 'login')}</h3>
+				<p class="no-margin">{$_(needToRegister ? 'materialiousCreate' : 'materialiousLogin')}</p>
 
-			<form onsubmit={onLogin}>
-				<div
-					class="field label prefix surface-container-highest"
-					class:invalid={failed && needToRegister}
-				>
-					<i>person</i>
-					<input bind:value={username} name="username" type="text" />
-					<label for="username">{$_('username')}</label>
-					{#if failed && needToRegister}
-						<output class="invalid">{$_('usernameTaken')}</output>
-					{/if}
-				</div>
-				<div
-					class="field label prefix surface-container-highest"
-					class:invalid={failed && !needToRegister}
-				>
-					<i>password</i>
-					<input bind:value={rawPassword} name="password" type="password" />
-					<label for="password">{$_('password')}</label>
-					{#if failed && !needToRegister}
-						<output class="invalid">{$_('invalidPassword')}</output>
-					{/if}
-				</div>
-
-				<PasswordStrength password={rawPassword} show={needToRegister} />
-
-				{#if !captchaDisabled}
-					<div class="space"></div>
-					<div class="surface-container-highest center-align small-padding max">
-						{#if captchaState === 'solving'}
-							<div class="center-align middle-align horizontal">
-								<progress class="circle indeterminate small" value="50" max="100"></progress>
-								<span class="small-text">{$_('verifyingCaptcha')}</span>
-							</div>
-						{:else if captchaState === 'solved'}
-							<div class="center-align horizontal">
-								<i class="primary-text">check_circle</i>
-								<span>{$_('captchaVerified')}</span>
-							</div>
-						{:else if captchaState === 'error'}
-							<div class="center-align horizontal">
-								<i class="red-text">error</i>
-								<span>{$_('captchaFailed')}</span>
-								<button
-									type="button"
-									class="chip circle small red-text"
-									onclick={solveCaptchaChallenge}
-								>
-									<i>refresh</i>
-								</button>
-							</div>
+				<form onsubmit={onLogin}>
+					<div
+						class="field label prefix surface-container-highest"
+						class:invalid={failed && needToRegister}
+					>
+						<i>person</i>
+						<input bind:value={username} name="username" type="text" />
+						<label for="username">{$_('username')}</label>
+						{#if failed && needToRegister}
+							<output class="invalid">{$_('usernameTaken')}</output>
 						{/if}
 					</div>
-				{/if}
-
-				<nav class="right-align">
-					<button
-						type="button"
-						class="secondary"
-						disabled={!registrationAllowed}
-						onclick={() => {
-							needToRegister = !needToRegister;
-							failed = false;
-						}}
+					<div
+						class="field label prefix surface-container-highest"
+						class:invalid={failed && !needToRegister}
 					>
-						{#if !registrationAllowed}
-							<div class="tooltip bottom">{$_('registrationDisabled')}</div>
+						<i>password</i>
+						<input bind:value={rawPassword} name="password" type="password" />
+						<label for="password">{$_('password')}</label>
+						{#if failed && !needToRegister}
+							<output class="invalid">{$_('invalidPassword')}</output>
 						{/if}
-						<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
-					</button>
-					<button type="submit" disabled={captchaState !== 'solved' && !captchaDisabled}>
-						<i>done</i>
-						<span>{$_(needToRegister ? 'createAccount' : 'login')}</span>
+					</div>
+
+					<PasswordStrength password={rawPassword} show={needToRegister} />
+
+					{#if !captchaDisabled}
+						<div class="space"></div>
+						<div class="surface-container-highest center-align small-padding max">
+							{#if captchaState === 'solving'}
+								<div class="center-align middle-align horizontal">
+									<progress class="circle indeterminate small" value="50" max="100"></progress>
+									<span class="small-text">{$_('verifyingCaptcha')}</span>
+								</div>
+							{:else if captchaState === 'solved'}
+								<div class="center-align horizontal">
+									<i class="primary-text">check_circle</i>
+									<span>{$_('captchaVerified')}</span>
+								</div>
+							{:else if captchaState === 'error'}
+								<div class="center-align horizontal">
+									<i class="red-text">error</i>
+									<span>{$_('captchaFailed')}</span>
+									<button
+										type="button"
+										class="chip circle small red-text"
+										onclick={solveCaptchaChallenge}
+									>
+										<i>refresh</i>
+									</button>
+								</div>
+							{/if}
+						</div>
+					{/if}
+
+					<nav class="right-align">
+						<button
+							type="button"
+							class="secondary"
+							disabled={!registrationAllowed}
+							onclick={() => {
+								needToRegister = !needToRegister;
+								failed = false;
+							}}
+						>
+							{#if !registrationAllowed}
+								<div class="tooltip bottom">{$_('registrationDisabled')}</div>
+							{/if}
+							<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
+						</button>
+						<button type="submit" disabled={captchaState !== 'solved' && !captchaDisabled}>
+							<i>done</i>
+							<span>{$_(needToRegister ? 'createAccount' : 'login')}</span>
+						</button>
+					</nav>
+				</form>
+			{:else}
+				<h3>{$_('quickConnect.title')}</h3>
+				<p class="no-margin">{$_('quickConnect.subtitle')}</p>
+				<QuickConnectReceiver onConnected={onQuickConnected} />
+				<nav class="right-align">
+					<button type="button" class="secondary link" onclick={() => (quickConnectMode = false)}>
+						{$_('cancel')}
 					</button>
 				</nav>
-			</form>
+			{/if}
+			{#if !quickConnectMode && isOwnBackend()?.quickConnect}
+				<div class="space"></div>
+				<div class="divider"></div>
+				<div class="space"></div>
+				<button class="outline flex" type="button" onclick={() => (quickConnectMode = true)}>
+					<i>devices</i>
+					<span>{$_('quickConnect.useQuickConnect')}</span>
+				</button>
+			{/if}
 		</article>
 	</nav>
 {/if}

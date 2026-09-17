@@ -39,6 +39,7 @@
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import { configBackendCache } from '$lib/stores/backend';
 	import WatchParty from '$lib/components/WatchParty.svelte';
 
 	let { children } = $props();
@@ -54,6 +55,13 @@
 	let notifications: Notification[] = $state([]);
 	let playerIsPip = $state(false);
 	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
+	let watchPartySupported = $state(isOwnBackend() !== null);
+	materialiousBackendStore.subscribe(() => {
+		watchPartySupported = isOwnBackend() !== null;
+	});
+	configBackendCache.subscribe(() => {
+		watchPartySupported = isOwnBackend() !== null;
+	});
 	let leftNavElement: HTMLElement | undefined = $state();
 
 	let pages = $state(getPages());
@@ -375,8 +383,8 @@
 					</div>
 				</div>
 			{:else}
-				<!-- Watch parties only work in HTTPS environments -->
-				{#if page.url.protocol === 'https:'}
+				<!-- Watch parties run on the own backend -->
+				{#if watchPartySupported}
 					<button
 						onclick={() => (showWatchParty = !showWatchParty)}
 						class="circle large transparent"
@@ -466,7 +474,7 @@
 		class="responsive max root"
 		class:full-window-main={$playerIsInWindowFullscreen}
 	>
-		{#if showWatchParty}
+		{#if showWatchParty && watchPartySupported}
 			<WatchParty />
 		{/if}
 

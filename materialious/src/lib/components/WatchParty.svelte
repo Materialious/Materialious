@@ -4,44 +4,54 @@
 	import { page } from '$app/state';
 	import { _ } from '$lib/i18n';
 	import { playerState } from '$lib/store';
+	import { getMaterialiousBackendUrl } from '$lib/backend';
 	import sodium from 'libsodium-wrappers-sumo';
 	import { onDestroy, onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
-	import { get } from 'svelte/store';
-	import { joinRoom, type Room } from '@trystero-p2p/mqtt';
-	import z from 'zod';
-	import { addToast } from './Toast.svelte';
+	import { watchPartyEventSchema, type WatchPartyEvent } from '$lib/watchParty';
 
-	const zWatchPartyEvent = z.object({
-		event: z.union([
-			z.literal('pause'),
-			z.literal('play'),
-			z.literal('seek'),
-			z.literal('goToVideo')
-		]),
-		videoId: z.string().regex(/^[a-zA-Z0-9_-]{11}$/),
-		sent: z.string().datetime(),
-		currentTime: z.number().min(0)
+	let room: { id: string; source: EventSource; clientId?: string } | undefined = $state();
+	let creating = $state(false);
+
+	onMount(() => joinRoomFromUrl());
+
+	onDestroy(() => {
+		room?.source.close();
 	});
 
-	type WatchPartyEvent = z.infer<typeof zWatchPartyEvent>;
+	function isHello(payload: unknown): payload is { event: 'hello'; clientId: string } {
+		return (
+			typeof payload === 'object' &&
+			payload !== null &&
+			(payload as { event?: unknown }).event === 'hello' &&
+			typeof (payload as { clientId?: unknown }).clientId === 'string'
+		);
+	}
 
-	let room: Room | undefined = $state();
-	let roomId: string | undefined = $state();
+	function connect(roomId: string) {
+		const source = new EventSource(`${getMaterialiousBackendUrl()}/api/watchParty/${roomId}`);
 
-	const appId = 'materialious_';
+		source.onmessage = (event) => {
+			let payload: unknown;
+			try {
+				payload = JSON.parse(event.data);
+			} catch {
+				return;
+			}
 
-	type SendEvent = (message: WatchPartyEvent, peerToSendTo?: string) => void;
+			if (isHello(payload)) {
+				room = { id: roomId, source, clientId: payload.clientId };
+				return;
+			}
 
-	// If room not in use message just get sent nowhere.
-	let sendEvent: SendEvent = () => {};
+			handleActionData(payload);
+		};
 
-	onMount(() => initalRoom());
-
-	onDestroy(() => room?.leave());
+		room = { id: roomId, source };
+	}
 
 	function handleActionData(data: unknown) {
-		const dataParsed = zWatchPartyEvent.safeParse(data);
+		const dataParsed = watchPartyEventSchema.safeParse(data);
 		if (!dataParsed.success) return;
 
 		if (dataParsed.data.event === 'goToVideo') {
@@ -54,127 +64,138 @@
 
 		const playerElement = player.playerElement;
 
-		const currentTime = playerElement.currentTime;
-		const sentTime = new Date(dataParsed.data.sent).getTime();
-		const timeDifference = Math.abs(currentTime - sentTime);
-
-		if (timeDifference > 5000) return;
-
-		const currentTimeWithDifference = Math.max(
-			0,
-			Math.min(dataParsed.data.currentTime + timeDifference, playerElement.duration)
-		);
+		const duration = playerElement.duration;
+		const targetTime = Number.isFinite(duration)
+			? Math.max(0, Math.min(dataParsed.data.currentTime, duration))
+			: Math.max(0, dataParsed.data.currentTime);
 
 		switch (dataParsed.data.event) {
 			case 'play':
+				if (Math.abs(playerElement.currentTime - targetTime) > 2) {
+					playerElement.currentTime = targetTime;
+				}
 				playerElement.play();
-				playerElement.currentTime = currentTimeWithDifference;
 				break;
 			case 'pause':
+				if (Math.abs(playerElement.currentTime - targetTime) > 0.5) {
+					playerElement.currentTime = targetTime;
+				}
 				playerElement.pause();
-				playerElement.currentTime = currentTimeWithDifference;
 				break;
 			case 'seek':
-				playerElement.currentTime = currentTimeWithDifference;
+				playerElement.currentTime = targetTime;
 				break;
 		}
 	}
 
-	function setupRoom(room: Room) {
-		const action = room.makeAction('watchParty');
+	function sendEvent(message: WatchPartyEvent) {
+		const currentRoom = room;
+		if (!currentRoom) return;
 
-		sendEvent = (message, peerToSendTo) => {
-			action.send(message, peerToSendTo ? { target: peerToSendTo } : undefined);
-		};
-
-		action.onMessage = (data) => {
-			handleActionData(data);
-		};
+		fetch(`${getMaterialiousBackendUrl()}/api/watchParty/${currentRoom.id}`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ ...message, clientId: currentRoom.clientId })
+		});
 	}
 
 	async function createRoom() {
-		await sodium.ready;
+		if (creating) return;
+		creating = true;
+		try {
+			await sodium.ready;
 
-		roomId = sodium.to_base64(sodium.randombytes_buf(24));
-		room = joinRoom({ appId }, roomId);
-
-		setupRoom(room);
-
-		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
-
-		currentSearchParams.set('room', roomId);
-
-		room.onPeerJoin = (peerId) => {
-			const player = get(playerState);
-			if (!player || !player.data || !player.playerElement) return;
-
-			addToast({
-				data: {
-					text: $_('watchParty.userJoin')
-				}
-			});
-
-			sendEvent(
-				{
-					event: 'goToVideo',
-					videoId: player.data.video.videoId,
-					sent: new Date().toISOString(),
-					currentTime: player.playerElement.currentTime
-				},
-				peerId
+			const roomId = sodium.to_base64(
+				sodium.randombytes_buf(24),
+				sodium.base64_variants.URLSAFE_NO_PADDING
 			);
-		};
 
-		room.onPeerLeave = () => {
-			addToast({
-				data: {
-					text: $_('watchParty.userLeft')
-				}
-			});
-		};
+			connect(roomId);
 
-		pushState(`?${currentSearchParams.toString()}`, { replaceState: false }); // eslint-disable-line svelte/no-navigation-without-resolve
+			const currentSearchParams = new SvelteURLSearchParams(window.location.search);
+			currentSearchParams.set('room', roomId);
+
+			pushState(`?${currentSearchParams.toString()}`, { replaceState: false });
+		} finally {
+			creating = false;
+		}
 	}
 
-	function initalRoom() {
+	function joinRoomFromUrl() {
 		const givenRoomId = page.url.searchParams.get('room');
 
 		if (!givenRoomId) return;
 
-		room = joinRoom({ appId }, givenRoomId);
-
-		setupRoom(room);
+		connect(givenRoomId);
 	}
 
-	playerState.subscribe((player) => {
-		if (!player?.playerElement) return;
+	function leaveRoom() {
+		room?.source.close();
+		room = undefined;
 
-		const playerElement = player.playerElement;
+		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
+		currentSearchParams.delete('room');
 
-		function sendPlayerEvent(event: 'play' | 'pause' | 'seek') {
-			if (!room || !player) return;
+		pushState(`?${currentSearchParams.toString()}`, { replaceState: false });
+	}
+
+	let attachedPlayerElement: HTMLMediaElement | undefined;
+
+	$effect(() => {
+		const player = $playerState;
+		const playerElement = player?.playerElement;
+		if (!playerElement) return;
+
+		if (attachedPlayerElement === playerElement) return;
+		attachedPlayerElement = playerElement;
+
+		let lastSent: { event: WatchPartyEvent['event']; time: number; at: number } | undefined;
+
+		function sendPlayerEvent(event: WatchPartyEvent['event']) {
+			if (!room || !playerElement || !player?.data?.video?.videoId) return;
+
+			const currentTime = playerElement.currentTime;
+			const now = Date.now();
+
+			if (
+				lastSent?.event === event &&
+				Math.abs(lastSent.time - currentTime) < 1 &&
+				now - lastSent.at < 1000
+			) {
+				return;
+			}
+
+			lastSent = { event, time: currentTime, at: now };
 
 			sendEvent({
 				event,
 				videoId: player.data.video.videoId,
 				sent: new Date().toISOString(),
-				currentTime: playerElement.currentTime
+				currentTime
 			});
 		}
 
-		let initalPlaying = true;
+		const onPlay = () => sendPlayerEvent('play');
+		const onPause = () => sendPlayerEvent('pause');
+		const onSeeked = () => sendPlayerEvent('seek');
+		const onWaiting = () => sendPlayerEvent('pause');
+		const onError = () => sendPlayerEvent('pause');
 
-		playerElement.addEventListener('play', () => sendPlayerEvent('play'));
-		playerElement.addEventListener('playing', () => {
-			if (!initalPlaying) return;
-			initalPlaying = true;
+		playerElement.addEventListener('play', onPlay);
+		playerElement.addEventListener('pause', onPause);
+		playerElement.addEventListener('seeked', onSeeked);
+		playerElement.addEventListener('waiting', onWaiting);
+		playerElement.addEventListener('error', onError);
 
-			sendPlayerEvent('play');
-		});
-		playerElement.addEventListener('seeked', () => sendPlayerEvent('seek'));
-		playerElement.addEventListener('pause', () => sendPlayerEvent('pause'));
-		playerElement.addEventListener('waiting', () => sendPlayerEvent('pause'));
-		playerElement.addEventListener('error', () => sendPlayerEvent('pause'));
+		return () => {
+			playerElement.removeEventListener('play', onPlay);
+			playerElement.removeEventListener('pause', onPause);
+			playerElement.removeEventListener('seeked', onSeeked);
+			playerElement.removeEventListener('waiting', onWaiting);
+			playerElement.removeEventListener('error', onError);
+
+			if (attachedPlayerElement === playerElement) attachedPlayerElement = undefined;
+		};
 	});
 </script>
 
@@ -184,18 +205,12 @@
 	{#if !room}
 		<div class="space"></div>
 
-		<button onclick={createRoom} class="surface-container-highest">
+		<button onclick={createRoom} disabled={creating} class="surface-container-highest">
 			<span>{$_('watchParty.createRoom')}</span>
 		</button>
 	{:else}
 		<div class="space"></div>
-		<button
-			onclick={() => {
-				room?.leave();
-				room = undefined;
-			}}
-			class="surface-container-highest"
-		>
+		<button onclick={leaveRoom} class="surface-container-highest">
 			{$_('watchParty.leaveRoom')}
 		</button>
 	{/if}

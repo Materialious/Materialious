@@ -1,10 +1,6 @@
 import { type Component } from 'svelte';
 import { Capacitor } from '@capacitor/core';
-import {
-	isMaterialiousAccountActive,
-	isUnrestrictedPlatform,
-	remoteMaterialiousSupported
-} from '$lib/backend';
+import { isMaterialiousAccountActive, isUnrestrictedPlatform } from '$lib/backend';
 import { isAndroidTv } from '$lib/utils';
 import { isAdminUsername, isOwnBackend } from '$lib/shared';
 import { backendFetch } from '$lib/api/backend/request';

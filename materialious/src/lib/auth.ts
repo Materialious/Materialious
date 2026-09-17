@@ -17,9 +17,10 @@ import { isOwnBackend } from './shared';
 import { Browser } from '@capacitor/browser';
 import { clearFeedYTjs } from './api/youtubejs/subscriptions';
 import { ensureNoTrailingSlash } from './utils';
-import { isYTBackend } from './backend';
-import { deleteKeyValue } from './api/backend/keyvalue';
+import { isMaterialiousAccountActive, isYTBackend } from './backend';
+import { deleteKeyValue, getKeyValue } from './api/backend/keyvalue';
 import semver from 'semver';
+import { configBackend } from './api/backend';
 import { backendFetch } from './api/backend/request';
 import { configBackendCache } from './stores/backend';
 
@@ -40,6 +41,33 @@ async function removeAuthFromBackend() {
 	if (!get(rawMasterKeyStore)) return;
 
 	await deleteKeyValue('authToken');
+}
+
+export async function syncAuthTokenFromCloud(): Promise<void> {
+	if (!get(rawMasterKeyStore)) return;
+
+	// On the web `isOwnBackend()` reads from `configBackendCache`, which is
+	// populated asynchronously. Resolve it here so the sync does not depend on
+	// a race between QuickConnect and the config fetch in the layout.
+	if (!isOwnBackend()) {
+		const config = await configBackend();
+		if (!config) return;
+		configBackendCache.set(config);
+	}
+
+	if (!isMaterialiousAccountActive()) return;
+
+	try {
+		const authTokenFromCloud = await getKeyValue('authToken');
+		if (typeof authTokenFromCloud === 'string')
+			invidiousAuthStore.set(JSON.parse(authTokenFromCloud));
+		else invidiousAuthStore.set(null);
+	} catch {
+		// Remote Materialious instance is unreachable; log out of the account.
+		authTokenStore.set(undefined);
+		rawMasterKeyStore.set(undefined);
+		invidiousAuthStore.set(null);
+	}
 }
 
 export async function setInvidiousInstance(

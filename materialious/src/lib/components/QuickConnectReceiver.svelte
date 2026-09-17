@@ -13,6 +13,7 @@
 		type QuickConnectCredentials
 	} from '$lib/api/backend/quickconnect';
 	import { quickConnectTtlMs } from '$lib/api/backend/quickconnect';
+	import { syncAuthTokenFromCloud } from '$lib/auth';
 	import { isAndroidTv } from '$lib/utils';
 
 	interface Props {
@@ -123,6 +124,7 @@
 				stopPolling();
 				phase = 'success';
 				applyQuickConnectCredentials(credentials);
+				await syncAuthTokenFromCloud();
 				onConnected(credentials);
 				return;
 			}

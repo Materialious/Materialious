@@ -22,11 +22,10 @@ import { get, type Writable } from 'svelte/store';
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import { deserialize } from '@macfja/serializer';
-import { isMaterialiousAccountActive, isYTBackend } from '$lib/backend';
+import { isYTBackend } from '$lib/backend';
 import { isOwnBackend } from '$lib/shared/index';
 import '$lib/fetchProxy';
 import { loadContentFilterFromURL } from '$lib/filtering/index.js';
-import { getKeyValue } from '$lib/api/backend/keyvalue.js';
 import { configBackend } from '$lib/api/backend';
 import { configBackendCache } from '$lib/stores/backend.js';
 
@@ -36,20 +35,6 @@ export const prerender = false;
 export async function load({ url }) {
 	if (browser) {
 		await initI18n();
-	}
-
-	if (isMaterialiousAccountActive()) {
-		try {
-			const authTokenFromCloud = await getKeyValue('authToken');
-			if (typeof authTokenFromCloud === 'string')
-				invidiousAuthStore.set(JSON.parse(authTokenFromCloud));
-			else invidiousAuthStore.set(null);
-		} catch {
-			// Remote Materialious instance is unreachable; log out of the account.
-			authTokenStore.set(undefined);
-			rawMasterKeyStore.set(undefined);
-			invidiousAuthStore.set(null);
-		}
 	}
 
 	await resolvePlatform();

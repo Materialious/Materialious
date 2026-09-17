@@ -39,6 +39,7 @@
 	import Author from '$lib/components/Author.svelte';
 	import Toast from '$lib/components/Toast.svelte';
 	import { isOwnBackend } from '$lib/shared';
+	import { configBackendCache } from '$lib/stores/backend';
 	import WatchParty from '$lib/components/WatchParty.svelte';
 
 	let { children } = $props();
@@ -54,6 +55,13 @@
 	let notifications: Notification[] = $state([]);
 	let playerIsPip = $state(false);
 	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
+	let watchPartySupported = $state(isOwnBackend() !== null);
+	materialiousBackendStore.subscribe(() => {
+		watchPartySupported = isOwnBackend() !== null;
+	});
+	configBackendCache.subscribe(() => {
+		watchPartySupported = isOwnBackend() !== null;
+	});
 	let leftNavElement: HTMLElement | undefined = $state();
 
 	let pages = $state(getPages());
@@ -106,8 +114,11 @@
 
 	onMount(async () => {
 		if ($invidiousAuthStore && !isYTBackend()) {
-			loadNotifications().catch(() => {
-				invidiousLogout();
+			loadNotifications().catch((error) => {
+				console.error('Failed to load invidious feed', error);
+				// A rejected token is only invalid on this device. Don't delete the
+				// synchronized cloud copy, which other (or future) sessions rely on.
+				invidiousAuthStore.set(null);
 			});
 		}
 
@@ -129,16 +140,27 @@
 		const el = playerPlaceholderArea ?? playerActiveArea;
 		if (!el) return;
 
-		const observer = new ResizeObserver((entries) => {
-			for (const entry of entries) {
-				const height = entry.contentBoxSize?.[0]?.blockSize ?? entry.contentRect.height;
-				document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
-			}
-		});
+		// In native fullscreen the player container leaves the normal flow,
+		// collapsing this wrapper. Use the fullscreen element's height instead
+		// so dependants like double-tap zones keep their correct sizing.
+		const updateHeight = () => {
+			const height = document.fullscreenElement
+				? document.fullscreenElement.getBoundingClientRect().height
+				: el.getBoundingClientRect().height;
 
+			document.documentElement.style.setProperty('--video-player-height', `${height + 10}px`);
+		};
+
+		const observer = new ResizeObserver(updateHeight);
 		observer.observe(el);
+		updateHeight();
 
-		return () => observer.disconnect();
+		document.addEventListener('fullscreenchange', updateHeight);
+
+		return () => {
+			observer.disconnect();
+			document.removeEventListener('fullscreenchange', updateHeight);
+		};
 	});
 
 	let fullscreenExited = false;
@@ -364,10 +386,13 @@
 					</div>
 				</div>
 			{:else}
-				<!-- Watch parties only work in HTTPS environments -->
-				{#if page.url.protocol === 'https:'}
+				<!-- Watch parties run on the own backend -->
+				{#if watchPartySupported}
 					<button
-						onclick={() => (showWatchParty = !showWatchParty)}
+						onclick={() => {
+							showWatchParty = !showWatchParty;
+							if (showWatchParty) resetScroll();
+						}}
 						class="circle large transparent"
 						class:active={showWatchParty}
 					>
@@ -455,7 +480,7 @@
 		class="responsive max root"
 		class:full-window-main={$playerIsInWindowFullscreen}
 	>
-		{#if showWatchParty}
+		{#if showWatchParty && watchPartySupported}
 			<WatchParty />
 		{/if}
 

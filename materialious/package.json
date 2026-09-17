@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.18.6",
+	"version": "1.18.7",
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && npm run patch:github && vite dev",
@@ -67,7 +67,6 @@
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"@materialious/shared": "file:shared",
-		"@trystero-p2p/mqtt": "^0.25.2",
 		"@zxcvbn-ts/core": "^4.1.2",
 		"@zxcvbn-ts/language-common": "^4.1.2",
 		"@zxcvbn-ts/language-en": "^4.1.1",

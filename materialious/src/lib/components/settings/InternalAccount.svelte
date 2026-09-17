@@ -4,6 +4,8 @@
 	import { resetPasswordBackend, type DerivePassword } from '$lib/api/backend';
 	import { backendFetch } from '$lib/api/backend/request';
 	import PasswordStrength from '$lib/components/PasswordStrength.svelte';
+	import QuickConnect from './QuickConnect.svelte';
+	import { isOwnBackend } from '$lib/shared';
 	import { onMount } from 'svelte';
 	import * as comlink from 'comlink';
 
@@ -117,6 +119,15 @@
 <div class="space"></div>
 <div class="divider"></div>
 <div class="space"></div>
+
+{#if isOwnBackend()?.quickConnect}
+	<h5 class="no-margin">{$_('quickConnect.senderTitle')}</h5>
+	<p class="small-text no-margin">{$_('quickConnect.senderDescription')}</p>
+	<QuickConnect />
+	<div class="space"></div>
+	<div class="divider"></div>
+	<div class="space"></div>
+{/if}
 
 <button class="tertiary" onclick={deleteAccount}>
 	<i>warning</i>

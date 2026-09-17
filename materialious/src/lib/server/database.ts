@@ -6,6 +6,7 @@ let ChannelSubscriptionTable: ModelCtor<Model<any, any>>;
 let CaptchaTable: ModelCtor<Model<any, any>>;
 let UserKeyValueTable: ModelCtor<Model<any, any>>;
 let UserHistoryTable: ModelCtor<Model<any, any>>;
+let QuickConnectTable: ModelCtor<Model<any, any>>;
 
 let sequelizeInstance: Sequelize | null = null;
 
@@ -39,6 +40,7 @@ export function getSequelize(): {
 	CaptchaTable: ModelCtor<Model<any, any>>;
 	UserKeyValueTable: ModelCtor<Model<any, any>>;
 	UserHistoryTable: ModelCtor<Model<any, any>>;
+	QuickConnectTable: ModelCtor<Model<any, any>>;
 } {
 	if (sequelizeInstance) {
 		return {
@@ -47,7 +49,8 @@ export function getSequelize(): {
 			ChannelSubscriptionTable,
 			CaptchaTable,
 			UserKeyValueTable,
-			UserHistoryTable
+			UserHistoryTable,
+			QuickConnectTable
 		};
 	}
 
@@ -127,6 +130,40 @@ export function getSequelize(): {
 				{
 					unique: true,
 					fields: ['UserId', 'key']
+				}
+			]
+		}
+	);
+
+	QuickConnectTable = sequelizeInstance.define(
+		'QuickConnect',
+		{
+			codeHash: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				primaryKey: true
+			},
+			receiverPublicKey: {
+				type: DataTypes.STRING,
+				allowNull: true
+			},
+			credentialsCipher: {
+				type: DataTypes.TEXT,
+				allowNull: true
+			},
+			created: {
+				type: DataTypes.DATE,
+				allowNull: false
+			},
+			expires: {
+				type: DataTypes.DATE,
+				allowNull: false
+			}
+		},
+		{
+			indexes: [
+				{
+					fields: ['expires']
 				}
 			]
 		}
@@ -242,7 +279,8 @@ export function getSequelize(): {
 		ChannelSubscriptionTable,
 		CaptchaTable,
 		UserKeyValueTable,
-		UserHistoryTable
+		UserHistoryTable,
+		QuickConnectTable
 	};
 }
 
@@ -271,4 +309,12 @@ export interface UserKeyStoreModel {
 	key: string;
 	valueCipher: string;
 	valueNonce: string;
+}
+
+export interface QuickConnectModel {
+	codeHash: string;
+	receiverPublicKey: string | null;
+	credentialsCipher: string | null;
+	created: Date;
+	expires: Date;
 }

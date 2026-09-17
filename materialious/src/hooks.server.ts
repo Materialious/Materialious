@@ -18,6 +18,10 @@ const strictLimiter = new RateLimiter({
 	IP: [10, 'm']
 });
 
+const quickConnectLimiter = new RateLimiter({
+	IP: [120, 'm']
+});
+
 const sensitivePaths = [/^\/api\/user\/create$/, /^\/api\/user\/login$/];
 
 export async function handle({ event, resolve }) {
@@ -64,12 +68,21 @@ export async function handle({ event, resolve }) {
 	}
 
 	if (!env.RATE_LIMIT_DISABLED && !env.PUBLIC_RATE_LIMIT_DISABLED) {
+		const tooManyRequests = () =>
+			new Response(JSON.stringify({ error: 'Too Many Requests' }), {
+				status: 429,
+				headers: { 'Content-Type': 'application/json' }
+			});
+
 		if (sensitivePaths.some((p) => p.test(event.url.pathname))) {
 			if (await strictLimiter.isLimited(event)) {
-				return new Response(JSON.stringify({ error: 'Too Many Requests' }), {
-					status: 429,
-					headers: { 'Content-Type': 'application/json' }
-				});
+				return tooManyRequests();
+			}
+		}
+
+		if (event.url.pathname.startsWith('/api/user/quickConnect')) {
+			if (await quickConnectLimiter.isLimited(event)) {
+				return tooManyRequests();
 			}
 		}
 	}

@@ -13,6 +13,7 @@
 		type QuickConnectCredentials
 	} from '$lib/api/backend/quickconnect';
 	import { quickConnectTtlMs } from '$lib/api/backend/quickconnect';
+	import { isAndroidTv } from '$lib/utils';
 
 	interface Props {
 		onConnected?: (credentials: QuickConnectCredentials) => void;
@@ -26,6 +27,8 @@
 	let code = $state('');
 	let keypair: { publicKey: Uint8Array; privateKey: Uint8Array } | null = null;
 	let deadline = $state(0);
+
+	let tvInputEl = $state<HTMLInputElement | undefined>(undefined);
 
 	let pollTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -68,6 +71,42 @@
 	function showError(message: string) {
 		errorMessage = message;
 		phase = 'error';
+	}
+
+	function lockTvInput() {
+		if (tvInputEl) tvInputEl.readOnly = true;
+	}
+
+	function unlockTvInput() {
+		if (!tvInputEl) return;
+		tvInputEl.readOnly = false;
+		tvInputEl.focus();
+	}
+
+	function onTvKeydown(event: KeyboardEvent) {
+		if (event.key !== 'Enter') return;
+
+		event.preventDefault();
+
+		if (tvInputEl?.readOnly) {
+			unlockTvInput();
+			return;
+		}
+
+		const value = normalizeQuickConnectCode(tvInputEl?.value ?? '');
+		if (value.length === 8) void submit(value);
+	}
+
+	function onTvInput(event: Event) {
+		const el = event.target as HTMLInputElement;
+		const normalized = normalizeQuickConnectCode(el.value).slice(0, 8);
+
+		if (el.value !== normalized) el.value = normalized;
+		if (normalized.length === 8) void submit(normalized);
+	}
+
+	function onTvClick() {
+		if (tvInputEl?.readOnly) unlockTvInput();
 	}
 
 	async function poll() {
@@ -124,6 +163,8 @@
 		deadline = 0;
 		errorMessage = '';
 		pinInput.value = '';
+		if (tvInputEl) tvInputEl.value = '';
+		lockTvInput();
 		phase = 'entering';
 	}
 
@@ -138,11 +179,30 @@
 <div class="center-align">
 	{#if phase === 'entering' || phase === 'error'}
 		<div class="pin-container">
-			<div {...pinInput.root} class="pin-input">
-				{#each pinInput.inputs as input, index (index)}
-					<input {...input} />
-				{/each}
-			</div>
+			{#if isAndroidTv()}
+				<input
+					bind:this={tvInputEl}
+					class="tv-code-input"
+					type="text"
+					inputmode="text"
+					autocomplete="off"
+					autocapitalize="characters"
+					spellcheck="false"
+					maxlength="8"
+					readonly
+					placeholder={$_('quickConnect.tvPlaceholder')}
+					onkeydown={onTvKeydown}
+					oninput={onTvInput}
+					onclick={onTvClick}
+					onblur={lockTvInput}
+				/>
+			{:else}
+				<div {...pinInput.root} class="pin-input">
+					{#each pinInput.inputs as input, index (index)}
+						<input {...input} />
+					{/each}
+				</div>
+			{/if}
 
 			{#if phase === 'error'}
 				<p class="error-text">{errorMessage}</p>
@@ -214,6 +274,28 @@
 		background-color: var(--surface-container-highest);
 		color: var(--on-surface);
 		text-transform: uppercase;
+	}
+
+	.tv-code-input {
+		width: 100%;
+		height: 4rem;
+		text-align: center;
+		font-size: 2rem;
+		font-family: monospace;
+		letter-spacing: 0.5rem;
+		text-transform: uppercase;
+		border: 0.0625rem solid var(--outline-variant);
+		border-radius: var(--border-radius);
+		background-color: var(--surface-container-highest);
+		color: var(--on-surface);
+	}
+
+	.tv-code-input::placeholder {
+		font-size: 1rem;
+		font-family: inherit;
+		letter-spacing: normal;
+		text-transform: none;
+		color: var(--on-surface-variant);
 	}
 
 	.error-text {

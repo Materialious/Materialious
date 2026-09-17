@@ -18,17 +18,19 @@ This guide is for the docker image `wardpearce/materialious-full`. It is **not**
 
 ## TOC
 
-* [Step 1: Deploy the container](#step-1-deploy-the-container)
-  * [Invidious configuration](#invidious-configuration-if-using-invidious)
-  * [Proof-of-work Captcha](#proof-of-work-captcha)
-  * [Docker Compose](#docker-compose)
-* [Step 2 (Optional, but recommended): Self-host RYD-Proxy](#step-2-optional-but-recommended-self-host-ryd-proxy)
-* [Troubleshooting](#troubleshooting)
+- [Step 1: Deploy the container](#step-1-deploy-the-container)
+  - [Invidious configuration](#invidious-configuration-if-using-invidious)
+  - [Proof-of-work Captcha](#proof-of-work-captcha)
+  - [Docker Compose](#docker-compose)
+- [Step 2 (Optional, but recommended): Self-host RYD-Proxy](#step-2-optional-but-recommended-self-host-ryd-proxy)
+- [Troubleshooting](#troubleshooting)
 
 ## Step 1: Deploy the container
 
 ### Invidious configuration (If using Invidious)
+
 #### Configuration
+
 The following Invidious values must be set in your config.
 
 - `domain:` - The reverse proxied domain of your Invidious instance.
@@ -36,16 +38,19 @@ The following Invidious values must be set in your config.
 - `external_port: 443` - Must be set if you are using HTTPS.
 
 #### Companion support
+
 `public_url` **MUST** be set in Invidious under **invidious_companion** for companion to work with Materialious.
 
 e.g.
+
 ```yml
 invidious_companion:
   - private_url: "http://companion:8282/companion"
-    public_url:  "http://companion.example.com/companion"
+    public_url: "http://companion.example.com/companion"
 ```
 
 ### Proof-of-work Captcha
+
 Will only work while using HTTPS. If in HTTP set `PUBLIC_CAPTCHA_DISABLED` to `true`
 
 ### Docker Compose
@@ -58,7 +63,8 @@ services:
     ports:
       - 3000:3000
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:3000/"]
+      test:
+        ["CMD", "wget", "--no-verbose", "--spider", "http://localhost:3000/"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -96,11 +102,16 @@ services:
       # When "false", only existing users can log in (no new accounts).
       PUBLIC_REGISTRATION_ALLOWED: "false"
 
+      # Enable quick connect: sign in on another device without a password by
+      # entering a short code shown on an already signed-in device.
+      # Requires PUBLIC_INTERNAL_AUTH: "true". Set to "false" to disable.
+      PUBLIC_QUICK_CONNECT: "true"
+
       # Comma-separated list of usernames that have admin privileges.
       # Admins can manage users and instance settings.
       # e.g. "user1,user2"
       PUBLIC_ADMIN_USERNAMES: ""
-      
+
       # Disable proof-of-work captcha on registration/login.
       # Captcha only works with HTTPS. If using HTTP, set this to "true".
       PUBLIC_CAPTCHA_DISABLED: "false"
@@ -113,12 +124,12 @@ services:
       # Number of days to keep watch history before automatic deletion.
       # Set to "-1" to keep history forever. Defaults to 365 days.
       HISTORY_CULLING: "365"
-      
+
       # Comma-separated list of additional domains allowed through the proxy.
       # Use base domains only (e.g. "youtube.com,google.com").
       # Do NOT include protocol or paths (not "https://youtube.com").
       WHITELIST_BASE_DOMAIN: ""
-  
+
       # Path to a CA certificate file to trust (useful for self-signed certs).
       # Leave blank to use system default certificates.
       PROXY_TRUST_CA: ""
@@ -173,18 +184,21 @@ services:
       - materialious-data:/materialious-data
 
 volumes:
-  materialious-data: 
+  materialious-data:
 ```
 
 ### Overwriting Materialious defaults
+
 Materialious lets you customize the default settings by overriding them with `PUBLIC_DEFAULT_SETTINGS`. To configure this easily, go to **Settings** → **Export/Import** and click "Export to clipboard" under the "Settings" header. For more details, check the [SETTINGS](./SETTINGS.md) page.
 
 **Please note:** These overwrites only apply on 1st load & won't replace existing configuration stored in browser local storage.
 
 ## Step 2 (Optional, but recommended): Self-host RYD-Proxy
+
 The snippets below are **fragments**: add them under `services:` in the same compose file you created in [Step 1](#step-1-deploy-the-container).
 
 #### With TOR (Recommended)
+
 ```yml
 tor-proxy:
   image: 1337kavin/alpine-tor:latest
@@ -202,7 +216,9 @@ ryd-proxy:
   ports:
     - 3003:3000
 ```
+
 #### Without TOR
+
 ```yml
 ryd-proxy:
   image: 1337kavin/ryd-proxy:latest
@@ -220,6 +236,7 @@ docker compose up -d
 ## Troubleshooting
 
 ### "COOKIE_SECRET must be at least 16 characters long"
+
 The container refuses to start. Generate a long, random secret and set it in your compose file configuration:
 
 ```bash
@@ -227,9 +244,11 @@ openssl rand -hex 32
 ```
 
 ### Captcha fails / registration or login is blocked
+
 The proof-of-work captcha only works over HTTPS. Either put this container behind an HTTPS reverse proxy, or if you are running plain HTTP set `PUBLIC_CAPTCHA_DISABLED: "true"`.
 
 ### Requests to Invidious/RYD/DeArrow are blocked at the proxy level
+
 The proxy only allows known base domains, plus whatever you configure:
 
 - Every `PUBLIC_DEFAULT_*_INSTANCE` URL is automatically whitelisted for you.
@@ -243,4 +262,5 @@ docker compose up -d
 ```
 
 ### Changing a `PUBLIC_*` environment variable does nothing
+
 In `materialious-full` the `PUBLIC_*` variables are read at runtime, not at build time. Restart the container after editing them as above.

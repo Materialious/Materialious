@@ -2,6 +2,9 @@ import sodium from 'libsodium-wrappers-sumo';
 import { get } from 'svelte/store';
 import { authTokenStore, rawMasterKeyStore } from '$lib/store';
 import { backendFetch } from './request';
+import type { Solution, Challenge } from 'altcha-lib/types';
+
+export type CaptchaPayload = { solution: Solution; challenge: Challenge };
 
 export type QuickConnectStatus = 'pending' | 'awaiting' | 'completed';
 
@@ -100,10 +103,14 @@ export async function sendQuickConnectCredentials(
 	return resp.ok;
 }
 
-export async function registerQuickConnectReceiver(code: string): Promise<{
-	publicKey: Uint8Array;
-	privateKey: Uint8Array;
-} | null> {
+export type QuickConnectRegisterResult =
+	| { status: 'ok'; keypair: { publicKey: Uint8Array; privateKey: Uint8Array } }
+	| { status: 'not-found' | 'conflict' | 'captcha' | 'error' };
+
+export async function registerQuickConnectReceiver(
+	code: string,
+	captchaPayload?: CaptchaPayload | null
+): Promise<QuickConnectRegisterResult> {
 	await sodium.ready;
 
 	const keypair = sodium.crypto_box_keypair();
@@ -112,15 +119,26 @@ export async function registerQuickConnectReceiver(code: string): Promise<{
 		`/api/user/quickConnect/${encodeURIComponent(normalizeQuickConnectCode(code))}/receiver`,
 		{
 			method: 'POST',
-			body: JSON.stringify({ publicKey: sodium.to_base64(keypair.publicKey) })
+			body: JSON.stringify({
+				publicKey: sodium.to_base64(keypair.publicKey),
+				captchaPayload: captchaPayload ?? null
+			})
 		}
 	);
 
-	if (!resp.ok) return null;
+	if (!resp.ok) {
+		if (resp.status === 404) return { status: 'not-found' };
+		if (resp.status === 409) return { status: 'conflict' };
+		if (resp.status === 400) return { status: 'captcha' };
+		return { status: 'error' };
+	}
 
 	return {
-		publicKey: keypair.publicKey,
-		privateKey: keypair.privateKey
+		status: 'ok',
+		keypair: {
+			publicKey: keypair.publicKey,
+			privateKey: keypair.privateKey
+		}
 	};
 }
 

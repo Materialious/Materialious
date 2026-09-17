@@ -219,6 +219,7 @@
 	"quickConnect": {
 		"title": "Quick connect",
 		"subtitle": "No password needed. Enter the 8-character code shown on your signed-in device.",
+		"codeLocation": "Find the code in Settings → Account → Quick connect on your signed-in device.",
 		"useQuickConnect": "Use quick connect",
 		"connecting": "Connecting…",
 		"waiting": "Waiting for the other device to send sign-in details…",
@@ -226,7 +227,6 @@
 		"invalidCode": "That code isn't valid. Check it and try again.",
 		"alreadyUsed": "That code has already been used.",
 		"expired": "That code has expired. Ask for a new one.",
-		"tryAgain": "Try again",
 		"tvPlaceholder": "Press OK, then enter the code",
 		"senderTitle": "Quick connect",
 		"senderDescription": "Sign in on another device without a password.",

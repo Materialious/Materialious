@@ -196,9 +196,16 @@
 			{:else}
 				<h3>{$_('quickConnect.title')}</h3>
 				<p class="no-margin">{$_('quickConnect.subtitle')}</p>
-				<QuickConnectReceiver onConnected={onQuickConnected} />
+				<QuickConnectReceiver onConnected={onQuickConnected} {captchaPayload} />
 				<nav class="right-align">
-					<button type="button" class="secondary link" onclick={() => (quickConnectMode = false)}>
+					<button
+						type="button"
+						class="secondary link"
+						onclick={() => {
+							quickConnectMode = false;
+							void solveCaptchaChallenge();
+						}}
+					>
 						{$_('cancel')}
 					</button>
 				</nav>
@@ -207,7 +214,12 @@
 				<div class="space"></div>
 				<div class="divider"></div>
 				<div class="space"></div>
-				<button class="outline flex" type="button" onclick={() => (quickConnectMode = true)}>
+				<button
+					class="outline flex"
+					type="button"
+					disabled={captchaState !== 'solved' && !captchaDisabled}
+					onclick={() => (quickConnectMode = true)}
+				>
 					<i>devices</i>
 					<span>{$_('quickConnect.useQuickConnect')}</span>
 				</button>

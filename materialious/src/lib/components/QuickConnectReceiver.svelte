@@ -2,6 +2,10 @@
 	import { _ } from '$lib/i18n';
 	import { PinInput } from 'melt/builders';
 	import { onDestroy } from 'svelte';
+	import { backendFetch } from '$lib/api/backend/request';
+	import { isOwnBackend } from '$lib/shared';
+	import { solveChallenge } from 'altcha-lib';
+	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
 	import {
 		cancelQuickConnectSession,
 		fetchQuickConnectCredentials,
@@ -10,7 +14,8 @@
 		openQuickConnectCredentials,
 		registerQuickConnectReceiver,
 		applyQuickConnectCredentials,
-		type QuickConnectCredentials
+		type QuickConnectCredentials,
+		type CaptchaPayload
 	} from '$lib/api/backend/quickconnect';
 	import { quickConnectTtlMs } from '$lib/api/backend/quickconnect';
 	import { syncAuthTokenFromCloud } from '$lib/auth';
@@ -18,9 +23,12 @@
 
 	interface Props {
 		onConnected?: (credentials: QuickConnectCredentials) => void;
+		captchaPayload?: CaptchaPayload | null;
 	}
 
-	let { onConnected = () => {} }: Props = $props();
+	let { onConnected = () => {}, captchaPayload: providedCaptcha = null }: Props = $props();
+
+	const captchaDisabled = $derived(!!isOwnBackend()?.captchaDisabled);
 
 	let phase = $state<'entering' | 'connecting' | 'waiting' | 'success' | 'error'>('entering');
 	let errorMessage = $state('');
@@ -31,7 +39,10 @@
 
 	let tvInputEl = $state<HTMLInputElement | undefined>(undefined);
 
+	let captchaPayload = $state<CaptchaPayload | null>(providedCaptcha);
+
 	let pollTimer: ReturnType<typeof setInterval> | undefined;
+	let errorResetTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const pinInput = new PinInput({
 		maxLength: 8,
@@ -41,29 +52,57 @@
 		}
 	});
 
+	async function solveCaptchaChallenge(): Promise<boolean> {
+		if (captchaDisabled) return true;
+
+		try {
+			const resp = await backendFetch('/api/captcha');
+			const challenge = await resp.json();
+
+			if (Object.keys(challenge).length === 0) return true;
+
+			const solution = await solveChallenge({ challenge, deriveKey });
+			if (!solution) return false;
+
+			captchaPayload = {
+				solution,
+				challenge
+			};
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	async function ensureCaptcha(): Promise<boolean> {
+		if (captchaDisabled || captchaPayload) return true;
+		return await solveCaptchaChallenge();
+	}
+
 	async function submit(enteredCode: string) {
 		if (phase !== 'entering') return;
+
+		if (!(await ensureCaptcha())) {
+			showError($_('captchaFailed'));
+			return;
+		}
 
 		code = enteredCode;
 		phase = 'connecting';
 
-		const status = await getQuickConnectStatus(code);
-		if (!status) {
-			showError($_('quickConnect.invalidCode'));
+		const result = await registerQuickConnectReceiver(code, captchaPayload);
+		if (result.status !== 'ok') {
+			if (result.status === 'not-found' || result.status === 'error') {
+				showError($_('quickConnect.invalidCode'));
+			} else if (result.status === 'conflict') {
+				showError($_('quickConnect.alreadyUsed'));
+			} else {
+				showError($_('captchaFailed'));
+			}
 			return;
 		}
 
-		if (status.status === 'completed') {
-			showError($_('quickConnect.alreadyUsed'));
-			return;
-		}
-
-		keypair = await registerQuickConnectReceiver(code);
-		if (!keypair) {
-			showError($_('quickConnect.alreadyUsed'));
-			return;
-		}
-
+		keypair = result.keypair;
 		deadline = Date.now() + quickConnectTtlMs;
 		phase = 'waiting';
 		startPolling();
@@ -72,6 +111,8 @@
 	function showError(message: string) {
 		errorMessage = message;
 		phase = 'error';
+		clearTimeout(errorResetTimer);
+		errorResetTimer = setTimeout(() => void reset(), 3000);
 	}
 
 	function lockTvInput() {
@@ -131,17 +172,15 @@
 		}
 
 		if (Date.now() > deadline) {
-			errorMessage = $_('quickConnect.expired');
-			phase = 'error';
 			stopPolling();
+			showError($_('quickConnect.expired'));
 			return;
 		}
 
 		const status = await getQuickConnectStatus(code);
 		if (!status || status.status === 'completed') {
-			errorMessage = $_('quickConnect.expired');
-			phase = 'error';
 			stopPolling();
+			showError($_('quickConnect.expired'));
 		}
 	}
 
@@ -159,6 +198,8 @@
 	}
 
 	function reset() {
+		clearTimeout(errorResetTimer);
+		errorResetTimer = undefined;
 		stopPolling();
 		code = '';
 		keypair = null;
@@ -168,9 +209,11 @@
 		if (tvInputEl) tvInputEl.value = '';
 		lockTvInput();
 		phase = 'entering';
+		captchaPayload = null;
 	}
 
 	onDestroy(() => {
+		clearTimeout(errorResetTimer);
 		stopPolling();
 		if (code) cancelQuickConnectSession(code);
 	});
@@ -206,16 +249,10 @@
 				</div>
 			{/if}
 
-			{#if phase === 'error'}
-				<p class="error-text">{errorMessage}</p>
-			{/if}
+			<p class="small-text no-margin hint-text">{$_('quickConnect.codeLocation')}</p>
 
 			{#if phase === 'error'}
-				<nav class="right-align no-space">
-					<button class="secondary link" type="button" onclick={reset}>
-						{$_('quickConnect.tryAgain')}
-					</button>
-				</nav>
+				<p class="error-text">{errorMessage}</p>
 			{/if}
 		</div>
 	{:else if phase === 'connecting'}
@@ -302,6 +339,10 @@
 
 	.error-text {
 		color: var(--error);
+	}
+
+	.hint-text {
+		color: var(--on-surface-variant);
 	}
 
 	.success-text {

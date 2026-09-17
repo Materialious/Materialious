@@ -5,6 +5,7 @@
 	import { _ } from '$lib/i18n';
 	import { playerState } from '$lib/store';
 	import { getMaterialiousBackendUrl } from '$lib/backend';
+	import { shareURL } from '$lib/download';
 	import sodium from 'libsodium-wrappers-sumo';
 	import { onDestroy, onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
@@ -12,6 +13,7 @@
 
 	let room: { id: string; source: EventSource; clientId?: string } | undefined = $state();
 	let creating = $state(false);
+	let roomCode = $state('');
 	let pending: WatchPartyEvent | undefined = $state();
 	let lastSentVideoId: string | undefined;
 	let lastRemoteVideoId: string | undefined;
@@ -213,6 +215,39 @@
 		connect(givenRoomId, false);
 	}
 
+	function joinRoom() {
+		const code = roomCode.trim();
+		if (!code || room) return;
+
+		let roomId = code;
+
+		try {
+			const roomParam = new URL(code).searchParams.get('room');
+			if (!roomParam) return;
+			roomId = roomParam;
+		} catch {
+			// not a URL, use the input as the room code
+		}
+
+		connect(roomId, false);
+
+		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
+		currentSearchParams.set('room', roomId);
+
+		pushState(`?${currentSearchParams.toString()}`, { replaceState: false });
+
+		roomCode = '';
+	}
+
+	function shareRoom() {
+		if (!room) return;
+
+		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
+		currentSearchParams.set('room', room.id);
+
+		shareURL(`${window.location.origin}/?${currentSearchParams.toString()}`);
+	}
+
 	function leaveRoom() {
 		room?.source.close();
 		room = undefined;
@@ -298,7 +333,32 @@
 		<button onclick={createRoom} disabled={creating} class="surface-container-highest">
 			<span>{$_('watchParty.createRoom')}</span>
 		</button>
+
+		<div class="space"></div>
+
+		<nav>
+			<div class="field label surface-container-highest small" style="max-width: 18rem;">
+				<input tabindex="0" id="watch-party-join-code" bind:value={roomCode} type="text" />
+				<label tabindex="-1" for="watch-party-join-code">{$_('watchParty.roomID')}</label>
+			</div>
+			<button onclick={joinRoom} disabled={!roomCode.trim()} class="surface-container-highest">
+				<span>{$_('watchParty.joinRoom')}</span>
+			</button>
+		</nav>
 	{:else}
+		<div class="space"></div>
+
+		<nav>
+			<div class="field label surface-container-highest small" style="max-width: 18rem;">
+				<input tabindex="0" id="watch-party-room-id" readonly value={room.id} />
+				<label tabindex="-1" for="watch-party-room-id">{$_('watchParty.roomID')}</label>
+			</div>
+			<button onclick={shareRoom} class="surface-container-highest">
+				<i>share</i>
+				<span>{$_('watchParty.shareRoom')}</span>
+			</button>
+		</nav>
+
 		<div class="space"></div>
 		<button onclick={leaveRoom} class="surface-container-highest">
 			{$_('watchParty.leaveRoom')}

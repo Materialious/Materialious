@@ -386,7 +386,10 @@
 				<!-- Watch parties run on the own backend -->
 				{#if watchPartySupported}
 					<button
-						onclick={() => (showWatchParty = !showWatchParty)}
+						onclick={() => {
+							showWatchParty = !showWatchParty;
+							if (showWatchParty) resetScroll();
+						}}
 						class="circle large transparent"
 						class:active={showWatchParty}
 					>

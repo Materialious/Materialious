@@ -145,7 +145,7 @@
 	</nav>
 {:else}
 	<div class="quick-connect">
-		<div class="space"></div>
+		<div class="small-space"></div>
 		{#if phase === 'showing' || phase === 'awaiting-send'}
 			<div class="pin-input">
 				{#each code.split('') as char, index (index)}

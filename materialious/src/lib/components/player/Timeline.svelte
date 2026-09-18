@@ -13,6 +13,7 @@
 		type TimelineThumbnail
 	} from '$lib/player/thumbnails';
 	import { onDestroy, onMount } from 'svelte';
+	import { createArrowSeek } from '$lib/player/arrowSeek';
 	import { videoLength } from '$lib/numbers';
 	import { truncate } from '$lib/misc';
 	import { mergeAttrs } from 'melt';
@@ -56,11 +57,6 @@
 	let playerTimelineTimeHover = $state(0);
 	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerBufferedTo: number = $state(0);
-	let playerScrubbingHoldTime = 0;
-	let playerScrubbingDirection: 1 | -1 = 1;
-	let playerScrubbingIsActive = false;
-	let playerScrubbingLastTimestamp: number | null = null;
-	let playerScrubbingPlaybackState: 'paused' | 'playing' | undefined;
 
 	const sponsorSegments = {
 		sponsor: $_('layout.sponsors.sponsor'),
@@ -115,13 +111,32 @@
 		max: () => playerMaxKnownTime
 	});
 
+	const arrowSeek = createArrowSeek({
+		getPlayerElement: () => playerElement,
+		getDuration: () => playerMaxKnownTime,
+		getCurrentTime: () => currentTime,
+		setCurrentTime: (time) => (currentTime = time),
+		onSeek: (time) => {
+			showPlayerUI();
+			setPlayerTimelineChapters(time);
+		},
+		onScrubFrame: async (time) => {
+			showPlayerUI();
+			playerShowTimelineThumbnail = true;
+			userManualSeeking = false;
+			playerTimelineTimeHover = time;
+			await renderTimelineTooltip(time / playerMaxKnownTime);
+		},
+		onScrubEnd: () => (playerShowTimelineThumbnail = false)
+	});
+
 	onMount(async () => {
 		const binds = $keybindStore;
 
-		Mousetrap.bind(binds.seekForward, () => playerScrubbingStart(1));
-		Mousetrap.bind(binds.seekBack, () => playerScrubbingStart(-1));
-		Mousetrap.bind(binds.seekForward, playerScrubbingStop, 'keyup');
-		Mousetrap.bind(binds.seekBack, playerScrubbingStop, 'keyup');
+		Mousetrap.bind(binds.seekForward, () => arrowSeek.start(1));
+		Mousetrap.bind(binds.seekBack, () => arrowSeek.start(-1));
+		Mousetrap.bind(binds.seekForward, arrowSeek.stop, 'keyup');
+		Mousetrap.bind(binds.seekBack, arrowSeek.stop, 'keyup');
 
 		playerElement?.addEventListener('timeupdate', () => {
 			const buffered = playerElement.buffered;
@@ -182,80 +197,6 @@
 		const binds = $keybindStore;
 		Mousetrap.unbind([binds.seekBack, binds.seekForward]);
 	});
-
-	function getScrubbingSpeeds(duration: number) {
-		const baseVelocity = duration * 0.001;
-		const maxVelocity = duration * 0.1;
-		const rampTime = duration * 0.2;
-
-		return { baseVelocity, maxVelocity, rampTime };
-	}
-
-	async function playerScrubbingFrame(duration: number) {
-		if (!playerScrubbingIsActive || !playerElement || !playerSliderElement) return;
-
-		if (!playerScrubbingPlaybackState)
-			playerScrubbingPlaybackState = playerElement.paused ? 'paused' : 'playing';
-
-		playerElement.pause();
-		showPlayerUI();
-
-		if (playerScrubbingLastTimestamp === null) playerScrubbingLastTimestamp = duration;
-		const delta = duration - playerScrubbingLastTimestamp;
-
-		playerScrubbingLastTimestamp = duration;
-		playerScrubbingHoldTime += delta;
-
-		const { baseVelocity, maxVelocity, rampTime } = getScrubbingSpeeds(playerMaxKnownTime);
-
-		const rampRatio = Math.min(playerScrubbingHoldTime / rampTime, 1);
-		const rampFactor = rampRatio * rampRatio;
-
-		const velocity = baseVelocity + (maxVelocity - baseVelocity) * rampFactor;
-
-		// Convert velocity (per second) into frame movement
-		const movementMs = (velocity * delta) / 1000;
-
-		currentTime += movementMs * playerScrubbingDirection;
-
-		// Clamp to video duration
-		if (currentTime < 0) currentTime = 0;
-		if (currentTime > playerMaxKnownTime) currentTime = playerMaxKnownTime;
-
-		playerShowTimelineThumbnail = true;
-		userManualSeeking = false;
-		playerTimelineTimeHover = currentTime;
-
-		await renderTimelineTooltip(currentTime / playerMaxKnownTime);
-
-		requestAnimationFrame(playerScrubbingFrame);
-	}
-
-	function playerScrubbingStart(dir: 1 | -1) {
-		if (playerScrubbingIsActive) return;
-
-		playerScrubbingDirection = dir;
-		playerScrubbingHoldTime = 0;
-		playerScrubbingLastTimestamp = null;
-		playerScrubbingIsActive = true;
-
-		requestAnimationFrame(playerScrubbingFrame);
-	}
-
-	function playerScrubbingStop() {
-		if (!playerScrubbingIsActive || !playerElement) return;
-
-		playerScrubbingIsActive = false;
-		playerScrubbingHoldTime = 0;
-		playerScrubbingLastTimestamp = null;
-		playerShowTimelineThumbnail = false;
-
-		playerElement.currentTime = currentTime;
-
-		if (playerScrubbingPlaybackState === 'playing') playerElement?.play();
-
-		playerScrubbingPlaybackState = undefined;
-	}
 
 	const markerGapSize = 0.1;
 	const minVisiblePercent = 0.05;

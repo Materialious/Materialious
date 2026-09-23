@@ -112,7 +112,7 @@
 		"svelte-infinite-loading": "^1.4.0",
 		"sveltekit-rate-limiter": "^0.8.0",
 		"tldts": "^7.4.5",
-		"youtubei.js": "^18.0.0",
+		"youtubei.js": "^18.1.0",
 		"zod": "^4.4.3"
 	},
 	"overrides": {

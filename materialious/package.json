@@ -63,7 +63,7 @@
 		"@capacitor/screen-orientation": "^8.0.1",
 		"@capacitor/share": "^8.0.2",
 		"@capgo/capacitor-file-sharer": "^8.1.9",
-		"@capgo/capacitor-keep-awake": "^8.1.15",
+		"@capgo/capacitor-keep-awake": "^8.1.16",
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"@materialious/shared": "file:shared",

@@ -36,7 +36,7 @@
 		"chokidar": "~5.0.0",
 		"electron-is-dev": "~3.0.1",
 		"electron-serve": "~3.0.0",
-		"electron-unhandled": "^4.0.1",
+		"electron-unhandled": "^6.0.0",
 		"electron-updater": "^6.8.9",
 		"electron-window-state": "^5.0.3",
 		"ffmpeg-static": "^5.3.0",

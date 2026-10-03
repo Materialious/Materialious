@@ -13,7 +13,7 @@ jobs:
   desktop-check:
     strategy:
       matrix:
-        node-version: [24]
+        node-version: [26]
         runtime:
           - linux-x64
           - win-x64

@@ -70,6 +70,7 @@ export interface AdaptiveFormats {
 	encoding?: string;
 	qualityLabel?: string;
 	resolution?: string;
+	size?: string;
 	audioQuality?: string;
 }
 

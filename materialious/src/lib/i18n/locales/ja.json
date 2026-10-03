@@ -417,5 +417,29 @@
     "materialiousLoginButton": "Materialious アカウントでログイン",
     "materialiousLogout": "Materialious アカウントからログアウト",
     "downloadedCompletedAndroid": "ファイルが Android のダウンロードフォルダーに保存されました",
-    "removeMaterialiousBackend": "Materialious インスタンスを削除する"
+    "removeMaterialiousBackend": "Materialious インスタンスを削除する",
+    "quickConnect": {
+        "title": "クイック接続",
+        "subtitle": "パスワードは不要です。サインイン済みのデバイスに表示されている8桁のコードを入力してください。",
+        "codeLocation": "サインイン済みのデバイスで、[設定] → [アカウント] → [クイック接続] にあるコードを確認してください。",
+        "useQuickConnect": "クイック接続を使用",
+        "connecting": "接続中…",
+        "waiting": "別のデバイスからサインイン情報が送信されるのを待っています…",
+        "success": "サインインしました！",
+        "invalidCode": "そのコードは無効です。確認して、もう一度試してください。",
+        "alreadyUsed": "そのコードはすでに使用されています。",
+        "expired": "そのコードは有効期限が切れています。新しいコードを請求してください。",
+        "tvPlaceholder": "OKを押してから、コードを入力してください",
+        "senderTitle": "クイック接続",
+        "senderDescription": "パスワードを使わずに、別のデバイスでサインインします。",
+        "generate": "コードを表示",
+        "generateFailed": "コードを作成できませんでした。もう一度試してください。",
+        "waitingForDevice": "デバイスがこのコードを入力するのを待っています…",
+        "deviceConnected": "デバイスが接続されました。サインイン情報を送信しますか？",
+        "send": "サインイン情報を送信する",
+        "sendFailed": "サインイン情報を送信できませんでした。もう一度試してください。",
+        "sent": "サインイン情報を送信しました。",
+        "expiresIn": "{{seconds}}秒後に有効期限が切れます",
+        "done": "完了"
+    }
 }

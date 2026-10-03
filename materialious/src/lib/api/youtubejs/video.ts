@@ -262,7 +262,8 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 			clen: '',
 			lmt: '',
 			projectionType: 0,
-			resolution: format.width ? `${format.width}x${format.height}` : undefined
+			resolution: format.width && format.height ? `${format.height}p` : undefined,
+			size: format.width && format.height ? `${format.width}x${format.height}` : undefined
 		});
 	});
 

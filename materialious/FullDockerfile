@@ -1,4 +1,4 @@
-FROM node:24-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 
 COPY . .
@@ -11,7 +11,7 @@ ENV PUBLIC_BUILD_WITH_BACKEND="true"
 RUN npm run build
 RUN npm prune --omit=dev
 
-FROM node:24-alpine
+FROM node:26-alpine
 
 WORKDIR /app
 

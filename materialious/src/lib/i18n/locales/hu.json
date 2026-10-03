@@ -417,5 +417,29 @@
     "materialiousLoginButton": "Bejelentkezés Materialious-fiókkal",
     "materialiousLogout": "Kijelentkezés a Materialious-fiókból",
     "downloadedCompletedAndroid": "Fájl mentve az Android „Letöltések” mappába",
-    "removeMaterialiousBackend": "Materialious példány eltávolítása"
+    "removeMaterialiousBackend": "Materialious példány eltávolítása",
+    "quickConnect": {
+        "title": "Gyors csatlakozás",
+        "subtitle": "Nincs szükség jelszóra. Adja meg a bejelentkezett eszközén megjelenő 8 karakteres kódot.",
+        "codeLocation": "A kódot a bejelentkezett eszközén a Beállítások → Fiók → Gyors csatlakozás menüpontban találja.",
+        "useQuickConnect": "Gyors csatlakozás használata",
+        "connecting": "Csatlakozás…",
+        "waiting": "Várakozás a másik eszközre, hogy elküldje a bejelentkezési adatokat…",
+        "success": "Bejelentkezve!",
+        "invalidCode": "Ez a kód érvénytelen. Ellenőrizze, és próbálja meg újra.",
+        "alreadyUsed": "Ezt a kódot már felhasználták.",
+        "expired": "Ez a kód lejárt. Kérjen egy újat.",
+        "tvPlaceholder": "Nyomja meg az OK gombot, majd adja meg a kódot",
+        "senderTitle": "Gyors csatlakozás",
+        "senderDescription": "Jelentkezzen be egy másik eszközön jelszó nélkül.",
+        "generate": "Kód megjelenítése",
+        "generateFailed": "Nem sikerült létrehozni a kódot. Próbálja újra.",
+        "waitingForDevice": "Várakozás arra, hogy egy eszköz megadja ezt a kódot…",
+        "deviceConnected": "Egy eszköz csatlakozott. Elküldi a bejelentkezési adatait?",
+        "send": "Bejelentkezési adatok küldése",
+        "sendFailed": "Nem sikerült elküldeni a bejelentkezési adatokat. Próbálja újra.",
+        "sent": "A bejelentkezési adatok elküldve.",
+        "expiresIn": "Lejár {{seconds}} másodperc múlva",
+        "done": "Kész"
+    }
 }

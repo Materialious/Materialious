@@ -113,7 +113,7 @@
 		"sveltekit-rate-limiter": "^0.8.0",
 		"tldts": "^7.4.5",
 		"youtubei.js": "^18.1.0",
-		"zod": "^4.4.3"
+		"zod": "^4.6.5"
 	},
 	"overrides": {
 		"cookie": "^0.7.2",

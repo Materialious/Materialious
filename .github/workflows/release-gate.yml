@@ -1,0 +1,66 @@
+name: Release gate
+
+on:
+  workflow_call:
+    inputs:
+      sha:
+        description: "Commit being released"
+        required: true
+        type: string
+      shas:
+        description: "Any other commit shas landed by the same push"
+        required: false
+        default: ""
+        type: string
+    outputs:
+      skip:
+        description: "'true' when the release should be skipped"
+        value: ${{ jobs.check.outputs.skip }}
+      sha:
+        description: "Tip commit of the release"
+        value: ${{ jobs.check.outputs.sha }}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+      sha: ${{ steps.check.outputs.sha }}
+    steps:
+      - name: Resolve merged pull requests
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_SHA: ${{ inputs.sha }}
+          INPUT_SHAS: ${{ inputs.shas }}
+        run: |
+          prs=$(mktemp)
+          for sha in $INPUT_SHAS $INPUT_SHA; do
+            if found=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/pulls" \
+              --jq ".[] | select(.merge_commit_sha | startswith(\"$sha\")) | {number, labels: [(.labels // [])[].name]}" 2>/dev/null); then
+              printf '%s\n' "$found" >> "$prs"
+            fi
+          done
+
+          merged=$(jq -s 'unique_by(.number)' "$prs")
+          total=$(jq 'length' <<< "$merged")
+          skipped=$(jq '[.[] | select(any(.labels[]?; . == "skip-release"))] | length' <<< "$merged")
+
+          echo "Release sha is $INPUT_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Merged pull requests:" >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.[] | "- #\(.number) [\(.labels | join(", "))]"' <<< "$merged" >> "$GITHUB_STEP_SUMMARY"
+          echo "sha=$INPUT_SHA" >> "$GITHUB_OUTPUT"
+
+          if [ "$total" -eq 0 ]; then
+            echo "No merged pull requests found, releasing anyway"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          elif [ "$skipped" -eq "$total" ]; then
+            echo "All $total merged pull requests are labeled skip-release, skipping"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "$((total - skipped)) of $total merged pull requests are release worthy, releasing"
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi

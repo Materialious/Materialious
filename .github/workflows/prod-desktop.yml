@@ -1,20 +1,28 @@
 name: Build desktop
 
 on:
-  pull_request:
+  push:
     branches: [main]
-    types: [closed]
     paths-ignore:
       - "**/*.md"
       - "./fastline/**"
       - "./materialious/src/lib/i18n/**"
 
+  workflow_dispatch:
+
 permissions:
   contents: write
 
 jobs:
+  gate:
+    uses: ./.github/workflows/release-gate.yml
+    with:
+      sha: ${{ github.sha }}
+      shas: ${{ github.event_name == 'push' && join(github.event.commits.*.sha, ' ') || '' }}
+
   desktop-build-1:
-    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
+    needs: gate
+    if: needs.gate.outputs.skip == 'false'
     uses: ./.github/workflows/reusable-desktop-build.yml
     secrets: inherit
 

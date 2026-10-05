@@ -1,7 +1,7 @@
 import { isOwnBackend } from '$lib/shared';
 import { env } from '$env/dynamic/public';
 import { env as privateEnv } from '$env/dynamic/private';
-import { Agent } from 'undici';
+import { Agent, fetch as undiciFetch } from 'undici';
 import fs from 'fs';
 import tls from 'tls';
 
@@ -63,7 +63,15 @@ for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
 	}
 }
 
-let dispatcher: Agent;
+// Node's built-in fetch and its bundled dispatcher must come from the same
+// undici copy to interoperate. Since Node 26 (bundled undici 8) the built-in
+// fetch expects a v1 compatible dispatcher, so handing it an Agent from the npm
+// `undici` package makes every request fail with "TypeError: fetch failed".
+//
+// Therefore we only build a dispatcher when we actually need one (i.e. a custom
+// CA was requested), and when we do we also use undici's own fetch so the
+// dispatcher and fetch come from the same copy.
+let dispatcher: Agent | undefined;
 
 const certPath = privateEnv.PROXY_TRUST_CA;
 if (certPath && fs.existsSync(certPath)) {
@@ -72,8 +80,6 @@ if (certPath && fs.existsSync(certPath)) {
 			ca: [fs.readFileSync(certPath), ...tls.rootCertificates]
 		}
 	});
-} else {
-	dispatcher = new Agent();
 }
 
 async function proxyRequest(
@@ -156,18 +162,30 @@ async function proxyRequest(
 		}
 	}
 
-	let response: Response | undefined;
+	// undici's fetch resolves to undici's own Response class, which is not the
+	// global one, so only rely on the parts that actually get read off of it.
+	type ProxiedResponse = Pick<Response, 'status' | 'headers' | 'body'>;
+
+	let response: ProxiedResponse | undefined;
 	let errorMsg = '';
 	try {
-		response = await fetch(urlToProxyObj.toString(), {
-			...requestOptions,
-			body,
-			signal: AbortSignal.timeout(10000),
-			// @ts-expect-error Node-specific option
-			dispatcher
-		});
+		const target = urlToProxyObj.toString();
+		const signal = AbortSignal.timeout(10000);
+
+		// Keep fetch paired with the dispatcher it was created by.
+		response = dispatcher
+			? ((await undiciFetch(target, {
+					...requestOptions,
+					body,
+					signal,
+					dispatcher
+				})) as unknown as ProxiedResponse)
+			: await fetch(target, { ...requestOptions, body, signal });
 	} catch (err) {
-		errorMsg = (err as any).toString();
+		const cause = (err as any)?.cause;
+		errorMsg = cause?.code
+			? `${(err as any).toString()} (${cause.code}: ${cause.message})`
+			: (err as any).toString();
 		console.warn('Proxy failed with error: ', errorMsg);
 	}
 

@@ -53,7 +53,7 @@
 	"dependencies": {
 		"@bbc/tv-lrud-spatial": "^0.0.18",
 		"@capacitor-community/electron": "^5.0.1",
-		"@capacitor/android": "^8.4.1",
+		"@capacitor/android": "^8.4.3",
 		"@capacitor/app": "^8.1.0",
 		"@capacitor/browser": "^8.0.4",
 		"@capacitor/clipboard": "^8.0.1",

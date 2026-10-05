@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.18.8",
+	"version": "1.18.9",
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && npm run patch:github && vite dev",
@@ -23,7 +23,7 @@
 		"@sveltejs/adapter-auto": "^7.0.0",
 		"@sveltejs/adapter-node": "^5.5.4",
 		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.69.2",
+		"@sveltejs/kit": "^2.70.3",
 		"@sveltejs/vite-plugin-svelte": "^7.3.0",
 		"@types/cookie-signature": "^1.1.2",
 		"@types/event-source-polyfill": "^1.0.5",
@@ -42,7 +42,7 @@
 		"patch-package": "^8.0.1",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.5.0",
-		"svelte": "^5.55.7",
+		"svelte": "^5.57.1",
 		"svelte-check": "^4.7.6",
 		"tslib": "^2.7.0",
 		"typescript": "^5.9.3",
@@ -71,7 +71,7 @@
 		"@zxcvbn-ts/language-common": "^4.1.2",
 		"@zxcvbn-ts/language-en": "^4.1.1",
 		"altcha-lib": "^2.3.2",
-		"beercss": "^4.0.23",
+		"beercss": "^5.0.3",
 		"bgutils-js": "^4.0.3",
 		"buffer": "^6.0.3",
 		"capacitor-music-controls-plugin": "^6.1.0",
@@ -112,8 +112,9 @@
 		"svelte-infinite-loading": "^1.4.0",
 		"sveltekit-rate-limiter": "^0.8.0",
 		"tldts": "^7.4.5",
+		"undici": "^8.10.2",
 		"youtubei.js": "^18.1.0",
-		"zod": "^4.4.3"
+		"zod": "^4.6.5"
 	},
 	"overrides": {
 		"cookie": "^0.7.2",

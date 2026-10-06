@@ -1,24 +1,19 @@
 name: Build full web
 
 on:
-    push:
+    pull_request:
         branches:
             - main
+        types:
+            - closed
         paths-ignore:
             - "**/*.md"
             - "./fastline/**"
             - "./materialious/src/lib/i18n/**"
 
 jobs:
-    gate:
-        uses: ./.github/workflows/release-gate.yml
-        with:
-            sha: ${{ github.sha }}
-            shas: ${{ join(github.event.commits.*.sha, ' ') }}
-
     web-build:
-        needs: gate
-        if: needs.gate.outputs.skip == 'false'
+        if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
         runs-on: ubuntu-latest
 
         steps:

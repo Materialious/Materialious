@@ -10,23 +10,33 @@ permissions:
   contents: write
 
 jobs:
-  check-skip:
-    uses: ./.github/workflows/release-gate.yml
-    with:
-      sha: ${{ github.event.workflow_run.head_sha }}
-
   android-build:
-    needs: check-skip
-    if: needs.check-skip.outputs.skip == 'false' && github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./materialious/android
 
     steps:
+      - name: Resolve released version
+        id: release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ steps.release.outputs.tag }}
+
+      - name: Verify checked out version matches release
+        run: |
+          PACKAGED=$(jq -r .version ../package.json)
+          if [ "$PACKAGED" != "${{ steps.release.outputs.tag }}" ]; then
+            echo "::error::Latest release is ${{ steps.release.outputs.tag }} but checked out tree is $PACKAGED"
+            exit 1
+          fi
 
       - uses: actions/setup-node@v6
         with:
@@ -89,19 +99,13 @@ jobs:
         run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; done
         continue-on-error: true
 
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-        with:
-          path: ./materialious
-
       - name: Upload APKs to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./materialious/android/app/release/*
-          tag: ${{ steps.package-version.outputs.current-version }}
-          release_name: ${{ steps.package-version.outputs.current-version }}
+          tag: ${{ steps.release.outputs.tag }}
+          release_name: ${{ steps.release.outputs.tag }}
           overwrite: true
           file_glob: true
           draft: false

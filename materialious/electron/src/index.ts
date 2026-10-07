@@ -12,7 +12,6 @@ import {
 } from '@materialious/shared/download';
 import { app, BrowserWindow, dialog, ipcMain, session } from 'electron';
 import electronIsDev from 'electron-is-dev';
-import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
 import { createWriteStream } from 'node:fs';
 import { Readable } from 'node:stream';
@@ -21,7 +20,9 @@ import { pipeline } from 'node:stream/promises';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 
 // Graceful handling of unhandled errors.
-unhandled();
+import('electron-unhandled')
+	.then(({ default: unhandled }) => unhandled())
+	.catch((error) => console.error(error));
 
 // Get Config options from capacitor.config
 const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();

@@ -7,14 +7,8 @@ on:
             - completed
 
 jobs:
-    check-skip:
-        uses: ./.github/workflows/release-gate.yml
-        with:
-            sha: ${{ github.event.workflow_run.head_sha }}
-
     flathub-create-pr:
-        needs: check-skip
-        if: needs.check-skip.outputs.skip == 'false' && github.event.workflow_run.conclusion == 'success'
+        if: github.event.workflow_run.conclusion == 'success'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout the flathub/us.materialio.Materialious repository
@@ -49,7 +43,7 @@ jobs:
             - name: Generate SHA256 checksum for materialious.metainfo.xml
               id: sha256_metainfo
               run: |
-                  METAINFO_URL="https://raw.githubusercontent.com/Materialious/Materialious/${{ github.event.workflow_run.head_sha }}/materialious/electron/materialious.metainfo.xml"
+                  METAINFO_URL="https://raw.githubusercontent.com/Materialious/Materialious/${{ steps.get_release.outputs.version }}/materialious/electron/materialious.metainfo.xml"
                   CHECKSUM=$(curl -L $METAINFO_URL | sha256sum | awk '{ print $1 }')
 
                   echo "metainfo_url=$METAINFO_URL" >> "$GITHUB_OUTPUT"

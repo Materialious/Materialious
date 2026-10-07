@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Resolve released version
         id: release
+        working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

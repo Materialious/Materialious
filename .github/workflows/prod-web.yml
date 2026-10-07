@@ -11,9 +11,11 @@ on:
             - "./fastline/**"
             - "./materialious/src/lib/i18n/**"
 
+    workflow_dispatch:
+
 jobs:
     web-build:
-        if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-release')
+        if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release'))
         runs-on: ubuntu-latest
 
         steps:

@@ -120,10 +120,24 @@
             "textColor": "Color de texto",
             "bgColor": "Color de fondo",
             "alignment": "Alineación",
-            "reset": "Restablecer valores predeterminados"
+            "reset": "Restablecer valores predeterminados",
+            "fontFamily": "Tipo de letra",
+            "opacity": "Opacidad",
+            "subtitleOffset": "Sincronización de subtítulos",
+            "textShadow": "Sombra del texto"
         },
         "pauseTimerFinished": "Temporizador de pausa finalizado",
-        "pauseOnNetworkChange": "Video pausado por cambio de red wifi"
+        "pauseOnNetworkChange": "Video pausado por cambio de red wifi",
+        "downloadType": "Tipo de descarga",
+        "downloadLoading": "Cargando formatos…",
+        "downloadBest": "Mejor calidad",
+        "downloadAudio": "Solo audio",
+        "downloadVideoAudio": "Video y audio",
+        "downloadFormat": "Formato",
+        "downloadCanceled": "Descarga cancelada",
+        "downloadComplete": "Descarga completada",
+        "downloadFailed": "Error en la descarga",
+        "defaultSubtitleLanguage": "Idioma predeterminado de los subtítulos"
     },
     "layout": {
         "interface": "Interfaz",
@@ -154,7 +168,17 @@
                 "modern": "Moderno",
                 "rounded": "Redondeado",
                 "borderRadius": "Radio del borde"
-            }
+            },
+            "presets": "Preajustes",
+            "saveAsPreset": "Guardar como preajuste",
+            "exportTheme": "Exportar tema",
+            "importTheme": "Importar tema",
+            "themeName": "Nombre del tema",
+            "themeImported": "Tema importado",
+            "themeImportFailed": "No se pudo importar el tema",
+            "themeExported": "Tema exportado",
+            "themeSaved": "Tema guardado",
+            "deletePreset": "Eliminar preajuste"
         },
         "searchSuggestions": "Sugerencias de búsqueda",
         "previewVideoOnHover": "Vista previa del video al pasar por encima",
@@ -292,7 +316,7 @@
         "export": {
             "title": "Exportar/Importar",
             "importSub": "Importar suscripciones",
-            "importSubSupported": "Compatible con YouTube CSV/OPML/JSON, Invidious OPML/JSON, base de datos de Freetube y NewPipe JSON",
+            "importSubSupported": "Compatible con YouTube CSV/OPML/JSON, Invidious OPML/JSON, base de datos de Freetube y NewPipe JSON. (Invidious JSON es lento)",
             "importing": "Importando suscripciones (esto tardará un momento)",
             "importingCompleted": "Suscripciones importadas correctamente",
             "exportSub": "Exportar suscripciones",
@@ -383,5 +407,37 @@
     "commentSortNewest": "Más recientes",
     "hideAuthor": "Ocultar autor",
     "favouriteChannel": "Añadir a favoritos",
-    "unfavouriteChannel": "Quitar de favoritos"
+    "unfavouriteChannel": "Quitar de favoritos",
+    "downloadedCompletedAndroid": "Archivo guardado en la carpeta Descargas de Android",
+    "materialiousBackend": "Backend de Materialious",
+    "materialiousBackendUrl": "URL de Materialious",
+    "removeMaterialiousBackend": "Eliminar instancia de Materialious",
+    "materialiousLoginButton": "Iniciar sesión con una cuenta de Materialious",
+    "materialiousLogout": "Cerrar sesión de la cuenta de Materialious",
+    "quickConnect": {
+        "title": "Conexión rápida",
+        "subtitle": "No hace falta contraseña. Introduce el código de 8 caracteres que aparece en el dispositivo donde ya has iniciado sesión.",
+        "codeLocation": "Encuentra el código en Configuraciones → Cuenta → Conexión rápida en el dispositivo donde ya has iniciado sesión.",
+        "useQuickConnect": "Usar conexión rápida",
+        "connecting": "Conectando…",
+        "waiting": "Esperando a que el otro dispositivo envíe los datos de inicio de sesión…",
+        "success": "¡Sesión iniciada!",
+        "invalidCode": "Ese código no es válido. Compruébalo e inténtalo de nuevo.",
+        "alreadyUsed": "Ese código ya se ha usado.",
+        "expired": "Ese código ha caducado. Pide uno nuevo.",
+        "tvPlaceholder": "Pulsa OK e introduce el código",
+        "senderTitle": "Conexión rápida",
+        "senderDescription": "Inicia sesión en otro dispositivo sin contraseña.",
+        "generate": "Mostrar código",
+        "generateFailed": "No se pudo crear un código. Inténtalo de nuevo.",
+        "waitingForDevice": "Esperando a que un dispositivo introduzca este código…",
+        "deviceConnected": "Se ha conectado un dispositivo. ¿Enviar tus datos de inicio de sesión?",
+        "send": "Enviar datos de inicio de sesión",
+        "sendFailed": "No se pudieron enviar los datos de inicio de sesión. Inténtalo de nuevo.",
+        "sent": "Datos de inicio de sesión enviados.",
+        "expiresIn": "Caduca en {{seconds}} segundos",
+        "done": "Hecho"
+    },
+    "subscribeFailed": "No se pudo suscribir",
+    "unsubscribeFailed": "No se pudo cancelar la suscripción"
 }

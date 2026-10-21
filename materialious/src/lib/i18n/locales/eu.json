@@ -193,8 +193,22 @@
             "textColor": "Testu-kolorea",
             "bgColor": "Atzeko planoaren kolorea",
             "alignment": "Lerrokatzea",
-            "reset": "Berrezarri lehenetsiak"
-        }
+            "reset": "Berrezarri lehenetsiak",
+            "fontFamily": "Letra-tipoa",
+            "opacity": "Opakotasuna",
+            "subtitleOffset": "Azpitituluen sinkronizazioa",
+            "textShadow": "Testuaren itzala"
+        },
+        "downloadType": "Deskarga mota",
+        "downloadLoading": "Formatuak kargatzen…",
+        "downloadBest": "Kalitate onena",
+        "downloadAudio": "Audioa soilik",
+        "downloadVideoAudio": "Bideoa eta audioa",
+        "downloadFormat": "Formatua",
+        "downloadCanceled": "Deskarga bertan behera utzi da",
+        "downloadComplete": "Deskarga osatu da",
+        "downloadFailed": "Deskargak huts egin du",
+        "defaultSubtitleLanguage": "Azpitituluen hizkuntza lehenetsia"
     },
     "layout": {
         "interface": "Interfazea",
@@ -268,7 +282,17 @@
                 "modern": "Modernoa",
                 "rounded": "Biribildua",
                 "borderRadius": "Ertz-erradioa"
-            }
+            },
+            "presets": "Aurrezarpenak",
+            "saveAsPreset": "Gorde aurrezarpen gisa",
+            "exportTheme": "Esportatu gaia",
+            "importTheme": "Inportatu gaia",
+            "themeName": "Gaiaren izena",
+            "themeImported": "Gaia inportatu da",
+            "themeImportFailed": "Ezin izan da gaia inportatu",
+            "themeExported": "Gaia esportatu da",
+            "themeSaved": "Gaia gorde da",
+            "deletePreset": "Ezabatu aurrezarpena"
         },
         "searchSuggestions": "Bilaketa-iradokizunak",
         "previewVideoOnHover": "Aurreikusi bideoa gainean pasatzean",
@@ -350,7 +374,7 @@
         "export": {
             "title": "Esportatu/Inportatu",
             "importSub": "Inportatu harpidetzak",
-            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube datu-basea eta NewPipe JSON onartzen dira",
+            "importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube datu-basea eta NewPipe JSON onartzen dira. (Invidious JSON motela da)",
             "importing": "Harpidetzak inportatzen (une bat beharko du)",
             "importingCompleted": "Harpidetzak ondo inportatu dira",
             "exportSub": "Esportatu harpidetzak",
@@ -367,5 +391,37 @@
     },
     "subscribe": "Harpidetu",
     "favouriteChannel": "Gehitu kanala gogokoetara",
-    "unfavouriteChannel": "Kendu kanala gogokoetatik"
+    "unfavouriteChannel": "Kendu kanala gogokoetatik",
+    "downloadedCompletedAndroid": "Fitxategia Androideko Deskargak karpetan gorde da",
+    "materialiousBackend": "Materialious backend-a",
+    "materialiousBackendUrl": "Materialious URLa",
+    "removeMaterialiousBackend": "Kendu Materialious instantzia",
+    "materialiousLoginButton": "Hasi saioa Materialious kontuarekin",
+    "materialiousLogout": "Amaitu Materialious kontuko saioa",
+    "quickConnect": {
+        "title": "Konexio azkarra",
+        "subtitle": "Ez da pasahitzik behar. Idatzi saioa hasita duzun gailuan ageri den 8 karaktereko kodea.",
+        "codeLocation": "Bilatu kodea Ezarpenak → Kontua → Konexio azkarra atalean, saioa hasita duzun gailuan.",
+        "useQuickConnect": "Erabili konexio azkarra",
+        "connecting": "Konektatzen…",
+        "waiting": "Beste gailuak saio-hasierako datuak bidaltzeko zain…",
+        "success": "Saioa hasi da!",
+        "invalidCode": "Kode hori ez da baliozkoa. Egiaztatu eta saiatu berriro.",
+        "alreadyUsed": "Kode hori dagoeneko erabili da.",
+        "expired": "Kode hori iraungi da. Eskatu beste bat.",
+        "tvPlaceholder": "Sakatu OK, eta idatzi kodea",
+        "senderTitle": "Konexio azkarra",
+        "senderDescription": "Hasi saioa beste gailu batean pasahitzik gabe.",
+        "generate": "Erakutsi kodea",
+        "generateFailed": "Ezin izan da koderik sortu. Saiatu berriro.",
+        "waitingForDevice": "Gailu batek kode hau idazteko zain…",
+        "deviceConnected": "Gailu bat konektatu da. Saio-hasierako datuak bidali?",
+        "send": "Bidali saio-hasierako datuak",
+        "sendFailed": "Ezin izan dira saio-hasierako datuak bidali. Saiatu berriro.",
+        "sent": "Saio-hasierako datuak bidali dira.",
+        "expiresIn": "{{seconds}} segundotan iraungiko da",
+        "done": "Eginda"
+    },
+    "subscribeFailed": "Ezin izan da harpidetu",
+    "unsubscribeFailed": "Ezin izan da harpidetza kendu"
 }

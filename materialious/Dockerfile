@@ -22,10 +22,10 @@ RUN echo "VITE_DEFAULT_INVIDIOUS_INSTANCE=VITE_DEFAULT_INVIDIOUS_INSTANCE_PLACEH
 
 # Install dependencies and build the project
 
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 RUN npm run build
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev --legacy-peer-deps
 
 FROM nginx:alpine
 

@@ -1,4 +1,4 @@
-import { invidiousAuthStore } from '$lib/store';
+import { invidiousAuthStore } from '#lib/store';
 import { get } from 'svelte/store';
 import { getSubscriptionsInvidious } from './feed';
 import { buildAuthHeaders, buildPath, fetchErrorHandle } from './request';

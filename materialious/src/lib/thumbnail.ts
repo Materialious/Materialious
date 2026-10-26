@@ -12,11 +12,7 @@ import { getBestThumbnail } from './images';
 let isInitial = false;
 
 export type ThumbnailVideo =
-	| VideoBase
-	| Video
-	| Notification
-	| PlaylistPageVideo
-	| VideoWatchHistory;
+	VideoBase | Video | Notification | PlaylistPageVideo | VideoWatchHistory;
 
 export async function associateAvatar(channelId: string, avatars: Image[]) {
 	if (avatars.length === 0) return;

@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { fetchErrorHandle } from './invidious/request';
-import { deArrowInstanceStore, deArrowThumbnailInstanceStore } from '$lib/store';
+import { deArrowInstanceStore, deArrowThumbnailInstanceStore } from '#lib/store';
 import type { DeArrow } from './model';
 
 export async function getDeArrow(videoId: string, fetchOptions?: RequestInit): Promise<DeArrow> {

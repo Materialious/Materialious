@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Capacitor } from '@capacitor/core';
-	import { addToast } from '$lib/components/Toast.svelte';
+	import { addToast } from '#lib/components/Toast.svelte';
 	import {
 		getDownloadFormats,
 		isDownloadSupported,
 		startDownload,
 		type AvailableFormats,
 		type DownloadSelection
-	} from '$lib/api';
-	import { _ } from '$lib/i18n';
-	import { isOwnBackend } from '$lib/shared';
-	import type { VideoPlay } from '$lib/api/model';
+	} from '#lib/api/index';
+	import { _ } from '#lib/i18n/index';
+	import { isOwnBackend } from '#lib/shared/index';
+	import type { VideoPlay } from '#lib/api/model';
 	import { Progress } from 'melt/builders';
 	import { SvelteSet } from 'svelte/reactivity';
 	import ui from 'beercss';

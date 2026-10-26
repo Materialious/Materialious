@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { isAndroidTv } from '$lib/utils';
+	import { isAndroidTv } from '#lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 
 	let { children } = $props();

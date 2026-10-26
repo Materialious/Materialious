@@ -23,7 +23,7 @@ import {
 	createRecoverableError,
 	headersToGenericObject,
 	makeResponse
-} from '$lib/player/sabr/helpers';
+} from '#lib/player/sabr/helpers';
 
 interface ShakaResponseArgs {
 	uri: string;

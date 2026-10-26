@@ -1,7 +1,7 @@
-import type { StoryBoard } from '$lib/api/model';
-import { ImageCache } from '$lib/images';
+import type { StoryBoard } from '#lib/api/model';
+import { ImageCache } from '#lib/images';
 import { parseText } from 'media-captions';
-import { findElementForTime } from '$lib/utils';
+import { findElementForTime } from '#lib/utils';
 
 export interface TimelineThumbnail {
 	url: string;

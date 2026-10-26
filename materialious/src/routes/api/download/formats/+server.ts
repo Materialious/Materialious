@@ -1,7 +1,7 @@
 import { getDownloadSession, SabrStream } from '@materialious/shared/download';
-import { error, json } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { isOwnBackend } from '$lib/shared/index';
+import { isOwnBackend } from '#lib/shared/index';
 
 const zFormatsSchema = z.object({
 	videoId: z.string().length(11)
@@ -23,7 +23,7 @@ export async function POST({ request, locals }) {
 		const video = await session.getInfo(data.data.videoId);
 		const sabrStream = new SabrStream(video);
 
-		return json({
+		return Response.json({
 			title: sabrStream.getTitle(),
 			formats: sabrStream.getFormats().filter((format) => !format.hasText)
 		});

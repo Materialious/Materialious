@@ -1,17 +1,21 @@
 <script lang="ts">
-	import { loadContentFilterFromURL, zFilterGroup, zFilterOperatorEnum } from '$lib/filtering';
-	import { ChannelSchema, VideoSchema, type SchemaStructure } from '$lib/filtering/schemas';
-	import { _ } from '$lib/i18n';
-	import { titleCase, camelCaseToHuman } from '$lib/letterCasing';
+	import {
+		loadContentFilterFromURL,
+		zFilterGroup,
+		zFilterOperatorEnum
+	} from '#lib/filtering/index';
+	import { ChannelSchema, VideoSchema, type SchemaStructure } from '#lib/filtering/schemas';
+	import { _ } from '#lib/i18n/index';
+	import { titleCase, camelCaseToHuman } from '#lib/letterCasing';
 	import {
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
 		filterContentUrlStore
-	} from '$lib/store';
+	} from '#lib/store';
 	import type z from 'zod';
 	import { addToast } from '../Toast.svelte';
 	import { Clipboard } from '@capacitor/clipboard';
-	import { downloadStringAsFile } from '$lib/download';
+	import { downloadStringAsFile } from '#lib/download';
 	import ComboBox from '../ComboBox.svelte';
 
 	let remoteFilterListUrl: string = $state($filterContentUrlStore ?? '');

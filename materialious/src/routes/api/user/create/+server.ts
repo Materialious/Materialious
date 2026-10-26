@@ -1,9 +1,9 @@
-import { isOwnBackend } from '$lib/shared';
-import { createUser } from '$lib/server/user';
-import { error, json } from '@sveltejs/kit';
+import { isOwnBackend } from '#lib/shared/index';
+import { createUser } from '#lib/server/user';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { generateAuthToken, setAuthCookie } from '$lib/server/misc';
-import { captchaPayload, verifyCaptcha } from '$lib/server/captcha';
+import { generateAuthToken, setAuthCookie } from '#lib/server/misc';
+import { captchaPayload, verifyCaptcha } from '#lib/server/captcha';
 
 const zUserCreate = z.object({
 	username: z.string().min(3).max(18),
@@ -52,5 +52,5 @@ export async function POST({ request, cookies, locals }) {
 
 	setAuthCookie(createdUser.id, cookies);
 
-	return json({ token: generateAuthToken(createdUser.id) });
+	return Response.json({ token: generateAuthToken(createdUser.id) });
 }

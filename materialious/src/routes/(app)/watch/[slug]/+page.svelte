@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getComments } from '$lib/api/index';
-	import type { Comments, PlaylistPage } from '$lib/api/model';
-	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
-	import Transcript from '$lib/components/watch/Transcript.svelte';
-	import { getBestThumbnail } from '$lib/images';
-	import { letterCase } from '$lib/letterCasing';
-	import { numberWithCommas } from '$lib/numbers';
+	import { getComments } from '#lib/api/index';
+	import type { Comments, PlaylistPage } from '#lib/api/model';
+	import Thumbnail from '#lib/components/thumbnail/VideoThumbnail.svelte';
+	import Transcript from '#lib/components/watch/Transcript.svelte';
+	import { getBestThumbnail } from '#lib/images';
+	import { letterCase } from '#lib/letterCasing';
+	import { numberWithCommas } from '#lib/numbers';
 	import {
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
@@ -22,26 +22,26 @@
 		type PlayerState,
 		filterContentListStore,
 		sleepTimerStore
-	} from '$lib/store';
+	} from '#lib/store';
 	import ui from 'beercss';
 	import { onDestroy, tick } from 'svelte';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
-	import Author from '$lib/components/Author.svelte';
-	import Description from '$lib/components/watch/Description.svelte';
-	import LikesDislikes from '$lib/components/watch/LikesDislikes.svelte';
-	import Comment from '$lib/components/watch/Comment.svelte';
-	import { expandSummery } from '$lib/utils';
-	import { humanizeSeconds, relativeTimestamp } from '$lib/time';
-	import { addToast } from '$lib/components/Toast.svelte';
-	import { getWatchPage } from '$lib/watch';
+	import Author from '#lib/components/Author.svelte';
+	import Description from '#lib/components/watch/Description.svelte';
+	import LikesDislikes from '#lib/components/watch/LikesDislikes.svelte';
+	import Comment from '#lib/components/watch/Comment.svelte';
+	import { expandSummery } from '#lib/utils';
+	import { humanizeSeconds, relativeTimestamp } from '#lib/time';
+	import { addToast } from '#lib/components/Toast.svelte';
+	import { getWatchPage } from '#lib/watch';
 	import { page } from '$app/state';
-	import Share from '$lib/components/Share.svelte';
-	import Playlist from '$lib/components/watch/Playlist.svelte';
-	import PlaylistManager from '$lib/components/PlaylistManager.svelte';
-	import { isItemFiltered } from '$lib/filtering/index';
-	import PageLoading from '$lib/components/PageLoading.svelte';
-	import Download from '$lib/components/watch/Download.svelte';
+	import Share from '#lib/components/Share.svelte';
+	import Playlist from '#lib/components/watch/Playlist.svelte';
+	import PlaylistManager from '#lib/components/PlaylistManager.svelte';
+	import { isItemFiltered } from '#lib/filtering/index';
+	import PageLoading from '#lib/components/PageLoading.svelte';
+	import Download from '#lib/components/watch/Download.svelte';
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let { data = $bindable() }: { data: any } = $props();
@@ -387,7 +387,7 @@
 							shares={[
 								{
 									type: 'materialious',
-									path: resolve('/watch/[videoId]', { videoId: data.video.videoId }),
+									path: resolve('/(app)/watch/[slug]', { slug: data.video.videoId }),
 									param: {
 										key: 'time',
 										value: () => Math.round(playerCurrentTime)
@@ -477,9 +477,7 @@
 											shares={[
 												{
 													type: 'materialious',
-													path: resolve(`/watch/[videoId]?time=${Math.round(timestamp.time)}`, {
-														videoId: data.video.videoId
-													})
+													path: `${resolve('/(app)/watch/[slug]', { slug: data.video.videoId })}?time=${Math.round(timestamp.time)}`
 												},
 												{
 													type: 'invidious',

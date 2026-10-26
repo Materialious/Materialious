@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { zBoolean, zNumber, zThemeColors } from '$lib/externalSettings/settings';
+import { zBoolean, zNumber, zThemeColors } from '#lib/externalSettings/settings';
 import type { CustomPreset } from './presets';
 import type { ThemeColors } from './index';
 

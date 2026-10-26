@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { proxyGoogleImage } from '$lib/images';
-	import { avatarFromChannelId } from '$lib/thumbnail';
+	import { proxyGoogleImage } from '#lib/images';
+	import { avatarFromChannelId } from '#lib/thumbnail';
 	import { mergeAttrs } from 'melt';
 	import { Avatar } from 'melt/builders';
 	import { onMount } from 'svelte';
@@ -21,7 +21,7 @@
 	});
 
 	function goToChannel() {
-		goto(resolve('/channel/[authorId]', { authorId }));
+		goto(resolve('/(app)/channel/[slug]', { slug: authorId }));
 	}
 </script>
 

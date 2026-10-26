@@ -1,15 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { createUserBackend, loginUserBackend, type DerivePassword } from '$lib/api/backend';
-	import { backendFetch } from '$lib/api/backend/request';
-	import PageLoading from '$lib/components/PageLoading.svelte';
-	import { _ } from '$lib/i18n';
-	import { isOwnBackend } from '$lib/shared';
+	import {
+		createUserBackend,
+		loginUserBackend,
+		type DerivePassword
+	} from '#lib/api/backend/index';
+	import { backendFetch } from '#lib/api/backend/request';
+	import PageLoading from '#lib/components/PageLoading.svelte';
+	import { _ } from '#lib/i18n/index';
+	import { isOwnBackend } from '#lib/shared/index';
 	import * as comlink from 'comlink';
 	import { onMount } from 'svelte';
-	import PasswordStrength from '$lib/components/PasswordStrength.svelte';
-	import QuickConnectReceiver from '$lib/components/QuickConnectReceiver.svelte';
+	import PasswordStrength from '#lib/components/PasswordStrength.svelte';
+	import QuickConnectReceiver from '#lib/components/QuickConnectReceiver.svelte';
 	import { solveChallenge } from 'altcha-lib';
 	import type { Solution, Challenge } from 'altcha-lib/types';
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
@@ -97,14 +101,14 @@
 		isLoading = false;
 
 		if (!failed) {
-			goto(resolve('/', {}), { replaceState: true });
+			goto(resolve('/(app)'), { replace: true });
 		} else {
 			solveCaptchaChallenge();
 		}
 	}
 
 	function onQuickConnected() {
-		goto(resolve('/', {}), { replaceState: true });
+		goto(resolve('/(app)'), { replace: true });
 	}
 </script>
 

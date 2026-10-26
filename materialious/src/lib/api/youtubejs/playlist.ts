@@ -1,4 +1,4 @@
-import { extractNumber } from '$lib/numbers';
+import { extractNumber } from '#lib/numbers';
 import { YT, YTNodes } from 'youtubei.js';
 import { getInnertube } from '.';
 import type { PlaylistPage, PlaylistPageVideo } from '../model';

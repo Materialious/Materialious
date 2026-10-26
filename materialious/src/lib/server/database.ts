@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Model, type ModelCtor } from 'sequelize';
-import { env } from '$env/dynamic/private';
+import { DATABASE_CONNECTION_URI } from '$app/env/private';
 
 let UserTable: ModelCtor<Model<any, any>>;
 let ChannelSubscriptionTable: ModelCtor<Model<any, any>>;
@@ -54,11 +54,11 @@ export function getSequelize(): {
 		};
 	}
 
-	if (!env.DATABASE_CONNECTION_URI) {
+	if (!DATABASE_CONNECTION_URI) {
 		throw new Error('DATABASE_CONNECTION_URI must be set');
 	}
 
-	sequelizeInstance = new Sequelize(env.DATABASE_CONNECTION_URI);
+	sequelizeInstance = new Sequelize(DATABASE_CONNECTION_URI);
 
 	UserTable = sequelizeInstance.define(
 		'User',

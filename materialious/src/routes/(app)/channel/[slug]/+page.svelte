@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { getChannelContent, searchChannelContent } from '$lib/api';
-	import type { ChannelContent, ChannelContentTypes, ChannelSortBy } from '$lib/api/model';
-	import PageLoading from '$lib/components/PageLoading.svelte';
-	import { proxyGoogleImage } from '$lib/images';
-	import { cleanNumber } from '$lib/numbers';
-	import { channelCacheStore } from '$lib/store';
-	import { isAndroidTv } from '$lib/utils';
-	import { _ } from '$lib/i18n';
+	import { getChannelContent, searchChannelContent } from '#lib/api/index';
+	import type { ChannelContent, ChannelContentTypes, ChannelSortBy } from '#lib/api/model';
+	import PageLoading from '#lib/components/PageLoading.svelte';
+	import { proxyGoogleImage } from '#lib/images';
+	import { cleanNumber } from '#lib/numbers';
+	import { channelCacheStore } from '#lib/store';
+	import { isAndroidTv } from '#lib/utils';
+	import { _ } from '#lib/i18n/index';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import ItemsList from '$lib/components/layout/ItemsList.svelte';
-	import Author from '$lib/components/Author.svelte';
+	import ItemsList from '#lib/components/layout/ItemsList.svelte';
+	import Author from '#lib/components/Author.svelte';
 	import { page } from '$app/state';
-	import { isYTBackend } from '$lib/backend';
-	import Share from '$lib/components/Share.svelte';
+	import { isYTBackend } from '#lib/backend';
+	import Share from '#lib/components/Share.svelte';
 	import { resolve } from '$app/paths';
 
 	let tab: ChannelContentTypes = $state('videos');
@@ -27,9 +27,11 @@
 
 	let channelSearchDebounce: ReturnType<typeof setTimeout>;
 
+	const slug = $derived(page.params.slug as string);
+
 	$effect(() => {
-		if ($channelCacheStore[page.params.slug]) {
-			displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
+		if ($channelCacheStore[slug]) {
+			displayContent = $channelCacheStore[slug].displayContent.videos;
 		}
 	});
 
@@ -37,13 +39,13 @@
 		if (channelSearchDebounce) clearTimeout(channelSearchDebounce);
 
 		if (channelSearch.trim() === '') {
-			displayContent = $channelCacheStore[page.params.slug].displayContent.videos;
+			displayContent = $channelCacheStore[slug].displayContent.videos;
 			return;
 		}
 
 		channelSearchDebounce = setTimeout(async () => {
 			displayContent = {
-				videos: await searchChannelContent(page.params.slug, channelSearch)
+				videos: await searchChannelContent(slug, channelSearch)
 			};
 		}, 200);
 	}
@@ -64,7 +66,7 @@
 				return;
 			}
 
-			newContent = await getChannelContent(page.params.slug, {
+			newContent = await getChannelContent(slug, {
 				type: tab,
 				continuation: displayContent.continuation,
 				sortBy: sortBy
@@ -96,28 +98,28 @@
 	async function changeTab(newTab: 'videos' | 'playlists' | 'streams' | 'shorts') {
 		tab = newTab;
 		displayContent = undefined;
-		displayContent = await getChannelContent(page.params.slug, { type: tab });
+		displayContent = await getChannelContent(slug, { type: tab });
 	}
 
 	let bannerSrc = $derived(
-		proxyGoogleImage($channelCacheStore[page.params.slug]?.channel?.authorBanners?.[0]?.url ?? '')
+		proxyGoogleImage($channelCacheStore[slug]?.channel?.authorBanners?.[0]?.url ?? '')
 	);
 </script>
 
-{#if $channelCacheStore[page.params.slug]}
+{#if $channelCacheStore[slug]}
 	<div class="padding">
 		<img src={bannerSrc} width="100%" alt="Channel banner" />
 		<div class="description">
 			<div>
 				<Author
 					channel={{
-						...$channelCacheStore[page.params.slug].channel,
-						subCountText: cleanNumber($channelCacheStore[page.params.slug].channel.subCount)
+						...$channelCacheStore[slug].channel,
+						subCountText: cleanNumber($channelCacheStore[slug].channel.subCount)
 					}}
 				/>
 				<p style="width: 60vw;max-height: 150px;overflow: scroll;">
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-					{@html $channelCacheStore[page.params.slug].channel.description}
+					{@html $channelCacheStore[slug].channel.description}
 				</p>
 			</div>
 			{#if !isAndroidTv()}
@@ -126,21 +128,21 @@
 					shares={[
 						{
 							type: 'materialious',
-							path: resolve('/channel/[channelId]', {
-								channelId: page.params.slug
+							path: resolve('/(app)/channel/[slug]', {
+								slug
 							})
 						},
 						{
 							type: 'youtube',
-							path: `/channel/${page.params.slug}`
+							path: `/channel/${slug}`
 						},
 						{
 							type: 'invidious',
-							path: `/channel/${page.params.slug}`
+							path: `/channel/${slug}`
 						},
 						{
 							type: 'invidious redirect',
-							path: `/channel/${page.params.slug}`
+							path: `/channel/${slug}`
 						}
 					]}
 				/>
@@ -148,25 +150,25 @@
 		</div>
 
 		<div class="tabs left-align scroll">
-			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('videos')}
+			{#if $channelCacheStore[slug].channel.tabs.includes('videos')}
 				<a class:active={tab === 'videos'} onclick={() => changeTab('videos')} href="#video">
 					<i>movie</i>
 					<span>{$_('videoTabs.videos')}</span>
 				</a>
 			{/if}
-			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('shorts')}
+			{#if $channelCacheStore[slug].channel.tabs.includes('shorts')}
 				<a class:active={tab === 'shorts'} onclick={() => changeTab('shorts')} href="#short">
 					<i>smartphone</i>
 					<span>{$_('videoTabs.shorts')}</span>
 				</a>
 			{/if}
-			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('streams')}
+			{#if $channelCacheStore[slug].channel.tabs.includes('streams')}
 				<a class:active={tab === 'streams'} onclick={() => changeTab('streams')} href="#stream">
 					<i>stream</i>
 					<span>{$_('videoTabs.streams')}</span>
 				</a>
 			{/if}
-			{#if $channelCacheStore[page.params.slug].channel.tabs.includes('playlists')}
+			{#if $channelCacheStore[slug].channel.tabs.includes('playlists')}
 				<a
 					class:active={tab === 'playlists'}
 					onclick={() => changeTab('playlists')}
@@ -187,7 +189,7 @@
 							onclick={async () => {
 								sortBy = sortingOption;
 
-								displayContent = await getChannelContent(page.params.slug, {
+								displayContent = await getChannelContent(slug, {
 									type: tab,
 									sortBy: sortBy
 								});

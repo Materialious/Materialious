@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestLandscapeThumbnail, imageHandleCors } from '$lib/images';
-	import { letterCase } from '$lib/letterCasing';
-	import { cleanNumber, videoLength } from '$lib/numbers';
+	import { resolveWatchPath } from '#lib/paths';
+	import { getBestLandscapeThumbnail, imageHandleCors } from '#lib/images';
+	import { letterCase } from '#lib/letterCasing';
+	import { cleanNumber, videoLength } from '#lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import { Avatar } from 'melt/builders';
 
@@ -13,16 +14,16 @@
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
 		playerState
-	} from '$lib/store';
-	import { relativeTimestamp } from '$lib/time';
-	import { queueGetWatchHistory } from '$lib/api/historyPool';
-	import { getDeArrow, getThumbnailDeArrow } from '$lib/api/dearrow';
+	} from '#lib/store';
+	import { relativeTimestamp } from '#lib/time';
+	import { queueGetWatchHistory } from '#lib/api/historyPool';
+	import { getDeArrow, getThumbnailDeArrow } from '#lib/api/dearrow';
 	import AuthorAvatar from '../AuthorAvatar.svelte';
 	import Share from '../Share.svelte';
 	import PlaylistManager from '../PlaylistManager.svelte';
-	import { deleteWatchHistoryItem, saveWatchHistory } from '$lib/api';
-	import type { ThumbnailVideo } from '$lib/thumbnail';
-	import { isAndroidTv, truncate } from '$lib/utils';
+	import { deleteWatchHistoryItem, saveWatchHistory } from '#lib/api/index';
+	import type { ThumbnailVideo } from '#lib/thumbnail';
+	import { isAndroidTv, truncate } from '#lib/utils';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -44,9 +45,7 @@
 			: video.publishedText;
 	}
 
-	const watchPath = resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]`, {
-		videoId: video.videoId
-	});
+	const watchPath = resolveWatchPath(video.videoId);
 	const watchUrl = new URL(`${location.origin}${watchPath}`);
 
 	if (playlistId !== '') {
@@ -160,7 +159,7 @@
 					shares={[
 						{
 							type: 'materialious',
-							path: resolve('/watch/[videoId]', { videoId: video.videoId })
+							path: resolve('/(app)/watch/[slug]', { slug: video.videoId })
 						},
 						{
 							type: 'invidious',
@@ -287,7 +286,7 @@
 			tabindex="-1"
 			class="wave thumbnail"
 			href={watchUrl.toString()}
-			data-sveltekit-preload-data="off"
+			data-sveltekit-preload-data="false"
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
@@ -383,7 +382,7 @@
 				tabindex="-1"
 				style="padding-left: 1px;"
 				class="video-title"
-				data-sveltekit-preload-data="off"
+				data-sveltekit-preload-data="false"
 				href={watchUrl.toString()}
 				onclick={onVideoSelected}
 			>
@@ -408,8 +407,8 @@
 								<a
 									tabindex="-1"
 									class:author={!sideways}
-									href={resolve(`/channel/[authorId]`, { authorId: video.authorId })}
-									data-sveltekit-preload-data="off"
+									href={resolve('/(app)/channel/[slug]', { slug: video.authorId })}
+									data-sveltekit-preload-data="false"
 									>{truncate(video.author, 20)}
 								</a>
 							{:else}

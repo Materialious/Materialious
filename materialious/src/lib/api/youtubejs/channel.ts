@@ -9,7 +9,7 @@ import type {
 	Video
 } from '../model';
 import { invidiousItemSchema } from './schema';
-import { associateAvatar } from '$lib/thumbnail';
+import { associateAvatar } from '#lib/thumbnail';
 
 export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
 	const innertube = await getInnertube();

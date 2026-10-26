@@ -1,7 +1,14 @@
-import { isOwnBackend } from '$lib/shared';
-import { getSequelize, runSequelizeMigrations } from '$lib/server/database';
+import { isOwnBackend } from '#lib/shared/index';
+import { getSequelize, runSequelizeMigrations } from '#lib/server/database';
 import { unsign } from 'cookie-signature';
-import { env } from '$env/dynamic/private';
+
+import {
+	DATABASE_CONNECTION_URI,
+	COOKIE_SECRET,
+	RATE_LIMIT_DISABLED,
+	PUBLIC_RATE_LIMIT_DISABLED
+} from '$app/env/private';
+
 import { RateLimiter } from 'sveltekit-rate-limiter/server';
 import sodium from 'libsodium-wrappers-sumo';
 
@@ -32,7 +39,7 @@ export async function handle({ event, resolve }) {
 	event.locals.captchaKey = captchaKey;
 	event.locals.captchaSignature = captchaSignature;
 
-	if (env.DATABASE_CONNECTION_URI) {
+	if (DATABASE_CONNECTION_URI) {
 		const sequelize = getSequelize();
 		if (!sequelizeAuthenticated) {
 			await sequelize.sequelize.sync();
@@ -41,17 +48,17 @@ export async function handle({ event, resolve }) {
 			sequelizeAuthenticated = true;
 		}
 
-		if (!env.COOKIE_SECRET) {
+		if (!COOKIE_SECRET) {
 			throw new Error('Cookie secret must be set');
 		}
 
-		if (env.COOKIE_SECRET.length < 16) {
+		if (COOKIE_SECRET.length < 16) {
 			throw new Error('COOKIE_SECRET must be at least 16 characters long');
 		}
 
 		const signedUserId = event.cookies.get('userid');
 		if (signedUserId) {
-			const userId = unsign(signedUserId, env.COOKIE_SECRET);
+			const userId = unsign(signedUserId, COOKIE_SECRET);
 			if (userId) {
 				event.locals.userId = userId;
 			}
@@ -60,14 +67,14 @@ export async function handle({ event, resolve }) {
 		const authorization = event.request.headers.get('authorization');
 		if (!event.locals.userId && authorization?.startsWith('Bearer ')) {
 			const token = authorization.slice(7);
-			const userId = unsign(token, env.COOKIE_SECRET);
+			const userId = unsign(token, COOKIE_SECRET);
 			if (userId) {
 				event.locals.userId = userId;
 			}
 		}
 	}
 
-	if (!env.RATE_LIMIT_DISABLED && !env.PUBLIC_RATE_LIMIT_DISABLED) {
+	if (!RATE_LIMIT_DISABLED && !PUBLIC_RATE_LIMIT_DISABLED) {
 		const tooManyRequests = () =>
 			new Response(JSON.stringify({ error: 'Too Many Requests' }), {
 				status: 429,

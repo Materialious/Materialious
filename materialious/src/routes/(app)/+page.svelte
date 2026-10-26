@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import ItemsList from '$lib/components/layout/ItemsList.svelte';
-	import Logo from '$lib/components/Logo.svelte';
-	import Search from '$lib/components/Search.svelte';
-	import { feedCacheStore, hideSearchStore, invidiousAuthStore } from '$lib/store';
-	import { isAndroidTv } from '$lib/utils';
+	import ItemsList from '#lib/components/layout/ItemsList.svelte';
+	import Logo from '#lib/components/Logo.svelte';
+	import Search from '#lib/components/Search.svelte';
+	import { feedCacheStore, hideSearchStore, invidiousAuthStore } from '#lib/store';
+	import { isAndroidTv } from '#lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
@@ -15,10 +15,10 @@
 		if (data.popularDisabled) {
 			if (isAndroidTv()) {
 				if (get(invidiousAuthStore)) {
-					goto(resolve('/subscriptions', {}), { replaceState: true });
+					goto(resolve('/(app)/subscriptions'), { replace: true });
 					return;
 				}
-				goto(resolve('/search', {}), { replaceState: true });
+				goto(resolve('/(app)/search'), { replace: true });
 				return;
 			}
 			hideSearchStore.set(true);

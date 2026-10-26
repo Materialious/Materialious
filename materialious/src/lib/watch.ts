@@ -4,8 +4,8 @@ import {
 	getVideoPage,
 	continueVideoPlayer,
 	saveWatchHistory
-} from '$lib/api/index';
-import { loadEntirePlaylist } from '$lib/playlist';
+} from '#lib/api/index';
+import { loadEntirePlaylist } from '#lib/playlist';
 import {
 	deArrowEnabledStore,
 	invidiousAuthStore,
@@ -13,15 +13,17 @@ import {
 	playerState,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore
-} from '$lib/store';
-import { parseDescription } from '$lib/description';
+} from '#lib/store';
+import { parseDescription } from '#lib/description';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import { getDislikesRYD } from './api/ytd';
 import { getDeArrow } from './api/dearrow';
 import type { VideoPlay } from './api/model';
 
-export async function getWatchPage(videoId: string, url: URL) {
+type SearchParamsSource = { searchParams: Pick<URLSearchParams, 'get'> };
+
+export async function getWatchPage(videoId: string, url: SearchParamsSource) {
 	const playerStateRetrieved = get(playerState);
 
 	let video: VideoPlay;
@@ -72,7 +74,7 @@ export async function getWatchPage(videoId: string, url: URL) {
 	};
 }
 
-export async function getWatchPlayer(videoId: string, url: URL) {
+export async function getWatchPlayer(videoId: string, url: SearchParamsSource) {
 	const playlistId = url.searchParams.get('playlist');
 
 	if (playlistId) {
@@ -108,7 +110,7 @@ export async function getWatchPlayer(videoId: string, url: URL) {
 	};
 }
 
-export async function getWatchDetails(videoId: string, url: URL) {
+export async function getWatchDetails(videoId: string, url: SearchParamsSource) {
 	const page = await getWatchPage(videoId, url);
 	const player = await getWatchPlayer(videoId, url);
 

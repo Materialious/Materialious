@@ -1,4 +1,4 @@
-import { _ } from '$lib/i18n';
+import { _ } from '#lib/i18n/index';
 import { get } from 'svelte/store';
 import { isYTBackend } from './backend';
 import { invidiousAuthStore } from './store';

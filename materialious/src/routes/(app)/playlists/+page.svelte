@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { deletePersonalPlaylist, getPersonalPlaylists, postPersonalPlaylist } from '$lib/api';
-	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
-	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
+	import {
+		deletePersonalPlaylist,
+		getPersonalPlaylists,
+		postPersonalPlaylist
+	} from '#lib/api/index';
+	import ContentColumn from '#lib/components/layout/ContentColumn.svelte';
+	import PlaylistThumbnail from '#lib/components/thumbnail/PlaylistThumbnail.svelte';
 	import ui from 'beercss';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 
 	let { data } = $props();
 
@@ -15,9 +19,7 @@
 	function onPrivacyChange(event: Event) {
 		if (!event.currentTarget) return;
 		playlistPrivacy = (event.currentTarget as HTMLInputElement).value as
-			| 'public'
-			| 'private'
-			| 'unlisted';
+			'public' | 'private' | 'unlisted';
 	}
 
 	async function removePlaylistItem(playlistId: string) {

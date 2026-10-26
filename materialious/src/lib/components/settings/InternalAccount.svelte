@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
-	import { materialiousLogout } from '$lib/auth';
-	import { resetPasswordBackend, type DerivePassword } from '$lib/api/backend';
-	import { backendFetch } from '$lib/api/backend/request';
-	import PasswordStrength from '$lib/components/PasswordStrength.svelte';
+	import { _ } from '#lib/i18n/index';
+	import { materialiousLogout } from '#lib/auth';
+	import { resetPasswordBackend, type DerivePassword } from '#lib/api/backend/index';
+	import { backendFetch } from '#lib/api/backend/request';
+	import PasswordStrength from '#lib/components/PasswordStrength.svelte';
 	import QuickConnect from './QuickConnect.svelte';
-	import { isOwnBackend } from '$lib/shared';
+	import { isOwnBackend } from '#lib/shared/index';
 	import { onMount } from 'svelte';
 	import * as comlink from 'comlink';
 

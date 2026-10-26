@@ -20,10 +20,11 @@
 		"@capacitor/assets": "^3.0.5",
 		"@capacitor/cli": "^8.5.1",
 		"@eslint/js": "^10.0.1",
-		"@sveltejs/adapter-auto": "^7.0.0",
-		"@sveltejs/adapter-node": "^5.5.4",
-		"@sveltejs/adapter-static": "^3.0.10",
-		"@sveltejs/kit": "^2.70.3",
+		"@sveltejs/adapter-auto": "^8.0.0",
+		"@sveltejs/adapter-node": "^6.0.0",
+		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/kit": "^3.0.0",
+		"@sveltejs/load-config": "^0.2.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.0",
 		"@types/cookie-signature": "^1.1.2",
 		"@types/event-source-polyfill": "^1.0.5",
@@ -45,7 +46,7 @@
 		"svelte": "^5.57.1",
 		"svelte-check": "^4.7.6",
 		"tslib": "^2.7.0",
-		"typescript": "^5.9.3",
+		"typescript": "^6.0.0",
 		"typescript-eslint": "^8.60.1",
 		"vite": "^8.3.5"
 	},
@@ -114,10 +115,11 @@
 		"tldts": "^7.4.5",
 		"undici": "^8.10.2",
 		"youtubei.js": "^18.3.0",
-		"zod": "^4.6.5"
+		"zod": "^4.6.5",
+		"cookie": "^2.0.1"
 	},
 	"overrides": {
-		"cookie": "^0.7.2",
+		"cookie": "^2.0.1",
 		"uuid": "^11.1.1",
 		"@capacitor/assets": {
 			"@capacitor/cli": {
@@ -128,5 +130,9 @@
 		"replace": {
 			"minimatch": "^3.1.5"
 		}
+	},
+	"imports": {
+		"#lib": "./src/lib/index.js",
+		"#lib/*": "./src/lib/*"
 	}
 }

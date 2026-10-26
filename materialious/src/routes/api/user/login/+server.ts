@@ -1,9 +1,9 @@
-import { authenticateUser } from '$lib/server/user';
-import { error, json } from '@sveltejs/kit';
+import { authenticateUser } from '#lib/server/user';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { isOwnBackend } from '$lib/shared';
-import { generateAuthToken, setAuthCookie } from '$lib/server/misc';
-import { captchaPayload, verifyCaptcha } from '$lib/server/captcha';
+import { isOwnBackend } from '#lib/shared/index';
+import { generateAuthToken, setAuthCookie } from '#lib/server/misc';
+import { captchaPayload, verifyCaptcha } from '#lib/server/captcha';
 
 const zUserLogin = z.object({
 	username: z.string(),
@@ -33,7 +33,7 @@ export async function POST({ request, cookies, locals }) {
 
 	setAuthCookie(userModel.id, cookies);
 
-	return json({
+	return Response.json({
 		token: generateAuthToken(userModel.id),
 		masterKeyCipher: userModel.data.masterKeyCipher,
 		masterKeyNonce: userModel.data.masterKeyNonce

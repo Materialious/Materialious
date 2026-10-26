@@ -1,25 +1,25 @@
 <script lang="ts">
-	import { bookmarkletSaveToUrl } from '$lib/externalSettings/index';
-	import { letterCase, titleCases, type TitleCase } from '$lib/letterCasing';
+	import { bookmarkletSaveToUrl } from '#lib/externalSettings/index';
+	import { letterCase, titleCases, type TitleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
 	import { iso31661 } from 'iso-3166';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import {
 		getMaterialiousBackendUrl,
 		isUnrestrictedPlatform,
 		remoteMaterialiousSupported
-	} from '$lib/backend';
-	import { timeout, isMobile } from '$lib/utils';
-	import { shareURL } from '$lib/download';
-	import { getPages, type Pages } from '$lib/navPages';
+	} from '#lib/backend';
+	import { timeout, isMobile } from '#lib/utils';
+	import { shareURL } from '#lib/download';
+	import { getPages, type Pages } from '#lib/navPages';
 	import {
 		setInvidiousInstance,
 		goToInvidiousLogin,
 		invidiousLogout,
 		setMaterialiousBackend,
 		removeMaterialiousBackend
-	} from '$lib/auth';
+	} from '#lib/auth';
 	import {
 		invidiousAuthStore,
 		backendInUseStore,
@@ -40,9 +40,9 @@
 		interfacePreserveTranslation,
 		interfaceMobileBackButtonStore
 	} from '../../store';
-	import { isOwnBackend } from '$lib/shared';
+	import { isOwnBackend } from '#lib/shared/index';
 	import ComboBox from '../ComboBox.svelte';
-	import { corsProxyUrl } from '$lib/fetchProxy';
+	import { corsProxyUrl } from '#lib/fetchProxy';
 
 	let invidiousInstance = $state(get(invidiousInstanceStore));
 

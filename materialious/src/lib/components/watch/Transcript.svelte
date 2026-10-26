@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { videoLength } from '$lib/numbers';
+	import { videoLength } from '#lib/numbers';
 	import Fuse from 'fuse.js';
 	import {
 		type VTTCue,
@@ -7,10 +7,10 @@
 		type ParsedCaptionsResult,
 		renderVTTCueString
 	} from 'media-captions';
-	import { _ } from '$lib/i18n';
-	import type { Captions, VideoPlay } from '$lib/api/model';
-	import { getCaptionUrl } from '$lib/player/captions';
-	import ComboBox from '$lib/components/ComboBox.svelte';
+	import { _ } from '#lib/i18n/index';
+	import type { Captions, VideoPlay } from '#lib/api/model';
+	import { getCaptionUrl } from '#lib/player/captions';
+	import ComboBox from '#lib/components/ComboBox.svelte';
 
 	interface Props {
 		video: VideoPlay;

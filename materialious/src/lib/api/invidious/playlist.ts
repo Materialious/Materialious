@@ -1,7 +1,7 @@
 import { get } from 'svelte/store';
 import type { PlaylistPage } from '../model';
 import { buildAuthHeaders, buildPath, fetchErrorHandle } from './request';
-import { invidiousAuthStore } from '$lib/store';
+import { invidiousAuthStore } from '#lib/store';
 
 export async function getPlaylistInvidious(
 	playlistId: string,

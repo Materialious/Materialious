@@ -1,7 +1,7 @@
-import { getUser } from '$lib/server/user';
-import { getSequelize } from '$lib/server/database';
+import { getUser } from '#lib/server/user';
+import { getSequelize } from '#lib/server/database';
 import { error } from '@sveltejs/kit';
-import { isAdminUsername } from '$lib/shared';
+import { isAdminUsername } from '#lib/shared/index';
 
 export async function DELETE({ locals, params }) {
 	if (!locals.userId) throw error(401);

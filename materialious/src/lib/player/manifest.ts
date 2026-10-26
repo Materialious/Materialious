@@ -1,4 +1,4 @@
-import { invidiousInstanceStore } from '$lib/store';
+import { invidiousInstanceStore } from '#lib/store';
 import { get } from 'svelte/store';
 
 export async function manifestDomainInclusion(manifestUrl: string): Promise<string> {

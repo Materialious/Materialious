@@ -8,13 +8,13 @@
 		materialiousBackendStore,
 		rawMasterKeyStore,
 		themeColorStore
-	} from '$lib/store';
-	import { isAndroidTv } from '$lib/utils';
+	} from '#lib/store';
+	import { isAndroidTv } from '#lib/utils';
 	import ui from 'beercss';
 	import { App } from '@capacitor/app';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import '$lib/css/global.css';
+	import '#lib/css/global.css';
 	import 'beercss';
 	import 'material-dynamic-colors';
 
@@ -24,20 +24,20 @@
 		setStatusBarColor,
 		setTheme,
 		setThemeColors
-	} from '$lib/theme/index';
+	} from '#lib/theme/index';
 
 	import { pwaInfo } from 'virtual:pwa-info';
 	import { onMount } from 'svelte';
 	import { Capacitor } from '@capacitor/core';
-	import colorTheme, { convertToHexColorCode } from '$lib/android/plugins/colorTheme';
+	import colorTheme, { convertToHexColorCode } from '#lib/android/plugins/colorTheme';
 	import { Browser } from '@capacitor/browser';
 	import {
 		bookmarkletLoadFromUrl,
 		loadSettingsFromEnv,
 		syncSettingsToBackend
-	} from '$lib/externalSettings';
-	import { configBackend } from '$lib/api/backend';
-	import { configBackendCache } from '$lib/stores/backend';
+	} from '#lib/externalSettings/index';
+	import { configBackend } from '#lib/api/backend/index';
+	import { configBackendCache } from '#lib/stores/backend';
 
 	let { children } = $props();
 
@@ -113,7 +113,7 @@
 				return;
 			}
 
-			goto(resolve(`/watch/[videoId]`, { videoId: videoId }));
+			goto(resolve('/(app)/watch/[slug]', { slug: videoId }));
 		} else {
 			// Auth response handling for Mobile
 			const username = url.searchParams.get('username');

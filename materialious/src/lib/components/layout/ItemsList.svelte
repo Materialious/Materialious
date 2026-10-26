@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { feedLastItemId, filterContentListStore } from '$lib/store';
-	import ContentColumn from '$lib/components/layout/ContentColumn.svelte';
+	import { feedLastItemId, filterContentListStore } from '#lib/store';
+	import ContentColumn from '#lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
-	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
-	import { extractUniqueId, type FeedItems } from '$lib/feed';
-	import { isAndroidTv, isMobile, keyCodeMap, timeout } from '$lib/utils';
-	import ChannelThumbnail from '$lib/components/thumbnail/ChannelThumbnail.svelte';
-	import PlaylistThumbnail from '$lib/components/thumbnail/PlaylistThumbnail.svelte';
-	import HashtagThumbnail from '$lib/components/thumbnail/HashtagThumbnail.svelte';
-	import NoResults from '$lib/components/NoResults.svelte';
+	import Thumbnail from '#lib/components/thumbnail/VideoThumbnail.svelte';
+	import { extractUniqueId, type FeedItems } from '#lib/feed';
+	import { isAndroidTv, isMobile, keyCodeMap, timeout } from '#lib/utils';
+	import ChannelThumbnail from '#lib/components/thumbnail/ChannelThumbnail.svelte';
+	import PlaylistThumbnail from '#lib/components/thumbnail/PlaylistThumbnail.svelte';
+	import HashtagThumbnail from '#lib/components/thumbnail/HashtagThumbnail.svelte';
+	import NoResults from '#lib/components/NoResults.svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
-	import { isItemFiltered } from '$lib/filtering/index';
+	import { isItemFiltered } from '#lib/filtering/index';
 
 	interface Props {
 		items?: FeedItems;

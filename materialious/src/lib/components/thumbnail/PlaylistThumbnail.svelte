@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { getBestThumbnail, imageHandleCors } from '$lib/images';
+	import { getBestThumbnail, imageHandleCors } from '#lib/images';
 	import { resolve } from '$app/paths';
-	import { letterCase } from '$lib/letterCasing';
-	import { _ } from '$lib/i18n';
-	import type { Playlist, PlaylistPage } from '$lib/api/model';
-	import { truncate } from '$lib/utils';
+	import { letterCase } from '#lib/letterCasing';
+	import { _ } from '#lib/i18n/index';
+	import type { Playlist, PlaylistPage } from '#lib/api/model';
+	import { truncate } from '#lib/utils';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 
@@ -14,7 +14,7 @@
 
 	let { playlist }: Props = $props();
 
-	const playlistLink = resolve('/playlist/[playlistId]', { playlistId: playlist.playlistId });
+	const playlistLink = resolve('/(app)/playlist/[slug]', { slug: playlist.playlistId });
 
 	function getThumbnailSrc(): string {
 		if (playlist.videos && playlist.videos.length > 0) {
@@ -51,7 +51,7 @@
 			<a href={playlistLink}><div class="bold">{letterCase(truncate(playlist.title))}</div></a>
 			<div>
 				{#if playlist.authorId}
-					<a href={resolve('/channel/[authorId]', { authorId: playlist.authorId })}
+					<a href={resolve('/(app)/channel/[slug]', { slug: playlist.authorId })}
 						>{playlist.author}</a
 					>
 				{:else}

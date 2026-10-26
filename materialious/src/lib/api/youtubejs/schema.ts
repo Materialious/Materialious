@@ -1,5 +1,5 @@
-import { cleanNumber, extractNumber } from '$lib/numbers';
-import { convertToSeconds } from '$lib/time';
+import { cleanNumber, extractNumber } from '#lib/numbers';
+import { convertToSeconds } from '#lib/time';
 import type { Channel, Playlist, Thumbnail, Video } from '../model';
 import { Helpers, YTNodes } from 'youtubei.js';
 

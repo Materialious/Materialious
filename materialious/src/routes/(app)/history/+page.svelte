@@ -1,8 +1,8 @@
 <script lang="ts">
-	import ItemsList from '$lib/components/layout/ItemsList.svelte';
+	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import { _ } from '$lib/i18n';
-	import { deleteWatchHistory, getWatchHistory } from '$lib/api/index.js';
+	import { _ } from '#lib/i18n/index';
+	import { deleteWatchHistory, getWatchHistory } from '#lib/api/index';
 
 	let { data } = $props();
 

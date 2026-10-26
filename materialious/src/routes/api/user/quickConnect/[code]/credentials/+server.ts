@@ -1,6 +1,9 @@
-import { error, json } from '@sveltejs/kit';
-import { isOwnBackend } from '$lib/shared';
-import { getQuickConnectCredentials, setQuickConnectCredentials } from '$lib/server/quickConnect';
+import { error } from '@sveltejs/kit';
+import { isOwnBackend } from '#lib/shared/index';
+import {
+	getQuickConnectCredentials,
+	setQuickConnectCredentials
+} from '#lib/server/quickConnect';
 import z from 'zod';
 
 const zCredentials = z.object({
@@ -15,7 +18,7 @@ export async function GET({ params }) {
 	const cipher = await getQuickConnectCredentials(params.code);
 	if (!cipher) throw error(404);
 
-	return json({ cipher });
+	return Response.json({ cipher });
 }
 
 export async function POST({ request, params }) {
@@ -29,5 +32,5 @@ export async function POST({ request, params }) {
 	const stored = await setQuickConnectCredentials(params.code, body.data.cipher);
 	if (!stored) throw error(409);
 
-	return json({ success: true });
+	return Response.json({ success: true });
 }

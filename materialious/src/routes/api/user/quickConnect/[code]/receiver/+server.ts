@@ -1,7 +1,7 @@
-import { error, json } from '@sveltejs/kit';
-import { isOwnBackend } from '$lib/shared';
-import { registerQuickConnectReceiver } from '$lib/server/quickConnect';
-import { captchaPayload, verifyCaptcha } from '$lib/server/captcha';
+import { error } from '@sveltejs/kit';
+import { isOwnBackend } from '#lib/shared/index';
+import { registerQuickConnectReceiver } from '#lib/server/quickConnect';
+import { captchaPayload, verifyCaptcha } from '#lib/server/captcha';
 import z from 'zod';
 
 const zReceiver = z.object({
@@ -30,5 +30,5 @@ export async function POST({ request, locals, params }) {
 	if (result === 'conflict') throw error(409);
 	if (result !== 'ok') throw error(404);
 
-	return json({ success: true });
+	return Response.json({ success: true });
 }

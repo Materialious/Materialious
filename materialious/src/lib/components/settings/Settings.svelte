@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { _ } from '$lib/i18n';
-	import { materialiousBackendStore, rawMasterKeyStore } from '$lib/store';
-	import { keyCodeMap } from '$lib/utils';
+	import { _ } from '#lib/i18n/index';
+	import { materialiousBackendStore, rawMasterKeyStore } from '#lib/store';
+	import { keyCodeMap } from '#lib/utils';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import {
 		getSettingsTabs,

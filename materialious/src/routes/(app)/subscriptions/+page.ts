@@ -1,8 +1,8 @@
-import { getFeed } from '$lib/api/index';
-import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
-import { localDb } from '$lib/dexie';
-import { authProtected } from '$lib/auth';
-import { feedCacheStore, feedLoadingStore } from '$lib/store';
+import { getFeed } from '#lib/api/index';
+import type { PlaylistPageVideo, Video, VideoBase } from '#lib/api/model';
+import { localDb } from '#lib/dexie';
+import { authProtected } from '#lib/auth';
+import { feedCacheStore, feedLoadingStore } from '#lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
@@ -44,7 +44,7 @@ export async function load() {
 		const videos = await sortVideosByFavourites([...feed.notifications, ...feed.videos]);
 		feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
 	} catch (e) {
-		error(500, e instanceof Error ? e : String(e));
+		error(500, e instanceof Error ? e.message : String(e));
 	} finally {
 		feedLoadingStore.set(false);
 	}

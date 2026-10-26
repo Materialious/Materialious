@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { watchPartyEventSchema, type WatchPartyEvent } from '$lib/watchParty';
+import { watchPartyEventSchema, type WatchPartyEvent } from '#lib/watchParty';
 
 export interface WatchPartyClient {
 	id: string;

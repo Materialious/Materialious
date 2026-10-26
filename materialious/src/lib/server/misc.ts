@@ -1,9 +1,9 @@
 import type { Cookies } from '@sveltejs/kit';
 import { sign } from 'cookie-signature';
-import { env } from '$env/dynamic/private';
+import { COOKIE_SECRET } from '$app/env/private';
 
 export function generateAuthToken(id: string): string {
-	return sign(id, env.COOKIE_SECRET as string);
+	return sign(id, COOKIE_SECRET as string);
 }
 
 export function setAuthCookie(id: string, cookies: Cookies) {

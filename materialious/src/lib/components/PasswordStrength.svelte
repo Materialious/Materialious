@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { ZxcvbnFactory } from '@zxcvbn-ts/core';
 	import { dictionary as commonDictionary, adjacencyGraphs } from '@zxcvbn-ts/language-common';
 	import { dictionary as enDictionary, translations } from '@zxcvbn-ts/language-en';

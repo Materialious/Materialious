@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { PinInput } from 'melt/builders';
 	import { onDestroy } from 'svelte';
-	import { backendFetch } from '$lib/api/backend/request';
-	import { isOwnBackend } from '$lib/shared';
+	import { backendFetch } from '#lib/api/backend/request';
+	import { isOwnBackend } from '#lib/shared/index';
 	import { solveChallenge } from 'altcha-lib';
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
 	import {
@@ -16,10 +16,10 @@
 		applyQuickConnectCredentials,
 		type QuickConnectCredentials,
 		type CaptchaPayload
-	} from '$lib/api/backend/quickconnect';
-	import { quickConnectTtlMs } from '$lib/api/backend/quickconnect';
-	import { syncAuthTokenFromCloud } from '$lib/auth';
-	import { isAndroidTv } from '$lib/utils';
+	} from '#lib/api/backend/quickconnect';
+	import { quickConnectTtlMs } from '#lib/api/backend/quickconnect';
+	import { syncAuthTokenFromCloud } from '#lib/auth';
+	import { isAndroidTv } from '#lib/utils';
 
 	interface Props {
 		onConnected?: (credentials: QuickConnectCredentials) => void;

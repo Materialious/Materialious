@@ -9,7 +9,9 @@ export async function load({ url }) {
 	const timestamp = url.searchParams.get('t');
 
 	if (videoId) {
-		const goToUrl = new URL(`${location.origin}${resolve(`/watch/[videoId]`, { videoId })}`);
+		const goToUrl = new URL(
+			`${location.origin}${resolve('/(app)/watch/[slug]', { slug: videoId })}`
+		);
 
 		if (playlistId) {
 			goToUrl.searchParams.set('playlist', playlistId);

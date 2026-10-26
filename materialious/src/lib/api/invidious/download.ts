@@ -1,12 +1,12 @@
-import { getPublicEnv } from '$lib/env';
-import type { AdaptiveFormats, VideoPlay } from '$lib/api/model';
+import { getPublicEnv } from '#lib/env';
+import type { AdaptiveFormats, VideoPlay } from '#lib/api/model';
 import { sanitizeFilename } from '@materialious/shared';
 import type { SabrFormat } from '@materialious/shared/download';
 import type {
 	AvailableFormats,
 	DownloadResult,
 	DownloadSelection
-} from '$lib/api/youtubejs/download';
+} from '#lib/api/youtubejs/download';
 
 export function getCompanionInstance(): string | undefined {
 	return getPublicEnv('DEFAULT_COMPANION_INSTANCE');

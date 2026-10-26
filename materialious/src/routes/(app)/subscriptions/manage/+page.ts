@@ -1,6 +1,6 @@
-import { getSubscriptions } from '$lib/api';
-import type { Subscription } from '$lib/api/model';
-import { authProtected } from '$lib/auth';
+import { getSubscriptions } from '#lib/api/index';
+import type { Subscription } from '#lib/api/model';
+import { authProtected } from '#lib/auth';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

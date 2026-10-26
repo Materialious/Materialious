@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Mousetrap from 'mousetrap';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { getSearchSuggestions } from '../api';
 	import {
 		interfaceSearchHistoryEnabled,
@@ -9,7 +9,7 @@
 		searchHistoryStore,
 		keybindStore
 	} from '../store';
-	import { goToSearch } from '$lib/search';
+	import { goToSearch } from '#lib/search';
 	import { page } from '$app/state';
 
 	let {

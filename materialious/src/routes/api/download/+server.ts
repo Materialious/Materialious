@@ -1,8 +1,8 @@
 import { createDownload, getDownloadSession } from '@materialious/shared/download';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { isOwnBackend } from '$lib/shared/index';
-import { clearDownloadProgress, setDownloadProgress } from '$lib/server/downloadProgress';
+import { isOwnBackend } from '#lib/shared/index';
+import { clearDownloadProgress, setDownloadProgress } from '#lib/server/downloadProgress';
 
 const zDownloadSchema = z.object({
 	videoId: z.string().length(11),

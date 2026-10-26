@@ -1,4 +1,4 @@
-import { getWatchPage, getWatchPlayer } from '$lib/watch';
+import { getWatchPage, getWatchPlayer } from '#lib/watch';
 
 export function load({ params, url }) {
 	const videoId = params.slug;

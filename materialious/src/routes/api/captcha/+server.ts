@@ -1,12 +1,11 @@
-import { isOwnBackend } from '$lib/shared/index.js';
-import { json } from '@sveltejs/kit';
+import { isOwnBackend } from '#lib/shared/index';
 import { createChallenge, randomInt } from 'altcha-lib';
 import { deriveKey } from 'altcha-lib/algorithms/pbkdf2';
 
 export async function GET({ locals }) {
-	if (isOwnBackend()?.captchaDisabled) return json({});
+	if (isOwnBackend()?.captchaDisabled) return Response.json({});
 
-	return json(
+	return Response.json(
 		await createChallenge({
 			hmacSignatureSecret: locals.captchaSignature,
 			hmacKeySignatureSecret: locals.captchaKey,

@@ -1,4 +1,4 @@
-import { associateAvatar } from '$lib/thumbnail';
+import { associateAvatar } from '#lib/thumbnail';
 import type { ChannelContent, ChannelOptions, ChannelPage, Video } from '../model';
 import { buildPath, fetchErrorHandle } from './request';
 

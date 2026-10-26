@@ -1,6 +1,6 @@
-import { error, json } from '@sveltejs/kit';
-import { isOwnBackend } from '$lib/shared';
-import { deleteQuickConnectSession, getQuickConnectSession } from '$lib/server/quickConnect';
+import { error } from '@sveltejs/kit';
+import { isOwnBackend } from '#lib/shared/index';
+import { deleteQuickConnectSession, getQuickConnectSession } from '#lib/server/quickConnect';
 
 export async function GET({ locals, params }) {
 	if (!isOwnBackend()?.internalAuth || !isOwnBackend()?.quickConnect) {
@@ -17,13 +17,13 @@ export async function GET({ locals, params }) {
 			: 'pending';
 
 	if (locals.userId) {
-		return json({
+		return Response.json({
 			status,
 			receiverPublicKey: session.receiverPublicKey
 		});
 	}
 
-	return json({ status });
+	return Response.json({ status });
 }
 
 export async function DELETE({ params }) {

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { getBestThumbnail } from '$lib/images';
-	import { videoLength } from '$lib/numbers';
-	import { generateChapterWebVTT, type ParsedDescription } from '$lib/description';
+	import { getBestThumbnail } from '#lib/images';
+	import { videoLength } from '#lib/numbers';
+	import { generateChapterWebVTT, type ParsedDescription } from '#lib/description';
 	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import { error } from '@sveltejs/kit';
 	import Mousetrap from 'mousetrap';
@@ -11,10 +11,10 @@
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
 	import { onDestroy, onMount } from 'svelte';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import { Slider } from 'melt/builders';
-	import type { VideoPlay } from '$lib/api/model';
+	import type { VideoPlay } from '#lib/api/model';
 	import {
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
@@ -33,25 +33,25 @@
 		sponsorBlockStore,
 		sponsorBlockUrlStore,
 		keybindStore
-	} from '$lib/store';
-	import { setStatusBarColor } from '$lib/theme/index';
-	import { getVideoYTjs } from '$lib/api/youtubejs/video';
+	} from '#lib/store';
+	import { setStatusBarColor } from '#lib/theme/index';
+	import { getVideoYTjs } from '#lib/api/youtubejs/video';
 	import {
 		goToNextVideo,
 		goToPreviousVideo,
 		restoreDefaultLanguage,
 		restoreQualityPreference,
 		toggleSubtitles
-	} from '$lib/player/index';
-	import { manifestDomainInclusion } from '$lib/player/manifest';
-	import { injectSabr } from '$lib/player/sabr';
+	} from '#lib/player/index';
+	import { manifestDomainInclusion } from '#lib/player/manifest';
+	import { injectSabr } from '#lib/player/sabr/index';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { fade } from 'svelte/transition';
-	import { addToast } from '$lib/components/Toast.svelte';
-	import { getPublicEnv } from '$lib/env';
-	import { isAndroidTv, isMobile } from '$lib/utils';
-	import { isUnrestrictedPlatform, isYTBackend } from '$lib/backend';
-	import { isOwnBackend } from '$lib/shared';
+	import { addToast } from '#lib/components/Toast.svelte';
+	import { getPublicEnv } from '#lib/env';
+	import { isAndroidTv, isMobile } from '#lib/utils';
+	import { isUnrestrictedPlatform, isYTBackend } from '#lib/backend';
+	import { isOwnBackend } from '#lib/shared/index';
 	import Settings, { setActiveAudioTrack, setActiveVideoTrack } from './settings/Settings.svelte';
 	import CaptionSettings from './settings/CaptionSettings.svelte';
 	import Airplay from './settings/Airplay.svelte';
@@ -62,7 +62,7 @@
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
 	import ClosedCaptions from './ClosedCaptions.svelte';
-	import { getVideoWatchHistory, updateWatchHistory } from '$lib/api';
+	import { getVideoWatchHistory, updateWatchHistory } from '#lib/api/index';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };

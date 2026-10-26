@@ -1,7 +1,7 @@
 import { mintPoTokenInJSDOM } from '@materialious/shared/jsdom';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
-import { isOwnBackend } from '$lib/shared/index';
+import { isOwnBackend } from '#lib/shared/index';
 
 const zPoTokenGenSchema = z.object({
 	requestKey: z.string(),

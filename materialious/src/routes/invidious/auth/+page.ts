@@ -1,7 +1,7 @@
 import { resolve } from '$app/paths';
-import { addOrUpdateKeyValue } from '$lib/api/backend/keyvalue.js';
-import { isMaterialiousAccountActive } from '$lib/backend';
-import { invidiousAuthStore } from '$lib/store';
+import { addOrUpdateKeyValue } from '#lib/api/backend/keyvalue';
+import { isMaterialiousAccountActive } from '#lib/backend';
+import { invidiousAuthStore } from '#lib/store';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ url }) {
@@ -19,5 +19,5 @@ export async function load({ url }) {
 		}
 	}
 
-	throw redirect(302, resolve('/', {}));
+	throw redirect(302, resolve('/(app)'));
 }

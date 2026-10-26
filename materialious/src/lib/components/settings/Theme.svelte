@@ -5,10 +5,10 @@
 		setThemeColor,
 		type ThemeColors,
 		type ThemeKey
-	} from '$lib/theme/index';
+	} from '#lib/theme/index';
 	import ui from 'beercss';
 	import type { RgbaColor, HsvaColor, Colord } from 'colord';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import {
@@ -19,12 +19,12 @@
 		interfaceBorderRadiusStore,
 		themeColorStore
 	} from '../../store';
-	import { isAndroidTv } from '$lib/utils';
+	import { isAndroidTv } from '#lib/utils';
 	import { onMount, tick } from 'svelte';
-	import { titleCase } from '$lib/letterCasing';
-	import { presets, type CustomPreset, type Preset } from '$lib/theme/presets';
-	import { parseThemeFile, serializeThemeFile } from '$lib/theme/themeFile';
-	import { downloadStringAsFile } from '$lib/download';
+	import { titleCase } from '#lib/letterCasing';
+	import { presets, type CustomPreset, type Preset } from '#lib/theme/presets/index';
+	import { parseThemeFile, serializeThemeFile } from '#lib/theme/themeFile';
+	import { downloadStringAsFile } from '#lib/download';
 	import { addToast } from '../Toast.svelte';
 
 	let colorPickerOpen = $state(false);

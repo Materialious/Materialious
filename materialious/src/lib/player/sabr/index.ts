@@ -1,12 +1,12 @@
-import type { VideoPlay } from '$lib/api/model';
+import type { VideoPlay } from '#lib/api/model';
 import { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import { ShakaPlayerAdapter } from './ShakaPlayerAdapter';
 import { Constants, YT } from 'youtubei.js';
 import { get } from 'svelte/store';
-import { poTokenCacheStore } from '$lib/store';
+import { poTokenCacheStore } from '#lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
-import { isUnrestrictedPlatform } from '$lib/backend';
+import { isUnrestrictedPlatform } from '#lib/backend';
 
 export async function injectSabr(
 	video: VideoPlay,

@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
-	import { exportSubscriptionsAsFile, importSubscriptionsFromFile } from '$lib/importExport';
+	import { _ } from '#lib/i18n/index';
+	import { exportSubscriptionsAsFile, importSubscriptionsFromFile } from '#lib/importExport';
 	import { addToast, toaster } from '../Toast.svelte';
-	import { getSubscriptions } from '$lib/api';
-	import { importSubscriptions } from '$lib/importExport';
-	import { postSubscribeInvidious } from '$lib/api/invidious/subscribe';
-	import { getSubscriptionsInvidious } from '$lib/api/invidious/feed';
-	import { backendInUseStore, invidiousAuthStore, invidiousInstanceStore } from '$lib/store';
+	import { getSubscriptions } from '#lib/api/index';
+	import { importSubscriptions } from '#lib/importExport';
+	import { postSubscribeInvidious } from '#lib/api/invidious/subscribe';
+	import { getSubscriptionsInvidious } from '#lib/api/invidious/feed';
+	import { backendInUseStore, invidiousAuthStore, invidiousInstanceStore } from '#lib/store';
 	import { Clipboard } from '@capacitor/clipboard';
-	import { loadSettingsFromFile, settingsToJson } from '$lib/externalSettings';
-	import { downloadStringAsFile } from '$lib/download';
+	import { loadSettingsFromFile, settingsToJson } from '#lib/externalSettings/index';
+	import { downloadStringAsFile } from '#lib/download';
 
 	async function importInvidiousSubs() {
 		const importedSubs = await getSubscriptionsInvidious();

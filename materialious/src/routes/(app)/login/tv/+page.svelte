@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { _ } from '$lib/i18n';
-	import { invidiousAuthStore, invidiousInstanceStore } from '$lib/store';
+	import { _ } from '#lib/i18n/index';
+	import { invidiousAuthStore, invidiousInstanceStore } from '#lib/store';
 	import { onMount } from 'svelte';
 
 	let loginError: boolean = $state(false);
@@ -41,7 +41,7 @@
 
 				if (sid) {
 					invidiousAuthStore.set({ username: rawUsername, token: sid });
-					goto(resolve('/', {}), { replaceState: true });
+					goto(resolve('/(app)'), { replace: true });
 					return;
 				}
 			}

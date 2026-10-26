@@ -1,12 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import Question from '$lib/components/Question.svelte';
-	import { _ } from '$lib/i18n';
-	import { isUnrestrictedPlatform, getMaterialiousBackendUrl, remoteMaterialiousSupported } from '$lib/backend';
-	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '$lib/auth';
-	import { isOwnBackend } from '$lib/shared';
-	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '$lib/store';
+	import Question from '#lib/components/Question.svelte';
+	import { _ } from '#lib/i18n/index';
+	import {
+		isUnrestrictedPlatform,
+		getMaterialiousBackendUrl,
+		remoteMaterialiousSupported
+	} from '#lib/backend';
+	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '#lib/auth';
+	import { isOwnBackend } from '#lib/shared/index';
+	import {
+		backendInUseStore,
+		invidiousInstanceStore,
+		playerYouTubeJsFallback
+	} from '#lib/store';
 
 	const defaultInstance = !isOwnBackend()
 		? 'https://invidious.materialio.us'
@@ -21,7 +29,7 @@
 
 	async function setupCompleted() {
 		clearCaches();
-		goto(resolve('/', {}), { replaceState: true });
+		goto(resolve('/(app)'), { replace: true });
 	}
 
 	async function setInvidious(event: Event) {

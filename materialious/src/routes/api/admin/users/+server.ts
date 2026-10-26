@@ -1,7 +1,7 @@
-import { getUser } from '$lib/server/user';
-import { getSequelize } from '$lib/server/database';
-import { error, json } from '@sveltejs/kit';
-import { isAdminUsername } from '$lib/shared';
+import { getUser } from '#lib/server/user';
+import { getSequelize } from '#lib/server/database';
+import { error } from '@sveltejs/kit';
+import { isAdminUsername } from '#lib/shared/index';
 
 export async function GET({ locals }) {
 	if (!locals.userId) throw error(401);
@@ -16,7 +16,7 @@ export async function GET({ locals }) {
 		attributes: ['id', 'username', 'created']
 	});
 
-	return json(
+	return Response.json(
 		allUsers.map((u: any) => ({
 			id: u.id,
 			username: u.username,

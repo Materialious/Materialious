@@ -1,6 +1,6 @@
-import { parseChannelRSS } from '$lib/api/youtubejs/subscriptions';
-import { getChannelYTjs } from '$lib/api/youtubejs/channel';
-import type { ChannelSubscriptions } from '$lib/dexie';
+import { parseChannelRSS } from '#lib/api/youtubejs/subscriptions';
+import { getChannelYTjs } from '#lib/api/youtubejs/channel';
+import type { ChannelSubscriptions } from '#lib/dexie';
 import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } from './encryption';
 import { backendFetch } from './request';
 

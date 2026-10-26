@@ -1,4 +1,4 @@
-import { androidPoTokenMinter } from '$lib/android/youtube/minter';
+import { androidPoTokenMinter } from '#lib/android/youtube/minter';
 import type {
 	AdaptiveFormats,
 	Captions,
@@ -7,17 +7,17 @@ import type {
 	Thumbnail,
 	VideoBase,
 	VideoPlay
-} from '$lib/api/model';
-import { poTokenCacheStore } from '$lib/store';
-import { convertToSeconds } from '$lib/time';
+} from '#lib/api/model';
+import { poTokenCacheStore } from '#lib/store';
+import { convertToSeconds } from '#lib/time';
 import { Capacitor } from '@capacitor/core';
 import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
 import { Innertube, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
-import { isUnrestrictedPlatform } from '$lib/backend';
-import { webPoTokenMinter } from '$lib/web/youtube/minter';
-import { associateAvatar } from '$lib/thumbnail';
+import { isUnrestrictedPlatform } from '#lib/backend';
+import { webPoTokenMinter } from '#lib/web/youtube/minter';
+import { associateAvatar } from '#lib/thumbnail';
 
 Platform.shim.eval = async (data: Types.BuildScriptResult) => new Function(data.output)();
 
@@ -204,7 +204,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 	adaptiveFormats: AdaptiveFormats[];
 	captions: Captions[];
 	hlsUrl?: string;
-	ytjs: import('$lib/api/model').Ytjs;
+	ytjs: import('#lib/api/model.js').Ytjs;
 }> {
 	const intermediate = videoIntermediateCache.get(videoId);
 	if (!intermediate) {

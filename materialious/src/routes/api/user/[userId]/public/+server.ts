@@ -1,6 +1,5 @@
-import { getUser } from '$lib/server/user';
-import { json } from '@sveltejs/kit';
-import { isOwnBackend } from '$lib/shared';
+import { getUser } from '#lib/server/user';
+import { isOwnBackend } from '#lib/shared/index';
 
 export async function GET({ params }) {
 	if (!isOwnBackend()?.internalAuth) {
@@ -8,5 +7,5 @@ export async function GET({ params }) {
 	}
 
 	const user = await getUser(params.userId);
-	return json(user.publicPasswordSalts);
+	return Response.json(user.publicPasswordSalts);
 }

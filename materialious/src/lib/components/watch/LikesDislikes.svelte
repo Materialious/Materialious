@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ReturnYTDislikes, VideoPlay } from '$lib/api/model';
-	import { cleanNumber } from '$lib/numbers';
+	import type { ReturnYTDislikes, VideoPlay } from '#lib/api/model';
+	import { cleanNumber } from '#lib/numbers';
 
 	let {
 		video,

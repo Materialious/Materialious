@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getComments } from '$lib/api';
-	import { type Comment, type Comments } from '$lib/api/model';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
-	import { numberWithCommas } from '$lib/numbers';
+	import { getComments } from '#lib/api/index';
+	import { type Comment, type Comments } from '#lib/api/model';
+	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
+	import { numberWithCommas } from '#lib/numbers';
 	import CommentSelf from './Comment.svelte';
-	import { truncate } from '$lib/utils';
-	import { _ } from '$lib/i18n';
-	import { extractActualLink } from '$lib/description';
+	import { truncate } from '#lib/utils';
+	import { _ } from '#lib/i18n/index';
+	import { extractActualLink } from '#lib/description';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 
@@ -56,11 +56,11 @@
 				const match = realHref?.match(/t=(\d+)/);
 				const timestamp = match ? match[1] : '';
 
-				const newHref = resolve(`/watch/[videoId]?time=${timestamp}`, { videoId });
+				const newHref = `${resolve('/(app)/watch/[slug]', { slug: videoId })}?time=${timestamp}`;
 
 				link.setAttribute('href', newHref);
 				link.removeAttribute('data-onclick');
-				link.setAttribute('data-sveltekit-preload-data', 'off');
+				link.setAttribute('data-sveltekit-preload-data', 'false');
 			} else {
 				link.setAttribute('href', realHref);
 				link.setAttribute('target', '_blank');
@@ -84,7 +84,7 @@
 			})}>{comment.author[1]}</button
 		>
 		<div class="comment-info">
-			<a href={resolve(`/channel/[authorId]`, { authorId: comment.authorId })} class="author">
+			<a href={resolve('/(app)/channel/[slug]', { slug: comment.authorId })} class="author">
 				<span class="bold" class:channel-owner={comment.authorIsChannelOwner}>
 					{truncate(comment.author, 12)}
 				</span>

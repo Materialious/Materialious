@@ -1,4 +1,4 @@
-import { getUser, authenticateUser } from '$lib/server/user';
+import { getUser, authenticateUser } from '#lib/server/user';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
 

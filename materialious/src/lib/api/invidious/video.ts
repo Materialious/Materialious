@@ -2,9 +2,9 @@ import { get } from 'svelte/store';
 import type { VideoPlay } from '../model';
 import { buildPath, fetchErrorHandle } from './request';
 import { getVideoYTjs } from '../youtubejs/video';
-import { playerYouTubeJsFallback } from '$lib/store';
-import { isUnrestrictedPlatform } from '$lib/backend';
-import { associateAvatar } from '$lib/thumbnail';
+import { playerYouTubeJsFallback } from '#lib/store';
+import { isUnrestrictedPlatform } from '#lib/backend';
+import { associateAvatar } from '#lib/thumbnail';
 
 export async function getVideoInvidious(
 	videoId: string,

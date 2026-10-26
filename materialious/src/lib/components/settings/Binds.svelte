@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
-	import { keybindStore, defaultKeybinds, type Keybinds } from '$lib/store';
+	import { _ } from '#lib/i18n/index';
+	import { keybindStore, defaultKeybinds, type Keybinds } from '#lib/store';
 
 	let binds = $state<Keybinds>({ ...$keybindStore });
 	let recording: keyof Keybinds | null = $state(null);

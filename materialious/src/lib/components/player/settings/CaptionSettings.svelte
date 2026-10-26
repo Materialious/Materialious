@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
-	import type { VideoPlay } from '$lib/api/model';
+	import { _ } from '#lib/i18n/index';
+	import type { VideoPlay } from '#lib/api/model';
 	import { selectTextTrack, setTextTrackVisibility } from '../ClosedCaptions.svelte';
 	import {
 		subtitleSettings,
 		defaultSubtitleSettings,
 		activeCaptionTrack,
 		type SubtitleSettings
-	} from '$lib/store';
+	} from '#lib/store';
 
 	let { video }: { video: VideoPlay } = $props();
 	let dialog: HTMLDialogElement;

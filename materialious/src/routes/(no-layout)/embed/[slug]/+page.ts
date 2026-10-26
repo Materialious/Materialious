@@ -1,5 +1,5 @@
-import { getVideo } from '$lib/api/index';
-import { playerProxyVideosStore } from '$lib/store';
+import { getVideo } from '#lib/api/index';
+import { playerProxyVideosStore } from '#lib/store';
 import { error } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 

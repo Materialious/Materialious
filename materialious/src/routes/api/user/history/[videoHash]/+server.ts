@@ -1,5 +1,5 @@
-import { getSequelize } from '$lib/server/database';
-import { error, json } from '@sveltejs/kit';
+import { getSequelize } from '#lib/server/database';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
 
 const zUserHistoryUpdate = z
@@ -43,5 +43,5 @@ export async function GET({ locals, params }) {
 
 	if (!history) throw error(404);
 
-	return json(history);
+	return Response.json(history);
 }

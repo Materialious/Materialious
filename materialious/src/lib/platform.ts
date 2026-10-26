@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import androidTv from '$lib/android/plugins/androidTv';
+import androidTv from '#lib/android/plugins/androidTv';
 
 export type Platform = 'web' | 'ios' | 'electron' | 'android' | 'androidTV';
 

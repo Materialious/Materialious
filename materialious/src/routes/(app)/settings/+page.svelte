@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
-	import { keyCodeMap, isAndroidTv } from '$lib/utils';
-	import { materialiousBackendStore, rawMasterKeyStore } from '$lib/store';
+	import { keyCodeMap, isAndroidTv } from '#lib/utils';
+	import { materialiousBackendStore, rawMasterKeyStore } from '#lib/store';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import {
@@ -12,7 +12,7 @@
 		updateAccountTabs,
 		type SettingsTab,
 		type SettingsTabCategories
-	} from '$lib/components/settings/tabs';
+	} from '#lib/components/settings/tabs';
 
 	let tabs: SettingsTab[] = $state(updateAccountTabs(getSettingsTabs()));
 
@@ -155,7 +155,7 @@
 
 	onMount(() => {
 		if (!isAndroidTv()) {
-			void goto(resolve('/', {}), { replaceState: true });
+			void goto(resolve('/(app)'), { replace: true });
 			return;
 		}
 

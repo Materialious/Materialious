@@ -1,4 +1,4 @@
-import { getPersonalPlaylists } from '$lib/api';
+import { getPersonalPlaylists } from '#lib/api/index';
 import { error } from '@sveltejs/kit';
 
 export async function load() {

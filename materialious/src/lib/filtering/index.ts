@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import type { FeedItem } from '$lib/feed';
+import type { FeedItem } from '#lib/feed';
 import isSafeRegex from 'safe-regex2';
-import { filterContentListStore } from '$lib/store';
+import { filterContentListStore } from '#lib/store';
 import { get } from 'svelte/store';
-import { originalFetch } from '$lib/fetchProxy';
+import { originalFetch } from '#lib/fetchProxy';
 import { ChannelSchema, VideoSchema } from './schemas';
 
 export const zFilterOperatorEnum = z.enum([

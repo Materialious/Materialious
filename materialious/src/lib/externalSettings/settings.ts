@@ -59,9 +59,9 @@ import {
 	interfacePreserveTranslation,
 	interfaceMobileBackButtonStore,
 	subtitleSettings
-} from '$lib/store';
-import { isOwnBackend } from '$lib/shared';
-import { SUPPORTED_THEME_KEYS } from '$lib/shared/theme';
+} from '#lib/store';
+import { isOwnBackend } from '#lib/shared/index';
+import { SUPPORTED_THEME_KEYS } from '#lib/shared/theme';
 
 export type PersistedStore<T> = {
 	name: string;

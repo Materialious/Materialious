@@ -1,10 +1,10 @@
-import { getUserLocale } from '$lib/i18n';
+import { getUserLocale } from '#lib/i18n/index';
 import {
 	interfacePreserveTranslation,
 	interfaceRegionStore,
 	invidiousAuthStore,
 	invidiousInstanceStore
-} from '$lib/store';
+} from '#lib/store';
 import { get } from 'svelte/store';
 
 export function buildPath(path: string): URL {

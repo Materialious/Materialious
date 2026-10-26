@@ -1,5 +1,5 @@
-import { getPublicEnv } from '$lib/env';
-import { interfaceRegionStore } from '$lib/store';
+import { getPublicEnv } from '#lib/env';
+import { interfaceRegionStore } from '#lib/store';
 import { USER_AGENT } from 'bgutils-js/utils';
 import { get } from 'svelte/store';
 import Innertube, { UniversalCache } from 'youtubei.js';

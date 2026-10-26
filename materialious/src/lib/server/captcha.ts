@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { verifySolution } from 'altcha-lib';
 import { getSequelize } from './database';
-import { isOwnBackend } from '$lib/shared';
+import { isOwnBackend } from '#lib/shared/index';
 import { deriveKey } from 'altcha-lib/algorithms/pbkdf2';
 import z from 'zod';
 

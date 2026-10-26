@@ -1,6 +1,6 @@
-import { localDb, type ChannelSubscriptions } from '$lib/dexie';
-import { cleanNumber } from '$lib/numbers';
-import { relativeTimestamp } from '$lib/time';
+import { localDb, type ChannelSubscriptions } from '#lib/dexie';
+import { cleanNumber } from '#lib/numbers';
+import { relativeTimestamp } from '#lib/time';
 import { get } from 'svelte/store';
 import type { Feed, Subscription, Thumbnail } from '../model';
 import { getChannelYTjs } from './channel';
@@ -9,7 +9,7 @@ import {
 	engineCullYTStore,
 	engineMaxConcurrentChannelsStore,
 	rawMasterKeyStore
-} from '$lib/store';
+} from '#lib/store';
 import { getSubscriptionsBackend } from '../backend/subscriptions';
 
 let refreshPromise: Promise<void> | null = null;

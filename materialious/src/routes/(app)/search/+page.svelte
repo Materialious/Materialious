@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getSearchSuggestions } from '$lib/api';
-	import { _ } from '$lib/i18n';
-	import { goToSearch } from '$lib/search';
+	import { getSearchSuggestions } from '#lib/api/index';
+	import { _ } from '#lib/i18n/index';
+	import { goToSearch } from '#lib/search';
 	import {
 		interfaceSearchHistoryEnabled,
 		interfaceSearchSuggestionsStore,
 		searchHistoryStore
-	} from '$lib/store';
+	} from '#lib/store';
 
 	let suggestionsForSearch: string[] = $state([]);
 	let search = $state('');

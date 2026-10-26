@@ -1,9 +1,25 @@
+import adapterStatic from '@sveltejs/adapter-static';
+import adapterNode from '@sveltejs/adapter-node';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vite';
 import pkg from './package.json';
+import path from 'path';
+
+const useSsr = process.env.PUBLIC_BUILD_WITH_BACKEND === 'true';
+
+const adapter = useSsr
+	? adapterNode({ out: 'build', precompress: true })
+	: adapterStatic({ fallback: 'index.html' });
 
 export default defineConfig({
+	resolve: {
+		alias: {
+			'#lib': path.resolve('./src/lib')
+		},
+		extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.svelte']
+	},
 	plugins: [
 		SvelteKitPWA({
 			injectRegister: 'inline',
@@ -33,7 +49,7 @@ export default defineConfig({
 				short_name: 'Materialious'
 			}
 		}),
-		sveltekit()
+		sveltekit({ preprocess: vitePreprocess(), adapter })
 	],
 	ssr: {
 		noExternal: ['beercss']

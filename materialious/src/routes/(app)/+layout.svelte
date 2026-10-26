@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { resolvePath } from '#lib/paths';
 	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/state';
-	import { getFeed, notificationsMarkAsRead } from '$lib/api/index';
-	import type { Notification } from '$lib/api/model';
-	import Logo from '$lib/components/Logo.svelte';
-	import PageLoading from '$lib/components/PageLoading.svelte';
-	import Search from '$lib/components/Search.svelte';
-	import Settings from '$lib/components/settings/Settings.svelte';
-	import Thumbnail from '$lib/components/thumbnail/VideoThumbnail.svelte';
-	import Player from '$lib/components/player/Player.svelte';
-	import { getPages } from '$lib/navPages';
+	import { getFeed, notificationsMarkAsRead } from '#lib/api/index';
+	import type { Notification } from '#lib/api/model';
+	import Logo from '#lib/components/Logo.svelte';
+	import PageLoading from '#lib/components/PageLoading.svelte';
+	import Search from '#lib/components/Search.svelte';
+	import Settings from '#lib/components/settings/Settings.svelte';
+	import Thumbnail from '#lib/components/thumbnail/VideoThumbnail.svelte';
+	import Player from '#lib/components/player/Player.svelte';
+	import { getPages } from '#lib/navPages';
 	import {
 		invidiousAuthStore,
 		interfaceDefaultPage,
@@ -25,22 +26,22 @@
 		hideSearchStore,
 		keybindStore,
 		interfaceMobileBackButtonStore
-	} from '$lib/store';
+	} from '#lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { onDestroy, onMount } from 'svelte';
 	import Mousetrap from 'mousetrap';
-	import { _ } from '$lib/i18n';
-	import { isMaterialiousAccountActive, isYTBackend } from '$lib/backend';
-	import { isAndroidTv, isMobile, truncate, keyCodeMap } from '$lib/utils';
+	import { _ } from '#lib/i18n/index';
+	import { isMaterialiousAccountActive, isYTBackend } from '#lib/backend';
+	import { isAndroidTv, isMobile, truncate, keyCodeMap } from '#lib/utils';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
-	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '$lib/auth';
-	import { backendFetch } from '$lib/api/backend/request';
-	import Author from '$lib/components/Author.svelte';
-	import Toast from '$lib/components/Toast.svelte';
-	import { isOwnBackend } from '$lib/shared';
-	import { configBackendCache } from '$lib/stores/backend';
-	import WatchParty from '$lib/components/WatchParty.svelte';
+	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '#lib/auth';
+	import { backendFetch } from '#lib/api/backend/request';
+	import Author from '#lib/components/Author.svelte';
+	import Toast from '#lib/components/Toast.svelte';
+	import { isOwnBackend } from '#lib/shared/index';
+	import { configBackendCache } from '#lib/stores/backend';
+	import WatchParty from '#lib/components/WatchParty.svelte';
 
 	let { children } = $props();
 
@@ -85,14 +86,14 @@
 
 	async function login() {
 		if (isOwnBackend()?.internalAuth) {
-			goto(resolve('/login/internal', {}));
+			goto(resolve('/(app)/login/internal'));
 			return;
 		}
 
 		if (!isAndroidTv()) {
 			await goToInvidiousLogin();
 		} else {
-			goto(resolve('/login/tv', {}));
+			goto(resolve('/(app)/login/tv'));
 		}
 	}
 
@@ -228,7 +229,7 @@
 				const p = getPages();
 				const tab = p[index];
 				if (tab) {
-					goto(resolve(tab.href, {}));
+					goto(resolvePath(tab.href));
 				}
 				return false;
 			});
@@ -286,29 +287,29 @@
 		{#if !isAndroidTv()}
 			<header class="small-padding no-margin">
 				<a
-					href={resolve($interfaceDefaultPage, {})}
+					href={resolvePath($interfaceDefaultPage)}
 					tabindex="-1"
-					data-sveltekit-preload-data="off"
+					data-sveltekit-preload-data="false"
 				>
 					<Logo />
 				</a>
 			</header>
 		{/if}
 		{#if isAndroidTv()}
-			<a href={resolve('/search', {})} class:active={page.url.href.endsWith('/search')}>
+			<a href={resolve('/(app)/search')} class:active={page.url.href.endsWith('/search')}>
 				<i>search</i>
 				<div>{$_('searchPlaceholder')}</div>
 			</a>
 		{/if}
 		{#each pages as navPage (navPage)}
-			<a href={resolve(navPage.href, {})} class:active={page.url.href.endsWith(navPage.href)}
+			<a href={resolvePath(navPage.href)} class:active={page.url.href.endsWith(navPage.href)}
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
 			</a>
 		{/each}
 		{#if isAndroidTv()}
 			<div class="divider"></div>
-			<a href={resolve('/settings', {})} class:active={page.url.href.endsWith('/settings')}>
+			<a href={resolve('/(app)/settings')} class:active={page.url.href.endsWith('/settings')}>
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
@@ -336,7 +337,7 @@
 		>
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
-					<a href={resolve($interfaceDefaultPage, {})}>
+					<a href={resolvePath($interfaceDefaultPage)}>
 						<Logo />
 					</a>
 				</header>
@@ -445,9 +446,9 @@
 		{#each pages as navPage (navPage)}
 			<a
 				class="round"
-				href={resolve(navPage.href, {})}
+				href={resolvePath(navPage.href)}
 				class:active={page.url.href.endsWith(navPage.href)}
-				data-sveltekit-preload-data="off"
+				data-sveltekit-preload-data="false"
 				><i>{navPage.icon}</i>
 				<span style="font-size: .8em;">{navPage.name}</span>
 			</a>
@@ -528,7 +529,7 @@
 								<nav class="s">
 									<a
 										class="button surface-container-highest"
-										href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
+										href={resolve('/(app)/watch/[slug]', { slug: $playerState.data.video.videoId })}
 										><i>keyboard_arrow_right</i></a
 									>
 									<button
@@ -552,7 +553,7 @@
 							<div class="max"></div>
 							<a
 								class="button surface-container-highest"
-								href={resolve(`/watch/[videoId]`, { videoId: $playerState.data.video.videoId })}
+								href={resolve('/(app)/watch/[slug]', { slug: $playerState.data.video.videoId })}
 								><i>keyboard_arrow_right</i></a
 							>
 						</nav>

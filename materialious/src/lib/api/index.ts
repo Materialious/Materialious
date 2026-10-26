@@ -1,4 +1,8 @@
-import { getVideoYTjs, getVideoPageYTjs, continueVideoPlayerYTjs } from '$lib/api/youtubejs/video';
+import {
+	getVideoYTjs,
+	getVideoPageYTjs,
+	continueVideoPlayerYTjs
+} from '#lib/api/youtubejs/video';
 import { get } from 'svelte/store';
 import {
 	invidiousAuthStore,
@@ -25,7 +29,7 @@ import type {
 } from './model';
 import { commentsSetDefaults, searchSetDefaults, useEngineFallback } from './misc';
 import { getSearchYTjs } from './youtubejs/search';
-import { isMaterialiousAccountActive, isUnrestrictedPlatform, isYTBackend } from '$lib/backend';
+import { isMaterialiousAccountActive, isUnrestrictedPlatform, isYTBackend } from '#lib/backend';
 import { getSearchSuggestionsYTjs } from './youtubejs/searchSuggestions';
 import { getResolveUrlYTjs } from './youtubejs/misc';
 import { getCommentsYTjs } from './youtubejs/comments';
@@ -51,7 +55,7 @@ import {
 	isCompanionAvailable,
 	startCompanionDownload
 } from './invidious/download';
-import { isOwnBackend } from '$lib/shared';
+import { isOwnBackend } from '#lib/shared/index';
 import {
 	amSubscribedBackend,
 	deleteUnsubscribeBackend,
@@ -93,9 +97,9 @@ import {
 	saveWatchHistoryBackend,
 	updateWatchHistoryBackend
 } from './backend/history';
-import { localDb } from '$lib/dexie';
-import { getBestThumbnail } from '$lib/images';
-import type { ThumbnailVideo } from '$lib/thumbnail';
+import { localDb } from '#lib/dexie';
+import { getBestThumbnail } from '#lib/images';
+import type { ThumbnailVideo } from '#lib/thumbnail';
 import { backendFetch } from './backend/request';
 
 export async function getPopular(fetchOptions?: RequestInit): Promise<Video[]> {

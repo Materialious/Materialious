@@ -1,4 +1,4 @@
-import { rawMasterKeyStore } from '$lib/store';
+import { rawMasterKeyStore } from '#lib/store';
 import sodium from 'libsodium-wrappers-sumo';
 import { get } from 'svelte/store';
 

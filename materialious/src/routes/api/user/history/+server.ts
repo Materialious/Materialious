@@ -1,8 +1,8 @@
-import { getSequelize } from '$lib/server/database';
-import { error, json } from '@sveltejs/kit';
+import { getSequelize } from '#lib/server/database';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { Op } from 'sequelize';
-import { env } from '$env/dynamic/private';
+import { HISTORY_CULLING } from '$app/env/private';
 
 const zUserHistory = z.object({
 	id: z.string().max(255),
@@ -75,7 +75,7 @@ export async function POST({ locals, request }) {
 
 	// Cull any history older than HISTORY_CULLING days.
 	// -1 disables culling, defaults to 365 days.
-	const cullingDays = env.HISTORY_CULLING ? Number(env.HISTORY_CULLING) : 365;
+	const cullingDays = HISTORY_CULLING ? Number(HISTORY_CULLING) : 365;
 	if (cullingDays >= 0) {
 		const cullingDate = new Date();
 		cullingDate.setDate(cullingDate.getDate() - cullingDays);
@@ -121,7 +121,7 @@ export async function GET({ locals, url }) {
 		order: [['watched', 'DESC']]
 	});
 
-	return json(history);
+	return Response.json(history);
 }
 
 export async function DELETE({ locals }) {

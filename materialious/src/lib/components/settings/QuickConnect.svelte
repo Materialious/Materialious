@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { onDestroy } from 'svelte';
 	import {
 		cancelQuickConnectSession,
 		createQuickConnectSession,
 		getQuickConnectStatus,
 		sendQuickConnectCredentials
-	} from '$lib/api/backend/quickconnect';
-	import { addToast } from '$lib/components/Toast.svelte';
+	} from '#lib/api/backend/quickconnect';
+	import { addToast } from '#lib/components/Toast.svelte';
 
 	let phase = $state<'idle' | 'showing' | 'awaiting-send' | 'sent' | 'error'>('idle');
 	let errorMessage = $state('');

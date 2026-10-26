@@ -33,7 +33,7 @@ export function clearCaches() {
 
 export function authProtected() {
 	if (!get(invidiousAuthStore) && !isYTBackend()) {
-		goto(resolve('/', {}), { replaceState: true });
+		goto(resolve('/(app)'), { replace: true });
 	}
 }
 
@@ -121,7 +121,7 @@ export async function goToInvidiousLogin() {
 		path.search = searchParams.toString();
 		await Browser.open({ url: path.toString() });
 	} else {
-		searchParams.set('callback_url', `${location.origin}${resolve('/invidious/auth', {})}`);
+		searchParams.set('callback_url', `${location.origin}${resolve('/invidious/auth')}`);
 		path.search = searchParams.toString();
 		document.location.href = path.toString();
 	}
@@ -131,7 +131,7 @@ export async function invidiousLogout() {
 	invidiousAuthStore.set(null);
 	await removeAuthFromBackend();
 
-	goto(resolve('/', {}));
+	goto(resolve('/(app)'));
 }
 
 export async function materialiousLogout() {
@@ -148,7 +148,7 @@ export async function materialiousLogout() {
 		clearCaches();
 	}
 
-	goto(resolve('/', {}));
+	goto(resolve('/(app)'));
 }
 
 export async function setMaterialiousBackend(

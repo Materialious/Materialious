@@ -1,9 +1,9 @@
 import { type Component } from 'svelte';
 import { Capacitor } from '@capacitor/core';
-import { isMaterialiousAccountActive, isUnrestrictedPlatform } from '$lib/backend';
-import { isAndroidTv } from '$lib/utils';
-import { isAdminUsername, isOwnBackend } from '$lib/shared';
-import { backendFetch } from '$lib/api/backend/request';
+import { isMaterialiousAccountActive, isUnrestrictedPlatform } from '#lib/backend';
+import { isAndroidTv } from '#lib/utils';
+import { isAdminUsername, isOwnBackend } from '#lib/shared/index';
+import { backendFetch } from '#lib/api/backend/request';
 import Interface from './Interface.svelte';
 import Theme from './Theme.svelte';
 import Player from './Player.svelte';

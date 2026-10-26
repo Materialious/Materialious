@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { deleteUnsubscribe } from '$lib/api';
+	import { deleteUnsubscribe } from '#lib/api/index';
 	import Fuse from 'fuse.js';
-	import { _ } from '$lib/i18n';
-	import NoResults from '$lib/components/NoResults.svelte';
-	import AuthorAvatar from '$lib/components/AuthorAvatar.svelte';
+	import { _ } from '#lib/i18n/index';
+	import NoResults from '#lib/components/NoResults.svelte';
+	import AuthorAvatar from '#lib/components/AuthorAvatar.svelte';
 
 	let { data } = $props();
 
@@ -52,7 +52,7 @@
 				<nav>
 					<AuthorAvatar author={sub.author} authorId={sub.authorId} />
 
-					<a href={resolve(`/channel/[authorId]`, { authorId: sub.authorId })}
+					<a href={resolve('/(app)/channel/[slug]', { slug: sub.authorId })}
 						><h6>
 							{sub.author}
 						</h6></a

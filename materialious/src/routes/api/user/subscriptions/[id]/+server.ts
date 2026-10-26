@@ -1,5 +1,5 @@
-import { getUser } from '$lib/server/user';
-import { error, json } from '@sveltejs/kit';
+import { getUser } from '#lib/server/user';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
 
 const zSubscriptionCreate = z.object({
@@ -41,7 +41,7 @@ export async function DELETE({ locals, params }) {
 export async function GET({ locals, params }) {
 	const user = await getUser(locals.userId);
 
-	return json({
+	return Response.json({
 		amSubscribed: await user.amSubscribed(params.id)
 	});
 }

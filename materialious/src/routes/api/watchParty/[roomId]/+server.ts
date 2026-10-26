@@ -1,13 +1,13 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { WatchPartyEvent } from '$lib/watchParty';
+import type { WatchPartyEvent } from '#lib/watchParty';
 import {
 	broadcastWatchParty,
 	createWatchPartyClientId,
 	joinWatchParty,
 	leaveWatchParty,
 	type WatchPartyClient
-} from '$lib/server/watchParty';
+} from '#lib/server/watchParty';
 
 const SSE_HEADERS = {
 	'Content-Type': 'text/event-stream',

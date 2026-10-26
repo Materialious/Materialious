@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import { activeCaptionTrack } from '$lib/store';
+	import { activeCaptionTrack } from '#lib/store';
 	import { get } from 'svelte/store';
 	import { addToast } from '../Toast.svelte';
 	import { parseResponse, CaptionsRenderer } from 'media-captions';
@@ -53,10 +53,14 @@
 </script>
 
 <script lang="ts">
-	import type { VideoPlay } from '$lib/api/model';
+	import type { VideoPlay } from '#lib/api/model';
 	import { onDestroy, onMount } from 'svelte';
-	import { getCaptionUrl } from '$lib/player/captions';
-	import { subtitleSettings, playerDefaultSubtitleLanguage, playerCCByDefault } from '$lib/store';
+	import { getCaptionUrl } from '#lib/player/captions';
+	import {
+		subtitleSettings,
+		playerDefaultSubtitleLanguage,
+		playerCCByDefault
+	} from '#lib/store';
 	import 'media-captions/styles/captions.css';
 
 	let {

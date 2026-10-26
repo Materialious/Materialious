@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestThumbnail, proxyGoogleImage } from '$lib/images';
-	import { cleanNumber } from '$lib/numbers';
-	import { _ } from '$lib/i18n';
-	import type { Channel } from '$lib/api/model';
-	import { isAndroidTv, truncate } from '$lib/utils';
+	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
+	import { cleanNumber } from '#lib/numbers';
+	import { _ } from '#lib/i18n/index';
+	import type { Channel } from '#lib/api/model';
+	import { isAndroidTv, truncate } from '#lib/utils';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 
@@ -18,7 +18,7 @@
 </script>
 
 <a
-	href={resolve(`/channel/[authorId]`, { authorId: channel.authorId })}
+	href={resolve('/(app)/channel/[slug]', { slug: channel.authorId })}
 	class="wave"
 	style="min-width: 100%;min-height: 100%;"
 >

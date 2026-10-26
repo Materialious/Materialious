@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { navigating } from '$app/state';
-	import PageLoading from '$lib/components/PageLoading.svelte';
+	import PageLoading from '#lib/components/PageLoading.svelte';
 
 	let { children } = $props();
 </script>

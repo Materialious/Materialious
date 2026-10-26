@@ -1,4 +1,4 @@
-import { getHashtag } from '$lib/api';
+import { getHashtag } from '#lib/api/index';
 
 export async function load({ params }) {
 	return {

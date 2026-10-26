@@ -97,9 +97,9 @@
 			"miniPlayer": "迷你播放器",
 			"proxyVideos": "代理视频",
 			"backgroundPlay": "在后台播放音频",
-			"dash": "MPEG-DASH 支持",
+			"dash": "Dash",
 			"silenceSkipper": "无声片段跳过（实验性）",
-			"youtubeJsAlways": "始终使用本地视频处理",
+			"youtubeJsAlways": "始终使用",
 			"youtubeJsFallback": "本地视频处理回退"
 		},
 		"instanceUrl": "实例 URL",

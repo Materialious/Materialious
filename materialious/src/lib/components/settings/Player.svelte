@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { titleCase } from '$lib/letterCasing';
+	import { titleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
 	import ISO6391 from 'iso-639-1';
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import {
 		backendInUseStore,
 		playerAlwaysLoopStore,
@@ -22,8 +22,8 @@
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
 	} from '../../store';
-	import { playbackRates } from '$lib/player/index';
-	import { isUnrestrictedPlatform } from '$lib/backend';
+	import { playbackRates } from '#lib/player/index';
+	import { isUnrestrictedPlatform } from '#lib/backend';
 	import ComboBox from '../ComboBox.svelte';
 
 	let localVideoFallback: 'enabled' | 'disabled' | 'always' = $state('enabled');

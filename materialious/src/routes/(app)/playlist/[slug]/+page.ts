@@ -1,4 +1,4 @@
-import { loadEntirePlaylist } from '$lib/playlist';
+import { loadEntirePlaylist } from '#lib/playlist';
 
 export function load({ params }) {
 	return {

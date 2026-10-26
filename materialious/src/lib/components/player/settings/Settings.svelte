@@ -16,11 +16,11 @@
 </script>
 
 <script lang="ts">
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { SvelteSet } from 'svelte/reactivity';
 	import ISO6391 from 'iso-639-1';
-	import { playerAlwaysLoopStore } from '$lib/store';
-	import { playbackRates } from '$lib/player/index';
+	import { playerAlwaysLoopStore } from '#lib/store';
+	import { playbackRates } from '#lib/player/index';
 
 	let { player, playerElement }: { player: shaka.Player; playerElement: HTMLMediaElement } =
 		$props();

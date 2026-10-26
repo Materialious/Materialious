@@ -4,10 +4,10 @@ import { z } from 'zod';
 
 import { persistedStores, ensureBackendPersistedStores, type PersistedStore } from './settings';
 
-import { getPublicEnv } from '$lib/env';
-import { isMaterialiousAccountActive } from '$lib/backend';
-import { addOrUpdateKeyValue, getKeyValue } from '$lib/api/backend/keyvalue';
-import { rawMasterKeyStore } from '$lib/store';
+import { getPublicEnv } from '#lib/env';
+import { isMaterialiousAccountActive } from '#lib/backend';
+import { addOrUpdateKeyValue, getKeyValue } from '#lib/api/backend/keyvalue';
+import { rawMasterKeyStore } from '#lib/store';
 
 const dontAutoSync = ['authToken'];
 
@@ -93,10 +93,7 @@ function setStores(
 	}
 }
 
-export async function loadSettingsFromFile(
-	file: File,
-	storeNames?: string[]
-) {
+export async function loadSettingsFromFile(file: File, storeNames?: string[]) {
 	const fileContents = await file.text();
 
 	let fileJson: Record<any, any> | undefined;

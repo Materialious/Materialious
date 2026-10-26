@@ -1,5 +1,5 @@
 import { get } from 'svelte/store';
-import type { PlaylistPageVideo, VideoPlay } from '$lib/api/model';
+import type { PlaylistPageVideo, VideoPlay } from '#lib/api/model';
 import {
 	playerAutoplayNextByDefaultStore,
 	activeCaptionTrack,
@@ -9,15 +9,15 @@ import {
 	playerPlaylistHistory,
 	playerState,
 	playlistSettingsStore
-} from '$lib/store';
+} from '#lib/store';
 import { goto } from '$app/navigation';
-import { resolve } from '$app/paths';
-import { loadEntirePlaylist } from '$lib/playlist';
-import { isAndroidTv, unsafeRandomItem } from '$lib/utils';
-import { isItemFiltered } from '$lib/filtering';
+import { resolveWatchPath } from '#lib/paths';
+import { loadEntirePlaylist } from '#lib/playlist';
+import { isAndroidTv, unsafeRandomItem } from '#lib/utils';
+import { isItemFiltered } from '#lib/filtering/index';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';
-import { selectTextTrack } from '$lib/components/player/ClosedCaptions.svelte';
+import { selectTextTrack } from '#lib/components/player/ClosedCaptions.svelte';
 
 export const playbackRates = [
 	0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4
@@ -29,12 +29,7 @@ export function goToPreviousVideo(playlistId: string | null) {
 	if (previousVideos.length > 1) {
 		playerState.set(undefined);
 
-		goto(
-			resolve('/watch/[videoId]?playlist=[playlistId]', {
-				videoId: previousVideos[1],
-				playlistId: playlistId ?? ''
-			})
-		);
+		goto(resolveWatchPath(previousVideos[1], playlistId ?? undefined));
 		delete previousVideos[1];
 	}
 }
@@ -44,14 +39,9 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 		if (get(playerAutoplayNextByDefaultStore)) {
 			const nextVideo = video.recommendedVideos.find((v) => !isItemFiltered(v));
 			if (nextVideo) {
-				goto(
-					resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]`, {
-						videoId: nextVideo.videoId
-					}),
-					{
-						replaceState: isAndroidTv()
-					}
-				);
+				goto(resolveWatchPath(nextVideo.videoId), {
+					replace: isAndroidTv()
+				});
 			}
 		}
 		return;
@@ -83,14 +73,9 @@ export async function goToNextVideo(video: VideoPlay, playlistId: string | null)
 	}
 
 	if (typeof goToVideo !== 'undefined') {
-		goto(
-			resolve(`/${isAndroidTv() ? 'tv' : 'watch'}/[videoId]?playlist=${playlistId}`, {
-				videoId: goToVideo.videoId
-			}),
-			{
-				replaceState: isAndroidTv()
-			}
-		);
+		goto(resolveWatchPath(goToVideo.videoId, playlistId), {
+			replace: isAndroidTv()
+		});
 	}
 }
 

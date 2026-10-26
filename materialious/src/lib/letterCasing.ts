@@ -2,12 +2,7 @@ import { get } from 'svelte/store';
 import { interfaceForceCase } from './store';
 
 export type TitleCase =
-	| 'uppercase'
-	| 'lowercase'
-	| 'sentence case'
-	| 'title case'
-	| 'original'
-	| null;
+	'uppercase' | 'lowercase' | 'sentence case' | 'title case' | 'original' | null;
 export const titleCases: TitleCase[] = [
 	'original',
 	'lowercase',

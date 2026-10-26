@@ -1,10 +1,9 @@
-import { getUser } from '$lib/server/user';
-import { json } from '@sveltejs/kit';
+import { getUser } from '#lib/server/user';
 
 export async function GET({ locals }) {
 	const user = await getUser(locals.userId);
 
-	return json({
+	return Response.json({
 		subscriptions: await user.subscriptions()
 	});
 }

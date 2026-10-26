@@ -1,6 +1,6 @@
 import he from 'he';
 import { Capacitor } from '@capacitor/core';
-export { isAndroidTv } from '$lib/platform';
+export { isAndroidTv } from '#lib/platform';
 
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;

@@ -1,6 +1,6 @@
-import { persistedStoreKeys } from '$lib/externalSettings/settings';
-import { getUser } from '$lib/server/user';
-import { error, json } from '@sveltejs/kit';
+import { persistedStoreKeys } from '#lib/externalSettings/settings';
+import { getUser } from '#lib/server/user';
+import { error } from '@sveltejs/kit';
 import z from 'zod';
 
 function keyAllowed(key: string) {
@@ -12,7 +12,7 @@ export async function GET({ locals, params }) {
 
 	const user = await getUser(locals.userId);
 
-	return json(await user.getKeyValue(params.key));
+	return Response.json(await user.getKeyValue(params.key));
 }
 
 export async function DELETE({ locals, params }) {

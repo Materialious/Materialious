@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { shareURL } from '$lib/download';
-	import { _ } from '$lib/i18n';
-	import { invidiousInstanceStore } from '$lib/store';
+	import { shareURL } from '#lib/download';
+	import { _ } from '#lib/i18n/index';
+	import { invidiousInstanceStore } from '#lib/store';
 	import { Capacitor } from '@capacitor/core';
-	import { sentenceCase } from '$lib/letterCasing';
+	import { sentenceCase } from '#lib/letterCasing';
 
 	type ShareLink = {
 		type: 'invidious' | 'youtube' | 'materialious' | 'invidious redirect';

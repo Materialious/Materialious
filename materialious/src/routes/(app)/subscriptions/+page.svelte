@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getFeed } from '$lib/api/index';
-	import type { PlaylistPageVideo, Video, VideoBase } from '$lib/api/model';
-	import { feedCacheStore, feedLoadingStore } from '$lib/store';
+	import { getFeed } from '#lib/api/index';
+	import type { PlaylistPageVideo, Video, VideoBase } from '#lib/api/model';
+	import { feedCacheStore, feedLoadingStore } from '#lib/store';
 	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
-	import ItemsList from '$lib/components/layout/ItemsList.svelte';
+	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import { resolve } from '$app/paths';
-	import { _ } from '$lib/i18n';
-	import PageLoading from '$lib/components/PageLoading.svelte';
+	import { _ } from '#lib/i18n/index';
+	import PageLoading from '#lib/components/PageLoading.svelte';
 
 	let currentPage = 1;
 	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $derived($feedCacheStore.subscription);
@@ -26,7 +26,7 @@
 </script>
 
 <nav class="right-align">
-	<a class="button surface-container-highest" href={resolve('/subscriptions/manage', {})}>
+	<a class="button surface-container-highest" href={resolve('/(app)/subscriptions/manage')}>
 		{$_('subscriptions.manageSubscriptions')}
 	</a>
 </nav>

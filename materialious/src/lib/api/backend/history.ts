@@ -1,8 +1,8 @@
 import sodium from 'libsodium-wrappers-sumo';
 import { decryptWithMasterKey, encryptWithMasterKey, getRawKey, getSecureHash } from './encryption';
 import type { VideoWatchHistory } from '../model';
-import { getBestThumbnail } from '$lib/images';
-import type { ThumbnailVideo } from '$lib/thumbnail';
+import { getBestThumbnail } from '#lib/images';
+import type { ThumbnailVideo } from '#lib/thumbnail';
 import { backendFetch } from './request';
 
 export async function updateWatchHistoryBackend(videoId: string, progress: number) {

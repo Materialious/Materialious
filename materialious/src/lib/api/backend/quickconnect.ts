@@ -1,6 +1,6 @@
 import sodium from 'libsodium-wrappers-sumo';
 import { get } from 'svelte/store';
-import { authTokenStore, rawMasterKeyStore } from '$lib/store';
+import { authTokenStore, rawMasterKeyStore } from '#lib/store';
 import { backendFetch } from './request';
 import type { Solution, Challenge } from 'altcha-lib/types';
 

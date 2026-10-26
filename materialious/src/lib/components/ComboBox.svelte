@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import { mergeAttrs } from 'melt';
 	import { Combobox } from 'melt/builders';
-	import { isAndroidTv } from '$lib/utils';
+	import { isAndroidTv } from '#lib/utils';
 
 	type ComboOption = { label: string; value: any };
 

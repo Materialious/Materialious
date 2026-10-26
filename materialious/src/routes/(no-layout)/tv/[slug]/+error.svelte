@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ErrorMsg from '$lib/components/ErrorMsg.svelte';
+	import ErrorMsg from '#lib/components/ErrorMsg.svelte';
 </script>
 
 <ErrorMsg />

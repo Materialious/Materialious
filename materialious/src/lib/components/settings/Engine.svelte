@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { _ } from '$lib/i18n';
+	import { _ } from '#lib/i18n/index';
 	import {
 		engineCooldownYTStore,
 		engineCullYTStore,
 		engineFallbacksStore,
 		engineMaxConcurrentChannelsStore,
 		backendInUseStore
-	} from '$lib/store';
-	import { useEngineFallback, type EngineFallback } from '$lib/api/misc';
+	} from '#lib/store';
+	import { useEngineFallback, type EngineFallback } from '#lib/api/misc';
 	import { get } from 'svelte/store';
 
 	const engineFallbacks: EngineFallback[] = [

@@ -1,7 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
-import type { IsOwnBackend } from '$lib/shared';
+import type { IsOwnBackend } from '#lib/shared/index';
 
 export const rawMasterKeyStore: Writable<string | undefined> = persist(
 	writable(),

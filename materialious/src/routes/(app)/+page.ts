@@ -1,14 +1,14 @@
 import { resolve } from '$app/paths';
-import { getPopular } from '$lib/api/index';
-import { HTTPError } from '$lib/api/invidious/request';
-import { isYTBackend } from '$lib/backend';
-import { feedCacheStore, invidiousInstanceStore } from '$lib/store';
+import { getPopular } from '#lib/api/index';
+import { HTTPError } from '#lib/api/invidious/request';
+import { isYTBackend } from '#lib/backend';
+import { feedCacheStore, invidiousInstanceStore } from '#lib/store';
 import { error, redirect } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
 export async function load() {
 	if (isYTBackend()) {
-		throw redirect(302, resolve('/subscriptions', {}));
+		throw redirect(302, resolve('/(app)/subscriptions'));
 	}
 
 	if (!get(invidiousInstanceStore)) {

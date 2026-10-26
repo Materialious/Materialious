@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { cleanNumber, numberWithCommas } from '$lib/numbers';
-	import { _ } from '$lib/i18n';
-	import type { VideoPlay } from '$lib/api/model';
+	import { cleanNumber, numberWithCommas } from '#lib/numbers';
+	import { _ } from '#lib/i18n/index';
+	import type { VideoPlay } from '#lib/api/model';
 	import { onMount } from 'svelte';
-	import { expandSummery } from '$lib/utils';
-	import { interfaceAutoExpandDesc } from '$lib/store';
-	import { humanizeTimestamp } from '$lib/time';
+	import { expandSummery } from '#lib/utils';
+	import { interfaceAutoExpandDesc } from '#lib/store';
+	import { humanizeTimestamp } from '#lib/time';
 
 	let { video, description }: { video: VideoPlay; description: string } = $props();
 
@@ -49,7 +49,9 @@
 				<nav class="scroll">
 					{#each video.keywords as keyword (keyword)}
 						<a
-							href={resolve(`/search/[search]`, { search: encodeURIComponent(keyword) })}
+							href={resolve('/(app)/search/[searchQuery]', {
+								searchQuery: encodeURIComponent(keyword)
+							})}
 							class="chip">{keyword}</a
 						>
 					{/each}

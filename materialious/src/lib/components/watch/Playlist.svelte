@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import type { PlaylistPage, PlaylistPageVideo, VideoPlay } from '$lib/api/model';
-	import { _ } from '$lib/i18n';
-	import { cleanNumber } from '$lib/numbers';
-	import { goToNextVideo, goToPreviousVideo } from '$lib/player';
-	import { playlistSettingsStore } from '$lib/store';
+	import type { PlaylistPage, PlaylistPageVideo, VideoPlay } from '#lib/api/model';
+	import { _ } from '#lib/i18n/index';
+	import { cleanNumber } from '#lib/numbers';
+	import { goToNextVideo, goToPreviousVideo } from '#lib/player/index';
+	import { playlistSettingsStore } from '#lib/store';
 	import VideoThumbnail from '../thumbnail/VideoThumbnail.svelte';
 
 	let {
@@ -38,8 +38,8 @@
 		<p>
 			{#if playlist.info.authorId}
 				<a
-					href={resolve(`/channel/[authorId]`, {
-						authorId: playlist.info.authorId
+					href={resolve('/(app)/channel/[slug]', {
+						slug: playlist.info.authorId
 					})}>{playlist.info.author}</a
 				>
 			{:else}

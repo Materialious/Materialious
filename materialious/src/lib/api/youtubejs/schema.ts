@@ -1,5 +1,5 @@
-import { cleanNumber, extractNumber } from '$lib/numbers';
-import { convertToSeconds } from '$lib/time';
+import { cleanNumber, extractNumber } from '#lib/numbers';
+import { convertToSeconds } from '#lib/time';
 import type { Channel, Playlist, Thumbnail, Video } from '../model';
 import { Helpers, YTNodes } from 'youtubei.js';
 
@@ -48,8 +48,8 @@ export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Pla
 		}
 		return {
 			type: 'playlist',
-			title: item.metadata?.title.text ?? '',
-			playlistId: item.content_id,
+			title: item.metadata?.title?.text ?? '',
+			playlistId: item.content_id ?? '',
 			playlistThumbnail: item.content_image?.is(YTNodes.CollectionThumbnailView)
 				? item.content_image.primary_thumbnail?.is(YTNodes.ThumbnailView)
 					? item.content_image.primary_thumbnail.image[0].url
@@ -120,8 +120,8 @@ export function invidiousItemSchema(item: Helpers.YTNode): Video | Channel | Pla
 
 		return {
 			type: 'video',
-			title: item.metadata?.title.toString() ?? '',
-			videoId: item.content_id,
+			title: item.metadata?.title?.toString() ?? '',
+			videoId: item.content_id ?? '',
 			viewCountText: viewCountText,
 			videoThumbnails: (item.content_image?.is(YTNodes.ThumbnailView)
 				? item.content_image.image

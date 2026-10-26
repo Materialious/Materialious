@@ -1,6 +1,15 @@
-import { isOwnBackend } from '$lib/shared';
-import { env } from '$env/dynamic/public';
-import { env as privateEnv } from '$env/dynamic/private';
+import { isOwnBackend } from '#lib/shared/index';
+
+import {
+	PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
+	PUBLIC_DEFAULT_DEARROW_INSTANCE,
+	PUBLIC_DEFAULT_INVIDIOUS_INSTANCE,
+	PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+	PUBLIC_DEFAULT_API_EXTENDED_INSTANCE,
+	PUBLIC_DEFAULT_COMPANION_INSTANCE
+} from '$app/env/public';
+
+import { WHITELIST_BASE_DOMAIN, PROXY_TRUST_CA } from '$app/env/private';
 import { Agent, fetch as undiciFetch } from 'undici';
 import fs from 'fs';
 import tls from 'tls';
@@ -40,19 +49,19 @@ const allowedBaseDomains: string[] = [
 	'googleapis.com'
 ];
 
-if (privateEnv.WHITELIST_BASE_DOMAIN) {
-	for (const baseDomain of privateEnv.WHITELIST_BASE_DOMAIN.split(',')) {
+if (WHITELIST_BASE_DOMAIN) {
+	for (const baseDomain of WHITELIST_BASE_DOMAIN.split(',')) {
 		if (baseDomain) allowedBaseDomains.push(baseDomain);
 	}
 }
 
 const dynamicAllowDomainsEnvVars = [
-	env.PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
-	env.PUBLIC_DEFAULT_DEARROW_INSTANCE,
-	env.PUBLIC_DEFAULT_INVIDIOUS_INSTANCE,
-	env.PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE,
-	env.PUBLIC_DEFAULT_API_EXTENDED_INSTANCE,
-	env.PUBLIC_DEFAULT_COMPANION_INSTANCE
+	PUBLIC_DEFAULT_DEARROW_THUMBNAIL_INSTANCE,
+	PUBLIC_DEFAULT_DEARROW_INSTANCE,
+	PUBLIC_DEFAULT_INVIDIOUS_INSTANCE,
+	PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE,
+	PUBLIC_DEFAULT_API_EXTENDED_INSTANCE,
+	PUBLIC_DEFAULT_COMPANION_INSTANCE
 ];
 
 const dynamicAllowDomains: string[] = [];
@@ -73,7 +82,7 @@ for (const dynamicDomain of dynamicAllowDomainsEnvVars) {
 // dispatcher and fetch come from the same copy.
 let dispatcher: Agent | undefined;
 
-const certPath = privateEnv.PROXY_TRUST_CA;
+const certPath = PROXY_TRUST_CA;
 if (certPath && fs.existsSync(certPath)) {
 	dispatcher = new Agent({
 		connect: {

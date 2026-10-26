@@ -27,11 +27,11 @@ export function goToSearch(searchValue: string) {
 
 	const videoIdFromUrl = extractVideoId(searchTrimmed);
 	if (videoIdFromUrl && isVideoID(videoIdFromUrl)) {
-		goto(resolve('/watch/[videoId]', { videoId: videoIdFromUrl }));
+		goto(resolve('/(app)/watch/[slug]', { slug: videoIdFromUrl }));
 		return;
 	}
 
-	goto(resolve(`/search/[searchQuery]`, { searchQuery: encodeURIComponent(searchTrimmed) }));
+	goto(resolve('/(app)/search/[searchQuery]', { searchQuery: encodeURIComponent(searchTrimmed) }));
 
 	if (get(interfaceSearchHistoryEnabled)) {
 		const pastHistory = get(searchHistoryStore);

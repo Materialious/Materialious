@@ -1,11 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 import type { DownloadFormatSelection, SabrFormat } from '@materialious/shared/download';
 import { backendFetch } from '../backend/request';
-import { addToast } from '$lib/components/Toast.svelte';
+import { addToast } from '#lib/components/Toast.svelte';
 import { FileSharer } from '@capgo/capacitor-file-sharer';
 import { get } from 'svelte/store';
-import { _ } from '$lib/i18n';
-import { blobToBase64 } from '$lib/download';
+import { _ } from '#lib/i18n/index';
+import { blobToBase64 } from '#lib/download';
 
 export type DownloadSelection = DownloadFormatSelection;
 
@@ -157,10 +157,10 @@ export async function startWebDownload(
 			try {
 				await FileSharer.save({
 					filename: filename,
-					base64Data: await blobToBase64(blob) as string,
+					base64Data: (await blobToBase64(blob)) as string,
 					android: {
-						saveDirectory: 'downloads',
-					},
+						saveDirectory: 'downloads'
+					}
 				});
 
 				addToast({

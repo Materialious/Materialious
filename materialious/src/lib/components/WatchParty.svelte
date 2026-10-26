@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { goto, pushState } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { _ } from '$lib/i18n';
-	import { playerState } from '$lib/store';
-	import { getMaterialiousBackendUrl } from '$lib/backend';
-	import { shareURL } from '$lib/download';
+	import { _ } from '#lib/i18n/index';
+	import { playerState } from '#lib/store';
+	import { getMaterialiousBackendUrl } from '#lib/backend';
+	import { shareURL } from '#lib/download';
 	import sodium from 'libsodium-wrappers-sumo';
 	import { onDestroy, onMount } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
-	import { watchPartyEventSchema, type WatchPartyEvent } from '$lib/watchParty';
+	import { watchPartyEventSchema, type WatchPartyEvent } from '#lib/watchParty';
 
 	let room: { id: string; source: EventSource; clientId?: string } | undefined = $state();
 	let creating = $state(false);
@@ -42,7 +42,7 @@
 	function watchPartyUrl(videoId: string): string {
 		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
 		if (room) currentSearchParams.set('room', room.id);
-		return `${resolve('/watch/[videoId]', { videoId })}?${currentSearchParams.toString()}`;
+		return `${resolve('/(app)/watch/[slug]', { slug: videoId })}?${currentSearchParams.toString()}`;
 	}
 
 	function connect(roomId: string, announceCurrent: boolean) {
@@ -199,9 +199,9 @@
 			connect(roomId, true);
 
 			const currentSearchParams = new SvelteURLSearchParams(window.location.search);
-			currentSearchParams.set('room', roomId);
 
-			pushState(`?${currentSearchParams.toString()}`, { replaceState: false });
+			currentSearchParams.set('room', roomId);
+			goto(`?${currentSearchParams.toString()}`, { shallow: true, state: { replaceState: false } });
 		} finally {
 			creating = false;
 		}
@@ -232,10 +232,9 @@
 		connect(roomId, false);
 
 		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
+
 		currentSearchParams.set('room', roomId);
-
-		pushState(`?${currentSearchParams.toString()}`, { replaceState: false });
-
+		goto(`?${currentSearchParams.toString()}`, { shallow: true, state: { replaceState: false } });
 		roomCode = '';
 	}
 
@@ -258,9 +257,9 @@
 		suppressUntil = 0;
 
 		const currentSearchParams = new SvelteURLSearchParams(window.location.search);
-		currentSearchParams.delete('room');
 
-		pushState(`?${currentSearchParams.toString()}`, { replaceState: false });
+		currentSearchParams.delete('room');
+		goto(`?${currentSearchParams.toString()}`, { shallow: true, state: { replaceState: false } });
 	}
 
 	let attachedPlayerElement: HTMLMediaElement | undefined;

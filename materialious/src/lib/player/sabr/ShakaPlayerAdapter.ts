@@ -1,10 +1,10 @@
 import shaka from 'shaka-player/dist/shaka-player.ui';
 
 import {
-	FormatKeyUtils,
+	createSegmentCacheKeyFromMetadata,
+	getUniqueFormatId,
 	type CacheManager,
-	type RequestMetadataManager,
-	isGoogleVideoURL
+	type RequestMetadataManager
 } from 'googlevideo/utils';
 
 import type { SabrFormat } from 'googlevideo/shared-types';
@@ -33,10 +33,33 @@ interface ShakaResponseArgs {
 	arrayBuffer?: Uint8Array | ArrayBuffer;
 }
 
+function isGoogleVideoURL(url: string): boolean {
+	if (url.startsWith('sabr://')) {
+		return true;
+	}
+
+	const [urlPart, queryPart = ''] = url.split('?');
+
+	if (urlPart.endsWith('/videoplayback')) {
+		const params = new URLSearchParams(queryPart);
+		return (
+			params.get('source') === 'youtube' ||
+			params.has('sabr') ||
+			params.has('lsig') ||
+			params.has('expire')
+		);
+	} else if (urlPart.includes('/videoplayback/')) {
+		const pathParts = urlPart.split('/');
+		return ['videoplayback', 'sabr', 'lsig', 'expire'].some((part) => pathParts.includes(part));
+	}
+
+	return false;
+}
+
 export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 	protected player: shaka.Player | null = null;
 	private requestMetadataManager?: RequestMetadataManager;
-	private cacheManager?: CacheManager;
+	private cacheManager?: CacheManager | null;
 	private abortController?: AbortController;
 
 	private requestFilter?: (
@@ -53,7 +76,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 	public initialize(
 		player: shaka.Player,
 		requestMetadataManager: RequestMetadataManager,
-		cacheManager: CacheManager
+		cacheManager: CacheManager | null
 	): void {
 		this.player = player;
 		this.requestMetadataManager = requestMetadataManager;
@@ -146,7 +169,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			return null;
 		}
 
-		const segmentKey = FormatKeyUtils.createSegmentCacheKeyFromMetadata(requestMetadata);
+		const segmentKey = createSegmentCacheKeyFromMetadata(requestMetadata);
 
 		let arrayBuffer = (
 			requestMetadata.isInit
@@ -189,7 +212,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 	): Promise<shaka.extern.Response> {
 		let lastTime = Date.now();
 
-		const sabrUmpReader = new SabrUmpProcessor(requestMetadata, this.cacheManager);
+		const sabrUmpReader = new SabrUmpProcessor(requestMetadata, this.cacheManager ?? undefined);
 
 		const checkResultIntegrity = (result: UmpProcessingResult) => {
 			if (
@@ -209,115 +232,23 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			);
 		};
 
-		// Fetch returning a ReadableStream response body is not currently
-		// supported by all browsers.
-		// Browser compatibility:
-		// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
-		// If it is not supported, returning the whole segment when
-		// it's ready (as xhr)
-		if (!response.body) {
-			const arrayBuffer = await response.arrayBuffer();
-			const currentTime = Date.now();
-
-			progressUpdated(currentTime - lastTime, arrayBuffer.byteLength, 0);
-
-			const result = await sabrUmpReader.processChunk(new Uint8Array(arrayBuffer));
-
-			if (result) {
-				checkResultIntegrity(result);
-				return this.createShakaResponse({
-					uri,
-					request,
-					requestType,
-					response,
-					arrayBuffer: result.data
-				});
-			}
-
-			if (shouldReturnEmptyResponse()) {
-				return this.createShakaResponse({
-					uri,
-					request,
-					requestType,
-					response,
-					arrayBuffer: undefined
-				});
-			}
-
-			throw createRecoverableError('Empty response with no redirect information', requestMetadata);
-		} else {
-			const reader = response.body.getReader();
-
-			let loaded = 0;
-			let lastLoaded = 0;
-			let contentLength;
-
-			while (!abortController.signal.aborted) {
-				let readObj;
-				try {
-					readObj = await reader.read();
-				} catch {
-					// If we abort the request while reading, we'll get an error here. Just ignore it.
-					break;
-				}
-
-				const { value, done } = readObj;
-
-				if (done) {
-					// If we got here, we read the whole response but there was no segment data; it means we must follow a
-					// redirect, or handle protocol updates.
-					if (shouldReturnEmptyResponse()) {
-						return this.createShakaResponse({
-							uri,
-							request,
-							requestType,
-							response,
-							arrayBuffer: undefined
-						});
-					}
-					throw createRecoverableError(
-						'Empty response with no redirect information',
-						requestMetadata
-					);
-				}
-
-				const result = await sabrUmpReader.processChunk(value);
-
-				const segmentInfo = sabrUmpReader.getSegmentInfo();
-
-				if (segmentInfo) {
-					if (!contentLength) {
-						contentLength = segmentInfo.mediaHeader.contentLength;
-					}
-
-					loaded += segmentInfo.lastChunkSize || 0;
-					segmentInfo.lastChunkSize = 0;
-				}
-
+		try {
+			// Fetch returning a ReadableStream response body is not currently
+			// supported by all browsers.
+			// Browser compatibility:
+			// https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+			// If it is not supported, returning the whole segment when
+			// it's ready (as xhr)
+			if (!response.body) {
+				const arrayBuffer = await response.arrayBuffer();
 				const currentTime = Date.now();
-				const chunkSize = loaded - lastLoaded;
 
-				// If the time between last time and this time we got
-				// progress event is long enough, or if a whole segment
-				// is downloaded, call progressUpdated().
-				if ((currentTime - lastTime > 100 && chunkSize >= minBytes) || result) {
-					// If we have a result, check its integrity before attempting anything.
-					if (result) checkResultIntegrity(result);
-					if (contentLength) {
-						const numBytesRemaining = result ? 0 : parseInt(contentLength) - loaded;
-						try {
-							progressUpdated(currentTime - lastTime, chunkSize, numBytesRemaining);
-						} catch {
-							/** no-op */
-						} finally {
-							lastLoaded = loaded;
-							lastTime = currentTime;
-						}
-					}
-				}
+				progressUpdated(currentTime - lastTime, arrayBuffer.byteLength, 0);
+
+				const result = await sabrUmpReader.processChunk(new Uint8Array(arrayBuffer));
 
 				if (result) {
-					abortController.abort();
+					checkResultIntegrity(result);
 					return this.createShakaResponse({
 						uri,
 						request,
@@ -326,13 +257,112 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 						arrayBuffer: result.data
 					});
 				}
-			}
 
-			// Unreachable if the loop is aborted correctly.
-			throw createRecoverableError(
-				'UMP stream processing was aborted but did not produce a result.',
-				requestMetadata
-			);
+				if (shouldReturnEmptyResponse()) {
+					return this.createShakaResponse({
+						uri,
+						request,
+						requestType,
+						response,
+						arrayBuffer: undefined
+					});
+				}
+
+				throw createRecoverableError(
+					'Empty response with no redirect information',
+					requestMetadata
+				);
+			} else {
+				const reader = response.body.getReader();
+
+				let loaded = 0;
+				let lastLoaded = 0;
+				let contentLength;
+
+				while (!abortController.signal.aborted) {
+					let readObj;
+					try {
+						readObj = await reader.read();
+					} catch {
+						// If we abort the request while reading, we'll get an error here. Just ignore it.
+						break;
+					}
+
+					const { value, done } = readObj;
+
+					if (done) {
+						// If we got here, we read the whole response but there was no segment data; it means we must follow a
+						// redirect, or handle protocol updates.
+						if (shouldReturnEmptyResponse()) {
+							return this.createShakaResponse({
+								uri,
+								request,
+								requestType,
+								response,
+								arrayBuffer: undefined
+							});
+						}
+						throw createRecoverableError(
+							'Empty response with no redirect information',
+							requestMetadata
+						);
+					}
+
+					const result = await sabrUmpReader.processChunk(value);
+
+					const segmentInfo = sabrUmpReader.getSegmentInfo();
+
+					if (segmentInfo) {
+						if (!contentLength) {
+							contentLength = segmentInfo.mediaHeader.segmentLengthBytes;
+						}
+
+						loaded += segmentInfo.lastChunkSize || 0;
+						segmentInfo.lastChunkSize = 0;
+					}
+
+					const currentTime = Date.now();
+					const chunkSize = loaded - lastLoaded;
+
+					// If the time between last time and this time we got
+					// progress event is long enough, or if a whole segment
+					// is downloaded, call progressUpdated().
+					if ((currentTime - lastTime > 100 && chunkSize >= minBytes) || result) {
+						// If we have a result, check its integrity before attempting anything.
+						if (result) checkResultIntegrity(result);
+						if (contentLength) {
+							const numBytesRemaining = result ? 0 : parseInt(contentLength) - loaded;
+							try {
+								progressUpdated(currentTime - lastTime, chunkSize, numBytesRemaining);
+							} catch {
+								/** no-op */
+							} finally {
+								lastLoaded = loaded;
+								lastTime = currentTime;
+							}
+						}
+					}
+
+					if (result) {
+						abortController.abort();
+						return this.createShakaResponse({
+							uri,
+							request,
+							requestType,
+							response,
+							arrayBuffer: result.data
+						});
+					}
+				}
+
+				// Unreachable if the loop is aborted correctly.
+				throw createRecoverableError(
+					'UMP stream processing was aborted but did not produce a result.',
+					requestMetadata
+				);
+			}
+		} finally {
+			sabrUmpReader.dispose();
 		}
 	}
 
@@ -463,7 +493,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			.getVariantTracks()
 			.find(
 				(track) =>
-					FormatKeyUtils.getUniqueFormatId(activeFormat) ===
+					getUniqueFormatId(activeFormat) ===
 					(activeFormat.width ? track.originalVideoId : track.originalAudioId)
 			);
 
@@ -471,9 +501,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			return { videoFormat: undefined, audioFormat: undefined };
 		}
 
-		const formatMap = new Map(
-			sabrFormats.map((format) => [FormatKeyUtils.getUniqueFormatId(format), format])
-		);
+		const formatMap = new Map(sabrFormats.map((format) => [getUniqueFormatId(format), format]));
 
 		return {
 			videoFormat: activeVariant.originalVideoId

@@ -109,8 +109,8 @@ export async function getVideoPageYTjs(videoId: string): Promise<VideoPlay> {
 
 		recommendedVideos.push({
 			videoThumbnails: (recommended?.content_image.image as Thumbnail[]) || [],
-			videoId: recommended.content_id,
-			title: recommended.metadata.title.toString(),
+			videoId: recommended.content_id ?? '',
+			title: recommended.metadata?.title?.toString() ?? '',
 			viewCountText,
 			author: recommended.metadata.metadata.metadata_rows[0]?.metadata_parts?.[0]?.text?.text ?? '',
 			lengthSeconds,

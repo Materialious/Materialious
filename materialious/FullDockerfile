@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Tell SvelteKit to use node adapter.
 ENV PUBLIC_BUILD_WITH_BACKEND="true"

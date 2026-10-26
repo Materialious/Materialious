@@ -9,7 +9,7 @@ RUN npm install --legacy-peer-deps
 ENV PUBLIC_BUILD_WITH_BACKEND="true"
 
 RUN npm run build
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev --legacy-peer-deps
 
 FROM node:26-alpine
 

@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm ci
+RUN npm install
 
 # Tell SvelteKit to use node adapter.
 ENV PUBLIC_BUILD_WITH_BACKEND="true"

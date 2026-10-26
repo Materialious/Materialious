@@ -28,10 +28,13 @@ jobs:
         run: cd ../static/nodejsAndroid && npm ci
 
       - name: Build package
-        run: cd ../ && npm run build && npm prune --omit=dev
+        run: cd ../ && npm run build
 
       - name: Sync package
         run: cd ../ && npx cap sync
+
+      - name: Prune dev modules
+        run: cd ../ && npm prune --omit=dev
 
       - name: Setup JDK
         uses: actions/setup-java@v3

@@ -598,7 +598,7 @@
 		box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.35);
 	}
 
-	:global(.item-select-focused) .tv-root .tv-play {
+	:global(.item-select:focus-within) .tv-root .tv-play {
 		display: flex;
 	}
 

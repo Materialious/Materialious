@@ -11,6 +11,8 @@
 	import { playlistCacheStore } from '#lib/store';
 	import { fade } from 'svelte/transition';
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
+	import { keyCodeMap } from '#lib/utils';
 
 	let { data } = $props();
 
@@ -93,7 +95,7 @@
 	function focusElement(el: HTMLElement | null | undefined) {
 		if (!el) return;
 		el.focus();
-		el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+		el.scrollIntoView({ block: 'center', inline: 'nearest' });
 	}
 
 	function openInfo() {
@@ -114,36 +116,6 @@
 		(document.activeElement as HTMLElement | null)?.blur();
 	}
 
-	function getInfoFocusables() {
-		return Array.from(
-			infoScope?.querySelectorAll<HTMLElement>(
-				'[tabindex]:not([tabindex="-1"]), a, button, summary'
-			) ?? []
-		);
-	}
-
-	function moveInfoFocus(direction: 1 | -1) {
-		const focusables = getInfoFocusables();
-		if (focusables.length === 0) return false;
-
-		const current = document.activeElement as HTMLElement | null;
-		const index = current ? focusables.indexOf(current) : -1;
-		let cursor;
-		if (index === -1) cursor = direction === 1 ? 0 : focusables.length - 1;
-		else cursor = index + direction;
-
-		while (cursor >= 0 && cursor < focusables.length) {
-			const el = focusables[cursor];
-			el.focus();
-			el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-
-			if (document.activeElement === el) return true;
-			cursor += direction;
-		}
-
-		return false;
-	}
-
 	function handleInfoKeyDown(event: KeyboardEvent) {
 		if (event.defaultPrevented) {
 			keydownHandledMovement = true;
@@ -151,15 +123,14 @@
 		}
 
 		keydownHandledMovement = false;
-		if (event.key === 'Enter') return;
+		const keyCode = keyCodeMap[event.key];
+		if (!keyCode || keyCode === 13 || !infoPanel) return;
 
-		const isNext = event.key === 'ArrowDown' || event.key === 'ArrowRight';
-		const isPrev = event.key === 'ArrowUp' || event.key === 'ArrowLeft';
-		if (!isNext && !isPrev) return;
-
-		if (moveInfoFocus(isNext ? 1 : -1)) {
+		const next = getNextFocus(document.activeElement, keyCode, infoPanel);
+		if (next instanceof HTMLElement) {
 			event.preventDefault();
 			keydownHandledMovement = true;
+			focusElement(next);
 		}
 	}
 
@@ -261,7 +232,9 @@
 	});
 
 	onDestroy(() => {
+		// unbind() only removes the default action; these were bound on keyup too.
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc']);
+		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc'], 'keyup');
 	});
 </script>
 

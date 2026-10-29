@@ -181,6 +181,7 @@
 
 		const binds = $keybindStore;
 		Mousetrap.unbind([binds.seekBack, binds.seekForward]);
+		Mousetrap.unbind([binds.seekBack, binds.seekForward], 'keyup');
 	});
 
 	function getScrubbingSpeeds(duration: number) {

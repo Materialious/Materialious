@@ -38,6 +38,7 @@ export {
 	interfaceForceCase,
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
+	interfaceHideShorts,
 	interfaceAutoExpandChapters,
 	interfaceAmoledTheme,
 	interfaceDisplayThumbnailAvatars,

@@ -12,6 +12,11 @@ export const playerSavePlaybackPositionStore = persist(
 	createStorage(),
 	'savePlaybackPosition'
 );
+export const playerFitScreenByDefaultStore = persist(
+	writable(false),
+	createStorage(),
+	'fitScreenByDefault'
+);
 export const playerTheatreModeByDefaultStore = persist(
 	writable(false),
 	createStorage(),

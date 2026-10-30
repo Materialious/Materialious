@@ -33,7 +33,7 @@
 		"@materialious/shared": "file:../shared",
 		"@types/jsdom": "^28.0.3",
 		"bgutils-js": "^4.0.3",
-		"chokidar": "~5.0.0",
+		"chokidar": "~6.0.0",
 		"electron-is-dev": "~3.0.1",
 		"electron-serve": "~3.0.0",
 		"electron-unhandled": "^6.0.0",

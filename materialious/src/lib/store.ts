@@ -6,6 +6,7 @@ export {
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
+	playerFitScreenByDefaultStore,
 	playerDefaultQualityStore,
 	playerAutoplayNextByDefaultStore,
 	playerYouTubeJsFallback,

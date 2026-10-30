@@ -16,6 +16,7 @@
 		playerPlaylistHistory,
 		playerState,
 		playerTheatreModeByDefaultStore,
+		playerFitScreenByDefaultStore,
 		playerTheatreModeIsActive,
 		playerIsInWindowFullscreen,
 		playlistCacheStore,
@@ -24,7 +25,8 @@
 		sleepTimerStore
 	} from '#lib/store';
 	import ui from 'beercss';
-	import { onDestroy, tick } from 'svelte';
+	import { onDestroy, tick, untrack } from 'svelte';
+	import { Capacitor } from '@capacitor/core';
 	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import Author from '#lib/components/Author.svelte';
@@ -54,6 +56,20 @@
 	let returnYTDislikes: Promise<any> | null = $state(null);
 
 	playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
+
+	const videoId = $derived(data.video?.videoId);
+	$effect(() => {
+		if (!videoId || Capacitor.getPlatform() === 'android') {
+			return;
+		}
+
+		// Apply defaults once per video, without reacting to manual mode changes.
+		untrack(() => {
+			if (get(playerFitScreenByDefaultStore)) {
+				playerIsInWindowFullscreen.set(true);
+			}
+		});
+	});
 
 	let pauseTimerSeconds: number = $state(0);
 	let pauseTimerRemaining: number = $state(0);

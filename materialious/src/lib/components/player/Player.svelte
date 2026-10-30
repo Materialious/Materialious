@@ -148,6 +148,40 @@
 		playerVolume = playerElement.volume;
 	}
 
+	function adjustVolume(event: KeyboardEvent, change: number) {
+		const videoElement = playerElement;
+		const hasPlayer = !!videoElement;
+		const isEventHandled = event.defaultPrevented;
+		const isComposingText = event.isComposing;
+		const editableControlSelector =
+			'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"], [role="spinbutton"], [role="slider"]';
+		const isEditableControl =
+			event.target instanceof Element && !!event.target.closest(editableControlSelector);
+
+		if (!hasPlayer || isEventHandled || isComposingText || isEditableControl) {
+			return;
+		}
+
+		const volume = Math.round(videoElement.volume * 100) + change;
+		videoElement.volume = Math.max(0, Math.min(100, volume)) / 100;
+		showPlayerUI();
+		return false;
+	}
+
+	$effect(() => {
+		const volumeUp = $keybindStore.volumeUp;
+		const volumeDown = $keybindStore.volumeDown;
+		// Android TV reserves arrow keys for remote-control navigation.
+		if (isAndroidTv()) {
+			return;
+		}
+
+		Mousetrap.bind(volumeUp, (event) => adjustVolume(event, 5));
+		Mousetrap.bind(volumeDown, (event) => adjustVolume(event, -5));
+
+		return () => Mousetrap.unbind([volumeUp, volumeDown]);
+	});
+
 	function skipSegment(segment: Segment) {
 		if (!playerElement) return;
 

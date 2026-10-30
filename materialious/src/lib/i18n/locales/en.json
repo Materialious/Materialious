@@ -250,6 +250,8 @@
 			"skipSponsor": "Skip sponsor segment",
 			"toggleSubtitles": "Toggle subtitles",
 			"toggleFullscreen": "Toggle fullscreen",
+			"volumeUp": "Increase volume",
+			"volumeDown": "Decrease volume",
 			"speedDown": "Decrease playback speed",
 			"speedUp": "Increase playback speed",
 			"frameBack": "Frame step backward",

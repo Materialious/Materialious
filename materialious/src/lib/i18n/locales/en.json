@@ -331,6 +331,7 @@
 		"expandDescription": "Expand description by default",
 		"expandChapters": "Expand chapters by default",
 		"expandComments": "Expand comments by default",
+		"hideShorts": "Hide shorts",
 		"allowInsecureRequests": "Allow insecure requests",
 		"disableAutoUpdate": "Disable automatic updates",
 		"androidNativeShare": "Use native share",

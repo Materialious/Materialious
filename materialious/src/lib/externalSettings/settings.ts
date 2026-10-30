@@ -10,6 +10,7 @@ import {
 	interfaceAmoledTheme,
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
+	interfaceHideShorts,
 	interfaceDefaultPage,
 	interfaceDisplayThumbnailAvatars,
 	interfaceForceCase,
@@ -212,6 +213,11 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'autoExpandDesc',
 		store: interfaceAutoExpandDesc,
+		schema: zBoolean
+	},
+	{
+		name: 'hideShorts',
+		store: interfaceHideShorts,
 		schema: zBoolean
 	},
 	{

@@ -19,6 +19,7 @@
 		playerProxyVideosStore,
 		playerSavePlaybackPositionStore,
 		playerTheatreModeByDefaultStore,
+		playerFitScreenByDefaultStore,
 		playerYouTubeJsAlways,
 		playerYouTubeJsFallback
 	} from '../../store';
@@ -265,6 +266,25 @@
 		</label>
 	</nav>
 </div>
+
+{#if Capacitor.getPlatform() !== 'android'}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.player.fitScreenByDefault')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$playerFitScreenByDefaultStore}
+					onclick={() => playerFitScreenByDefaultStore.set(!$playerFitScreenByDefaultStore)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+{/if}
 
 <div class="field no-margin m l">
 	<nav class="no-padding">

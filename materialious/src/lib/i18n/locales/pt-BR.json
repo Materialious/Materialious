@@ -139,6 +139,7 @@
 		"previewVideoOnHover": "Pré-visualizar vídeo com passagem do mouse",
 		"expandDescription": "Expandir descrição por padrão",
 		"expandComments": "Expandir comentários por padrão",
+		"hideShorts": "Ocultar shorts",
 		"dataPreferences": {
 			"content": "Procurando importar/exportar inscrições, alterar senha ou excluir conta? Clique aqui e navegue até o fim da página.",
 			"dataPreferences": "Preferências de dados"

@@ -10,6 +10,7 @@ import {
 	interfaceAmoledTheme,
 	interfaceAutoExpandComments,
 	interfaceAutoExpandDesc,
+	interfaceHideShorts,
 	interfaceDefaultPage,
 	interfaceDisplayThumbnailAvatars,
 	interfaceForceCase,
@@ -23,6 +24,7 @@ import {
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
+	playerFitScreenByDefaultStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore,
 	showWarningStore,
@@ -139,6 +141,11 @@ export const persistedStores: PersistedStore<any>[] = [
 		schema: zBoolean
 	},
 	{
+		name: 'fitScreenByDefault',
+		store: playerFitScreenByDefaultStore,
+		schema: zBoolean
+	},
+	{
 		name: 'theatreModeByDefault',
 		store: playerTheatreModeByDefaultStore,
 		schema: zBoolean
@@ -206,6 +213,11 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'autoExpandDesc',
 		store: interfaceAutoExpandDesc,
+		schema: zBoolean
+	},
+	{
+		name: 'hideShorts',
+		store: interfaceHideShorts,
 		schema: zBoolean
 	},
 	{

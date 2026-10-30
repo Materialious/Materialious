@@ -43,6 +43,11 @@ export const interfaceAutoExpandDesc: Writable<boolean> = persist(
 	createStorage(),
 	'autoExpandDesc'
 );
+export const interfaceHideShorts: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'hideShorts'
+);
 export const interfaceAutoExpandChapters: Writable<boolean> = persist(
 	writable(false),
 	createStorage(),

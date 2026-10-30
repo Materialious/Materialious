@@ -33,7 +33,7 @@
 		"@materialious/shared": "file:../shared",
 		"@types/jsdom": "^28.0.3",
 		"bgutils-js": "^4.0.3",
-		"chokidar": "~5.0.0",
+		"chokidar": "~6.0.0",
 		"electron-is-dev": "~3.0.1",
 		"electron-serve": "~3.0.0",
 		"electron-unhandled": "^6.0.0",
@@ -49,7 +49,7 @@
 	"devDependencies": {
 		"@types/fluent-ffmpeg": "^2.1.28",
 		"electron": "^44.9.1",
-		"electron-builder": "^26.15.3",
+		"electron-builder": "^26.18.0",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^7.0.2"
 	},

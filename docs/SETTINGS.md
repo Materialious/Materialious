@@ -29,6 +29,7 @@ Materialious allows you to customize various settings by overwriting the default
     * [Proxy videos](#proxy-videos)
     * [Save playback position](#save-playback-position)
     * [Theatre mode by default](#theatre-mode-by-default)
+    * [Fit screen by default](#fit-screen-by-default)
     * [Autoplay next by default](#autoplay-next-by-default)
     * [Default video quality](#default-video-quality)
     * [Default playback speed](#default-playback-speed)
@@ -212,6 +213,14 @@ Enables theatre mode automatically when starting a video.
 
 ```json
 "theatreModeByDefault": true
+```
+
+### Fit screen by default
+
+Enables in-window fullscreen automatically when starting a video.
+
+```json
+"fitScreenByDefault": false
 ```
 
 ### Autoplay next by default

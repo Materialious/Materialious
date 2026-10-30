@@ -24,6 +24,7 @@ import {
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
+	playerFitScreenByDefaultStore,
 	returnYTDislikesInstanceStore,
 	returnYtDislikesStore,
 	showWarningStore,
@@ -137,6 +138,11 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'savePlaybackPosition',
 		store: playerSavePlaybackPositionStore,
+		schema: zBoolean
+	},
+	{
+		name: 'fitScreenByDefault',
+		store: playerFitScreenByDefaultStore,
 		schema: zBoolean
 	},
 	{

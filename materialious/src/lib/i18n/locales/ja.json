@@ -315,7 +315,9 @@
             "tab2": "タブ 2",
             "tab3": "タブ 3",
             "tab4": "タブ 4",
-            "reset": "初期設定に戻す"
+            "reset": "初期設定に戻す",
+            "volumeUp": "音量を上げる",
+            "volumeDown": "音量を下げる"
         },
         "showMobileBackButton": "画面上のナビゲーションコントロール",
         "admin": "管理者",

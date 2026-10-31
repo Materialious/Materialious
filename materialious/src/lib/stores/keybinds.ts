@@ -7,6 +7,8 @@ export interface Keybinds {
 	skipSponsor: string;
 	toggleSubtitles: string;
 	toggleFullscreen: string;
+	volumeUp: string;
+	volumeDown: string;
 	speedDown: string;
 	speedUp: string;
 	frameBack: string;
@@ -28,6 +30,8 @@ export const defaultKeybinds: Keybinds = {
 	skipSponsor: 'enter',
 	toggleSubtitles: 'c',
 	toggleFullscreen: 'f',
+	volumeUp: 'up',
+	volumeDown: 'down',
 	speedDown: 'shift+left',
 	speedUp: 'shift+right',
 	frameBack: ',',

@@ -24,7 +24,7 @@
 		if (event.shiftKey) parts.push('shift');
 		if (event.metaKey) parts.push('command');
 
-		const mapped = key === ' ' ? 'space' : key.toLowerCase();
+		const mapped = key === ' ' ? 'space' : key.toLowerCase().replace(/^arrow/, '');
 		parts.push(mapped);
 
 		const combo = parts.join('+');
@@ -49,6 +49,8 @@
 		{ key: 'skipSponsor', label: $_('layout.binds.skipSponsor') },
 		{ key: 'toggleSubtitles', label: $_('layout.binds.toggleSubtitles') },
 		{ key: 'toggleFullscreen', label: $_('layout.binds.toggleFullscreen') },
+		{ key: 'volumeUp', label: $_('layout.binds.volumeUp') },
+		{ key: 'volumeDown', label: $_('layout.binds.volumeDown') },
 		{ key: 'speedDown', label: $_('layout.binds.speedDown') },
 		{ key: 'speedUp', label: $_('layout.binds.speedUp') },
 		{ key: 'frameBack', label: $_('layout.binds.frameBack') },
@@ -66,7 +68,7 @@
 	];
 </script>
 
-<svelte:window onkeydown={onKeyDown} />
+<svelte:window onkeydowncapture={onKeyDown} />
 
 {#each actions as { key, label } (key)}
 	<nav class="no-padding">

@@ -168,6 +168,31 @@
 		playerVolume = playerElement.volume;
 	}
 
+	function adjustVolume(change: number) {
+		if (!playerElement) {
+			return;
+		}
+
+		const volume = Math.round(playerElement.volume * 100) + change;
+		playerElement.volume = Math.max(0, Math.min(100, volume)) / 100;
+		showPlayerUI();
+		return false;
+	}
+
+	$effect(() => {
+		const volumeUp = $keybindStore.volumeUp;
+		const volumeDown = $keybindStore.volumeDown;
+		// Android TV reserves arrow keys for remote-control navigation.
+		if (isAndroidTv()) {
+			return;
+		}
+
+		Mousetrap.bind(volumeUp, () => adjustVolume(5));
+		Mousetrap.bind(volumeDown, () => adjustVolume(-5));
+
+		return () => Mousetrap.unbind([volumeUp, volumeDown]);
+	});
+
 	function skipSegment(segment: Segment) {
 		if (!playerElement) return;
 

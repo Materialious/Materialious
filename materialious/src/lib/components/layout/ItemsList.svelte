@@ -21,25 +21,46 @@
 	let { items = [], playlistId = '', classes = 'page right active' }: Props = $props();
 
 	let gridElement: HTMLElement;
-	let focusedItemId: string | undefined = $state(undefined);
+
+	const cardOf = (el: Element | null) => el?.closest<HTMLElement>('article.item-select') ?? null;
 
 	function handleKeyDown(event: KeyboardEvent) {
-		if (event.key === 'Enter' && focusedItemId) {
+		const card = cardOf(event.target as Element);
+
+		if (event.key === 'Enter' && card) {
 			event.preventDefault();
-			handleItemSelect(event, focusedItemId);
+			handleItemSelect(event, card.id);
 			return;
 		}
 
 		const keyCode = keyCodeMap[event.key];
 		if (!keyCode) return;
 
-		const nextFocus = getNextFocus(event.target as Element, keyCode, gridElement);
+		// Move card to card: links/buttons inside a card are not separate stops.
+		const next = cardOf(getNextFocus(card ?? (event.target as Element), keyCode, gridElement));
 
-		if (nextFocus) {
+		if (next && next !== card) {
 			event.preventDefault();
-			nextFocus.focus();
-			focusedItemId = nextFocus.id;
+			next.focus({ preventScroll: true });
+			next.scrollIntoView({ block: 'center', inline: 'nearest' });
+			return;
 		}
+
+		// Left edge of the grid: go to the side menu (native spatial nav loses focus here).
+		const menuItem =
+			document.querySelector<HTMLElement>('#left-nav a.active') ??
+			document.querySelector<HTMLElement>('#left-nav a');
+		if (!next && keyCode === 37 && isAndroidTv() && menuItem) {
+			event.preventDefault();
+			menuItem.focus();
+		}
+	}
+
+	// Focus arriving from outside (native spatial nav) can land on a link inside a card.
+	function handleFocusIn(event: FocusEvent) {
+		if (!isAndroidTv()) return;
+		const card = cardOf(event.target as Element);
+		if (card && card !== event.target) card.focus();
 	}
 
 	function goToItem(uniqueItemId: string) {
@@ -54,7 +75,6 @@
 
 	function handleItemSelect(event: Event, uniqueItemId: string) {
 		feedLastItemId.set(uniqueItemId);
-		focusedItemId = uniqueItemId;
 
 		if (event instanceof KeyboardEvent && event.key === 'Enter') goToItem(uniqueItemId);
 	}
@@ -72,7 +92,6 @@
 					inline: 'nearest'
 				});
 
-				focusedItemId = $feedLastItemId;
 				await timeout(0);
 				const focusable = element.querySelector('a, button, [tabindex]');
 				if (focusable instanceof HTMLElement) {
@@ -85,7 +104,12 @@
 	});
 </script>
 
-<div onkeydown={handleKeyDown} class={classes} class:item-container={!isMobile() || isAndroidTv()}>
+<div
+	onkeydown={handleKeyDown}
+	onfocusin={handleFocusIn}
+	class={classes}
+	class:item-container={!isMobile() || isAndroidTv()}
+>
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
@@ -99,8 +123,6 @@
 							onclick={(event) => handleItemSelect(event, uniqueItemId)}
 							id={uniqueItemId}
 							class="no-padding item-select border"
-							class:item-select-focused={(!isMobile() || isAndroidTv()) &&
-								focusedItemId === uniqueItemId}
 							style="height: 100%;"
 							tabindex="0"
 						>
@@ -134,7 +156,7 @@
 			box-shadow 0.15s ease;
 	}
 
-	.item-select-focused {
+	.item-container .item-select:focus-within {
 		transform: scale(1.05);
 		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		z-index: 10;

@@ -64,6 +64,7 @@
 		watchPartySupported = isOwnBackend() !== null;
 	});
 	let leftNavElement: HTMLElement | undefined = $state();
+	let lastMainFocus: HTMLElement | undefined;
 
 	let pages = $state(getPages());
 	invidiousAuthStore.subscribe(() => {
@@ -270,10 +271,38 @@
 				return;
 			}
 			const main = document.getElementById('main-content');
-			main?.querySelector<HTMLElement>('[tabindex], a, input, button')?.focus();
+			if (!main) return;
+			// Back to where the user was in the page, else the nearest thing to the right.
+			const next =
+				(lastMainFocus && main.contains(lastMainFocus) ? lastMainFocus : undefined) ??
+				(getNextFocus(target, keyCode, main) as HTMLElement | undefined) ??
+				main.querySelector<HTMLElement>('[tabindex], a, input, button');
+			next?.focus({ preventScroll: true });
+			next?.scrollIntoView({ block: 'center', inline: 'nearest' });
 		}
 	}
+
+	// TV: an arrow press with nothing focused lands on the first visible card, not nowhere.
+	function recoverLostFocus(event: KeyboardEvent) {
+		if (!isAndroidTv() || event.defaultPrevented || !keyCodeMap[event.key]) return;
+		const active = document.activeElement;
+		if (active && active !== document.body && active.id !== 'main-content') return;
+
+		const main = document.getElementById('main-content');
+		const cards = Array.from(main?.querySelectorAll<HTMLElement>('article.item-select') ?? []);
+		const target =
+			cards.find((card) => card.getBoundingClientRect().bottom > 0) ??
+			main?.querySelector<HTMLElement>('a, button, input, [tabindex="0"]') ??
+			leftNavElement?.querySelector<HTMLElement>('a.active, a');
+		if (!target) return;
+
+		event.preventDefault();
+		target.focus({ preventScroll: true });
+		target.scrollIntoView({ block: 'nearest' });
+	}
 </script>
+
+<svelte:window onkeydown={recoverLostFocus} />
 
 <div>
 	<nav
@@ -477,7 +506,8 @@
 
 	<main
 		id="main-content"
-		tabindex="0"
+		tabindex={isAndroidTv() ? -1 : 0}
+		onfocusin={(event) => (lastMainFocus = event.target as HTMLElement)}
 		class="responsive max root"
 		class:full-window-main={$playerIsInWindowFullscreen}
 	>

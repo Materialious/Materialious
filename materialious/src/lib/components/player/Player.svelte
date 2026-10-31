@@ -44,7 +44,7 @@
 		toggleSubtitles
 	} from '#lib/player/index';
 	import { manifestDomainInclusion } from '#lib/player/manifest';
-	import { injectSabr } from '#lib/player/sabr/index';
+	import { injectSabr, refreshSabrSession } from '#lib/player/sabr/index';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '#lib/components/Toast.svelte';
@@ -110,7 +110,27 @@
 	let showVideoRetry = $state(false);
 
 	let player: shaka.Player;
-	let sabrAdapter: SabrStreamingAdapter | null;
+	let sabrAdapter: SabrStreamingAdapter | null = null;
+	let playerLoadedListenerAdded = false;
+	let sponsorSkipListenerAdded = false;
+
+	const STALL_CHECK_INTERVAL_MS = 3_000;
+	const STALL_TIMEOUT_MS = 12_000;
+	const MAX_STALL_RECOVERY_ATTEMPTS = 3;
+	const MAX_STREAMING_FAILURE_RETRIES = 5;
+
+	let stallWatchdogInterval: ReturnType<typeof setInterval> | undefined;
+	let stallWatchdogLastTime = 0;
+	let stallWatchdogLastProgress = Date.now();
+	let stallRecoveryAttempts = 0;
+	let stallRecoveryInProgress = false;
+	let lastStallRecoveryAt = 0;
+
+	let streamingFailureRetries = 0;
+	let streamingFailureRetryTimer: ReturnType<typeof setTimeout> | undefined;
+	let lastStreamingFailureAt = 0;
+	let streamingFailureExhausted = false;
+	let stallRecoveryExhausted = false;
 
 	let androidInitialNetworkStatus: ConnectionStatus | undefined;
 	let androidOriginalOrigination: ScreenOrientationResult | undefined;
@@ -185,6 +205,9 @@
 
 		if (segments.length === 0) return;
 
+		if (sponsorSkipListenerAdded) return;
+		sponsorSkipListenerAdded = true;
+
 		playerElement?.addEventListener('timeupdate', () => {
 			segments.forEach((segment) => {
 				if (!playerElement) return;
@@ -247,8 +270,161 @@
 		playerIsInWindowFullscreen.update((v) => !v);
 	}
 
+	function isRetryableStreamingError(error: shaka.util.Error): boolean {
+		if (!error) return false;
+
+		// Aborted operations are intentional (seek/teardown) and must not
+		// trigger recovery.
+		if (error.code === shaka.util.Error.Code.OPERATION_ABORTED) return false;
+
+		if (error.severity === shaka.util.Error.Severity.RECOVERABLE) return true;
+
+		return (
+			error.category === shaka.util.Error.Category.NETWORK ||
+			error.code === shaka.util.Error.Code.SEGMENT_MISSING ||
+			error.code === shaka.util.Error.Code.MEDIA_SOURCE_OPERATION_FAILED
+		);
+	}
+
+	function scheduleStreamingRetry(error: shaka.util.Error) {
+		console.error('Streaming failure:', error);
+
+		if (!isRetryableStreamingError(error)) return;
+
+		// Once we have handed control back to the user, do not stack up more
+		// retries/toasts until the stream is reloaded.
+		if (streamingFailureExhausted) return;
+
+		const now = Date.now();
+		if (streamingFailureRetries > 0 && now - lastStreamingFailureAt > 30_000) {
+			streamingFailureRetries = 0;
+		}
+		lastStreamingFailureAt = now;
+
+		// A retry is already scheduled; let it run instead of stacking them up.
+		if (streamingFailureRetryTimer) return;
+
+		if (streamingFailureRetries >= MAX_STREAMING_FAILURE_RETRIES) {
+			streamingFailureExhausted = true;
+			showVideoRetry = true;
+			addToast({ data: { text: $_('player.retryText'), icon: 'error' } });
+			return;
+		}
+
+		streamingFailureRetries++;
+		const delay = Math.min(1000 * 2 ** (streamingFailureRetries - 1), 10_000);
+
+		streamingFailureRetryTimer = setTimeout(() => {
+			streamingFailureRetryTimer = undefined;
+			if (!player) return;
+
+			if (!player.retryStreaming(0)) {
+				streamingFailureExhausted = true;
+				showVideoRetry = true;
+				addToast({ data: { text: $_('player.retryText'), icon: 'error' } });
+			}
+		}, delay);
+	}
+
+	function startStallWatchdog() {
+		if (stallWatchdogInterval) clearInterval(stallWatchdogInterval);
+
+		stallWatchdogLastTime = playerElement?.currentTime ?? 0;
+		stallWatchdogLastProgress = Date.now();
+		stallWatchdogInterval = setInterval(checkForStall, STALL_CHECK_INTERVAL_MS);
+	}
+
+	function stopStallWatchdog() {
+		if (stallWatchdogInterval) clearInterval(stallWatchdogInterval);
+		stallWatchdogInterval = undefined;
+	}
+
+	function checkForStall() {
+		if (!player || !playerElement || stallRecoveryInProgress || stallRecoveryExhausted) return;
+
+		if (playerElement.paused || playerElement.seeking || playerElement.ended) {
+			stallWatchdogLastProgress = Date.now();
+			return;
+		}
+
+		if (document.visibilityState !== 'visible' || navigator.onLine === false) {
+			stallWatchdogLastProgress = Date.now();
+			return;
+		}
+
+		const now = Date.now();
+		const currentTime = playerElement.currentTime;
+
+		if (Math.abs(currentTime - stallWatchdogLastTime) > 0.05) {
+			stallWatchdogLastTime = currentTime;
+			stallWatchdogLastProgress = now;
+
+			if (now - lastStallRecoveryAt > 10_000) {
+				stallRecoveryAttempts = 0;
+			}
+			return;
+		}
+
+		if (now - stallWatchdogLastProgress < STALL_TIMEOUT_MS) return;
+
+		void recoverFromStall();
+	}
+
+	async function recoverFromStall() {
+		if (!player || !playerElement) return;
+
+		stallRecoveryInProgress = true;
+		stallRecoveryAttempts++;
+		lastStallRecoveryAt = Date.now();
+		stallWatchdogLastProgress = Date.now();
+
+		console.warn(`[Player] Playback stalled, recovery attempt ${stallRecoveryAttempts}`);
+
+		try {
+			if (stallRecoveryAttempts === 1) {
+				// Refresh attestation/PoToken first, then let Shaka refetch.
+				await refreshSabrSession(data.video);
+				player.retryStreaming(0);
+			} else if (stallRecoveryAttempts < MAX_STALL_RECOVERY_ATTEMPTS) {
+				// A plain retry did not help; rebuild the SABR session.
+				await refreshSabrSession(data.video);
+				await reloadVideo(playerElement.currentTime);
+			} else {
+				stallRecoveryExhausted = true;
+				stopStallWatchdog();
+				showVideoRetry = true;
+				addToast({ data: { text: $_('player.retryText'), icon: 'error' } });
+			}
+		} catch (error) {
+			console.error('[Player] Stall recovery failed:', error);
+			stallRecoveryExhausted = true;
+			stopStallWatchdog();
+			showVideoRetry = true;
+			addToast({ data: { text: $_('player.retryText'), icon: 'error' } });
+		} finally {
+			stallRecoveryInProgress = false;
+			stallWatchdogLastProgress = Date.now();
+			stallWatchdogLastTime = playerElement?.currentTime ?? 0;
+		}
+	}
+
 	async function loadVideo() {
 		showVideoRetry = false;
+
+		// A new stream is being loaded; discard any pending retry from the
+		// previous one and give streaming failures a fresh budget.
+		if (streamingFailureRetryTimer) {
+			clearTimeout(streamingFailureRetryTimer);
+			streamingFailureRetryTimer = undefined;
+		}
+		streamingFailureRetries = 0;
+		lastStreamingFailureAt = 0;
+		streamingFailureExhausted = false;
+
+		if (sabrAdapter) {
+			sabrAdapter.dispose();
+			sabrAdapter = null;
+		}
 
 		sabrAdapter = await injectSabr(data.video, player);
 
@@ -258,15 +434,19 @@
 
 		setupSponsorSkip();
 
-		player.addEventListener('loaded', () => {
-			restoreQualityPreference(player);
-			restoreDefaultLanguage(player);
+		if (!playerLoadedListenerAdded) {
+			playerLoadedListenerAdded = true;
 
-			setActiveAudioTrack(player);
-			setActiveVideoTrack(player);
+			player.addEventListener('loaded', () => {
+				restoreQualityPreference(player);
+				restoreDefaultLanguage(player);
 
-			if ($playerAutoPlayStore) playerElement?.play();
-		});
+				setActiveAudioTrack(player);
+				setActiveVideoTrack(player);
+
+				if ($playerAutoPlayStore) playerElement?.play();
+			});
+		}
 
 		if (!data.video.liveNow) {
 			if (watchProgressInterval) {
@@ -330,12 +510,32 @@
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
 		}
+
+		startStallWatchdog();
 	}
 
-	async function reloadVideo() {
+	async function reloadVideo(resumeTime?: number) {
 		showVideoRetry = false;
+
+		// A reload triggered by the user (or the initial fallback) should also
+		// reset the stall recovery budget; an internal stall recovery must keep
+		// it so that we can escalate instead of looping forever.
+		if (resumeTime === undefined) {
+			stallRecoveryAttempts = 0;
+			stallRecoveryExhausted = false;
+		}
+
+		const targetTime = resumeTime ?? playerElement?.currentTime ?? 0;
+		const wasPlaying = playerElement ? !playerElement.paused : false;
+
 		data.video = await getVideoYTjs(data.video.videoId);
 		await loadVideo();
+
+		if (targetTime > 0 && playerElement) {
+			playerElement.currentTime = targetTime;
+		}
+
+		if (wasPlaying) playerElement?.play();
 	}
 
 	function toggleVideoPlaybackStatus() {
@@ -429,19 +629,22 @@
 			},
 			streaming: {
 				failureCallback: (error: shaka.util.Error) => {
-					console.error('Streaming failure:', error);
-					player.retryStreaming(5);
+					scheduleStreamingRetry(error);
 				},
-				bufferingGoal: 120,
-				rebufferingGoal: 2,
+				bufferingGoal: 60,
+				rebufferingGoal: 5,
 				bufferBehind: 300,
-				// Jump over small gaps in the buffer instead of stalling
-				// until the user manually seeks.
-				gapDetectionThreshold: 1,
+				// Only jump over gaps Shaka considers small. A larger threshold
+				// makes playback visibly skip ahead by up to that many seconds.
+				gapDetectionThreshold: 0.5,
+				// Do not let Shaka's stall detector seek/nudge the media; the
+				// watchdog below handles genuine stalls based on currentTime.
+				stallEnabled: false,
+				stallSkip: 0,
 				retryParameters: {
-					maxAttempts: 4,
+					maxAttempts: 8,
 					fuzzFactor: 0.5,
-					timeout: 15 * 1000
+					timeout: 30 * 1000
 				}
 			}
 		});
@@ -792,6 +995,8 @@
 		}
 
 		if (watchProgressInterval) clearInterval(watchProgressInterval);
+		stopStallWatchdog();
+		if (streamingFailureRetryTimer) clearTimeout(streamingFailureRetryTimer);
 		if (sabrAdapter) sabrAdapter.dispose();
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
@@ -940,7 +1145,7 @@
 			<progress class="circle large"></progress>
 		{:else}
 			<p>{$_('player.retryText')}</p>
-			<button onclick={reloadVideo}>{$_('player.enableYoutubejsTemp')}</button>
+			<button onclick={() => reloadVideo()}>{$_('player.enableYoutubejsTemp')}</button>
 			<div class="space"></div>
 			<button
 				class="border"

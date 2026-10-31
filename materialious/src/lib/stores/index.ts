@@ -1,4 +1,9 @@
-export { createStorage, ifNotWebDefault } from './storage';
+export {
+	createStorage,
+	hydrateSettings,
+	consumeInitialLoadState,
+	ifNotWebDefault
+} from './storage';
 export {
 	playerAutoPlayStore,
 	playerAlwaysLoopStore,

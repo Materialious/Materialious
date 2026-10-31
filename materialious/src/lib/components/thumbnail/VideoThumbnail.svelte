@@ -215,18 +215,20 @@
 							{@const authorId = video.authorId}
 							<li
 								onclick={() => {
-									$filterContentListStore?.push({
-										type: 'video',
-										conditions: [
-											{
-												field: 'authorId',
-												operator: 'equals',
-												values: [authorId],
-												note: $_('layout.filter.channelFiltered', { authorName: video.author })
-											}
-										]
-									});
-									filterContentListStore.set($filterContentListStore);
+									filterContentListStore.update((filterList) => [
+										...filterList,
+										{
+											type: 'video',
+											conditions: [
+												{
+													field: 'authorId',
+													operator: 'equals',
+													values: [authorId],
+													note: $_('layout.filter.channelFiltered', { authorName: video.author })
+												}
+											]
+										}
+									]);
 									filterContentUrlAutoUpdateStore.set(false);
 									thumbnailActionsVisible = false;
 								}}
@@ -239,21 +241,23 @@
 						{/if}
 						<li
 							onclick={() => {
-								$filterContentListStore?.push({
-									type: 'video',
-									conditions: [
-										{
-											field: 'videoId',
-											operator: 'equals',
-											values: [video.videoId],
-											note: $_('layout.filter.videoFiltered', {
-												videoTitle: video.title,
-												authorName: video.author
-											})
-										}
-									]
-								});
-								filterContentListStore.set($filterContentListStore);
+								filterContentListStore.update((filterList) => [
+									...filterList,
+									{
+										type: 'video',
+										conditions: [
+											{
+												field: 'videoId',
+												operator: 'equals',
+												values: [video.videoId],
+												note: $_('layout.filter.videoFiltered', {
+													videoTitle: video.title,
+													authorName: video.author
+												})
+											}
+										]
+									}
+								]);
 								filterContentUrlAutoUpdateStore.set(false);
 								thumbnailActionsVisible = false;
 							}}
@@ -598,7 +602,7 @@
 		box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.35);
 	}
 
-	:global(.item-select-focused) .tv-root .tv-play {
+	:global(.item-select:focus-within) .tv-root .tv-play {
 		display: flex;
 	}
 

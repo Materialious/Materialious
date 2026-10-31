@@ -9,20 +9,16 @@ import { initI18n } from '#lib/i18n/index';
 import { getPages } from '#lib/navPages';
 import {
 	invidiousAuthStore,
-	backendInUseStore,
 	invidiousInstanceStore,
 	interfaceDefaultPage,
-	authTokenStore,
 	materialiousBackendStore,
 	rawMasterKeyStore,
 	filterContentListStore,
 	filterContentUrlStore,
-	filterContentUrlAutoUpdateStore
+	filterContentUrlAutoUpdateStore,
+	hydrateSettings
 } from '#lib/store';
-import { get, type Writable } from 'svelte/store';
-import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
-import { deserialize } from '@macfja/serializer';
+import { get } from 'svelte/store';
 import { isYTBackend } from '#lib/backend';
 import { isOwnBackend } from '#lib/shared/index';
 import '#lib/fetchProxy.js';
@@ -38,28 +34,11 @@ export async function load({ url }) {
 		await initI18n();
 	}
 
+	// Persisted stores hydrate asynchronously on Android. Wait for them before
+	// making routing decisions that depend on the saved settings.
+	await hydrateSettings();
+
 	await resolvePlatform();
-
-	if (Capacitor.getPlatform() === 'android') {
-		const preferenceKey: Record<string, Writable<any>> = {
-			invidiousInstance: invidiousInstanceStore,
-			authToken: invidiousAuthStore,
-			backendInUse: backendInUseStore,
-			rawMasterKey: rawMasterKeyStore,
-			materialiousBackend: materialiousBackendStore,
-			materialiousAuthToken: authTokenStore,
-			filterContentList: filterContentListStore,
-			filterContentUrl: filterContentUrlStore,
-			filterContentUrlAutoUpdate: filterContentUrlAutoUpdateStore
-		};
-
-		for (const [key, store] of Object.entries(preferenceKey)) {
-			const result = await Preferences.get({ key });
-			if (result.value !== null) {
-				store.set(deserialize(result.value));
-			}
-		}
-	}
 
 	if (get(materialiousBackendStore)) {
 		const config = await configBackend();

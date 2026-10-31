@@ -9,6 +9,7 @@
 	import { humanizeTimestamp } from '#lib/time';
 
 	let { video, description }: { video: VideoPlay; description: string } = $props();
+	let open = $state(false);
 
 	onMount(() => {
 		if ($interfaceAutoExpandDesc) {
@@ -17,7 +18,7 @@
 	});
 </script>
 
-<details>
+<details bind:open>
 	<summary id="description" tabindex="0" class="bold none">
 		<nav>
 			<div class="max">
@@ -37,7 +38,7 @@
 		</nav>
 	</summary>
 	<div class="space"></div>
-	<div class="description">
+	<div class="description" class:lrud-ignore={!open}>
 		<div style="white-space: pre-line; overflow-wrap: break-word;">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html description}

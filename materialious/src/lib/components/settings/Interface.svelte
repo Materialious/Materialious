@@ -3,6 +3,7 @@
 	import { letterCase, titleCases, type TitleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
 	import { iso31661 } from 'iso-3166';
+	import { isContentRegion } from '#lib/regions';
 	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import {
@@ -425,12 +426,14 @@
 <ComboBox
 	label={$_('region')}
 	defaultValue={$interfaceRegionStore}
-	options={iso31661.map((region) => {
-		return {
-			label: region.name,
-			value: region.alpha2
-		};
-	})}
+	options={iso31661
+		.filter((region) => isContentRegion(region.alpha2))
+		.map((region) => {
+			return {
+				label: region.name,
+				value: region.alpha2
+			};
+		})}
 	onChange={(value) => interfaceRegionStore.set(value)}
 />
 

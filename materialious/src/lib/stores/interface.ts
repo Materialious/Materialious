@@ -1,6 +1,7 @@
 import { writable, type Writable } from 'svelte/store';
 import { persist } from '@macfja/svelte-persistent-store';
 import { createStorage } from './storage';
+import { normalizeContentRegion } from '../regions';
 import type { TitleCase } from '../letterCasing';
 import type { CustomPreset } from '../theme/presets';
 import type { ThemeColors } from '../theme/index';
@@ -23,6 +24,14 @@ export const interfaceRegionStore: Writable<string> = persist(
 	createStorage(),
 	'interfaceRegion'
 );
+
+// Older versions allowed any ISO 3166-1 country, including ones YouTube does
+// not support as content regions. Migrate those persisted values to the default.
+interfaceRegionStore.subscribe((region) => {
+	const normalized = normalizeContentRegion(region) ?? 'US';
+	if (normalized !== region) interfaceRegionStore.set(normalized);
+});
+
 export const interfaceSearchSuggestionsStore = persist(
 	writable(true),
 	createStorage(),

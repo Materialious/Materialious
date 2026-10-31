@@ -23,8 +23,11 @@ const publicEnv: Record<string, string | undefined> = {
 };
 
 export function getPublicEnv(envName: string): string | undefined {
+	// SvelteKit 3 normalizes unset PUBLIC_* variables to an empty string, so a
+	// nullish check isn't enough to fall back to the VITE_* placeholders used by
+	// the legacy Docker image (which are replaced at container start).
 	const envValue: string | undefined =
-		publicEnv[envName] ?? (import.meta.env[`VITE_${envName}`] as string | undefined);
+		publicEnv[envName] || (import.meta.env[`VITE_${envName}`] as string | undefined);
 	if (envValue === '') return;
 	return envValue;
 }

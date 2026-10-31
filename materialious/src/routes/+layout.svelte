@@ -154,7 +154,7 @@
 			});
 		}
 
-		loadSettingsFromEnv();
+		await loadSettingsFromEnv();
 		// Should always be loaded after env settings
 		// So user preferences overwrite instance preferences.
 		bookmarkletLoadFromUrl();

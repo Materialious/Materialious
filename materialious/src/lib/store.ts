@@ -1,5 +1,7 @@
 export {
 	createStorage,
+	hydrateSettings,
+	consumeInitialLoadState,
 	ifNotWebDefault,
 	playerAutoPlayStore,
 	playerAlwaysLoopStore,

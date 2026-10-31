@@ -11,7 +11,6 @@ import type {
 import { poTokenCacheStore } from '#lib/store';
 import { convertToSeconds } from '#lib/time';
 import { Capacitor } from '@capacitor/core';
-import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
 import { Innertube, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
@@ -199,6 +198,33 @@ export async function getVideoPageYTjs(videoId: string): Promise<VideoPlay> {
 	};
 }
 
+const PO_TOKEN_REQUEST_KEY = 'O43z0dpjhgX20SCx4KAo';
+
+/**
+ * Mints a fresh playback PoToken for the given video and stores it for reuse.
+ * Also used by the SABR player to refresh tokens when YouTube asks for
+ * attestation mid-playback.
+ */
+export async function mintPoTokenForVideo(videoId: string): Promise<string> {
+	let platformMinter: (requestKey: string, visitorData: string) => Promise<string>;
+
+	switch (Capacitor.getPlatform()) {
+		case 'electron':
+			platformMinter = window.electronAPI.generatePoToken;
+			break;
+		case 'android':
+			platformMinter = androidPoTokenMinter;
+			break;
+		default:
+			platformMinter = webPoTokenMinter;
+			break;
+	}
+
+	const poToken = await platformMinter(PO_TOKEN_REQUEST_KEY, videoId);
+	poTokenCacheStore.set(poToken);
+	return poToken;
+}
+
 export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 	dashUrl?: string;
 	adaptiveFormats: AdaptiveFormats[];
@@ -222,23 +248,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 
 	const { innertube, video, clientPlaybackNonce, rawPlayerResponse } = intermediate;
 
-	const requestKey = 'O43z0dpjhgX20SCx4KAo';
-
-	let platformMinter: (requestKey: string, visitorData: string) => Promise<string>;
-
-	switch (Capacitor.getPlatform()) {
-		case 'electron':
-			platformMinter = window.electronAPI.generatePoToken;
-			break;
-		case 'android':
-			platformMinter = androidPoTokenMinter;
-			break;
-		default:
-			platformMinter = webPoTokenMinter;
-			break;
-	}
-
-	poTokenCacheStore.set(await platformMinter(requestKey, videoId));
+	const poToken = await mintPoTokenForVideo(videoId);
 
 	let dashUri: string | undefined;
 
@@ -297,7 +307,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 		const url = new URL(caption.base_url);
 
 		url.searchParams.set('potc', '1');
-		url.searchParams.set('pot', get(poTokenCacheStore) ?? '');
+		url.searchParams.set('pot', poToken);
 		url.searchParams.set('c', innertube.session.context.client.clientName);
 		url.searchParams.set('fmt', 'vtt');
 

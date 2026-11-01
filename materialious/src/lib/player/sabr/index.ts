@@ -7,7 +7,7 @@ import { get } from 'svelte/store';
 import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
 import { isUnrestrictedPlatform } from '$lib/misc';
-import { lastMintedBy, mintPoToken } from '$lib/api/youtubejs/video';
+import { mintPoToken } from '$lib/api/youtubejs/video';
 
 /**
  * What the streaming side did lately - which token it streamed with, what it
@@ -64,7 +64,6 @@ export async function injectSabr(
 		signedIn: video.ytjs.innertube.session.logged_in === true,
 		playerToken: !!video.ytjs.playerPoToken,
 		binding: bindings[0]?.kind ?? null,
-		mintedBy: lastMintedBy ?? null,
 		fallbacks: bindings.slice(1).map((binding) => binding.kind)
 	});
 
@@ -97,7 +96,7 @@ export async function injectSabr(
 		note('refused', { binding: bindings[bindingIndex]?.kind ?? null, tryingNext: next.kind });
 
 		try {
-			poTokenCacheStore.set(await mintPoToken(next.value, video.ytjs?.innertube));
+			poTokenCacheStore.set(await mintPoToken(next.value));
 			bindingIndex++;
 		} catch (error) {
 			note('mintFailed', { binding: next.kind, error: String(error) });

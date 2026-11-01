@@ -5,7 +5,6 @@ import type {
 	Captions,
 	Image,
 	StoryBoard,
-	StreamingBinding,
 	Thumbnail,
 	VideoBase,
 	VideoPlay
@@ -39,31 +38,6 @@ export interface VideoIntermediate {
 
 const videoIntermediateCache = new Map<string, VideoIntermediate>();
 
-/**
- * What a playback token has to be bound to.
- *
- * Anonymously that is the video. A signed-in session's token has to be bound
- * to the account instead - its data sync id, which every signed-in response
- * carries - and a token bound to the video is refused by the streaming server
- * as "sabr.malformed_config" a few seconds into playback.
- */
-function poTokenBinding(
-	innertube: Innertube,
-	playerResponse: import('youtubei.js').ApiResponse,
-	videoId: string
-): string {
-	if (!innertube.session.logged_in) return videoId;
-
-	const datasyncId = (
-		playerResponse.data as
-			| { responseContext?: { mainAppWebResponseContext?: { datasyncId?: string } } }
-			| undefined
-	)?.responseContext?.mainAppWebResponseContext?.datasyncId;
-
-	// Written "<account>||<delegated account>", where only the first is wanted.
-	return datasyncId?.split('||')[0] || videoId;
-}
-
 const REQUEST_KEY = 'O43z0dpjhgX20SCx4KAo';
 
 function platformMinter(): (requestKey: string, visitorData: string) => Promise<string> {
@@ -75,25 +49,6 @@ function platformMinter(): (requestKey: string, visitorData: string) => Promise<
 		default:
 			return webPoTokenMinter;
 	}
-}
-
-/** A playback token, minted by whatever this platform mints with. */
-export function mintPoToken(binding: string): Promise<string> {
-	return platformMinter()(REQUEST_KEY, binding);
-}
-
-/**
- * Which account a signed-in session is, from the guide, which YouTube answers
- * without a bot check.
- */
-async function accountOf(innertube: Innertube): Promise<string | undefined> {
-	const answer = await innertube.actions.execute('/guide', { parse: false });
-	const data = (typeof answer.data === 'string' ? JSON.parse(answer.data) : answer.data) as
-		| { responseContext?: { mainAppWebResponseContext?: { datasyncId?: string } } }
-		| undefined;
-
-	// Written "<account>||<delegated account>", where only the first is wanted.
-	return data?.responseContext?.mainAppWebResponseContext?.datasyncId?.split('||')[0] || undefined;
 }
 
 /** The pair `vb=1`, as it is encoded inside a format's xtags. */
@@ -193,12 +148,8 @@ export async function getVideoPageYTjs(videoId: string): Promise<VideoPlay> {
 			signedInTried = true;
 			innertube = signedIn;
 
-			// Asked without a token first. Since one was sent with this request -
-			// bound to the account, then to the video - the streaming server has
-			// refused every request after the first with "sabr.malformed_config",
-			// whatever the streaming token was bound to, and playback stopped
-			// when the first minute ran out. Asked without, it played. Only if
-			// YouTube will not answer that is a token sent after all.
+			// Asked without a token first, as it was before one was ever sent
+			// here; only if YouTube will not answer that is one sent after all.
 			rawPlayerResponse = await askForPlayer(signedIn);
 
 			if (playabilityStatusOf(rawPlayerResponse) !== 'OK') {
@@ -387,35 +338,13 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 
 	const { innertube, video, clientPlaybackNonce, rawPlayerResponse } = intermediate;
 
-	// Nothing to play means nothing to ask a token for.
-	const streamingBindings: StreamingBinding[] = [];
-
+	// Nothing to play means nothing to ask a token for. Bound to the video,
+	// signed in or not: bound to the account - which this used to insist on -
+	// or to the visitor, the streaming server marks a signed-in stream
+	// "attestation pending" from its first answer, sends a minute's grace and
+	// then nothing, and playback stopped at 1:00.
 	if (video.streaming_data) {
-		let binding = poTokenBinding(innertube, rawPlayerResponse, videoId);
-		let kind: StreamingBinding['kind'] = binding === videoId ? 'video' : 'account';
-
-		// The player's answer normally names the account; when it does not,
-		// the guide still does.
-		if (innertube.session.logged_in && binding === videoId) {
-			const account = await accountOf(innertube).catch(() => undefined);
-			if (account) {
-				binding = account;
-				kind = 'guide';
-			}
-		}
-
-		streamingBindings.push({ kind, value: binding });
-
-		// What else a signed-in session's streaming token could be bound to,
-		// for the player to fall back on if the streaming server refuses the
-		// first: which one YouTube wants has changed under us more than once.
-		if (innertube.session.logged_in) {
-			const visitorData = innertube.session.context.client.visitorData;
-			if (binding !== videoId) streamingBindings.push({ kind: 'video', value: videoId });
-			if (visitorData) streamingBindings.push({ kind: 'visitor', value: visitorData });
-		}
-
-		poTokenCacheStore.set(await mintPoToken(binding));
+		poTokenCacheStore.set(await platformMinter()(REQUEST_KEY, videoId));
 	}
 
 	let dashUri: string | undefined;
@@ -504,8 +433,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 			video: video,
 			clientPlaybackNonce: clientPlaybackNonce,
 			rawApiResponse: rawPlayerResponse,
-			playerPoToken: intermediate.playerPoToken,
-			streamingBindings
+			playerPoToken: intermediate.playerPoToken
 		}
 	};
 }

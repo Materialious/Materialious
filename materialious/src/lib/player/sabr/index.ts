@@ -7,12 +7,11 @@ import { get } from 'svelte/store';
 import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
 import { isUnrestrictedPlatform } from '$lib/misc';
-import { mintPoToken } from '$lib/api/youtubejs/video';
 
 /**
- * What the streaming side did lately - which token it streamed with, what it
- * fell back on, what a reload came back with - for a report of a failure to
- * say. Nothing in it identifies the account or carries a token.
+ * What the streaming side did lately - how it was set up, what a reload came
+ * back with - for a report of a failure to say. Nothing in it identifies the
+ * account or carries a token.
  */
 const trace: { at: number; what: string; [detail: string]: unknown }[] = [];
 
@@ -56,61 +55,18 @@ export async function injectSabr(
 	});
 
 	trace.length = 0;
-	const bindings = video.ytjs.streamingBindings ?? [];
-	let bindingIndex = 0;
-	let switching = false;
-
 	note('start', {
 		signedIn: video.ytjs.innertube.session.logged_in === true,
-		playerToken: !!video.ytjs.playerPoToken,
-		binding: bindings[0]?.kind ?? null,
-		fallbacks: bindings.slice(1).map((binding) => binding.kind)
+		playerToken: !!video.ytjs.playerPoToken
 	});
 
 	sabrAdapter.onMintPoToken(async () => {
 		return get(poTokenCacheStore) || '';
 	});
 
-	// The streaming server says "sabr.malformed_config" when it will not take
-	// the token, and says it again for every request after. Which binding a
-	// signed-in session's token needs has changed under us more than once, so
-	// rather than stopping a minute in, the next one is minted and every
-	// request from then on carries it. The adapter asks for the token afresh
-	// with each request, so nothing else has to be told.
-	player.addEventListener('error', async (event) => {
-		const detail = (event as CustomEvent).detail as { data?: unknown[] } | undefined;
-		const info = detail?.data?.[1] as
-			| { info?: { error?: { sabrError?: { type?: string } } } }
-			| undefined;
-
-		if (info?.info?.error?.sabrError?.type !== 'sabr.malformed_config') return;
-		if (switching) return;
-
-		const next = bindings[bindingIndex + 1];
-		if (!next) {
-			note('refused', { binding: bindings[bindingIndex]?.kind ?? null, noneLeft: true });
-			return;
-		}
-
-		switching = true;
-		note('refused', { binding: bindings[bindingIndex]?.kind ?? null, tryingNext: next.kind });
-
-		try {
-			poTokenCacheStore.set(await mintPoToken(next.value));
-			bindingIndex++;
-		} catch (error) {
-			note('mintFailed', { binding: next.kind, error: String(error) });
-			bindingIndex++;
-		} finally {
-			switching = false;
-		}
-	});
-
 	sabrAdapter.onReloadPlayerResponse(async (reloadContext) => {
 		if (!video.ytjs) return;
 
-		// The streaming token is bound to the account, and is not what the
-		// player is asked with.
 		const ytjs = video.ytjs;
 
 		const reload = async (poToken: string | undefined) => {

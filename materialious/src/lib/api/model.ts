@@ -101,16 +101,6 @@ export interface Ytjs {
 	rawApiResponse: ApiResponse;
 	/** The token the player was asked with, bound to the video, if any. */
 	playerPoToken?: string;
-	/**
-	 * What the streaming token can be bound to, the one in use first and the
-	 * ones to fall back on after it.
-	 */
-	streamingBindings?: StreamingBinding[];
-}
-
-export interface StreamingBinding {
-	kind: 'account' | 'guide' | 'video' | 'visitor';
-	value: string;
 }
 
 export type FallbackPatches = 'youtubejs' | 'piped';

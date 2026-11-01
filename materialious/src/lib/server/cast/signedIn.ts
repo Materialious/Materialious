@@ -15,9 +15,8 @@ const REQUEST_KEY = 'O43z0dpjhgX20SCx4KAo';
  * when it starts a video; they are used for that video's session and kept for
  * nothing else, and never written anywhere.
  *
- * Streaming has to be done with a token bound to the account rather than to
- * the video, or the streaming server refuses it, so that one is handed back
- * beside the session, which asks for the video without one.
+ * The session asks for the video without a token; the one it streams with,
+ * bound to the video, is handed back beside it.
  */
 export async function getSignedInSession(
 	cookie: string,
@@ -60,13 +59,12 @@ export async function getSignedInSession(
 
 	const probe = await create();
 
-	// Which account the cookies are, from a page YouTube does not bot-check:
-	// asking for the video itself without a token is exactly what it refuses,
-	// and the refusal says nothing about who asked.
+	// Whether the cookies still sign anybody in, from a page YouTube does not
+	// bot-check.
 	const answer = await probe.actions.execute('/guide', { parse: false });
 
 	const data = (typeof answer.data === 'string' ? JSON.parse(answer.data) : answer.data) as {
-		responseContext?: { mainAppWebResponseContext?: { datasyncId?: string; loggedOut?: boolean } };
+		responseContext?: { mainAppWebResponseContext?: { loggedOut?: boolean } };
 	};
 
 	const context = data?.responseContext?.mainAppWebResponseContext;
@@ -84,18 +82,15 @@ export async function getSignedInSession(
 		);
 	}
 
-	// Written "<account>||<delegated account>", where only the first is wanted.
-	const account = context?.datasyncId?.split('||')[0] || videoId;
-
-	// Streaming is done with a token bound to the account. The player is
-	// asked without one: sent with that request - bound to the account, then
-	// to the video - the streaming server refused every request after the
-	// first with "sabr.malformed_config", and playback stopped a minute in.
-	// Only a session that asks with a token bound to the video is offered for
-	// the case YouTube will not answer without.
+	// Streaming is done with a token bound to the video, signed in or not.
+	// Bound to the account - as this used to be - the streaming server marks
+	// a signed-in stream "attestation pending" from its first answer, sends a
+	// minute's grace and then nothing. The player is asked without a token,
+	// and only a session that asks with one is offered for the case YouTube
+	// will not answer without.
 	let streamingPoToken: string | undefined;
 	try {
-		streamingPoToken = await mintPoTokenInJSDOM(REQUEST_KEY, account);
+		streamingPoToken = await mintPoTokenInJSDOM(REQUEST_KEY, videoId);
 	} catch (error) {
 		console.warn(
 			'cast: could not mint a token for a signed-in session:',
@@ -105,7 +100,8 @@ export async function getSignedInSession(
 
 	return {
 		innertube: probe,
-		withPlayerToken: async () => create(await mintPoTokenInJSDOM(REQUEST_KEY, videoId)),
+		withPlayerToken: async () =>
+			create(streamingPoToken ?? (await mintPoTokenInJSDOM(REQUEST_KEY, videoId))),
 		streamingPoToken
 	};
 }

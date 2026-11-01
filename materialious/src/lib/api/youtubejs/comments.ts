@@ -1,5 +1,5 @@
 import { extractNumber } from '$lib/numbers';
-import { YT, YTNodes } from 'youtubei.js';
+import { YT, YTNodes, type Actions } from 'youtubei.js';
 import { getInnertube } from '.';
 import type { Comment, Comments, CommentsOptions, Thumbnail } from '../model';
 
@@ -71,6 +71,59 @@ function replyPage(videoId: string, page: ReplyPage): Comments {
 	return replies;
 }
 
+/**
+ * A thread's first batch of replies, fetched here rather than by youtubei.js:
+ * it looks for the way to them only among a thread's sub-threads, and the
+ * comments the browser is sent carry it in the replies' contents instead, so
+ * every thread failed with "Replies continuation item not found".
+ */
+async function fetchReplies(thread: YTNodes.CommentThread, actions: Actions): Promise<ReplyPage> {
+	const data = thread.comment_replies_data;
+	const item =
+		data?.sub_threads.firstOfType(YTNodes.ContinuationItem) ??
+		data?.contents.firstOfType(YTNodes.ContinuationItem);
+
+	const endpoint = item?.button?.endpoint ?? item?.endpoint;
+	if (!endpoint) return thread.getReplies();
+
+	return repliesFrom(endpoint, actions);
+}
+
+/** One batch of replies from where a "show replies" or "more" points. */
+async function repliesFrom(
+	endpoint: YTNodes.NavigationEndpoint,
+	actions: Actions
+): Promise<ReplyPage> {
+	const response = await endpoint.call(actions, { parse: true });
+	const items =
+		response.on_response_received_endpoints?.firstOfType(YTNodes.AppendContinuationItemsAction)
+			?.contents ?? [];
+
+	const more = items.find((item) => item.is(YTNodes.ContinuationItem)) as
+		| YTNodes.ContinuationItem
+		| undefined;
+	const next = more?.button?.endpoint ?? more?.endpoint;
+
+	return {
+		// Replies come as threads of their own, or - in the layout that broke
+		// youtubei.js - as bare comments; either is a reply.
+		replies: items
+			.map((item) =>
+				item.is(YTNodes.CommentThread)
+					? item
+					: item.is(YTNodes.CommentView)
+						? ({ comment: item } as YTNodes.CommentThread)
+						: undefined
+			)
+			.filter((thread): thread is YTNodes.CommentThread => !!thread),
+		has_continuation: !!next,
+		getContinuation: async () => {
+			if (!next) throw new Error('No more replies');
+			return repliesFrom(next, actions);
+		}
+	};
+}
+
 /** A reply has none of its own to show. */
 function replyContent(view: YTNodes.CommentView): Comment | undefined {
 	const reply = invidiousCommentContentSchema(view);
@@ -86,7 +139,8 @@ function invidiousCommentSchema(innerResults: YT.Comments, videoId: string) {
 			const invidiousResult = invidiousCommentContentSchema(result.comment);
 			if (invidiousResult) {
 				if (result.has_replies) {
-					invidiousResult.getReplies = async () => replyPage(videoId, await result.getReplies());
+					invidiousResult.getReplies = async () =>
+						replyPage(videoId, await fetchReplies(result, (await getInnertube()).actions));
 				}
 
 				comment.push(invidiousResult);

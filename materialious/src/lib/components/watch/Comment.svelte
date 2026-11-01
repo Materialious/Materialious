@@ -42,8 +42,9 @@
 			} else if (continuation) {
 				replies = await getComments(videoId, { continuation, sort_by: 'top' });
 			}
-		} catch {
+		} catch (error) {
 			// Left to be asked again.
+			console.warn('Could not load replies:', error);
 		} finally {
 			loadingReplies = false;
 		}
@@ -56,8 +57,9 @@
 		try {
 			const next = await replies.getContinuation();
 			replies = { ...next, comments: [...replies.comments, ...next.comments] };
-		} catch {
+		} catch (error) {
 			// Left to be asked again.
+			console.warn('Could not load more replies:', error);
 		} finally {
 			loadingReplies = false;
 		}

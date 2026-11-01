@@ -26,6 +26,9 @@ export async function getVideoInvidious(
 
 	if (resp.ok) {
 		await associateAvatar(respJson.authorId, respJson.authorThumbnails);
+
+		// Invidious omits `type` on recommended videos; ItemsList needs it to render them.
+		respJson.recommendedVideos?.forEach((video: { type?: string }) => (video.type ??= 'video'));
 	}
 
 	return respJson;

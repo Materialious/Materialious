@@ -101,6 +101,8 @@ export interface Ytjs {
 	rawApiResponse: ApiResponse;
 	/** The token the player was asked with, bound to the video, if any. */
 	playerPoToken?: string;
+	/** The token this video streams with, bound to the video. */
+	streamingPoToken?: string;
 }
 
 export type FallbackPatches = 'youtubejs' | 'piped';

@@ -491,12 +491,36 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 		const networkingEngine = this.player.getNetworkingEngine();
 		if (!networkingEngine) return;
 
+		// Shaka runs the filters again on every retry, over the same request it
+		// already handed through once - by then rewritten from its sabr: address
+		// to the real one, its Range header taken away and its body replaced. The
+		// adapter took that for a plain media request and sent the streaming URL
+		// a two-byte body, which the server answers with "sabr.malformed_config",
+		// and every retry after it did the same: one dropped connection was the
+		// end of the stream. Each retry starts again from the request as it was.
+		const originals = new WeakMap<
+			shaka.extern.Request,
+			{ uris: string[]; method: string; headers: Record<string, string>; body: unknown }
+		>();
+
 		this.requestFilter = async (type, request, context) => {
-			if (
-				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
-				!isGoogleVideoURL(request.uris[0])
-			)
-				return;
+			if (type !== shaka.net.NetworkingEngine.RequestType.SEGMENT) return;
+
+			const original = originals.get(request);
+			if (original) {
+				request.uris = [...original.uris];
+				request.method = original.method;
+				request.headers = { ...original.headers };
+				request.body = original.body as typeof request.body;
+			} else {
+				if (!isGoogleVideoURL(request.uris[0])) return;
+				originals.set(request, {
+					uris: [...request.uris],
+					method: request.method,
+					headers: { ...request.headers },
+					body: request.body
+				});
+			}
 
 			const modifiedRequest = await interceptor({
 				headers: request.headers,

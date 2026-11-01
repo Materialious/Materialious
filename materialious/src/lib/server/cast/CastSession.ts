@@ -210,9 +210,9 @@ export class CastSession {
 	private hlsMaster?: { url: string; at: number };
 
 	/**
-	 * What a signed-in session streams with, bound to the account: the
-	 * session's own token is bound to the video, which is what the player is
-	 * asked with and what the streaming server refuses from an account.
+	 * What a signed-in session streams with, bound to the video like every
+	 * token: the session itself may have been asked for the video without
+	 * one, and has none of its own.
 	 */
 	private streamingPoToken?: string;
 
@@ -246,7 +246,14 @@ export class CastSession {
 		// does: everything else stays anonymous.
 		if (info.playability_status?.status === 'LOGIN_REQUIRED' && options.youtubeCookie) {
 			try {
-				const signedIn = await getSignedInSession(options.youtubeCookie, videoId);
+				// The anonymous session's token is bound to the same video, and
+				// is what the signed-in one streams with: minting another would
+				// only cost a second BotGuard run behind every other mint.
+				const signedIn = await getSignedInSession(
+					options.youtubeCookie,
+					videoId,
+					innertube.session.po_token
+				);
 				let signedInSession = signedIn.innertube;
 				let signedInInfo = await signedInSession.getInfo(videoId);
 
@@ -523,27 +530,44 @@ export class CastSession {
 
 	/** Re-fetches the player response when the SABR server invalidates ours. */
 	private async reloadPlayerResponse(reloadContext: unknown): Promise<void> {
-		const reloaded = await this.innertube.actions.execute('/player', {
-			videoId: this.videoId,
-			contentCheckOk: true,
-			racyCheckOk: true,
-			playbackContext: {
-				contentPlaybackContext: {
-					signatureTimestamp: this.innertube.session.player?.signature_timestamp
-				},
-				reloadPlaybackContext: reloadContext
-			}
-		});
+		const ask = async (poToken: string | undefined) =>
+			new YT.VideoInfo(
+				[
+					await this.innertube.actions.execute('/player', {
+						videoId: this.videoId,
+						contentCheckOk: true,
+						racyCheckOk: true,
+						playbackContext: {
+							contentPlaybackContext: {
+								signatureTimestamp: this.innertube.session.player?.signature_timestamp
+							},
+							reloadPlaybackContext: reloadContext
+						},
+						...(poToken ? { serviceIntegrityDimensions: { poToken } } : {})
+					})
+				],
+				this.innertube.actions,
+				(this.info as Mixins.MediaInfo).cpn
+			);
 
-		const info = new YT.VideoInfo(
-			[reloaded],
-			this.innertube.actions,
-			(this.info as Mixins.MediaInfo).cpn
-		);
+		// Asked again the way the session first asked - with its own token if
+		// it has one - and if that comes back with nothing to stream, once more
+		// the other way, as the website does.
+		const own = this.innertube.session.po_token;
+		let info = await ask(own);
+		if (!info.streaming_data) info = await ask(own ? undefined : this.streamingPoToken);
+
+		// A refusal is not kept over what was working: the old address and
+		// configuration at least fail the way they did.
+		if (!info.streaming_data || !this.innertube.session.player) {
+			console.warn(
+				`cast: reload for ${this.videoId} came back with nothing to stream:`,
+				info.playability_status?.reason || info.playability_status?.status
+			);
+			return;
+		}
 
 		this.info = info;
-
-		if (!info.streaming_data || !this.innertube.session.player) return;
 
 		this.sabr.setStreamingURL(
 			await this.innertube.session.player.decipher(info.streaming_data.server_abr_streaming_url)
@@ -912,9 +936,8 @@ export class CastSession {
 		url.searchParams.set('fmt', 'vtt');
 		url.searchParams.set('potc', '1');
 		url.searchParams.set('c', this.innertube.session.context.client.clientName);
-		if (this.innertube.session.po_token) {
-			url.searchParams.set('pot', this.innertube.session.po_token);
-		}
+		const pot = this.streamingPoToken ?? this.innertube.session.po_token;
+		if (pot) url.searchParams.set('pot', pot);
 		url.searchParams.delete('xosf');
 
 		// A redirect would take the token somewhere that was never checked, so

@@ -3,8 +3,6 @@ import { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import { ShakaPlayerAdapter } from './ShakaPlayerAdapter';
 import { Constants, YT } from 'youtubei.js';
-import { get } from 'svelte/store';
-import { poTokenCacheStore } from '$lib/store';
 import { buildSabrFormat } from 'googlevideo/utils';
 import { isUnrestrictedPlatform } from '$lib/misc';
 
@@ -30,15 +28,6 @@ export async function injectSabr(
 ): Promise<SabrStreamingAdapter | null> {
 	if (!video.ytjs || !isUnrestrictedPlatform()) return null;
 
-	// Primes BotGuard attestation state, without it SABR servers may
-	// silently stop sending media mid-playback until the user seeks.
-	// https://github.com/LuanRT/YouTube.js/issues/1121
-	try {
-		await video.ytjs.innertube.getAttestationChallenge('ENGAGEMENT_TYPE_UNBOUND');
-	} catch {
-		// Continue regardless
-	}
-
 	const sabrAdapter = new SabrStreamingAdapter({
 		playerAdapter: new ShakaPlayerAdapter(),
 		clientInfo: {
@@ -60,9 +49,9 @@ export async function injectSabr(
 		playerToken: !!video.ytjs.playerPoToken
 	});
 
-	sabrAdapter.onMintPoToken(async () => {
-		return get(poTokenCacheStore) || '';
-	});
+	// This video's own token, not whichever video was loaded last.
+	const streamingPoToken = video.ytjs.streamingPoToken ?? '';
+	sabrAdapter.onMintPoToken(async () => streamingPoToken);
 
 	sabrAdapter.onReloadPlayerResponse(async (reloadContext) => {
 		if (!video.ytjs) return;
@@ -101,12 +90,23 @@ export async function injectSabr(
 		};
 
 		// Asked again the way it was asked the first time; and if that comes
-		// back with nothing to stream, once more the way it was asked before a
-		// token was sent with it at all.
+		// back with nothing to stream, once more the other way - with a token
+		// bound to the video if it went without one, without if it went with.
+		const streamingUrl = (info: YT.VideoInfo) => info.streaming_data?.server_abr_streaming_url;
+
 		let parsedInfo = await reload(ytjs.playerPoToken);
-		if (!parsedInfo.streaming_data?.server_abr_streaming_url && ytjs.playerPoToken) {
-			parsedInfo = await reload(undefined);
+		const otherWay = ytjs.playerPoToken ? undefined : ytjs.streamingPoToken;
+		if (!streamingUrl(parsedInfo) && (ytjs.playerPoToken || otherWay)) {
+			parsedInfo = await reload(otherWay);
 		}
+
+		// Nothing to stream with either way: the old address and configuration
+		// are kept, which at least fails as it did, rather than throwing here.
+		if (!streamingUrl(parsedInfo)) {
+			note('reloadRefused');
+			return;
+		}
+
 		sabrAdapter.setStreamingURL(
 			await video.ytjs.innertube.session.player!.decipher(
 				parsedInfo.streaming_data?.server_abr_streaming_url

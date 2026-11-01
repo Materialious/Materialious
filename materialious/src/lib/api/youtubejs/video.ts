@@ -9,10 +9,8 @@ import type {
 	VideoBase,
 	VideoPlay
 } from '$lib/api/model';
-import { poTokenCacheStore } from '$lib/store';
 import { convertToSeconds } from '$lib/time';
 import { Capacitor } from '@capacitor/core';
-import { get } from 'svelte/store';
 import type { Types } from 'youtubei.js';
 import { Innertube, Utils, YT, YTNodes, Platform } from 'youtubei.js';
 import { getInnertube } from '.';
@@ -146,15 +144,27 @@ export async function getVideoPageYTjs(videoId: string): Promise<VideoPlay> {
 
 		if (signedIn) {
 			signedInTried = true;
-			innertube = signedIn;
 
 			// Asked without a token first, as it was before one was ever sent
 			// here; only if YouTube will not answer that is one sent after all.
-			rawPlayerResponse = await askForPlayer(signedIn);
+			// A retry that fails outright leaves the refusal as it was, which at
+			// least says why, rather than taking the page down with it.
+			try {
+				let answer = await askForPlayer(signedIn);
 
-			if (playabilityStatusOf(rawPlayerResponse) !== 'OK') {
-				playerPoToken = await platformMinter()(REQUEST_KEY, videoId).catch(() => undefined);
-				if (playerPoToken) rawPlayerResponse = await askForPlayer(signedIn, playerPoToken);
+				if (playabilityStatusOf(answer) !== 'OK') {
+					const token = await platformMinter()(REQUEST_KEY, videoId).catch(() => undefined);
+					const withToken = token ? await askForPlayer(signedIn, token) : undefined;
+					if (withToken && playabilityStatusOf(withToken) === 'OK') {
+						answer = withToken;
+						playerPoToken = token;
+					}
+				}
+
+				innertube = signedIn;
+				rawPlayerResponse = answer;
+			} catch (error) {
+				console.warn('Could not ask for the video as the saved account:', error);
 			}
 		}
 	}
@@ -343,8 +353,20 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 	// or to the visitor, the streaming server marks a signed-in stream
 	// "attestation pending" from its first answer, sends a minute's grace and
 	// then nothing, and playback stopped at 1:00.
+	//
+	// Kept with this video rather than shared: tokens bound to a video are good
+	// for that video only, and a player still streaming the last one would
+	// otherwise pick up this one's and stall a minute later. A token the player
+	// request was already asked with is the same one. One that cannot be
+	// minted at all leaves the minute's grace rather than no video.
+	let streamingPoToken: string | undefined;
 	if (video.streaming_data) {
-		poTokenCacheStore.set(await platformMinter()(REQUEST_KEY, videoId));
+		streamingPoToken =
+			intermediate.playerPoToken ??
+			(await platformMinter()(REQUEST_KEY, videoId).catch((error) => {
+				console.warn('Could not mint a playback token:', error);
+				return undefined;
+			}));
 	}
 
 	let dashUri: string | undefined;
@@ -410,7 +432,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 		const url = new URL(caption.base_url);
 
 		url.searchParams.set('potc', '1');
-		url.searchParams.set('pot', get(poTokenCacheStore) ?? '');
+		if (streamingPoToken) url.searchParams.set('pot', streamingPoToken);
 		url.searchParams.set('c', innertube.session.context.client.clientName);
 		url.searchParams.set('fmt', 'vtt');
 
@@ -433,7 +455,8 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 			video: video,
 			clientPlaybackNonce: clientPlaybackNonce,
 			rawApiResponse: rawPlayerResponse,
-			playerPoToken: intermediate.playerPoToken
+			playerPoToken: intermediate.playerPoToken,
+			streamingPoToken
 		}
 	};
 }

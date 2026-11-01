@@ -20,7 +20,9 @@ const REQUEST_KEY = 'O43z0dpjhgX20SCx4KAo';
  */
 export async function getSignedInSession(
 	cookie: string,
-	videoId: string
+	videoId: string,
+	/** A token already minted for this video, which is used rather than another. */
+	videoPoToken?: string
 ): Promise<{
 	innertube: Innertube;
 	withPlayerToken: () => Promise<Innertube>;
@@ -88,9 +90,9 @@ export async function getSignedInSession(
 	// minute's grace and then nothing. The player is asked without a token,
 	// and only a session that asks with one is offered for the case YouTube
 	// will not answer without.
-	let streamingPoToken: string | undefined;
+	let streamingPoToken = videoPoToken;
 	try {
-		streamingPoToken = await mintPoTokenInJSDOM(REQUEST_KEY, videoId);
+		streamingPoToken ??= await mintPoTokenInJSDOM(REQUEST_KEY, videoId);
 	} catch (error) {
 		console.warn(
 			'cast: could not mint a token for a signed-in session:',

@@ -20,6 +20,7 @@ import { getInnertube } from '.';
 import { getSignedInInnertube } from './account';
 import { isUnrestrictedPlatform } from '$lib/misc';
 import { webPoTokenMinter } from '$lib/web/youtube/minter';
+import { mintInBrowser } from '$lib/web/youtube/botguard';
 import { associateAvatar } from '$lib/thumbnail';
 
 Platform.shim.eval = async (data: Types.BuildScriptResult) => new Function(data.output)();
@@ -77,8 +78,26 @@ function platformMinter(): (requestKey: string, visitorData: string) => Promise<
 	}
 }
 
-/** A playback token, minted by whatever this platform mints with. */
-export function mintPoToken(binding: string): Promise<string> {
+/** Where the last streaming token came from, for a failure report to say. */
+export let lastMintedBy: 'browser' | 'platform' | undefined;
+
+/**
+ * A playback token, minted by whatever this platform mints with - or, for a
+ * signed-in session on the web, by BotGuard in this browser, the only kind
+ * YouTube will stream to an account for longer than a minute.
+ */
+export async function mintPoToken(binding: string, session?: Innertube): Promise<string> {
+	if (session?.session.logged_in && Capacitor.getPlatform() === 'web') {
+		try {
+			const token = await mintInBrowser(session, binding);
+			lastMintedBy = 'browser';
+			return token;
+		} catch (error) {
+			console.warn('Could not mint in the browser, asking the server:', error);
+		}
+	}
+
+	lastMintedBy = 'platform';
 	return platformMinter()(REQUEST_KEY, binding);
 }
 
@@ -415,7 +434,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 			if (visitorData) streamingBindings.push({ kind: 'visitor', value: visitorData });
 		}
 
-		poTokenCacheStore.set(await mintPoToken(binding));
+		poTokenCacheStore.set(await mintPoToken(binding, innertube));
 	}
 
 	let dashUri: string | undefined;

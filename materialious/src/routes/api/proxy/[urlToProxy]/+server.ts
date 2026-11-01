@@ -44,12 +44,23 @@ function isYouTubeHost(host: string): boolean {
 	return name === 'youtube.com' || name.endsWith('.youtube.com');
 }
 
+/**
+ * The BotGuard interpreter a signed-in session's attestation challenge points
+ * at, which the browser runs to mint its own playback token. Only that path on
+ * google.com, not google.com at large.
+ */
+function isBotGuardInterpreter(url: URL): boolean {
+	return (
+		url.protocol === 'https:' && url.host === 'www.google.com' && url.pathname.startsWith('/js/th/')
+	);
+}
+
 const allowedBaseDomains: string[] = [
 	'youtube.com',
 	'ytimg.com',
 	'googlevideo.com',
 	'returnyoutubedislikeapi.com',
-  'ajay.app',
+	'ajay.app',
 	'googleapis.com'
 ];
 
@@ -212,7 +223,8 @@ async function proxyRequest(
 
 	if (
 		!dynamicAllowDomains.includes(urlToProxyObj.host) &&
-		(!baseDomain || !allowedBaseDomains.includes(baseDomain))
+		(!baseDomain || !allowedBaseDomains.includes(baseDomain)) &&
+		!isBotGuardInterpreter(urlToProxyObj)
 	) {
 		// allowAnyProxy allows a instance owner to bypass the whitelist.
 		// BUT is extremely strict.

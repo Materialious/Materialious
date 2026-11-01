@@ -88,6 +88,9 @@
 	});
 
 	App.addListener('backButton', async (data) => {
+		// Pages can preventDefault() this to handle back themselves (e.g. close an overlay).
+		if (!window.dispatchEvent(new Event('materialious:back', { cancelable: true }))) return;
+
 		if (data.canGoBack) {
 			window.history.back();
 		} else {

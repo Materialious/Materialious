@@ -140,7 +140,15 @@
 		closeInfo();
 	}
 
+	function handleBack(event: Event) {
+		if (!showInfo) return;
+		event.preventDefault();
+		closeInfo();
+	}
+
 	onMount(() => {
+		window.addEventListener('materialious:back', handleBack);
+
 		if (playerElement) {
 			playerElement.addEventListener('timeupdate', () => {
 				if (!playerElement) return;
@@ -232,6 +240,7 @@
 	});
 
 	onDestroy(() => {
+		window.removeEventListener('materialious:back', handleBack);
 		// unbind() only removes the default action; these were bound on keyup too.
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc']);
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc'], 'keyup');

@@ -110,7 +110,7 @@
 		"sponsorblock-api": "^0.2.4",
 		"sqlite3": "^6.0.1",
 		"svelte-awesome-color-picker": "^4.1.3",
-		"svelte-infinite-loading": "^1.4.0",
+		"svelte-infinite-loading": "^2.0.0",
 		"sveltekit-rate-limiter": "^0.8.0",
 		"tldts": "^7.4.5",
 		"undici": "^8.10.2",

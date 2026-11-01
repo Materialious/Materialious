@@ -23,20 +23,46 @@
 
 	const replyText: string = comment.replies?.replyCount > 1 ? $_('replies') : $_('reply');
 
+	let loadingReplies = $state(false);
+
+	// Only a comment that has replies, and a way to them, offers to show
+	// them. Every comment used to: one with none, or a reply itself, then
+	// asked for "replies" with nothing to ask with, and was handed the video's
+	// own comments over again, nested under it.
+	const canLoadReplies = $derived(
+		(comment.replies?.replyCount ?? 0) > 0 &&
+			(!!comment.getReplies || !!comment.replies?.continuation)
+	);
+
 	async function loadReplies(continuation: string) {
-		if (comment?.getReplies) {
-			replies = await comment.getReplies();
-		} else {
-			try {
-				replies = await getComments(videoId, {
-					continuation: continuation,
-					sort_by: 'top'
-				});
-			} catch {
-				// Continue regardless of error
+		loadingReplies = true;
+		try {
+			if (comment.getReplies) {
+				replies = await comment.getReplies();
+			} else if (continuation) {
+				replies = await getComments(videoId, { continuation, sort_by: 'top' });
 			}
+		} catch {
+			// Left to be asked again.
+		} finally {
+			loadingReplies = false;
 		}
 	}
+
+	async function loadMoreReplies() {
+		if (!replies?.getContinuation) return;
+
+		loadingReplies = true;
+		try {
+			const next = await replies.getContinuation();
+			replies = { ...next, comments: [...replies.comments, ...next.comments] };
+		} catch {
+			// Left to be asked again.
+		} finally {
+			loadingReplies = false;
+		}
+	}
+
 	function parseComment(html: string): string {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(html, 'text/html');
@@ -97,10 +123,11 @@
 			</p>
 			<div class="comment-actions">
 				<p class="no-margin no-padding"><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
-				{#if comment.replies && !replies}
+				{#if canLoadReplies && !replies}
 					<button
 						onclick={async () => loadReplies(comment.replies.continuation)}
 						class="transparent replies"
+						disabled={loadingReplies}
 					>
 						<i>expand_more</i>
 						<span>{comment.replies.replyCount} {replyText}</span>
@@ -119,6 +146,14 @@
 		{#each replies.comments as reply (reply)}
 			<CommentSelf comment={reply} {videoId} isSubComp={true} />
 		{/each}
+		{#if replies.getContinuation}
+			<nav class="no-padding">
+				<button onclick={loadMoreReplies} class="transparent replies" disabled={loadingReplies}>
+					<i>expand_more</i>
+					<span>{$_('loadMore')}</span>
+				</button>
+			</nav>
+		{/if}
 	{/if}
 </article>
 

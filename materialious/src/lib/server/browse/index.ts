@@ -931,7 +931,7 @@ export async function getCollaborators(videoId: string): Promise<BrowseCollabora
 }
 
 /** How long a channel's videos are served for before being fetched again. */
-const FEED_CACHE_MS = 30 * 60 * 1000;
+const FEED_CACHE_MS = 90 * 60 * 1000;
 
 /**
  * How old a channel may get before it is fetched again with nobody waiting.
@@ -941,8 +941,13 @@ const FEED_CACHE_MS = 30 * 60 * 1000;
  * next twenty seconds, a few channels at a time. Kept fresh behind the scenes
  * instead, a feed is whole and current the moment it is asked for. Well inside
  * FEED_CACHE_MS, so that nothing anybody asks for has gone stale.
+ *
+ * An hour and a quarter, not twenty minutes: a hundred and sixty channels every
+ * twenty minutes is eight channel pages a minute for as long as anybody is
+ * about, and the address was asked to prove it was not a bot again within
+ * hours of changing. New uploads still show up when the feed is refreshed.
  */
-const KEEP_FRESH_AFTER_MS = 20 * 60 * 1000;
+const KEEP_FRESH_AFTER_MS = 75 * 60 * 1000;
 
 /**
  * How often the stalest channel is fetched, one at a time.
@@ -954,13 +959,14 @@ const KEEP_FRESH_AFTER_MS = 20 * 60 * 1000;
  * was the cause, it was the obvious thing to ask less of. A channel that
  * falls behind is still fetched the moment somebody asks.
  */
-const KEEP_FRESH_EVERY_MS = 5_000;
+const KEEP_FRESH_EVERY_MS = 15_000;
 
 /**
  * How long after the last feed anybody asked for channels are still kept
- * fresh. Nobody is looking overnight, and nothing needs fetching for them.
+ * fresh. Nobody is looking overnight, and nothing needs fetching for them; an
+ * hour after the last look, the next one waits for a fetch instead.
  */
-const KEEP_FRESH_WHILE_IN_USE_MS = 6 * 60 * 60 * 1000;
+const KEEP_FRESH_WHILE_IN_USE_MS = 60 * 60 * 1000;
 
 /** When anybody last asked for a feed. */
 let lastFeedAskedAt = 0;

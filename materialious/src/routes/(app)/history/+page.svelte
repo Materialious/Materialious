@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
-	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import InfiniteLoading, { type InfiniteEvent } from '#lib/components/InfiniteLoading.svelte';
 	import { _ } from '#lib/i18n/index';
 	import { deleteWatchHistory, getWatchHistory } from '#lib/api/index';
 

@@ -7,7 +7,7 @@
 	import { channelCacheStore } from '#lib/store';
 	import { isAndroidTv } from '#lib/utils';
 	import { _ } from '#lib/i18n/index';
-	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import InfiniteLoading, { type InfiniteEvent } from '#lib/components/InfiniteLoading.svelte';
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import Author from '#lib/components/Author.svelte';
 	import { page } from '$app/state';

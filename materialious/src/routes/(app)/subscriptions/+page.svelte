@@ -2,7 +2,7 @@
 	import { getFeed } from '#lib/api/index';
 	import type { PlaylistPageVideo, Video, VideoBase } from '#lib/api/model';
 	import { feedCacheStore, feedLoadingStore } from '#lib/store';
-	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import InfiniteLoading, { type InfiniteEvent } from '#lib/components/InfiniteLoading.svelte';
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import { resolve } from '$app/paths';
 	import { _ } from '#lib/i18n/index';

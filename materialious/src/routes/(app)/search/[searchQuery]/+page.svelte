@@ -3,7 +3,7 @@
 	import PageLoading from '#lib/components/PageLoading.svelte';
 	import { searchCacheStore } from '#lib/store';
 	import { _ } from '#lib/i18n/index';
-	import InfiniteLoading, { type InfiniteEvent } from 'svelte-infinite-loading';
+	import InfiniteLoading, { type InfiniteEvent } from '#lib/components/InfiniteLoading.svelte';
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import type { SearchOptions, SearchResults } from '#lib/api/model';
 

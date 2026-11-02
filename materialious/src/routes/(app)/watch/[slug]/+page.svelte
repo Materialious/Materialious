@@ -151,62 +151,94 @@
 		}
 	});
 
-	playerStream?.then(async (playerResult: any) => {
-		if (!data.video) {
-			try {
-				await pageStream;
-			} catch {
-				// Page failed to load, there is nothing to play.
+	playerStream
+		?.then(async (playerResult: any) => {
+			if (!data.video) {
+				try {
+					await pageStream;
+				} catch {
+					// Page failed to load, there is nothing to play.
+				}
 			}
-		}
 
-		if (data.video && playerResult.playerData) {
-			data.video.dashUrl = playerResult.playerData.dashUrl ?? data.video.dashUrl;
-			data.video.adaptiveFormats = playerResult.playerData.adaptiveFormats;
-			data.video.captions = playerResult.playerData.captions;
-			data.video.hlsUrl = playerResult.playerData.hlsUrl ?? data.video.hlsUrl;
-			data.video.ytjs = playerResult.playerData.ytjs;
-		}
+			if (data.video && playerResult.playerData) {
+				data.video.dashUrl = playerResult.playerData.dashUrl ?? data.video.dashUrl;
+				data.video.adaptiveFormats = playerResult.playerData.adaptiveFormats;
+				data.video.captions = playerResult.playerData.captions;
+				data.video.hlsUrl = playerResult.playerData.hlsUrl ?? data.video.hlsUrl;
+				data.video.ytjs = playerResult.playerData.ytjs;
+			}
 
-		if (playerResult.personalPlaylists) {
-			playerResult.personalPlaylists.then((streamPlaylists: PlaylistPage[]) => {
-				personalPlaylistsCacheStore.set(streamPlaylists);
-			});
-		}
+			if (playerResult.personalPlaylists) {
+				playerResult.personalPlaylists
+					.then((streamPlaylists: PlaylistPage[]) => {
+						personalPlaylistsCacheStore.set(streamPlaylists);
+					})
+					.catch(() => {
+						// Personal playlists are not required to play the video.
+					});
+			}
 
-		returnYTDislikes = playerResult.returnYTDislikes;
-		playerReady = true;
+			returnYTDislikes = playerResult.returnYTDislikes;
+			playerReady = true;
 
-		if (
-			data.video &&
-			!hasPremiere() &&
-			!data.video.premium &&
-			(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
-		) {
-			playerLoadingStore.set(false);
-			playerState.set({
-				data: data
-			});
-		} else {
-			playerLoadingStore.set(false);
-		}
-
-		if (data.video) {
-			if ($playerState?.playerElement) {
-				load($playerState);
+			if (
+				data.video &&
+				!hasPremiere() &&
+				!data.video.premium &&
+				(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
+			) {
+				playerLoadingStore.set(false);
+				playerState.set({
+					data: data
+				});
 			} else {
-				let loadedPlayer = false;
-				playerState.subscribe(async (updatedPlayerState) => {
-					if (!updatedPlayerState?.playerElement || loadedPlayer) {
-						return;
-					}
-					loadedPlayer = true;
+				playerLoadingStore.set(false);
+			}
 
-					await load(updatedPlayerState);
+			if (data.video) {
+				if ($playerState?.playerElement) {
+					load($playerState);
+				} else {
+					let loadedPlayer = false;
+					playerState.subscribe(async (updatedPlayerState) => {
+						if (!updatedPlayerState?.playerElement || loadedPlayer) {
+							return;
+						}
+						loadedPlayer = true;
+
+						await load(updatedPlayerState);
+					});
+				}
+			}
+		})
+		.catch(async (error: unknown) => {
+			// A failed player-data request must not take down the page. Fall back to
+			// the page data so the player can surface the playback failure itself.
+			console.error('Failed to load player data:', error);
+
+			if (!data.video) {
+				try {
+					await pageStream;
+				} catch {
+					// Page failed to load, there is nothing to play.
+				}
+			}
+
+			playerLoadingStore.set(false);
+			playerReady = true;
+
+			if (
+				data.video &&
+				!hasPremiere() &&
+				!data.video.premium &&
+				(!$playerState || $playerState.data.video.videoId !== data.video.videoId)
+			) {
+				playerState.set({
+					data: data
 				});
 			}
-		}
-	});
+		});
 
 	$effect(() => {
 		if ($interfaceAutoExpandComments && comments) {

@@ -196,6 +196,13 @@
 		"retryText": "Video failed to load, how would you like to continue?",
 		"enableYoutubejsTemp": "Use local video fallback once",
 		"enableYoutubejsPerm": "Always allow local video fallback",
+		"playbackErrorTitle": "Playback failed",
+		"playbackErrorSabr": "The YouTube SABR stream could not be played. The playback session or video source may have expired.",
+		"playbackErrorInvidious": "The video source could not be loaded from Invidious or the companion server.",
+		"playbackErrorYoutubeJs": "The local YouTube.js video source could not be loaded.",
+		"playbackErrorUnknown": "The video could not be played because of an unexpected error.",
+		"retry": "Retry",
+		"retrying": "Retrying…",
 		"controls": {
 			"back": "Back",
 			"quality": "Quality",

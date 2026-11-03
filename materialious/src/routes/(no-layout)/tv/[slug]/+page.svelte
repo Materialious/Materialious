@@ -13,10 +13,23 @@
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import { keyCodeMap } from '#lib/utils';
+	import type shaka from 'shaka-player/dist/shaka-player.ui';
+	import TvSettings from '#lib/components/player/settings/TvSettings.svelte';
 
 	let { data } = $props();
 
 	let playerElement: HTMLMediaElement | undefined = $state();
+	let shakaPlayer: shaka.Player | undefined = $state();
+	let showTvSettings = $state(false);
+	let tvSettings: TvSettings | undefined = $state();
+	// Down focuses the play/pause button, left/right move to the settings button, and down
+	// again opens the info sheet. Up closes the bar.
+	let controlsPinned = $state(false);
+	let playButton: HTMLButtonElement | undefined = $state();
+	let gearButton: HTMLButtonElement | undefined = $state();
+	let controlsPinTimeout: ReturnType<typeof setTimeout> | undefined;
+	// Overlays opened from the control bar hand focus back to the button they came from.
+	let returnFocusTo: HTMLElement | undefined;
 	let showInfo = $state(false);
 	let infoPanel: HTMLElement | undefined = $state();
 	let infoScope: HTMLElement | undefined = $state();
@@ -37,9 +50,17 @@
 	const hasRecommended = $derived(data.video.recommendedVideos.length > 0);
 
 	function startSeeking(direction: 'left' | 'right') {
+		if (!showInfo && !showTvSettings && isControlFocused()) {
+			if (direction === 'right' && document.activeElement === playButton) focusControl(gearButton);
+			if (direction === 'left' && document.activeElement === gearButton) focusControl(playButton);
+
+			pinControls();
+			return false;
+		}
+
 		showControls = true;
 
-		if (!playerElement || showInfo || isSeeking) return true;
+		if (!playerElement || showInfo || showTvSettings || isSeeking) return true;
 
 		userManualSeeking = true;
 		isSeeking = true;
@@ -78,8 +99,9 @@
 	}
 
 	function stopSeeking() {
+		const wasSeeking = isSeeking;
 		isSeeking = false;
-		showControls = false;
+		showControls = controlsPinned || !!playerElement?.paused;
 		userManualSeeking = false;
 
 		if (seekRaf !== null) {
@@ -87,7 +109,9 @@
 			seekRaf = null;
 		}
 
-		if (playerElement && !showInfo) {
+		// Only seek when this key press actually scrubbed; a key-up after moving focus
+		// would otherwise re-seek to the current position and stutter the video.
+		if (wasSeeking && playerElement && !showInfo && !showTvSettings) {
 			playerElement.currentTime = currentTime;
 		}
 	}
@@ -98,7 +122,36 @@
 		el.scrollIntoView({ block: 'center', inline: 'nearest' });
 	}
 
+	const isControlFocused = () =>
+		!!document.activeElement &&
+		(document.activeElement === playButton || document.activeElement === gearButton);
+
+	// preventScroll: focusing inside the clipped player container must not shift the video.
+	function focusControl(element: HTMLElement | undefined) {
+		tick().then(() => element?.focus({ preventScroll: true }));
+	}
+
+	function pinControls() {
+		controlsPinned = true;
+		showControls = true;
+
+		clearTimeout(controlsPinTimeout);
+		controlsPinTimeout = setTimeout(unpinControls, 6000);
+	}
+
+	function unpinControls() {
+		if (!controlsPinned) return;
+
+		clearTimeout(controlsPinTimeout);
+		controlsPinned = false;
+		// A paused video keeps its control bar (and the settings button) on screen.
+		showControls = !!playerElement?.paused;
+
+		if (isControlFocused()) (document.activeElement as HTMLElement).blur();
+	}
+
 	function openInfo() {
+		unpinControls();
 		showInfo = true;
 
 		tick().then(() => {
@@ -111,9 +164,33 @@
 		});
 	}
 
+	function openTvSettings() {
+		returnFocusTo = gearButton;
+		unpinControls();
+		showTvSettings = true;
+	}
+
+	function restoreControlFocus() {
+		if (!returnFocusTo) return;
+
+		const target = returnFocusTo;
+		returnFocusTo = undefined;
+		pinControls();
+		focusControl(target);
+	}
+
 	function closeInfo() {
 		showInfo = false;
 		(document.activeElement as HTMLElement | null)?.blur();
+		restoreControlFocus();
+	}
+
+	function closeTvSettings() {
+		// Back first goes up a level (quality list -> root); only root closes the panel.
+		if (tvSettings?.back()) return;
+		showTvSettings = false;
+		(document.activeElement as HTMLElement | null)?.blur();
+		restoreControlFocus();
 	}
 
 	function handleInfoKeyDown(event: KeyboardEvent) {
@@ -141,7 +218,19 @@
 	}
 
 	function handleBack(event: Event) {
-		if (!showInfo) return;
+		if (showTvSettings) {
+			event.preventDefault();
+			closeTvSettings();
+			return;
+		}
+
+		if (!showInfo) {
+			if (controlsPinned) {
+				event.preventDefault();
+				unpinControls();
+			}
+			return;
+		}
 		event.preventDefault();
 		closeInfo();
 	}
@@ -159,9 +248,15 @@
 		Mousetrap.bind(
 			'down',
 			() => {
-				if (showInfo) return true;
+				if (showInfo || showTvSettings) return true;
 
-				openInfo();
+				if (isControlFocused()) {
+					returnFocusTo = document.activeElement as HTMLElement;
+					openInfo();
+				} else {
+					pinControls();
+					focusControl(playButton);
+				}
 
 				return false;
 			},
@@ -171,8 +266,12 @@
 		Mousetrap.bind(
 			'up',
 			() => {
+				if (showTvSettings) return true;
+
 				if (!showInfo) {
-					openInfo();
+					if (isControlFocused()) unpinControls();
+					else openInfo();
+
 					return false;
 				}
 
@@ -195,6 +294,8 @@
 		);
 
 		// Arrow key seeking bindings
+		// Up/down act on key-up, so stop the WebView from also moving focus natively on key-down.
+		Mousetrap.bind(['up', 'down'], () => !isControlFocused(), 'keydown');
 		Mousetrap.bind('right', () => startSeeking('right'), 'keydown');
 		Mousetrap.bind('right', stopSeeking, 'keyup');
 		Mousetrap.bind('left', () => startSeeking('left'), 'keydown');
@@ -203,8 +304,18 @@
 		Mousetrap.bind(
 			'esc',
 			() => {
+				if (showTvSettings) {
+					closeTvSettings();
+					return false;
+				}
+
 				if (showInfo) {
 					closeInfo();
+					return false;
+				}
+
+				if (controlsPinned) {
+					unpinControls();
 					return false;
 				}
 
@@ -216,6 +327,11 @@
 		Mousetrap.bind(
 			'enter',
 			() => {
+				if (showTvSettings) return true;
+
+				// Enter on a focused control is a native click, handled by the button itself.
+				if (isControlFocused()) return true;
+
 				if (infoClosedByEnter) {
 					infoClosedByEnter = false;
 					return true;
@@ -241,6 +357,7 @@
 
 	onDestroy(() => {
 		window.removeEventListener('materialious:back', handleBack);
+		clearTimeout(controlsPinTimeout);
 		// unbind() only removes the default action; these were bound on keyup too.
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc']);
 		Mousetrap.unbind(['up', 'down', 'left', 'right', 'enter', 'esc'], 'keyup');
@@ -250,13 +367,21 @@
 {#key data.video.videoId}
 	<Player
 		bind:playerElement
+		onShakaPlayer={(player) => (shakaPlayer = player)}
 		bind:currentTime
 		bind:userManualSeeking
+		bind:showControls
+		bind:tvPlayButton={playButton}
+		bind:tvSettingsButton={gearButton}
+		holdControls={controlsPinned}
 		isEmbed={true}
 		{data}
-		{showControls}
+		onTvSettings={openTvSettings}
 	/>
 {/key}
+{#if showTvSettings && shakaPlayer && playerElement}
+	<TvSettings bind:this={tvSettings} player={shakaPlayer} {playerElement} video={data.video} />
+{/if}
 
 {#if showInfo}
 	<article
@@ -350,6 +475,12 @@
 {/if}
 
 <style>
+	/* The (no-layout) route never gets the app layout that sets this, which left the
+	   buffering spinner stuck to the top of the player. The TV player fills the screen. */
+	:global(#player-container) {
+		--video-player-height: 100vh;
+	}
+
 	#shown-info {
 		position: fixed;
 		bottom: 0;

@@ -789,7 +789,23 @@
 
 		player.configure({
 			abr: {
-				enabled: true
+				enabled: true,
+				restrictions: {
+					// Only caps what Auto may pick; manual selection can still choose any
+					// track. ABR only looks at bandwidth, so on low-RAM Android TVs it can
+					// climb to a resolution the decoder/UI then can't keep up with and the
+					// playback stalls. abr.restrictToScreenSize isn't enough here: it still
+					// allows the first resolution covering the screen (2560x1280 for a 2:1
+					// video).
+					maxPixels: isAndroidTv()
+						? Math.round(screen.width * devicePixelRatio) *
+							Math.round(screen.height * devicePixelRatio)
+						: Infinity
+				},
+				// SABR servers pace delivery by the client's reported bandwidth
+				// estimate; a low anchor throttles high resolutions to ~9 Mbps even on
+				// a fast wire. Anchor high on TV so high-resolution tracks can deliver.
+				defaultBandwidthEstimate: isAndroidTv() ? 50_000_000 : undefined
 			},
 			streaming: {
 				failureCallback: (error: shaka.util.Error) => {

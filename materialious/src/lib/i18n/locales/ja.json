@@ -142,7 +142,14 @@
         "downloadVideoAudio": "動画と音声",
         "downloadFormat": "フォーマット",
         "downloadType": "ダウンロードタイプ",
-        "defaultSubtitleLanguage": "デフォルトの字幕言語"
+        "defaultSubtitleLanguage": "デフォルトの字幕言語",
+        "playbackErrorTitle": "再生に失敗しました",
+        "playbackErrorSabr": "YouTube の SABR ストリームを再生できませんでした。再生セッションまたは動画ソースの有効期限が切れている可能性があります。",
+        "playbackErrorInvidious": "Invidious または関連サーバーから動画ソースを読み込めませんでした。",
+        "playbackErrorYoutubeJs": "ローカルの YouTube.js 動画ソースを読み込めませんでした。",
+        "playbackErrorUnknown": "予期せぬエラーが発生したため、動画を再生できませんでした。",
+        "retry": "再試行",
+        "retrying": "再試行中…"
     },
     "layout": {
         "interface": "外観",

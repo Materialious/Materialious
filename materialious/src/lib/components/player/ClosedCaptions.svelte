@@ -6,7 +6,7 @@
 
 	let renderer: CaptionsRenderer | undefined;
 
-	let captionTracks: Record<string, string> = {};
+	let captionTracks: Record<string, string[]> = {};
 
 	export function setTextTrackVisibility(visible: boolean) {
 		if (!visible) {
@@ -29,8 +29,8 @@
 		}
 		if (!language || !captionTracks[language]) return;
 
-		const resp = await fetch(captionTracks[language], { method: 'GET' });
-		if (!resp.ok) {
+		const resp = await fetchCaption(captionTracks[language]);
+		if (!resp) {
 			addToast({
 				data: {
 					text: 'Unable to fetch captions'
@@ -55,12 +55,8 @@
 <script lang="ts">
 	import type { VideoPlay } from '#lib/api/model';
 	import { onDestroy, onMount } from 'svelte';
-	import { getCaptionUrl } from '#lib/player/captions';
-	import {
-		subtitleSettings,
-		playerDefaultSubtitleLanguage,
-		playerCCByDefault
-	} from '#lib/store';
+	import { getCaptionUrls, fetchCaption } from '#lib/player/captions';
+	import { subtitleSettings, playerDefaultSubtitleLanguage, playerCCByDefault } from '#lib/store';
 	import 'media-captions/styles/captions.css';
 
 	let {
@@ -81,11 +77,11 @@
 	onMount(async () => {
 		if (video.captions) {
 			for (const caption of video.captions) {
-				const captionUrl = getCaptionUrl(caption, video.fallbackPatch);
+				const captionUrls = getCaptionUrls(caption, video.fallbackPatch);
 
-				if (!captionUrl) continue;
+				if (captionUrls.length === 0) continue;
 
-				captionTracks[caption.language_code] = captionUrl;
+				captionTracks[caption.language_code] = captionUrls;
 			}
 			hasTracks = Object.keys(captionTracks).length > 0;
 		}

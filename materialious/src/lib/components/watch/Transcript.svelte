@@ -9,7 +9,7 @@
 	} from 'media-captions';
 	import { _ } from '#lib/i18n/index';
 	import type { Captions, VideoPlay } from '#lib/api/model';
-	import { getCaptionUrl } from '#lib/player/captions';
+	import { getCaptionUrls, fetchCaption } from '#lib/player/captions';
 	import ComboBox from '#lib/components/ComboBox.svelte';
 
 	interface Props {
@@ -68,12 +68,8 @@
 		isLoading = true;
 		transcript = null;
 
-		const captionUrl = getCaptionUrl(selectedCaption, video.fallbackPatch);
-
-		if (!captionUrl) return;
-
-		const resp = await fetch(captionUrl);
-		if (!resp.ok) return;
+		const resp = await fetchCaption(getCaptionUrls(selectedCaption, video.fallbackPatch));
+		if (!resp) return;
 
 		transcript = await parseText(await resp.text(), { strict: false });
 		transcriptCues = transcript.cues;

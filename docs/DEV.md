@@ -221,7 +221,7 @@ At runtime, the app detects its environment via `Capacitor.getPlatform()`:
 
 Key platform-specific behaviors:
 
-- **Android:** Uses `@capacitor/preferences` instead of `localStorage`, `@capacitor/browser` for OAuth login, music controls via `capacitor-music-controls-plugin`, screen orientation, network status, status bar color theme, and Android TV plugins.
+- **Android:** Uses `@capacitor/preferences` instead of `localStorage`, `@capacitor/browser` for OAuth login, media controls via `@capgo/capacitor-media-session`, screen orientation, network status, status bar color theme, and Android TV plugins.
 - **Electron:** Shows custom back/forward navigation buttons visible only on desktop, different settings UI sections.
 - **Web:** Standard browser APIs (`localStorage`, `fetch`, etc.), PWA service worker, web export/import controls.
 - **Fetch proxy** (`src/lib/fetchProxy.ts`): Routes requests differently per platform — on Android, images are proxied through CORS; on web, they use the configured Invidious instance directly.

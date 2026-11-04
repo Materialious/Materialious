@@ -5,7 +5,7 @@
 	import { generateChapterWebVTT, type ParsedDescription } from '#lib/description';
 	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import Mousetrap from 'mousetrap';
-	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
+	import { MediaSession } from '@capgo/capacitor-media-session';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -899,52 +899,22 @@
 				}
 			});
 
-			await CapacitorMusicControls.create({
-				track: data.video.title,
-				artist: data.video.author,
-				cover: getBestThumbnail(data.video.videoThumbnails, 800, 800),
-				hasPrev: data.playlistId !== null,
-				hasNext: data.playlistId !== null,
-				isPlaying: true,
-				hasClose: true,
-				dismissable: true,
-				playIcon: '',
-				pauseIcon: '',
-				prevIcon: '',
-				nextIcon: '',
-				closeIcon: '',
-				notificationIcon: '',
-				ticker: `Now playing "${data.video.title}"`
-			});
-
-			// @ts-expect-error: Is handle correctly via https://github.com/ingageco/capacitor-music-controls-plugin
-			document.addEventListener('controlsNotification', (event: { message: string }) => {
-				if (
-					event.message === 'music-controls-headset-unplugged' ||
-					event.message === 'music-controls-pause'
-				) {
-					playerElement?.pause();
-					return;
-				} else if (event.message === 'music-controls-play') {
-					playerElement?.play();
-					return;
-				}
-
-				if (data.playlistId) {
-					if (event.message === 'music-controls-next') {
-						goToNextVideo(data.video, data.playlistId);
-					} else if (event.message === 'music-controls-previous') {
-						goToPreviousVideo(data.playlistId);
-					}
-				}
-			});
+			await MediaSession.setMetadata({ title: data.video.title, artist: data.video.author, artwork: [{ src: getBestThumbnail(data.video.videoThumbnails, 800, 800), sizes: '800x800', type: 'image/jpeg' }] });
+			await MediaSession.setPlaybackState({ playbackState: 'playing' });
+			await MediaSession.setActionHandler({ action: 'play' }, () => playerElement?.play());
+			await MediaSession.setActionHandler({ action: 'pause' }, () => playerElement?.pause());
+			await MediaSession.setActionHandler({ action: 'stop' }, () => { if (playerElement) { playerElement.pause(); playerElement.currentTime = 0; } });
+			if (data.playlistId) {
+				await MediaSession.setActionHandler({ action: 'nexttrack' }, () => goToNextVideo(data.video, data.playlistId!));
+				await MediaSession.setActionHandler({ action: 'previoustrack' }, () => goToPreviousVideo(data.playlistId!));
+			}
 
 			playerElement?.addEventListener('play', () => {
-				CapacitorMusicControls.updateIsPlaying({ isPlaying: true });
+				MediaSession.setPlaybackState({ playbackState: 'playing' });
 			});
 
 			playerElement?.addEventListener('pause', () => {
-				CapacitorMusicControls.updateIsPlaying({ isPlaying: false });
+				MediaSession.setPlaybackState({ playbackState: 'paused' });
 			});
 		} else if ('mediaSession' in navigator) {
 			const metadataArtwork: MediaImage[] = [];
@@ -1172,7 +1142,7 @@
 
 		if (Capacitor.getPlatform() === 'android') {
 			await setStatusBarColor();
-			await CapacitorMusicControls.destroy();
+			await MediaSession.setPlaybackState({ playbackState: 'none' });
 
 			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 

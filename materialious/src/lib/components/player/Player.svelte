@@ -814,12 +814,12 @@
 				bufferingGoal: 60,
 				rebufferingGoal: 5,
 				bufferBehind: 300,
-				// Only jump over gaps Shaka considers small. A larger threshold
-				// makes playback visibly skip ahead by up to that many seconds.
+				// Keep Shaka's default threshold. It controls proximity to a
+				// buffered edge, not the maximum size of a gap jump.
 				gapDetectionThreshold: 0.5,
-				// Do not let Shaka's stall detector seek/nudge the media; the
-				// watchdog below handles genuine stalls based on currentTime.
-				stallEnabled: false,
+				// Let Shaka reset a stall without moving the playhead. The watchdog
+				// below refreshes SABR attestation after longer stalls.
+				stallEnabled: true,
 				stallSkip: 0,
 				retryParameters: {
 					maxAttempts: 8,

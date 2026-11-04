@@ -187,21 +187,34 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 
 		const segmentKey = createSegmentCacheKeyFromMetadata(requestMetadata);
 
-		let arrayBuffer = (
+		const cachedSegment = (
 			requestMetadata.isInit
 				? this.cacheManager.getInitSegment(segmentKey)
 				: this.cacheManager.getSegment(segmentKey)
-		)?.buffer as ArrayBuffer;
+		);
 
-		if (!arrayBuffer) {
+		if (!cachedSegment) {
 			return null;
 		}
 
+		// Cache entries are Uint8Array views; preserve their view boundaries in
+		// case the backing buffer contains bytes outside the cached segment.
+		let arrayBuffer = cachedSegment.buffer.slice(
+			cachedSegment.byteOffset,
+			cachedSegment.byteOffset + cachedSegment.byteLength
+		) as ArrayBuffer;
+
 		if (requestMetadata.isInit) {
-			arrayBuffer = arrayBuffer.slice(
-				requestMetadata.byteRange.start,
-				requestMetadata.byteRange.end + 1
-			);
+			const { start, end } = requestMetadata.byteRange;
+			const endExclusive = end + 1;
+
+			// A bad or stale cache entry must not be served as a successful init
+			// segment. Fall through to the network so Shaka can receive fresh data.
+			if (start < 0 || endExclusive > arrayBuffer.byteLength || endExclusive <= start) {
+				return null;
+			}
+
+			arrayBuffer = arrayBuffer.slice(start, endExclusive);
 		}
 
 		const headers = {

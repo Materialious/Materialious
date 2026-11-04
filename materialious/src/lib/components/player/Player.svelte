@@ -822,7 +822,7 @@
 				// SABR servers pace delivery by the client's reported bandwidth
 				// estimate; a low anchor throttles high resolutions to ~9 Mbps even on
 				// a fast wire. Anchor high on TV so high-resolution tracks can deliver.
-				defaultBandwidthEstimate: isAndroidTv() ? 50_000_000 : undefined
+				defaultBandwidthEstimate: isAndroidTv() ? 50_000_000 : undefined,
 				// TV decoders can't keep up with tracks above the screen size.
 				restrictToScreenSize: isAndroidTv()
 			},

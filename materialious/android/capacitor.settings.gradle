@@ -29,8 +29,8 @@ project(':capgo-capacitor-file-sharer').projectDir = new File('../node_modules/@
 include ':capgo-capacitor-keep-awake'
 project(':capgo-capacitor-keep-awake').projectDir = new File('../node_modules/@capgo/capacitor-keep-awake/android')
 
-include ':capacitor-music-controls-plugin'
-project(':capacitor-music-controls-plugin').projectDir = new File('../node_modules/capacitor-music-controls-plugin/android')
+include ':capgo-capacitor-media-session'
+project(':capgo-capacitor-media-session').projectDir = new File('../node_modules/@capgo/capacitor-media-session/android')
 
 include ':capacitor-nodejs'
 project(':capacitor-nodejs').projectDir = new File('../node_modules/capacitor-nodejs/android')

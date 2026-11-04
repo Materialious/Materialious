@@ -18,7 +18,7 @@ dependencies {
     implementation project(':capacitor-share')
     implementation project(':capgo-capacitor-file-sharer')
     implementation project(':capgo-capacitor-keep-awake')
-    implementation project(':capacitor-music-controls-plugin')
+    implementation project(':capgo-capacitor-media-session')
     implementation project(':capacitor-nodejs')
 
 }

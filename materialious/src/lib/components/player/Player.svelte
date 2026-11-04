@@ -5,7 +5,8 @@
 	import { generateChapterWebVTT, type ParsedDescription } from '#lib/description';
 	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import Mousetrap from 'mousetrap';
-	import { CapacitorMusicControls } from 'capacitor-music-controls-plugin';
+	import { MediaSession } from '@capgo/capacitor-media-session';
+	import { AndroidPictureInPicture } from '#lib/android/plugins/androidPictureInPicture';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -18,6 +19,7 @@
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
+		playerAndroidAutoPip,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
@@ -70,7 +72,16 @@
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 		showControls?: boolean;
+		// Android TV: keeps the control bar on screen while the page has focus inside it.
+		holdControls?: boolean;
 		playerIsPip?: boolean;
+		// Lets the TV page reach the Shaka instance for its settings panel.
+		onShakaPlayer?: (player: shaka.Player | undefined) => void;
+		// Android TV only: shows a settings button next to the timeline, since the regular
+		// settings menu isn't reachable with a D-pad.
+		onTvSettings?: () => void;
+		tvPlayButton?: HTMLButtonElement | undefined;
+		tvSettingsButton?: HTMLButtonElement | undefined;
 	}
 
 	let {
@@ -80,7 +91,12 @@
 		playerElement = $bindable(undefined),
 		currentTime = $bindable(0),
 		userManualSeeking = $bindable(false),
-		showControls = false
+		showControls = $bindable(false),
+		holdControls = false,
+		onShakaPlayer = undefined,
+		onTvSettings = undefined,
+		tvPlayButton = $bindable(undefined),
+		tvSettingsButton = $bindable(undefined)
 	}: Props = $props();
 
 	let segments: Segment[] = $state([]);
@@ -150,6 +166,8 @@
 	let playerVideoEndTimePretty: string = $state('');
 	let playerIsFullscreen = $state(false);
 	let playerInitalInteract = $state(true);
+	let isAndroidPictureInPicture = $state(false);
+	let pictureInPictureListener: { remove: () => Promise<void> } | undefined;
 
 	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
@@ -185,6 +203,13 @@
 		showPlayerUI();
 		return false;
 	}
+
+	$effect(() => {
+		const automaticPipEnabled = $playerAndroidAutoPip;
+		if (Capacitor.getPlatform() === 'android') {
+			AndroidPictureInPicture.setAutoPipEnabled({ enabled: automaticPipEnabled });
+		}
+	});
 
 	$effect(() => {
 		const volumeUp = $keybindStore.volumeUp;
@@ -717,6 +742,8 @@
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		showPlayerUiTimeout = setTimeout(() => {
+			if (holdControls) return;
+
 			showControls = false;
 			playerInitalInteract = true;
 		}, 5000);
@@ -786,6 +813,7 @@
 		}
 
 		player = new shaka.Player();
+		onShakaPlayer?.(player);
 
 		player.configure({
 			abr: {
@@ -805,7 +833,9 @@
 				// SABR servers pace delivery by the client's reported bandwidth
 				// estimate; a low anchor throttles high resolutions to ~9 Mbps even on
 				// a fast wire. Anchor high on TV so high-resolution tracks can deliver.
-				defaultBandwidthEstimate: isAndroidTv() ? 50_000_000 : undefined
+				defaultBandwidthEstimate: isAndroidTv() ? 50_000_000 : undefined,
+				// TV decoders can't keep up with tracks above the screen size.
+				restrictToScreenSize: isAndroidTv()
 			},
 			streaming: {
 				failureCallback: (error: shaka.util.Error) => {
@@ -814,12 +844,12 @@
 				bufferingGoal: 60,
 				rebufferingGoal: 5,
 				bufferBehind: 300,
-				// Only jump over gaps Shaka considers small. A larger threshold
-				// makes playback visibly skip ahead by up to that many seconds.
+				// Keep Shaka's default threshold. It controls proximity to a
+				// buffered edge, not the maximum size of a gap jump.
 				gapDetectionThreshold: 0.5,
-				// Do not let Shaka's stall detector seek/nudge the media; the
-				// watchdog below handles genuine stalls based on currentTime.
-				stallEnabled: false,
+				// Let Shaka reset a stall without moving the playhead. The watchdog
+				// below refreshes SABR attestation after longer stalls.
+				stallEnabled: true,
 				stallSkip: 0,
 				retryParameters: {
 					maxAttempts: 8,
@@ -866,6 +896,12 @@
 		});
 
 		if (Capacitor.getPlatform() === 'android') {
+			pictureInPictureListener = await AndroidPictureInPicture.addListener(
+				'pictureInPictureModeChanged',
+				({ isInPictureInPictureMode }) => {
+					isAndroidPictureInPicture = isInPictureInPictureMode;
+				}
+			);
 			await androidHandleRotate();
 
 			androidInitialNetworkStatus = await Network.getStatus();
@@ -880,52 +916,50 @@
 				}
 			});
 
-			await CapacitorMusicControls.create({
-				track: data.video.title,
+			await MediaSession.setMetadata({
+				title: data.video.title,
 				artist: data.video.author,
-				cover: getBestThumbnail(data.video.videoThumbnails, 800, 800),
-				hasPrev: data.playlistId !== null,
-				hasNext: data.playlistId !== null,
-				isPlaying: true,
-				hasClose: true,
-				dismissable: true,
-				playIcon: '',
-				pauseIcon: '',
-				prevIcon: '',
-				nextIcon: '',
-				closeIcon: '',
-				notificationIcon: '',
-				ticker: `Now playing "${data.video.title}"`
-			});
-
-			// @ts-expect-error: Is handle correctly via https://github.com/ingageco/capacitor-music-controls-plugin
-			document.addEventListener('controlsNotification', (event: { message: string }) => {
-				if (
-					event.message === 'music-controls-headset-unplugged' ||
-					event.message === 'music-controls-pause'
-				) {
-					playerElement?.pause();
-					return;
-				} else if (event.message === 'music-controls-play') {
-					playerElement?.play();
-					return;
-				}
-
-				if (data.playlistId) {
-					if (event.message === 'music-controls-next') {
-						goToNextVideo(data.video, data.playlistId);
-					} else if (event.message === 'music-controls-previous') {
-						goToPreviousVideo(data.playlistId);
+				artwork: [
+					{
+						src: getBestThumbnail(data.video.videoThumbnails, 800, 800),
+						sizes: '800x800',
+						type: 'image/jpeg'
 					}
+				]
+			});
+			await MediaSession.setPlaybackState({
+				playbackState: playerElement?.paused ? 'paused' : 'playing'
+			});
+			await MediaSession.setActionHandler({ action: 'play' }, () => playerElement?.play());
+			await MediaSession.setActionHandler({ action: 'pause' }, () => playerElement?.pause());
+			await MediaSession.setActionHandler({ action: 'stop' }, () => {
+				if (playerElement) {
+					playerElement.pause();
+					playerElement.currentTime = 0;
 				}
 			});
+			if (data.playlistId) {
+				await MediaSession.setActionHandler({ action: 'nexttrack' }, () =>
+					goToNextVideo(data.video, data.playlistId!)
+				);
+				await MediaSession.setActionHandler({ action: 'previoustrack' }, () =>
+					goToPreviousVideo(data.playlistId!)
+				);
+			}
 
 			playerElement?.addEventListener('play', () => {
-				CapacitorMusicControls.updateIsPlaying({ isPlaying: true });
+				MediaSession.setPlaybackState({ playbackState: 'playing' });
+				AndroidPictureInPicture.setPlaybackActive({ active: true });
 			});
 
 			playerElement?.addEventListener('pause', () => {
-				CapacitorMusicControls.updateIsPlaying({ isPlaying: false });
+				MediaSession.setPlaybackState({ playbackState: 'paused' });
+				AndroidPictureInPicture.setPlaybackActive({ active: false });
+			});
+
+			playerElement?.addEventListener('ended', () => {
+				MediaSession.setPlaybackState({ playbackState: 'none' });
+				AndroidPictureInPicture.setPlaybackActive({ active: false });
 			});
 		} else if ('mediaSession' in navigator) {
 			const metadataArtwork: MediaImage[] = [];
@@ -1079,6 +1113,9 @@
 		playerElement?.addEventListener('playing', async () => {
 			playerCurrentPlaybackState = true;
 			playerIsBuffering = false;
+			if (Capacitor.getPlatform() === 'android') {
+				await AndroidPictureInPicture.setPlaybackActive({ active: true });
+			}
 			await requestKeepAwake();
 		});
 
@@ -1152,8 +1189,10 @@
 		await releaseKeepAwake();
 
 		if (Capacitor.getPlatform() === 'android') {
+			await pictureInPictureListener?.remove();
+			await AndroidPictureInPicture.setPlaybackActive({ active: false });
 			await setStatusBarColor();
-			await CapacitorMusicControls.destroy();
+			await MediaSession.setPlaybackState({ playbackState: 'none' });
 
 			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 
@@ -1193,6 +1232,7 @@
 		if (player) {
 			player.unload();
 			player.destroy();
+			onShakaPlayer?.(undefined);
 		}
 	});
 </script>
@@ -1200,7 +1240,7 @@
 <div
 	id="player-container"
 	class:contain-video={!isAndroidTv()}
-	class:full-window={$playerIsInWindowFullscreen}
+	class:full-window={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
 	class:tv-contain-video={isAndroidTv()}
 	class:hide-cursor={!showControls}
 	role="presentation"
@@ -1220,7 +1260,7 @@
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !isAndroidTv()}
+	{#if isEmbed && !isAndroidTv() && !isAndroidPictureInPicture}
 		<div
 			class="chip surface-container-highest"
 			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
@@ -1229,7 +1269,7 @@
 		</div>
 	{/if}
 
-	{#if showControls}
+	{#if showControls && !isAndroidPictureInPicture}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1245,16 +1285,19 @@
 			{/if}
 		</div>
 	{/if}
-	<TouchControls
-		{playerElement}
-		{showPlayerUI}
-		{toggleVideoPlaybackStatus}
-		{toggleFullscreen}
-		bind:playerInitalInteract
-		bind:playerMaxKnownTime
-		bind:playerIsBuffering
-	/>
-	<div id="player-controls" class="hide" class:show={showControls}>
+	{#if !isAndroidPictureInPicture}
+		<TouchControls
+			{playerElement}
+			{showPlayerUI}
+			{toggleVideoPlaybackStatus}
+			{toggleFullscreen}
+			bind:playerInitalInteract
+			bind:playerMaxKnownTime
+			bind:playerIsBuffering
+		/>
+	{/if}
+	{#if !isAndroidPictureInPicture}
+		<div id="player-controls" class="hide" class:show={showControls}>
 		<Timeline
 			{playerElement}
 			{currentTime}
@@ -1292,6 +1335,26 @@
 			<div class="max"></div>
 
 			<nav class="no-wrap">
+				{#if isAndroidTv() && onTvSettings}
+					<button
+						bind:this={tvPlayButton}
+						class="circle transparent tv-control-button"
+						aria-label={playerCurrentPlaybackState
+							? $_('player.controls.pause')
+							: $_('player.controls.play')}
+						onclick={toggleVideoPlaybackStatus}
+					>
+						<i>{playerCurrentPlaybackState ? 'pause' : 'play_arrow'}</i>
+					</button>
+					<button
+						bind:this={tvSettingsButton}
+						class="circle transparent tv-control-button"
+						aria-label={$_('layout.settings')}
+						onclick={onTvSettings}
+					>
+						<i>settings</i>
+					</button>
+				{/if}
 				<p class="chip m l" style="height: 100%;">
 					{#if data.video.liveNow}
 						{$_('thumbnail.live')}
@@ -1320,6 +1383,7 @@
 			</nav>
 		</nav>
 	</div>
+	{/if}
 	{#if playbackError}
 		<div class="player-error" role="alert">
 			<div class="player-error-content surface-container-highest">
@@ -1442,6 +1506,19 @@
 		background-color: var(--surface-container-highest);
 		color: var(--on-surface);
 		border: none;
+	}
+
+	.tv-control-button {
+		color: white;
+	}
+
+	.tv-control-button i {
+		filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+	}
+
+	.tv-control-button:focus {
+		outline: 3px solid var(--primary);
+		outline-offset: 2px;
 	}
 
 	.hide-cursor {

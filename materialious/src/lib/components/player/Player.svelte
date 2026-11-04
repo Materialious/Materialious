@@ -70,7 +70,16 @@
 		isEmbed?: boolean;
 		playerElement?: HTMLMediaElement | undefined;
 		showControls?: boolean;
+		// Android TV: keeps the control bar on screen while the page has focus inside it.
+		holdControls?: boolean;
 		playerIsPip?: boolean;
+		// Lets the TV page reach the Shaka instance for its settings panel.
+		onShakaPlayer?: (player: shaka.Player | undefined) => void;
+		// Android TV only: shows a settings button next to the timeline, since the regular
+		// settings menu isn't reachable with a D-pad.
+		onTvSettings?: () => void;
+		tvPlayButton?: HTMLButtonElement | undefined;
+		tvSettingsButton?: HTMLButtonElement | undefined;
 	}
 
 	let {
@@ -80,7 +89,12 @@
 		playerElement = $bindable(undefined),
 		currentTime = $bindable(0),
 		userManualSeeking = $bindable(false),
-		showControls = false
+		showControls = $bindable(false),
+		holdControls = false,
+		onShakaPlayer = undefined,
+		onTvSettings = undefined,
+		tvPlayButton = $bindable(undefined),
+		tvSettingsButton = $bindable(undefined)
 	}: Props = $props();
 
 	let segments: Segment[] = $state([]);
@@ -717,6 +731,8 @@
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		showPlayerUiTimeout = setTimeout(() => {
+			if (holdControls) return;
+
 			showControls = false;
 			playerInitalInteract = true;
 		}, 5000);
@@ -786,6 +802,7 @@
 		}
 
 		player = new shaka.Player();
+		onShakaPlayer?.(player);
 
 		player.configure({
 			abr: {
@@ -806,6 +823,8 @@
 				// estimate; a low anchor throttles high resolutions to ~9 Mbps even on
 				// a fast wire. Anchor high on TV so high-resolution tracks can deliver.
 				defaultBandwidthEstimate: isAndroidTv() ? 50_000_000 : undefined
+				// TV decoders can't keep up with tracks above the screen size.
+				restrictToScreenSize: isAndroidTv()
 			},
 			streaming: {
 				failureCallback: (error: shaka.util.Error) => {
@@ -1193,6 +1212,7 @@
 		if (player) {
 			player.unload();
 			player.destroy();
+			onShakaPlayer?.(undefined);
 		}
 	});
 </script>
@@ -1292,6 +1312,26 @@
 			<div class="max"></div>
 
 			<nav class="no-wrap">
+				{#if isAndroidTv() && onTvSettings}
+					<button
+						bind:this={tvPlayButton}
+						class="circle transparent tv-control-button"
+						aria-label={playerCurrentPlaybackState
+							? $_('player.controls.pause')
+							: $_('player.controls.play')}
+						onclick={toggleVideoPlaybackStatus}
+					>
+						<i>{playerCurrentPlaybackState ? 'pause' : 'play_arrow'}</i>
+					</button>
+					<button
+						bind:this={tvSettingsButton}
+						class="circle transparent tv-control-button"
+						aria-label={$_('layout.settings')}
+						onclick={onTvSettings}
+					>
+						<i>settings</i>
+					</button>
+				{/if}
 				<p class="chip m l" style="height: 100%;">
 					{#if data.video.liveNow}
 						{$_('thumbnail.live')}
@@ -1442,6 +1482,19 @@
 		background-color: var(--surface-container-highest);
 		color: var(--on-surface);
 		border: none;
+	}
+
+	.tv-control-button {
+		color: white;
+	}
+
+	.tv-control-button i {
+		filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+	}
+
+	.tv-control-button:focus {
+		outline: 3px solid var(--primary);
+		outline-offset: 2px;
 	}
 
 	.hide-cursor {

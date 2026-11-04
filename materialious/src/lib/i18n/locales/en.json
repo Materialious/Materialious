@@ -379,6 +379,7 @@
 			"youtubeJsAlways": "Always use",
 			"lockOrientation": "Orientation locked to aspect ratio",
 			"networkChangePause": "Pause on network change",
+			"androidAutoPip": "Automatically enter PiP on app exit",
 			"defaultPlaybackSpeed": "Default playback speed",
 			"playerStatistics": "Show player statistics by default"
 		},

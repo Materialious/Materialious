@@ -49,6 +49,7 @@ import {
 	interfaceAndroidUseNativeShare,
 	playerAndroidPauseOnNetworkChange,
 	playerAndroidLockOrientation,
+	playerAndroidAutoPip,
 	playerYouTubeJsFallback,
 	playerYouTubeJsAlways,
 	interfaceSearchHistoryEnabled,
@@ -406,6 +407,12 @@ function registerBackendStores() {
 	persistedStores.push({
 		name: 'androidLockOrientation',
 		store: playerAndroidLockOrientation,
+		schema: zBoolean,
+		excludeFromBookmarklet: true
+	});
+	persistedStores.push({
+		name: 'androidAutoPip',
+		store: playerAndroidAutoPip,
 		schema: zBoolean,
 		excludeFromBookmarklet: true
 	});

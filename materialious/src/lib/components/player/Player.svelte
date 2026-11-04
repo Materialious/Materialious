@@ -6,6 +6,7 @@
 	import { Capacitor, SystemBars, SystemBarsStyle, SystemBarType } from '@capacitor/core';
 	import Mousetrap from 'mousetrap';
 	import { MediaSession } from '@capgo/capacitor-media-session';
+	import { AndroidPictureInPicture } from '#lib/android/plugins/androidPictureInPicture';
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
@@ -18,6 +19,7 @@
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
+		playerAndroidAutoPip,
 		playerAutoPlayStore,
 		playerDefaultLanguage,
 		playerDefaultPlaybackSpeed,
@@ -164,6 +166,8 @@
 	let playerVideoEndTimePretty: string = $state('');
 	let playerIsFullscreen = $state(false);
 	let playerInitalInteract = $state(true);
+	let isAndroidPictureInPicture = $state(false);
+	let pictureInPictureListener: { remove: () => Promise<void> } | undefined;
 
 	const playerVolumeSlider = new Slider({
 		onValueChange: (volumeToSet) => {
@@ -199,6 +203,13 @@
 		showPlayerUI();
 		return false;
 	}
+
+	$effect(() => {
+		const automaticPipEnabled = $playerAndroidAutoPip;
+		if (Capacitor.getPlatform() === 'android') {
+			AndroidPictureInPicture.setAutoPipEnabled({ enabled: automaticPipEnabled });
+		}
+	});
 
 	$effect(() => {
 		const volumeUp = $keybindStore.volumeUp;
@@ -885,6 +896,12 @@
 		});
 
 		if (Capacitor.getPlatform() === 'android') {
+			pictureInPictureListener = await AndroidPictureInPicture.addListener(
+				'pictureInPictureModeChanged',
+				({ isInPictureInPictureMode }) => {
+					isAndroidPictureInPicture = isInPictureInPictureMode;
+				}
+			);
 			await androidHandleRotate();
 
 			androidInitialNetworkStatus = await Network.getStatus();
@@ -899,22 +916,50 @@
 				}
 			});
 
-			await MediaSession.setMetadata({ title: data.video.title, artist: data.video.author, artwork: [{ src: getBestThumbnail(data.video.videoThumbnails, 800, 800), sizes: '800x800', type: 'image/jpeg' }] });
-			await MediaSession.setPlaybackState({ playbackState: 'playing' });
+			await MediaSession.setMetadata({
+				title: data.video.title,
+				artist: data.video.author,
+				artwork: [
+					{
+						src: getBestThumbnail(data.video.videoThumbnails, 800, 800),
+						sizes: '800x800',
+						type: 'image/jpeg'
+					}
+				]
+			});
+			await MediaSession.setPlaybackState({
+				playbackState: playerElement?.paused ? 'paused' : 'playing'
+			});
 			await MediaSession.setActionHandler({ action: 'play' }, () => playerElement?.play());
 			await MediaSession.setActionHandler({ action: 'pause' }, () => playerElement?.pause());
-			await MediaSession.setActionHandler({ action: 'stop' }, () => { if (playerElement) { playerElement.pause(); playerElement.currentTime = 0; } });
+			await MediaSession.setActionHandler({ action: 'stop' }, () => {
+				if (playerElement) {
+					playerElement.pause();
+					playerElement.currentTime = 0;
+				}
+			});
 			if (data.playlistId) {
-				await MediaSession.setActionHandler({ action: 'nexttrack' }, () => goToNextVideo(data.video, data.playlistId!));
-				await MediaSession.setActionHandler({ action: 'previoustrack' }, () => goToPreviousVideo(data.playlistId!));
+				await MediaSession.setActionHandler({ action: 'nexttrack' }, () =>
+					goToNextVideo(data.video, data.playlistId!)
+				);
+				await MediaSession.setActionHandler({ action: 'previoustrack' }, () =>
+					goToPreviousVideo(data.playlistId!)
+				);
 			}
 
 			playerElement?.addEventListener('play', () => {
 				MediaSession.setPlaybackState({ playbackState: 'playing' });
+				AndroidPictureInPicture.setPlaybackActive({ active: true });
 			});
 
 			playerElement?.addEventListener('pause', () => {
 				MediaSession.setPlaybackState({ playbackState: 'paused' });
+				AndroidPictureInPicture.setPlaybackActive({ active: false });
+			});
+
+			playerElement?.addEventListener('ended', () => {
+				MediaSession.setPlaybackState({ playbackState: 'none' });
+				AndroidPictureInPicture.setPlaybackActive({ active: false });
 			});
 		} else if ('mediaSession' in navigator) {
 			const metadataArtwork: MediaImage[] = [];
@@ -1068,6 +1113,9 @@
 		playerElement?.addEventListener('playing', async () => {
 			playerCurrentPlaybackState = true;
 			playerIsBuffering = false;
+			if (Capacitor.getPlatform() === 'android') {
+				await AndroidPictureInPicture.setPlaybackActive({ active: true });
+			}
 			await requestKeepAwake();
 		});
 
@@ -1141,6 +1189,8 @@
 		await releaseKeepAwake();
 
 		if (Capacitor.getPlatform() === 'android') {
+			await pictureInPictureListener?.remove();
+			await AndroidPictureInPicture.setPlaybackActive({ active: false });
 			await setStatusBarColor();
 			await MediaSession.setPlaybackState({ playbackState: 'none' });
 
@@ -1190,7 +1240,7 @@
 <div
 	id="player-container"
 	class:contain-video={!isAndroidTv()}
-	class:full-window={$playerIsInWindowFullscreen}
+	class:full-window={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
 	class:tv-contain-video={isAndroidTv()}
 	class:hide-cursor={!showControls}
 	role="presentation"
@@ -1210,7 +1260,7 @@
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !isAndroidTv()}
+	{#if isEmbed && !isAndroidTv() && !isAndroidPictureInPicture}
 		<div
 			class="chip surface-container-highest"
 			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
@@ -1219,7 +1269,7 @@
 		</div>
 	{/if}
 
-	{#if showControls}
+	{#if showControls && !isAndroidPictureInPicture}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1235,16 +1285,19 @@
 			{/if}
 		</div>
 	{/if}
-	<TouchControls
-		{playerElement}
-		{showPlayerUI}
-		{toggleVideoPlaybackStatus}
-		{toggleFullscreen}
-		bind:playerInitalInteract
-		bind:playerMaxKnownTime
-		bind:playerIsBuffering
-	/>
-	<div id="player-controls" class="hide" class:show={showControls}>
+	{#if !isAndroidPictureInPicture}
+		<TouchControls
+			{playerElement}
+			{showPlayerUI}
+			{toggleVideoPlaybackStatus}
+			{toggleFullscreen}
+			bind:playerInitalInteract
+			bind:playerMaxKnownTime
+			bind:playerIsBuffering
+		/>
+	{/if}
+	{#if !isAndroidPictureInPicture}
+		<div id="player-controls" class="hide" class:show={showControls}>
 		<Timeline
 			{playerElement}
 			{currentTime}
@@ -1330,6 +1383,7 @@
 			</nav>
 		</nav>
 	</div>
+	{/if}
 	{#if playbackError}
 		<div class="player-error" role="alert">
 			<div class="player-error-content surface-container-highest">

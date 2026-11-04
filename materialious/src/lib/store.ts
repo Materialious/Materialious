@@ -20,6 +20,7 @@ export {
 	playerDefaultPlaybackSpeed,
 	playerMiniplayerEnabled,
 	playerAndroidPauseOnNetworkChange,
+	playerAndroidAutoPip,
 	playerPreferredVolumeStore,
 	playerPlaylistHistory,
 	playerState,

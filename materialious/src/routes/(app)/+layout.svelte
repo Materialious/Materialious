@@ -12,6 +12,7 @@
 	import Settings from '#lib/components/settings/Settings.svelte';
 	import Thumbnail from '#lib/components/thumbnail/VideoThumbnail.svelte';
 	import Player from '#lib/components/player/Player.svelte';
+	import { AndroidPictureInPicture } from '#lib/android/plugins/androidPictureInPicture';
 	import { getPages } from '#lib/navPages';
 	import {
 		invidiousAuthStore,
@@ -55,6 +56,7 @@
 	let mobileSearchShow = $state(false);
 	let notifications: Notification[] = $state([]);
 	let playerIsPip = $state(false);
+	let isAndroidPictureInPicture = $state(false);
 	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
 	let watchPartySupported = $state(isOwnBackend() !== null);
 	materialiousBackendStore.subscribe(() => {
@@ -67,6 +69,23 @@
 	let lastMainFocus: HTMLElement | undefined;
 
 	let pages = $state(getPages());
+	let pictureInPictureListener: { remove: () => Promise<void> } | undefined;
+
+	onMount(async () => {
+		if (Capacitor.getPlatform() === 'android') {
+			pictureInPictureListener = await AndroidPictureInPicture.addListener(
+				'pictureInPictureModeChanged',
+				({ isInPictureInPictureMode }) => {
+					isAndroidPictureInPicture = isInPictureInPictureMode;
+				}
+			);
+		}
+	});
+
+	onDestroy(async () => {
+		await pictureInPictureListener?.remove();
+	});
+
 	invidiousAuthStore.subscribe(() => {
 		pages = getPages();
 	});
@@ -309,7 +328,7 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={isAndroidTv()}
-		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen}
+		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen || isAndroidPictureInPicture}
 		bind:this={leftNavElement}
 		onkeydown={handleLeftNavKeyDown}
 	>
@@ -362,7 +381,7 @@
 			class="top"
 			id="top-content"
 			class:tv-nav={isAndroidTv()}
-			class:hide-element={$playerIsInWindowFullscreen}
+			class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
 		>
 			{#if $playerTheatreModeIsActive}
 				<header role="presentation" style="cursor: pointer;" tabindex="-1" class="small-padding">
@@ -471,7 +490,7 @@
 		</nav>
 	{/if}
 
-	<nav class="bottom s" class:hide-element={$playerIsInWindowFullscreen}>
+	<nav class="bottom s" class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}>
 		{#each pages as navPage (navPage)}
 			<a
 				class="round"
@@ -605,7 +624,7 @@
 
 <style>
 	.hide-element {
-		display: none;
+		display: none !important;
 	}
 
 	.tv-nav {

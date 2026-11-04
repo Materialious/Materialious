@@ -8,6 +8,7 @@
 		playerAlwaysLoopStore,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
+		playerAndroidAutoPip,
 		playerAutoPlayStore,
 		playerAutoplayNextByDefaultStore,
 		playerCCByDefault,
@@ -223,6 +224,23 @@
 					type="checkbox"
 					bind:checked={$playerAndroidPauseOnNetworkChange}
 					onclick={() => playerAndroidPauseOnNetworkChange.set(!$playerAndroidPauseOnNetworkChange)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.player.androidAutoPip')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$playerAndroidAutoPip}
+					onclick={() => playerAndroidAutoPip.set(!$playerAndroidAutoPip)}
 					role="switch"
 				/>
 				<span></span>

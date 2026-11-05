@@ -13,7 +13,7 @@
 
 	let search: string = $state('');
 	let multipleActions = $state(false);
-	let selectedIds = $state(new SvelteSet<string>());
+	let selectedIds = new SvelteSet<string>();
 	let selectedSubscriptions = $derived(
 		subscriptions.filter((sub) => selectedIds.has(sub.authorId))
 	);
@@ -120,9 +120,7 @@
 			</div>
 		{/if}
 		{#each subscriptions as sub (sub.authorId)}
-			<article
-				class:selected={multipleActions && selectedIds.has(sub.authorId)}
-			>
+			<article class:selected={multipleActions && selectedIds.has(sub.authorId)}>
 				<nav>
 					<AuthorAvatar author={sub.author} authorId={sub.authorId} />
 

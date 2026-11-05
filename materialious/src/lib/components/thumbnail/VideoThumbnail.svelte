@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { resolveWatchPath } from '#lib/paths';
-	import { getBestLandscapeThumbnail, imageHandleCors } from '#lib/images';
+	import { getBestLandscapeThumbnail, getBestThumbnail, imageHandleCors } from '#lib/images';
 	import { letterCase } from '#lib/letterCasing';
 	import { cleanNumber, videoLength } from '#lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
@@ -54,9 +54,14 @@
 
 	let progress: string | undefined = $state();
 
-	let thumbnailSrc = $state(
-		'thumbnail' in video ? video.thumbnail : getBestLandscapeThumbnail(video.videoThumbnails)
-	);
+	const highQualityThumbnailSrc =
+		'thumbnail' in video ? video.thumbnail : getBestLandscapeThumbnail(video.videoThumbnails);
+	const lowQualityThumbnailSrc =
+		'thumbnail' in video
+			? video.thumbnail
+			: getBestThumbnail(video.videoThumbnails, 320, 240) || highQualityThumbnailSrc;
+	let thumbnailSrc = $state(lowQualityThumbnailSrc);
+	let deArrowThumbnailSelected = false;
 
 	if (get(deArrowEnabledStore)) {
 		try {
@@ -76,6 +81,7 @@
 						thumbnail.timestamp !== null &&
 						(thumbnail.locked || thumbnail.votes > 0 || !thumbnail.original)
 					) {
+						deArrowThumbnailSelected = true;
 						thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
 							priority: 'low'
 						});
@@ -90,15 +96,21 @@
 
 	let thumbnailHeight = $state(0);
 	let thumbnailWidth = $state(0);
+	let thumbnailInView = $state(false);
 	let thumbnailImageElement: HTMLImageElement | undefined = $state();
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
-		src: () => imageHandleCors(thumbnailSrc),
+		src: () => (thumbnailInView ? imageHandleCors(thumbnailSrc) : ''),
 		onLoadingStatusChange: () => {
 			if (thumbnailImageElement) {
 				thumbnailHeight = thumbnailImageElement.naturalHeight;
 				thumbnailWidth = thumbnailImageElement.naturalWidth;
+				if (!deArrowThumbnailSelected && thumbnailSrc !== highQualityThumbnailSrc) {
+					setTimeout(() => {
+						if (!deArrowThumbnailSelected) thumbnailSrc = highQualityThumbnailSrc;
+					}, 250);
+				}
 			}
 		}
 	});
@@ -115,7 +127,8 @@
 	let thumbnailActionsVisible = $state(false);
 
 	const observer = new IntersectionObserver(([entry]) => {
-		if (!entry.isIntersecting) thumbnailActionsVisible = false;
+		if (entry.isIntersecting) thumbnailInView = true;
+		else thumbnailActionsVisible = false;
 	});
 
 	onMount(async () => {
@@ -300,14 +313,11 @@
 						class:watched={progress}
 						{...thumbnail.image}
 						bind:this={thumbnailImageElement}
+						decoding="async"
 						alt="Thumbnail for video"
 					/>
 				</div>
-				<div
-					{...thumbnail.fallback}
-					class="secondary-container responsive"
-					style="height: 200px;"
-				></div>
+				<div {...thumbnail.fallback} class="secondary-container responsive"></div>
 
 				{#if isAndroidTv()}
 					<div class="tv-play"><i>play_arrow</i></div>
@@ -541,6 +551,19 @@
 
 	.thumbnail-image {
 		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+	}
+
+	.thumbnail-image > div:not(.tv-play) {
+		width: 100%;
+		height: 100%;
+	}
+
+	.thumbnail-image > .secondary-container {
+		position: absolute;
+		inset: 0;
 	}
 
 	.thumbnail-image .chip {

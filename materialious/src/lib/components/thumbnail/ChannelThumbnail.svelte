@@ -28,6 +28,8 @@
 				{...avatar.image}
 				class="circle"
 				style="width: 90px;height: 90px;"
+				loading="lazy"
+				decoding="async"
 				alt={channel.author}
 			/>
 			<button

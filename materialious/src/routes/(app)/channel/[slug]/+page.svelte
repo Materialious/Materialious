@@ -213,7 +213,7 @@
 						<button onclick={() => (showSearch = true)}><i>search</i></button>
 					{/if}
 				{/if}
-				{#if !isAndroidTv()}
+				{#if !isAndroidTv() && displayContent && ('videos' in displayContent ? displayContent.videos.length > 0 : 'playlists' in displayContent && displayContent.playlists.length > 0)}
 					<button
 						class="surface-container-highest"
 						aria-label="Bulk actions"

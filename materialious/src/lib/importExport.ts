@@ -152,7 +152,22 @@ export async function importSubscriptionsFromFile(file: File) {
 		const csv = Papa.parse(fileContents, { header: true, skipEmptyLines: true });
 
 		if (csv.data.length > 0) {
-			const youtubeSubs = zYouTubeCsvSubs.safeParse(csv.data);
+			// YouTube's export uses "Channel Id" and "Channel Title". Normalize
+			// header casing and spacing so it also accepts the older header names.
+			const normalizedRows = csv.data.map((row) => {
+				const fields = Object.fromEntries(
+					Object.entries(row as Record<string, string>).map(([key, value]) => [
+						key.toLowerCase().replace(/[^a-z]/g, ''),
+						value
+					])
+				);
+
+				return {
+					'Channel ID': fields.channelid,
+					'Channel title': fields.channeltitle
+				};
+			});
+			const youtubeSubs = zYouTubeCsvSubs.safeParse(normalizedRows);
 
 			if (youtubeSubs.success) {
 				for (const sub of youtubeSubs.data) {

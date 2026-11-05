@@ -108,6 +108,14 @@
 		/>
 	</div>
 	<p><i>info</i> {$_('layout.export.importSubSupported')}</p>
+	<a
+		class="link"
+		href="https://docs.invidious.io/export-youtube-subscriptions/"
+		target="_blank"
+		rel="noopener noreferrer"
+	>
+		How to export YouTube subscriptions
+	</a>
 
 	<div class="space"></div>
 

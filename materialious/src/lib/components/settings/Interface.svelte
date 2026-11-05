@@ -5,7 +5,7 @@
 	import { iso31661 } from 'iso-3166';
 	import { isContentRegion } from '#lib/regions';
 	import { _ } from '#lib/i18n/index';
-	import { isUnrestrictedPlatform } from '#lib/backend';
+	import { isUnrestrictedPlatform, remoteMaterialiousSupported } from '#lib/backend';
 	import { timeout, isMobile } from '#lib/utils';
 	import { shareURL } from '#lib/download';
 	import { getPages, type Pages } from '#lib/navPages';
@@ -52,6 +52,7 @@
 
 	async function setMaterialiousInstance(event: Event) {
 		event.preventDefault();
+		if (!remoteMaterialiousSupported()) return;
 		invalidMaterialiousBackend = !(await setMaterialiousBackend(materialiousBackend));
 
 		if (invalidMaterialiousBackend) return;
@@ -61,6 +62,7 @@
 	}
 
 	async function removeMaterialiousInstance() {
+		if (!remoteMaterialiousSupported()) return;
 		await removeMaterialiousBackend();
 
 		await timeout(100);
@@ -186,40 +188,42 @@
 	{/if}
 {/if}
 
-<div class="settings">
-	<form onsubmit={setMaterialiousInstance}>
-		<nav>
-			<div
-				class="field prefix label suffix surface-container-highest max"
-				class:invalid={invalidMaterialiousBackend}
-				style="min-width: 0"
-			>
-				<i>link</i>
-				<input
-					tabindex="0"
-					bind:value={materialiousBackend}
-					name="materialious-backend"
-					type="text"
-				/>
-				<label tabindex="-1" for="materialious-backend">{$_('materialiousBackendUrl')}</label>
-				{#if invalidMaterialiousBackend}
-					<span class="error">{$_('invalidInstance')}</span>
-				{/if}
-				{#if materialiousBackend}
-					<i
-						class="front"
-						role="presentation"
-						title={$_('removeMaterialiousBackend')}
-						onclick={removeMaterialiousInstance}>close</i
-					>
-				{/if}
-			</div>
-			<button class="circle" style="flex-shrink: 0">
-				<i>done</i>
-			</button>
-		</nav>
-	</form>
-</div>
+{#if remoteMaterialiousSupported()}
+	<div class="settings">
+		<form onsubmit={setMaterialiousInstance}>
+			<nav>
+				<div
+					class="field prefix label suffix surface-container-highest max"
+					class:invalid={invalidMaterialiousBackend}
+					style="min-width: 0"
+				>
+					<i>link</i>
+					<input
+						tabindex="0"
+						bind:value={materialiousBackend}
+						name="materialious-backend"
+						type="text"
+					/>
+					<label tabindex="-1" for="materialious-backend">{$_('materialiousBackendUrl')}</label>
+					{#if invalidMaterialiousBackend}
+						<span class="error">{$_('invalidInstance')}</span>
+					{/if}
+					{#if materialiousBackend}
+						<i
+							class="front"
+							role="presentation"
+							title={$_('removeMaterialiousBackend')}
+							onclick={removeMaterialiousInstance}>close</i
+						>
+					{/if}
+				</div>
+				<button class="circle" style="flex-shrink: 0">
+					<i>done</i>
+				</button>
+			</nav>
+		</form>
+	</div>
+{/if}
 
 <div class="field no-margin">
 	<nav class="no-padding">

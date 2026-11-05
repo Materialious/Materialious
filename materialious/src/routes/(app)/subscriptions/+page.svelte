@@ -49,7 +49,7 @@
 </script>
 
 <nav class="right-align">
-	{#if !isAndroidTv()}
+	{#if !isAndroidTv() && (videos?.length ?? 0) > 0}
 		<button
 			class="button surface-container-highest"
 			aria-label="Bulk actions"

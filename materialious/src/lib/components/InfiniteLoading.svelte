@@ -16,6 +16,7 @@
 </script>
 
 <InfiniteLoadingBase {distance} {direction} {forceUseInfiniteWrapper} {identifier} on:infinite>
+	<span slot="noResults"></span>
 	<progress
 		slot="spinner"
 		class="circle indeterminate"

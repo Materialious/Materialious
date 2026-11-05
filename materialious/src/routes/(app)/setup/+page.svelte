@@ -2,7 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { _ } from '#lib/i18n/index';
-	import { isUnrestrictedPlatform, getMaterialiousBackendUrl } from '#lib/backend';
+	import {
+		isUnrestrictedPlatform,
+		getMaterialiousBackendUrl,
+		remoteMaterialiousSupported
+	} from '#lib/backend';
 	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '#lib/auth';
 	import { isOwnBackend } from '#lib/shared/index';
 	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '#lib/store';
@@ -26,14 +30,18 @@
 		goto(resolve('/(app)'), { replace: true });
 	}
 
-	function chooseBackend(invidious: boolean) {
+	async function chooseBackend(invidious: boolean) {
 		usingInvidious = invidious;
 		if (invidious) {
 			backendInUseStore.set('ivg');
 			step = 1;
 		} else {
 			backendInUseStore.set('yt');
-			step = 2;
+			if (remoteMaterialiousSupported()) {
+				step = 2;
+			} else {
+				await setupCompleted();
+			}
 		}
 	}
 
@@ -53,7 +61,7 @@
 				if (!invidiousInstanceValid) return;
 			}
 
-			if (materialiousBackend.trim()) {
+			if (remoteMaterialiousSupported() && materialiousBackend.trim()) {
 				invalidMaterialiousBackend = !(await setMaterialiousBackend(materialiousBackend.trim()));
 				if (invalidMaterialiousBackend) return;
 			}
@@ -170,18 +178,21 @@
 								<label for="instanceUrl">{$_('invidiousInstance')}</label>
 							</div>
 						{/if}
-						<div
-							class="field label prefix surface-container-highest"
-							class:invalid={invalidMaterialiousBackend}
-						>
-							<i>link</i><input
-								bind:value={materialiousBackend}
-								id="materialiousBackendUrl"
-								name="materialiousBackendUrl"
-								type="url"
-							/>
-							<label for="materialiousBackendUrl">{$_('materialiousBackendUrl')} (Optional)</label>
-						</div>
+						{#if remoteMaterialiousSupported()}
+							<div
+								class="field label prefix surface-container-highest"
+								class:invalid={invalidMaterialiousBackend}
+							>
+								<i>link</i><input
+									bind:value={materialiousBackend}
+									id="materialiousBackendUrl"
+									name="materialiousBackendUrl"
+									type="url"
+								/>
+								<label for="materialiousBackendUrl">{$_('materialiousBackendUrl')} (Optional)</label
+								>
+							</div>
+						{/if}
 						<div class="actions">
 							<button
 								type="button"
@@ -302,6 +313,16 @@
 		gap: 0.5rem;
 	}
 	@media (max-width: 560px) {
+		.setup-page {
+			display: block;
+			height: 100%;
+			min-height: 0;
+			overflow-y: auto;
+			overscroll-behavior: contain;
+		}
+		.setup-card {
+			margin: 1rem auto;
+		}
 		.step-item {
 			font-size: 0.75rem;
 			gap: 0.3rem;

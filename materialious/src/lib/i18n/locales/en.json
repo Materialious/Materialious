@@ -423,6 +423,7 @@
 			"title": "Export/Import",
 			"importSub": "Import subscriptions",
 			"importSubSupported": "YouTube CSV/OPML/JSON, Invidious OPML/JSON, Freetube database & NewPipe JSON supported. (Invidious JSON is slow)",
+			"youtubeSubscriptionsGuide": "How to export YouTube subscriptions",
 			"importing": "Importing subscriptions (this will take a moment)",
 			"importingCompleted": "Subscriptions successfully imported",
 			"exportSub": "Export subscriptions",

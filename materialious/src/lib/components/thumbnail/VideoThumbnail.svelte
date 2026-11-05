@@ -10,6 +10,7 @@
 	import { Avatar } from 'melt/builders';
 
 	import {
+		authTokenStore,
 		backendInUseStore,
 		deArrowEnabledStore,
 		filterContentListStore,
@@ -55,6 +56,7 @@
 	}
 
 	let progress: string | undefined = $state();
+	let historyRequest = 0;
 
 	const highQualityThumbnailSrc =
 		'thumbnail' in video ? video.thumbnail : getBestLandscapeThumbnail(video.videoThumbnails);
@@ -134,19 +136,26 @@
 		else thumbnailActionsVisible = false;
 	});
 
-	onMount(async () => {
+	onMount(() => {
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
 		addEventListener('resize', disableSideways);
 
-		queueGetWatchHistory(video.videoId).then(async (watchHistory) => {
-			if (watchHistory) {
-				progress = watchHistory.progress.toString();
-			}
+		if (thumbnailElement) observer.observe(thumbnailElement);
+
+		const unsubscribe = authTokenStore.subscribe(() => {
+			const request = ++historyRequest;
+			progress = undefined;
+			queueGetWatchHistory(video.videoId).then((watchHistory) => {
+				if (request === historyRequest) progress = watchHistory?.progress.toString();
+			});
 		});
 
-		if (thumbnailElement) observer.observe(thumbnailElement);
+		return () => {
+			unsubscribe();
+			historyRequest++;
+		};
 	});
 
 	onDestroy(() => {
@@ -199,6 +208,7 @@
 			<li>
 				<button
 					onclick={async () => {
+						historyRequest++;
 						if (progress) {
 							await deleteWatchHistoryItem(video.videoId);
 							progress = undefined;
@@ -333,6 +343,7 @@
 							onclick={(e) => {
 								e.stopPropagation();
 								e.preventDefault();
+								historyRequest++;
 								(async () => {
 									await deleteWatchHistoryItem(video.videoId);
 									progress = undefined;
@@ -348,6 +359,7 @@
 							onclick={(e) => {
 								e.stopPropagation();
 								e.preventDefault();
+								historyRequest++;
 								(async () => {
 									await saveWatchHistory(video, 1);
 									progress = '0';

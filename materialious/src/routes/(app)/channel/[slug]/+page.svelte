@@ -51,6 +51,13 @@
 		}, 200);
 	}
 
+	function closeChannelSearch() {
+		if (channelSearchDebounce) clearTimeout(channelSearchDebounce);
+		channelSearch = '';
+		showSearch = false;
+		displayContent = $channelCacheStore[slug].displayContent.videos;
+	}
+
 	async function loadMore(event: InfiniteEvent) {
 		if (typeof displayContent === 'undefined') return;
 
@@ -201,16 +208,23 @@
 			<div class="channel-toolbar-actions">
 				{#if !isYTBackend()}
 					{#if showSearch}
-						<div class="field suffix prefix suffix small no-margin surface-variant">
-							<i class="front">search</i><input
+						<div
+							class="field prefix suffix small no-margin round channel-search surface-container-highest"
+						>
+							<i class="front" tabindex="-1">search</i><input
 								bind:value={channelSearch}
 								oninput={searchChannel}
 								type="text"
 								placeholder={$_('searchPlaceholder')}
 							/>
+							<i class="front" role="presentation" onclick={closeChannelSearch}>close</i>
 						</div>
 					{:else}
-						<button onclick={() => (showSearch = true)}><i>search</i></button>
+						<button
+							class="surface-container-highest"
+							aria-label="Search channel"
+							onclick={() => (showSearch = true)}><i>search</i></button
+						>
 					{/if}
 				{/if}
 				{#if !isAndroidTv() && displayContent && ('videos' in displayContent ? displayContent.videos.length > 0 : 'playlists' in displayContent && displayContent.playlists.length > 0)}
@@ -230,17 +244,9 @@
 
 {#if displayContent}
 	{#if 'videos' in displayContent}
-		<ItemsList
-			items={displayContent.videos}
-			bind:multipleActions
-			showActionButton={false}
-		/>
+		<ItemsList items={displayContent.videos} bind:multipleActions showActionButton={false} />
 	{:else}
-		<ItemsList
-			items={displayContent.playlists}
-			bind:multipleActions
-			showActionButton={false}
-		/>
+		<ItemsList items={displayContent.playlists} bind:multipleActions showActionButton={false} />
 	{/if}
 	<InfiniteLoading on:infinite={loadMore} />
 {:else}
@@ -264,6 +270,21 @@
 		flex-wrap: wrap;
 		gap: 0.5rem;
 		margin-left: auto;
+	}
+
+	.channel-search {
+		--_background: var(--surface-container-highest);
+	}
+
+	.channel-search input {
+		flex: 1;
+		min-width: 0;
+		background-color: var(--surface-container-highest);
+	}
+
+	.channel-search > .front:last-child {
+		cursor: pointer;
+		user-select: none;
 	}
 
 	.description {

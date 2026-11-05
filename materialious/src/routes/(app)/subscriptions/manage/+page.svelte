@@ -113,7 +113,8 @@
 				{#if selectedIds.size > 0}
 					<div class="bulk-controls">
 						<button class="surface-container-highest" onclick={unsubscribeSelected}>
-							<i>person_remove</i>Unsubscribe selected
+							<i>person_remove</i>
+							Unsubscribe selected
 						</button>
 					</div>
 				{/if}

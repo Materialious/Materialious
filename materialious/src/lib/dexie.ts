@@ -11,6 +11,8 @@ export interface ChannelSubscriptions {
 	channelId: string;
 	channelName: string;
 	lastRSSFetch: Date;
+	nextRSSFetch?: Date;
+	rssFailureCount?: number;
 }
 
 export interface ChannelAvatars {

@@ -14,7 +14,7 @@ export const engineCooldownYTStore: Writable<number> = persist(
 	'engineCooldownYT'
 );
 export const engineMaxConcurrentChannelsStore: Writable<number> = persist(
-	writable(50),
+	writable(4),
 	createStorage(),
 	'engineMaxConcurrentChannels'
 );

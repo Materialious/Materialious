@@ -1,5 +1,9 @@
 <script lang="ts">
-	import { feedLastItemId, filterContentListStore } from '#lib/store';
+	import {
+		feedLastItemId,
+		filterContentListStore,
+		filterContentUrlAutoUpdateStore
+	} from '#lib/store';
 	import ContentColumn from '#lib/components/layout/ContentColumn.svelte';
 	import { onMount } from 'svelte';
 	import Thumbnail from '#lib/components/thumbnail/VideoThumbnail.svelte';
@@ -11,16 +15,82 @@
 	import NoResults from '#lib/components/NoResults.svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import { isItemFiltered } from '#lib/filtering/index';
+	import PlaylistManager from '#lib/components/PlaylistManager.svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		items?: FeedItems;
 		playlistId?: string;
 		classes?: string;
+		multipleActions?: boolean;
+		showActionButton?: boolean;
 	}
 
-	let { items = [], playlistId = '', classes = 'page right active' }: Props = $props();
+	let {
+		items = [],
+		playlistId = '',
+		classes = 'page right active',
+		multipleActions = $bindable(false),
+		showActionButton = true
+	}: Props = $props();
 
 	let gridElement: HTMLElement;
+	let selectedIds = $state(new Set<string>());
+	let visibleItems = $derived(items.filter((item) => !isItemFiltered(item)));
+	let selectedItems = $derived(
+		visibleItems.filter((item) => selectedIds.has(extractUniqueId(item)))
+	);
+	let selectedVideoIds = $derived(
+		selectedItems.filter((item) => 'videoId' in item).map((item) => item.videoId)
+	);
+	$effect(() => {
+		if (!multipleActions) selectedIds = new Set();
+	});
+
+	function toggleSelection(id: string) {
+		const next = new SvelteSet(selectedIds);
+		if (next.has(id)) next.delete(id);
+		else next.add(id);
+		selectedIds = next;
+	}
+
+	function finishSelection() {
+		multipleActions = false;
+		selectedIds = new Set();
+	}
+
+	function hideSelectedVideos(field: 'videoId' | 'authorId') {
+		const values = [
+			...new Set(
+				selectedItems.flatMap((item) => {
+					if (!('videoId' in item)) return [];
+					if (field === 'videoId') return [item.videoId];
+					return 'authorId' in item && item.authorId ? [item.authorId] : [];
+				})
+			)
+		];
+		if (!values.length) return;
+		const names = [
+			...new Set(
+				selectedItems.flatMap((item) => {
+					if (!('videoId' in item)) return [];
+					if (field === 'videoId') return [item.title];
+					return 'author' in item && item.author ? [item.author] : [];
+				})
+			)
+		];
+		const noteNames = names.length ? names : values;
+		const note = `${field === 'videoId' ? 'Hidden videos' : 'Hidden channels'}: ${noteNames.join(', ')}`;
+		filterContentListStore.update((filters) => [
+			...filters,
+			{
+				type: 'video',
+				conditions: [{ field, operator: 'in', values: [values], note }]
+			}
+		]);
+		filterContentUrlAutoUpdateStore.set(false);
+		finishSelection();
+	}
 
 	const cardOf = (el: Element | null) => el?.closest<HTMLElement>('article.item-select') ?? null;
 
@@ -29,7 +99,8 @@
 
 		if (event.key === 'Enter' && card) {
 			event.preventDefault();
-			handleItemSelect(event, card.id);
+			if (multipleActions) toggleSelection(card.id);
+			else handleItemSelect(event, card.id);
 			return;
 		}
 
@@ -110,6 +181,60 @@
 	class={classes}
 	class:item-container={!isMobile() || isAndroidTv()}
 >
+	{#if showActionButton && !isAndroidTv()}
+		<div class="bulk-actions right-align">
+			<button
+				class="surface-container-highest"
+				aria-label="Bulk actions"
+				aria-pressed={multipleActions}
+				onclick={() => (multipleActions = !multipleActions)}
+			>
+				<i>checklist</i><span class="m l">Bulk actions</span>
+			</button>
+		</div>
+	{/if}
+	{#if multipleActions}
+		<div class="bulk-actions surface-container" role="toolbar" aria-label="Bulk actions">
+			<div class="bulk-header">
+				<div class="bulk-title">
+					<strong>Bulk actions</strong>
+					<span>{selectedIds.size} selected</span>
+				</div>
+				<button
+					class="surface-container-highest"
+					onclick={() => {
+						const allSelected = visibleItems.every((item) =>
+							selectedIds.has(extractUniqueId(item))
+						);
+						selectedIds = allSelected ? new Set() : new Set(visibleItems.map(extractUniqueId));
+					}}
+				>
+					{visibleItems.every((item) => selectedIds.has(extractUniqueId(item)))
+						? 'Deselect all'
+						: 'Select all'}
+				</button>
+			</div>
+			<div class="bulk-controls">
+				{#if selectedVideoIds.length > 0}
+					<div class="bulk-video-actions">
+						<PlaylistManager
+							mode="clone"
+							videoIds={selectedVideoIds}
+							buttonText="Add to playlist"
+							buttonIcon="playlist_add"
+							buttonClasses="surface-container-highest"
+						/>
+						<button class="surface-container-highest" onclick={() => hideSelectedVideos('videoId')}
+							><i>filter_alt</i>Filter videos</button
+						>
+						<button class="surface-container-highest" onclick={() => hideSelectedVideos('authorId')}
+							><i>person_off</i>Filter channels</button
+						>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{/if}
 	{#if items.length === 0}
 		<NoResults />
 	{/if}
@@ -120,9 +245,16 @@
 					{@const uniqueItemId = extractUniqueId(item)}
 					<ContentColumn>
 						<article
-							onclick={(event) => handleItemSelect(event, uniqueItemId)}
+							onclick={(event) => {
+								if (multipleActions) {
+									event.preventDefault();
+									toggleSelection(uniqueItemId);
+								} else handleItemSelect(event, uniqueItemId);
+							}}
 							id={uniqueItemId}
 							class="no-padding item-select border"
+							class:bulk-selection={multipleActions}
+							class:selected={multipleActions && selectedIds.has(uniqueItemId)}
 							style="height: 100%;"
 							tabindex="0"
 						>
@@ -154,6 +286,55 @@
 		transition:
 			transform 0.15s ease,
 			box-shadow 0.15s ease;
+	}
+
+	.bulk-actions {
+		margin: 0.5rem 0 1rem;
+		padding: 1rem;
+		border-radius: 1rem;
+	}
+
+	.bulk-header,
+	.bulk-title,
+	.bulk-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.bulk-header {
+		justify-content: space-between;
+	}
+
+	.bulk-title {
+		gap: 0.5rem;
+	}
+
+	.bulk-title span,
+	.bulk-label {
+		font-size: 0.9em;
+		opacity: 0.75;
+	}
+
+	.bulk-controls {
+		margin-top: 0.75rem;
+	}
+
+	.bulk-video-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.item-select.selected {
+		outline: 2px solid var(--primary);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+	}
+
+	.item-select.bulk-selection {
+		padding: 0.5rem !important;
 	}
 
 	.item-container .item-select:focus-within {

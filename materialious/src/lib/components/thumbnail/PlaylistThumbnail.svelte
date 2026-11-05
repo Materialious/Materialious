@@ -35,6 +35,8 @@
 		{...mergeAttrs(thumbnail.image, {
 			style: 'max-width: 100%;height: 100%;'
 		})}
+		loading="lazy"
+		decoding="async"
 		alt="Thumbnail for playlist"
 	/>
 	<div {...thumbnail.fallback} class="secondary-container responsive" style="height: 200px;"></div>

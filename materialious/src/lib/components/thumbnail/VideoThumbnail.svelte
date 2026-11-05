@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { resolveWatchPath } from '#lib/paths';
-	import { getBestLandscapeThumbnail, imageHandleCors } from '#lib/images';
+	import { getBestLandscapeThumbnail, getBestThumbnail, imageHandleCors } from '#lib/images';
 	import { letterCase } from '#lib/letterCasing';
 	import { cleanNumber, videoLength } from '#lib/numbers';
 	import { onDestroy, onMount } from 'svelte';
@@ -10,6 +10,8 @@
 	import { Avatar } from 'melt/builders';
 
 	import {
+		authTokenStore,
+		backendInUseStore,
 		deArrowEnabledStore,
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
@@ -24,6 +26,7 @@
 	import { deleteWatchHistoryItem, saveWatchHistory } from '#lib/api/index';
 	import type { ThumbnailVideo } from '#lib/thumbnail';
 	import { isAndroidTv, truncate } from '#lib/utils';
+	import { isYTBackend } from '#lib/backend';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -53,10 +56,17 @@
 	}
 
 	let progress: string | undefined = $state();
+	let historyRequest = 0;
 
-	let thumbnailSrc = $state(
-		'thumbnail' in video ? video.thumbnail : getBestLandscapeThumbnail(video.videoThumbnails)
-	);
+	const highQualityThumbnailSrc =
+		'thumbnail' in video ? video.thumbnail : getBestLandscapeThumbnail(video.videoThumbnails);
+	const lowQualityThumbnailSrc =
+		'thumbnail' in video
+			? video.thumbnail
+			: getBestThumbnail(video.videoThumbnails, 320, 240) || highQualityThumbnailSrc;
+	let thumbnailSrc = $state(lowQualityThumbnailSrc);
+	let deArrowThumbnailSelected = false;
+	let useYtCrop = $derived($backendInUseStore === 'yt' && isYTBackend());
 
 	if (get(deArrowEnabledStore)) {
 		try {
@@ -76,6 +86,7 @@
 						thumbnail.timestamp !== null &&
 						(thumbnail.locked || thumbnail.votes > 0 || !thumbnail.original)
 					) {
+						deArrowThumbnailSelected = true;
 						thumbnailSrc = await getThumbnailDeArrow(video.videoId, thumbnail.timestamp, {
 							priority: 'low'
 						});
@@ -90,15 +101,21 @@
 
 	let thumbnailHeight = $state(0);
 	let thumbnailWidth = $state(0);
+	let thumbnailInView = $state(false);
 	let thumbnailImageElement: HTMLImageElement | undefined = $state();
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
-		src: () => imageHandleCors(thumbnailSrc),
+		src: () => (thumbnailInView ? imageHandleCors(thumbnailSrc) : ''),
 		onLoadingStatusChange: () => {
 			if (thumbnailImageElement) {
 				thumbnailHeight = thumbnailImageElement.naturalHeight;
 				thumbnailWidth = thumbnailImageElement.naturalWidth;
+				if (!deArrowThumbnailSelected && thumbnailSrc !== highQualityThumbnailSrc) {
+					setTimeout(() => {
+						if (!deArrowThumbnailSelected) thumbnailSrc = highQualityThumbnailSrc;
+					}, 250);
+				}
 			}
 		}
 	});
@@ -115,22 +132,30 @@
 	let thumbnailActionsVisible = $state(false);
 
 	const observer = new IntersectionObserver(([entry]) => {
-		if (!entry.isIntersecting) thumbnailActionsVisible = false;
+		if (entry.isIntersecting) thumbnailInView = true;
+		else thumbnailActionsVisible = false;
 	});
 
-	onMount(async () => {
+	onMount(() => {
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
 		addEventListener('resize', disableSideways);
 
-		queueGetWatchHistory(video.videoId).then(async (watchHistory) => {
-			if (watchHistory) {
-				progress = watchHistory.progress.toString();
-			}
+		if (thumbnailElement) observer.observe(thumbnailElement);
+
+		const unsubscribe = authTokenStore.subscribe(() => {
+			const request = ++historyRequest;
+			progress = undefined;
+			queueGetWatchHistory(video.videoId).then((watchHistory) => {
+				if (request === historyRequest) progress = watchHistory?.progress.toString();
+			});
 		});
 
-		if (thumbnailElement) observer.observe(thumbnailElement);
+		return () => {
+			unsubscribe();
+			historyRequest++;
+		};
 	});
 
 	onDestroy(() => {
@@ -183,6 +208,7 @@
 			<li>
 				<button
 					onclick={async () => {
+						historyRequest++;
 						if (progress) {
 							await deleteWatchHistoryItem(video.videoId);
 							progress = undefined;
@@ -294,20 +320,17 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={thumbnailHeight > thumbnailWidth}>
+				<div class:crop={thumbnailHeight > thumbnailWidth || useYtCrop} class:yt-crop={useYtCrop}>
 					<img
 						class="responsive"
 						class:watched={progress}
 						{...thumbnail.image}
 						bind:this={thumbnailImageElement}
+						decoding="async"
 						alt="Thumbnail for video"
 					/>
 				</div>
-				<div
-					{...thumbnail.fallback}
-					class="secondary-container responsive"
-					style="height: 200px;"
-				></div>
+				<div {...thumbnail.fallback} class="secondary-container responsive"></div>
 
 				{#if isAndroidTv()}
 					<div class="tv-play"><i>play_arrow</i></div>
@@ -320,6 +343,7 @@
 							onclick={(e) => {
 								e.stopPropagation();
 								e.preventDefault();
+								historyRequest++;
 								(async () => {
 									await deleteWatchHistoryItem(video.videoId);
 									progress = undefined;
@@ -335,6 +359,7 @@
 							onclick={(e) => {
 								e.stopPropagation();
 								e.preventDefault();
+								historyRequest++;
 								(async () => {
 									await saveWatchHistory(video, 1);
 									progress = '0';
@@ -471,6 +496,12 @@
 		margin-bottom: -22%;
 	}
 
+	.crop.yt-crop img {
+		clip-path: none;
+		transform: scale(1.35);
+		margin-bottom: 0;
+	}
+
 	.use-flex-column {
 		height: 100%;
 		display: flex;
@@ -541,6 +572,19 @@
 
 	.thumbnail-image {
 		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+	}
+
+	.thumbnail-image > div:not(.tv-play) {
+		width: 100%;
+		height: 100%;
+	}
+
+	.thumbnail-image > .secondary-container {
+		position: absolute;
+		inset: 0;
 	}
 
 	.thumbnail-image .chip {

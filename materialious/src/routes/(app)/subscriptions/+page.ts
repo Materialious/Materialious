@@ -8,7 +8,7 @@ import { get } from 'svelte/store';
 
 type supportedVideos = (VideoBase | Video | PlaylistPageVideo)[];
 
-async function sortVideosByFavourites(videos: supportedVideos): Promise<supportedVideos> {
+export async function _sortVideosByFavourites(videos: supportedVideos): Promise<supportedVideos> {
 	if (!window.indexedDB) return videos;
 
 	const favouritedChannels = (await localDb.favouriteChannels.toArray()).map(
@@ -41,7 +41,7 @@ export async function load() {
 
 	try {
 		const feed = await getFeed(100, 1);
-		const videos = await sortVideosByFavourites([...feed.notifications, ...feed.videos]);
+		const videos = await _sortVideosByFavourites([...feed.notifications, ...feed.videos]);
 		feedCacheStore.set({ ...get(feedCacheStore), subscription: videos });
 	} catch (e) {
 		error(500, e instanceof Error ? e.message : String(e));

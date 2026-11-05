@@ -30,7 +30,16 @@
 		}
 	});
 
-	if (defaultValue) combobox.select(defaultValue);
+	let lastDefaultValue: string | null | undefined;
+
+	$effect(() => {
+		const currentDefaultValue = defaultValue;
+		if (!currentDefaultValue || currentDefaultValue === lastDefaultValue) return;
+
+		lastDefaultValue = currentDefaultValue;
+		initialValueChange = true;
+		combobox.select(currentDefaultValue);
+	});
 
 	let valueToLabel: Record<string, string> = {};
 

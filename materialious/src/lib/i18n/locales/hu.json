@@ -424,7 +424,7 @@
     "subscribeFailed": "Feliratkozás sikertelen",
     "unsubscribeFailed": "Leiratkozás sikertelen",
     "materialiousBackend": "Materialious háttérprogram",
-    "materialiousBackendUrl": "Materialious webcím",
+    "materialiousBackendUrl": "Materialious példány",
     "materialiousLoginButton": "Bejelentkezés Materialious-fiókkal",
     "materialiousLogout": "Kijelentkezés a Materialious-fiókból",
     "downloadedCompletedAndroid": "Fájl mentve az Android „Letöltések” mappába",

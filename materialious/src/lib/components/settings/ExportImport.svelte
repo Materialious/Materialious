@@ -107,8 +107,17 @@
 			type="file"
 		/>
 	</div>
+	<p>
+		<a
+			class="link"
+			href="https://docs.invidious.io/export-youtube-subscriptions/"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			{$_('layout.export.youtubeSubscriptionsGuide')}
+		</a>
+	</p>
 	<p><i>info</i> {$_('layout.export.importSubSupported')}</p>
-
 	<div class="space"></div>
 
 	<div>

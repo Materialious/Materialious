@@ -181,7 +181,7 @@
 	class={classes}
 	class:item-container={!isMobile() || isAndroidTv()}
 >
-	{#if showActionButton && !isAndroidTv()}
+	{#if showActionButton && visibleItems.length > 0 && !isAndroidTv()}
 		<div class="bulk-actions right-align">
 			<button
 				class="surface-container-highest"

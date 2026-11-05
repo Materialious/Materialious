@@ -152,7 +152,7 @@
 		</div>
 	</article>
 	</details>
-	{#if !isAndroidTv()}
+	{#if !isAndroidTv() && ($searchCacheStore[data.searchStoreId]?.length ?? 0) > 0}
 	<button
 		class="surface-container-highest"
 		aria-label="Bulk actions"

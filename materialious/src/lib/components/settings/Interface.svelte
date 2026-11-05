@@ -5,12 +5,7 @@
 	import { iso31661 } from 'iso-3166';
 	import { isContentRegion } from '#lib/regions';
 	import { _ } from '#lib/i18n/index';
-	import { get } from 'svelte/store';
-	import {
-		getMaterialiousBackendUrl,
-		isUnrestrictedPlatform,
-		remoteMaterialiousSupported
-	} from '#lib/backend';
+	import { isUnrestrictedPlatform, remoteMaterialiousSupported } from '#lib/backend';
 	import { timeout, isMobile } from '#lib/utils';
 	import { shareURL } from '#lib/download';
 	import { getPages, type Pages } from '#lib/navPages';
@@ -24,6 +19,7 @@
 	import {
 		invidiousAuthStore,
 		backendInUseStore,
+		materialiousBackendStore,
 		invidiousInstanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAndroidUseNativeShare,
@@ -46,16 +42,17 @@
 	import ComboBox from '../ComboBox.svelte';
 	import { corsProxyUrl } from '#lib/fetchProxy';
 
-	let invidiousInstance = $state(get(invidiousInstanceStore));
+	let invidiousInstance = $derived($invidiousInstanceStore ?? '');
 
 	let invalidInstance = $state(false);
 
-	let materialiousBackend = $state(getMaterialiousBackendUrl());
+	let materialiousBackend = $derived($materialiousBackendStore ?? '');
 
 	let invalidMaterialiousBackend = $state(false);
 
 	async function setMaterialiousInstance(event: Event) {
 		event.preventDefault();
+		if (!remoteMaterialiousSupported()) return;
 		invalidMaterialiousBackend = !(await setMaterialiousBackend(materialiousBackend));
 
 		if (invalidMaterialiousBackend) return;
@@ -65,6 +62,7 @@
 	}
 
 	async function removeMaterialiousInstance() {
+		if (!remoteMaterialiousSupported()) return;
 		await removeMaterialiousBackend();
 
 		await timeout(100);
@@ -142,7 +140,7 @@
 						name="invidious-instance"
 						type="text"
 					/>
-					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
+					<label tabindex="-1" for="invidious-instance">{$_('invidiousInstance')}</label>
 					{#if invalidInstance}
 						<span class="error">{$_('invalidInstance')}</span>
 					{/if}

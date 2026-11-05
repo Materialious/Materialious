@@ -7,8 +7,10 @@
 	import { resolve } from '$app/paths';
 	import { _ } from '#lib/i18n/index';
 	import PageLoading from '#lib/components/PageLoading.svelte';
+	import { isAndroidTv } from '#lib/utils';
 
 	let currentPage = 1;
+	let multipleActions = $state(false);
 	let videos: (VideoBase | Video | PlaylistPageVideo)[] = $derived($feedCacheStore.subscription);
 
 	async function loadMore(event: InfiniteEvent) {
@@ -26,6 +28,11 @@
 </script>
 
 <nav class="right-align">
+	{#if !isAndroidTv()}
+		<button class="button surface-container-highest" aria-label="Bulk actions" aria-pressed={multipleActions} onclick={() => (multipleActions = !multipleActions)}>
+			<i>checklist</i><span class="m l">Bulk actions</span>
+		</button>
+	{/if}
 	<a class="button surface-container-highest" href={resolve('/(app)/subscriptions/manage')}>
 		{$_('subscriptions.manageSubscriptions')}
 	</a>
@@ -33,7 +40,7 @@
 <div class="space"></div>
 
 {#if !$feedLoadingStore}
-	<ItemsList items={videos ?? []} />
+	<ItemsList items={videos ?? []} bind:multipleActions showActionButton={false} />
 	<InfiniteLoading on:infinite={loadMore} />
 {:else}
 	<PageLoading />

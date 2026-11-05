@@ -9,6 +9,8 @@
 	"loadMore": "Load more",
 	"views": "views",
 	"login": "Login",
+	"loginWithPassword": "Login with password",
+	"loginWithQuickConnect": "Login with Quick connect",
 	"username": "Username",
 	"password": "Password",
 	"captionStyle": "Caption styles",

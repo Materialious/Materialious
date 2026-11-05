@@ -24,9 +24,16 @@
 	interface Props {
 		onConnected?: (credentials: QuickConnectCredentials) => void;
 		captchaPayload?: CaptchaPayload | null;
+		getCaptcha?: () => Promise<{ verified: boolean; payload: CaptchaPayload | null }>;
+		onCaptchaUsed?: () => void;
 	}
 
-	let { onConnected = () => {}, captchaPayload: providedCaptcha = null }: Props = $props();
+	let {
+		onConnected = () => {},
+		captchaPayload: providedCaptcha = null,
+		getCaptcha,
+		onCaptchaUsed = () => {}
+	}: Props = $props();
 
 	const captchaDisabled = $derived(!!isOwnBackend()?.captchaDisabled);
 
@@ -39,7 +46,11 @@
 
 	let tvInputEl = $state<HTMLInputElement | undefined>(undefined);
 
-	let captchaPayload = $state<CaptchaPayload | null>(providedCaptcha);
+	let captchaPayload = $state<CaptchaPayload | null>(null);
+
+	$effect(() => {
+		if (providedCaptcha) captchaPayload = providedCaptcha;
+	});
 
 	let pollTimer: ReturnType<typeof setInterval> | undefined;
 	let errorResetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -75,12 +86,18 @@
 	}
 
 	async function ensureCaptcha(): Promise<boolean> {
+		if (getCaptcha) {
+			const result = await getCaptcha();
+			captchaPayload = result.payload;
+			return result.verified;
+		}
 		if (captchaDisabled || captchaPayload) return true;
 		return await solveCaptchaChallenge();
 	}
 
 	async function submit(enteredCode: string) {
 		if (phase !== 'entering') return;
+		phase = 'connecting';
 
 		if (!(await ensureCaptcha())) {
 			showError($_('captchaFailed'));
@@ -88,9 +105,10 @@
 		}
 
 		code = enteredCode;
-		phase = 'connecting';
 
 		const result = await registerQuickConnectReceiver(code, captchaPayload);
+		captchaPayload = null;
+		onCaptchaUsed();
 		if (result.status !== 'ok') {
 			if (result.status === 'not-found' || result.status === 'error') {
 				showError($_('quickConnect.invalidCode'));

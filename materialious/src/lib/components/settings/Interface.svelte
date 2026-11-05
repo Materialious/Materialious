@@ -5,12 +5,7 @@
 	import { iso31661 } from 'iso-3166';
 	import { isContentRegion } from '#lib/regions';
 	import { _ } from '#lib/i18n/index';
-	import { get } from 'svelte/store';
-	import {
-		getMaterialiousBackendUrl,
-		isUnrestrictedPlatform,
-		remoteMaterialiousSupported
-	} from '#lib/backend';
+	import { isUnrestrictedPlatform } from '#lib/backend';
 	import { timeout, isMobile } from '#lib/utils';
 	import { shareURL } from '#lib/download';
 	import { getPages, type Pages } from '#lib/navPages';
@@ -24,6 +19,7 @@
 	import {
 		invidiousAuthStore,
 		backendInUseStore,
+		materialiousBackendStore,
 		invidiousInstanceStore,
 		interfaceAllowInsecureRequests,
 		interfaceAndroidUseNativeShare,
@@ -46,11 +42,11 @@
 	import ComboBox from '../ComboBox.svelte';
 	import { corsProxyUrl } from '#lib/fetchProxy';
 
-	let invidiousInstance = $state(get(invidiousInstanceStore));
+	let invidiousInstance = $derived($invidiousInstanceStore ?? '');
 
 	let invalidInstance = $state(false);
 
-	let materialiousBackend = $state(getMaterialiousBackendUrl());
+	let materialiousBackend = $derived($materialiousBackendStore ?? '');
 
 	let invalidMaterialiousBackend = $state(false);
 
@@ -142,7 +138,7 @@
 						name="invidious-instance"
 						type="text"
 					/>
-					<label tabindex="-1" for="invidious-instance">{$_('layout.instanceUrl')}</label>
+					<label tabindex="-1" for="invidious-instance">{$_('invidiousInstance')}</label>
 					{#if invalidInstance}
 						<span class="error">{$_('invalidInstance')}</span>
 					{/if}
@@ -190,42 +186,40 @@
 	{/if}
 {/if}
 
-{#if remoteMaterialiousSupported()}
-	<div class="settings">
-		<form onsubmit={setMaterialiousInstance}>
-			<nav>
-				<div
-					class="field prefix label suffix surface-container-highest max"
-					class:invalid={invalidMaterialiousBackend}
-					style="min-width: 0"
-				>
-					<i>link</i>
-					<input
-						tabindex="0"
-						bind:value={materialiousBackend}
-						name="materialious-backend"
-						type="text"
-					/>
-					<label tabindex="-1" for="materialious-backend">{$_('materialiousBackendUrl')}</label>
-					{#if invalidMaterialiousBackend}
-						<span class="error">{$_('invalidInstance')}</span>
-					{/if}
-					{#if materialiousBackend}
-						<i
-							class="front"
-							role="presentation"
-							title={$_('removeMaterialiousBackend')}
-							onclick={removeMaterialiousInstance}>close</i
-						>
-					{/if}
-				</div>
-				<button class="circle" style="flex-shrink: 0">
-					<i>done</i>
-				</button>
-			</nav>
-		</form>
-	</div>
-{/if}
+<div class="settings">
+	<form onsubmit={setMaterialiousInstance}>
+		<nav>
+			<div
+				class="field prefix label suffix surface-container-highest max"
+				class:invalid={invalidMaterialiousBackend}
+				style="min-width: 0"
+			>
+				<i>link</i>
+				<input
+					tabindex="0"
+					bind:value={materialiousBackend}
+					name="materialious-backend"
+					type="text"
+				/>
+				<label tabindex="-1" for="materialious-backend">{$_('materialiousBackendUrl')}</label>
+				{#if invalidMaterialiousBackend}
+					<span class="error">{$_('invalidInstance')}</span>
+				{/if}
+				{#if materialiousBackend}
+					<i
+						class="front"
+						role="presentation"
+						title={$_('removeMaterialiousBackend')}
+						onclick={removeMaterialiousInstance}>close</i
+					>
+				{/if}
+			</div>
+			<button class="circle" style="flex-shrink: 0">
+				<i>done</i>
+			</button>
+		</nav>
+	</form>
+</div>
 
 <div class="field no-margin">
 	<nav class="no-padding">

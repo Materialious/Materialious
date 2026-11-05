@@ -410,7 +410,7 @@
 	"unfavouriteChannel": "Quitar de favoritos",
 	"downloadedCompletedAndroid": "Archivo guardado en la carpeta Descargas de Android",
 	"materialiousBackend": "Backend de Materialious",
-	"materialiousBackendUrl": "URL de Materialious",
+	"materialiousBackendUrl": "Instancia de Materialious",
 	"removeMaterialiousBackend": "Eliminar instancia de Materialious",
 	"materialiousLoginButton": "Iniciar sesión con una cuenta de Materialious",
 	"materialiousLogout": "Cerrar sesión de la cuenta de Materialious",

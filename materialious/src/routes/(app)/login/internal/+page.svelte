@@ -195,20 +195,22 @@
 						<PasswordStrength password={rawPassword} show={needToRegister} />
 
 						<nav class="right-align">
-							<button
-								type="button"
-								class="secondary"
-								disabled={!registrationAllowed}
-								onclick={() => {
-									needToRegister = !needToRegister;
-									failed = false;
-								}}
-							>
+							<span class="registration-toggle">
+								<button
+									type="button"
+									class="secondary"
+									disabled={!registrationAllowed}
+									onclick={() => {
+										needToRegister = !needToRegister;
+										failed = false;
+									}}
+								>
+									<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
+								</button>
 								{#if !registrationAllowed}
 									<div class="tooltip bottom">{$_('registrationDisabled')}</div>
 								{/if}
-								<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
-							</button>
+							</span>
 							<button type="submit" disabled={captchaState !== 'solved' && !captchaDisabled}>
 								<i>done</i>
 								<span>{$_(needToRegister ? 'createAccount' : 'login')}</span>
@@ -263,5 +265,10 @@
 	.login-card {
 		width: 100%;
 		max-width: 440px;
+	}
+
+	.registration-toggle {
+		position: relative;
+		display: inline-flex;
 	}
 </style>

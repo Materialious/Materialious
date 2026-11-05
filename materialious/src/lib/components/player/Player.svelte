@@ -153,6 +153,7 @@
 	let streamingFailureRetryTimer: ReturnType<typeof setTimeout> | undefined;
 	let lastStreamingFailureAt = 0;
 	let streamingFailureExhausted = false;
+	let sabrSessionRecoveryAttempted = false;
 	let stallRecoveryExhausted = false;
 
 	let androidInitialNetworkStatus: ConnectionStatus | undefined;
@@ -418,10 +419,23 @@
 		};
 	}
 
+	function recoverSabrSession(error: shaka.util.Error): boolean {
+		if (currentPlaybackErrorSource() !== 'sabr' || sabrSessionRecoveryAttempted) return false;
+
+		// Segment retries reuse the current SABR URL and playback response. If
+		// that session has expired, fetch fresh YouTube.js playback data once.
+		sabrSessionRecoveryAttempted = true;
+		streamingFailureExhausted = true;
+		console.warn('[Player] Streaming retries exhausted; rebuilding the SABR session', error);
+		void reloadVideo(playerElement?.currentTime ?? 0, true);
+		return true;
+	}
+
 	function scheduleStreamingRetry(error: shaka.util.Error) {
 		console.error('Streaming failure:', error);
 
 		if (!isRetryableStreamingError(error)) {
+			if (recoverSabrSession(error)) return;
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 			return;
 		}
@@ -440,6 +454,7 @@
 		if (streamingFailureRetryTimer) return;
 
 		if (streamingFailureRetries >= MAX_STREAMING_FAILURE_RETRIES) {
+			if (recoverSabrSession(error)) return;
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 			return;
 		}
@@ -453,6 +468,7 @@
 
 			try {
 				if (!player.retryStreaming(0)) {
+					if (recoverSabrSession(error)) return;
 					reportPlaybackError(currentPlaybackErrorSource(), error);
 				}
 			} catch (retryError) {
@@ -677,6 +693,7 @@
 		if (resumeTime === undefined) {
 			stallRecoveryAttempts = 0;
 			stallRecoveryExhausted = false;
+			sabrSessionRecoveryAttempted = false;
 		}
 
 		const targetTime = resumeTime ?? playerElement?.currentTime ?? 0;

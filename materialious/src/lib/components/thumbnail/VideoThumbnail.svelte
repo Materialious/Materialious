@@ -10,6 +10,7 @@
 	import { Avatar } from 'melt/builders';
 
 	import {
+		backendInUseStore,
 		deArrowEnabledStore,
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
@@ -24,6 +25,7 @@
 	import { deleteWatchHistoryItem, saveWatchHistory } from '#lib/api/index';
 	import type { ThumbnailVideo } from '#lib/thumbnail';
 	import { isAndroidTv, truncate } from '#lib/utils';
+	import { isYTBackend } from '#lib/backend';
 
 	interface Props {
 		video: ThumbnailVideo;
@@ -62,6 +64,7 @@
 			: getBestThumbnail(video.videoThumbnails, 320, 240) || highQualityThumbnailSrc;
 	let thumbnailSrc = $state(lowQualityThumbnailSrc);
 	let deArrowThumbnailSelected = false;
+	let useYtCrop = $derived($backendInUseStore === 'yt' && isYTBackend());
 
 	if (get(deArrowEnabledStore)) {
 		try {
@@ -307,7 +310,7 @@
 			onclick={onVideoSelected}
 		>
 			<div class="thumbnail-image">
-				<div class:crop={thumbnailHeight > thumbnailWidth}>
+				<div class:crop={thumbnailHeight > thumbnailWidth || useYtCrop} class:yt-crop={useYtCrop}>
 					<img
 						class="responsive"
 						class:watched={progress}
@@ -479,6 +482,12 @@
 		display: block;
 		transform: translateY(-15%);
 		margin-bottom: -22%;
+	}
+
+	.crop.yt-crop img {
+		clip-path: none;
+		transform: scale(1.35);
+		margin-bottom: 0;
 	}
 
 	.use-flex-column {

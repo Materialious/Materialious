@@ -22,6 +22,7 @@
 
 	let showSearch: boolean = $state(false);
 	let channelSearch: string = $state('');
+	let multipleActions = $state(false);
 
 	let displayContent: ChannelContent | undefined = $state(undefined);
 
@@ -180,27 +181,25 @@
 			{/if}
 		</div>
 
-		<div class="grid">
-			<div class="s12 m9 l9">
-				<nav class="group">
-					{#each sortByOptions as sortingOption (sortingOption)}
-						<button
-							class="no-round"
-							onclick={async () => {
-								sortBy = sortingOption;
+		<div class="channel-toolbar">
+			<nav class="group">
+				{#each sortByOptions as sortingOption (sortingOption)}
+					<button
+						class="no-round"
+						onclick={async () => {
+							sortBy = sortingOption;
 
-								displayContent = await getChannelContent(slug, {
-									type: tab,
-									sortBy: sortBy
-								});
-							}}
-							class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
-						>
-					{/each}
-				</nav>
-			</div>
-			{#if !isYTBackend()}
-				<div class="s12 m3 l3">
+							displayContent = await getChannelContent(slug, {
+								type: tab,
+								sortBy: sortBy
+							});
+						}}
+						class:active={sortBy === sortingOption}>{$_(sortingOption)}</button
+					>
+				{/each}
+			</nav>
+			<div class="channel-toolbar-actions">
+				{#if !isYTBackend()}
 					{#if showSearch}
 						<div class="field suffix prefix suffix small no-margin surface-variant">
 							<i class="front">search</i><input
@@ -211,22 +210,37 @@
 							/>
 						</div>
 					{:else}
-						<nav class="right-align m l">
-							<button onclick={() => (showSearch = true)}><i>search</i></button>
-						</nav>
-						<button class="s" onclick={() => (showSearch = true)}><i>search</i></button>
+						<button onclick={() => (showSearch = true)}><i>search</i></button>
 					{/if}
-				</div>
-			{/if}
+				{/if}
+				{#if !isAndroidTv()}
+					<button
+						class="surface-container-highest"
+						aria-label="Bulk actions"
+						aria-pressed={multipleActions}
+						onclick={() => (multipleActions = !multipleActions)}
+					>
+						<i>checklist</i><span class="m l">Bulk actions</span>
+					</button>
+				{/if}
+			</div>
 		</div>
 	</div>
 {/if}
 
 {#if displayContent}
 	{#if 'videos' in displayContent}
-		<ItemsList items={displayContent.videos} />
+		<ItemsList
+			items={displayContent.videos}
+			bind:multipleActions
+			showActionButton={false}
+		/>
 	{:else}
-		<ItemsList items={displayContent.playlists} />
+		<ItemsList
+			items={displayContent.playlists}
+			bind:multipleActions
+			showActionButton={false}
+		/>
 	{/if}
 	<InfiniteLoading on:infinite={loadMore} />
 {:else}
@@ -234,6 +248,24 @@
 {/if}
 
 <style>
+	.channel-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 0.5rem 0 1rem;
+	}
+
+	.channel-toolbar-actions {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-left: auto;
+	}
+
 	.description {
 		display: flex;
 		padding: 1em 0;

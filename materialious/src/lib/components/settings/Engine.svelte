@@ -76,9 +76,11 @@
 			oninput={(event: Event) => {
 				engineMaxConcurrentChannelsStore.set(Number((event.target as HTMLInputElement).value));
 			}}
-			value={$engineMaxConcurrentChannelsStore}
+			value={Math.min(4, $engineMaxConcurrentChannelsStore)}
 			name="concurrent"
 			type="number"
+			min="1"
+			max="4"
 		/>
 		<label for="concurrent">{$_('layout.backendEngine.concurrent')}</label>
 	</div>

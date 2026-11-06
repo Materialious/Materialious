@@ -24,7 +24,7 @@
 	</section>
 
 	<div class="page-content">
-		<section class="setup-guide" aria-labelledby="setup-heading">
+		<section class="setup-guide">
 			<article class="surface-container-high">
 				<h2 id="setup-heading">{$_('companionRequired.setupTitle')}</h2>
 				<ol>
@@ -50,12 +50,12 @@
 			</article>
 		</section>
 
-		<section class="downloads" aria-labelledby="download-heading">
+		<section class="downloads">
 			<article class="surface-container-high padding">
 				<h2 id="download-heading">{$_('companionRequired.downloadTitle')}</h2>
 				<div class="grid medium-space platforms">
 					<div class="s12 m6 l4">
-						<div class="platform-options" aria-labelledby="windows-heading">
+						<div class="platform-options">
 							<h3 id="windows-heading">{$_('companionRequired.windows')}</h3>
 							<a
 								class="button surface-container-highest"
@@ -70,7 +70,7 @@
 						</div>
 					</div>
 					<div class="s12 m6 l4">
-						<div class="platform-options" aria-labelledby="android-heading">
+						<div class="platform-options">
 							<h3 id="android-heading">{$_('companionRequired.android')}</h3>
 							<a
 								class="button surface-container-highest"
@@ -105,7 +105,7 @@
 						</div>
 					</div>
 					<div class="s12 m6 l4">
-						<div class="platform-options" aria-labelledby="linux-heading">
+						<div class="platform-options">
 							<h3 id="linux-heading">{$_('companionRequired.linux')}</h3>
 							<a
 								class="button surface-container-highest"

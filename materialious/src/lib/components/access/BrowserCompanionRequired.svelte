@@ -20,26 +20,25 @@
 	<section class="notice">
 		<h1>{$_('companionRequired.title')}</h1>
 		<p>{$_('companionRequired.description')}</p>
-		<p>{$_('companionRequired.installInstruction')}</p>
+		<a
+			class="firefox-addon-link"
+			href="https://addons.mozilla.org/en-US/firefox/addon/materialious-companion/"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			<img
+				src="/images/firefox-get-addon.png"
+				alt="Get the Materialious Companion add-on for Firefox"
+				width="172"
+				height="60"
+			/>
+		</a>
 	</section>
 
 	<div class="page-content">
 		<section class="setup-guide">
 			<article class="surface-container-high">
 				<h2 id="setup-heading">{$_('companionRequired.setupTitle')}</h2>
-				<a
-					class="firefox-addon-link"
-					href="https://addons.mozilla.org/en-US/firefox/addon/materialious-companion/"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<img
-						src="/images/firefox-get-addon.png"
-						alt="Get the Materialious Companion add-on for Firefox"
-						width="172"
-						height="60"
-					/>
-				</a>
 				<ol>
 					<li>{$_('companionRequired.setupStepOne')}</li>
 					<li>

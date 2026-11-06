@@ -15,6 +15,7 @@ let mobileNodeLoaded = false;
 
 function needsProxying(target: string): boolean {
 	if (!target.startsWith('http')) return false;
+	if (Capacitor.getPlatform() === 'android') return true;
 	try {
 		return new URL(target).origin !== location.origin;
 	} catch {

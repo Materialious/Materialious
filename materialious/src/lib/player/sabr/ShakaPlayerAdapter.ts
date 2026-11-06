@@ -576,18 +576,23 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 		const networkingEngine = this.player.getNetworkingEngine();
 		if (!networkingEngine) return;
 
+		// Shaka reruns filters on the same request for each network retry. Keep
+		// the logical URI: the HTTPS URL we wrote on the previous attempt would
+		// otherwise be interpreted as plain UMP, losing the SABR request body.
+		const originalUris = new WeakMap<shaka.extern.Request, string>();
+
 		this.requestFilter = async (type, request, context) => {
-			if (
-				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
-				!isGoogleVideoURL(request.uris[0])
-			)
+			const originalUri = originalUris.get(request) ?? request.uris[0];
+			if (type !== shaka.net.NetworkingEngine.RequestType.SEGMENT || !isGoogleVideoURL(originalUri))
 				return;
+
+			originalUris.set(request, originalUri);
 
 			const modifiedRequest = await (async () => {
 				try {
 					return await interceptor({
 						headers: request.headers,
-						url: request.uris[0],
+						url: originalUri,
 						method: request.method,
 						segment: {
 							getStartTime: () => context?.segment?.getStartTime() ?? null,
@@ -621,16 +626,16 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 		if (!networkingEngine) return;
 
 		this.responseFilter = async (type, response, context) => {
-			if (
-				type !== shaka.net.NetworkingEngine.RequestType.SEGMENT ||
-				!isGoogleVideoURL(response.uri)
-			)
+			// Response.url can identify the local HTTP proxy instead of YouTube.
+			// Match the upstream request so protocol updates and reloads still run.
+			const requestUri = response.originalRequest?.uris[0] ?? response.originalUri ?? response.uri;
+			if (type !== shaka.net.NetworkingEngine.RequestType.SEGMENT || !isGoogleVideoURL(requestUri))
 				return;
 
 			const modifiedResponse = await (async () => {
 				try {
 					return await interceptor({
-						url: response.originalRequest.uris[0],
+						url: requestUri,
 						method: response.originalRequest.method,
 						headers: response.headers,
 						data: response.data,
@@ -704,6 +709,16 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			shaka.net.NetworkingEngine.unregisterScheme('http');
 			shaka.net.NetworkingEngine.unregisterScheme('https');
 			shaka.net.NetworkingEngine.unregisterScheme('sabr');
+			// Scheme registrations replace Shaka's built-in handlers. Restore
+			// native fetching so the next HLS stream works without this adapter.
+			for (const scheme of ['http', 'https']) {
+				shaka.net.NetworkingEngine.registerScheme(
+					scheme,
+					shaka.net.HttpFetchPlugin.parse,
+					shaka.net.NetworkingEngine.PluginPriority.PREFERRED,
+					true
+				);
+			}
 
 			this.player = null;
 		}

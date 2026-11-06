@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.18.17",
+	"version": "1.18.18",
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && npm run patch:github && vite dev",

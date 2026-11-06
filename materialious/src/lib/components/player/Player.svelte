@@ -46,6 +46,7 @@
 	} from '#lib/player/index';
 	import { manifestDomainInclusion } from '#lib/player/manifest';
 	import { injectSabr, refreshSabrSession } from '#lib/player/sabr/index';
+	import { registerHlsTransmuxer } from '#lib/player/hls';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '#lib/components/Toast.svelte';
@@ -752,6 +753,19 @@
 		}
 	}
 
+	function seekToLiveEdge() {
+		if (!playerElement || !data.video.liveNow) return;
+
+		const seekable = playerElement.seekable;
+		if (seekable.length === 0) return;
+
+		const liveEdge = seekable.end(seekable.length - 1);
+		if (!Number.isFinite(liveEdge)) return;
+
+		playerElement.currentTime = liveEdge;
+		currentTime = liveEdge;
+	}
+
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
 	function showPlayerUI() {
 		showControls = true;
@@ -820,6 +834,7 @@
 
 	onMount(async () => {
 		shaka.polyfill.installAll();
+		registerHlsTransmuxer();
 		if (!shaka.Player.isBrowserSupported()) {
 			addToast({
 				data: {
@@ -1372,13 +1387,15 @@
 						<i>settings</i>
 					</button>
 				{/if}
-				<p class="chip m l" style="height: 100%;">
-					{#if data.video.liveNow}
+				{#if data.video.liveNow}
+					<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
 						{$_('thumbnail.live')}
-					{:else}
+					</button>
+				{:else}
+					<p class="chip m l" style="height: 100%;">
 						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
-					{/if}
-				</p>
+					</p>
+				{/if}
 				{#if !isAndroidTv() && !playerIsPip}
 					<CaptionSettings video={data.video} />
 					{#if playerElement}

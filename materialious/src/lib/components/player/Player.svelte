@@ -753,6 +753,19 @@
 		}
 	}
 
+	function seekToLiveEdge() {
+		if (!playerElement || !data.video.liveNow) return;
+
+		const seekable = playerElement.seekable;
+		if (seekable.length === 0) return;
+
+		const liveEdge = seekable.end(seekable.length - 1);
+		if (!Number.isFinite(liveEdge)) return;
+
+		playerElement.currentTime = liveEdge;
+		currentTime = liveEdge;
+	}
+
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
 	function showPlayerUI() {
 		showControls = true;
@@ -1374,13 +1387,15 @@
 						<i>settings</i>
 					</button>
 				{/if}
-				<p class="chip m l" style="height: 100%;">
-					{#if data.video.liveNow}
+				{#if data.video.liveNow}
+					<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
 						{$_('thumbnail.live')}
-					{:else}
+					</button>
+				{:else}
+					<p class="chip m l" style="height: 100%;">
 						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
-					{/if}
-				</p>
+					</p>
+				{/if}
 				{#if !isAndroidTv() && !playerIsPip}
 					<CaptionSettings video={data.video} />
 					{#if playerElement}

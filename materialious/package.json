@@ -14,7 +14,7 @@
 		"format": "prettier --write .",
 		"patch:shaka": "node ./scripts/patchShaka.mjs",
 		"patch:github": "node ./scripts/githubContributors.mjs",
-		"postinstall": "npm run patch:shaka"
+		"postinstall": "patch-package --error-on-fail && npm run patch:shaka"
 	},
 	"devDependencies": {
 		"@capacitor/assets": "^3.0.5",

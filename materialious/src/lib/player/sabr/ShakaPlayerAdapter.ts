@@ -187,11 +187,9 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 
 		const segmentKey = createSegmentCacheKeyFromMetadata(requestMetadata);
 
-		const cachedSegment = (
-			requestMetadata.isInit
-				? this.cacheManager.getInitSegment(segmentKey)
-				: this.cacheManager.getSegment(segmentKey)
-		);
+		const cachedSegment = requestMetadata.isInit
+			? this.cacheManager.getInitSegment(segmentKey)
+			: this.cacheManager.getSegment(segmentKey);
 
 		if (!cachedSegment) {
 			return null;

@@ -1,4 +1,8 @@
 declare global {
+	interface Window {
+		materialiousCompanionFetch?: typeof fetch;
+	}
+
 	namespace App {
 		// interface Error {}
 		interface Locals {

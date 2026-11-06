@@ -10,7 +10,11 @@ import {
 import { ensureNoTrailingSlash } from './utils';
 
 export function isUnrestrictedPlatform(): boolean {
-	return isOwnBackend() !== null || Capacitor.isNativePlatform();
+	return (
+		isOwnBackend() !== null ||
+		Capacitor.isNativePlatform() ||
+		(typeof window !== 'undefined' && !!window.materialiousCompanionFetch)
+	);
 }
 
 export function getMaterialiousBackendUrl(): string {

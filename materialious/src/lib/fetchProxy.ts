@@ -15,7 +15,11 @@ let mobileNodeLoaded = false;
 
 function needsProxying(target: string): boolean {
 	if (!target.startsWith('http')) return false;
-	return true;
+	try {
+		return new URL(target).origin !== location.origin;
+	} catch {
+		return true;
+	}
 }
 
 function encodeUrl(url: string): string {
@@ -60,11 +64,11 @@ export const fetchProxied = async (
 		}
 	}
 
-	if (typeof window !== 'undefined' && window.materialiousCompanionFetch) {
-		return window.materialiousCompanionFetch(requestInput, requestOptions);
-	}
-
 	if (needsProxying(nonProxiedUrl)) {
+		if (window?.materialiousCompanionFetch) {
+			return window.materialiousCompanionFetch(requestInput, requestOptions);
+		}
+
 		const proxiedUrl = corsProxyUrl + encodeUrl(nonProxiedUrl);
 
 		if (requestInput instanceof Request) {

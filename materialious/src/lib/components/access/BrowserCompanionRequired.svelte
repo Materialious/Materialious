@@ -27,6 +27,19 @@
 		<section class="setup-guide">
 			<article class="surface-container-high">
 				<h2 id="setup-heading">{$_('companionRequired.setupTitle')}</h2>
+				<a
+					class="firefox-addon-link"
+					href="https://addons.mozilla.org/en-US/firefox/addon/materialious-companion/"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<img
+						src="/images/firefox-get-addon.png"
+						alt="Get the Materialious Companion add-on for Firefox"
+						width="172"
+						height="60"
+					/>
+				</a>
 				<ol>
 					<li>{$_('companionRequired.setupStepOne')}</li>
 					<li>
@@ -191,6 +204,17 @@
 
 	.setup-guide li + li {
 		margin-block-start: 0.5rem;
+	}
+
+	.firefox-addon-link {
+		display: inline-block;
+		margin-block-start: 0.5rem;
+		line-height: 0;
+	}
+
+	.firefox-addon-link img {
+		max-width: 100%;
+		height: auto;
 	}
 
 	.instance-url-row {

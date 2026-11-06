@@ -139,7 +139,7 @@
 			([entry]) => {
 				if (entry.isIntersecting) thumbnailInView = true;
 			},
-			{ rootMargin: window.matchMedia('(max-width: 700px)').matches ? '300px 0px' : '0px' }
+			{ rootMargin: window.matchMedia('(max-width: 700px)').matches ? `${Math.ceil(window.innerHeight * 1.5)}px 0px` : '0px' }
 		);
 		visibilityObserver = new IntersectionObserver(([entry]) => {
 			if (!entry.isIntersecting) thumbnailActionsVisible = false;

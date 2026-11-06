@@ -150,7 +150,7 @@
 				</button>
 			</nav>
 		</form>
-		{#if isOwnBackend()?.internalAuth && $invidiousInstanceStore}
+		{#if (isOwnBackend()?.internalAuth || $materialiousBackendStore) && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
 				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
 					<i>link</i>

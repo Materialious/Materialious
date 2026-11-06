@@ -469,9 +469,8 @@
 							iconOnly={true}
 							style="margin: 0;"
 						/>
-						{#if !data.video.liveNow}
-							<Download video={data.video} />
-						{/if}
+						<Download video={data.video} />
+
 						<PlaylistManager mode="toggle" videoId={data.video.videoId} />
 					</div>
 				</div>

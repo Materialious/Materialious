@@ -442,5 +442,28 @@
 	"subscribeFailed": "Failed to subscribe",
 	"unsubscribeFailed": "Failed to unsubscribe",
 	"favouriteChannel": "Favourite channel",
-	"unfavouriteChannel": "Unfavourite channel"
+	"unfavouriteChannel": "Unfavourite channel",
+	"companionRequired": {
+		"title": "Browser companion required",
+		"description": "This instance of Materialious only works with the browser companion extension or the Android and desktop apps.",
+		"installInstruction": "Install and enable the companion extension, or download an app below.",
+		"downloadTitle": "Download Materialious",
+		"windows": "Windows",
+		"windowsX64": "Windows x64",
+		"windowsX32": "Windows x32",
+		"android": "Android",
+		"fDroid": "F-Droid",
+		"izzyOnDroid": "IzzyOnDroid",
+		"apkUniversal": "APK Universal",
+		"apkX64": "APK x64",
+		"apkArm64": "APK ARM64",
+		"obtainium": "Obtainium",
+		"linux": "Linux",
+		"flathub": "Flathub",
+		"snap": "Snap",
+		"debianUbuntu": "Debian/Ubuntu",
+		"fedoraOpenSuse": "Fedora/OpenSuse",
+		"appImage": "AppImage",
+		"tarball": "Tarball"
+	}
 }

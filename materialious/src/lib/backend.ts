@@ -10,8 +10,16 @@ import {
 import { ensureNoTrailingSlash } from './utils';
 
 export function isUnrestrictedPlatform(): boolean {
+	const backend = isOwnBackend();
+	if (backend?.requireCompanion) {
+		return (
+			Capacitor.getPlatform() === 'android' ||
+			Capacitor.getPlatform() === 'electron' ||
+			(typeof window !== 'undefined' && !!window.materialiousCompanionFetch)
+		);
+	}
 	return (
-		isOwnBackend() !== null ||
+		backend !== null ||
 		Capacitor.isNativePlatform() ||
 		(typeof window !== 'undefined' && !!window.materialiousCompanionFetch)
 	);

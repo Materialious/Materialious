@@ -1,5 +1,6 @@
 import {
 	PUBLIC_BUILD_WITH_BACKEND,
+	PUBLIC_REQUIRE_BROWSER_COMPANION,
 	PUBLIC_INTERNAL_AUTH,
 	PUBLIC_REQUIRE_AUTH,
 	PUBLIC_REGISTRATION_ALLOWED,
@@ -22,6 +23,7 @@ export type IsOwnBackend = {
 	allowAnyProxy: boolean;
 	captchaDisabled: boolean;
 	quickConnect: boolean;
+	requireCompanion: boolean;
 };
 
 export function isOwnBackend(): IsOwnBackend | null {
@@ -44,7 +46,8 @@ export function isOwnBackend(): IsOwnBackend | null {
 		registrationAllowed: PUBLIC_REGISTRATION_ALLOWED === 'true',
 		allowAnyProxy: PUBLIC_DANGEROUS_ALLOW_ANY_PROXY === 'true',
 		captchaDisabled: PUBLIC_CAPTCHA_DISABLED === 'true',
-		quickConnect: PUBLIC_QUICK_CONNECT !== 'false'
+		quickConnect: PUBLIC_QUICK_CONNECT !== 'false',
+		requireCompanion: PUBLIC_REQUIRE_BROWSER_COMPANION === 'true'
 	};
 }
 

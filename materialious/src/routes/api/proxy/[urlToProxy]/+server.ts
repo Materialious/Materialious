@@ -113,7 +113,9 @@ async function proxyRequest(
 
 	let urlToProxyObj: URL;
 	try {
-		urlToProxyObj = new URL(decodeURIComponent(urlToProxy));
+		// SvelteKit already decodes the route parameter. A second decode
+		// changes escaped delimiters inside YouTube's signed live URLs.
+		urlToProxyObj = new URL(urlToProxy);
 	} catch {
 		throw error(400, 'Invalid URL');
 	}

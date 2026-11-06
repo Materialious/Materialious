@@ -709,6 +709,16 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			shaka.net.NetworkingEngine.unregisterScheme('http');
 			shaka.net.NetworkingEngine.unregisterScheme('https');
 			shaka.net.NetworkingEngine.unregisterScheme('sabr');
+			// Scheme registrations replace Shaka's built-in handlers. Restore
+			// native fetching so the next HLS stream works without this adapter.
+			for (const scheme of ['http', 'https']) {
+				shaka.net.NetworkingEngine.registerScheme(
+					scheme,
+					shaka.net.HttpFetchPlugin.parse,
+					shaka.net.NetworkingEngine.PluginPriority.PREFERRED,
+					true
+				);
+			}
 
 			this.player = null;
 		}

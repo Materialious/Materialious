@@ -46,6 +46,7 @@
 	} from '#lib/player/index';
 	import { manifestDomainInclusion } from '#lib/player/manifest';
 	import { injectSabr, refreshSabrSession } from '#lib/player/sabr/index';
+	import { registerHlsTransmuxer } from '#lib/player/hls';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
 	import { fade } from 'svelte/transition';
 	import { addToast } from '#lib/components/Toast.svelte';
@@ -820,6 +821,7 @@
 
 	onMount(async () => {
 		shaka.polyfill.installAll();
+		registerHlsTransmuxer();
 		if (!shaka.Player.isBrowserSupported()) {
 			addToast({
 				data: {

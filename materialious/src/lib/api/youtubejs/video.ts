@@ -246,7 +246,45 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 
 	videoIntermediateCache.delete(videoId);
 
-	const { innertube, video, clientPlaybackNonce, rawPlayerResponse } = intermediate;
+	const { innertube, clientPlaybackNonce } = intermediate;
+	let { video, rawPlayerResponse } = intermediate;
+
+	// WEB can return a playable live response with no DASH/HLS manifests.
+	// VISIONOS supplies the live manifests used by the upstream Shaka example.
+	if (
+		video.basic_info.is_live &&
+		!video.streaming_data?.dash_manifest_url &&
+		!video.streaming_data?.hls_manifest_url
+	) {
+		const livePlayerResponse = await innertube.actions.execute('/player', {
+			videoId,
+			client: 'VISIONOS',
+			contentCheckOk: true,
+			racyCheckOk: true,
+			playbackContext: {
+				contentPlaybackContext: {
+					signatureTimestamp: innertube.session.player?.signature_timestamp
+				}
+			}
+		});
+		const liveVideo = new YT.VideoInfo(
+			[livePlayerResponse],
+			innertube.actions,
+			clientPlaybackNonce
+		);
+		if (liveVideo.playability_status?.status !== 'OK') {
+			throw new Error(liveVideo.playability_status?.reason || 'Live stream is unavailable');
+		}
+		if (
+			!liveVideo.streaming_data?.dash_manifest_url &&
+			!liveVideo.streaming_data?.hls_manifest_url
+		) {
+			throw new Error('No DASH or HLS manifest was provided for this live video');
+		}
+
+		video = liveVideo;
+		rawPlayerResponse = livePlayerResponse;
+	}
 
 	const poToken = await mintPoTokenForVideo(videoId);
 

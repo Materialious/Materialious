@@ -16,6 +16,17 @@ const ATTESTATION_RETRIES = 3;
 const PLAYER_RELOAD_RETRIES = 3;
 const PO_TOKEN_REFRESH_COOLDOWN_MS = 15_000;
 
+function usesManifestPlayback(video: VideoPlay): boolean {
+	const info = video.ytjs?.video;
+	return !!(
+		video.liveNow ||
+		info?.basic_info.is_live ||
+		info?.basic_info.is_post_live_dvr ||
+		(info?.basic_info.is_live_content &&
+			(info.streaming_data?.dash_manifest_url || info.streaming_data?.hls_manifest_url))
+	);
+}
+
 function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -50,6 +61,7 @@ let poTokenRefresh: { videoId: string; promise: Promise<void> } | null = null;
  * status 3) and by the playback stall watchdog.
  */
 export async function refreshSabrSession(video: VideoPlay): Promise<void> {
+	if (!video.ytjs || usesManifestPlayback(video)) return;
 	// Deduplicate refreshes for the same video, but never let a refresh for a
 	// previous video block the newly playing one.
 	if (poTokenRefresh?.videoId === video.videoId) return poTokenRefresh.promise;
@@ -87,7 +99,9 @@ export async function injectSabr(
 	video: VideoPlay,
 	player: shaka.Player
 ): Promise<SabrStreamingAdapter | null> {
-	if (!video.ytjs || !isUnrestrictedPlatform()) return null;
+	// Live and post-live DVR manifests go straight through Shaka. Do not
+	// rewrite their media GETs into SABR/UMP POSTs or start SABR recovery.
+	if (!video.ytjs || !isUnrestrictedPlatform() || usesManifestPlayback(video)) return null;
 
 	await primeSabrAttestation(video);
 
@@ -196,16 +210,7 @@ export async function injectSabr(
 		throw lastError instanceof Error ? lastError : new Error('Unable to reload player response');
 	});
 
-	const isLive = video.ytjs.video.basic_info.is_live;
-	const isPostLiveDVR =
-		!!video.ytjs.video.basic_info.is_post_live_dvr ||
-		(video.ytjs.video.basic_info.is_live_content &&
-			!!(
-				video.ytjs.video.streaming_data?.dash_manifest_url ||
-				video.ytjs.video.streaming_data?.hls_manifest_url
-			));
-
-	if (video.ytjs.video.streaming_data && !isPostLiveDVR && !isLive) {
+	if (video.ytjs.video.streaming_data) {
 		sabrAdapter.setStreamingURL(
 			await video.ytjs.innertube.session.player!.decipher(
 				video.ytjs.video.streaming_data?.server_abr_streaming_url

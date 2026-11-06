@@ -8,6 +8,7 @@
 		"build:shared": "npm run --prefix shared build",
 		"preview": "vite preview",
 		"check": "npm run build:shared && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"test:sabr": "node --test tests/sabr-recovery.test.mjs",
 		"check:watch": "npm run build:shared && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
 		"eslint": "eslint .",

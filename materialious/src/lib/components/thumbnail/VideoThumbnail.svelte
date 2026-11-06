@@ -131,18 +131,29 @@
 
 	let thumbnailActionsVisible = $state(false);
 
-	const observer = new IntersectionObserver(([entry]) => {
-		if (entry.isIntersecting) thumbnailInView = true;
-		else thumbnailActionsVisible = false;
-	});
+	let thumbnailObserver: IntersectionObserver;
+	let visibilityObserver: IntersectionObserver;
 
 	onMount(() => {
+		thumbnailObserver = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) thumbnailInView = true;
+			},
+			{ rootMargin: window.matchMedia('(max-width: 700px)').matches ? '300px 0px' : '0px' }
+		);
+		visibilityObserver = new IntersectionObserver(([entry]) => {
+			if (!entry.isIntersecting) thumbnailActionsVisible = false;
+		});
+
 		// Check if sideways should be enabled or disabled.
 		disableSideways();
 
 		addEventListener('resize', disableSideways);
 
-		if (thumbnailElement) observer.observe(thumbnailElement);
+		if (thumbnailElement) {
+			thumbnailObserver.observe(thumbnailElement);
+			visibilityObserver.observe(thumbnailElement);
+		}
 
 		const unsubscribe = authTokenStore.subscribe(() => {
 			const request = ++historyRequest;
@@ -160,7 +171,8 @@
 
 	onDestroy(() => {
 		removeEventListener('resize', disableSideways);
-		observer.disconnect();
+		thumbnailObserver.disconnect();
+		visibilityObserver.disconnect();
 	});
 
 	function onVideoSelected() {

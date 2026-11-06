@@ -237,7 +237,7 @@
 	}
 </script>
 
-{#if isDownloadSupported()}
+{#if isDownloadSupported() && !video.liveNow}
 	<button
 		class="surface-container-highest"
 		onclick={onDownloadButtonClick}

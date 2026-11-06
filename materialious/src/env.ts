@@ -19,6 +19,7 @@ export const variables = defineEnvVars({
 	WHITELIST_BASE_DOMAIN: { schema: (input) => input ?? '' },
 	PROXY_TRUST_CA: { schema: (input) => input ?? '' },
 	PUBLIC_BUILD_WITH_BACKEND: { public: true, schema: (input) => input ?? '' },
+	PUBLIC_REQUIRE_BROWSER_COMPANION: { public: true, schema: (input) => input ?? '' },
 	PUBLIC_INTERNAL_AUTH: { public: true, schema: (input) => input ?? '' },
 	PUBLIC_REQUIRE_AUTH: { public: true, schema: (input) => input ?? '' },
 	PUBLIC_REGISTRATION_ALLOWED: { public: true, schema: (input) => input ?? '' },

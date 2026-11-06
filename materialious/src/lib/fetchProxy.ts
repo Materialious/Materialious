@@ -44,6 +44,26 @@ export const fetchProxied = async (
 	const nonProxiedUrl =
 		requestInput instanceof Request ? requestInput.url : requestInput.toString();
 
+	if (isOwnBackend() && Capacitor.getPlatform() === 'web' && requestOptions?.body) {
+		if (requestOptions.body instanceof ArrayBuffer) {
+			requestOptions.body = new Uint8Array(requestOptions?.body);
+		}
+
+		if (requestOptions.body instanceof Uint8Array) {
+			await sodium.ready;
+			requestOptions.body = sodium.to_base64(requestOptions.body);
+
+			requestOptions.headers = {
+				...requestOptions.headers,
+				__is_base64_encoded: 'true'
+			};
+		}
+	}
+
+	if (typeof window !== 'undefined' && window.materialiousCompanionFetch) {
+		return window.materialiousCompanionFetch(requestInput, requestOptions);
+	}
+
 	if (needsProxying(nonProxiedUrl)) {
 		const proxiedUrl = corsProxyUrl + encodeUrl(nonProxiedUrl);
 
@@ -66,30 +86,15 @@ export const fetchProxied = async (
 		}
 	}
 
-	if (isOwnBackend() && Capacitor.getPlatform() === 'web' && requestOptions?.body) {
-		if (requestOptions.body instanceof ArrayBuffer) {
-			requestOptions.body = new Uint8Array(requestOptions?.body);
-		}
-
-		if (requestOptions.body instanceof Uint8Array) {
-			await sodium.ready;
-			requestOptions.body = sodium.to_base64(requestOptions.body);
-
-			requestOptions.headers = {
-				...requestOptions.headers,
-				__is_base64_encoded: 'true'
-			};
-		}
-	}
-
 	// Use the original fetch with the proxied URL and options
 	return originalFetch(requestInput, requestOptions);
 };
 
 if (
-	isUnrestrictedPlatform() &&
-	Capacitor.getPlatform() !== 'electron' &&
-	getPublicEnv('PROXY_DISABLED') !== 'true'
+	(isUnrestrictedPlatform() &&
+		Capacitor.getPlatform() !== 'electron' &&
+		getPublicEnv('PROXY_DISABLED') !== 'true') ||
+	(typeof window !== 'undefined' && !!window.materialiousCompanionFetch)
 ) {
 	window.fetch = fetchProxied;
 

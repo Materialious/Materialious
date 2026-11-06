@@ -249,7 +249,7 @@
 	</div>
 {/if}
 
-{#if isUnrestrictedPlatform()}
+{#if isUnrestrictedPlatform() && $backendInUseStore === 'ivg'}
 	<div class="field no-margin">
 		<nav class="no-padding">
 			<div class="max">

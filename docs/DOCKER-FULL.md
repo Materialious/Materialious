@@ -138,6 +138,11 @@ services:
       # respect CORS headers directly. Most users should leave as "false".
       PUBLIC_PROXY_DISABLED: "false"
 
+      # Require the browser companion integration or a native app (desktop or
+      # Android) so requests can be made without using the server-side proxy.
+      # This does not disable the Materialious account system.
+      PUBLIC_REQUIRE_BROWSER_COMPANION: "false"
+
       # Allow proxying ANY domain (DANGEROUS - use with caution).
       # Requires ALL of the following to take effect:
       #   - PUBLIC_REGISTRATION_ALLOWED: "false"

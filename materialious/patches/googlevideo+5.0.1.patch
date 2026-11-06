@@ -1,0 +1,13 @@
+diff --git a/node_modules/googlevideo/dist/src/core/SabrUmpProcessor.js b/node_modules/googlevideo/dist/src/core/SabrUmpProcessor.js
+--- a/node_modules/googlevideo/dist/src/core/SabrUmpProcessor.js
++++ b/node_modules/googlevideo/dist/src/core/SabrUmpProcessor.js
+@@ -38,6 +38,9 @@
+         this.cacheManager = cacheManager;
+         this.umpReader = new UmpReader({
+             onPart: (type, data) => {
++                // One fetch chunk may contain multiple segments. Preserve the
++                // first terminal result and its metadata/cache side effects.
++                if (this.returnData) return;
+                 const part = { type, size: data.getLength(), data };
+                 const handler = this.umpPartHandlers.get(part.type);
+                 const result = handler?.(part);

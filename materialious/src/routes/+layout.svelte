@@ -38,6 +38,8 @@
 	} from '#lib/externalSettings/index';
 	import { configBackend } from '#lib/api/backend/index';
 	import { configBackendCache } from '#lib/stores/backend';
+	import { isOwnBackend } from '#lib/shared/index';
+	import BrowserCompanionRequired from '#lib/components/access/BrowserCompanionRequired.svelte';
 
 	let { children } = $props();
 
@@ -173,6 +175,12 @@
 	});
 
 	let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifest.linkTag : '');
+	let browserCompanionRequired = $derived(
+		isOwnBackend()?.requireCompanion === true &&
+			Capacitor.getPlatform() === 'web' &&
+			typeof window !== 'undefined' &&
+			!window.materialiousCompanionFetch
+	);
 </script>
 
 <svelte:head>
@@ -201,4 +209,8 @@
 	{/if}
 </svelte:head>
 
-{@render children?.()}
+{#if browserCompanionRequired}
+	<BrowserCompanionRequired />
+{:else}
+	{@render children?.()}
+{/if}

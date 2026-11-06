@@ -75,4 +75,18 @@ jobs:
         if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
 
       - name: Build desktop packages
-        run: cd ./materialious/electron && npm run electron:make
+        shell: bash
+        run: |
+          cd ./materialious/electron
+          for attempt in 1 2 3; do
+            echo "Build attempt ${attempt}/3"
+            if npm run electron:make; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              echo "Build failed; retrying in 10 seconds"
+              sleep 10
+            fi
+          done
+          echo "Build failed after 3 attempts"
+          exit 1

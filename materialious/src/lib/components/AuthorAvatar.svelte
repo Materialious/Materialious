@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { imageHandleCors, proxyGoogleImage } from '#lib/images';
+	import { proxyGoogleImage } from '#lib/images';
 	import { avatarFromChannelId } from '#lib/thumbnail';
 	import { mergeAttrs } from 'melt';
 	import { Avatar } from 'melt/builders';
-	
+	import { onMount } from 'svelte';
+
 	let { author, authorId }: { author: string; authorId: string } = $props();
 
 	let avatarSrc = $state('');
@@ -13,21 +14,10 @@
 		src: () => avatarSrc
 	});
 
-	$effect(() => {
-		const id = authorId;
-		let active = true;
-		avatarSrc = '';
-		avatarFromChannelId(id)
-			.then((src) => imageHandleCors(src ? proxyGoogleImage(src) : ''))
-			.then((src) => {
-				if (active) avatarSrc = src;
-			})
-			.catch(() => {
-				if (active) avatarSrc = '';
-			});
-		return () => {
-			active = false;
-		};
+	onMount(() => {
+		avatarFromChannelId(authorId).then((src) => {
+			if (src) avatarSrc = proxyGoogleImage(src);
+		});
 	});
 
 	function goToChannel() {

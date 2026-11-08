@@ -2,10 +2,8 @@ import { getPublicEnv } from '#lib/env';
 import { isUnrestrictedPlatform } from '#lib/backend';
 import { timeout } from '#lib/utils';
 import { Capacitor } from '@capacitor/core';
-import { Nodejs } from '@capawesome/capacitor-nodejs';
 import sodium from 'libsodium-wrappers-sumo';
 import { isOwnBackend } from './shared';
-import { getNativeProxyToken, TOKEN_HEADER } from './nativeProxyAuth';
 
 export const originalFetch = window.fetch;
 export const corsProxyUrl =
@@ -35,14 +33,10 @@ export const fetchProxied = async (
 ): Promise<Response> => {
 	if (!mobileNodeLoaded && Capacitor.getPlatform() === 'android') {
 		let mobileNodeResp: Response | undefined;
-		let nodeReady = false;
 
-		while (!nodeReady || !mobileNodeResp?.ok) {
-			if (!nodeReady) ({ ready: nodeReady } = await Nodejs.isReady());
+		while (!mobileNodeResp || !mobileNodeResp.ok) {
 			try {
-				if (!mobileNodeResp?.ok) {
-					mobileNodeResp = await originalFetch(corsProxyUrl + 'check-nodejs');
-				}
+				mobileNodeResp = await originalFetch(corsProxyUrl + 'check-nodejs');
 			} catch {
 				// Continue regardless of error
 			}
@@ -77,18 +71,11 @@ export const fetchProxied = async (
 		}
 
 		const proxiedUrl = corsProxyUrl + encodeUrl(nonProxiedUrl);
-		const headers = new Headers(
-			requestOptions?.headers ??
-				(requestInput instanceof Request ? requestInput.headers : undefined)
-		);
-		if (Capacitor.getPlatform() === 'android') {
-			headers.set(TOKEN_HEADER, await getNativeProxyToken());
-		}
 
 		if (requestInput instanceof Request) {
 			requestInput = new Request(proxiedUrl, {
 				method: requestInput.method,
-				headers,
+				headers: requestInput.headers,
 				body: requestInput.body,
 				mode: requestInput.mode,
 				credentials: requestInput.credentials,
@@ -97,13 +84,10 @@ export const fetchProxied = async (
 				referrer: requestInput.referrer,
 				integrity: requestInput.integrity,
 				keepalive: requestInput.keepalive,
-				signal: requestInput.signal,
 				...(requestInput.body ? { duplex: 'half' } : {})
 			});
-			requestOptions = { ...requestOptions, headers };
 		} else {
 			requestInput = proxiedUrl;
-			requestOptions = { ...requestOptions, headers };
 		}
 	}
 
@@ -118,4 +102,14 @@ if (
 	(typeof window !== 'undefined' && !!window.materialiousCompanionFetch)
 ) {
 	window.fetch = fetchProxied;
+
+	const originalXhrOpen = XMLHttpRequest.prototype.open;
+
+	XMLHttpRequest.prototype.open = function (...args: any[]): void {
+		if (needsProxying(args[1])) {
+			args[1] = corsProxyUrl + encodeUrl(args[1]);
+		}
+		// @ts-expect-error args have any type
+		return originalXhrOpen.apply(this, args);
+	};
 }

@@ -1,29 +1,12 @@
 const http = require('http');
 const https = require('https');
-const crypto = require('crypto');
 
+const HOST = 'localhost';
 const PORT = 3000;
 const MAX_REDIRECTS = 10;
-const MAX_REPLAY_BYTES = 2 * 1024 * 1024;
-const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 12, maxFreeSockets: 4 });
-// Native launch configuration may opt in for development; never changed by HTTP requests.
-let rejectUnauthorized = process.env.MATERIALIOUS_ALLOW_INSECURE_TLS === 'true' ? false : true;
-let proxySessionToken = null;
 
-// TLS exceptions arrive through the Capacitor native bridge, never over HTTP.
-try {
-	const { channel } = require('bridge');
-	channel.on('set-insecure-tls', (isAllowed) => {
-		rejectUnauthorized = isAllowed !== true;
-	});
-	channel.on('set-proxy-session', (token, requestId) => {
-		if (typeof token !== 'string' || token.length < 40) return;
-		proxySessionToken = token;
-		channel.post('proxy-session-ready', requestId);
-	});
-} catch (err) {
-	console.warn('Capacitor bridge unavailable; TLS verification remains enabled.');
-}
+// Can be changed via channels to disable ssl validation.
+let rejectUnauthorized = true;
 
 const CORS_HEADERS = [
 	'Origin',
@@ -31,7 +14,6 @@ const CORS_HEADERS = [
 	'Content-Type',
 	'Accept',
 	'Authorization',
-	'X-Materialious-Session',
 	'x-goog-visitor-id',
 	'x-goog-api-key',
 	'x-origin',
@@ -63,14 +45,16 @@ function setCorsHeaders(res) {
 	res.setHeader('Access-Control-Allow-Credentials', 'true');
 }
 
-function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCount = 0) {
+function proxyRequest(clientReq, clientRes, parsedUrl, bodyChunks = [], redirectCount = 0) {
 	if (redirectCount > MAX_REDIRECTS) {
 		clientRes.writeHead(508, { 'Content-Type': 'text/plain' });
 		return clientRes.end('Too many redirects');
 	}
 
 	const redirectAllowed = clientReq.headers.__redirect !== 'manual';
+	delete clientReq.headers.__redirect;
 	const returnHeadersAsJson = clientReq.headers.__custom_return === 'json-headers';
+	delete clientReq.headers.__custom_return;
 
 	const isHttps = parsedUrl.protocol === 'https:';
 	const httpClient = isHttps ? https : http;
@@ -82,19 +66,15 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 			host: parsedUrl.host,
 			origin: parsedUrl.origin,
 			'user-agent': USER_AGENT,
-			connection: 'keep-alive'
+			connection: 'close'
 		},
-		rejectUnauthorized,
-		agent: isHttps ? httpsAgent : undefined
+		rejectUnauthorized: rejectUnauthorized
 	};
 
 	if (clientReq.headers.__sid_auth) {
 		proxyOptions.headers.cookie = clientReq.headers.__sid_auth;
 		delete proxyOptions.headers.__sid_auth;
 	}
-	delete proxyOptions.headers['x-materialious-session'];
-	delete proxyOptions.headers.__redirect;
-	delete proxyOptions.headers.__custom_return;
 
 	// Remove headers that may cause issues or be auto-managed
 	for (const key of [
@@ -118,34 +98,10 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 		) {
 			proxyRes.resume(); // discard response data
 			const newUrl = new URL(proxyRes.headers.location, parsedUrl);
-			const status = proxyRes.statusCode;
-			const rewriteToGet =
-				(status === 303 && clientReq.method !== 'HEAD') ||
-				((status === 301 || status === 302) && clientReq.method === 'POST');
-			if (body === null && clientReq.method !== 'GET' && clientReq.method !== 'HEAD' && !rewriteToGet) {
-				clientRes.writeHead(502, { 'Content-Type': 'text/plain' });
-				return clientRes.end('Cannot replay streamed request body across redirect');
-			}
-			if (!rewriteToGet && body && body.length > MAX_REPLAY_BYTES) {
-				clientRes.writeHead(413, { 'Content-Type': 'text/plain' });
-				return clientRes.end('Redirect body exceeds replay limit');
-			}
-			if (newUrl.origin !== parsedUrl.origin) {
-				for (const key of ['authorization', 'cookie', 'proxy-authorization', '__sid_auth'])
-					delete clientReq.headers[key];
-			}
-			if (rewriteToGet) {
-				clientReq.method = 'GET';
-				body = Buffer.alloc(0);
-				delete clientReq.headers['content-length'];
-				delete clientReq.headers['content-type'];
-				delete clientReq.headers['transfer-encoding'];
-			}
-			return proxyRequest(clientReq, clientRes, newUrl, body, redirectCount + 1);
+			return proxyRequest(clientReq, clientRes, newUrl, bodyChunks, redirectCount + 1);
 		}
 
 		if (returnHeadersAsJson) {
-			proxyRes.resume();
 			const headersDict = {};
 			for (const [key, value] of Object.entries(proxyRes.headers)) {
 				headersDict[key] = value;
@@ -172,18 +128,16 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 			'Access-Control-Allow-Credentials': 'true'
 		});
 
-		proxyRes.on('error', (err) => proxyReq.destroy(err));
 		proxyRes.pipe(clientRes);
 	});
 
 	// Timeout handler
-	proxyReq.setTimeout(clientReq.headers.range ? 0 : 30000, () => {
+	proxyReq.setTimeout(120000, () => {
 		proxyReq.destroy(new Error('Proxy request timed out'));
 	});
 
 	proxyReq.on('error', (err) => {
 		console.error('Proxy request error:', err.message);
-		if (clientRes.headersSent) return clientRes.destroy(err);
 		if (!clientRes.headersSent) {
 			clientRes.writeHead(500, { 'Content-Type': 'text/plain' });
 		}
@@ -191,17 +145,13 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 	});
 
 	clientReq.on('aborted', () => proxyReq.destroy());
-	clientRes.on('close', () => {
-		if (!clientRes.writableEnded) proxyReq.destroy();
-	});
-	if (body !== null) {
-		if (body.length) proxyReq.write(body);
-		proxyReq.end();
-	} else if (redirectCount > 0) {
-		proxyReq.end();
-	} else {
-		clientReq.pipe(proxyReq);
+
+	// Write buffered body if present
+	if (bodyChunks.length > 0) {
+		proxyReq.write(Buffer.concat(bodyChunks));
 	}
+
+	proxyReq.end();
 }
 
 const server = http.createServer((req, res) => {
@@ -211,23 +161,6 @@ const server = http.createServer((req, res) => {
 		res.writeHead(204);
 		return res.end();
 	}
-	if (req.method === 'GET' && req.url === '/check-nodejs') {
-		res.writeHead(200);
-		return res.end();
-	}
-
-	const suppliedToken = req.headers['x-materialious-session'];
-	const suppliedTokenBuffer =
-		typeof suppliedToken === 'string' ? Buffer.from(suppliedToken) : Buffer.alloc(0);
-	const expectedTokenBuffer = proxySessionToken ? Buffer.from(proxySessionToken) : Buffer.alloc(0);
-	if (
-		!proxySessionToken ||
-		suppliedTokenBuffer.length !== expectedTokenBuffer.length ||
-		!crypto.timingSafeEqual(suppliedTokenBuffer, expectedTokenBuffer)
-	) {
-		res.writeHead(401, { 'Content-Type': 'text/plain' });
-		return res.end('Unauthorized Materialious session');
-	}
 
 	if (!req.url || req.url === '/') {
 		res.writeHead(400, { 'Content-Type': 'text/plain' });
@@ -235,6 +168,20 @@ const server = http.createServer((req, res) => {
 	}
 
 	let targetUrl = req.url.slice(1);
+
+	// Quick way to quickly send commands between app and nodejs backend.
+	if (targetUrl === 'allow-insecure-requests') {
+		rejectUnauthorized = false;
+		res.writeHead(200);
+		return res.end();
+	} else if (targetUrl === 'deny-insecure-requests') {
+		rejectUnauthorized = true;
+		res.writeHead(200);
+		return res.end();
+	} else if (targetUrl === 'check-nodejs') {
+		res.writeHead(200);
+		return res.end();
+	}
 
 	if (!targetUrl.startsWith('http')) {
 		targetUrl = 'http://' + targetUrl;
@@ -248,18 +195,11 @@ const server = http.createServer((req, res) => {
 		return res.end(`Invalid URL: ${err.message}`);
 	}
 
-	proxyRequest(req, res, parsedTarget);
+	const bodyChunks = [];
+	req.on('data', (chunk) => bodyChunks.push(chunk));
+	req.on('end', () => proxyRequest(req, res, parsedTarget, bodyChunks));
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-	console.log(`Proxy server running at http://127.0.0.1:${PORT}`);
-});
-
-process.on('SIGINT', () => {
-	httpsAgent.destroy();
-	server.close(() => process.exit(0));
-});
-process.on('SIGTERM', () => {
-	httpsAgent.destroy();
-	server.close(() => process.exit(0));
+server.listen(PORT, () => {
+	console.log(`Proxy server running at http://${HOST}:${PORT}`);
 });

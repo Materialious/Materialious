@@ -3,10 +3,10 @@
 `npm install` and `npm ci` apply these patches through `postinstall` using
 `patch-package --error-on-fail`.
 
-## @capawesome/capacitor-nodejs 0.2.0
+## capacitor-nodejs 1.0.0-beta.9
 
-Normalize native source paths and omit the linker-generated Build ID so the
-Android JNI library is byte-identical across checkout directories.
+Normalize native source paths so the JNI library and its linker build ID do not
+depend on the builder's checkout directory.
 
 ## googlevideo 5.0.1
 

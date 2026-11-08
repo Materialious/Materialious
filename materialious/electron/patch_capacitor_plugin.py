@@ -26,7 +26,7 @@ def run():
             return
 
         try:
-            package["dependencies"].pop("@capawesome/capacitor-nodejs")
+            package["dependencies"].pop("capacitor-nodejs")
         except KeyError:
             return
 

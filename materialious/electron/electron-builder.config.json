@@ -11,6 +11,10 @@
     "app/**/*",
     "!**/.electron-cache/**"
 	],
+	"protocols": {
+		"name": "Materialious",
+		"schemes": ["materialious"]
+	},
 	"publish": [
 		{
 			"provider": "github",
@@ -72,6 +76,7 @@
 		]
 	},
 	"linux": {
+		"mimeTypes": ["x-scheme-handler/materialious"],
 		"publish": [
 			{
 				"provider": "github",

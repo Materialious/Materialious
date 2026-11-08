@@ -154,10 +154,9 @@ npm run build       # Production build
 
 The contributor list is a committed snapshot. When preparing a release, set
 `LATEST_VERSION` in `update_versions.py` and run the script from the repository
-root. A version change refreshes `materialious/static/localApi/ghContributors.json`
-once; review and commit that snapshot with the version changes before tagging.
-The script needs Python 3, the dependencies in `requirements.txt` (install with
-`python3 -m pip install -r requirements.txt`), and access to the GitHub API.
+root. The script refreshes `materialious/static/localApi/ghContributors.json`;
+review and commit that snapshot with the version changes before tagging. The
+script needs Python 3, the `requests` package, and access to the GitHub API.
 Normal builds use the committed snapshot so they do not depend on GitHub's live
 contributor count.
 

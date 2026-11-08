@@ -93,13 +93,7 @@ def update_metainfo_release() -> None:
 
 
 if __name__ == "__main__":
-    with open(ROOT_PACKAGE, "r") as f_:
-        current_version = json.load(f_)["version"]
-
-    # Refresh the committed snapshot before changing the version. If fetching
-    # fails, the version remains unchanged and the release can be retried.
-    if current_version != LATEST_VERSION:
-        update_contributors()
+    update_contributors()
 
     for location in (ROOT_PACKAGE, SHARED_PACKAGE, ELECTRON_PACKAGE):
         package_json_update_ver(location)

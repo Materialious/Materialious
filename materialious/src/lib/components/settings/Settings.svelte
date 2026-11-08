@@ -217,8 +217,13 @@
 
 	@media screen and (max-width: 800px) {
 		#dialog-settings {
-			width: 100%;
-			height: 100%;
+			box-sizing: border-box;
+			width: 100vw;
+			height: 100vh;
+			height: 100dvh;
+			max-height: 100dvh;
+			min-height: 100dvh;
+			margin: 0;
 		}
 
 		.settings {

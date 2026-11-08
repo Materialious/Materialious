@@ -5,6 +5,7 @@ export {
 	ifNotWebDefault,
 	playerAutoPlayStore,
 	playerAlwaysLoopStore,
+	playerAudioOnlyByDefault,
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,

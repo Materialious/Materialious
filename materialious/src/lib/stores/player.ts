@@ -5,6 +5,11 @@ import type { VideoPlay } from '../api/model';
 import type { ParsedDescription } from '../description';
 
 export const playerAutoPlayStore = persist(writable(true), createStorage(), 'autoPlay');
+export const playerAudioOnlyByDefault = persist(
+	writable(false),
+	createStorage(),
+	'audioOnlyByDefault'
+);
 export const playerAlwaysLoopStore = persist(writable(false), createStorage(), 'alwaysLoop');
 export const playerProxyVideosStore = persist(writable(true), createStorage(), 'proxyVideos');
 export const playerSavePlaybackPositionStore = persist(

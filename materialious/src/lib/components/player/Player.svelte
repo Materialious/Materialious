@@ -10,13 +10,14 @@
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import { Slider } from 'melt/builders';
 	import type { VideoPlay } from '#lib/api/model';
 	import {
 		playerAlwaysLoopStore,
+		playerAudioOnlyByDefault,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
 		playerAndroidAutoPip,
@@ -99,6 +100,23 @@
 		tvPlayButton = $bindable(undefined),
 		tvSettingsButton = $bindable(undefined)
 	}: Props = $props();
+
+	let audioOnlyOverride = $state<{ videoId: string; value: boolean } | null>(null);
+	let audioOnly = $derived(
+		audioOnlyOverride?.videoId === data.video.videoId
+			? audioOnlyOverride.value
+			: $playerAudioOnlyByDefault
+	);
+
+	$effect(() => {
+		const videoId = data.video.videoId;
+		if (
+			untrack(() => audioOnlyOverride) !== null &&
+			untrack(() => audioOnlyOverride?.videoId) !== videoId
+		) {
+			audioOnlyOverride = null;
+		}
+	});
 
 	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
@@ -1201,7 +1219,6 @@
 			// unexpected rejection can never take down the whole app.
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 		}
-
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
@@ -1280,7 +1297,8 @@
 	class:contain-video={!isAndroidTv()}
 	class:full-window={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
 	class:tv-contain-video={isAndroidTv()}
-	class:hide-cursor={!showControls}
+	class:audio-only={audioOnly}
+	class:hide-cursor={!showControls && !audioOnly}
 	role="presentation"
 	onmouseenter={showPlayerUI}
 	onmousemove={showPlayerUI}
@@ -1294,6 +1312,7 @@
 	<ClosedCaptions video={data.video} bind:currentTime bind:showControls />
 
 	<video
+		class:audio-only={audioOnly}
 		controls={false}
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
@@ -1307,7 +1326,7 @@
 		</div>
 	{/if}
 
-	{#if showControls && !isAndroidPictureInPicture}
+	{#if showControls && !audioOnly && !isAndroidPictureInPicture}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1323,7 +1342,7 @@
 			{/if}
 		</div>
 	{/if}
-	{#if !isAndroidPictureInPicture}
+	{#if !isAndroidPictureInPicture && !audioOnly}
 		<TouchControls
 			{playerElement}
 			{showPlayerUI}
@@ -1335,7 +1354,27 @@
 		/>
 	{/if}
 	{#if !isAndroidPictureInPicture}
-		<div id="player-controls" class="hide" class:show={showControls}>
+		<svelte:element
+			this={audioOnly ? 'article' : 'div'}
+			id="player-controls"
+			class="hide"
+			class:show={showControls || audioOnly}
+			class:surface-container-low={audioOnly}
+		>
+			{#if audioOnly}
+				<div id="mobile-time">
+					<p class="chip surface-container-highest s">
+						{#if data.video.liveNow}
+							{$_('thumbnail.live')}
+						{:else}
+							{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
+						{/if}
+					</p>
+					{#if playerVideoEndTimePretty}
+						<p class="chip surface-container-highest">{playerVideoEndTimePretty}</p>
+					{/if}
+				</div>
+			{/if}
 			<Timeline
 				{playerElement}
 				{currentTime}
@@ -1406,13 +1445,24 @@
 						</p>
 					{/if}
 					{#if !isAndroidTv() && !playerIsPip}
-						<CaptionSettings video={data.video} />
-						{#if playerElement}
-							<Settings {player} {playerElement} />
-							<Airplay {playerElement} />
-							<Pip {playerElement} />
+						{#if !audioOnly}
+							<CaptionSettings video={data.video} />
 						{/if}
-						{#if Capacitor.getPlatform() !== 'android'}
+						{#if playerElement}
+							<Settings
+								{player}
+								{playerElement}
+								{audioOnly}
+								onAudioOnlyChange={(value) => {
+									audioOnlyOverride = { videoId: data.video.videoId, value };
+								}}
+							/>
+							<Airplay {playerElement} />
+							{#if !audioOnly}
+								<Pip {playerElement} />
+							{/if}
+						{/if}
+						{#if !audioOnly && Capacitor.getPlatform() !== 'android'}
 							<button
 								class="surface-container-highest"
 								class:primary={$playerIsInWindowFullscreen}
@@ -1421,11 +1471,13 @@
 								<i>fit_screen</i>
 							</button>
 						{/if}
-						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+						{#if !audioOnly}
+							<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+						{/if}
 					{/if}
 				</nav>
 			</nav>
-		</div>
+		</svelte:element>
 	{/if}
 	{#if playbackError}
 		<div class="player-error" role="alert">
@@ -1527,6 +1579,48 @@
 		flex: 1;
 		background-color: black;
 		aspect-ratio: 16 / 9;
+	}
+
+	.contain-video.audio-only,
+	.tv-contain-video.audio-only {
+		width: 100%;
+		max-width: none;
+		max-height: none;
+		height: auto;
+		min-height: 76px;
+		aspect-ratio: auto;
+		overflow: visible;
+		background-color: transparent;
+	}
+
+	.audio-only video {
+		display: none;
+	}
+
+	.audio-only #player-controls {
+		position: relative;
+		bottom: auto;
+		left: auto;
+		right: auto;
+		margin: 2rem 0 0;
+	}
+
+	.audio-only #mobile-time {
+		position: static;
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding: 0 0 1rem;
+	}
+
+	.audio-only:focus-within {
+		z-index: 10;
+	}
+
+	.audio-only :global(menu.player-settings) {
+		top: 100%;
+		bottom: auto;
+		transform: none !important;
 	}
 
 	video[poster] {

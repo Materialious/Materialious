@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { getComments } from '#lib/api/index';
+	import { invidiousInstanceStore } from '#lib/store';
 	import { type Comment, type Comments } from '#lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
 	import { numberWithCommas } from '#lib/numbers';
@@ -67,6 +68,16 @@
 				link.setAttribute('referrerpolicy', 'no-referrer');
 			}
 		});
+
+		// Invidious comment HTML can contain root-relative custom emoji URLs
+		// (for example /ggpht/...). Resolve them against Invidious, not the
+		// Materialious frontend's origin.
+		if ($invidiousInstanceStore) {
+			doc.querySelectorAll('img[src^="/"]').forEach((image) => {
+				const src = image.getAttribute('src');
+				if (src) image.setAttribute('src', new URL(src, `${$invidiousInstanceStore}/`).href);
+			});
+		}
 
 		return doc.documentElement.outerHTML;
 	}

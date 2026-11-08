@@ -33,21 +33,26 @@
 	});
 
 	let debounceTimer: ReturnType<typeof setTimeout>;
+	let suggestionRequest = 0;
 	function debouncedSearch(event: any) {
 		if (!$interfaceSearchSuggestionsStore) return;
 
+		const request = ++suggestionRequest;
+		const value = event.target.value;
 		if (debounceTimer) clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(async () => {
-			if (event.target.value === '') {
+			if (value === '') {
 				suggestionsForSearch = [];
 				return;
 			}
-			suggestionsForSearch = (await getSearchSuggestions(event.target.value)).suggestions;
+			const result = await getSearchSuggestions(value);
+			if (request === suggestionRequest) suggestionsForSearch = result.suggestions;
 		}, 250);
 	}
 
 	function onSubmit(event: Event | undefined = undefined) {
 		clearTimeout(debounceTimer);
+		suggestionRequest++;
 		event?.preventDefault();
 
 		goToSearch(search);
@@ -100,6 +105,8 @@
 	}
 
 	function resetSearch() {
+		clearTimeout(debounceTimer);
+		suggestionRequest++;
 		search = '';
 		suggestionsForSearch = [];
 		selectedSuggestionIndex = -1;
@@ -145,10 +152,17 @@
 			bind:this={searchBoxEl}
 		/>
 		{#if showSearchBox}
-			<menu class="min suggestions-container fill">
+			<menu class="min active suggestions-container fill">
 				<div class="field large prefix fill suffix no-margin fixed round">
-					<i class="front" role="presentation" onclick={() => dispatch('searchCancelled')}
-						>arrow_back</i
+					<button
+						type="button"
+						class="transparent circle search-action search-back"
+						aria-label={$_('cancel')}
+						onclick={(event) => {
+							event.stopPropagation();
+							resetSearch();
+							dispatch('searchCancelled');
+						}}><i>arrow_back</i></button
 					>
 					<input
 						tabindex="0"
@@ -167,7 +181,20 @@
 							}
 						}}
 					/>
-					<i class="front" role="presentation" onclick={resetSearch}>close</i>
+					<button
+						type="button"
+						class="transparent circle search-action clear"
+						aria-label={$_('player.pauseTimerClear')}
+						onclick={(event) => {
+							event.stopPropagation();
+							clearTimeout(debounceTimer);
+							suggestionRequest++;
+							search = '';
+							suggestionsForSearch = [];
+							selectedSuggestionIndex = -1;
+							searchEl?.focus();
+						}}><i>close</i></button
+					>
 				</div>
 				{#if $interfaceSearchSuggestionsStore}
 					{#each suggestionsForSearch as suggestion, index (index)}
@@ -211,6 +238,21 @@
 	.search {
 		width: 500px;
 		--_background: var(--surface-container-highest);
+	}
+
+	.search-action {
+		position: absolute;
+		z-index: 10;
+		inset-block-start: 50%;
+		transform: translateY(-50%);
+	}
+
+	.search-action.search-back {
+		inset-inline-start: 0.5rem;
+	}
+
+	.search-action.clear {
+		inset-inline-end: 0.5rem;
 	}
 
 	.selected {

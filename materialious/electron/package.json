@@ -46,7 +46,7 @@
 		"youtubei.js": "^18.3.0"
 	},
 	"devDependencies": {
-		"electron": "^45.1.0",
+		"electron": "^45.2.3",
 		"electron-builder": "^26.18.0",
 		"electron-rebuild": "^3.2.9",
 		"typescript": "^7.0.2"

@@ -1330,93 +1330,96 @@
 	{/if}
 	{#if !isAndroidPictureInPicture}
 		<div id="player-controls" class="hide" class:show={showControls}>
-		<Timeline
-			{playerElement}
-			{currentTime}
-			{showPlayerUI}
-			{segments}
-			{playerIsPip}
-			video={data.video}
-			content={data.content}
-			bind:userManualSeeking
-			bind:playerMaxKnownTime
-		/>
-		<nav>
-			{#if !isAndroidTv()}
-				<nav class="no-wrap">
-					<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
-						<i>
-							{#if playerCurrentPlaybackState}
-								pause
-							{:else}
-								play_arrow
-							{/if}
-						</i>
-					</button>
-					{#if !isMobile() && !playerIsPip}
-						<div class="player-slider volume m l" {...playerVolumeSlider.root}>
-							<div class="track">
-								<div class="range"></div>
-								<div {...playerVolumeSlider.thumb}></div>
+			<Timeline
+				{playerElement}
+				{currentTime}
+				{showPlayerUI}
+				{segments}
+				{playerIsPip}
+				video={data.video}
+				content={data.content}
+				bind:userManualSeeking
+				bind:playerMaxKnownTime
+			/>
+			<nav>
+				{#if !isAndroidTv()}
+					<nav class="no-wrap">
+						<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
+							<i>
+								{#if playerCurrentPlaybackState}
+									pause
+								{:else}
+									play_arrow
+								{/if}
+							</i>
+						</button>
+						{#if !isMobile() && !playerIsPip}
+							<div class="volume-control m l">
+								<i aria-hidden="true">{playerVolume === 0 ? 'volume_off' : 'volume_up'}</i>
+								<div class="player-slider volume" {...playerVolumeSlider.root}>
+									<div class="track">
+										<div class="range"></div>
+										<div {...playerVolumeSlider.thumb} aria-label="Volume"></div>
+									</div>
+								</div>
 							</div>
-						</div>
-					{/if}
-				</nav>
-			{/if}
-
-			<div class="max"></div>
-
-			<nav class="no-wrap">
-				{#if isAndroidTv() && onTvSettings}
-					<button
-						bind:this={tvPlayButton}
-						class="circle transparent tv-control-button"
-						aria-label={playerCurrentPlaybackState
-							? $_('player.controls.pause')
-							: $_('player.controls.play')}
-						onclick={toggleVideoPlaybackStatus}
-					>
-						<i>{playerCurrentPlaybackState ? 'pause' : 'play_arrow'}</i>
-					</button>
-					<button
-						bind:this={tvSettingsButton}
-						class="circle transparent tv-control-button"
-						aria-label={$_('layout.settings')}
-						onclick={onTvSettings}
-					>
-						<i>settings</i>
-					</button>
+						{/if}
+					</nav>
 				{/if}
-				{#if data.video.liveNow}
-					<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
-						{$_('thumbnail.live')}
-					</button>
-				{:else}
-					<p class="chip m l" style="height: 100%;">
-						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
-					</p>
-				{/if}
-				{#if !isAndroidTv() && !playerIsPip}
-					<CaptionSettings video={data.video} />
-					{#if playerElement}
-						<Settings {player} {playerElement} />
-						<Airplay {playerElement} />
-						<Pip {playerElement} />
-					{/if}
-					{#if Capacitor.getPlatform() !== 'android'}
+
+				<div class="max"></div>
+
+				<nav class="no-wrap">
+					{#if isAndroidTv() && onTvSettings}
 						<button
-							class="surface-container-highest"
-							class:primary={$playerIsInWindowFullscreen}
-							onclick={toggleInWindowFullscreen}
+							bind:this={tvPlayButton}
+							class="circle transparent tv-control-button"
+							aria-label={playerCurrentPlaybackState
+								? $_('player.controls.pause')
+								: $_('player.controls.play')}
+							onclick={toggleVideoPlaybackStatus}
 						>
-							<i>fit_screen</i>
+							<i>{playerCurrentPlaybackState ? 'pause' : 'play_arrow'}</i>
+						</button>
+						<button
+							bind:this={tvSettingsButton}
+							class="circle transparent tv-control-button"
+							aria-label={$_('layout.settings')}
+							onclick={onTvSettings}
+						>
+							<i>settings</i>
 						</button>
 					{/if}
-					<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
-				{/if}
+					{#if data.video.liveNow}
+						<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
+							{$_('thumbnail.live')}
+						</button>
+					{:else}
+						<p class="chip m l" style="height: 100%;">
+							{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
+						</p>
+					{/if}
+					{#if !isAndroidTv() && !playerIsPip}
+						<CaptionSettings video={data.video} />
+						{#if playerElement}
+							<Settings {player} {playerElement} />
+							<Airplay {playerElement} />
+							<Pip {playerElement} />
+						{/if}
+						{#if Capacitor.getPlatform() !== 'android'}
+							<button
+								class="surface-container-highest"
+								class:primary={$playerIsInWindowFullscreen}
+								onclick={toggleInWindowFullscreen}
+							>
+								<i>fit_screen</i>
+							</button>
+						{/if}
+						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+					{/if}
+				</nav>
 			</nav>
-		</nav>
-	</div>
+		</div>
 	{/if}
 	{#if playbackError}
 		<div class="player-error" role="alert">

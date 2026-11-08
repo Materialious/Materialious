@@ -1617,10 +1617,12 @@
 		z-index: 10;
 	}
 
-	.audio-only :global(menu.player-settings) {
-		top: 100%;
-		bottom: auto;
-		transform: none !important;
+	@media screen and (min-width: 1001px) {
+		.audio-only :global(menu.player-settings) {
+			top: 100%;
+			bottom: auto;
+			transform: none !important;
+		}
 	}
 
 	video[poster] {

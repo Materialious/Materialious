@@ -5,7 +5,7 @@ from datetime import datetime
 
 import requests
 
-LATEST_VERSION = "1.18.20"
+LATEST_VERSION = "1.18.21"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
@@ -15,7 +15,9 @@ SHARED_PACKAGE = os.path.join(WORKING_DIR, "shared", "package.json")
 ELECTRON_PACKAGE = os.path.join(WORKING_DIR, "electron", "package.json")
 ANDROID_PACKAGE = os.path.join(WORKING_DIR, "android", "app", "build.gradle")
 METAINFO_FILE = os.path.join(WORKING_DIR, "electron", "materialious.metainfo.xml")
-CONTRIBUTORS_FILE = os.path.join(WORKING_DIR, "static", "localApi", "ghContributors.json")
+CONTRIBUTORS_FILE = os.path.join(
+    WORKING_DIR, "static", "localApi", "ghContributors.json"
+)
 
 
 def update_contributors() -> None:

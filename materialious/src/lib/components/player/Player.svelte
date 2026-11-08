@@ -10,13 +10,14 @@
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import { Slider } from 'melt/builders';
 	import type { VideoPlay } from '#lib/api/model';
 	import {
 		playerAlwaysLoopStore,
+		playerAudioOnlyByDefault,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
 		playerAndroidAutoPip,
@@ -95,6 +96,24 @@
 		onShakaPlayer = undefined,
 		segments = $bindable([])
 	}: Props = $props();
+
+	let audioOnlyOverride = $state<{ videoId: string; value: boolean } | null>(null);
+	let audioOnly = $derived(
+		audioOnlyOverride?.videoId === data.video.videoId
+			? audioOnlyOverride.value
+			: $playerAudioOnlyByDefault
+	);
+
+	$effect(() => {
+		const videoId = data.video.videoId;
+		if (
+			untrack(() => audioOnlyOverride) !== null &&
+			untrack(() => audioOnlyOverride?.videoId) !== videoId
+		) {
+			audioOnlyOverride = null;
+		}
+	});
+
 	let segmentManualSkip: Segment | undefined = $state();
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let keepAwakeSupported = $state(false);
@@ -125,6 +144,7 @@
 	}
 
 	let playbackError = $state<PlaybackError | null>(null);
+	let youtubeJsFallbackAttemptedFor: string | null = null;
 	let isRetryingPlayback = $state(false);
 
 	let player: shaka.Player;
@@ -412,6 +432,21 @@
 			source,
 			detail: errorDetail(error)
 		};
+
+		// Streaming errors can happen well after loadVideo() has returned. Apply
+		// the configured fallback here as well as for failures during startup.
+		// Record the video before retrying so a failed YouTube.js attempt cannot
+		// recursively trigger another fallback.
+		if (
+			$playerYouTubeJsFallback &&
+			isUnrestrictedPlatform() &&
+			!isYTBackend() &&
+			data.video.fallbackPatch !== 'youtubejs' &&
+			youtubeJsFallbackAttemptedFor !== data.video.videoId
+		) {
+			youtubeJsFallbackAttemptedFor = data.video.videoId;
+			void retryPlayback(true);
+		}
 	}
 
 	function recoverSabrSession(error: shaka.util.Error): boolean {
@@ -1185,17 +1220,6 @@
 			// unexpected rejection can never take down the whole app.
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 		}
-
-		// Honour the user's "always allow local video fallback" preference.
-		if (
-			playbackError &&
-			$playerYouTubeJsFallback &&
-			isUnrestrictedPlatform() &&
-			!isYTBackend() &&
-			data.video.fallbackPatch !== 'youtubejs'
-		) {
-			await retryPlayback(true);
-		}
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
@@ -1274,7 +1298,8 @@
 	class:contain-video={!isAndroidTv()}
 	class:full-window={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
 	class:tv-contain-video={isAndroidTv()}
-	class:hide-cursor={!showControls}
+	class:audio-only={audioOnly}
+	class:hide-cursor={!showControls && !audioOnly}
 	role="presentation"
 	onmouseenter={showPlayerUI}
 	onmousemove={showPlayerUI}
@@ -1289,6 +1314,7 @@
 	<ClosedCaptions video={data.video} bind:currentTime bind:showControls />
 
 	<video
+		class:audio-only={audioOnly}
 		controls={false}
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
@@ -1302,7 +1328,7 @@
 		</div>
 	{/if}
 
-	{#if showControls && !isAndroidPictureInPicture && !isAndroidTv()}
+	{#if showControls && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1318,7 +1344,7 @@
 			{/if}
 		</div>
 	{/if}
-	{#if !isAndroidPictureInPicture}
+	{#if !isAndroidPictureInPicture && !audioOnly}
 		<TouchControls
 			{playerElement}
 			{showPlayerUI}
@@ -1330,7 +1356,27 @@
 		/>
 	{/if}
 	{#if !isAndroidPictureInPicture && !isAndroidTv()}
-		<div id="player-controls" class="hide" class:show={showControls}>
+		<svelte:element
+			this={audioOnly ? 'article' : 'div'}
+			id="player-controls"
+			class="hide"
+			class:show={showControls || audioOnly}
+			class:surface-container-low={audioOnly}
+		>
+			{#if audioOnly}
+				<div id="mobile-time">
+					<p class="chip surface-container-highest s">
+						{#if data.video.liveNow}
+							{$_('thumbnail.live')}
+						{:else}
+							{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
+						{/if}
+					</p>
+					{#if playerVideoEndTimePretty}
+						<p class="chip surface-container-highest">{playerVideoEndTimePretty}</p>
+					{/if}
+				</div>
+			{/if}
 			<Timeline
 				{playerElement}
 				{currentTime}
@@ -1355,10 +1401,13 @@
 							</i>
 						</button>
 						{#if !isMobile() && !playerIsPip}
-							<div class="player-slider volume m l" {...playerVolumeSlider.root}>
-								<div class="track">
-									<div class="range"></div>
-									<div {...playerVolumeSlider.thumb}></div>
+							<div class="volume-control m l">
+								<i aria-hidden="true">{playerVolume === 0 ? 'volume_off' : 'volume_up'}</i>
+								<div class="player-slider volume" {...playerVolumeSlider.root}>
+									<div class="track">
+										<div class="range"></div>
+										<div {...playerVolumeSlider.thumb} aria-label="Volume"></div>
+									</div>
 								</div>
 							</div>
 						{/if}
@@ -1378,13 +1427,24 @@
 						</p>
 					{/if}
 					{#if !isAndroidTv() && !playerIsPip}
-						<CaptionSettings video={data.video} />
-						{#if playerElement}
-							<Settings {player} {playerElement} />
-							<Airplay {playerElement} />
-							<Pip {playerElement} />
+						{#if !audioOnly}
+							<CaptionSettings video={data.video} />
 						{/if}
-						{#if Capacitor.getPlatform() !== 'android'}
+						{#if playerElement}
+							<Settings
+								{player}
+								{playerElement}
+								{audioOnly}
+								onAudioOnlyChange={(value) => {
+									audioOnlyOverride = { videoId: data.video.videoId, value };
+								}}
+							/>
+							<Airplay {playerElement} />
+							{#if !audioOnly}
+								<Pip {playerElement} />
+							{/if}
+						{/if}
+						{#if !audioOnly && Capacitor.getPlatform() !== 'android'}
 							<button
 								class="surface-container-highest"
 								class:primary={$playerIsInWindowFullscreen}
@@ -1393,26 +1453,28 @@
 								<i>fit_screen</i>
 							</button>
 						{/if}
-						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+						{#if !audioOnly}
+							<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+						{/if}
 					{/if}
 				</nav>
 			</nav>
-		</div>
+		</svelte:element>
 	{/if}
 	{#if playbackError}
 		<div class="player-error" role="alert">
 			<div class="player-error-content surface-container-highest">
-				<h5>{$_('player.playbackErrorTitle')}</h5>
-				<p>{playbackErrorMessage(playbackError.source)}</p>
-				{#if playbackError.detail}
-					<p class="player-error-detail">{playbackError.detail}</p>
-				{/if}
 				<nav class="player-error-actions">
 					<button onclick={() => retryPlayback()} disabled={isRetryingPlayback}>
 						<i>{isRetryingPlayback ? 'hourglass_top' : 'refresh'}</i>
 						{isRetryingPlayback ? $_('player.retrying') : $_('player.retry')}
 					</button>
 				</nav>
+				<h5>{$_('player.playbackErrorTitle')}</h5>
+				<p>{playbackErrorMessage(playbackError.source)}</p>
+				{#if playbackError.detail}
+					<p class="player-error-detail">{playbackError.detail}</p>
+				{/if}
 				{#if isUnrestrictedPlatform() && !isYTBackend() && data.video.fallbackPatch !== 'youtubejs'}
 					<p>{$_('player.retryText')}</p>
 					<nav class="player-error-actions">
@@ -1499,6 +1561,50 @@
 		flex: 1;
 		background-color: black;
 		aspect-ratio: 16 / 9;
+	}
+
+	.contain-video.audio-only,
+	.tv-contain-video.audio-only {
+		width: 100%;
+		max-width: none;
+		max-height: none;
+		height: auto;
+		min-height: 76px;
+		aspect-ratio: auto;
+		overflow: visible;
+		background-color: transparent;
+	}
+
+	.audio-only video {
+		display: none;
+	}
+
+	.audio-only #player-controls {
+		position: relative;
+		bottom: auto;
+		left: auto;
+		right: auto;
+		margin: 2rem 0 0;
+	}
+
+	.audio-only #mobile-time {
+		position: static;
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding: 0 0 1rem;
+	}
+
+	.audio-only:focus-within {
+		z-index: 10;
+	}
+
+	@media screen and (min-width: 1001px) {
+		.audio-only :global(menu.player-settings) {
+			top: 100%;
+			bottom: auto;
+			transform: none !important;
+		}
 	}
 
 	video[poster] {

@@ -22,8 +22,17 @@
 	import { playerAlwaysLoopStore } from '#lib/store';
 	import { playbackRates } from '#lib/player/index';
 
-	let { player, playerElement }: { player: shaka.Player; playerElement: HTMLMediaElement } =
-		$props();
+	let {
+		player,
+		playerElement,
+		audioOnly,
+		onAudioOnlyChange
+	}: {
+		player: shaka.Player;
+		playerElement: HTMLMediaElement;
+		audioOnly: boolean;
+		onAudioOnlyChange: (value: boolean) => void;
+	} = $props();
 
 	let playerSettings: 'quality' | 'speed' | 'language' | 'root' = $state('root');
 	let playerLoop = $state($playerAlwaysLoopStore);
@@ -73,6 +82,19 @@
 			</li>
 		{/if}
 		{#if playerSettings === 'root'}
+			<li
+				role="presentation"
+				class:selected={audioOnly}
+				onclick={() => onAudioOnlyChange(!audioOnly)}
+			>
+				<nav class="no-wrap" style="width: 100%;">
+					<i>headphones</i>{$_('player.audioOnly')}
+					<div class="max"></div>
+					<span class="chip"
+						>{audioOnly ? $_('player.controls.on') : $_('player.controls.off')}</span
+					>
+				</nav>
+			</li>
 			<li role="presentation" onclick={() => (playerSettings = 'quality')}>
 				<nav class="no-wrap" style="width: 100%;">
 					<i>high_quality</i>

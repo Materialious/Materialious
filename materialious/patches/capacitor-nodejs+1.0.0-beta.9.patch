@@ -1,0 +1,13 @@
+diff --git a/node_modules/capacitor-nodejs/android/CMakeLists.txt b/node_modules/capacitor-nodejs/android/CMakeLists.txt
+--- a/node_modules/capacitor-nodejs/android/CMakeLists.txt
++++ b/node_modules/capacitor-nodejs/android/CMakeLists.txt
+@@ -15,4 +15,9 @@ add_library( native-lib
+              src/main/cpp/native-lib.cpp
+              src/main/cpp/bridge.cpp )
+ 
++# Keep checkout paths out of the native library and its build ID.
++target_compile_options( native-lib PRIVATE
++                        "-ffile-prefix-map=${CMAKE_SOURCE_DIR}=."
++                        "-ffile-prefix-map=${CMAKE_BINARY_DIR}=." )
++
+ include_directories(libnode/include/node/)

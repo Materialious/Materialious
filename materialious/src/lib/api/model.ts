@@ -167,7 +167,7 @@ export interface Comment {
 		creatorThumbnail: string;
 		creatorName: string;
 	};
-	replies: {
+	replies?: {
 		replyCount: number;
 		continuation: string;
 	};

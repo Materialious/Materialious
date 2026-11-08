@@ -47,6 +47,19 @@ function parseAudioQuality(
 	return `AUDIO_QUALITY_${normalized}` as AudioFormatPreferences['quality'];
 }
 
+function audioSelector(
+	selection: Pick<DownloadFormatSelection, 'itag' | 'language' | 'audioTrackId'>
+) {
+	if (!selection.itag && !selection.language && !selection.audioTrackId) return undefined;
+	return (formats: GoogleSabrFormat[]) =>
+		formats.find(
+			(format) =>
+				(!selection.itag || format.itag === selection.itag) &&
+				(!selection.language || format.language === selection.language) &&
+				(!selection.audioTrackId || format.audioTrackId === selection.audioTrackId)
+		);
+}
+
 export class SabrStream {
 	constructor(public readonly media: Mixins.MediaInfo) {}
 
@@ -222,7 +235,7 @@ export class SabrStream {
 						}
 					: {})
 			},
-			...(isAudio ? { audioFormat: selection.itag } : { videoFormat: selection.itag })
+			...(isAudio ? { audioFormat: audioSelector(selection) } : { videoFormat: selection.itag })
 		});
 
 		const format = isAudio ? selectedFormats.audioFormat : selectedFormats.videoFormat;
@@ -238,7 +251,10 @@ export class SabrStream {
 	}
 
 	async downloadBoth(
-		selection: Pick<DownloadFormatSelection, 'quality' | 'itag' | 'format' | 'codec' | 'language'>
+		selection: Pick<
+			DownloadFormatSelection,
+			'quality' | 'itag' | 'format' | 'codec' | 'language' | 'audioTrackId'
+		>
 	): Promise<SabrDownloadBothResult> {
 		const preferences = this.getPreferenceOptions(selection);
 		const stream = await this.createGoogleStream();
@@ -253,7 +269,7 @@ export class SabrStream {
 				...preferences.audioPreferences,
 				...(selection.language ? { language: selection.language } : {})
 			},
-			...(selection.itag ? { audioFormat: selection.itag } : {})
+			audioFormat: audioSelector(selection)
 		});
 
 		if (!selectedFormats.videoFormat) {

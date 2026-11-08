@@ -21,4 +21,10 @@ export const authTokenStore: Writable<string | undefined> = persist(
 	'materialiousAuthToken'
 );
 
+export const disableSettingsSyncStore: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'disableSettingsSync'
+);
+
 export const configBackendCache: Writable<IsOwnBackend | undefined> = writable();

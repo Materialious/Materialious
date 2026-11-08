@@ -29,6 +29,7 @@ async function main() {
 		console.log('Github contributors fetched and written to', path.join(outputDir, outputFile));
 	} catch (error) {
 		console.error('Error fetching data:', error);
+		process.exitCode = 1;
 	}
 }
 

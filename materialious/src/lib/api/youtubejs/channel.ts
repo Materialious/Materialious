@@ -186,6 +186,7 @@ export async function getChannelContentYTjs(
 
 	let innerResults: YT.Channel | YT.ChannelListContinuation;
 	if (options.type === 'videos') {
+		if (!channel.hasTabWithURL('videos')) return { videos: [] };
 		innerResults = await channel.getVideos();
 	} else if (options.type === 'playlists') {
 		innerResults = await channel.getPlaylists();
@@ -197,10 +198,7 @@ export async function getChannelContentYTjs(
 
 	if (options.sortBy && innerResults instanceof YT.Channel) {
 		const sortBy = options.sortBy;
-		const sortFilterLabels: Record<
-			NonNullable<ChannelOptions['sortBy']>,
-			[string, ...string[]]
-		> = {
+		const sortFilterLabels: Record<NonNullable<ChannelOptions['sortBy']>, [string, ...string[]]> = {
 			newest: ['Latest', 'Newest'],
 			oldest: ['Oldest'],
 			popular: ['Popular']

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { getComments } from '#lib/api/index';
+	import { invidiousInstanceStore } from '#lib/store';
 	import { type Comment, type Comments } from '#lib/api/model';
 	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
 	import { numberWithCommas } from '#lib/numbers';
@@ -21,7 +22,7 @@
 
 	let replies: Comments | undefined = $state(undefined);
 
-	const replyText: string = comment.replies?.replyCount > 1 ? $_('replies') : $_('reply');
+	const replyText = $derived((comment.replies?.replyCount ?? 0) > 1 ? $_('replies') : $_('reply'));
 
 	async function loadReplies(continuation: string) {
 		if (comment?.getReplies) {
@@ -68,6 +69,16 @@
 			}
 		});
 
+		// Invidious comment HTML can contain root-relative custom emoji URLs
+		// (for example /ggpht/...). Resolve them against Invidious, not the
+		// Materialious frontend's origin.
+		if ($invidiousInstanceStore) {
+			doc.querySelectorAll('img[src^="/"]').forEach((image) => {
+				const src = image.getAttribute('src');
+				if (src) image.setAttribute('src', new URL(src, `${$invidiousInstanceStore}/`).href);
+			});
+		}
+
 		return doc.documentElement.outerHTML;
 	}
 
@@ -99,7 +110,7 @@
 				<p class="no-margin no-padding"><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
 				{#if comment.replies && !replies}
 					<button
-						onclick={async () => loadReplies(comment.replies.continuation)}
+						onclick={async () => loadReplies(comment.replies?.continuation ?? '')}
 						class="transparent replies"
 					>
 						<i>expand_more</i>

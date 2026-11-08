@@ -7,6 +7,7 @@ export {
 export {
 	playerAutoPlayStore,
 	playerAlwaysLoopStore,
+	playerAudioOnlyByDefault,
 	playerProxyVideosStore,
 	playerSavePlaybackPositionStore,
 	playerTheatreModeByDefaultStore,
@@ -78,6 +79,7 @@ export {
 	rawMasterKeyStore,
 	materialiousBackendStore,
 	authTokenStore,
+	disableSettingsSyncStore,
 	configBackendCache
 } from './backend';
 export { watchHistoryEnabledStore, poTokenCacheStore } from './misc';

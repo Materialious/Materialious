@@ -347,6 +347,8 @@
 		pointer-events: none;
 		visibility: hidden;
 		opacity: 0;
+		/* D-pad only. Never capture the pointer: toggling pointer-events under a stationary
+		   TV WebView cursor fired mouseleave/enter on the player in a loop (flicker). */
 		transition:
 			opacity 0.2s,
 			visibility 0.2s;
@@ -355,7 +357,6 @@
 	.tv-controls.visible {
 		visibility: visible;
 		opacity: 1;
-		pointer-events: auto;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -476,7 +477,8 @@
 
 	.seek-preview {
 		position: absolute;
-		bottom: calc(240 * var(--u));
+		/* Above the title block so the preview never covers it. */
+		bottom: calc(340 * var(--u));
 		transform: translateX(-50%);
 		display: flex;
 		flex-direction: column;

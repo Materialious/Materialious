@@ -41,7 +41,10 @@
 	let infoPanel: HTMLElement | undefined = $state();
 	let infoScope: HTMLElement | undefined = $state();
 	let playerCurrentTime: number = $state(0);
+	// Single owner of "bar visible": syncControls() derives it from pinned / seeking /
+	// paused. Player's own mouse/auto-hide logic is disabled on TV.
 	let showControls = $state(false);
+	let paused = $state(false);
 	let currentTime = $state(0);
 	let userManualSeeking = $state(false);
 
@@ -51,6 +54,7 @@
 	let lastUpdate = 0;
 	let infoClosedByEnter = false;
 	let keydownHandledMovement = false;
+	let enterStartedOnControl = false;
 
 	const hasChapters = $derived(data.content.timestamps.length > 0);
 	const hasPlaylist = $derived(!!data.playlistId && data.playlistId in $playlistCacheStore);
@@ -77,22 +81,29 @@
 		return index === -1 ? undefined : `${index + 1} / ${playlistVideos.length}`;
 	});
 
+	function syncControls() {
+		showControls = controlsPinned || isSeeking || paused;
+	}
+
 	function startSeeking(direction: 'left' | 'right') {
-		if (!showInfo && !showTvSettings && isControlFocused()) {
-			// Focus sits on a bar button: ←/→ walk the button row instead of seeking.
-			const keyCode = keyCodeMap[direction === 'right' ? 'ArrowRight' : 'ArrowLeft'];
-			const next = getNextFocus(document.activeElement, keyCode, tvControlsRow);
-			if (next instanceof HTMLElement) focusControl(next);
+		if (!showInfo && !showTvSettings && (isControlFocused() || paused)) {
+			// Bar focused, or video paused (bar is up): ←/→ walk the button row, never seek.
+			if (isControlFocused()) {
+				const keyCode = keyCodeMap[direction === 'right' ? 'ArrowRight' : 'ArrowLeft'];
+				const next = getNextFocus(document.activeElement, keyCode, tvControlsRow);
+				if (next instanceof HTMLElement) focusControl(next);
+			} else {
+				focusControl(rowButtons()[0]);
+			}
 			pinControls();
 			return false;
 		}
-
-		showControls = true;
 
 		if (!playerElement || showInfo || showTvSettings || isSeeking) return true;
 
 		userManualSeeking = true;
 		isSeeking = true;
+		syncControls();
 		lastUpdate = performance.now();
 
 		const duration = data.video.lengthSeconds;
@@ -130,7 +141,7 @@
 	function stopSeeking() {
 		const wasSeeking = isSeeking;
 		isSeeking = false;
-		showControls = controlsPinned || !!playerElement?.paused;
+		syncControls();
 		userManualSeeking = false;
 
 		if (seekRaf !== null) {
@@ -153,7 +164,15 @@
 
 	// preventScroll: focusing inside the clipped player container must not shift the video.
 	function focusControl(element: HTMLElement | undefined) {
-		tick().then(() => element?.focus({ preventScroll: true }));
+		// The bar toggles `visibility` and a hidden element can't take focus, so retry for a
+		// few frames until the visible state has reached the DOM.
+		let attempts = 0;
+		const tryFocus = () => {
+			element?.focus({ preventScroll: true });
+			if (element && document.activeElement !== element && attempts++ < 10)
+				requestAnimationFrame(tryFocus);
+		};
+		tick().then(tryFocus);
 	}
 
 	// The button row lives in TvControls; buttons carry data-tv-button and render
@@ -169,7 +188,7 @@
 
 	function pinControls() {
 		controlsPinned = true;
-		showControls = true;
+		syncControls();
 
 		clearTimeout(controlsPinTimeout);
 		controlsPinTimeout = setTimeout(unpinControls, 6000);
@@ -180,10 +199,10 @@
 
 		clearTimeout(controlsPinTimeout);
 		controlsPinned = false;
-		// A paused video keeps its control bar (and the settings button) on screen.
-		showControls = !!playerElement?.paused;
+		syncControls();
 
-		if (isControlFocused()) (document.activeElement as HTMLElement).blur();
+		// A paused video keeps the bar (and its focus) on screen.
+		if (!paused && isControlFocused()) (document.activeElement as HTMLElement).blur();
 	}
 
 	function openInfo() {
@@ -280,7 +299,7 @@
 		}
 
 		if (!showInfo) {
-			if (controlsPinned) {
+			if (controlsPinned && !paused) {
 				event.preventDefault();
 				unpinControls();
 			}
@@ -289,6 +308,33 @@
 		event.preventDefault();
 		closeInfo();
 	}
+
+	// Pause shows the bar with focus on Play; play hides it again (Enter on Play resumes).
+	function onVideoPause() {
+		if (playerElement?.ended) return;
+		paused = true;
+		syncControls();
+		if (!showInfo && !showTvSettings) focusControl(rowButtons()[0]);
+	}
+
+	function onVideoPlay() {
+		paused = false;
+		unpinControls();
+	}
+
+	$effect(() => {
+		const element = playerElement;
+		if (!element) return;
+
+		paused = element.paused;
+		syncControls();
+		element.addEventListener('pause', onVideoPause);
+		element.addEventListener('play', onVideoPlay);
+		return () => {
+			element.removeEventListener('pause', onVideoPause);
+			element.removeEventListener('play', onVideoPlay);
+		};
+	});
 
 	onMount(() => {
 		window.addEventListener('materialious:back', handleBack);
@@ -369,7 +415,7 @@
 					return false;
 				}
 
-				if (controlsPinned) {
+				if (controlsPinned && !paused) {
 					unpinControls();
 					return false;
 				}
@@ -382,10 +428,24 @@
 		Mousetrap.bind(
 			'enter',
 			() => {
+				enterStartedOnControl = isControlFocused();
+				return true;
+			},
+			'keydown'
+		);
+
+		Mousetrap.bind(
+			'enter',
+			() => {
 				if (showTvSettings) return true;
 
 				// Enter on a focused control is a native click, handled by the button itself.
-				if (isControlFocused()) return true;
+				// The press may have moved focus away (Play hides the bar), so use the
+				// state captured on key-down or it would toggle playback a second time.
+				if (enterStartedOnControl || isControlFocused()) {
+					enterStartedOnControl = false;
+					return true;
+				}
 
 				if (infoClosedByEnter) {
 					infoClosedByEnter = false;
@@ -393,14 +453,7 @@
 				}
 
 				if (!showInfo) {
-					if (playerElement?.paused) {
-						showControls = false;
-						playerElement?.play();
-					} else {
-						showControls = true;
-
-						playerElement?.pause();
-					}
+					togglePlayback();
 					return false;
 				}
 

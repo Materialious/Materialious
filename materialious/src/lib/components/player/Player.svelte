@@ -762,6 +762,11 @@
 
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
 	function showPlayerUI() {
+		// TV: the watch page owns control visibility (D-pad pin/pause/seek state). A
+		// second owner here, plus mouse enter/leave from a stationary pointer, made the
+		// bar flicker.
+		if (isAndroidTv()) return;
+
 		showControls = true;
 
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
@@ -1275,6 +1280,7 @@
 	onmousemove={showPlayerUI}
 	onscroll={showPlayerUI}
 	onmouseleave={() => {
+		if (isAndroidTv()) return;
 		showControls = false;
 		playerInitalInteract = true;
 	}}

@@ -6,6 +6,7 @@
 	import {
 		backendInUseStore,
 		playerAlwaysLoopStore,
+		playerAudioOnlyByDefault,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
 		playerAndroidAutoPip,
@@ -130,10 +131,24 @@
 
 <div class="field no-margin">
 	<nav class="no-padding">
+		<div class="max"><div>{$_('player.audioOnly')}</div></div>
+		<label class="switch" tabindex="0"
+			><input
+				type="checkbox"
+				bind:checked={$playerAudioOnlyByDefault}
+				role="switch"
+				aria-label={$_('player.audioOnly')}
+			/><span></span></label
+		>
+	</nav>
+</div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
 		<div class="max">
 			<div>{$_('layout.player.ccByDefault')}</div>
 		</div>
-		<label class="switch" tabindex="0">
+		<label class="switch">
 			<input
 				type="checkbox"
 				bind:checked={$playerCCByDefault}

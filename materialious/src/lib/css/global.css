@@ -189,6 +189,20 @@ menu.player-settings li.selected i {
 	width: 100%;
 }
 
+.volume-control {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--border-radius);
+	background: var(--surface-container-highest);
+}
+
+.volume-control > i {
+	color: white;
+	font-size: 1.5rem;
+}
+
 .player-slider.volume {
 	width: 200px;
 }

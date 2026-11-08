@@ -70,6 +70,8 @@ export class ElectronCapacitorApp {
   private mainWindowState: windowStateKeeper.State | undefined = undefined;
 	private loadWebApp;
 	private customScheme: string;
+	private pendingDeepLinks: string[] = [];
+	private deepLinkProtocol = 'materialious';
 
 	constructor(
 		capacitorFileConfig: CapacitorElectronConfig,
@@ -78,6 +80,7 @@ export class ElectronCapacitorApp {
 		this.CapacitorFileConfig = capacitorFileConfig;
 
 		this.customScheme = this.CapacitorFileConfig.electron?.customUrlScheme ?? 'capacitor-electron';
+		this.registerDeepLinking();
 
 		if (trayMenuTemplate) {
 			this.TrayMenuTemplate = trayMenuTemplate;
@@ -88,6 +91,52 @@ export class ElectronCapacitorApp {
 			directory: join(app.getAppPath(), 'app'),
 			scheme: this.customScheme
 		});
+	}
+
+	private registerDeepLinking(): void {
+		if (!app.requestSingleInstanceLock()) {
+			app.quit();
+			return;
+		}
+
+		if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
+			app.setAsDefaultProtocolClient(this.deepLinkProtocol, process.execPath, [
+				path.resolve(process.argv[1])
+			]);
+		} else {
+			app.setAsDefaultProtocolClient(this.deepLinkProtocol);
+		}
+
+		this.queueDeepLink(process.argv.find((arg) => arg.startsWith(`${this.deepLinkProtocol}://`)));
+		app.on('second-instance', (_event, commandLine) => {
+			this.queueDeepLink(commandLine.find((arg) => arg.startsWith(`${this.deepLinkProtocol}://`)));
+			this.focusMainWindow();
+		});
+		app.on('open-url', (event, url) => {
+			event.preventDefault();
+			this.queueDeepLink(url);
+			this.focusMainWindow();
+		});
+	}
+
+	private focusMainWindow(): void {
+		const window = this.MainWindow;
+		if (!window || window.isDestroyed()) return;
+		if (window.isMinimized()) window.restore();
+		window.show();
+		window.focus();
+	}
+
+	private queueDeepLink(url?: string): void {
+		if (!url || !url.startsWith(`${this.deepLinkProtocol}://`)) return;
+		this.pendingDeepLinks.push(url);
+		this.flushDeepLinks();
+	}
+
+	private flushDeepLinks(): void {
+		const window = this.MainWindow;
+		if (!window || window.isDestroyed() || window.webContents.isLoading()) return;
+		for (const url of this.pendingDeepLinks.splice(0)) window.webContents.send('appUrlOpen', url);
 	}
 
 	// Helper function to load in the app.
@@ -243,36 +292,11 @@ export class ElectronCapacitorApp {
 					this.MainWindow?.webContents?.openDevTools();
 				}
 				CapElectronEventEmitter.emit('CAPELECTRON_DeeplinkListenerInitialized', '');
+				this.flushDeepLinks();
 			}, 400);
 		});
+		this.MainWindow.webContents.on('did-finish-load', () => this.flushDeepLinks());
 
-		// remove so we can register each time as we run the app.
-		app.removeAsDefaultProtocolClient('materialious');
-
-		// If we are running a non-packaged version of the app && on windows
-		if (process.env.NODE_ENV === 'development' && process.platform === 'win32') {
-			// Set the path of electron.exe and your app.
-			// These two additional parameters are only available on windows.
-			app.setAsDefaultProtocolClient('materialious', process.execPath, [
-				path.resolve(process.argv[1])
-			]);
-		} else {
-			app.setAsDefaultProtocolClient('materialious');
-		}
-
-		const gotTheLock = app.requestSingleInstanceLock();
-
-		if (!gotTheLock) {
-			app.quit();
-		} else {
-			app.on('second-instance', (event, commandLine, workingDirectory) => {
-				// Someone tried to run a second instance, we should focus our window.
-				if (this.MainWindow) {
-					if (this.MainWindow.isMinimized()) this.MainWindow.restore();
-					this.MainWindow.focus();
-				}
-			});
-		}
 	}
 }
 

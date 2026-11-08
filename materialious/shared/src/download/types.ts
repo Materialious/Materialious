@@ -19,6 +19,8 @@ export type SabrFormat = {
 	approxDurationMs?: number;
 	projectionType?: string;
 	language?: string | null;
+	audioTrackId?: string;
+	audioTrackName?: string;
 };
 
 export type DownloadType = 'video' | 'audio' | 'video+audio' | 'merged';
@@ -30,6 +32,7 @@ export type DownloadFormatSelection = {
 	format?: string;
 	codec?: string;
 	language?: string;
+	audioTrackId?: string;
 };
 
 export type MergeContainer = 'mp4' | 'webm' | 'mkv';

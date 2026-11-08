@@ -49,7 +49,11 @@ export default defineConfig({
 				short_name: 'Materialious'
 			}
 		}),
-		sveltekit({ preprocess: vitePreprocess(), adapter })
+		sveltekit({
+			preprocess: vitePreprocess(),
+			adapter,
+			version: { name: pkg.version }
+		})
 	],
 	ssr: {
 		noExternal: ['beercss']

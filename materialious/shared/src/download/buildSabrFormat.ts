@@ -32,6 +32,8 @@ export function buildSabrFormat(format: Misc.Format): SabrFormat {
 		audioSampleRate: format.audio_sample_rate,
 		approxDurationMs: format.approx_duration_ms,
 		projectionType: format.projection_type,
-		language: format.language
+		language: format.language,
+		audioTrackId: format.audio_track?.id,
+		audioTrackName: format.audio_track?.display_name
 	};
 }

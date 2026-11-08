@@ -81,9 +81,10 @@ Built by [prod-android.yml](../.github/workflows/prod-android.yml), triggered on
 
 1. `npm ci` — install dependencies.
 2. `npm ci` in `materialious/static/nodejsAndroid/` — install Node.js runtime modules used by [Capacitor-NodeJS](https://github.com/hampoelz/Capacitor-NodeJS) on Android.
-3. `npm run build && npm prune --omit=dev` — build the web app.
+3. `npm run build` — build the web app.
 4. `npx cap sync` — synchronize Capacitor with the Android platform.
-5. `setup-java@v3` — configure JDK 21 (Zulu) with Gradle caching.
-6. `bash gradlew assembleRelease` and `bash gradlew bundleRelease` — produce the APK and AAB.
-7. [sign-android-release@v2](https://github.com/ilharp/sign-android-release/tree/v2) — sign both artifacts using the configured keystore.
-8. [upload-release-action@v2](https://github.com/svenstaro/upload-release-action) — upload the signed APK and AAB to the GitHub release matching the version from `package.json`.
+5. `npm prune --omit=dev` — remove development modules after Capacitor sync.
+6. `setup-java@v3` — configure JDK 21 (Zulu) with Gradle caching.
+7. `bash gradlew assembleRelease` and `bash gradlew bundleRelease` — produce the APK and AAB.
+8. [sign-android-release@v2](https://github.com/ilharp/sign-android-release/tree/v2) — sign both artifacts using the configured keystore.
+9. [upload-release-action@v2](https://github.com/svenstaro/upload-release-action) — upload the signed APK and AAB to the GitHub release matching the version from `package.json`.

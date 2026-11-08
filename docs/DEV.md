@@ -152,6 +152,12 @@ npm run eslint      # Linting
 npm run build       # Production build
 ```
 
+The contributor list is a committed snapshot. To update it before tagging a
+release, run `npm run patch:github` in `materialious/`, review the change to
+`static/localApi/ghContributors.json`, and commit it. Normal builds use that
+snapshot so rebuilding a release does not depend on GitHub's live contributor
+count.
+
 ### App Type Overview
 
 Materialious can be built and run in four different configurations, each serving a different platform:
@@ -163,7 +169,7 @@ Materialious can be built and run in four different configurations, each serving
 | **Desktop** | `@sveltejs/adapter-static` + Capacitor Electron | Electron | Linux, macOS, Windows |
 | **Android** | `@sveltejs/adapter-static` + Capacitor Android | Android WebView | Android |
 
-The adapter is selected at build time via the `PUBLIC_BUILD_WITH_BACKEND` environment variable in [`svelte.config.js`](../materialious/svelte.config.js):
+The adapter is selected at build time via the `PUBLIC_BUILD_WITH_BACKEND` environment variable in [`vite.config.ts`](../materialious/vite.config.ts):
 
 ```js
 const useSsr = process.env.PUBLIC_BUILD_WITH_BACKEND === 'true';

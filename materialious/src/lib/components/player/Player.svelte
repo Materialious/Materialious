@@ -79,11 +79,9 @@
 		playerIsPip?: boolean;
 		// Lets the TV page reach the Shaka instance for its settings panel.
 		onShakaPlayer?: (player: shaka.Player | undefined) => void;
-		// Android TV only: shows a settings button next to the timeline, since the regular
-		// settings menu isn't reachable with a D-pad.
-		onTvSettings?: () => void;
-		tvPlayButton?: HTMLButtonElement | undefined;
-		tvSettingsButton?: HTMLButtonElement | undefined;
+		// Android TV: SponsorBlock segments, shared with the TV controls overlay.
+		segments?: Segment[];
+		// TV gets its own control overlay (TvControls) instead of the inline bar.
 	}
 
 	let {
@@ -96,9 +94,7 @@
 		showControls = $bindable(false),
 		holdControls = false,
 		onShakaPlayer = undefined,
-		onTvSettings = undefined,
-		tvPlayButton = $bindable(undefined),
-		tvSettingsButton = $bindable(undefined)
+		segments = $bindable([])
 	}: Props = $props();
 
 	let audioOnlyOverride = $state<{ videoId: string; value: boolean } | null>(null);
@@ -118,7 +114,6 @@
 		}
 	});
 
-	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let keepAwakeSupported = $state(false);
@@ -802,12 +797,18 @@
 
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
 	function showPlayerUI() {
+		// TV: the watch page owns control visibility (D-pad pin/pause/seek state). A
+		// second owner here, plus mouse enter/leave from a stationary pointer, made the
+		// bar flicker.
+		if (isAndroidTv()) return;
+
 		showControls = true;
 
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		showPlayerUiTimeout = setTimeout(() => {
-			if (holdControls) return;
+			// A paused video keeps its control bar on screen.
+			if (holdControls || playerElement?.paused) return;
 
 			showControls = false;
 			playerInitalInteract = true;
@@ -1304,6 +1305,7 @@
 	onmousemove={showPlayerUI}
 	onscroll={showPlayerUI}
 	onmouseleave={() => {
+		if (isAndroidTv()) return;
 		showControls = false;
 		playerInitalInteract = true;
 	}}
@@ -1326,7 +1328,7 @@
 		</div>
 	{/if}
 
-	{#if showControls && !audioOnly && !isAndroidPictureInPicture}
+	{#if showControls && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1353,7 +1355,7 @@
 			bind:playerIsBuffering
 		/>
 	{/if}
-	{#if !isAndroidPictureInPicture}
+	{#if !isAndroidPictureInPicture && !isAndroidTv()}
 		<svelte:element
 			this={audioOnly ? 'article' : 'div'}
 			id="player-controls"
@@ -1415,26 +1417,6 @@
 				<div class="max"></div>
 
 				<nav class="no-wrap">
-					{#if isAndroidTv() && onTvSettings}
-						<button
-							bind:this={tvPlayButton}
-							class="circle transparent tv-control-button"
-							aria-label={playerCurrentPlaybackState
-								? $_('player.controls.pause')
-								: $_('player.controls.play')}
-							onclick={toggleVideoPlaybackStatus}
-						>
-							<i>{playerCurrentPlaybackState ? 'pause' : 'play_arrow'}</i>
-						</button>
-						<button
-							bind:this={tvSettingsButton}
-							class="circle transparent tv-control-button"
-							aria-label={$_('layout.settings')}
-							onclick={onTvSettings}
-						>
-							<i>settings</i>
-						</button>
-					{/if}
 					{#if data.video.liveNow}
 						<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
 							{$_('thumbnail.live')}
@@ -1645,19 +1627,6 @@
 		background-color: var(--surface-container-highest);
 		color: var(--on-surface);
 		border: none;
-	}
-
-	.tv-control-button {
-		color: white;
-	}
-
-	.tv-control-button i {
-		filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
-	}
-
-	.tv-control-button:focus {
-		outline: 3px solid var(--primary);
-		outline-offset: 2px;
 	}
 
 	.hide-cursor {

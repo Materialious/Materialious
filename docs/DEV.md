@@ -152,11 +152,12 @@ npm run eslint      # Linting
 npm run build       # Production build
 ```
 
-The contributor list is a committed snapshot. To update it before tagging a
-release, run `npm run patch:github` in `materialious/`, review the change to
-`static/localApi/ghContributors.json`, and commit it. Normal builds use that
-snapshot so rebuilding a release does not depend on GitHub's live contributor
-count.
+The contributor list is a committed snapshot. When preparing a release, set
+`LATEST_VERSION` in `update_versions.py` and run the script from the repository
+root. A version change refreshes `materialious/static/localApi/ghContributors.json`
+once; review and commit that snapshot with the version changes before tagging.
+The script needs Python 3 and access to the GitHub API. Normal builds use the
+committed snapshot so they do not depend on GitHub's live contributor count.
 
 ### App Type Overview
 

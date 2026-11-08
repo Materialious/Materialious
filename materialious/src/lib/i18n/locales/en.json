@@ -207,6 +207,10 @@
 		"retry": "Retry",
 		"retrying": "Retrying…",
 		"controls": {
+			"playbackControls": "Playback controls",
+			"endsAt": "Ends at {{time}}",
+			"videoInfo": "Video information",
+			"positionOf": "{{elapsed}} of {{total}}",
 			"back": "Back",
 			"quality": "Quality",
 			"auto": "Auto",

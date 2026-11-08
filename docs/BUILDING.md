@@ -49,7 +49,7 @@ Built by [prod-desktop.yml](../.github/workflows/prod-desktop.yml), triggered on
 1. `npm ci` — install dependencies.
 2. `npm run build && npm prune --omit=dev` — build the web app.
 3. `npx cap sync @capacitor-community/electron` — synchronize Capacitor with the Electron platform.
-4. [patch_capacitor_plugin.py](../materialious/electron/patch_capacitor_plugin.py) — removes the `capacitor-nodejs` plugin from the Electron build (not needed on desktop).
+4. [patch_capacitor_plugin.py](../materialious/electron/patch_capacitor_plugin.py) — removes the `@capawesome/capacitor-nodejs` plugin from the Electron build (not needed on desktop).
 5. `npm ci` in `materialious/electron/` — install Electron-specific dependencies.
 6. For Linux: `snap install snapcraft --classic` and `SNAPCRAFT_STORE_CREDENTIALS` are configured for Snap Store publishing.
 7. `npm run electron:make` — builds and publishes via [electron-builder](https://www.electron.build/) using [electron-builder.config.json](../materialious/electron/electron-builder.config.json).
@@ -80,7 +80,7 @@ Built by [prod-android.yml](../.github/workflows/prod-android.yml), triggered on
 **Build process:**
 
 1. `npm ci` — install dependencies.
-2. `npm ci` in `materialious/static/nodejsAndroid/` — install Node.js runtime modules used by [Capacitor-NodeJS](https://github.com/hampoelz/Capacitor-NodeJS) on Android.
+2. `npm ci` in `materialious/static/nodejsAndroid/` — install Node.js runtime modules used by [Capawesome Capacitor Node.js](https://github.com/capawesome-team/capacitor-plugins/tree/main/packages/nodejs) on Android.
 3. `npm run build` — build the web app.
 4. `npx cap sync` — synchronize Capacitor with the Android platform.
 5. `npm prune --omit=dev` — remove development modules after Capacitor sync.

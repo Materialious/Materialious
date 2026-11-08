@@ -8,6 +8,8 @@
 	import { isOwnBackend } from '#lib/shared/index';
 	import { onMount } from 'svelte';
 	import * as comlink from 'comlink';
+	import { disableSettingsSyncStore } from '#lib/store';
+	import { exportSettingsToAccount, importSettingsFromAccount } from '#lib/externalSettings/index';
 
 	let clickCount = $state(0);
 	const clicksToDelte = 3;
@@ -45,6 +47,23 @@
 	let isResetting = $state(false);
 	let statusMessage = $state('');
 	let statusType = $state<'success' | 'error' | ''>('');
+	let settingsTransferMessage = $state('');
+	let settingsTransferError = $state(false);
+
+	async function transferSettings(action: 'import' | 'export') {
+		settingsTransferMessage = '';
+		settingsTransferError = false;
+		try {
+			if (action === 'import') await importSettingsFromAccount();
+			else await exportSettingsToAccount();
+			settingsTransferMessage = $_(
+				action === 'import' ? 'layout.settingsImportedFromAccount' : 'layout.settingsExportedToAccount'
+			);
+		} catch (error) {
+			settingsTransferError = true;
+			settingsTransferMessage = error instanceof Error ? error.message : String(error);
+		}
+	}
 
 	async function onResetPassword(event: Event) {
 		event.preventDefault();
@@ -115,6 +134,38 @@
 		<span>{$_('layout.changePassword')}</span>
 	</button>
 </form>
+
+<div class="space"></div>
+<div class="divider"></div>
+<div class="space"></div>
+
+<div class="field no-margin">
+	<nav class="no-padding">
+		<div class="max">
+			<h6>{$_('layout.disableSettingsSync')}</h6>
+			<div class="small-text">{$_('layout.disableSettingsSyncDescription')}</div>
+		</div>
+		<label class="switch">
+			<input type="checkbox" role="switch" bind:checked={$disableSettingsSyncStore} />
+			<span></span>
+		</label>
+	</nav>
+</div>
+
+<div class="space"></div>
+<button class="surface-container-highest" onclick={() => transferSettings('export')}>
+	<i>file_export</i>
+	<span>{$_('layout.exportSettingsToAccount')}</span>
+</button>
+
+<div class="space"></div>
+<button class="surface-container-highest" onclick={() => transferSettings('import')}>
+	<i>file_download</i>
+	<span>{$_('layout.importSettingsFromAccount')}</span>
+</button>
+{#if settingsTransferMessage}
+	<p class:error-text={settingsTransferError} role="status">{settingsTransferMessage}</p>
+{/if}
 
 <div class="space"></div>
 <div class="divider"></div>

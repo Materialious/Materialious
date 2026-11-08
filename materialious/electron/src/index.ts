@@ -1,8 +1,5 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
-import {
-	getCapacitorElectronConfig,
-	setupElectronDeepLinking
-} from '@capacitor-community/electron';
+import { getCapacitorElectronConfig } from '@capacitor-community/electron';
 import { mintPoTokenInJSDOM } from '@materialious/shared/jsdom';
 import {
 	createDownload,
@@ -30,13 +27,6 @@ const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig(
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
 const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
-
-// If deeplinking is enabled then we will set it up here.
-if (capacitorFileConfig.electron?.deepLinkingEnabled) {
-	setupElectronDeepLinking(myCapacitorApp, {
-		customProtocol: capacitorFileConfig.electron.deepLinkingCustomProtocol ?? 'mycapacitorapp'
-	});
-}
 
 // If we are in Dev mode, use the file watcher components.
 if (electronIsDev) {

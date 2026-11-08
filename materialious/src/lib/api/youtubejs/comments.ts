@@ -3,7 +3,10 @@ import { YT, YTNodes } from 'youtubei.js';
 import { getInnertube } from '.';
 import type { Comment, Comments, CommentsOptions, Thumbnail } from '../model';
 
-function invidiousCommentContentSchema(result: YTNodes.CommentView): Comment | undefined {
+function invidiousCommentContentSchema(
+	result: YTNodes.CommentView,
+	hasReplies = false
+): Comment | undefined {
 	if (!result.author) return;
 
 	return {
@@ -17,35 +20,40 @@ function invidiousCommentContentSchema(result: YTNodes.CommentView): Comment | u
 		contentHtml: result.content?.toHTML() ?? '',
 		published: 0,
 		publishedText: result.published_time ?? '',
-		likeCount: extractNumber(result.like_count ?? '0'),
+		likeCount: extractNumber(result.like_count ?? '0') || 0,
 		authorIsChannelOwner: result.author_is_channel_owner === true,
 		creatorHeart: {
 			creatorName: result.heart_active_tooltip?.split('@')[1] ?? '',
 			creatorThumbnail: result.creator_thumbnail_url ?? ''
 		},
-		replies: {
-			replyCount: extractNumber(result.reply_count ?? '0'),
-			continuation: ''
-		}
+		replies:
+			hasReplies && extractNumber(result.reply_count ?? '0') > 0
+				? { replyCount: extractNumber(result.reply_count ?? '0'), continuation: '' }
+				: undefined
 	};
 }
 
 function invidiousCommentSchema(innerResults: YT.Comments, videoId: string) {
 	const comment: Comment[] = [];
 
-	innerResults.contents.forEach(async (result) => {
+	innerResults.contents.forEach((result) => {
 		if (result.comment) {
-			const invidiousResult = invidiousCommentContentSchema(result.comment);
+			const replyData = result.comment_replies_data;
+			const hasReplyContinuation =
+				replyData?.sub_threads.some((item) => item.is(YTNodes.ContinuationItem)) ?? false;
+			const preloadedReplies =
+				replyData?.contents.filter((item) => item.is(YTNodes.CommentView)) ?? [];
+			const useThreadReplies = result.is_prepopulated || hasReplyContinuation;
+			const canLoadReplies = useThreadReplies || preloadedReplies.length > 0;
+			const invidiousResult = invidiousCommentContentSchema(result.comment, canLoadReplies);
 			if (invidiousResult) {
-				if (result.has_replies)
+				if (canLoadReplies)
 					invidiousResult.getReplies = async (): Promise<Comments> => {
-						const replies = await result.getReplies();
-						if (!replies.replies) return { videoId: '', comments: [], commentCount: 0 };
-
-						const comments: Comment[] = replies.replies
-							.map((replyThread) =>
-								replyThread.comment ? invidiousCommentContentSchema(replyThread.comment) : undefined
-							)
+						const replyViews = useThreadReplies
+							? ((await result.getReplies()).replies?.map((thread) => thread.comment) ?? [])
+							: preloadedReplies;
+						const comments: Comment[] = replyViews
+							.map((reply) => (reply ? invidiousCommentContentSchema(reply) : undefined))
 							.filter((comment): comment is Comment => !!comment);
 
 						return {
@@ -76,9 +84,10 @@ async function fetchCommentsWithContinuation(
 	};
 
 	if (comments.continuation) {
+		let currentResults = innerResults;
 		comments.getContinuation = async () => {
-			const continuation = await innerResults.getContinuation();
-			return fetchCommentsWithContinuation(videoId, continuation, options);
+			currentResults = await currentResults.getContinuation();
+			return fetchCommentsWithContinuation(videoId, currentResults, options);
 		};
 	}
 

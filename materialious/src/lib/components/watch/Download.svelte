@@ -101,7 +101,7 @@
 
 		return (compatible.length > 0 ? compatible : candidates)
 			.filter((format) => {
-				const key = `${format.language ?? 'x'}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
+				const key = `${format.audioTrackId ?? format.language ?? 'x'}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
 				if (seen.has(key)) return false;
 				seen.add(key);
 				return true;
@@ -131,13 +131,15 @@
 	});
 
 	function audioFormatKey(format: AvailableFormats['formats'][number]): string {
-		return `${format.itag}-${format.language ?? ''}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
+		return `${format.itag}-${format.audioTrackId ?? ''}-${format.language ?? ''}-${format.container}-${Math.round((format.bitrate ?? 0) / 1000)}`;
 	}
 
 	function audioLabel(format: AvailableFormats['formats'][number]): string {
 		const parts: string[] = [];
 
-		if (format.language) {
+		if (format.audioTrackName) {
+			parts.push(format.audioTrackName);
+		} else if (format.language) {
 			parts.push(ISO6391.getName(format.language) || format.language);
 		}
 		if (format.bitrate) parts.push(`${Math.round(format.bitrate / 1000)} kbps`);
@@ -173,6 +175,7 @@
 				type: 'audio',
 				itag: audioFormat?.itag,
 				language: audioFormat?.language ?? undefined,
+				audioTrackId: audioFormat?.audioTrackId,
 				format: selectedContainer
 			};
 		}
@@ -182,6 +185,7 @@
 			quality: selectedQuality,
 			itag: audioFormat?.itag,
 			language: audioFormat?.language ?? undefined,
+			audioTrackId: audioFormat?.audioTrackId,
 			format: selectedContainer,
 			codec: selectedContainer === 'webm' ? 'vp9' : 'avc1'
 		};

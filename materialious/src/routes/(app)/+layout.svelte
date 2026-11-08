@@ -431,7 +431,7 @@
 			{#if mobileSearchShow}
 				<div class="mobile-search-container">
 					<div style="width: 100%;">
-						<Search on:searchCancelled={() => (mobileSearchShow = false)} />
+						<Search autoFocus on:searchCancelled={() => (mobileSearchShow = false)} />
 					</div>
 				</div>
 			{:else}

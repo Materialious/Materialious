@@ -32,6 +32,7 @@ export function buildDownloadURL(videoId: string, selection: DownloadSelection):
 	if (selection.format) params.set('format', selection.format);
 	if (selection.codec) params.set('codec', selection.codec);
 	if (selection.language) params.set('language', selection.language);
+	if (selection.audioTrackId) params.set('audioTrackId', selection.audioTrackId);
 
 	return `/api/download?${params.toString()}`;
 }

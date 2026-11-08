@@ -94,7 +94,8 @@
 			"expiredBody": "Este pedido de login expirou. Inicie de novo na TV.",
 			"invalidTitle": "Falha no login",
 			"invalidBody": "Este link de login não é mais válido. Inicie de novo na TV."
-		}
+		},
+		"passwordError": "Usuário ou senha incorretos."
 	},
 	"player": {
 		"audioOnly": "Somente áudio",

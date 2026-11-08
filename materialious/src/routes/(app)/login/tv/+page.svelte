@@ -216,7 +216,11 @@
 
 <section class="tv-login" class:with-qr={showQr} aria-labelledby="tv-login-title">
 	{#if showQr}
-		<div class="qr-tile" role="img" aria-label={$_('loginQr.qrAriaLabel', { url: qrCodeUrl })}>
+		<div
+			class="qr-tile"
+			role={qrCodeUrl ? 'img' : undefined}
+			aria-label={qrCodeUrl ? $_('loginQr.qrAriaLabel', { url: qrCodeUrl }) : undefined}
+		>
 			{#if qrCodeUrl}
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 				{@html renderSVG(qrCodeUrl, { border: 0 })}
@@ -241,7 +245,9 @@
 
 			<div class="code-block">
 				<span class="code-label">{$_('loginQr.codeLabel')}</span>
-				<code class="code">{code}</code>
+				<!-- Screen readers get the code letter by letter instead of as one made-up word. -->
+				<code class="code" aria-hidden="true">{code}</code>
+				<span class="visually-hidden">{code.split('').join(' ')}</span>
 				<span class="countdown">{$_('loginQr.expiresIn', { time: countdownText })}</span>
 			</div>
 
@@ -254,7 +260,7 @@
 					onclick={() => toggleQr(false)}
 					bind:this={qrActionButton}
 				>
-					<i>password</i>
+					<i aria-hidden="true">password</i>
 					<span>{$_('loginQr.usePassword')}</span>
 				</button>
 			</nav>
@@ -266,13 +272,32 @@
 
 			<form onsubmit={usernamePasswordLogin}>
 				<div class="field label border" class:invalid={loginError}>
-					<input id="username" bind:value={rawUsername} name="username" type="text" />
+					<input
+						id="username"
+						bind:value={rawUsername}
+						name="username"
+						type="text"
+						autocomplete="username"
+						aria-invalid={loginError}
+						aria-describedby={loginError ? 'login-error' : undefined}
+					/>
 					<label for="username">{$_('username')}</label>
 				</div>
 				<div class="field label border" class:invalid={loginError}>
-					<input id="password" bind:value={rawPassword} name="password" type="password" />
+					<input
+						id="password"
+						bind:value={rawPassword}
+						name="password"
+						type="password"
+						autocomplete="current-password"
+						aria-invalid={loginError}
+						aria-describedby={loginError ? 'login-error' : undefined}
+					/>
 					<label for="password">{$_('password')}</label>
 				</div>
+				{#if loginError}
+					<p id="login-error" class="error-text" role="alert">{$_('loginQr.passwordError')}</p>
+				{/if}
 
 				<nav class="actions">
 					<button type="submit">{$_('login')}</button>
@@ -281,7 +306,7 @@
 					</button>
 					{#if qrEnabled && loginStatus !== 'error'}
 						<button class="surface-container-highest" type="button" onclick={() => toggleQr(true)}>
-							<i>qr_code_2</i>
+							<i aria-hidden="true">qr_code_2</i>
 							<span>{$_('loginQr.useQr')}</span>
 						</button>
 					{/if}
@@ -431,6 +456,15 @@
 
 	.error-text {
 		color: var(--error);
+	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
 	}
 
 	.actions {

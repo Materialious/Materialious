@@ -40,7 +40,8 @@
 			"expiredBody": "This login request expired. Start it again on your TV.",
 			"invalidTitle": "Login failed",
 			"invalidBody": "This login link is no longer valid. Start it again on your TV."
-		}
+		},
+		"passwordError": "Wrong username or password."
 	},
 	"username": "Username",
 	"password": "Password",

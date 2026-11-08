@@ -70,44 +70,70 @@ jobs:
           bash gradlew assembleRelease
           bash gradlew bundleRelease
 
-      - name: Move files
-        run: |
-          mv app/build/outputs/apk/release/*.apk app/build/outputs/
-          mv app/build/outputs/bundle/release/*.aab app/build/outputs/
-
       - name: Sign App
-        id: sign_app
-        uses: ilharp/sign-android-release@v2
-        with:
-          releaseDir: ./materialious/android/app/build/outputs/
-          signingKey: ${{ secrets.ANDROID_SIGNING_KEY }}
-          keyAlias: ${{ secrets.ANDROID_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          buildToolsVersion: 36.0.0
-
-      - name: Make release dir
-        run: mkdir app/release
-
-      - name: Delete temp apks
-        run: rm app/build/outputs/*temp*
-        continue-on-error: true
-
-      - name: Move files to release
+        env:
+          ANDROID_SIGNING_KEY: ${{ secrets.ANDROID_SIGNING_KEY }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          mv app/build/outputs/*-signed.aab app/release/
-          mv app/build/outputs/*-signed.apk app/release/
-        continue-on-error: true
+          set -euo pipefail
+          shopt -s nullglob
+          apks=(app/build/outputs/apk/release/*-unsigned.apk)
+          bundles=(app/build/outputs/bundle/release/*.aab)
+          (( ${#apks[@]} > 0 && ${#bundles[@]} > 0 ))
 
-      - name: Remove unsigned from file name
-        run: cd app/release/ && for file in *-unsigned*; do mv "$file" "${file//-unsigned/}"; done
-        continue-on-error: true
+          signing_dir=$(mktemp -d)
+          trap 'rm -rf "$signing_dir"' EXIT
+          printf '%s' "$ANDROID_SIGNING_KEY" | base64 --decode > "$signing_dir/release.jks"
+          chmod 600 "$signing_dir/release.jks"
+          export ANDROID_KEY_PASSWORD="${ANDROID_KEY_PASSWORD:-$ANDROID_KEYSTORE_PASSWORD}"
+          build_tools="$ANDROID_HOME/build-tools/36.0.0"
+          if [ ! -x "$build_tools/apksigner" ]; then
+            "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;36.0.0" > /dev/null
+          fi
+          mkdir -p app/release
+
+          for apk in "${apks[@]}"; do
+            name=$(basename "${apk%-unsigned.apk}")
+            "$build_tools/zipalign" -f -P 16 4 "$apk" "$signing_dir/aligned.apk"
+            "$build_tools/apksigner" sign \
+              --ks "$signing_dir/release.jks" \
+              --ks-key-alias "$ANDROID_KEY_ALIAS" \
+              --ks-pass env:ANDROID_KEYSTORE_PASSWORD \
+              --key-pass env:ANDROID_KEY_PASSWORD \
+              --v4-signing-enabled false \
+              --out "app/release/$name-signed.apk" \
+              "$signing_dir/aligned.apk"
+            "$build_tools/apksigner" verify "app/release/$name-signed.apk"
+          done
+
+          for bundle in "${bundles[@]}"; do
+            name=$(basename "${bundle%.aab}")
+            jarsigner -keystore "$signing_dir/release.jks" \
+              -storepass:env ANDROID_KEYSTORE_PASSWORD \
+              -keypass:env ANDROID_KEY_PASSWORD \
+              -signedjar "app/release/$name-signed.aab" \
+              "$bundle" "$ANDROID_KEY_ALIAS"
+            jarsigner -verify "app/release/$name-signed.aab"
+          done
 
       - name: Upload APKs to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./materialious/android/app/release/*
+          file: ./materialious/android/app/release/*-signed.apk
+          tag: ${{ steps.release.outputs.tag }}
+          release_name: ${{ steps.release.outputs.tag }}
+          overwrite: true
+          file_glob: true
+          draft: false
+
+      - name: Upload AABs to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./materialious/android/app/release/*-signed.aab
           tag: ${{ steps.release.outputs.tag }}
           release_name: ${{ steps.release.outputs.tag }}
           overwrite: true

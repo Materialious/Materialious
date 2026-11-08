@@ -115,6 +115,7 @@
 		"sveltekit-rate-limiter": "^0.8.0",
 		"tldts": "^7.4.5",
 		"undici": "^8.10.2",
+		"uqr": "0.1.3",
 		"youtubei.js": "^18.3.0",
 		"zod": "^4.6.5"
 	},

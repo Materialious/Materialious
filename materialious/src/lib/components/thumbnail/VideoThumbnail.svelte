@@ -358,7 +358,7 @@
 					<div class="tv-play"><i>play_arrow</i></div>
 				{/if}
 
-				{#if !isAndroidTv()}
+				{#if !isAndroidTv() && !sideways}
 					{#if progress}
 						<button
 							class="chip surface-container-highest"

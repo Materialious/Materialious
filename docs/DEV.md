@@ -152,11 +152,13 @@ npm run eslint      # Linting
 npm run build       # Production build
 ```
 
-The contributor list is a committed snapshot. To update it before tagging a
-release, run `npm run patch:github` in `materialious/`, review the change to
-`static/localApi/ghContributors.json`, and commit it. Normal builds use that
-snapshot so rebuilding a release does not depend on GitHub's live contributor
-count.
+The contributor list is a committed snapshot. When preparing a release, set
+`LATEST_VERSION` in `update_versions.py` and run the script from the repository
+root. The script refreshes `materialious/static/localApi/ghContributors.json`;
+review and commit that snapshot with the version changes before tagging. The
+script needs Python 3, the `requests` package, and access to the GitHub API.
+Normal builds use the committed snapshot so they do not depend on GitHub's live
+contributor count.
 
 ### App Type Overview
 
@@ -198,7 +200,7 @@ const adapter = useSsr
 
 - Built using `@capacitor-community/electron` — wraps the static SPA build in an Electron shell.
 - The [`electron/`](../materialious/electron/) directory contains its own `package.json`, `capacitor.config.ts`, and [`electron-builder.config.json`](../materialious/electron/electron-builder.config.json).
-- The `capacitor-nodejs` plugin is removed from the desktop build via [`patch_capacitor_plugin.py`](../materialious/electron/patch_capacitor_plugin.py) (it's Android-only).
+- The `@capawesome/capacitor-nodejs` plugin is removed from the desktop build via [`patch_capacitor_plugin.py`](../materialious/electron/patch_capacitor_plugin.py) (it's used by Android).
 - Supports deb, rpm, AppImage, snap (Linux), universal DMG (macOS), and NSIS installer (Windows).
 - Published to GitHub Releases and Snap Store. See [BUILDING](./BUILDING.md) for details.
 
@@ -212,7 +214,7 @@ const adapter = useSsr
       androidScheme: 'https'
   }
   ```
-- Includes `capacitor-nodejs` for running a Node.js runtime directly on the device (useful for YouTube API operations that require a PO token).
+- Includes `@capawesome/capacitor-nodejs` for running a Node.js runtime directly on the device (useful for YouTube API operations that require a PO token).
 - The Android-specific modules live in [`static/nodejsAndroid/`](../materialious/static/nodejsAndroid/).
 - Supports custom Capacitor plugins for Android TV, color theme, music controls, screen orientation, and more (see [`src/lib/android/`](../materialious/src/lib/android/)).
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
+	import { getBestThumbnail, imageHandleCors, proxyGoogleImage } from '#lib/images';
 	import { cleanNumber } from '#lib/numbers';
 	import { _ } from '#lib/i18n/index';
 	import type { Channel } from '#lib/api/model';
@@ -14,7 +14,24 @@
 
 	let { channel }: Props = $props();
 
-	const avatar = new Avatar({ src: proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)) });
+	let avatarSrc = $state('');
+	const avatar = new Avatar({ src: () => avatarSrc });
+
+	$effect(() => {
+		const src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails));
+		let active = true;
+		avatarSrc = '';
+		imageHandleCors(src)
+			.then((url) => {
+				if (active) avatarSrc = url;
+			})
+			.catch(() => {
+				if (active) avatarSrc = '';
+			});
+		return () => {
+			active = false;
+		};
+	});
 </script>
 
 <a

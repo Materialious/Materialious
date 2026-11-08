@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
-import { Preferences } from '@capacitor/preferences';
+import { SecureStorage } from '@aparajita/capacitor-secure-storage';
+import { secureStorageReady } from '../secureStorage';
 import {
 	createLocalStorage,
 	type StorageInterface,
@@ -15,6 +16,10 @@ type HydratableStorage = SelfUpdateStorageInterface<any> & {
 
 const HYDRATION_TIMEOUT_MS = 2000;
 const INITIAL_LOAD_STATE_KEY = 'initialLoadState';
+
+function usesNativeSecureStorage(): boolean {
+	return ['android', 'ios'].includes(Capacitor.getPlatform());
+}
 
 function createAndroidStorage(): HydratableStorage {
 	const listeners = new Map<string, Set<StorageListener>>();
@@ -33,8 +38,9 @@ function createAndroidStorage(): HydratableStorage {
 		const existing = inFlight.get(key);
 		if (existing) return existing;
 
-		const promise = Preferences.get({ key })
-			.then(({ value }) => {
+		const promise = secureStorageReady
+			.then(() => SecureStorage.getItem(key))
+			.then((value) => {
 				if (value === null) return;
 
 				const parsed = deserialize(value);
@@ -71,16 +77,20 @@ function createAndroidStorage(): HydratableStorage {
 			// killed during startup (see issue #2016).
 			if (!hydratedKeys.has(key)) return;
 
-			void Preferences.set({ key, value: serialize(value) }).catch((error) => {
-				console.error(`Failed to save preference "${key}"`, error);
-			});
+			void secureStorageReady
+				.then(() => SecureStorage.setItem(key, serialize(value)))
+				.catch((error) => {
+					console.error(`Failed to save preference "${key}"`, error);
+				});
 		},
 		deleteValue(key: string) {
 			if (!hydratedKeys.has(key)) return;
 
-			void Preferences.remove({ key }).catch((error) => {
-				console.error(`Failed to remove preference "${key}"`, error);
-			});
+			void secureStorageReady
+				.then(() => SecureStorage.removeItem(key))
+				.catch((error) => {
+					console.error(`Failed to remove preference "${key}"`, error);
+				});
 		},
 		addListener(key: string, listener: StorageListener) {
 			let keyListeners = listeners.get(key);
@@ -105,7 +115,7 @@ function createAndroidStorage(): HydratableStorage {
 			while (inFlight.size > 0) {
 				const remaining = deadline - Date.now();
 				if (remaining <= 0) {
-					console.warn('Timed out waiting for Android preferences to load');
+				console.warn('Timed out waiting for native settings to load');
 					break;
 				}
 
@@ -129,7 +139,7 @@ function createAndroidStorage(): HydratableStorage {
 let androidStorage: HydratableStorage | undefined;
 
 export function createStorage(): StorageInterface<any> | SelfUpdateStorageInterface<any> {
-	if (Capacitor.getPlatform() === 'android') {
+	if (usesNativeSecureStorage()) {
 		androidStorage ??= createAndroidStorage();
 		return androidStorage;
 	}
@@ -140,11 +150,11 @@ export function createStorage(): StorageInterface<any> | SelfUpdateStorageInterf
 /**
  * Wait for every persisted store's initial read to finish.
  *
- * Android's Preferences API is asynchronous, so routing decisions (setup,
+ * Native secure storage is asynchronous, so routing decisions (setup,
  * login, default page) must not run against store defaults.
  */
 export async function hydrateSettings(timeoutMs?: number): Promise<void> {
-	if (Capacitor.getPlatform() !== 'android' || !androidStorage) return;
+	if (!usesNativeSecureStorage() || !androidStorage) return;
 
 	await androidStorage.hydrate(timeoutMs);
 }
@@ -153,13 +163,14 @@ export async function hydrateSettings(timeoutMs?: number): Promise<void> {
  * Returns true the first time it is called on this device and records that
  * the instance defaults have been applied.
  *
- * Uses Preferences on Android so a cleared WebView localStorage cannot
+ * Uses secure storage on native platforms so a cleared WebView localStorage cannot
  * re-apply DEFAULT_SETTINGS and wipe the user's settings.
  */
 export async function consumeInitialLoadState(): Promise<boolean> {
-	if (Capacitor.getPlatform() === 'android') {
+	if (usesNativeSecureStorage()) {
 		try {
-			const { value } = await Preferences.get({ key: INITIAL_LOAD_STATE_KEY });
+			await secureStorageReady;
+			const value = await SecureStorage.getItem(INITIAL_LOAD_STATE_KEY);
 			if (value !== null) return false;
 
 			// Migrate the legacy localStorage flag so upgrading users don't
@@ -176,13 +187,13 @@ export async function consumeInitialLoadState(): Promise<boolean> {
 			// that this is not a fresh install, so treat them as such.
 			let hasExistingSettings = false;
 			try {
-				const { keys } = await Preferences.keys();
+				const keys = await SecureStorage.keys();
 				hasExistingSettings = keys.some((key) => key !== INITIAL_LOAD_STATE_KEY);
 			} catch {
 				// Ignore if the plugin cannot enumerate keys.
 			}
 
-			await Preferences.set({ key: INITIAL_LOAD_STATE_KEY, value: '0' });
+			await SecureStorage.setItem(INITIAL_LOAD_STATE_KEY, '0');
 			return legacyFlag === null && !hasExistingSettings;
 		} catch {
 			return true;

@@ -102,11 +102,12 @@
 	let thumbnailHeight = $state(0);
 	let thumbnailWidth = $state(0);
 	let thumbnailInView = $state(false);
+	let thumbnailDisplaySrc = $state('');
 	let thumbnailImageElement: HTMLImageElement | undefined = $state();
 	let thumbnailElement: HTMLElement | undefined = $state();
 
 	const thumbnail = new Avatar({
-		src: () => (thumbnailInView ? imageHandleCors(thumbnailSrc) : ''),
+		src: () => thumbnailDisplaySrc,
 		onLoadingStatusChange: () => {
 			if (thumbnailImageElement) {
 				thumbnailHeight = thumbnailImageElement.naturalHeight;
@@ -133,6 +134,26 @@
 
 	let thumbnailObserver: IntersectionObserver;
 	let visibilityObserver: IntersectionObserver;
+
+	$effect(() => {
+		const src = thumbnailSrc;
+		if (!thumbnailInView) {
+			thumbnailDisplaySrc = '';
+			return;
+		}
+
+		let active = true;
+		imageHandleCors(src)
+			.then((displaySrc) => {
+				if (active) thumbnailDisplaySrc = displaySrc;
+			})
+			.catch(() => {
+				if (active) thumbnailDisplaySrc = '';
+			});
+		return () => {
+			active = false;
+		};
+	});
 
 	onMount(() => {
 		thumbnailObserver = new IntersectionObserver(

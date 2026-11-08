@@ -3,7 +3,9 @@ import os
 import re
 from datetime import datetime
 
-LATEST_VERSION = "1.18.20"
+import requests
+
+LATEST_VERSION = "1.18.21"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
@@ -13,6 +15,24 @@ SHARED_PACKAGE = os.path.join(WORKING_DIR, "shared", "package.json")
 ELECTRON_PACKAGE = os.path.join(WORKING_DIR, "electron", "package.json")
 ANDROID_PACKAGE = os.path.join(WORKING_DIR, "android", "app", "build.gradle")
 METAINFO_FILE = os.path.join(WORKING_DIR, "electron", "materialious.metainfo.xml")
+CONTRIBUTORS_FILE = os.path.join(
+    WORKING_DIR, "static", "localApi", "ghContributors.json"
+)
+
+
+def update_contributors() -> None:
+    response = requests.get(
+        "https://api.github.com/repos/Materialious/Materialious/contributors",
+        headers={"Accept": "application/vnd.github+json"},
+        timeout=30,
+    )
+    response.raise_for_status()
+    contributors = response.json()
+
+    os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
+    with open(CONTRIBUTORS_FILE, "w", encoding="utf-8") as f_:
+        json.dump(contributors, f_, ensure_ascii=False, separators=(",", ":"))
+    print(f"GitHub contributors written to {CONTRIBUTORS_FILE}")
 
 
 def package_json_update_ver(location: str) -> None:
@@ -34,6 +54,8 @@ def update_android_version() -> None:
     version_name_match = re.search(r'versionName\s+"([^"]+)"', contents)
 
     if version_code_match and version_name_match:
+        if version_name_match.group(1) == LATEST_VERSION:
+            return
         version_code = int(version_code_match.group(1)) + 1
         contents = re.sub(r"versionCode\s+\d+", f"versionCode {version_code}", contents)
         contents = re.sub(
@@ -73,6 +95,8 @@ def update_metainfo_release() -> None:
 
 
 if __name__ == "__main__":
+    update_contributors()
+
     for location in (ROOT_PACKAGE, SHARED_PACKAGE, ELECTRON_PACKAGE):
         package_json_update_ver(location)
 

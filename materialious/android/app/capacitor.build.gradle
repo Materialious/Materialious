@@ -9,17 +9,17 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':aparajita-capacitor-secure-storage')
     implementation project(':capacitor-app')
     implementation project(':capacitor-browser')
     implementation project(':capacitor-clipboard')
     implementation project(':capacitor-network')
-    implementation project(':capacitor-preferences')
     implementation project(':capacitor-screen-orientation')
     implementation project(':capacitor-share')
+    implementation project(':capawesome-capacitor-nodejs')
     implementation project(':capgo-capacitor-file-sharer')
     implementation project(':capgo-capacitor-keep-awake')
     implementation project(':capgo-capacitor-media-session')
-    implementation project(':capacitor-nodejs')
 
 }
 

@@ -2,6 +2,9 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
+include ':aparajita-capacitor-secure-storage'
+project(':aparajita-capacitor-secure-storage').projectDir = new File('../node_modules/@aparajita/capacitor-secure-storage/android')
+
 include ':capacitor-app'
 project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/android')
 
@@ -14,14 +17,14 @@ project(':capacitor-clipboard').projectDir = new File('../node_modules/@capacito
 include ':capacitor-network'
 project(':capacitor-network').projectDir = new File('../node_modules/@capacitor/network/android')
 
-include ':capacitor-preferences'
-project(':capacitor-preferences').projectDir = new File('../node_modules/@capacitor/preferences/android')
-
 include ':capacitor-screen-orientation'
 project(':capacitor-screen-orientation').projectDir = new File('../node_modules/@capacitor/screen-orientation/android')
 
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/share/android')
+
+include ':capawesome-capacitor-nodejs'
+project(':capawesome-capacitor-nodejs').projectDir = new File('../node_modules/@capawesome/capacitor-nodejs/android')
 
 include ':capgo-capacitor-file-sharer'
 project(':capgo-capacitor-file-sharer').projectDir = new File('../node_modules/@capgo/capacitor-file-sharer/android')
@@ -31,6 +34,3 @@ project(':capgo-capacitor-keep-awake').projectDir = new File('../node_modules/@c
 
 include ':capgo-capacitor-media-session'
 project(':capgo-capacitor-media-session').projectDir = new File('../node_modules/@capgo/capacitor-media-session/android')
-
-include ':capacitor-nodejs'
-project(':capacitor-nodejs').projectDir = new File('../node_modules/capacitor-nodejs/android')

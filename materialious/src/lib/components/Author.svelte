@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 	import { amSubscribed, deleteUnsubscribe, postSubscribe } from '#lib/api/index';
 	import type { Image } from '#lib/api/model';
-	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
+	import { getBestThumbnail, imageHandleCors, proxyGoogleImage } from '#lib/images';
 	import { isYTBackend } from '#lib/backend';
 	import { isAndroidTv, truncate } from '#lib/utils';
 	import { invidiousAuthStore } from '#lib/store';
@@ -60,7 +60,24 @@
 		}
 	}
 
-	const avatar = new Avatar({ src: proxyGoogleImage(getBestThumbnail(channel.authorThumbnails)) });
+	let avatarSrc = $state('');
+	const avatar = new Avatar({ src: () => avatarSrc });
+
+	$effect(() => {
+		const src = proxyGoogleImage(getBestThumbnail(channel.authorThumbnails));
+		let active = true;
+		avatarSrc = '';
+		imageHandleCors(src)
+			.then((url) => {
+				if (active) avatarSrc = url;
+			})
+			.catch(() => {
+				if (active) avatarSrc = '';
+			});
+		return () => {
+			active = false;
+		};
+	});
 </script>
 
 <nav>

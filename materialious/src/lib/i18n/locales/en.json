@@ -13,7 +13,9 @@
 	"loginWithQuickConnect": "Login with Quick connect",
 	"loginQr": {
 		"waiting": "Waiting for login on another device.",
-		"instructions": "Scan the QR code with your phone, or open the address below on any device on your network and enter the code.",
+		"stepScan": "Scan the QR code with your phone camera.",
+		"stepAddress": "Or open this address on a phone or computer on the same network:",
+		"stepCode": "Enter the code, then sign in to Invidious and approve.",
 		"codeLabel": "Code",
 		"success": "Logged in.",
 		"failed": "QR login could not be started. Use username and password instead.",

@@ -65,6 +65,20 @@
 	"subscribers": "inscritos",
 	"unsubscribe": "Cancelar inscrição",
 	"loginRequired": "Login necessário",
+	"loginQr": {
+		"waiting": "Aguardando login em outro dispositivo.",
+		"stepScan": "Escaneie o QR code com a câmera do celular.",
+		"stepAddress": "Ou abra este endereço num celular ou computador da mesma rede:",
+		"stepCode": "Digite o código, entre no Invidious e aprove.",
+		"codeLabel": "Código",
+		"success": "Login feito.",
+		"failed": "Não foi possível iniciar o login por QR code. Use usuário e senha.",
+		"noAddress": "Não foi possível descobrir o endereço de rede da TV. Use usuário e senha.",
+		"expiresIn": "Novo código em {{time}}",
+		"usePassword": "Usar usuário e senha",
+		"useQr": "Usar QR code",
+		"qrAriaLabel": "QR code com o endereço {{url}}"
+	},
 	"player": {
 		"audioOnly": "Somente áudio",
 		"theatreMode": "Modo teatro",

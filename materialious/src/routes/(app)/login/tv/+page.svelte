@@ -192,59 +192,72 @@
 	</style>
 </svelte:head>
 
-<nav class="center-align">
-	<article class="padding left-align">
-		<h5>{$_('loginRequired')}</h5>
-		<div>{$_('invidiousLogin')}</div>
+{#snippet heading()}
+	<h1 id="tv-login-title">{$_('loginRequired')}</h1>
+	<p class="subtitle">{$_('invidiousLogin')}</p>
+{/snippet}
 
-		<p class="status" class:error-text={loginStatus === 'error'} role="status" aria-live="polite">
-			{loginStatus === 'success'
-				? $_('loginQr.success')
-				: loginStatus === 'error'
-					? errorMessage
-					: showQr
-						? $_('loginQr.waiting')
-						: ''}
-		</p>
+{#snippet status()}
+	<p class="status" class:error-text={loginStatus === 'error'} role="status" aria-live="polite">
+		{loginStatus === 'success'
+			? $_('loginQr.success')
+			: loginStatus === 'error'
+				? errorMessage
+				: showQr
+					? $_('loginQr.waiting')
+					: ''}
+	</p>
+{/snippet}
 
-		{#if showQr}
-			<div class="qr-login">
-				<p>{$_('loginQr.instructions')}</p>
-				{#if qrCodeUrl}
-					<div
-						class="qr-code"
-						role="img"
-						aria-label={$_('loginQr.qrAriaLabel', { url: qrCodeUrl })}
-					>
-						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-						{@html renderSVG(qrCodeUrl)}
-					</div>
-				{/if}
+<section class="tv-login" class:with-qr={showQr} aria-labelledby="tv-login-title">
+	{#if showQr}
+		<div class="qr-tile" role="img" aria-label={$_('loginQr.qrAriaLabel', { url: qrCodeUrl })}>
+			{#if qrCodeUrl}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html renderSVG(qrCodeUrl, { border: 0 })}
+			{/if}
+		</div>
 
-				<div class="qr-details">
-					<span>{$_('loginQr.codeLabel')}</span>
-					<code class="code-display">{code}</code>
-					{#each addresses as address (address)}
-						<div class="address">http://{address}:{TV_LOGIN_PORT}/?c={code}</div>
+		<div class="details">
+			{@render heading()}
+
+			<ol class="steps">
+				<li>{$_('loginQr.stepScan')}</li>
+				<li>
+					{$_('loginQr.stepAddress')}
+					{#each addresses as address, index (address)}
+						<span class="address" class:alt-address={index > 0}>
+							http://{address}:{TV_LOGIN_PORT}
+						</span>
 					{/each}
-					<div>{$_('loginQr.expiresIn', { time: countdownText })}</div>
-				</div>
+				</li>
+				<li>{$_('loginQr.stepCode')}</li>
+			</ol>
 
+			<div class="code-block">
+				<span class="code-label">{$_('loginQr.codeLabel')}</span>
+				<code class="code">{code}</code>
+				<span class="countdown">{$_('loginQr.expiresIn', { time: countdownText })}</span>
+			</div>
+
+			{@render status()}
+
+			<nav class="actions">
 				<button
 					class="surface-container-highest"
 					type="button"
 					onclick={() => toggleQr(false)}
 					bind:this={qrActionButton}
 				>
-					{$_('loginQr.usePassword')}
+					<i>password</i>
+					<span>{$_('loginQr.usePassword')}</span>
 				</button>
-			</div>
-		{:else}
-			{#if qrEnabled && loginStatus !== 'error'}
-				<button class="surface-container-highest" type="button" onclick={() => toggleQr(true)}>
-					{$_('loginQr.useQr')}
-				</button>
-			{/if}
+			</nav>
+		</div>
+	{:else}
+		<div class="details">
+			{@render heading()}
+			{@render status()}
 
 			<form onsubmit={usernamePasswordLogin}>
 				<div class="field label border" class:invalid={loginError}>
@@ -252,97 +265,159 @@
 					<label for="username">{$_('username')}</label>
 				</div>
 				<div class="field label border" class:invalid={loginError}>
-					<input bind:value={rawPassword} name="password" type="password" />
+					<input id="password" bind:value={rawPassword} name="password" type="password" />
 					<label for="password">{$_('password')}</label>
 				</div>
 
-				<nav class="right-align no-space">
-					<button class="transparent link" type="button" onclick={() => window.history.back()}>
+				<nav class="actions">
+					<button type="submit">{$_('login')}</button>
+					<button class="border" type="button" onclick={() => window.history.back()}>
 						{$_('cancel')}
 					</button>
-					<button class="transparent link" type="submit">{$_('login')}</button>
+					{#if qrEnabled && loginStatus !== 'error'}
+						<button class="surface-container-highest" type="button" onclick={() => toggleQr(true)}>
+							<i>qr_code_2</i>
+							<span>{$_('loginQr.useQr')}</span>
+						</button>
+					{/if}
 				</nav>
 			</form>
-		{/if}
-	</article>
-</nav>
+		</div>
+	{/if}
+</section>
 
 <style>
-	article {
-		width: 400px;
+	/* 10-foot UI. 1u = 1px of a 1920x1080 layout, shrunk to whichever axis is tighter so the
+	   page always fits without scrolling. */
+	.tv-login {
+		--u: min(calc(100vw / 1920), calc(100vh / 1080));
+		box-sizing: border-box;
+		height: 100%;
+		min-height: 0;
+		display: grid;
+		grid-template-columns: minmax(0, calc(760 * var(--u)));
+		justify-content: center;
+		align-content: center;
+		gap: calc(96 * var(--u));
+		padding: calc(48 * var(--u)) calc(64 * var(--u));
+		font-size: calc(26 * var(--u));
+		line-height: 1.45;
+		color: var(--on-surface);
 	}
 
-	@media screen and (max-width: 400px) {
-		article {
-			width: 100%;
-		}
+	.tv-login.with-qr {
+		grid-template-columns: auto minmax(0, calc(760 * var(--u)));
+		align-items: center;
 	}
 
-	/* 10-foot UI: 1u = 1px on a 1920-wide screen. */
-	@media screen and (min-width: 1280px) {
-		article {
-			width: calc(900 * 100vw / 1920);
-			font-size: calc(28 * 100vw / 1920);
-		}
+	/* The on-screen keyboard shrinks the viewport height while typing; scale from width only
+	   and anchor to the top so the form keeps its size and stays above the keyboard. */
+	.tv-login:not(.with-qr) {
+		--u: calc(100vw / 1920);
+		align-content: start;
+		padding-top: calc(96 * var(--u));
+	}
 
-		article :global(h5) {
-			font-size: calc(40 * 100vw / 1920);
-		}
+	.qr-tile {
+		/* Scanners need dark-on-light with a quiet zone, whatever the app theme. */
+		background: #fff;
+		width: calc(440 * var(--u));
+		aspect-ratio: 1;
+		padding: calc(28 * var(--u));
+		border-radius: calc(28 * var(--u));
+		box-sizing: border-box;
+	}
 
-		article :global(input),
-		article :global(label) {
-			font-size: calc(28 * 100vw / 1920);
-		}
+	.qr-tile :global(svg) {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
 
-		article :global(input),
-		article :global(button) {
-			min-height: calc(72 * 100vw / 1920);
-		}
+	.details {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		min-width: 0;
+	}
 
-		.qr-login {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: calc(32 * 100vw / 1920);
-		}
+	h1 {
+		margin: 0;
+		font-size: calc(44 * var(--u));
+		line-height: 1.15;
+		font-weight: 600;
+		text-wrap: balance;
+	}
 
-		.qr-code {
-			/* White backing for the QR's quiet zone — scanners need the contrast
-			   regardless of theme (same spirit as the black-scrim exception). */
-			background: white;
-			padding: calc(16 * 100vw / 1920);
-			border-radius: calc(16 * 100vw / 1920);
-			width: calc(360 * 100vw / 1920);
-			height: calc(360 * 100vw / 1920);
-		}
+	.subtitle {
+		margin: calc(10 * var(--u)) 0 0;
+		color: var(--on-surface-variant);
+	}
 
-		.qr-code :global(svg) {
-			width: 100%;
-			height: 100%;
-			display: block;
-		}
+	.steps {
+		margin: calc(40 * var(--u)) 0 0;
+		padding-inline-start: 1.4em;
+		display: flex;
+		flex-direction: column;
+		gap: calc(14 * var(--u));
+	}
 
-		.qr-details {
-			display: flex;
-			flex-direction: column;
-			gap: calc(12 * 100vw / 1920);
-		}
+	.steps li::marker {
+		color: var(--primary);
+		font-weight: 700;
+	}
 
-		.code-display {
-			font-size: calc(72 * 100vw / 1920);
-			font-weight: 700;
-			letter-spacing: calc(12 * 100vw / 1920);
-			color: var(--primary);
-		}
+	.address {
+		display: block;
+		margin-top: calc(6 * var(--u));
+		font-family: monospace;
+		font-size: calc(30 * var(--u));
+		font-weight: 600;
+		overflow-wrap: anywhere;
+	}
 
-		.address {
-			font-family: monospace;
-			word-break: break-all;
-		}
+	.address.alt-address {
+		font-size: calc(24 * var(--u));
+		font-weight: 400;
+		color: var(--on-surface-variant);
+	}
 
-		article :global(button) {
-			font-size: calc(28 * 100vw / 1920);
-		}
+	.code-block {
+		margin-top: calc(36 * var(--u));
+		display: grid;
+		grid-template-columns: auto auto;
+		justify-content: start;
+		align-items: baseline;
+		column-gap: calc(28 * var(--u));
+	}
+
+	.code-label {
+		grid-column: 1 / -1;
+		color: var(--on-surface-variant);
+		font-size: calc(22 * var(--u));
+	}
+
+	.code {
+		font-family: monospace;
+		font-size: calc(76 * var(--u));
+		font-weight: 700;
+		line-height: 1.1;
+		letter-spacing: 0.12em;
+		font-variant-numeric: tabular-nums;
+		color: var(--primary);
+		background: none;
+		padding: 0;
+	}
+
+	.countdown {
+		color: var(--on-surface-variant);
+		font-size: calc(22 * var(--u));
+		font-variant-numeric: tabular-nums;
+	}
+
+	.status {
+		margin: calc(24 * var(--u)) 0 0;
+		color: var(--on-surface-variant);
 	}
 
 	.status:empty {
@@ -351,5 +426,43 @@
 
 	.error-text {
 		color: var(--error);
+	}
+
+	.actions {
+		margin-top: calc(36 * var(--u));
+		display: flex;
+		flex-wrap: wrap;
+		gap: calc(20 * var(--u));
+	}
+
+	form {
+		width: 100%;
+		margin-top: calc(32 * var(--u));
+	}
+
+	.tv-login :global(button) {
+		min-height: calc(72 * var(--u));
+		padding-inline: calc(32 * var(--u));
+		font-size: calc(26 * var(--u));
+		border-radius: calc(36 * var(--u));
+		gap: calc(12 * var(--u));
+	}
+
+	.tv-login :global(button > i) {
+		font-size: calc(32 * var(--u));
+	}
+
+	.tv-login .field :global(input),
+	.tv-login .field :global(label) {
+		font-size: calc(26 * var(--u));
+	}
+
+	.tv-login .field {
+		height: calc(80 * var(--u));
+		margin-block: calc(20 * var(--u));
+	}
+
+	.tv-login .field :global(input) {
+		height: 100%;
 	}
 </style>

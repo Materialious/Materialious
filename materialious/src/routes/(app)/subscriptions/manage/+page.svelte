@@ -13,7 +13,7 @@
 
 	let search: string = $state('');
 	let multipleActions = $state(false);
-	let selectedIds = new SvelteSet<string>();
+	const selectedIds = new SvelteSet<string>();
 	let selectedSubscriptions = $derived(
 		subscriptions.filter((sub) => selectedIds.has(sub.authorId))
 	);
@@ -42,15 +42,29 @@
 	}
 
 	function toggleSelection(authorId: string) {
-		const next = new SvelteSet(selectedIds);
-		if (next.has(authorId)) next.delete(authorId);
-		else next.add(authorId);
-		selectedIds = next;
+		if (selectedIds.has(authorId)) selectedIds.delete(authorId);
+		else selectedIds.add(authorId);
+	}
+
+	function clearSelection() {
+		selectedIds.clear();
+	}
+
+	function handleCardClick(event: MouseEvent, authorId: string) {
+		if (!multipleActions || (event.target as HTMLElement).closest('a, button')) return;
+		toggleSelection(authorId);
+	}
+
+	function handleCardKeydown(event: KeyboardEvent, authorId: string) {
+		if (!multipleActions || (event.key !== 'Enter' && event.key !== ' ')) return;
+		if ((event.target as HTMLElement).closest('a, button')) return;
+		event.preventDefault();
+		toggleSelection(authorId);
 	}
 
 	function finishSelection() {
 		multipleActions = false;
-		selectedIds = new SvelteSet();
+		clearSelection();
 	}
 
 	async function unsubscribeSelected() {
@@ -84,7 +98,7 @@
 				aria-pressed={multipleActions}
 				onclick={() => {
 					multipleActions = !multipleActions;
-					selectedIds = new SvelteSet();
+					clearSelection();
 				}}
 			>
 				<i>checklist</i><span class="m l">Bulk actions</span>
@@ -100,9 +114,10 @@
 						class="surface-container-highest"
 						onclick={() => {
 							const allSelected = subscriptions.every((sub) => selectedIds.has(sub.authorId));
-							selectedIds = allSelected
-								? new SvelteSet()
-								: new SvelteSet(subscriptions.map((sub) => sub.authorId));
+							clearSelection();
+							if (!allSelected) {
+								for (const sub of subscriptions) selectedIds.add(sub.authorId);
+							}
 						}}
 					>
 						{subscriptions.every((sub) => selectedIds.has(sub.authorId))
@@ -121,7 +136,15 @@
 			</div>
 		{/if}
 		{#each subscriptions as sub (sub.authorId)}
-			<article class:selected={multipleActions && selectedIds.has(sub.authorId)}>
+			<article
+				class:selected={multipleActions && selectedIds.has(sub.authorId)}
+				class:selectable={multipleActions}
+				role={multipleActions ? 'button' : undefined}
+				aria-pressed={multipleActions ? selectedIds.has(sub.authorId) : undefined}
+				tabindex={multipleActions ? 0 : undefined}
+				onclick={(event) => handleCardClick(event, sub.authorId)}
+				onkeydown={(event) => handleCardKeydown(event, sub.authorId)}
+			>
 				<nav>
 					<AuthorAvatar author={sub.author} authorId={sub.authorId} />
 
@@ -131,14 +154,7 @@
 						</h6></a
 					>
 					<div class="max"></div>
-					{#if multipleActions}
-						<button
-							class="surface-container-highest"
-							aria-pressed={selectedIds.has(sub.authorId)}
-							onclick={() => toggleSelection(sub.authorId)}
-							>{selectedIds.has(sub.authorId) ? 'Selected' : 'Select'}</button
-						>
-					{:else}
+					{#if !multipleActions}
 						<button
 							onclick={async () => unsubscribe(sub.authorId)}
 							class="surface-container-highest">Unsubscribe</button
@@ -191,8 +207,10 @@
 		margin-top: 0.75rem;
 	}
 	article.selected {
-		outline: 2px solid var(--primary);
-		box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+		border: 2px solid var(--primary);
+	}
+	article.selectable {
+		cursor: pointer;
 	}
 	@media screen and (max-width: 590px) {
 		.search-actions {

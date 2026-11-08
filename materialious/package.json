@@ -81,7 +81,7 @@
 		"dayjs": "^1.11.23",
 		"dexie": "^4.4.4",
 		"ffmpeg-static": "^5.3.0",
-		"fuse.js": "^7.0.0",
+		"fuse.js": "^7.5.0",
 		"googlevideo": "^5.0.1",
 		"he": "^2.0.0",
 		"human-number": "^3.0.0",

@@ -25,8 +25,24 @@
 	}
 
 	let thumbnailSrc = $state(getThumbnailSrc());
+	let thumbnailDisplaySrc = $state('');
 
-	const thumbnail = new Avatar({ src: imageHandleCors(thumbnailSrc) });
+	const thumbnail = new Avatar({ src: () => thumbnailDisplaySrc });
+
+	$effect(() => {
+		const src = thumbnailSrc;
+		let active = true;
+		imageHandleCors(src)
+			.then((displaySrc) => {
+				if (active) thumbnailDisplaySrc = displaySrc;
+			})
+			.catch(() => {
+				if (active) thumbnailDisplaySrc = '';
+			});
+		return () => {
+			active = false;
+		};
+	});
 </script>
 
 <a href={playlistLink} style="width: 100%; overflow: hidden;min-height:100px;" class="wave">

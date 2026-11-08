@@ -3,7 +3,7 @@
 	import { getComments } from '#lib/api/index';
 	import { invidiousInstanceStore } from '#lib/store';
 	import { type Comment, type Comments } from '#lib/api/model';
-	import { getBestThumbnail, proxyGoogleImage } from '#lib/images';
+	import { getBestThumbnail, imageHandleCors, proxyGoogleImage } from '#lib/images';
 	import { numberWithCommas } from '#lib/numbers';
 	import CommentSelf from './Comment.svelte';
 	import { truncate } from '#lib/utils';
@@ -82,7 +82,24 @@
 		return doc.documentElement.outerHTML;
 	}
 
-	const avatar = new Avatar({ src: proxyGoogleImage(getBestThumbnail(comment.authorThumbnails)) });
+	let avatarSrc = $state('');
+	const avatar = new Avatar({ src: () => avatarSrc });
+
+	$effect(() => {
+		const src = proxyGoogleImage(getBestThumbnail(comment.authorThumbnails));
+		let active = true;
+		avatarSrc = '';
+		imageHandleCors(src)
+			.then((url) => {
+				if (active) avatarSrc = url;
+			})
+			.catch(() => {
+				if (active) avatarSrc = '';
+			});
+		return () => {
+			active = false;
+		};
+	});
 </script>
 
 <article class="comment" class:border={!isSubComp}>

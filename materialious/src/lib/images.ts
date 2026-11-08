@@ -3,7 +3,10 @@ import type { Image } from './api/model';
 import { invidiousInstanceStore } from './store';
 import { isYTBackend } from './backend';
 import { Capacitor } from '@capacitor/core';
-import { corsProxyUrl } from './fetchProxy';
+import { fetchProxied } from './fetchProxy';
+
+const proxiedImageUrls = new Map<string, string>();
+const MAX_CACHED_PROXY_IMAGES = 128;
 
 export class ImageCache {
 	private cache = new Map<string, HTMLImageElement>();
@@ -84,10 +87,24 @@ export function proxyGoogleImage(source: string): string {
 	return `${get(invidiousInstanceStore)}/ggpht${path}`;
 }
 
-export function imageHandleCors(source: string): string {
-	if (Capacitor.getPlatform() === 'android') {
-		return corsProxyUrl + source;
-	}
+export async function imageHandleCors(source: string): Promise<string> {
+	if (!source) return '';
+	if (Capacitor.getPlatform() !== 'android') return source;
 
-	return source;
+	const cached = proxiedImageUrls.get(source);
+	if (cached) return cached;
+
+	const response = await fetchProxied(source);
+	if (!response.ok) throw new Error(`Image proxy request failed: ${response.status}`);
+
+	const objectUrl = URL.createObjectURL(await response.blob());
+	proxiedImageUrls.set(source, objectUrl);
+	if (proxiedImageUrls.size > MAX_CACHED_PROXY_IMAGES) {
+		const oldestKey = proxiedImageUrls.keys().next().value;
+		if (oldestKey) {
+			URL.revokeObjectURL(proxiedImageUrls.get(oldestKey)!);
+			proxiedImageUrls.delete(oldestKey);
+		}
+	}
+	return objectUrl;
 }

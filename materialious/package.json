@@ -50,6 +50,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@aparajita/capacitor-secure-storage": "^8.0.1",
 		"@bbc/tv-lrud-spatial": "^0.0.18",
 		"@capacitor-community/electron": "^5.0.1",
 		"@capacitor/android": "^8.6.0",
@@ -58,7 +59,6 @@
 		"@capacitor/clipboard": "^8.0.1",
 		"@capacitor/core": "^8.2.0",
 		"@capacitor/network": "^8.0.1",
-		"@capacitor/preferences": "^8.0.1",
 		"@capacitor/screen-orientation": "^8.0.1",
 		"@capacitor/share": "^8.0.2",
 		"@capawesome/capacitor-nodejs": "^0.2.0",

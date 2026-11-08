@@ -2,6 +2,7 @@
 	import { bookmarkletSaveToUrl } from '#lib/externalSettings/index';
 	import { letterCase, titleCases, type TitleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
+	import { Nodejs } from '@capawesome/capacitor-nodejs';
 	import { iso31661 } from 'iso-3166';
 	import { isContentRegion } from '#lib/regions';
 	import { _ } from '#lib/i18n/index';
@@ -40,7 +41,6 @@
 	} from '../../store';
 	import { isOwnBackend } from '#lib/shared/index';
 	import ComboBox from '../ComboBox.svelte';
-	import { corsProxyUrl } from '#lib/fetchProxy';
 
 	let invidiousInstance = $derived($invidiousInstanceStore ?? '');
 
@@ -90,13 +90,18 @@
 		interfaceAllowInsecureRequests.set(!$interfaceAllowInsecureRequests);
 	}
 
-	// Used to toggle rejectUnauthorized in the backend
+	// Configure TLS through the native Node bridge, never through the HTTP proxy.
 	interfaceAllowInsecureRequests.subscribe(async (isAllowed) => {
 		if (Capacitor.getPlatform() === 'android') {
-			if (isAllowed) {
-				await fetch(corsProxyUrl + 'allow-insecure-requests');
-			} else {
-				await fetch(corsProxyUrl + 'deny-insecure-requests');
+			try {
+				let ready = false;
+				while (!ready) {
+					({ ready } = await Nodejs.isReady());
+					if (!ready) await timeout(100);
+				}
+				await Nodejs.send({ eventName: 'set-insecure-tls', args: [isAllowed] });
+			} catch {
+				// The persisted setting is applied when the Node runtime is ready again.
 			}
 		} else if (Capacitor.getPlatform() === 'electron') {
 			await window.electronAPI.setAllowInsecureSSL(isAllowed);

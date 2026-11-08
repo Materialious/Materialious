@@ -1430,17 +1430,17 @@
 	{#if playbackError}
 		<div class="player-error" role="alert">
 			<div class="player-error-content surface-container-highest">
-				<h5>{$_('player.playbackErrorTitle')}</h5>
-				<p>{playbackErrorMessage(playbackError.source)}</p>
-				{#if playbackError.detail}
-					<p class="player-error-detail">{playbackError.detail}</p>
-				{/if}
 				<nav class="player-error-actions">
 					<button onclick={() => retryPlayback()} disabled={isRetryingPlayback}>
 						<i>{isRetryingPlayback ? 'hourglass_top' : 'refresh'}</i>
 						{isRetryingPlayback ? $_('player.retrying') : $_('player.retry')}
 					</button>
 				</nav>
+				<h5>{$_('player.playbackErrorTitle')}</h5>
+				<p>{playbackErrorMessage(playbackError.source)}</p>
+				{#if playbackError.detail}
+					<p class="player-error-detail">{playbackError.detail}</p>
+				{/if}
 				{#if isUnrestrictedPlatform() && !isYTBackend() && data.video.fallbackPatch !== 'youtubejs'}
 					<p>{$_('player.retryText')}</p>
 					<nav class="player-error-actions">

@@ -114,7 +114,11 @@
 			"loop": "Repetir",
 			"on": "On",
 			"off": "Off",
-			"language": "Idioma"
+			"language": "Idioma",
+			"playbackControls": "Controles de reprodução",
+			"endsAt": "Termina às {{time}}",
+			"videoInfo": "Informações do vídeo",
+			"positionOf": "{{elapsed}} de {{total}}"
 		}
 	},
 	"layout": {

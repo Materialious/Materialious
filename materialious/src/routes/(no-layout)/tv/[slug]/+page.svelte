@@ -7,7 +7,7 @@
 	import LikesDislikes from '#lib/components/watch/LikesDislikes.svelte';
 	import { letterCase } from '#lib/letterCasing';
 	import Mousetrap from 'mousetrap';
-	import { onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, onMount, tick, untrack } from 'svelte';
 	import { _ } from '#lib/i18n/index';
 	import { playlistCacheStore, playlistSettingsStore } from '#lib/store';
 	import { fade } from 'svelte/transition';
@@ -45,6 +45,10 @@
 	// paused. Player's own mouse/auto-hide logic is disabled on TV.
 	let showControls = $state(false);
 	let paused = $state(false);
+	// Bar shown because of a pause. Back dismisses it without resuming; a new pause (or a
+	// key press) brings it back, so it never re-shows by itself.
+	let pauseBar = $state(false);
+	let hasStartedPlaying = false;
 	let currentTime = $state(0);
 	let userManualSeeking = $state(false);
 
@@ -82,7 +86,7 @@
 	});
 
 	function syncControls() {
-		showControls = controlsPinned || isSeeking || paused;
+		showControls = controlsPinned || isSeeking || pauseBar;
 	}
 
 	function startSeeking(direction: 'left' | 'right') {
@@ -201,8 +205,17 @@
 		controlsPinned = false;
 		syncControls();
 
-		// A paused video keeps the bar (and its focus) on screen.
-		if (!paused && isControlFocused()) (document.activeElement as HTMLElement).blur();
+		// While the pause bar is up it keeps its focus.
+		if (!pauseBar && isControlFocused()) (document.activeElement as HTMLElement).blur();
+	}
+
+	// Back/Esc on a visible bar: hide it entirely. A paused video stays paused.
+	function hideBar() {
+		clearTimeout(controlsPinTimeout);
+		controlsPinned = false;
+		pauseBar = false;
+		syncControls();
+		if (isControlFocused()) (document.activeElement as HTMLElement).blur();
 	}
 
 	function openInfo() {
@@ -299,9 +312,9 @@
 		}
 
 		if (!showInfo) {
-			if (controlsPinned && !paused) {
+			if (controlsPinned || pauseBar) {
 				event.preventDefault();
-				unpinControls();
+				hideBar();
 			}
 			return;
 		}
@@ -309,30 +322,66 @@
 		closeInfo();
 	}
 
-	// Pause shows the bar with focus on Play; play hides it again (Enter on Play resumes).
-	function onVideoPause() {
-		if (playerElement?.ended) return;
-		paused = true;
+	// A pause after playback has started shows the bar with focus on Play; play hides it
+	// again (Enter on Play resumes). The initial not-yet-playing state is not a pause:
+	// the bar stays away while the video loads/buffers.
+	function showPauseBar() {
+		pauseBar = true;
 		syncControls();
 		if (!showInfo && !showTvSettings) focusControl(rowButtons()[0]);
 	}
 
+	function onVideoPause() {
+		if (playerElement?.ended) return;
+		paused = true;
+		if (hasStartedPlaying) showPauseBar();
+	}
+
 	function onVideoPlay() {
 		paused = false;
+		pauseBar = false;
 		unpinControls();
+		syncControls();
+	}
+
+	function onVideoPlaying() {
+		hasStartedPlaying = true;
+	}
+
+	// Autoplay blocked or failed: the video is loaded but stays paused. After a short
+	// grace period (autoplay normally starts right after canplay) show the bar so the
+	// user can press Play.
+	let autoplayFallback: ReturnType<typeof setTimeout> | undefined;
+	function onVideoCanPlay() {
+		if (hasStartedPlaying) return;
+		clearTimeout(autoplayFallback);
+		autoplayFallback = setTimeout(() => {
+			if (!hasStartedPlaying && playerElement?.paused) showPauseBar();
+		}, 2500);
 	}
 
 	$effect(() => {
 		const element = playerElement;
 		if (!element) return;
 
-		paused = element.paused;
-		syncControls();
+		// untrack: syncControls() reads other state; without it every pin/pause change
+		// re-ran this effect and reset hasStartedPlaying.
+		untrack(() => {
+			paused = element.paused;
+			hasStartedPlaying = false;
+			pauseBar = false;
+			syncControls();
+		});
 		element.addEventListener('pause', onVideoPause);
 		element.addEventListener('play', onVideoPlay);
+		element.addEventListener('playing', onVideoPlaying);
+		element.addEventListener('canplay', onVideoCanPlay);
 		return () => {
+			clearTimeout(autoplayFallback);
 			element.removeEventListener('pause', onVideoPause);
 			element.removeEventListener('play', onVideoPlay);
+			element.removeEventListener('playing', onVideoPlaying);
+			element.removeEventListener('canplay', onVideoCanPlay);
 		};
 	});
 
@@ -415,8 +464,8 @@
 					return false;
 				}
 
-				if (controlsPinned && !paused) {
-					unpinControls();
+				if (controlsPinned || pauseBar) {
+					hideBar();
 					return false;
 				}
 

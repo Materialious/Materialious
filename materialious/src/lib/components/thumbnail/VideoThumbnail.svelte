@@ -191,7 +191,13 @@
 	bind:this={thumbnailElement}
 	tabindex="0"
 	role="button"
-	onmouseleave={() => (thumbnailActionsVisible = false)}
+	onmouseleave={(event) => {
+		const nextTarget = event.relatedTarget;
+		const actionsMenu = event.currentTarget.querySelector('.root-menu');
+		if (!(nextTarget instanceof Node) || !actionsMenu?.contains(nextTarget)) {
+			thumbnailActionsVisible = false;
+		}
+	}}
 >
 	{#if thumbnailActionsVisible}
 		<menu class="active root-menu" onmouseleave={() => (thumbnailActionsVisible = false)}>

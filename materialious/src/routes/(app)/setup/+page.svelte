@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { tick } from 'svelte';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
+	import { isAndroidTv, keyCodeMap } from '#lib/utils';
 	import { resolve } from '$app/paths';
 	import { _ } from '#lib/i18n/index';
 	import {
@@ -24,6 +27,57 @@
 	let saving = $state(false);
 
 	const stepNames = ['Backend', 'Player', 'Connections'];
+	let setupPage: HTMLElement;
+
+	$effect(() => {
+		void step;
+		if (!isAndroidTv()) return;
+		let cancelled = false;
+		void tick().then(() => {
+			if (cancelled) return;
+			const target = setupPage?.querySelector<HTMLElement>(
+				'.step-content input, .step-content button, .setup-card a'
+			);
+			if (target instanceof HTMLInputElement) target.readOnly = true;
+			target?.focus();
+			target?.scrollIntoView({ block: 'nearest' });
+		});
+		return () => {
+			cancelled = true;
+		};
+	});
+
+	function handleKeyDown(event: KeyboardEvent) {
+		if (!isAndroidTv()) return;
+		const target = event.target as HTMLElement;
+		if (target instanceof HTMLInputElement) {
+			if (event.key === 'Enter' && target.readOnly) {
+				event.preventDefault();
+				target.readOnly = false;
+				target.focus();
+				return;
+			}
+			if (!target.readOnly) return;
+		}
+		const code = keyCodeMap[event.key];
+		if (![37, 38, 39, 40].includes(code)) return;
+		event.preventDefault();
+		const next = getNextFocus(target, code, setupPage);
+		if (next instanceof HTMLInputElement) next.readOnly = true;
+		next?.focus();
+		next?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+	}
+
+	function handleFocusOut(event: FocusEvent) {
+		if (isAndroidTv() && event.target instanceof HTMLInputElement) event.target.readOnly = true;
+	}
+
+	function handleClick(event: MouseEvent) {
+		if (isAndroidTv() && event.target instanceof HTMLInputElement && event.target.readOnly) {
+			event.target.readOnly = false;
+			event.target.focus();
+		}
+	}
 
 	async function setupCompleted() {
 		clearCaches();
@@ -73,7 +127,16 @@
 	}
 </script>
 
-<main class="setup-page">
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+<div
+	class="setup-page"
+	role="group"
+	aria-label="Setup"
+	bind:this={setupPage}
+	onkeydown={handleKeyDown}
+	onfocusout={handleFocusOut}
+	onclick={handleClick}
+>
 	{#if !isUnrestrictedPlatform()}
 		<section class="setup-card surface-container">
 			<p><code>VITE_DEFAULT_INVIDIOUS_INSTANCE</code> has not been provided.</p>
@@ -104,7 +167,7 @@
 					>
 						<button
 							class="circle small step-circle"
-							disabled={step < index}
+							disabled={step < index || (index === 1 && usingInvidious === false)}
 							onclick={() => (step = index)}
 						>
 							{#if step > index}<i>done</i>{:else}{index + 1}{/if}
@@ -208,17 +271,21 @@
 			{/if}
 		</section>
 	{/if}
-</main>
+</div>
 
 <style>
 	.setup-page {
-		min-height: 75vh;
-		display: grid;
-		place-items: center;
+		height: 100%;
+		box-sizing: border-box;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		display: flex;
 		padding: 2rem 1rem;
 	}
 	.setup-card {
 		width: min(100%, 680px);
+		margin: auto;
+		flex-shrink: 0;
 		box-sizing: border-box;
 		padding: clamp(1.25rem, 4vw, 2.5rem);
 		border-radius: 1.5rem;
@@ -292,7 +359,10 @@
 		text-align: left;
 		border-radius: 1rem;
 	}
-	.choice:hover {
+	.choice:hover,
+	.setup-page :global(button:focus-visible),
+	.setup-page :global(input:focus-visible),
+	.setup-page :global(a:focus-visible) {
 		outline: 2px solid var(--primary);
 	}
 	.choice span {

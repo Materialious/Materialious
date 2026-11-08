@@ -18,18 +18,19 @@ jobs:
         working-directory: ./materialious/android
 
     steps:
-      - name: Resolve released version
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Resolve desktop release
         id: release
         working-directory: .
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)
+          TAG=$(jq -r .version materialious/package.json)
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-      - uses: actions/checkout@v5
-        with:
-          ref: ${{ steps.release.outputs.tag }}
 
       - name: Verify checked out version matches release
         run: |
@@ -118,24 +119,13 @@ jobs:
             jarsigner -verify "app/release/$name-signed.aab"
           done
 
-      - name: Upload APKs to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./materialious/android/app/release/*-signed.apk
-          tag: ${{ steps.release.outputs.tag }}
-          release_name: ${{ steps.release.outputs.tag }}
-          overwrite: true
-          file_glob: true
-          draft: false
-
-      - name: Upload AABs to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./materialious/android/app/release/*-signed.aab
-          tag: ${{ steps.release.outputs.tag }}
-          release_name: ${{ steps.release.outputs.tag }}
-          overwrite: true
-          file_glob: true
-          draft: false
+      - name: Upload Android artifacts to desktop release
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ steps.release.outputs.tag }}" \
+            materialious/android/app/release/*-signed.apk \
+            materialious/android/app/release/*-signed.aab \
+            --repo "$GITHUB_REPOSITORY" \
+            --clobber

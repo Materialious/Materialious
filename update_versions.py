@@ -2,7 +2,8 @@ import json
 import os
 import re
 from datetime import datetime
-from urllib.request import Request, urlopen
+
+import requests
 
 LATEST_VERSION = "1.18.20"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
@@ -18,12 +19,13 @@ CONTRIBUTORS_FILE = os.path.join(WORKING_DIR, "static", "localApi", "ghContribut
 
 
 def update_contributors() -> None:
-    request = Request(
+    response = requests.get(
         "https://api.github.com/repos/Materialious/Materialious/contributors",
         headers={"Accept": "application/vnd.github+json"},
+        timeout=30,
     )
-    with urlopen(request, timeout=30) as response:
-        contributors = json.load(response)
+    response.raise_for_status()
+    contributors = response.json()
 
     os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
     with open(CONTRIBUTORS_FILE, "w", encoding="utf-8") as f_:

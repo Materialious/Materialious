@@ -131,6 +131,7 @@
 	}
 
 	let playbackError = $state<PlaybackError | null>(null);
+	let youtubeJsFallbackAttemptedFor: string | null = null;
 	let isRetryingPlayback = $state(false);
 
 	let player: shaka.Player;
@@ -418,6 +419,21 @@
 			source,
 			detail: errorDetail(error)
 		};
+
+		// Streaming errors can happen well after loadVideo() has returned. Apply
+		// the configured fallback here as well as for failures during startup.
+		// Record the video before retrying so a failed YouTube.js attempt cannot
+		// recursively trigger another fallback.
+		if (
+			$playerYouTubeJsFallback &&
+			isUnrestrictedPlatform() &&
+			!isYTBackend() &&
+			data.video.fallbackPatch !== 'youtubejs' &&
+			youtubeJsFallbackAttemptedFor !== data.video.videoId
+		) {
+			youtubeJsFallbackAttemptedFor = data.video.videoId;
+			void retryPlayback(true);
+		}
 	}
 
 	function recoverSabrSession(error: shaka.util.Error): boolean {
@@ -1186,16 +1202,6 @@
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 		}
 
-		// Honour the user's "always allow local video fallback" preference.
-		if (
-			playbackError &&
-			$playerYouTubeJsFallback &&
-			isUnrestrictedPlatform() &&
-			!isYTBackend() &&
-			data.video.fallbackPatch !== 'youtubejs'
-		) {
-			await retryPlayback(true);
-		}
 	});
 
 	async function getPlaybackHistory(): Promise<number> {

@@ -21,7 +21,7 @@
 
 	let replies: Comments | undefined = $state(undefined);
 
-	const replyText: string = comment.replies?.replyCount > 1 ? $_('replies') : $_('reply');
+	const replyText = $derived((comment.replies?.replyCount ?? 0) > 1 ? $_('replies') : $_('reply'));
 
 	async function loadReplies(continuation: string) {
 		if (comment?.getReplies) {
@@ -99,7 +99,7 @@
 				<p class="no-margin no-padding"><i>thumb_up</i> {numberWithCommas(comment.likeCount)}</p>
 				{#if comment.replies && !replies}
 					<button
-						onclick={async () => loadReplies(comment.replies.continuation)}
+						onclick={async () => loadReplies(comment.replies?.continuation ?? '')}
 						class="transparent replies"
 					>
 						<i>expand_more</i>

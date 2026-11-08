@@ -130,6 +130,6 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: var(--video-player-height);
+		height: 100%;
 	}
 </style>

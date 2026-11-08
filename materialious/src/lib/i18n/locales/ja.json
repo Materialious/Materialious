@@ -129,7 +129,10 @@
             "fontFamily": "フォント",
             "opacity": "不透明度",
             "subtitleOffset": "字幕のタイミング",
-            "textShadow": "テキストの影"
+            "textShadow": "テキストの影",
+            "play": "再生",
+            "pause": "一時停止",
+            "subtitles": "字幕"
         },
         "pauseTimerFinished": "一時停止タイマーが終了しました",
         "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
@@ -222,7 +225,8 @@
             "defaultPlaybackSpeed": "既定の再生速度",
             "playerStatistics": "最初からプレイヤー統計情報を表示",
             "networkChangePause": "ネットワーク変更時に一時停止",
-            "fitScreenByDefault": "デフォルトで画面に合わせる"
+            "fitScreenByDefault": "デフォルトで画面に合わせる",
+            "androidAutoPip": "アプリの終了時に自動的に PiP モードに入る"
         },
         "bookmarklet": "ブックマーク",
         "instanceUrl": "インスタンスのURL",
@@ -298,7 +302,8 @@
             "exportToClipboard": "クリップボードへエクスポート",
             "exportToFile": "ファイルへエクスポート",
             "importFromFile": "ファイルからインポート",
-            "exportToShareUrl": "共有URLにエクスポート"
+            "exportToShareUrl": "共有URLにエクスポート",
+            "youtubeSubscriptionsGuide": "YouTube のチャンネル登録者をエクスポートする方法"
         },
         "preserveTranslation": "オリジナルの翻訳を使用する",
         "binds": {
@@ -452,5 +457,37 @@
         "sent": "サインイン情報を送信しました。",
         "expiresIn": "{{seconds}}秒後に有効期限が切れます",
         "done": "完了"
+    },
+    "loginWithPassword": "パスワードでログイン",
+    "loginWithQuickConnect": "クイックコネクトでログイン",
+    "invidiousInstance": "不明なインスタンス",
+    "companionRequired": {
+        "title": "ブラウザ用コンパニオンアプリが必要です",
+        "description": "この Materialious のインスタンスは、ブラウザ用拡張機能、または Android およびデスクトップアプリと組み合わせてのみ動作します。",
+        "installInstruction": "対応する拡張機能をインストールして有効にするか、以下のアプリをダウンロードしてください。",
+        "setupTitle": "このインスタンスをブラウザ拡張機能に追加する",
+        "setupStepOne": "ブラウザのツールバーにある「Materialious Companion」のアイコンを選択してください。",
+        "setupStepTwo": "「インスタンスを追加」フィールドに、次のURLを入力してください：",
+        "setupStepThree": "「追加」を選択し、ブラウザからの権限リクエストを許可してください。",
+        "copyUrl": "URLをコピー",
+        "instanceUrl": "インスタンスの URL",
+        "downloadTitle": "Materialious をダウンロード",
+        "windows": "Windows",
+        "windowsX64": "Windows x64",
+        "windowsX32": "Windows x32",
+        "android": "Android",
+        "fDroid": "F-Droid",
+        "izzyOnDroid": "IzzyOnDroid",
+        "apkUniversal": "APK Universal",
+        "apkX64": "APK x64",
+        "apkArm64": "APK ARM64",
+        "obtainium": "Obtainium",
+        "linux": "Linux",
+        "flathub": "Flathub",
+        "snap": "Snap",
+        "debianUbuntu": "Debian/Ubuntu",
+        "fedoraOpenSuse": "Fedora/OpenSuse",
+        "appImage": "AppImage",
+        "tarball": "Tarball"
     }
 }

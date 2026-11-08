@@ -2,12 +2,14 @@ import { getDownloadSession, SabrStream } from '@materialious/shared/download';
 import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { isOwnBackend } from '#lib/shared/index';
+import { assertDownloadEnabled } from '#lib/server/downloadAvailability';
 
 const zFormatsSchema = z.object({
 	videoId: z.string().length(11)
 });
 
 export async function POST({ request, locals }) {
+	assertDownloadEnabled();
 	if (isOwnBackend()?.requireAuth && !locals.userId) {
 		throw error(401);
 	}

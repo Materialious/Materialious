@@ -16,6 +16,7 @@ export const variables = defineEnvVars({
 	PUBLIC_DEFAULT_SPONSERBLOCK_INSTANCE: { public: true, schema: (input) => input ?? '' },
 	PUBLIC_PLAYER_ID: { public: true, schema: (input) => input ?? '' },
 	PUBLIC_PROXY_DISABLED: { public: true, schema: (input) => input ?? '' },
+	PUBLIC_DOWNLOAD_DISABLED: { public: true, schema: (input) => input ?? '' },
 	WHITELIST_BASE_DOMAIN: { schema: (input) => input ?? '' },
 	PROXY_TRUST_CA: { schema: (input) => input ?? '' },
 	PUBLIC_BUILD_WITH_BACKEND: { public: true, schema: (input) => input ?? '' },

@@ -1,10 +1,10 @@
 {
 	"name": "materialious",
-	"version": "1.18.19",
+	"version": "1.18.20",
 	"private": true,
 	"scripts": {
-		"dev": "npm run build:shared && npm run patch:github && vite dev",
-		"build": "npm run build:shared && npm run patch:github && vite build",
+		"dev": "npm run build:shared && vite dev",
+		"build": "npm run build:shared && vite build",
 		"build:shared": "npm run --prefix shared build",
 		"preview": "vite preview",
 		"check": "npm run build:shared && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

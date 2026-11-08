@@ -1,5 +1,8 @@
 const http = require('http');
 const https = require('https');
+const { channel } = require('bridge');
+
+const startTvLoginServer = require('./login-server');
 
 const HOST = 'localhost';
 const PORT = 3000;
@@ -200,6 +203,10 @@ const server = http.createServer((req, res) => {
 	req.on('end', () => proxyRequest(req, res, parsedTarget, bodyChunks));
 });
 
-server.listen(PORT, () => {
+// Bound to loopback only: this is an open proxy by design and must never be
+// reachable from the LAN.
+server.listen(PORT, '127.0.0.1', () => {
 	console.log(`Proxy server running at http://${HOST}:${PORT}`);
 });
+
+startTvLoginServer(channel);

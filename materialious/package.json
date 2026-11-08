@@ -13,7 +13,6 @@
 		"eslint": "eslint .",
 		"format": "prettier --write .",
 		"patch:shaka": "node ./scripts/patchShaka.mjs",
-		"patch:github": "node ./scripts/githubContributors.mjs",
 		"postinstall": "patch-package --error-on-fail && npm run patch:shaka"
 	},
 	"devDependencies": {

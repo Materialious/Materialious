@@ -69,7 +69,7 @@
 		<button class="circle transparent" data-ui="#dialog-settings"><i>close</i></button>
 	</nav>
 
-	<div style="height: 100%;">
+	<div class="settings-body">
 		<nav class="wrap s">
 			{#if tabs}
 				{@const currentTab = tabs.find((tab) => tab.id === activeTab)}
@@ -160,6 +160,17 @@
 <style>
 	#dialog-settings {
 		width: 800px;
+		height: 80vh;
+		max-height: 80vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.settings-body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-height: 0;
 	}
 
 	.categories {
@@ -171,14 +182,22 @@
 	}
 
 	.settings {
-		height: 800px;
+		height: 100%;
+		min-height: 0;
+		box-sizing: border-box;
 		overflow-y: auto;
 		padding-right: 10px;
 	}
 
 	.grid {
+		flex: 1;
 		margin-top: 0 !important;
-		height: 100% !important;
+		min-height: 0;
+		height: 0 !important;
+	}
+
+	.grid > div {
+		min-height: 0;
 	}
 
 	.grid .m,

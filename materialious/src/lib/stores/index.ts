@@ -78,6 +78,7 @@ export {
 	rawMasterKeyStore,
 	materialiousBackendStore,
 	authTokenStore,
+	disableSettingsSyncStore,
 	configBackendCache
 } from './backend';
 export { watchHistoryEnabledStore, poTokenCacheStore } from './misc';

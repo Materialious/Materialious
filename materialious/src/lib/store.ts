@@ -67,6 +67,7 @@ export {
 	rawMasterKeyStore,
 	materialiousBackendStore,
 	authTokenStore,
+	disableSettingsSyncStore,
 	watchHistoryEnabledStore,
 	poTokenCacheStore,
 	filterContentListStore,

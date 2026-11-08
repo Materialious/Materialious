@@ -17,7 +17,7 @@
 		startTvLoginSession,
 		stopTvLoginSession
 	} from '#lib/tvQrLogin';
-	import { renderSVG } from 'uqr';
+	import QR from '@svelte-put/qr/svg/QR.svelte';
 	import { isAndroidTv } from '#lib/utils';
 	import { onDestroy, onMount, tick } from 'svelte';
 
@@ -47,8 +47,8 @@
 		const instance = $invidiousInstanceStore;
 		if (!qrEnabled || !instance) return;
 
-		code = generateLoginCode();
-		secret = generateLoginSecret();
+		code = await generateLoginCode();
+		secret = await generateLoginSecret();
 		loginStatus = 'waiting';
 
 		try {
@@ -56,7 +56,7 @@
 				code,
 				secret,
 				instance,
-				theme: readTheme(),
+				theme: await readTheme(),
 				strings: readWebStrings($_),
 				lang: $locale
 			});
@@ -222,8 +222,13 @@
 			aria-label={qrCodeUrl ? $_('loginQr.qrAriaLabel', { url: qrCodeUrl }) : undefined}
 		>
 			{#if qrCodeUrl}
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html renderSVG(qrCodeUrl, { border: 0 })}
+				<QR
+					data={qrCodeUrl}
+					margin={0}
+					moduleFill="black"
+					anchorInnerFill="black"
+					anchorOuterFill="black"
+				/>
 			{/if}
 		</div>
 

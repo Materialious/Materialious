@@ -1,5 +1,9 @@
 import { NodeJS } from 'capacitor-nodejs';
 import type { PluginListenerHandle } from '@capacitor/core';
+import sodium from 'libsodium-wrappers-sumo';
+import { get } from 'svelte/store';
+import { getDynamicTheme } from '#lib/theme/index';
+import { darkModeStore } from '#lib/store';
 
 // TV QR login: the WebView drives the session (code + secret), the embedded
 // Node process serves the handshake pages to the phone/PC (see
@@ -44,9 +48,6 @@ const WEB_STRING_KEYS = [
 	'continue',
 	'wrongCode',
 	'tooManyAttempts',
-	'redirecting',
-	'redirectingHint',
-	'redirectingAction',
 	'doneTitle',
 	'doneBody',
 	'expiredTitle',
@@ -55,12 +56,13 @@ const WEB_STRING_KEYS = [
 	'invalidBody'
 ];
 
-// Reads the colors BeerCSS currently applies to the body (validated again on the Node side).
-export function readTheme(): TvLoginSession['theme'] {
-	const style = getComputedStyle(document.body);
+// Live app theme via the existing helper; the Node side validates every value again.
+export async function readTheme(): Promise<TvLoginSession['theme']> {
+	const colors = await getDynamicTheme();
 	const vars: Record<string, string> = {};
-	for (const name of THEME_VARS) vars[name] = style.getPropertyValue(`--${name}`).trim();
-	return { vars, dark: document.body.classList.contains('dark') };
+	for (const name of THEME_VARS)
+		vars[name] = (colors[`--${name}` as keyof typeof colors] ?? '').trim();
+	return { vars, dark: !!get(darkModeStore) };
 }
 
 export function readWebStrings(translate: (key: string) => string): Record<string, string> {
@@ -73,19 +75,15 @@ export interface TvLoginEvents {
 	onError?: (message: string) => void;
 }
 
-export function generateLoginCode(): string {
-	const bytes = crypto.getRandomValues(new Uint8Array(6));
-	let code = '';
-	for (let i = 0; i < 6; i++) code += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
-	return code;
+export async function generateLoginCode(): Promise<string> {
+	await sodium.ready;
+	const bytes = sodium.randombytes_buf(6);
+	return Array.from(bytes, (byte) => CODE_ALPHABET[byte % CODE_ALPHABET.length]).join('');
 }
 
-export function generateLoginSecret(): string {
-	const bytes = crypto.getRandomValues(new Uint8Array(16));
-	return btoa(String.fromCharCode(...bytes))
-		.replace(/\+/g, '-')
-		.replace(/\//g, '_')
-		.replace(/=/g, '');
+export async function generateLoginSecret(): Promise<string> {
+	await sodium.ready;
+	return sodium.to_base64(sodium.randombytes_buf(16), sodium.base64_variants.URLSAFE_NO_PADDING);
 }
 
 export async function startTvLoginSession(session: TvLoginSession): Promise<void> {

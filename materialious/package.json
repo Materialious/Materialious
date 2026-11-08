@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && npm run patch:github && vite dev",
-		"build": "npm run build:shared && npm run patch:github && vite build",
+		"build": "npm run build:shared && npm run patch:github && npm run build:tv-login-web && vite build",
+		"build:tv-login-web": "node ./scripts/buildTvLoginWeb.mjs",
 		"build:shared": "npm run --prefix shared build",
 		"preview": "vite preview",
 		"check": "npm run build:shared && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -69,6 +70,7 @@
 		"@macfja/serializer": "^1.1.4",
 		"@macfja/svelte-persistent-store": "^2.4.2",
 		"@materialious/shared": "file:shared",
+		"@svelte-put/qr": "2.1.3",
 		"@zxcvbn-ts/core": "^4.2.0",
 		"@zxcvbn-ts/language-common": "^4.1.3",
 		"@zxcvbn-ts/language-en": "^4.1.1",
@@ -115,7 +117,6 @@
 		"sveltekit-rate-limiter": "^0.8.0",
 		"tldts": "^7.4.5",
 		"undici": "^8.10.2",
-		"uqr": "0.1.3",
 		"youtubei.js": "^18.3.0",
 		"zod": "^4.6.5"
 	},

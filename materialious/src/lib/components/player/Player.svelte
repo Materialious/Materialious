@@ -78,11 +78,9 @@
 		playerIsPip?: boolean;
 		// Lets the TV page reach the Shaka instance for its settings panel.
 		onShakaPlayer?: (player: shaka.Player | undefined) => void;
-		// Android TV only: shows a settings button next to the timeline, since the regular
-		// settings menu isn't reachable with a D-pad.
-		onTvSettings?: () => void;
-		tvPlayButton?: HTMLButtonElement | undefined;
-		tvSettingsButton?: HTMLButtonElement | undefined;
+		// Android TV: SponsorBlock segments, shared with the TV controls overlay.
+		segments?: Segment[];
+		// TV gets its own control overlay (TvControls) instead of the inline bar.
 	}
 
 	let {
@@ -95,12 +93,8 @@
 		showControls = $bindable(false),
 		holdControls = false,
 		onShakaPlayer = undefined,
-		onTvSettings = undefined,
-		tvPlayButton = $bindable(undefined),
-		tvSettingsButton = $bindable(undefined)
+		segments = $bindable([])
 	}: Props = $props();
-
-	let segments: Segment[] = $state([]);
 	let segmentManualSkip: Segment | undefined = $state();
 	let watchProgressInterval: ReturnType<typeof setInterval>;
 	let keepAwakeSupported = $state(false);
@@ -773,7 +767,8 @@
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		showPlayerUiTimeout = setTimeout(() => {
-			if (holdControls) return;
+			// A paused video keeps its control bar on screen.
+			if (holdControls || playerElement?.paused) return;
 
 			showControls = false;
 			playerInitalInteract = true;
@@ -1301,7 +1296,7 @@
 		</div>
 	{/if}
 
-	{#if showControls && !isAndroidPictureInPicture}
+	{#if showControls && !isAndroidPictureInPicture && !isAndroidTv()}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1328,95 +1323,75 @@
 			bind:playerIsBuffering
 		/>
 	{/if}
-	{#if !isAndroidPictureInPicture}
+	{#if !isAndroidPictureInPicture && !isAndroidTv()}
 		<div id="player-controls" class="hide" class:show={showControls}>
-		<Timeline
-			{playerElement}
-			{currentTime}
-			{showPlayerUI}
-			{segments}
-			{playerIsPip}
-			video={data.video}
-			content={data.content}
-			bind:userManualSeeking
-			bind:playerMaxKnownTime
-		/>
-		<nav>
-			{#if !isAndroidTv()}
-				<nav class="no-wrap">
-					<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
-						<i>
-							{#if playerCurrentPlaybackState}
-								pause
-							{:else}
-								play_arrow
-							{/if}
-						</i>
-					</button>
-					{#if !isMobile() && !playerIsPip}
-						<div class="player-slider volume m l" {...playerVolumeSlider.root}>
-							<div class="track">
-								<div class="range"></div>
-								<div {...playerVolumeSlider.thumb}></div>
+			<Timeline
+				{playerElement}
+				{currentTime}
+				{showPlayerUI}
+				{segments}
+				{playerIsPip}
+				video={data.video}
+				content={data.content}
+				bind:userManualSeeking
+				bind:playerMaxKnownTime
+			/>
+			<nav>
+				{#if !isAndroidTv()}
+					<nav class="no-wrap">
+						<button class="surface-container-highest" onclick={toggleVideoPlaybackStatus}>
+							<i>
+								{#if playerCurrentPlaybackState}
+									pause
+								{:else}
+									play_arrow
+								{/if}
+							</i>
+						</button>
+						{#if !isMobile() && !playerIsPip}
+							<div class="player-slider volume m l" {...playerVolumeSlider.root}>
+								<div class="track">
+									<div class="range"></div>
+									<div {...playerVolumeSlider.thumb}></div>
+								</div>
 							</div>
-						</div>
+						{/if}
+					</nav>
+				{/if}
+
+				<div class="max"></div>
+
+				<nav class="no-wrap">
+					{#if data.video.liveNow}
+						<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
+							{$_('thumbnail.live')}
+						</button>
+					{:else}
+						<p class="chip m l" style="height: 100%;">
+							{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
+						</p>
+					{/if}
+					{#if !isAndroidTv() && !playerIsPip}
+						<CaptionSettings video={data.video} />
+						{#if playerElement}
+							<Settings {player} {playerElement} />
+							<Airplay {playerElement} />
+							<Pip {playerElement} />
+						{/if}
+						{#if Capacitor.getPlatform() !== 'android'}
+							<button
+								class="surface-container-highest"
+								class:primary={$playerIsInWindowFullscreen}
+								onclick={toggleInWindowFullscreen}
+							>
+								<i>fit_screen</i>
+							</button>
+						{/if}
+						<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
 					{/if}
 				</nav>
-			{/if}
-
-			<div class="max"></div>
-
-			<nav class="no-wrap">
-				{#if isAndroidTv() && onTvSettings}
-					<button
-						bind:this={tvPlayButton}
-						class="circle transparent tv-control-button"
-						aria-label={playerCurrentPlaybackState
-							? $_('player.controls.pause')
-							: $_('player.controls.play')}
-						onclick={toggleVideoPlaybackStatus}
-					>
-						<i>{playerCurrentPlaybackState ? 'pause' : 'play_arrow'}</i>
-					</button>
-					<button
-						bind:this={tvSettingsButton}
-						class="circle transparent tv-control-button"
-						aria-label={$_('layout.settings')}
-						onclick={onTvSettings}
-					>
-						<i>settings</i>
-					</button>
-				{/if}
-				{#if data.video.liveNow}
-					<button class="chip m l" style="height: 100%;" onclick={seekToLiveEdge}>
-						{$_('thumbnail.live')}
-					</button>
-				{:else}
-					<p class="chip m l" style="height: 100%;">
-						{videoLength(currentTime)} / {videoLength(data.video.lengthSeconds)}
-					</p>
-				{/if}
-				{#if !isAndroidTv() && !playerIsPip}
-					<CaptionSettings video={data.video} />
-					{#if playerElement}
-						<Settings {player} {playerElement} />
-						<Airplay {playerElement} />
-						<Pip {playerElement} />
-					{/if}
-					{#if Capacitor.getPlatform() !== 'android'}
-						<button
-							class="surface-container-highest"
-							class:primary={$playerIsInWindowFullscreen}
-							onclick={toggleInWindowFullscreen}
-						>
-							<i>fit_screen</i>
-						</button>
-					{/if}
-					<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
-				{/if}
 			</nav>
-		</nav>
-	</div>
+		</div>
 	{/if}
 	{#if playbackError}
 		<div class="player-error" role="alert">
@@ -1540,19 +1515,6 @@
 		background-color: var(--surface-container-highest);
 		color: var(--on-surface);
 		border: none;
-	}
-
-	.tv-control-button {
-		color: white;
-	}
-
-	.tv-control-button i {
-		filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
-	}
-
-	.tv-control-button:focus {
-		outline: 3px solid var(--primary);
-		outline-offset: 2px;
 	}
 
 	.hide-cursor {

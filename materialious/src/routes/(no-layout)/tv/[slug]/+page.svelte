@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ContentColumn from '#lib/components/layout/ContentColumn.svelte';
 	import Player from '#lib/components/player/Player.svelte';
+	import TvControls from '#lib/components/player/TvControls.svelte';
 	import Author from '#lib/components/Author.svelte';
 	import Description from '#lib/components/watch/Description.svelte';
 	import LikesDislikes from '#lib/components/watch/LikesDislikes.svelte';
@@ -8,28 +9,34 @@
 	import Mousetrap from 'mousetrap';
 	import { onDestroy, onMount, tick } from 'svelte';
 	import { _ } from '#lib/i18n/index';
-	import { playlistCacheStore } from '#lib/store';
+	import { playlistCacheStore, playlistSettingsStore } from '#lib/store';
 	import { fade } from 'svelte/transition';
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
-	import { keyCodeMap } from '#lib/utils';
+	import { isAndroidTv, keyCodeMap } from '#lib/utils';
+	import type { Segment } from 'sponsorblock-api';
 	import type shaka from 'shaka-player/dist/shaka-player.ui';
 	import TvSettings from '#lib/components/player/settings/TvSettings.svelte';
+	import { goToNextVideo } from '#lib/player/index';
+	import { goto } from '$app/navigation';
+	import { resolveWatchPath } from '#lib/paths';
+	import { isItemFiltered } from '#lib/filtering/index';
 
 	let { data } = $props();
 
 	let playerElement: HTMLMediaElement | undefined = $state();
 	let shakaPlayer: shaka.Player | undefined = $state();
+	// SponsorBlock segments, fetched inside Player and shared with TvControls.
+	let tvSegments: Segment[] = $state([]);
 	let showTvSettings = $state(false);
 	let tvSettings: TvSettings | undefined = $state();
-	// Down focuses the play/pause button, left/right move to the settings button, and down
-	// again opens the info sheet. Up closes the bar.
+	// The TV control bar is a row of buttons in TvControls; focus moves along it by
+	// index (←/→) and Down opens the info sheet from any button.
 	let controlsPinned = $state(false);
-	let playButton: HTMLButtonElement | undefined = $state();
-	let gearButton: HTMLButtonElement | undefined = $state();
-	let controlsPinTimeout: ReturnType<typeof setTimeout> | undefined;
+	let tvControlsRow: HTMLElement | undefined = $state();
 	// Overlays opened from the control bar hand focus back to the button they came from.
 	let returnFocusTo: HTMLElement | undefined;
+	let controlsPinTimeout: ReturnType<typeof setTimeout> | undefined;
 	let showInfo = $state(false);
 	let infoPanel: HTMLElement | undefined = $state();
 	let infoScope: HTMLElement | undefined = $state();
@@ -49,11 +56,33 @@
 	const hasPlaylist = $derived(!!data.playlistId && data.playlistId in $playlistCacheStore);
 	const hasRecommended = $derived(data.video.recommendedVideos.length > 0);
 
+	// Next-video button: playlist successor, else the first unfiltered recommendation.
+	const playlistVideos = $derived(
+		hasPlaylist ? $playlistCacheStore[data.playlistId!].videos : undefined
+	);
+	const nextRecommended = $derived(
+		data.video.recommendedVideos.find((video) => !isItemFiltered(video))
+	);
+	const hasNextVideo = $derived(
+		hasPlaylist
+			? !!playlistVideos &&
+					(playlistVideos.findIndex((video) => video.videoId === data.video.videoId) + 1 <
+						playlistVideos.length ||
+						$playlistSettingsStore[data.playlistId!]?.loop)
+			: !!nextRecommended
+	);
+	const playlistPosition = $derived.by(() => {
+		if (!playlistVideos) return undefined;
+		const index = playlistVideos.findIndex((video) => video.videoId === data.video.videoId);
+		return index === -1 ? undefined : `${index + 1} / ${playlistVideos.length}`;
+	});
+
 	function startSeeking(direction: 'left' | 'right') {
 		if (!showInfo && !showTvSettings && isControlFocused()) {
-			if (direction === 'right' && document.activeElement === playButton) focusControl(gearButton);
-			if (direction === 'left' && document.activeElement === gearButton) focusControl(playButton);
-
+			// Focus sits on a bar button: ←/→ walk the button row instead of seeking.
+			const keyCode = keyCodeMap[direction === 'right' ? 'ArrowRight' : 'ArrowLeft'];
+			const next = getNextFocus(document.activeElement, keyCode, tvControlsRow);
+			if (next instanceof HTMLElement) focusControl(next);
 			pinControls();
 			return false;
 		}
@@ -122,14 +151,21 @@
 		el.scrollIntoView({ block: 'center', inline: 'nearest' });
 	}
 
-	const isControlFocused = () =>
-		!!document.activeElement &&
-		(document.activeElement === playButton || document.activeElement === gearButton);
-
 	// preventScroll: focusing inside the clipped player container must not shift the video.
 	function focusControl(element: HTMLElement | undefined) {
 		tick().then(() => element?.focus({ preventScroll: true }));
 	}
+
+	// The button row lives in TvControls; buttons carry data-tv-button and render
+	// conditionally, so the row is queried rather than kept as fixed refs.
+	function rowButtons(): HTMLButtonElement[] {
+		return tvControlsRow
+			? Array.from(tvControlsRow.querySelectorAll<HTMLButtonElement>('button[data-tv-button]'))
+			: [];
+	}
+
+	const isControlFocused = () =>
+		!!tvControlsRow && !!document.activeElement && tvControlsRow.contains(document.activeElement);
 
 	function pinControls() {
 		controlsPinned = true;
@@ -164,10 +200,29 @@
 		});
 	}
 
-	function openTvSettings() {
-		returnFocusTo = gearButton;
+	function openTvSettings(opener: HTMLElement) {
+		returnFocusTo = opener;
 		unpinControls();
 		showTvSettings = true;
+	}
+
+	function openInfoFromButton(opener: HTMLElement) {
+		returnFocusTo = opener;
+		openInfo();
+	}
+
+	function playNextVideo() {
+		if (hasPlaylist) {
+			void goToNextVideo(data.video, data.playlistId);
+		} else if (nextRecommended) {
+			goto(resolveWatchPath(nextRecommended.videoId), { replace: isAndroidTv() });
+		}
+	}
+
+	function togglePlayback() {
+		if (!playerElement) return;
+		if (playerElement.paused) playerElement.play();
+		else playerElement.pause();
 	}
 
 	function restoreControlFocus() {
@@ -255,7 +310,7 @@
 					openInfo();
 				} else {
 					pinControls();
-					focusControl(playButton);
+					focusControl(rowButtons()[0]);
 				}
 
 				return false;
@@ -371,14 +426,28 @@
 		bind:currentTime
 		bind:userManualSeeking
 		bind:showControls
-		bind:tvPlayButton={playButton}
-		bind:tvSettingsButton={gearButton}
+		bind:segments={tvSegments}
 		holdControls={controlsPinned}
 		isEmbed={true}
 		{data}
-		onTvSettings={openTvSettings}
 	/>
 {/key}
+<TvControls
+	bind:rowElement={tvControlsRow}
+	video={data.video}
+	content={data.content}
+	segments={tvSegments}
+	{playerElement}
+	{currentTime}
+	{userManualSeeking}
+	visible={showControls}
+	{playlistPosition}
+	hasNext={hasNextVideo}
+	onPlayPause={togglePlayback}
+	onNext={playNextVideo}
+	onSettings={openTvSettings}
+	onInfo={openInfoFromButton}
+/>
 {#if showTvSettings && shakaPlayer && playerElement}
 	<TvSettings bind:this={tvSettings} player={shakaPlayer} {playerElement} video={data.video} />
 {/if}

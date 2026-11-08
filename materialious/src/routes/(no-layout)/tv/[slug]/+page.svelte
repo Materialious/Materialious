@@ -34,6 +34,7 @@
 	// index (←/→) and Down opens the info sheet from any button.
 	let controlsPinned = $state(false);
 	let tvControlsRow: HTMLElement | undefined = $state();
+	let tvTimeline: HTMLElement | undefined = $state();
 	// Overlays opened from the control bar hand focus back to the button they came from.
 	let returnFocusTo: HTMLElement | undefined;
 	let controlsPinTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -90,7 +91,9 @@
 	}
 
 	function startSeeking(direction: 'left' | 'right') {
-		if (!showInfo && !showTvSettings && (isControlFocused() || paused)) {
+		const onTimeline = isTimelineFocused();
+
+		if (!showInfo && !showTvSettings && !onTimeline && (isControlFocused() || paused)) {
 			// Bar focused, or video paused (bar is up): ←/→ walk the button row, never seek.
 			if (isControlFocused()) {
 				const keyCode = keyCodeMap[direction === 'right' ? 'ArrowRight' : 'ArrowLeft'];
@@ -112,6 +115,15 @@
 
 		const duration = data.video.lengthSeconds;
 		const base = duration * 0.005; // ~0.5%
+
+		// A tap is shorter than the 100ms seek throttle; on the paused timeline it still
+		// moves one base step.
+		if (onTimeline) {
+			currentTime =
+				direction === 'right'
+					? Math.min(currentTime + base, duration)
+					: Math.max(currentTime - base, 0);
+		}
 
 		function step(now: number) {
 			if (!isSeeking) return;
@@ -187,6 +199,10 @@
 			: [];
 	}
 
+	// Paused only: Up moves focus onto the progress bar so Left/Right can scrub.
+	const isTimelineFocused = () => !!tvTimeline && document.activeElement === tvTimeline;
+	const isBarFocused = () => isControlFocused() || isTimelineFocused();
+
 	const isControlFocused = () =>
 		!!tvControlsRow && !!document.activeElement && tvControlsRow.contains(document.activeElement);
 
@@ -206,7 +222,7 @@
 		syncControls();
 
 		// While the pause bar is up it keeps its focus.
-		if (!pauseBar && isControlFocused()) (document.activeElement as HTMLElement).blur();
+		if (!pauseBar && isBarFocused()) (document.activeElement as HTMLElement).blur();
 	}
 
 	// Back/Esc on a visible bar: hide it entirely. A paused video stays paused.
@@ -215,7 +231,7 @@
 		controlsPinned = false;
 		pauseBar = false;
 		syncControls();
-		if (isControlFocused()) (document.activeElement as HTMLElement).blur();
+		if (isBarFocused()) (document.activeElement as HTMLElement).blur();
 	}
 
 	function openInfo() {
@@ -419,7 +435,15 @@
 				if (showTvSettings) return true;
 
 				if (!showInfo) {
-					if (isControlFocused()) unpinControls();
+					if (paused) {
+						// Paused: Up goes to the timeline (showing the bar first if hidden) so the
+						// user can scrub; Down returns to the buttons, which keep the info sheet.
+						if (!isTimelineFocused()) {
+							pauseBar = true;
+							syncControls();
+							focusControl(tvTimeline);
+						}
+					} else if (isControlFocused()) unpinControls();
 					else openInfo();
 
 					return false;
@@ -445,7 +469,7 @@
 
 		// Arrow key seeking bindings
 		// Up/down act on key-up, so stop the WebView from also moving focus natively on key-down.
-		Mousetrap.bind(['up', 'down'], () => !isControlFocused(), 'keydown');
+		Mousetrap.bind(['up', 'down'], () => !isBarFocused(), 'keydown');
 		Mousetrap.bind('right', () => startSeeking('right'), 'keydown');
 		Mousetrap.bind('right', stopSeeking, 'keyup');
 		Mousetrap.bind('left', () => startSeeking('left'), 'keydown');
@@ -536,6 +560,7 @@
 {/key}
 <TvControls
 	bind:rowElement={tvControlsRow}
+	bind:timelineElement={tvTimeline}
 	video={data.video}
 	content={data.content}
 	segments={tvSegments}

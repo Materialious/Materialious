@@ -118,6 +118,7 @@
 			"playbackControls": "Controles de reprodução",
 			"endsAt": "Termina às {{time}}",
 			"videoInfo": "Informações do vídeo",
+			"timeline": "Linha do tempo",
 			"positionOf": "{{elapsed}} de {{total}}"
 		}
 	},

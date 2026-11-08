@@ -35,7 +35,8 @@
 		onNext,
 		onSettings,
 		onInfo,
-		rowElement = $bindable()
+		rowElement = $bindable(),
+		timelineElement = $bindable()
 	}: {
 		video: VideoPlay;
 		content: ParsedDescription;
@@ -51,6 +52,7 @@
 		onSettings: (opener: HTMLElement) => void;
 		onInfo: (opener: HTMLElement) => void;
 		rowElement: HTMLElement | undefined;
+		timelineElement: HTMLElement | undefined;
 	} = $props();
 
 	let playing = $state(false);
@@ -239,18 +241,20 @@
 			<div
 				class="tv-progress"
 				role="slider"
+				bind:this={timelineElement}
 				tabindex="-1"
-				aria-label={$_('player.controls.positionOf', {
-					elapsed: videoLength(currentTime),
-					total: videoLength(video.lengthSeconds)
-				})}
+				aria-label={$_('player.controls.timeline')}
 				aria-valuemin={0}
 				aria-valuemax={video.lengthSeconds}
 				aria-valuenow={Math.round(currentTime)}
-				aria-valuetext="{videoLength(currentTime)} / {videoLength(video.lengthSeconds)}"
+				aria-valuetext={$_('player.controls.positionOf', {
+					elapsed: videoLength(currentTime),
+					total: videoLength(video.lengthSeconds)
+				})}
 			>
 				<div class="track-line"></div>
 				<div class="range" style:width="{(currentTime / video.lengthSeconds) * 100}%"></div>
+				<div class="thumb" style:left="{previewPercent}%"></div>
 				{#each content.timestamps as chapter, index (chapter)}
 					<div
 						class="chapter-marker"
@@ -452,6 +456,34 @@
 		background-color: var(--primary);
 		border-radius: var(--player-border-radius);
 		z-index: 1;
+	}
+
+	/* Timeline focus (paused): thicker track, knob and the same ring as the buttons. */
+	.tv-progress:focus {
+		outline: 3px solid var(--primary);
+		outline-offset: calc(14 * var(--u));
+		border-radius: calc(6 * var(--u));
+	}
+
+	.tv-progress:focus .track-line,
+	.tv-progress:focus .range {
+		transform: scaleY(1.8);
+	}
+
+	.thumb {
+		display: none;
+		position: absolute;
+		top: 50%;
+		width: calc(28 * var(--u));
+		height: calc(28 * var(--u));
+		margin: calc(-14 * var(--u)) 0 0 calc(-14 * var(--u));
+		border-radius: 50%;
+		background-color: var(--primary);
+		z-index: 3;
+	}
+
+	.tv-progress:focus .thumb {
+		display: block;
 	}
 
 	.chapter-marker {

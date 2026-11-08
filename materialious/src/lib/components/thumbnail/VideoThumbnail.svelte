@@ -25,7 +25,7 @@
 	import PlaylistManager from '../PlaylistManager.svelte';
 	import { deleteWatchHistoryItem, saveWatchHistory } from '#lib/api/index';
 	import type { ThumbnailVideo } from '#lib/thumbnail';
-	import { isAndroidTv, truncate } from '#lib/utils';
+	import { isAndroidTv, isMobile, truncate } from '#lib/utils';
 	import { isYTBackend } from '#lib/backend';
 
 	interface Props {
@@ -139,7 +139,11 @@
 			([entry]) => {
 				if (entry.isIntersecting) thumbnailInView = true;
 			},
-			{ rootMargin: window.matchMedia('(max-width: 700px)').matches ? `${Math.ceil(window.innerHeight * 1.5)}px 0px` : '0px' }
+			{
+				rootMargin: isMobile()
+					? `${Math.ceil((thumbnailElement?.getBoundingClientRect().height || 180) * 3)}px 0px`
+					: '0px'
+			}
 		);
 		visibilityObserver = new IntersectionObserver(([entry]) => {
 			if (!entry.isIntersecting) thumbnailActionsVisible = false;

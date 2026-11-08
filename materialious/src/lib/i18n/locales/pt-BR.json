@@ -77,7 +77,24 @@
 		"expiresIn": "Novo código em {{time}}",
 		"usePassword": "Usar usuário e senha",
 		"useQr": "Usar QR code",
-		"qrAriaLabel": "QR code com o endereço {{url}}"
+		"qrAriaLabel": "QR code com o endereço {{url}}",
+		"web": {
+			"title": "Entrar no Materialious",
+			"instruction": "Digite o código mostrado na TV, depois entre no Invidious e aprove.",
+			"codeLabel": "Código",
+			"continue": "Continuar",
+			"wrongCode": "Código errado. Tente de novo.",
+			"tooManyAttempts": "Muitas tentativas erradas. Foi gerado um novo código, veja a TV.",
+			"redirecting": "Levando você ao Invidious",
+			"redirectingHint": "Entre e aprove o pedido. Se nada acontecer, use o botão.",
+			"redirectingAction": "Continuar para o Invidious",
+			"doneTitle": "Pronto",
+			"doneBody": "Login feito. Você pode voltar para a TV.",
+			"expiredTitle": "Login expirado",
+			"expiredBody": "Este pedido de login expirou. Inicie de novo na TV.",
+			"invalidTitle": "Falha no login",
+			"invalidBody": "Este link de login não é mais válido. Inicie de novo na TV."
+		}
 	},
 	"player": {
 		"audioOnly": "Somente áudio",

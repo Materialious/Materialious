@@ -2,6 +2,8 @@ const http = require('http');
 const os = require('os');
 const crypto = require('crypto');
 
+const pages = require('./login-pages');
+
 // Short-lived listener for TV QR login. Unlike the proxy in index.js this one
 // is reachable from the LAN on purpose, but only serves the login handshake,
 // only while the TV login page is open, and only for a single secret.
@@ -15,6 +17,8 @@ const AUTH_SCOPES = ':feed,:subscriptions*,:playlists*,:history*,:notifications*
 
 let server = null;
 let session = null;
+// Kept after stop so late visitors still get a themed, translated page.
+let lastSession = null;
 
 function generateCode() {
 	const bytes = crypto.randomBytes(6);
@@ -46,59 +50,30 @@ function hostIsOwn(req) {
 	return ownIpAddresses().has(hostname);
 }
 
-function page(title, body) {
-	return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${title}</title>
-<style>
-	body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
-	input { font-size: 1.25rem; letter-spacing: 0.2em; text-transform: uppercase; width: 10ch; padding: 0.5rem; }
-	button { font-size: 1.1rem; padding: 0.5rem 1.5rem; }
-	.error { color: #b3261e; font-weight: bold; }
-</style>
-</head>
-<body>
-<h1>${title}</h1>
-${body}
-</body>
-</html>`;
-}
+const SECURITY_HEADERS = {
+	'Content-Type': 'text/html; charset=utf-8',
+	'Content-Security-Policy':
+		"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+	'Cache-Control': 'no-store',
+	'Referrer-Policy': 'no-referrer',
+	'X-Content-Type-Options': 'nosniff'
+};
 
-function codeForm(message = '', isError = false) {
-	const messageHtml = message
-		? `<p class="${isError ? 'error' : ''}" role="alert">${message}</p>`
-		: '';
-	return page(
-		'Login to Materialious',
-		`${messageHtml}
-<p>Enter the code shown on your TV:</p>
-<form method="GET" action="/go">
-	<label for="code">Code</label><br>
-	<input id="code" name="c" autocomplete="off" maxlength="6" required>
-	<br><br>
-	<button type="submit">Continue</button>
-</form>`
-	);
+function sendHtml(res, status, html) {
+	res.writeHead(status, SECURITY_HEADERS);
+	res.end(html);
 }
 
 function redirectAuthorize(res, req) {
 	const secret = encodeURIComponent(session.secret);
 	const callbackUrl = encodeURIComponent(`http://${req.headers.host}/callback?s=${secret}`);
-	res.writeHead(302, {
-		Location: `${session.instance}/authorize_token?scopes=${encodeURIComponent(AUTH_SCOPES)}&callback_url=${callbackUrl}`
-	});
-	res.end();
+	const target = `${session.instance}/authorize_token?scopes=${encodeURIComponent(AUTH_SCOPES)}&callback_url=${callbackUrl}`;
+	sendHtml(res, 200, pages.redirecting(session, target));
 }
 
 function handleCodeAttempt(res, req, code) {
 	if (isExpired()) {
-		res.writeHead(410, { 'Content-Type': 'text/html' });
-		return res.end(
-			page('Login expired', '<p>The login request expired. Start it again on your TV.</p>')
-		);
+		return sendHtml(res, 410, pages.expired(session || lastSession));
 	}
 
 	if (code && code.toUpperCase() === session.code) {
@@ -110,14 +85,10 @@ function handleCodeAttempt(res, req, code) {
 		session.code = generateCode();
 		session.wrongAttempts = 0;
 		channelSend('tv-login:new-code', { code: session.code });
-		res.writeHead(200, { 'Content-Type': 'text/html' });
-		return res.end(
-			codeForm('Too many wrong attempts. A new code was generated — check your TV.', true)
-		);
+		return sendHtml(res, 200, pages.codeForm(session, 'tooManyAttempts'));
 	}
 
-	res.writeHead(200, { 'Content-Type': 'text/html' });
-	res.end(codeForm('Wrong code. Try again.', true));
+	sendHtml(res, 200, pages.codeForm(session, 'wrongCode'));
 }
 
 function handleCallback(res, req, searchParams) {
@@ -129,10 +100,7 @@ function handleCallback(res, req, searchParams) {
 		given.length !== expected.length ||
 		!crypto.timingSafeEqual(given, expected)
 	) {
-		res.writeHead(403, { 'Content-Type': 'text/html' });
-		return res.end(
-			page('Login failed', '<p>This login link is no longer valid. Start it again on your TV.</p>')
-		);
+		return sendHtml(res, 403, pages.invalid(session || lastSession));
 	}
 
 	session.used = true;
@@ -141,13 +109,7 @@ function handleCallback(res, req, searchParams) {
 
 	channelSend('tv-login:success', { username, token });
 
-	res.writeHead(200, { 'Content-Type': 'text/html' });
-	res.end(
-		page(
-			'Logged in',
-			'<p><strong>Done!</strong> Your TV is now logged in. You can close this page.</p>'
-		)
-	);
+	sendHtml(res, 200, pages.done(session));
 	stopServer();
 }
 
@@ -167,16 +129,12 @@ function handleRequest(req, res) {
 
 	if (path === '/') {
 		if (isExpired()) {
-			res.writeHead(410, { 'Content-Type': 'text/html' });
-			return res.end(
-				page('Login expired', '<p>The login request expired. Start it again on your TV.</p>')
-			);
+			return sendHtml(res, 410, pages.expired(session || lastSession));
 		}
 		const code = url.searchParams.get('c');
 		// A code in the URL counts as an attempt, so it can't be brute-forced past the limit.
 		if (code) return handleCodeAttempt(res, req, code);
-		res.writeHead(200, { 'Content-Type': 'text/html' });
-		return res.end(codeForm());
+		return sendHtml(res, 200, pages.codeForm(session));
 	}
 
 	if (path === '/go') return handleCodeAttempt(res, req, url.searchParams.get('c'));
@@ -194,6 +152,7 @@ function stopServer() {
 		server.close();
 		server = null;
 	}
+	lastSession = session || lastSession;
 	session = null;
 }
 
@@ -205,6 +164,9 @@ module.exports = function startTvLoginServer(channel) {
 			code: options.code,
 			secret: options.secret,
 			instance: options.instance,
+			theme: pages.sanitizeTheme(options.theme),
+			strings: pages.sanitizeStrings(options.strings),
+			lang: pages.sanitizeLang(options.lang),
 			expiresAt: Date.now() + SESSION_TTL_MS,
 			wrongAttempts: 0,
 			used: false

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { _ } from '#lib/i18n/index';
+	import { _, locale } from '#lib/i18n/index';
 	import { invidiousAuthStore, invidiousInstanceStore } from '#lib/store';
 	import { isMaterialiousAccountActive } from '#lib/backend';
 	import { addOrUpdateKeyValue } from '#lib/api/backend/keyvalue';
@@ -12,6 +12,8 @@
 		addTvLoginListeners,
 		generateLoginCode,
 		generateLoginSecret,
+		readTheme,
+		readWebStrings,
 		startTvLoginSession,
 		stopTvLoginSession
 	} from '#lib/tvQrLogin';
@@ -53,7 +55,10 @@
 			await startTvLoginSession({
 				code,
 				secret,
-				instance
+				instance,
+				theme: readTheme(),
+				strings: readWebStrings($_),
+				lang: $locale
 			});
 			secondsLeft = TV_LOGIN_TTL_SECONDS;
 		} catch {

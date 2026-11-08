@@ -15,6 +15,56 @@ export interface TvLoginSession {
 	code: string;
 	secret: string;
 	instance: string;
+	// Live app theme + translated strings for the pages the phone/PC sees.
+	theme: { vars: Record<string, string>; dark: boolean };
+	strings: Record<string, string>;
+	lang: string;
+}
+
+const THEME_VARS = [
+	'primary',
+	'on-primary',
+	'primary-container',
+	'on-primary-container',
+	'surface',
+	'surface-container',
+	'surface-container-highest',
+	'on-surface',
+	'on-surface-variant',
+	'outline',
+	'outline-variant',
+	'error',
+	'on-error'
+];
+
+const WEB_STRING_KEYS = [
+	'title',
+	'instruction',
+	'codeLabel',
+	'continue',
+	'wrongCode',
+	'tooManyAttempts',
+	'redirecting',
+	'redirectingHint',
+	'redirectingAction',
+	'doneTitle',
+	'doneBody',
+	'expiredTitle',
+	'expiredBody',
+	'invalidTitle',
+	'invalidBody'
+];
+
+// Reads the colors BeerCSS currently applies to the body (validated again on the Node side).
+export function readTheme(): TvLoginSession['theme'] {
+	const style = getComputedStyle(document.body);
+	const vars: Record<string, string> = {};
+	for (const name of THEME_VARS) vars[name] = style.getPropertyValue(`--${name}`).trim();
+	return { vars, dark: document.body.classList.contains('dark') };
+}
+
+export function readWebStrings(translate: (key: string) => string): Record<string, string> {
+	return Object.fromEntries(WEB_STRING_KEYS.map((key) => [key, translate(`loginQr.web.${key}`)]));
 }
 
 export interface TvLoginEvents {

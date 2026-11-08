@@ -15,6 +15,7 @@
 	import { SvelteSet } from 'svelte/reactivity';
 	import ui from 'beercss';
 	import ISO6391 from 'iso-639-1';
+	import { PUBLIC_DOWNLOAD_DISABLED, PUBLIC_REQUIRE_BROWSER_COMPANION } from '$app/env/public';
 
 	let { video }: { video: VideoPlay } = $props();
 
@@ -241,7 +242,7 @@
 	}
 </script>
 
-{#if isDownloadSupported() && !video.liveNow}
+{#if PUBLIC_DOWNLOAD_DISABLED !== 'true' && PUBLIC_REQUIRE_BROWSER_COMPANION !== 'true' && isDownloadSupported() && !video.liveNow}
 	<button
 		class="surface-container-highest"
 		onclick={onDownloadButtonClick}

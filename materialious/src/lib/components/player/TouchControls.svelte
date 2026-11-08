@@ -103,6 +103,13 @@
 		height: 100%;
 	}
 
+	#player-center > .grid {
+		box-sizing: border-box;
+		block-size: 100%;
+		padding-bottom: 5rem;
+		grid-template-rows: minmax(0, 1fr);
+	}
+
 	.seek-double-click {
 		background-color: var(--secondary-container);
 		height: var(--video-player-height);

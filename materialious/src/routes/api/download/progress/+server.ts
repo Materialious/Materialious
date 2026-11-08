@@ -1,8 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { isOwnBackend } from '#lib/shared/index';
 import { getDownloadProgress } from '#lib/server/downloadProgress';
+import { assertDownloadEnabled } from '#lib/server/downloadAvailability';
 
 export async function GET({ url, locals }) {
+	assertDownloadEnabled();
 	if (isOwnBackend()?.requireAuth && !locals.userId) {
 		throw error(401);
 	}

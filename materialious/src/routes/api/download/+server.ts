@@ -3,6 +3,7 @@ import { error } from '@sveltejs/kit';
 import z from 'zod';
 import { isOwnBackend } from '#lib/shared/index';
 import { clearDownloadProgress, setDownloadProgress } from '#lib/server/downloadProgress';
+import { assertDownloadEnabled } from '#lib/server/downloadAvailability';
 
 const zDownloadSchema = z.object({
 	videoId: z.string().length(11),
@@ -25,6 +26,7 @@ function contentDisposition(filename: string): string {
 }
 
 export async function GET({ request, url, locals }) {
+	assertDownloadEnabled();
 	if (isOwnBackend()?.requireAuth && !locals.userId) {
 		throw error(401);
 	}

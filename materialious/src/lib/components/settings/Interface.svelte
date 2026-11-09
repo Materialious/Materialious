@@ -2,7 +2,6 @@
 	import { bookmarkletSaveToUrl } from '#lib/externalSettings/index';
 	import { letterCase, titleCases, type TitleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
-	import { Nodejs } from '@capawesome/capacitor-nodejs';
 	import { iso31661 } from 'iso-3166';
 	import { isContentRegion } from '#lib/regions';
 	import { _ } from '#lib/i18n/index';
@@ -22,7 +21,6 @@
 		backendInUseStore,
 		materialiousBackendStore,
 		invidiousInstanceStore,
-		interfaceAllowInsecureRequests,
 		interfaceAndroidUseNativeShare,
 		interfaceAutoExpandChapters,
 		interfaceAutoExpandComments,
@@ -41,6 +39,7 @@
 	} from '../../store';
 	import { isOwnBackend } from '#lib/shared/index';
 	import ComboBox from '../ComboBox.svelte';
+	import AllowInsecureRequests from '../AllowInsecureRequests.svelte';
 
 	let invidiousInstance = $derived($invidiousInstanceStore ?? '');
 
@@ -84,29 +83,6 @@
 		await timeout(100);
 		location.reload();
 	}
-
-	function allowInsecureRequests() {
-		if (!Capacitor.isNativePlatform()) return;
-		interfaceAllowInsecureRequests.set(!$interfaceAllowInsecureRequests);
-	}
-
-	// Configure TLS through the native Node bridge, never through the HTTP proxy.
-	interfaceAllowInsecureRequests.subscribe(async (isAllowed) => {
-		if (Capacitor.getPlatform() === 'android') {
-			try {
-				let ready = false;
-				while (!ready) {
-					({ ready } = await Nodejs.isReady());
-					if (!ready) await timeout(100);
-				}
-				await Nodejs.send({ eventName: 'set-insecure-tls', args: [isAllowed] });
-			} catch {
-				// The persisted setting is applied when the Node runtime is ready again.
-			}
-		} else if (Capacitor.getPlatform() === 'electron') {
-			await window.electronAPI.setAllowInsecureSSL(isAllowed);
-		}
-	});
 
 	if (Capacitor.getPlatform() === 'electron') {
 		interfaceDisableAutoUpdate.subscribe((isDisabled) => {
@@ -173,24 +149,7 @@
 		<div class="space"></div>
 	{/if}
 
-	{#if Capacitor.isNativePlatform() && (invalidInstance || $interfaceAllowInsecureRequests)}
-		<div class="field no-margin">
-			<nav class="no-padding">
-				<div class="max">
-					<div>{$_('layout.allowInsecureRequests')}</div>
-				</div>
-				<label class="switch" tabindex="0">
-					<input
-						type="checkbox"
-						bind:checked={$interfaceAllowInsecureRequests}
-						onclick={allowInsecureRequests}
-						role="switch"
-					/>
-					<span></span>
-				</label>
-			</nav>
-		</div>
-	{/if}
+	<AllowInsecureRequests show={invalidInstance || invalidMaterialiousBackend} />
 {/if}
 
 {#if remoteMaterialiousSupported()}

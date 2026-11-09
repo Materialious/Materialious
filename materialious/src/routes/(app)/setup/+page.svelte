@@ -13,6 +13,7 @@
 	import { setInvidiousInstance, setMaterialiousBackend, clearCaches } from '#lib/auth';
 	import { isOwnBackend } from '#lib/shared/index';
 	import { backendInUseStore, invidiousInstanceStore, playerYouTubeJsFallback } from '#lib/store';
+	import AllowInsecureRequests from '#lib/components/AllowInsecureRequests.svelte';
 
 	const defaultInstance = !isOwnBackend()
 		? 'https://invidious.materialio.us'
@@ -256,6 +257,7 @@
 								>
 							</div>
 						{/if}
+						<AllowInsecureRequests show={!invidiousInstanceValid || invalidMaterialiousBackend} />
 						<div class="actions">
 							<button
 								type="button"

@@ -132,7 +132,13 @@
             "textShadow": "テキストの影",
             "play": "再生",
             "pause": "一時停止",
-            "subtitles": "字幕"
+            "subtitles": "字幕",
+            "playbackControls": "再生コントロール",
+            "endsAt": "{{time}} で終了",
+            "videoInfo": "動画情報",
+            "timeline": "タイムライン",
+            "positionOf": "{{elapsed}} / {{total}}",
+            "loadingCaptions": "字幕を読み込み中"
         },
         "pauseTimerFinished": "一時停止タイマーが終了しました",
         "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
@@ -226,7 +232,9 @@
             "playerStatistics": "最初からプレイヤー統計情報を表示",
             "networkChangePause": "ネットワーク変更時に一時停止",
             "fitScreenByDefault": "デフォルトで画面に合わせる",
-            "androidAutoPip": "アプリの終了時に自動的に PiP モードに入る"
+            "androidAutoPip": "アプリの終了時に自動的に PiP モードに入る",
+            "autoFullscreen": "動画を自動的に全画面表示",
+            "rotateOnTilt": "デバイスを傾けたときに、全画面表示の動画を回転"
         },
         "bookmarklet": "ブックマーク",
         "instanceUrl": "インスタンスのURL",
@@ -414,7 +422,8 @@
         "shareRoom": "ルームを共有",
         "leaveRoom": "ルームから退出",
         "userJoin": "ユーザーがルームに参加しました",
-        "userLeft": "ユーザーがルームから退出しました"
+        "userLeft": "ユーザーがルームから退出しました",
+        "description": "動画を同期して一緒に見る。"
     },
     "markAs": {
         "watched": "視聴済みにする",
@@ -495,5 +504,16 @@
         "fedoraOpenSuse": "Fedora/OpenSuse",
         "appImage": "AppImage",
         "tarball": "Tarball"
+    },
+    "transcriptAutoScroll": "自動スクロール",
+    "transcriptLoading": "文字起こしの読み込み中",
+    "transcriptLoadError": "文字起こしを読み込めませんでした。言語を選択して、もう一度試してください。",
+    "queue": {
+        "header": "次へ",
+        "empty": "キューは空です。",
+        "add": "キューに追加",
+        "remove": "キューから削除",
+        "moveUp": "キュー内で上に移動",
+        "moveDown": "キュー内で下に移動"
     }
 }

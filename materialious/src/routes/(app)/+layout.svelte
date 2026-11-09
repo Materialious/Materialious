@@ -331,7 +331,9 @@
 		id="left-nav"
 		class="left m l surface-container"
 		class:tv-nav={isAndroidTv()}
-		class:hide-element={$playerTheatreModeIsActive || $playerIsInWindowFullscreen || isAndroidPictureInPicture}
+		class:hide-element={$playerTheatreModeIsActive ||
+			$playerIsInWindowFullscreen ||
+			isAndroidPictureInPicture}
 		bind:this={leftNavElement}
 		onkeydown={handleLeftNavKeyDown}
 	>
@@ -438,21 +440,19 @@
 					</div>
 				</div>
 			{:else}
+				<button
+					class="circle large transparent"
+					onclick={() => {
+						if (!showVideoQueue) showVideoQueue = true;
+						else ui('#dialog-video-queue');
+					}}
+					aria-label={$_('queue.header')}
+				>
+					<i>queue_music</i>
+					<div class="badge secondary">{$videoQueueStore.length}</div>
+					<div class="tooltip bottom">{$_('queue.header')}</div>
+				</button>
 				<!-- Watch parties run on the own backend -->
-				{#if $playerState || $videoQueueStore.length > 0}
-					<button
-						class="circle large transparent"
-						onclick={() => {
-							if (!showVideoQueue) showVideoQueue = true;
-							else ui('#dialog-video-queue');
-						}}
-						aria-label={$_('queue.header')}
-					>
-						<i>queue_music</i>
-						<div class="badge secondary">{$videoQueueStore.length}</div>
-						<div class="tooltip bottom">{$_('queue.header')}</div>
-					</button>
-				{/if}
 				{#if watchPartySupported}
 					<button
 						onclick={() => {
@@ -507,7 +507,10 @@
 		</nav>
 	{/if}
 
-	<nav class="bottom s" class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}>
+	<nav
+		class="bottom s"
+		class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
+	>
 		{#each pages as navPage (navPage)}
 			<a
 				class="round"
@@ -524,19 +527,23 @@
 		<Settings />
 	{/if}
 
-	<dialog class="right" id="dialog-notifications">
-		<nav>
-			<h5 class="max">{$_('layout.notifications')}</h5>
-			<button class="circle transparent" data-ui="#dialog-notifications"><i>close</i></button>
-		</nav>
+	<dialog class="right surface-container" id="dialog-notifications">
+		<header class="row">
+			<h4 class="max">{$_('layout.notifications')}</h4>
+			<button class="circle transparent" data-ui="#dialog-notifications" aria-label={$_('cancel')}
+				><i>close</i></button
+			>
+		</header>
 		{#if notifications.length === 0}
-			<p>{$_('layout.noNewNotifications')}</p>
+			<p class="notifications-empty">{$_('layout.noNewNotifications')}</p>
 		{:else}
-			{#each notifications as notification (notification)}
-				<article class="no-padding border">
-					<Thumbnail video={notification} sideways={true}></Thumbnail>
-				</article>
-			{/each}
+			<div class="notifications-list">
+				{#each notifications as notification (notification)}
+					<article class="no-padding border notification-thumbnail">
+						<Thumbnail video={notification} sideways={true}></Thumbnail>
+					</article>
+				{/each}
+			</div>
 		{/if}
 	</dialog>
 
@@ -547,10 +554,6 @@
 		class="responsive max root"
 		class:full-window-main={$playerIsInWindowFullscreen}
 	>
-		{#if showWatchParty && watchPartySupported}
-			<WatchParty onLeave={() => (showWatchParty = false)} />
-		{/if}
-
 		{#if $playerLoadingStore && !$playerState}
 			<div class="grid">
 				<div
@@ -588,7 +591,10 @@
 							{#if playerIsPip}
 								<a
 									class="pip-video-link"
-									href={resolveWatchPath(activePlayer.data.video.videoId, activePlayer.data.playlistId ?? undefined)}
+									href={resolveWatchPath(
+										activePlayer.data.video.videoId,
+										activePlayer.data.playlistId ?? undefined
+									)}
 									aria-label={activePlayer.data.video.title}
 								></a>
 							{/if}
@@ -612,6 +618,10 @@
 
 		<Toast />
 	</main>
+
+	{#if showWatchParty && watchPartySupported}
+		<WatchParty onLeave={() => (showWatchParty = false)} />
+	{/if}
 
 	{#if showVideoQueue}
 		<VideoQueue />
@@ -654,7 +664,34 @@
 	}
 
 	#dialog-notifications {
-		width: 500px;
+		width: min(32rem, calc(100vw - 2rem));
+		max-width: 100%;
+		padding: 1rem;
+	}
+
+	#dialog-notifications header {
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	#dialog-notifications h4 {
+		margin: 0 0 0.75rem;
+	}
+
+	.notifications-list {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.notification-thumbnail {
+		width: 100%;
+		min-width: 0;
+		margin: 0;
+		background: var(--surface-container-highest);
+	}
+
+	.notifications-empty {
+		opacity: 0.7;
 	}
 
 	@media only screen and (max-width: 993px) {
@@ -668,10 +705,6 @@
 			bottom: 100px;
 			right: 0px;
 			padding: 0.5rem;
-		}
-
-		#dialog-notifications {
-			width: 100%;
 		}
 
 		.pip > .pip-info > .player {
@@ -690,7 +723,6 @@
 			flex: 1;
 			min-width: 0;
 		}
-
 	}
 
 	.mobile-search-container {

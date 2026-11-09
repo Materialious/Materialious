@@ -275,7 +275,13 @@
 
 		currentSearchParams.delete('room');
 		goto(`?${currentSearchParams.toString()}`, { shallow: true, state: { replaceState: false } });
-		onLeave?.();
+		const dialog = document.querySelector<HTMLDialogElement>('#dialog-watch-party');
+		if (dialog?.open) {
+			ui('#dialog-watch-party');
+			requestAnimationFrame(() => onLeave?.());
+		} else {
+			onLeave?.();
+		}
 	}
 
 	let attachedPlayerElement: HTMLMediaElement | undefined;
@@ -339,79 +345,82 @@
 	});
 </script>
 
-<dialog id="dialog-watch-party" class="right surface-container watch-party-dialog">
-	<article class="watch-party">
-		<header class="row">
-			<div class="max">
-				<h4>{$_('watchParty.header')}</h4>
-				<p class="muted">{$_('watchParty.description')}</p>
-			</div>
-			{#if room}
-				<span class="chip" class:primary-container={connectionState === 'connected'}>
-					<span class="status-dot" class:online={connectionState === 'connected'}></span>
-					{connectionState === 'connected' ? 'Connected' : $_('connecting')}
-				</span>
-			{/if}
-			<button
-				class="circle transparent"
-				data-ui="#dialog-watch-party"
-				aria-label="Close watch party"
-			>
-				<i>close</i>
-			</button>
-		</header>
-
-		{#if !room}
-			<div class="room-actions">
-				<button onclick={createRoom} disabled={creating} class="primary">
-					<i>groups</i>
-					<span>{creating ? $_('connecting') : $_('watchParty.createRoom')}</span>
-				</button>
-				<nav class="group join-room">
-					<div class="field label surface-container-highest left-round">
-						<input
-							tabindex="0"
-							id="watch-party-join-code"
-							bind:value={roomCode}
-							type="text"
-							placeholder=" "
-						/>
-						<label tabindex="-1" for="watch-party-join-code">{$_('watchParty.roomID')}</label>
-					</div>
-					<button
-						type="button"
-						onclick={joinRoom}
-						disabled={!roomCode.trim()}
-						class="primary right-round"
-						aria-label={$_('watchParty.joinRoom')}
-						title={$_('watchParty.joinRoom')}
-					>
-						<i>login</i>
-					</button>
-				</nav>
-			</div>
-		{:else}
-			<div class="active-room">
-				<div class="field label fill round">
-					<input tabindex="0" id="watch-party-room-id" readonly value={room.id} placeholder=" " />
-					<label tabindex="-1" for="watch-party-room-id">{$_('watchParty.roomID')}</label>
+<div>
+	<dialog id="dialog-watch-party" class="right surface-container watch-party-dialog">
+		<article class="watch-party">
+			<header class="row">
+				<div class="max">
+					<h4>{$_('watchParty.header')}</h4>
+					<p class="muted">{$_('watchParty.description')}</p>
 				</div>
-				<button onclick={shareRoom} class="primary share-room-button">
-					<i>share</i>
-					<span>{$_('watchParty.shareRoom')}</span>
+				{#if room}
+					<span class="chip" class:primary-container={connectionState === 'connected'}>
+						<span class="status-dot" class:online={connectionState === 'connected'}></span>
+						{connectionState === 'connected' ? 'Connected' : $_('connecting')}
+					</span>
+				{/if}
+				<button
+					class="circle transparent"
+					data-ui="#dialog-watch-party"
+					aria-label="Close watch party"
+				>
+					<i>close</i>
 				</button>
-				<button onclick={leaveRoom} class="surface-container-highest">
-					<i>logout</i>
-					<span>{$_('watchParty.leaveRoom')}</span>
-				</button>
-			</div>
-		{/if}
-	</article>
-</dialog>
+			</header>
+
+			{#if !room}
+				<div class="room-actions">
+					<button onclick={createRoom} disabled={creating} class="primary">
+						<i>groups</i>
+						<span>{creating ? $_('connecting') : $_('watchParty.createRoom')}</span>
+					</button>
+					<nav class="group join-room">
+						<div class="field label surface-container-highest left-round">
+							<input
+								tabindex="0"
+								id="watch-party-join-code"
+								bind:value={roomCode}
+								type="text"
+								placeholder=" "
+							/>
+							<label tabindex="-1" for="watch-party-join-code">{$_('watchParty.roomID')}</label>
+						</div>
+						<button
+							type="button"
+							onclick={joinRoom}
+							disabled={!roomCode.trim()}
+							class="primary right-round"
+							aria-label={$_('watchParty.joinRoom')}
+							title={$_('watchParty.joinRoom')}
+						>
+							<i>login</i>
+						</button>
+					</nav>
+				</div>
+			{:else}
+				<div class="active-room">
+					<div class="field label fill round">
+						<input tabindex="0" id="watch-party-room-id" readonly value={room.id} placeholder=" " />
+						<label tabindex="-1" for="watch-party-room-id">{$_('watchParty.roomID')}</label>
+					</div>
+					<button onclick={shareRoom} class="primary share-room-button">
+						<i>share</i>
+						<span>{$_('watchParty.shareRoom')}</span>
+					</button>
+					<button onclick={leaveRoom} class="surface-container-highest">
+						<i>logout</i>
+						<span>{$_('watchParty.leaveRoom')}</span>
+					</button>
+				</div>
+			{/if}
+		</article>
+	</dialog>
+</div>
 
 <style>
 	.watch-party-dialog {
-		width: min(32rem, calc(100vw - 2rem));
+		inline-size: min(32rem, calc(100vw - 2rem));
+		min-inline-size: 0;
 		max-width: 100%;
 		padding: 1rem;
 	}
@@ -449,6 +458,10 @@
 		align-items: center;
 	}
 
+	.active-room .field {
+		min-width: 0;
+	}
+
 	.join-room {
 		width: 100%;
 	}
@@ -481,10 +494,11 @@
 
 	@media (max-width: 36rem) {
 		.active-room {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.active-room button {
+			box-sizing: border-box;
 			width: 100%;
 		}
 	}

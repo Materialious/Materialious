@@ -405,6 +405,8 @@
 			"localVideoFallback": "Local video fallback",
 			"youtubeJsFallback": "Local video processing fallback",
 			"youtubeJsAlways": "Always use",
+			"autoFullscreen": "Automatically fullscreen videos",
+			"rotateOnTilt": "Rotate fullscreen video when tilting device",
 			"lockOrientation": "Orientation locked to aspect ratio",
 			"networkChangePause": "Pause on network change",
 			"androidAutoPip": "Automatically enter PiP on app exit",

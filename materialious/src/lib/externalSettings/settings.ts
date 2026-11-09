@@ -48,6 +48,8 @@ import {
 	interfaceDisableAutoUpdate,
 	interfaceAndroidUseNativeShare,
 	playerAndroidPauseOnNetworkChange,
+	playerAndroidAutoFullscreen,
+	playerAndroidRotateOnTilt,
 	playerAndroidLockOrientation,
 	playerAndroidAutoPip,
 	playerYouTubeJsFallback,
@@ -401,6 +403,18 @@ function registerBackendStores() {
 	persistedStores.push({
 		name: 'pauseOnNetworkChange',
 		store: playerAndroidPauseOnNetworkChange,
+		schema: zBoolean,
+		excludeFromBookmarklet: true
+	});
+	persistedStores.push({
+		name: 'androidAutoFullscreen',
+		store: playerAndroidAutoFullscreen,
+		schema: zBoolean,
+		excludeFromBookmarklet: true
+	});
+	persistedStores.push({
+		name: 'androidRotateOnTilt',
+		store: playerAndroidRotateOnTilt,
 		schema: zBoolean,
 		excludeFromBookmarklet: true
 	});

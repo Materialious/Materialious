@@ -18,6 +18,8 @@
 	import {
 		playerAlwaysLoopStore,
 		playerAudioOnlyByDefault,
+		playerAndroidAutoFullscreen,
+		playerAndroidRotateOnTilt,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
 		playerAndroidAutoPip,
@@ -64,6 +66,7 @@
 	import TouchControls from './TouchControls.svelte';
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
+	import { Motion } from '@capacitor/motion';
 	import ClosedCaptions from './ClosedCaptions.svelte';
 	import { getVideo, getVideoWatchHistory, updateWatchHistory } from '#lib/api/index';
 
@@ -332,7 +335,9 @@
 	});
 
 	function toggleFullscreen() {
-		if (document.fullscreenElement) {
+		if (Capacitor.getPlatform() === 'android' && $playerIsInWindowFullscreen) {
+			playerIsInWindowFullscreen.set(false);
+		} else if (document.fullscreenElement) {
 			document.exitFullscreen();
 			playerIsFullscreen = false;
 		} else {
@@ -866,11 +871,116 @@
 		}, 5000);
 	}
 
-	async function onAndroidFullscreenChange() {
-		const videoFormats = data.video.adaptiveFormats.filter((format) =>
-			format.type.startsWith('video/')
-		);
+	function videoOrientation(): 'landscape' | 'portrait' | undefined {
+		const size = data.video.adaptiveFormats.find(
+			(format) => format.type.startsWith('video/') && format.size
+		)?.size;
+		if (!size) return;
+		const [width, height] = size.split('x').map(Number);
+		if (!width || !height) return;
+		return width > height ? 'landscape' : 'portrait';
+	}
 
+	async function lockToVideoOrientation() {
+		const orientation = videoOrientation();
+		if (!orientation) return;
+		const current = await ScreenOrientation.orientation();
+		if (isDestroyed || (!document.fullscreenElement && !get(playerIsInWindowFullscreen))) return;
+		await ScreenOrientation.lock({
+			orientation: current.type.startsWith(orientation) ? current.type : `${orientation}-primary`
+		});
+	}
+
+	// The player is keyed by video ID, so this runs once for each newly opened video.
+	onMount(() => {
+		if (
+			Capacitor.getPlatform() !== 'android' ||
+			isAndroidTv() ||
+			isEmbed ||
+			playerIsPip ||
+			audioOnly ||
+			!$playerAndroidAutoFullscreen
+		)
+			return;
+		playerIsInWindowFullscreen.set(true);
+	});
+
+	$effect(() => {
+		if (Capacitor.getPlatform() !== 'android' || isAndroidTv() || isEmbed) return;
+		const active =
+			$playerAndroidRotateOnTilt && !playerIsPip && !isAndroidPictureInPicture && !audioOnly;
+		if (!active) return;
+
+		let disposed = false;
+		let lastTilt:
+			| 'portrait-primary'
+			| 'portrait-secondary'
+			| 'landscape-primary'
+			| 'landscape-secondary'
+			| undefined;
+		let candidate: typeof lastTilt;
+		let candidateSince = 0;
+		let listener: Awaited<ReturnType<typeof Motion.addListener>> | undefined;
+		void Motion.addListener('accel', ({ accelerationIncludingGravity: gravity }) => {
+			if (disposed || !gravity || gravity.x == null || gravity.y == null || gravity.z == null)
+				return;
+			if (!document.fullscreenElement && !get(playerIsInWindowFullscreen)) {
+				lastTilt = undefined;
+				candidate = undefined;
+				return;
+			}
+			// Ignore a flat device and require a stable tilt before switching sides.
+			if (Math.abs(gravity.z) > 7) return;
+			const tilt =
+				Math.abs(gravity.x) > 6 && Math.abs(gravity.x) > Math.abs(gravity.y) + 2
+					? gravity.x > 0
+						? 'landscape-primary'
+						: 'landscape-secondary'
+					: Math.abs(gravity.y) > 6 && Math.abs(gravity.y) > Math.abs(gravity.x) + 2
+						? gravity.y > 0
+							? 'portrait-primary'
+							: 'portrait-secondary'
+						: undefined;
+			const lockedOrientation = get(playerAndroidLockOrientation) ? videoOrientation() : undefined;
+			if (!tilt || (lockedOrientation && !tilt.startsWith(lockedOrientation))) {
+				candidate = undefined;
+				return;
+			}
+			if (tilt !== candidate) {
+				candidate = tilt;
+				candidateSince = Date.now();
+				return;
+			}
+			if (tilt === lastTilt || Date.now() - candidateSince < 500) return;
+			lastTilt = tilt;
+			void ScreenOrientation.lock({ orientation: tilt });
+		})
+			.then((handle) => {
+				if (disposed) void handle.remove();
+				else listener = handle;
+			})
+			.catch((error) => console.warn('[Player] Motion listener unavailable', error));
+		return () => {
+			disposed = true;
+			void listener?.remove();
+		};
+	});
+
+	$effect(() => {
+		if (Capacitor.getPlatform() !== 'android' || isAndroidTv() || isEmbed) return;
+		if ($playerIsInWindowFullscreen && !playerIsPip && !isAndroidPictureInPicture && !audioOnly) {
+			if ($playerAndroidLockOrientation) void lockToVideoOrientation();
+			void SystemBars.setStyle({ style: SystemBarsStyle.Light });
+			void SystemBars.hide({ bar: SystemBarType.NavigationBar });
+			void SystemBars.hide({ bar: SystemBarType.StatusBar });
+			return () => {
+				void setStatusBarColor();
+				void ScreenOrientation.unlock();
+			};
+		}
+	});
+
+	async function onAndroidFullscreenChange() {
 		const isFullScreen = !!document.fullscreenElement;
 
 		if (isFullScreen) {
@@ -886,23 +996,11 @@
 			await setStatusBarColor();
 		}
 
-		if (!$playerAndroidLockOrientation) return;
-
-		if (isFullScreen && videoFormats[0]?.size) {
-			const widthHeight = videoFormats[0].size.split('x');
-
-			if (widthHeight.length !== 2) return;
-
-			if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-				await ScreenOrientation.lock({ orientation: 'landscape' });
-			} else {
-				await ScreenOrientation.lock({ orientation: 'portrait' });
-			}
-		} else {
-			await ScreenOrientation.lock({
-				orientation: (androidOriginalOrigination as ScreenOrientationResult).type
-			});
+		if (!isFullScreen) {
+			await ScreenOrientation.unlock();
+			return;
 		}
+		if ($playerAndroidLockOrientation) await lockToVideoOrientation();
 	}
 
 	async function androidHandleRotate() {
@@ -1283,6 +1381,9 @@
 	onDestroy(async () => {
 		// Invalidate pending recovery before any asynchronous platform cleanup.
 		isDestroyed = true;
+		if (Capacitor.getPlatform() === 'android' && !isAndroidTv()) {
+			playerIsInWindowFullscreen.set(false);
+		}
 		loadController?.abort();
 		stopStallWatchdog();
 		if (streamingFailureRetryTimer) clearTimeout(streamingFailureRetryTimer);
@@ -1335,11 +1436,7 @@
 
 				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
 
-				if (androidOriginalOrigination) {
-					await ScreenOrientation.lock({
-						orientation: androidOriginalOrigination.type
-					});
-				}
+				if (androidOriginalOrigination) await ScreenOrientation.unlock();
 			}
 		} catch (error) {
 			console.warn('[Player] Platform cleanup failed', error);
@@ -1508,7 +1605,11 @@
 							</button>
 						{/if}
 						{#if !audioOnly}
-							<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+							<FullscreenToggle
+								{toggleFullscreen}
+								playerIsFullscreen={playerIsFullscreen ||
+									(Capacitor.getPlatform() === 'android' && $playerIsInWindowFullscreen)}
+							/>
 						{/if}
 					{/if}
 				</nav>

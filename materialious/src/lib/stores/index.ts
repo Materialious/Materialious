@@ -16,6 +16,8 @@ export {
 	playerAutoplayNextByDefaultStore,
 	playerYouTubeJsFallback,
 	playerYouTubeJsAlways,
+	playerAndroidAutoFullscreen,
+	playerAndroidRotateOnTilt,
 	playerAndroidLockOrientation,
 	playerDefaultLanguage,
 	playerCCByDefault,

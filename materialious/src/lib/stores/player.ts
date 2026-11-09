@@ -43,6 +43,16 @@ export const playerYouTubeJsFallback = persist(
 	'youTubeJsFallback'
 );
 export const playerYouTubeJsAlways = persist(writable(false), createStorage(), 'youTubeJsAlways');
+export const playerAndroidAutoFullscreen = persist(
+	writable(false),
+	createStorage(),
+	'androidAutoFullscreen'
+);
+export const playerAndroidRotateOnTilt = persist(
+	writable(true),
+	createStorage(),
+	'androidRotateOnTilt'
+);
 export const playerAndroidLockOrientation = persist(
 	writable(true),
 	createStorage(),

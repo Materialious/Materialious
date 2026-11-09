@@ -93,6 +93,15 @@
 	}
 </script>
 
+{#if isOwnBackend()?.quickConnect}
+	<h5 class="no-margin">{$_('quickConnect.senderTitle')}</h5>
+	<p class="small-text no-margin">{$_('quickConnect.senderDescription')}</p>
+	<QuickConnect />
+	<div class="space"></div>
+	<div class="divider"></div>
+	<div class="space"></div>
+{/if}
+
 <h5 class="no-margin">{$_('layout.resetPassword')}</h5>
 
 <form onsubmit={onResetPassword}>
@@ -170,15 +179,6 @@
 <div class="space"></div>
 <div class="divider"></div>
 <div class="space"></div>
-
-{#if isOwnBackend()?.quickConnect}
-	<h5 class="no-margin">{$_('quickConnect.senderTitle')}</h5>
-	<p class="small-text no-margin">{$_('quickConnect.senderDescription')}</p>
-	<QuickConnect />
-	<div class="space"></div>
-	<div class="divider"></div>
-	<div class="space"></div>
-{/if}
 
 <button class="tertiary" onclick={deleteAccount}>
 	<i>warning</i>

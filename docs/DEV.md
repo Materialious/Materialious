@@ -5,7 +5,7 @@
 - [Caddy](https://caddyserver.com/docs/install)
 - [Node.js](https://nodejs.org/) (latest LTS recommended)
 
-#### Invidious Deployment
+#### Invidious Deployment (Optional) 
 
 Deploy Invidious locally using Docker Compose:
 

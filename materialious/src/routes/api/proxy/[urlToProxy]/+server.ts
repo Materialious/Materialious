@@ -103,7 +103,6 @@ async function proxyRequest(
 
 	const backendRestrictions = isOwnBackend();
 	if (!backendRestrictions) {
-		// Shouldn't be possible.
 		throw error(400, 'How did you get here?');
 	}
 

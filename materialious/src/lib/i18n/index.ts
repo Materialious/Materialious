@@ -17,13 +17,16 @@ const resources: Record<string, () => Promise<Record<string, any>>> = {
 	nl: () => import('./locales/nl.json'),
 	de: () => import('./locales/de.json'),
 	es: () => import('./locales/es.json'),
+	eu: () => import('./locales/eu.json'),
 	gsw: () => import('./locales/gsw.json'),
 	sh: () => import('./locales/sh.json'),
 	'pt-BR': () => import('./locales/pt-BR.json'),
 	lv: () => import('./locales/lv.json'),
 	ja: () => import('./locales/ja.json'),
 	mi: () => import('./locales/mi.json'),
-	'hu-HU': () => import('./locales/hu.json')
+	'hu-HU': () => import('./locales/hu.json'),
+	'zh-TW': () => import('./locales/zh_Hant.json'),
+	'zh-HK': () => import('./locales/zh_Hant.json')
 };
 
 export function getUserLocale(): string {

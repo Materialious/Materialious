@@ -498,11 +498,16 @@
 				tabindex="-1"
 				style="padding-left: 1px;"
 				class="video-title"
+				title={sideways ? video.title : undefined}
 				data-sveltekit-preload-data="false"
 				href={watchUrl.toString()}
 				onclick={onVideoSelected}
 			>
-				<span class="bold" style="width: 100%;">{letterCase(video.title.trimEnd())}</span>
+				<span class="bold" style="width: 100%;"
+					>{sideways
+						? truncate(letterCase(video.title.trimEnd()), 50)
+						: letterCase(video.title.trimEnd())}</span
+				>
 			</a>
 
 			{#if !sideways}
@@ -707,6 +712,10 @@
 	.align-end {
 		flex: 1;
 		align-items: end;
+	}
+
+	.root-menu {
+		bottom: 2rem;
 	}
 
 	.root-menu > li:hover {

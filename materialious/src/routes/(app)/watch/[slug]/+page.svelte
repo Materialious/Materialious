@@ -614,7 +614,7 @@
 					{#key data.video.videoId}
 						<Transcript
 							video={data.video}
-							currentTime={playerCurrentTime}
+							{playerElement}
 							onSeek={(time) => {
 								if (playerElement) playerElement.currentTime = time;
 							}}
@@ -640,12 +640,7 @@
 		{/if}
 	</div>
 
-	<SleepTimer
-		bind:pauseTimerSeconds
-		bind:pauseTimerRemaining
-		{setPauseTimer}
-		{clearPauseTimer}
-	/>
+	<SleepTimer bind:pauseTimerSeconds bind:pauseTimerRemaining {setPauseTimer} {clearPauseTimer} />
 {/if}
 
 <style>

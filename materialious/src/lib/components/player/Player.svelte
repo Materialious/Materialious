@@ -157,8 +157,8 @@
 	let playerLoadedListenerAdded = false;
 	let sponsorSkipListenerAdded = false;
 
-	const STALL_CHECK_INTERVAL_MS = 3_000;
-	const STALL_TIMEOUT_MS = 12_000;
+	const STALL_CHECK_INTERVAL_MS = 1_000;
+	const STALL_TIMEOUT_MS = 6_000;
 	const MAX_STALL_RECOVERY_ATTEMPTS = 3;
 	const MAX_STREAMING_FAILURE_RETRIES = 5;
 

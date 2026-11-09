@@ -57,6 +57,9 @@ function isGoogleVideoURL(url: string): boolean {
 }
 
 export class ShakaPlayerAdapter implements SabrPlayerAdapter {
+	constructor(private readonly onSegmentActivity?: (active: boolean) => void) {}
+
+	private activeSegments = 0;
 	protected player: shaka.Player | null = null;
 	private requestMetadataManager?: RequestMetadataManager;
 	private cacheManager?: CacheManager | null;
@@ -136,6 +139,9 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 
 		const minBytes = config.minBytesForProgressEvents || 0;
 
+		const trackSegment =
+			requestType === shaka.net.NetworkingEngine.RequestType.SEGMENT && isGoogleVideoURL(uri);
+		if (trackSegment && ++this.activeSegments === 1) this.onSegmentActivity?.(true);
 		const pendingRequest = this.request(
 			uri,
 			request,
@@ -146,7 +152,9 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			progressUpdated,
 			headersReceived,
 			minBytes
-		);
+		).finally(() => {
+			if (trackSegment && --this.activeSegments === 0) this.onSegmentActivity?.(false);
+		});
 
 		const operation = new shaka.util.AbortableOperation(pendingRequest, () => {
 			abortStatus.canceled = true;

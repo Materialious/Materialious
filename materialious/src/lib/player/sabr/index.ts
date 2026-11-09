@@ -97,7 +97,8 @@ export async function refreshSabrSession(video: VideoPlay): Promise<void> {
 export async function injectSabr(
 	video: VideoPlay,
 	player: shaka.Player,
-	signal?: AbortSignal
+	signal?: AbortSignal,
+	onSegmentActivity?: (active: boolean) => void
 ): Promise<SabrStreamingAdapter | null> {
 	// Live and post-live DVR manifests go straight through Shaka. Do not
 	// rewrite their media GETs into SABR/UMP POSTs or start SABR recovery.
@@ -107,7 +108,7 @@ export async function injectSabr(
 	await primeSabrAttestation(video);
 	if (signal?.aborted) return null;
 
-	const shakaPlayerAdapter = new ShakaPlayerAdapter();
+	const shakaPlayerAdapter = new ShakaPlayerAdapter(onSegmentActivity);
 
 	const sabrAdapter = new SabrStreamingAdapter({
 		playerAdapter: shakaPlayerAdapter,

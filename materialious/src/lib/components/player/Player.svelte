@@ -154,11 +154,12 @@
 	let isDestroyed = false;
 	let loadController: AbortController | undefined;
 	let sabrAdapter: SabrStreamingAdapter | null = null;
+	let sabrSegmentActive = false;
 	let playerLoadedListenerAdded = false;
 	let sponsorSkipListenerAdded = false;
 
 	const STALL_CHECK_INTERVAL_MS = 1_000;
-	const STALL_TIMEOUT_MS = 6_000;
+	const STALL_TIMEOUT_MS = 12_000;
 	const MAX_STALL_RECOVERY_ATTEMPTS = 3;
 	const MAX_STREAMING_FAILURE_RETRIES = 5;
 
@@ -575,12 +576,17 @@
 			return;
 		}
 
-		if (now - stallWatchdogLastProgress < STALL_TIMEOUT_MS) return;
+		const stalledFor = now - stallWatchdogLastProgress;
+		const idleSabr =
+			!!sabrAdapter &&
+			(playerIsBuffering || playerElement.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) &&
+			!sabrSegmentActive;
+		if (stalledFor < (idleSabr ? 1_000 : STALL_TIMEOUT_MS)) return;
 
-		void recoverFromStall();
+		void recoverFromStall(idleSabr);
 	}
 
-	async function recoverFromStall() {
+	async function recoverFromStall(idleSabr = false) {
 		if (isDestroyed || !player || !playerElement) return;
 		const videoId = data.video.videoId;
 
@@ -592,7 +598,9 @@
 		console.warn(`[Player] Playback stalled, recovery attempt ${stallRecoveryAttempts}`);
 
 		try {
-			if (stallRecoveryAttempts === 1) {
+			if (idleSabr && stallRecoveryAttempts === 1) {
+				if (!player.retryStreaming(0)) await reloadVideo(playerElement.currentTime);
+			} else if (stallRecoveryAttempts === 1) {
 				// Refresh attestation/PoToken first, then let Shaka refetch.
 				await refreshSabrSession(data.video);
 				if (isDestroyed || data.video.videoId !== videoId) return;
@@ -623,6 +631,7 @@
 		loadController?.abort();
 		const controller = new AbortController();
 		loadController = controller;
+		sabrSegmentActive = false;
 		// A new stream is being loaded; discard any pending retry from the
 		// previous one and give streaming failures a fresh budget.
 		if (streamingFailureRetryTimer) {
@@ -639,7 +648,9 @@
 		}
 
 		try {
-			const adapter = await injectSabr(data.video, player, controller.signal);
+			const adapter = await injectSabr(data.video, player, controller.signal, (active) => {
+				if (!controller.signal.aborted) sabrSegmentActive = active;
+			});
 			if (controller.signal.aborted) {
 				adapter?.dispose();
 				return;

@@ -1373,7 +1373,7 @@
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !isAndroidTv() && !isAndroidPictureInPicture}
+	{#if isEmbed && !playerIsPip && !isAndroidTv() && !isAndroidPictureInPicture}
 		<div
 			class="chip surface-container-highest"
 			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
@@ -1382,7 +1382,7 @@
 		</div>
 	{/if}
 
-	{#if showControls && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
+	{#if showControls && !playerIsPip && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1398,7 +1398,7 @@
 			{/if}
 		</div>
 	{/if}
-	{#if !isAndroidPictureInPicture && !audioOnly}
+	{#if !playerIsPip && !isAndroidPictureInPicture && !audioOnly}
 		<TouchControls
 			{playerElement}
 			{showPlayerUI}
@@ -1409,7 +1409,7 @@
 			bind:playerIsBuffering
 		/>
 	{/if}
-	{#if !isAndroidPictureInPicture && !isAndroidTv()}
+	{#if !playerIsPip && !isAndroidPictureInPicture && !isAndroidTv()}
 		<svelte:element
 			this={audioOnly ? 'article' : 'div'}
 			id="player-controls"

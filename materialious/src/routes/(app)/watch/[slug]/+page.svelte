@@ -587,7 +587,13 @@
 
 						<div class="comment-list">
 							{#each comments.comments as comment (comment)}
-								<Comment {comment} videoId={data.video.videoId}></Comment>
+								<Comment
+									{comment}
+									videoId={data.video.videoId}
+									onTimestampClick={(time) => {
+										if (playerElement) playerElement.currentTime = time;
+									}}
+								/>
 							{/each}
 							{#if comments.continuation}
 								<div class="space"></div>

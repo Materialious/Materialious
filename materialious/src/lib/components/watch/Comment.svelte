@@ -8,7 +8,7 @@
 	import CommentSelf from './Comment.svelte';
 	import { truncate } from '#lib/utils';
 	import { _ } from '#lib/i18n/index';
-	import { extractActualLink } from '#lib/description';
+	import { extractActualLink, getTimestampFromUrl } from '#lib/description';
 	import { Avatar } from 'melt/builders';
 	import { mergeAttrs } from 'melt';
 
@@ -16,9 +16,10 @@
 		comment: Comment;
 		videoId: string;
 		isSubComp?: boolean;
+		onTimestampClick?: (time: number) => void;
 	}
 
-	let { comment, videoId, isSubComp = false }: Props = $props();
+	let { comment, videoId, isSubComp = false, onTimestampClick }: Props = $props();
 
 	let replies: Comments | undefined = $state(undefined);
 
@@ -82,6 +83,18 @@
 		return doc.documentElement.outerHTML;
 	}
 
+	function handleCommentClick(event: MouseEvent) {
+		const target = event.target;
+		if (!(target instanceof Element)) return;
+		const anchor = target.closest('a');
+		if (!anchor) return;
+		const timestamp = getTimestampFromUrl(anchor.href, location.href);
+		if (timestamp === null) return;
+
+		event.preventDefault();
+		onTimestampClick?.(timestamp);
+	}
+
 	let avatarSrc = $state('');
 	const avatar = new Avatar({ src: () => avatarSrc });
 
@@ -102,7 +115,7 @@
 	});
 </script>
 
-<article class="comment" class:border={!isSubComp}>
+	<article class="comment" class:border={!isSubComp} onclick={handleCommentClick}>
 	<div class="comment-header">
 		<img {...avatar.image} class="circle small" alt="comment profile" />
 		<button
@@ -145,7 +158,7 @@
 
 	{#if replies}
 		{#each replies.comments as reply (reply)}
-			<CommentSelf comment={reply} {videoId} isSubComp={true} />
+			<CommentSelf comment={reply} {videoId} isSubComp={true} {onTimestampClick} />
 		{/each}
 	{/if}
 </article>

@@ -94,6 +94,13 @@ export {
 	channelCacheStore,
 	personalPlaylistsCacheStore
 } from './stores/index';
+export {
+	videoQueueStore,
+	addVideoToQueue,
+	removeVideoFromQueue,
+	takeNextQueuedVideo
+} from './stores/index';
+export type { QueuedVideo } from './stores/index';
 export { isAndroidTv } from './utils';
 export type {
 	PlayerState,

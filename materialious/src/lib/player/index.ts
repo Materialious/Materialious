@@ -5,9 +5,9 @@ import {
 	activeCaptionTrack,
 	playerDefaultLanguage,
 	playerDefaultQualityStore,
-	playerDefaultSubtitleLanguage,
 	playerPlaylistHistory,
 	playerState,
+	takeNextQueuedVideo,
 	playlistSettingsStore
 } from '#lib/store';
 import { goto } from '$app/navigation';
@@ -17,7 +17,10 @@ import { isAndroidTv, unsafeRandomItem } from '#lib/utils';
 import { isItemFiltered } from '#lib/filtering/index';
 import type shaka from 'shaka-player/dist/shaka-player.ui';
 import ISO6391 from 'iso-639-1';
-import { selectTextTrack } from '#lib/components/player/ClosedCaptions.svelte';
+import {
+	selectTextTrack,
+	setTextTrackVisibility
+} from '#lib/components/player/ClosedCaptions.svelte';
 
 export const playbackRates = [
 	0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75, 4
@@ -35,6 +38,15 @@ export function goToPreviousVideo(playlistId: string | null) {
 }
 
 export async function goToNextVideo(video: VideoPlay, playlistId: string | null) {
+	const queuedVideo = takeNextQueuedVideo();
+	if (queuedVideo) {
+		playerState.set(undefined);
+		goto(resolveWatchPath(queuedVideo.videoId), {
+			replace: isAndroidTv()
+		});
+		return;
+	}
+
 	if (!playlistId) {
 		if (get(playerAutoplayNextByDefaultStore)) {
 			const nextVideo = video.recommendedVideos.find((v) => !isItemFiltered(v));
@@ -138,13 +150,10 @@ export function toggleSubtitles() {
 
 	if (active !== null) {
 		// Subtitles currently visible -> turn them off.
-		activeCaptionTrack.set(null);
+		setTextTrackVisibility(false);
 		return;
 	}
 
-	// Subtitles hidden -> enable them using the default subtitle language.
-	const defaultLang = get(playerDefaultSubtitleLanguage);
-	const langCode =
-		defaultLang === 'original' || defaultLang === '' ? '' : ISO6391.getCode(defaultLang);
-	void selectTextTrack(langCode);
+	// The caption controller restores the last track or selects the configured default.
+	void selectTextTrack('');
 }

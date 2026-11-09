@@ -35,6 +35,14 @@
 		{ value: 6, label: 'XXL' }
 	] as const;
 
+	const fontOptions = [
+		{ value: 'var(--font)', label: 'Default' },
+		{ value: 'Arial, sans-serif', label: 'Arial' },
+		{ value: 'Verdana, sans-serif', label: 'Verdana' },
+		{ value: 'Georgia, serif', label: 'Georgia' },
+		{ value: 'monospace', label: 'Monospace' }
+	];
+
 	const alignmentOptions = [
 		{ value: 'start', label: 'Left' },
 		{ value: 'center', label: 'Center' },
@@ -72,6 +80,11 @@
 	}
 
 	let fontSize = $state($subtitleSettings.fontSize);
+	let fontFamily = $state(
+		$subtitleSettings.fontFamily && $subtitleSettings.fontFamily !== 'inherit'
+			? $subtitleSettings.fontFamily
+			: 'var(--font)'
+	);
 	let color = $state($subtitleSettings.color);
 	let backgroundColor = $state($subtitleSettings.backgroundColor);
 	let backgroundColorBase = $state('#000000');
@@ -95,6 +108,8 @@
 
 	function selectBackgroundBase(base: string) {
 		backgroundColorBase = rgbBaseOf(base);
+		const alpha = base.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/);
+		backgroundOpacity = alpha ? Number(alpha[1]) : 1;
 		applyBackground();
 	}
 
@@ -102,6 +117,7 @@
 		subtitleSettings.update((s) => ({
 			...s,
 			fontSize,
+			fontFamily,
 			color,
 			backgroundColor,
 			textShadow,
@@ -113,6 +129,10 @@
 
 	function openDialog() {
 		fontSize = $subtitleSettings.fontSize;
+		fontFamily =
+			$subtitleSettings.fontFamily && $subtitleSettings.fontFamily !== 'inherit'
+				? $subtitleSettings.fontFamily
+				: 'var(--font)';
 		color = $subtitleSettings.color;
 		backgroundColor = $subtitleSettings.backgroundColor;
 		backgroundColorBase = rgbBaseOf($subtitleSettings.backgroundColor);
@@ -149,9 +169,9 @@
 				<li
 					role="presentation"
 					data-ui="#cc-menu"
-					class:selected={$activeCaptionTrack === track.language_code}
+					class:selected={$activeCaptionTrack === track.url}
 					onclick={() => {
-						selectTextTrack(track.language_code);
+						selectTextTrack(track.url);
 					}}
 				>
 					<i>subtitles</i>
@@ -174,15 +194,25 @@
 		<header>
 			<nav class="no-wrap">
 				<h6 class="max no-margin">{$_('layout.customize')}</h6>
-				<button class="circle transparent" onclick={() => dialog.close()}><i>close</i></button>
+				<button class="circle transparent" aria-label="Close" onclick={() => dialog.close()}
+					><i>close</i></button
+				>
 			</nav>
 		</header>
 
-		<div class="cc-preview">
+		<div
+			class="cc-preview"
+			style:justify-content={alignment === 'start'
+				? 'flex-start'
+				: alignment === 'end'
+					? 'flex-end'
+					: 'center'}
+		>
 			<span
 				class="cc-preview-text"
 				style="color: {color};background: {backgroundColor};font-size: {14 +
-					fontSize * 2}px;text-shadow: {textShadow};"
+					fontSize *
+						2}px;text-shadow: {textShadow};text-align: {alignment}; font-family: {fontFamily};"
 			>
 				&#11015; &nbsp; Hello, welcome to Materialious
 			</span>
@@ -195,6 +225,7 @@
 					{#each sizeOptions as opt (opt)}
 						<button
 							class="small"
+							aria-pressed={fontSize === opt.value}
 							class:primary={fontSize === opt.value}
 							class:surface-container-highest={fontSize !== opt.value}
 							onclick={() => (fontSize = opt.value)}>{opt.label}</button
@@ -204,11 +235,25 @@
 			</div>
 
 			<div>
+				<label class="no-margin cc-label" for="caption-font"
+					>{$_('player.controls.fontFamily')}</label
+				>
+				<div class="field border">
+					<select id="caption-font" bind:value={fontFamily}>
+						{#each fontOptions as font (font.value)}
+							<option value={font.value}>{font.label}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+
+			<div>
 				<span class="no-margin cc-label">{$_('player.controls.alignment')}</span>
 				<nav class="no-wrap cc-segmented no-margin" style="gap: 4px;">
 					{#each alignmentOptions as opt (opt)}
 						<button
 							class="small"
+							aria-pressed={alignment === opt.value}
 							class:primary={alignment === opt.value}
 							class:surface-container-highest={alignment !== opt.value}
 							onclick={() => (alignment = opt.value)}>{opt.label}</button
@@ -227,6 +272,8 @@
 							style="background:{presetColor};border-radius:50%;"
 							onclick={() => (color = presetColor)}
 							title={presetColor}
+							aria-label="Text color {presetColor}"
+							aria-pressed={color === presetColor}
 						></button>
 					{/each}
 					<input
@@ -244,10 +291,12 @@
 					{#each backgroundPresets as presetBg (presetBg)}
 						<button
 							class="cc-swatch"
-							class:primary={rgbBaseOf(presetBg) === backgroundColorBase}
+							class:primary={presetBg === backgroundColor}
 							style="background:{presetBg};border-radius:50%;"
 							onclick={() => selectBackgroundBase(presetBg)}
 							title={presetBg}
+							aria-label="Background color {presetBg}"
+							aria-pressed={presetBg === backgroundColor}
 						></button>
 					{/each}
 					<input
@@ -265,12 +314,14 @@
 				<div class="slider small" style="--_start: 0%; --_end: {100 - backgroundOpacity * 100}%;">
 					<input
 						type="range"
+						aria-label={$_('player.controls.opacity')}
 						min="0"
 						max="1"
 						step="0.05"
 						bind:value={backgroundOpacity}
 						oninput={applyBackground}
 					/>
+					<span></span>
 				</div>
 			</div>
 
@@ -280,6 +331,7 @@
 					{#each textShadowOptions as opt (opt)}
 						<button
 							class="small"
+							aria-pressed={textShadow === opt.value}
 							class:primary={textShadow === opt.value}
 							class:surface-container-highest={textShadow !== opt.value}
 							onclick={() => (textShadow = opt.value)}>{opt.label}</button
@@ -291,11 +343,19 @@
 			<div>
 				<span class="no-margin cc-label">{$_('player.controls.subtitleOffset')}</span>
 				<nav class="no-wrap no-margin" style="gap: 8px;align-items:center;">
-					<button class="small surface-container-highest" onclick={() => (offset -= 0.5)}>
+					<button
+						class="small surface-container-highest"
+						aria-label="Decrease subtitle delay"
+						onclick={() => (offset -= 0.5)}
+					>
 						<i>remove</i>
 					</button>
 					<span class="cc-offset-value">{offset.toFixed(1)}s</span>
-					<button class="small surface-container-highest" onclick={() => (offset += 0.5)}>
+					<button
+						class="small surface-container-highest"
+						aria-label="Increase subtitle delay"
+						onclick={() => (offset += 0.5)}
+					>
 						<i>add</i>
 					</button>
 					<button class="small border" onclick={() => (offset = 0)}
@@ -308,6 +368,7 @@
 				class="small border"
 				onclick={() => {
 					fontSize = defaultSubtitleSettings.fontSize;
+					fontFamily = defaultSubtitleSettings.fontFamily ?? 'var(--font)';
 					color = defaultSubtitleSettings.color;
 					backgroundColorBase = rgbBaseOf(defaultSubtitleSettings.backgroundColor);
 					backgroundOpacity = defaultSubtitleSettings.backgroundOpacity;

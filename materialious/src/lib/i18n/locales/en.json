@@ -122,6 +122,14 @@
 		"userJoin": "User joined room",
 		"userLeft": "User left room"
 	},
+	"queue": {
+		"header": "Up next",
+		"empty": "Your queue is empty.",
+		"add": "Add to queue",
+		"remove": "Remove from queue",
+		"moveUp": "Move up in queue",
+		"moveDown": "Move down in queue"
+	},
 	"subscriptions": {
 		"manageSubscriptions": "Manage subscriptions"
 	},
@@ -225,6 +233,7 @@
 			"language": "Language",
 			"subtitles": "Subtitles",
 			"fontSize": "Font size",
+			"fontFamily": "Font",
 			"textColor": "Text color",
 			"bgColor": "Background color",
 			"alignment": "Alignment",

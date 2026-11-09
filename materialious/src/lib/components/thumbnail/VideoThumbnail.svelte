@@ -15,6 +15,8 @@
 		deArrowEnabledStore,
 		filterContentListStore,
 		filterContentUrlAutoUpdateStore,
+		addVideoToQueue,
+		removeVideoFromQueue,
 		playerState
 	} from '#lib/store';
 	import { relativeTimestamp } from '#lib/time';
@@ -32,9 +34,17 @@
 		video: ThumbnailVideo;
 		playlistId?: string;
 		sideways?: boolean;
+		forceSideways?: boolean;
+		queueAction?: 'add' | 'remove';
 	}
 
-	let { video = $bindable(), playlistId = '', sideways = $bindable(false) }: Props = $props();
+	let {
+		video = $bindable(),
+		playlistId = '',
+		sideways = $bindable(false),
+		forceSideways = false,
+		queueAction = 'add'
+	}: Props = $props();
 
 	function getRelativePublished() {
 		if (!('published' in video)) return '';
@@ -124,6 +134,10 @@
 	let startedSideways = sideways === true;
 	function disableSideways() {
 		if (!startedSideways) return;
+		if (forceSideways) {
+			sideways = true;
+			return;
+		}
 
 		if (window.innerWidth <= 1800) {
 			sideways = false;
@@ -201,12 +215,14 @@
 	});
 
 	function onVideoSelected() {
+		if (queueAction === 'remove') removeVideoFromQueue(video.videoId);
 		playerState.set(undefined);
 	}
 </script>
 
 <div
 	class:sideways-root={sideways}
+	class:forced-sideways={forceSideways}
 	class:use-flex-column={!sideways}
 	class:tv-root={isAndroidTv()}
 	bind:this={thumbnailElement}
@@ -222,6 +238,34 @@
 >
 	{#if thumbnailActionsVisible}
 		<menu class="active root-menu" onmouseleave={() => (thumbnailActionsVisible = false)}>
+			<li>
+				<button
+					class="transparent max"
+					onclick={() => {
+						if (queueAction === 'remove') removeVideoFromQueue(video.videoId);
+						else {
+							const thumbnail =
+								'thumbnail' in video ? video.thumbnail : video.videoThumbnails[0]?.url;
+							addVideoToQueue({
+								videoId: video.videoId,
+								title: video.title,
+								author: video.author,
+								thumbnail,
+								viewCountText:
+									'viewCountText' in video
+										? video.viewCountText
+										: 'viewCount' in video && video.viewCount !== undefined
+											? cleanNumber(video.viewCount)
+											: undefined
+							});
+						}
+						thumbnailActionsVisible = false;
+					}}
+				>
+					<i>{queueAction === 'remove' ? 'playlist_remove' : 'queue'}</i>
+					<span>{queueAction === 'remove' ? $_('queue.remove') : $_('queue.add')}</span>
+				</button>
+			</li>
 			<li>
 				<Share
 					shares={[
@@ -487,7 +531,7 @@
 								<p>{truncate(video.author, 20)}</p>
 							{/if}
 
-							{#if !('publishedText' in video) && 'viewCountText' in video}
+							{#if !('publishedText' in video) && 'viewCountText' in video && video.viewCountText}
 								<span>
 									{video.viewCountText ?? cleanNumber(video.viewCount ?? 0)}
 									{$_('views')}
@@ -507,7 +551,7 @@
 								{/if}
 							{/if}
 						</div>
-						{#if !sideways && !isAndroidTv()}
+						{#if !isAndroidTv()}
 							<button
 								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
 								class="transparent circle"
@@ -694,7 +738,7 @@
 	}
 
 	@media screen and (max-width: 1800px) {
-		.sideways-root .thumbnail {
+		.sideways-root:not(.forced-sideways) .thumbnail {
 			width: 100%;
 			max-height: 100%;
 		}
@@ -703,7 +747,7 @@
 			align-items: center;
 		}
 
-		.sideways-root .thumbnail-details {
+		.sideways-root:not(.forced-sideways) .thumbnail-details {
 			display: none;
 		}
 	}

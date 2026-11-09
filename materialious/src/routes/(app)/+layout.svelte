@@ -26,7 +26,8 @@
 		backendInUseStore,
 		hideSearchStore,
 		keybindStore,
-		interfaceMobileBackButtonStore
+		interfaceMobileBackButtonStore,
+		videoQueueStore
 	} from '#lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -43,6 +44,7 @@
 	import { isOwnBackend } from '#lib/shared/index';
 	import { configBackendCache } from '#lib/stores/backend';
 	import WatchParty from '#lib/components/WatchParty.svelte';
+	import VideoQueue from '#lib/components/VideoQueue.svelte';
 
 	let { children } = $props();
 
@@ -58,6 +60,7 @@
 	let playerIsPip = $state(false);
 	let isAndroidPictureInPicture = $state(false);
 	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
+	let showVideoQueue = $state(false);
 	let watchPartySupported = $state(isOwnBackend() !== null);
 	materialiousBackendStore.subscribe(() => {
 		watchPartySupported = isOwnBackend() !== null;
@@ -436,11 +439,25 @@
 				</div>
 			{:else}
 				<!-- Watch parties run on the own backend -->
+				{#if $playerState || $videoQueueStore.length > 0}
+					<button
+						class="circle large transparent"
+						onclick={() => {
+							if (!showVideoQueue) showVideoQueue = true;
+							else ui('#dialog-video-queue');
+						}}
+						aria-label={$_('queue.header')}
+					>
+						<i>queue_music</i>
+						<div class="badge secondary">{$videoQueueStore.length}</div>
+						<div class="tooltip bottom">{$_('queue.header')}</div>
+					</button>
+				{/if}
 				{#if watchPartySupported}
 					<button
 						onclick={() => {
-							showWatchParty = !showWatchParty;
-							if (showWatchParty) resetScroll();
+							if (!showWatchParty) showWatchParty = true;
+							else ui('#dialog-watch-party');
 						}}
 						class="circle large transparent"
 						class:active={showWatchParty}
@@ -531,7 +548,7 @@
 		class:full-window-main={$playerIsInWindowFullscreen}
 	>
 		{#if showWatchParty && watchPartySupported}
-			<WatchParty />
+			<WatchParty onLeave={() => (showWatchParty = false)} />
 		{/if}
 
 		{#if $playerLoadingStore && !$playerState}
@@ -620,6 +637,10 @@
 
 		<Toast />
 	</main>
+
+	{#if showVideoQueue}
+		<VideoQueue />
+	{/if}
 </div>
 
 <style>

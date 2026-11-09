@@ -1365,7 +1365,7 @@
 	}}
 	bind:this={playerContainer}
 >
-	<ClosedCaptions video={data.video} bind:currentTime bind:showControls />
+	<ClosedCaptions video={data.video} {playerElement} {showControls} />
 
 	<video
 		class:audio-only={audioOnly}

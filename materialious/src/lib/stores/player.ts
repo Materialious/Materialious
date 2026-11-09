@@ -118,7 +118,7 @@ export const defaultSubtitleSettings: SubtitleSettings = {
 	backgroundColor: 'rgba(0, 0, 0, 0.8)',
 	textShadow: '2px 2px 2px rgba(0,0,0,0.8)',
 	offset: 0,
-	fontFamily: 'inherit',
+	fontFamily: 'var(--font)',
 	alignment: 'center',
 	backgroundOpacity: 0.8
 };

@@ -1,165 +1,263 @@
 <script lang="ts" module>
 	import { activeCaptionTrack } from '#lib/store';
-	import { get } from 'svelte/store';
-	import { addToast } from '../Toast.svelte';
-	import { parseResponse, CaptionsRenderer } from 'media-captions';
+	import { writable } from 'svelte/store';
 
-	let renderer: CaptionsRenderer | undefined;
+	export const loadingCaptionTrack = writable<string | null>(null);
 
-	let captionTracks: Record<string, string[]> = {};
+	// The player controls outside this component address the currently mounted player.
+	let controller: { select: (track: string) => Promise<void>; hide: () => void } | undefined;
 
 	export function setTextTrackVisibility(visible: boolean) {
-		if (!visible) {
-			activeCaptionTrack.set(null);
-			return;
-		}
-		// Re-apply the currently active track (or default language) so visibility
-		// toggling stays in sync with the single source of truth.
-		const active = get(activeCaptionTrack);
-		if (active) {
-			void selectTextTrack(active);
-		}
+		if (!visible) controller?.hide();
+		else if (controller) void controller.select('');
 	}
 
-	// Fetch caption data for a selected language
-	export async function selectTextTrack(language: string) {
-		if (!language) {
-			// Default to the first available track when no language specified.
-			language = Object.keys(captionTracks)[0] ?? '';
-		}
-		if (!language || !captionTracks[language]) return;
-
-		const resp = await fetchCaption(captionTracks[language]);
-		if (!resp) {
-			addToast({
-				data: {
-					text: 'Unable to fetch captions'
-				}
-			});
-			return;
-		}
-
-		try {
-			renderer?.changeTrack(await parseResponse(resp));
-			activeCaptionTrack.set(language);
-		} catch {
-			addToast({
-				data: {
-					text: 'Unable to fetch captions'
-				}
-			});
-		}
+	export async function selectTextTrack(track: string) {
+		await controller?.select(track);
 	}
 </script>
 
 <script lang="ts">
 	import type { VideoPlay } from '#lib/api/model';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
+	import { get } from 'svelte/store';
+	import ISO6391 from 'iso-639-1';
+	import { parseResponse, CaptionsRenderer } from 'media-captions';
+	import { addToast } from '../Toast.svelte';
 	import { getCaptionUrls, fetchCaption } from '#lib/player/captions';
 	import { subtitleSettings, playerDefaultSubtitleLanguage, playerCCByDefault } from '#lib/store';
 	import 'media-captions/styles/captions.css';
+	import 'media-captions/styles/regions.css';
 
 	let {
 		video,
-		currentTime = $bindable(),
-		showControls = $bindable()
+		playerElement,
+		showControls
 	}: {
 		video: VideoPlay;
-		currentTime: number;
+		playerElement?: HTMLMediaElement;
 		showControls: boolean;
 	} = $props();
 
-	let captionElement: HTMLElement | undefined = $state();
-	let hasTracks = $state(false);
+	let captionElement: HTMLElement;
+	let renderer: CaptionsRenderer | undefined;
+	let loadedTrack: Awaited<ReturnType<typeof parseResponse>> | undefined;
+	let bounds = $state({ left: 0, top: 0, width: 0, height: 0, controlsTop: 0 });
+	let captionHeight = $derived(
+		Math.max(
+			0,
+			bounds.height -
+				(showControls
+					? Math.max(bounds.height * 0.02, bounds.top + bounds.height - bounds.controlsTop + 8)
+					: bounds.height * 0.02)
+		)
+	);
+	let tracks = $derived(
+		video.captions
+			.map((track) => ({
+				...track,
+				urls: getCaptionUrls(track, video.fallbackPatch)
+			}))
+			.filter((track) => track.urls.length > 0)
+	);
+	let generation = 0;
+	let lastTrack = '';
+	const cachedTracks = new SvelteMap<string, Awaited<ReturnType<typeof parseResponse>>>();
 
-	let trackVisible = $derived(hasTracks && $activeCaptionTrack !== null);
-
-	onMount(async () => {
-		if (video.captions) {
-			for (const caption of video.captions) {
-				const captionUrls = getCaptionUrls(caption, video.fallbackPatch);
-
-				if (captionUrls.length === 0) continue;
-
-				captionTracks[caption.language_code] = captionUrls;
-			}
-			hasTracks = Object.keys(captionTracks).length > 0;
+	function defaultTrack() {
+		const language = get(playerDefaultSubtitleLanguage);
+		if (language === 'original' || !language) {
+			return tracks.find((track) => /auto/i.test(track.label)) ?? tracks[0];
 		}
-
-		if (captionElement) {
-			renderer = new CaptionsRenderer(captionElement);
-		}
-
-		// Apply default subtitle language on load when subtitles are enabled by default.
-		if (hasTracks && get(playerCCByDefault)) {
-			const defaultLang = get(playerDefaultSubtitleLanguage);
-			const langCode = getLangCode(defaultLang, video);
-
-			if (langCode && captionTracks[langCode]) {
-				await selectTextTrack(langCode);
-			}
-		}
-	});
-
-	onDestroy(() => {
-		captionTracks = {};
-		activeCaptionTrack.set(null);
-	});
-
-	function getLangCode(defaultLang: string, video: VideoPlay): string | undefined {
-		if (defaultLang === 'original') {
-			const auto = video.captions.find((c) => /auto/i.test(c.label));
-			return auto?.language_code ?? video.captions[0]?.language_code;
-		}
-		return video.captions.find((c) => c.language_code.startsWith(defaultLang))?.language_code;
+		const code = ISO6391.getCode(language) || language.toLowerCase();
+		return (
+			tracks.find((track) => track.language_code.toLowerCase() === code.toLowerCase()) ??
+			tracks.find((track) => track.language_code.toLowerCase().startsWith(`${code.toLowerCase()}-`))
+		);
 	}
 
-	let captionStyle = $derived({
-		'--cue-color': $subtitleSettings.color,
-		'--cue-bg-color': $subtitleSettings.backgroundColor,
-		'--cue-font-size': `calc(var(--overlay-height) / 100 * ${$subtitleSettings.fontSize})`,
-		'--cue-text-shadow': $subtitleSettings.textShadow,
-		'--cue-font-family': $subtitleSettings.fontFamily ?? 'inherit',
-		'--cue-text-align': $subtitleSettings.alignment ?? 'center'
-	} as Record<string, string>);
+	async function select(trackId: string) {
+		const track =
+			tracks.find((item) => item.url === trackId) ??
+			tracks.find((item) => item.language_code === trackId) ??
+			(!trackId ? (tracks.find((item) => item.url === lastTrack) ?? defaultTrack()) : undefined);
+		if (!track || !renderer) return;
+		const request = ++generation;
+		try {
+			let parsed = untrack(() => cachedTracks.get(track.url));
+			if (!parsed) {
+				loadingCaptionTrack.set(track.url);
+				const response = await fetchCaption(track.urls);
+				if (!response) throw new Error('Caption fetch failed');
+				parsed = await parseResponse(response);
+				if (request !== generation || !renderer) return;
+				cachedTracks.set(track.url, parsed);
+			} else {
+				loadingCaptionTrack.set(null);
+			}
+			if (request !== generation || !renderer) return;
+			renderer.changeTrack(parsed);
+			loadedTrack = parsed;
+			lastTrack = track.url;
+			activeCaptionTrack.set(track.url);
+		} catch {
+			if (request === generation) addToast({ data: { text: 'Unable to fetch captions' } });
+		} finally {
+			if (request === generation) loadingCaptionTrack.set(null);
+		}
+	}
+
+	function hide() {
+		generation++;
+		loadingCaptionTrack.set(null);
+		activeCaptionTrack.set(null);
+	}
+
+	onMount(() => {
+		renderer = new CaptionsRenderer(captionElement);
+		const instance = { select, hide };
+		controller = instance;
+		if (get(playerCCByDefault)) void select('');
+		return () => {
+			generation++;
+			renderer?.destroy();
+			renderer = undefined;
+			if (controller === instance) {
+				loadingCaptionTrack.set(null);
+				controller = undefined;
+				activeCaptionTrack.set(null);
+			}
+		};
+	});
 
 	$effect(() => {
-		if (!renderer) return;
-		// Apply subtitle timing offset (positive = delay subtitles).
+		// Reset on navigation even when the player component is reused.
+		void video.videoId;
+		generation++;
+		lastTrack = '';
+		cachedTracks.clear();
+		loadingCaptionTrack.set(null);
+		loadedTrack = undefined;
+		renderer?.reset();
+		activeCaptionTrack.set(null);
+		if (renderer && get(playerCCByDefault)) void select('');
+	});
+
+	$effect(() => {
+		const element = playerElement;
+		if (!(element instanceof HTMLVideoElement)) return;
+		const parent = captionElement.parentElement;
+		if (!parent) return;
+		const controls = parent.querySelector<HTMLElement>('#player-controls');
+		const measure = () => {
+			const box = element.getBoundingClientRect();
+			const parentBox = parent.getBoundingClientRect();
+			const ratio =
+				element.videoWidth && element.videoHeight
+					? element.videoWidth / element.videoHeight
+					: box.width / box.height;
+			const width = Math.min(box.width, box.height * ratio);
+			const height = Math.min(box.height, box.width / ratio);
+			if (Number.isFinite(width) && Number.isFinite(height))
+				bounds = {
+					left: box.left - parentBox.left + (box.width - width) / 2,
+					top: box.top - parentBox.top + (box.height - height) / 2,
+					width,
+					height,
+					controlsTop: controls
+						? controls.getBoundingClientRect().top - parentBox.top
+						: box.bottom - parentBox.top - Math.min(80, height * 0.2)
+				};
+		};
+		const observer = new ResizeObserver(measure);
+		observer.observe(element);
+		observer.observe(parent);
+		if (controls) observer.observe(controls);
+		element.addEventListener('loadedmetadata', measure);
+		element.addEventListener('resize', measure);
+		measure();
+		return () => {
+			observer.disconnect();
+			element.removeEventListener('loadedmetadata', measure);
+			element.removeEventListener('resize', measure);
+		};
+	});
+
+	$effect(() => {
+		// Rebuild cue positions after the renderer has processed its resize. Its
+		// cached starting boxes otherwise retain positions from the old overlay.
+		void captionHeight;
+		void bounds.width;
+		const timer = setTimeout(() => {
+			if (renderer && loadedTrack) renderer.changeTrack(loadedTrack);
+		}, 100);
+		return () => clearTimeout(timer);
+	});
+
+	$effect(() => {
+		const element = playerElement;
 		const offset = $subtitleSettings.offset ?? 0;
-		renderer.currentTime = (currentTime ?? 0) - offset;
+		if (!element) return;
+		let frame = 0;
+		const update = () => {
+			if (renderer) renderer.currentTime = element.currentTime - offset;
+		};
+		const tick = () => {
+			update();
+			frame = requestAnimationFrame(tick);
+		};
+		const start = () => {
+			cancelAnimationFrame(frame);
+			tick();
+		};
+		const stop = () => {
+			cancelAnimationFrame(frame);
+			update();
+		};
+		element.addEventListener('play', start);
+		element.addEventListener('pause', stop);
+		element.addEventListener('ended', stop);
+		element.addEventListener('seeked', update);
+		element.addEventListener('seeking', update);
+		if (!element.paused) start();
+		else update();
+		return () => {
+			cancelAnimationFrame(frame);
+			element.removeEventListener('play', start);
+			element.removeEventListener('pause', stop);
+			element.removeEventListener('ended', stop);
+			element.removeEventListener('seeked', update);
+			element.removeEventListener('seeking', update);
+		};
 	});
 </script>
 
 <div
 	id="captions"
-	class:controls-shown={showControls}
-	class:hide={!trackVisible}
+	class:hide={$activeCaptionTrack === null}
 	bind:this={captionElement}
-	style="left: 50%;bottom: {showControls
-		? '80px'
-		: '30px'};transform: translateX(-50%);{Object.entries(captionStyle)
-		.map(([k, v]) => `${k}:${v};`)
-		.join('')}"
+	style:left="{bounds.left}px"
+	style:top="{bounds.top}px"
+	style:width="{bounds.width}px"
+	style:height="{captionHeight}px"
+	style:--cue-color={$subtitleSettings.color}
+	style:--cue-bg-color={$subtitleSettings.backgroundColor}
+	style:--cue-font-size="{(bounds.height / 100) * $subtitleSettings.fontSize}px"
+	style:--cue-text-shadow={$subtitleSettings.textShadow}
+	style:--user-cue-alignment={$subtitleSettings.alignment ?? 'center'}
+	style:font-family={!$subtitleSettings.fontFamily || $subtitleSettings.fontFamily === 'inherit'
+		? 'var(--font)'
+		: $subtitleSettings.fontFamily}
 ></div>
 
 <style>
 	#captions {
-		--overlay-padding: 1%;
-		--cue-line-height: calc(var(--cue-font-size) * 1.2);
-		--cue-padding-x: calc(var(--cue-font-size) * 0.6);
-		--cue-padding-y: calc(var(--cue-font-size) * 0.4);
-		text-align: var(--cue-text-align);
-
-		position: absolute;
-		z-index: 1;
-		pointer-events: none;
+		--overlay-padding: 0px;
+		margin: 0;
+		clip-path: inset(0);
 	}
-
-	@media screen and (max-width: 1000px) {
-		#captions {
-			/* Keep captions visible above controls on mobile instead of hiding them. */
-			display: block !important;
-		}
+	#captions :global([part='cue-display']) {
+		text-align: var(--user-cue-alignment);
 	}
 </style>

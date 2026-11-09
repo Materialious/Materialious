@@ -368,7 +368,7 @@
 
 				<section class="download-section">
 					<h6 class="no-margin">{$_('player.downloadFormat')}</h6>
-					<div class="field suffix label border">
+					<div class="field suffix label surface-container-highest">
 						<select id="download-format" bind:value={selectedContainer}>
 							{#each containerOptions as container (container)}
 								<option value={container}>{container.toUpperCase()}</option>

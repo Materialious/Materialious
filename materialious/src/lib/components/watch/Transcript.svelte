@@ -1,172 +1,229 @@
 <script lang="ts">
 	import { videoLength } from '#lib/numbers';
 	import Fuse from 'fuse.js';
-	import {
-		type VTTCue,
-		parseText,
-		type ParsedCaptionsResult,
-		renderVTTCueString
-	} from 'media-captions';
+	import { parseResponse } from 'media-captions';
+	import { transcriptLines, type TranscriptLine } from '#lib/player/transcript';
+	import { subtitleSettings } from '#lib/store';
 	import { _ } from '#lib/i18n/index';
-	import type { Captions, VideoPlay } from '#lib/api/model';
+	import type { VideoPlay } from '#lib/api/model';
 	import { getCaptionUrls, fetchCaption } from '#lib/player/captions';
 	import ComboBox from '#lib/components/ComboBox.svelte';
 
 	interface Props {
 		video: VideoPlay;
-		currentTime: number;
+		playerElement?: HTMLMediaElement;
+		onSeek: (time: number) => void;
 	}
 
-	let { video, currentTime = $bindable() }: Props = $props();
-
-	let selectedCaption: Captions | undefined = $state();
-	let autoScroll: boolean = $state(true);
+	let { video, playerElement, onSeek }: Props = $props();
+	let currentTime = $state(0);
+	const captionTime = $derived(currentTime - ($subtitleSettings.offset ?? 0));
+	let cues: TranscriptLine[] = $state.raw([]);
+	let isLoading = $state(false);
+	let hasError = $state(false);
+	let hasTranscript = $state(false);
+	let autoScroll = $state(true);
+	let search = $state('');
+	let scrollable: HTMLElement;
+	let requestId = 0;
 
 	const captionOptions = $derived(
 		[{ label: $_('selectLang'), value: '' }].concat(
 			video.captions.map((c, i) => ({ label: c.label, value: String(i) }))
 		)
 	);
-
-	function onCaptionChange(value: string) {
-		if (value === '') {
-			selectedCaption = undefined;
-		} else {
-			selectedCaption = video.captions[Number(value)];
-		}
-		loadTranscript();
-	}
-
-	let transcript: ParsedCaptionsResult | null = $state(null);
-	let transcriptCues: VTTCue[] = $state([]);
-	let isLoading = $state(false);
-	let search: string = $state('');
+	const searchIndex = $derived(new Fuse(cues, { keys: ['text'] }));
+	const visibleCues = $derived.by(() => {
+		if (!search.trim()) return cues;
+		const matches = new Set(searchIndex.search(search.trim()).map((result) => result.item));
+		return cues.filter((cue) => matches.has(cue));
+	});
+	const activeCue = $derived(
+		visibleCues.find((cue) => captionTime >= cue.startTime && captionTime < cue.endTime)
+	);
 
 	$effect(() => {
-		// currentTime must be referenced to update effect
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		currentTime;
-
-		if (autoScroll) {
-			const currentTranscriptLine = document.querySelector(
-				'.transcript-line.current-line'
-			) as HTMLElement;
-			const transcriptScrollable = document.getElementById('transcript');
-
-			if (currentTranscriptLine && transcriptScrollable) {
-				transcriptScrollable.scrollTop =
-					currentTranscriptLine.offsetTop - transcriptScrollable.offsetTop - 300;
+		if (!autoScroll || !activeCue || !scrollable) return;
+		const line = scrollable.querySelector<HTMLElement>('[aria-current="true"]');
+		if (line) {
+			const top =
+				line.getBoundingClientRect().top -
+				scrollable.getBoundingClientRect().top +
+				scrollable.scrollTop -
+				scrollable.clientTop;
+			if (
+				top < scrollable.scrollTop ||
+				top + line.offsetHeight > scrollable.scrollTop + scrollable.clientHeight
+			) {
+				scrollable.scrollTop = top - scrollable.clientHeight / 2 + line.offsetHeight / 2;
 			}
 		}
 	});
 
-	async function loadTranscript() {
-		if (!selectedCaption) {
-			transcript = null;
-			return;
+	$effect(() => {
+		const element = playerElement;
+		if (!element) return;
+		let frame = 0;
+		const update = () => {
+			currentTime = element.currentTime;
+		};
+		const tick = () => {
+			update();
+			frame = requestAnimationFrame(tick);
+		};
+		const start = () => {
+			cancelAnimationFrame(frame);
+			tick();
+		};
+		const stop = () => {
+			cancelAnimationFrame(frame);
+			update();
+		};
+		element.addEventListener('play', start);
+		element.addEventListener('pause', stop);
+		element.addEventListener('ended', stop);
+		element.addEventListener('seeking', update);
+		element.addEventListener('seeked', update);
+		if (element.paused) update();
+		else start();
+		return () => {
+			cancelAnimationFrame(frame);
+			element.removeEventListener('play', start);
+			element.removeEventListener('pause', stop);
+			element.removeEventListener('ended', stop);
+			element.removeEventListener('seeking', update);
+			element.removeEventListener('seeked', update);
+		};
+	});
+
+	async function onCaptionChange(value: string) {
+		const id = ++requestId;
+		const caption = value === '' ? undefined : video.captions[Number(value)];
+		cues = [];
+		search = '';
+		hasTranscript = false;
+		hasError = false;
+		isLoading = !!caption;
+		if (!caption) return;
+
+		try {
+			const response = await fetchCaption(getCaptionUrls(caption, video.fallbackPatch));
+			if (!response) throw new Error('Caption fetch failed');
+			const transcript = await parseResponse(response);
+			if (id !== requestId) return;
+			cues = transcriptLines(transcript.cues);
+			hasTranscript = true;
+		} catch {
+			if (id === requestId) hasError = true;
+		} finally {
+			if (id === requestId) isLoading = false;
 		}
-		isLoading = true;
-		transcript = null;
-
-		const resp = await fetchCaption(getCaptionUrls(selectedCaption, video.fallbackPatch));
-		if (!resp) return;
-
-		transcript = await parseText(await resp.text(), { strict: false });
-		transcriptCues = transcript.cues;
-
-		isLoading = false;
-	}
-
-	function searchTranscript() {
-		if (!transcript) return;
-
-		if (search.trim() === '') {
-			transcriptCues = transcript.cues;
-			return;
-		}
-
-		const fuse = new Fuse(transcript.cues, {
-			keys: ['text']
-		});
-
-		transcriptCues = fuse.search(search).map((item) => item.item);
 	}
 </script>
 
-<article class="scroll border no-padding" style="height: 75vh;" id="transcript">
-	<article class="no-elevate padding" style="position: sticky; top: 0; z-index: 3;">
+<article class="border no-padding transcript-panel">
+	<div class="padding transcript-controls">
 		<h6>{$_('transcript')}</h6>
 		<ComboBox options={captionOptions} label={$_('language')} onChange={onCaptionChange} />
-		{#if transcriptCues.length > 0}
-			<div class="space"></div>
-			<div class="max field suffix prefix small round no-margin surface-container-highest">
-				<i class="front">search</i><input
+		{#if hasTranscript && cues.length > 0}
+			<div class="small-space"></div>
+			<div class="field prefix small round no-margin surface-container-highest">
+				<i class="front">search</i>
+				<input
 					bind:value={search}
-					oninput={searchTranscript}
-					type="text"
+					type="search"
+					aria-label={$_('searchPlaceholder')}
 					placeholder={$_('searchPlaceholder')}
 				/>
 			</div>
-			<div class="space"></div>
+			<div class="small-space"></div>
 			<label class="checkbox">
 				<input bind:checked={autoScroll} type="checkbox" />
-				<span>Auto scroll</span>
+				<span>{$_('transcriptAutoScroll')}</span>
 			</label>
 		{/if}
-		<div class="space"></div>
-		<div class="divider"></div>
-	</article>
-
-	{#if isLoading}
-		<nav class="center-align">
-			<progress class="circle"></progress>
-		</nav>
-	{:else if transcript}
-		{#if transcript.cues.length > 0}
-			{#if transcriptCues.length > 0}
-				{#each transcriptCues as cue (cue)}
-					{@const isCurrent = currentTime >= cue.startTime && currentTime <= cue.endTime}
-					<div
-						class="transcript-line"
-						role="presentation"
-						onclick={() => (currentTime = cue.startTime)}
-						class:current-line={isCurrent}
-						class:surface-container-highest={isCurrent}
-					>
-						<p class="chip no-margin">{videoLength(cue.startTime)}</p>
-						<p class="transcript-text">
-							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-							{@html renderVTTCueString(cue, currentTime)}
-						</p>
-					</div>
-				{/each}
-			{:else}
-				<nav class="center-align">
-					<h6>{$_('noResult')}</h6>
-				</nav>
-			{/if}
-		{:else}
-			<nav class="center-align">
-				<h6>{$_('noCaptionData')}</h6>
+	</div>
+	<div class="divider"></div>
+	<div
+		class="scroll transcript-list"
+		role="region"
+		aria-label={$_('transcript')}
+		bind:this={scrollable}
+	>
+		{#if isLoading}
+			<nav class="center-align padding">
+				<progress class="circle" aria-label={$_('transcriptLoading')}></progress>
 			</nav>
+		{:else if hasError}
+			<p class="padding" role="alert">{$_('transcriptLoadError')}</p>
+		{:else if hasTranscript}
+			{#if cues.length === 0}
+				<p class="padding">{$_('noCaptionData')}</p>
+			{:else if visibleCues.length === 0}
+				<p class="padding">{$_('noResult')}</p>
+			{:else}
+				{#each visibleCues as item (item)}
+					{@const isCurrent = captionTime >= item.startTime && captionTime < item.endTime}
+					<button
+						type="button"
+						class="transcript-line"
+						class:surface-container-highest={isCurrent}
+						aria-current={isCurrent ? 'true' : undefined}
+						onclick={() => onSeek(Math.max(0, item.startTime + ($subtitleSettings.offset ?? 0)))}
+					>
+						<span class="transcript-time"
+							>{videoLength(Math.max(0, item.startTime + ($subtitleSettings.offset ?? 0)))}</span
+						>
+						<span class="transcript-text">{item.text}</span>
+					</button>
+				{/each}
+			{/if}
 		{/if}
-	{/if}
+	</div>
 </article>
 
 <style>
-	.transcript-line {
+	.transcript-panel {
 		display: flex;
-		cursor: pointer;
-		align-items: center;
-		padding: 0.5em;
-		margin: 1em;
+		flex-direction: column;
+		max-height: min(75vh, 48rem);
 	}
-
+	.transcript-controls {
+		flex: none;
+	}
+	.transcript-list {
+		min-height: 4rem;
+		overflow-y: auto;
+		position: relative;
+	}
+	.transcript-line {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		align-items: start;
+		gap: 1rem;
+		width: 100%;
+		height: auto;
+		min-height: 0;
+		padding: 0.75rem 1rem;
+		margin: 0;
+		border-radius: 0;
+		background: var(--surface-container-low);
+		color: inherit;
+		text-align: left;
+		white-space: normal;
+	}
+	.transcript-line.surface-container-highest {
+		background: var(--surface-container-highest);
+	}
+	.transcript-line:focus-visible {
+		outline: 2px solid var(--primary);
+		outline-offset: -2px;
+	}
+	.transcript-time {
+		font-variant-numeric: tabular-nums;
+	}
 	.transcript-text {
-		margin-left: 1em;
-	}
-
-	.transcript-line .chip {
-		padding: 0 1.5em;
+		white-space: pre-line;
+		overflow-wrap: anywhere;
 	}
 </style>

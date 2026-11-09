@@ -221,7 +221,7 @@ export async function mintPoTokenForVideo(videoId: string): Promise<string> {
 	}
 
 	const poToken = await platformMinter(PO_TOKEN_REQUEST_KEY, videoId);
-	poTokenCacheStore.set(poToken);
+	poTokenCacheStore.set({ videoId, poToken });
 	return poToken;
 }
 

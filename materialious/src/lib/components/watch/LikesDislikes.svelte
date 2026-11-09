@@ -8,6 +8,13 @@
 	}: { video: VideoPlay; returnYTDislikes?: Promise<ReturnYTDislikes> | null } = $props();
 </script>
 
+{#snippet likeCountOnly()}
+	<button style="cursor: default;margin-left: 0;" class="surface-container-highest">
+		<i class="small">thumb_up</i>
+		<span>{cleanNumber(video.likeCount)}</span>
+	</button>
+{/snippet}
+
 {#await returnYTDislikes then returnYTDislikes}
 	{#if returnYTDislikes}
 		<button style="cursor: default;margin-left: 0;" class="surface-container-highest">
@@ -17,9 +24,8 @@
 			<span>{cleanNumber(returnYTDislikes.dislikes)}</span>
 		</button>
 	{:else}
-		<button style="cursor: default;margin-left: 0;" class="surface-container-highest">
-			<i class="small">thumb_up</i>
-			<span>{cleanNumber(video.likeCount)}</span>
-		</button>
+		{@render likeCountOnly()}
 	{/if}
+{:catch}
+	{@render likeCountOnly()}
 {/await}

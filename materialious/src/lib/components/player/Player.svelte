@@ -18,6 +18,8 @@
 	import {
 		playerAlwaysLoopStore,
 		playerAudioOnlyByDefault,
+		playerAndroidAutoFullscreen,
+		playerAndroidRotateOnTilt,
 		playerAndroidLockOrientation,
 		playerAndroidPauseOnNetworkChange,
 		playerAndroidAutoPip,
@@ -64,6 +66,7 @@
 	import TouchControls from './TouchControls.svelte';
 	import { Network, type ConnectionStatus } from '@capacitor/network';
 	import { ScreenOrientation, type ScreenOrientationResult } from '@capacitor/screen-orientation';
+	import { Motion } from '@capacitor/motion';
 	import ClosedCaptions from './ClosedCaptions.svelte';
 	import { getVideo, getVideoWatchHistory, updateWatchHistory } from '#lib/api/index';
 
@@ -96,6 +99,13 @@
 		onShakaPlayer = undefined,
 		segments = $bindable([])
 	}: Props = $props();
+
+	// The parent may clear its player state before this component is destroyed.
+	// Keep the last video available for the final playback-history save.
+	let historyVideo = untrack(() => data.video);
+	$effect(() => {
+		historyVideo = data.video;
+	});
 
 	let audioOnlyOverride = $state<{ videoId: string; value: boolean } | null>(null);
 	let audioOnly = $derived(
@@ -148,11 +158,14 @@
 	let isRetryingPlayback = $state(false);
 
 	let player: shaka.Player;
+	let isDestroyed = false;
+	let loadController: AbortController | undefined;
 	let sabrAdapter: SabrStreamingAdapter | null = null;
+	let sabrSegmentActive = false;
 	let playerLoadedListenerAdded = false;
 	let sponsorSkipListenerAdded = false;
 
-	const STALL_CHECK_INTERVAL_MS = 3_000;
+	const STALL_CHECK_INTERVAL_MS = 1_000;
 	const STALL_TIMEOUT_MS = 12_000;
 	const MAX_STALL_RECOVERY_ATTEMPTS = 3;
 	const MAX_STREAMING_FAILURE_RETRIES = 5;
@@ -312,25 +325,22 @@
 		});
 	}
 
-	function loadTimeFromUrl(): boolean {
-		if (player) {
-			const timeGivenUrl = page.url.searchParams.get('time');
-			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
-				if (!playerElement) return false;
-				playerElement.currentTime = Number(timeGivenUrl);
-				return true;
-			}
-		}
-
-		return false;
+	function timeFromUrl(): number | undefined {
+		const value = page.url.searchParams.get('time') ?? page.url.searchParams.get('t');
+		if (value === null || value.trim() === '') return undefined;
+		const time = Number(value);
+		return Number.isFinite(time) && time >= 0 ? time : undefined;
 	}
 
 	$effect(() => {
-		loadTimeFromUrl();
+		const time = timeFromUrl();
+		if (time !== undefined && playerElement) playerElement.currentTime = time;
 	});
 
 	function toggleFullscreen() {
-		if (document.fullscreenElement) {
+		if (Capacitor.getPlatform() === 'android' && $playerIsInWindowFullscreen) {
+			playerIsInWindowFullscreen.set(false);
+		} else if (document.fullscreenElement) {
 			document.exitFullscreen();
 			playerIsFullscreen = false;
 		} else {
@@ -414,6 +424,7 @@
 	 * crashing on an unhandled rejection.
 	 */
 	function reportPlaybackError(source: PlaybackErrorSource, error: unknown) {
+		if (isDestroyed) return;
 		console.error(`[Player] ${source} playback failed:`, error);
 
 		// Stop all automatic recovery loops; the user is now in control.
@@ -462,6 +473,7 @@
 	}
 
 	function scheduleStreamingRetry(error: shaka.util.Error) {
+		if (isDestroyed || error?.code === shaka.util.Error.Code.OPERATION_ABORTED) return;
 		console.error('Streaming failure:', error);
 
 		if (!isRetryableStreamingError(error)) {
@@ -494,7 +506,7 @@
 
 		streamingFailureRetryTimer = setTimeout(() => {
 			streamingFailureRetryTimer = undefined;
-			if (!player) return;
+			if (isDestroyed || !player) return;
 
 			try {
 				if (!player.retryStreaming(0)) {
@@ -507,7 +519,25 @@
 		}, delay);
 	}
 
+	function handlePlayerError(event: Event) {
+		const error = (event as CustomEvent).detail as shaka.util.Error;
+		if (isDestroyed || error?.code === shaka.util.Error.Code.OPERATION_ABORTED || error?.handled)
+			return;
+		console.error('Player error:', error);
+
+		if (error?.severity !== shaka.util.Error.Severity.CRITICAL) return;
+		if (isRetryableStreamingError(error)) {
+			// Shaka emits this event before failureCallback. In particular, token
+			// request-filter failures are marked CRITICAL even when retryable.
+			scheduleStreamingRetry(error);
+			event.preventDefault();
+			return;
+		}
+		reportPlaybackError(currentPlaybackErrorSource(), error);
+	}
+
 	function startStallWatchdog() {
+		if (isDestroyed) return;
 		if (stallWatchdogInterval) clearInterval(stallWatchdogInterval);
 
 		stallWatchdogLastTime = playerElement?.currentTime ?? 0;
@@ -521,7 +551,14 @@
 	}
 
 	function checkForStall() {
-		if (!player || !playerElement || stallRecoveryInProgress || stallRecoveryExhausted) return;
+		if (
+			isDestroyed ||
+			!player ||
+			!playerElement ||
+			stallRecoveryInProgress ||
+			stallRecoveryExhausted
+		)
+			return;
 
 		if (playerElement.paused || playerElement.seeking || playerElement.ended) {
 			stallWatchdogLastProgress = Date.now();
@@ -546,13 +583,19 @@
 			return;
 		}
 
-		if (now - stallWatchdogLastProgress < STALL_TIMEOUT_MS) return;
+		const stalledFor = now - stallWatchdogLastProgress;
+		const idleSabr =
+			!!sabrAdapter &&
+			(playerIsBuffering || playerElement.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) &&
+			!sabrSegmentActive;
+		if (stalledFor < (idleSabr ? 1_000 : STALL_TIMEOUT_MS)) return;
 
-		void recoverFromStall();
+		void recoverFromStall(idleSabr);
 	}
 
-	async function recoverFromStall() {
-		if (!player || !playerElement) return;
+	async function recoverFromStall(idleSabr = false) {
+		if (isDestroyed || !player || !playerElement) return;
+		const videoId = data.video.videoId;
 
 		stallRecoveryInProgress = true;
 		stallRecoveryAttempts++;
@@ -562,20 +605,27 @@
 		console.warn(`[Player] Playback stalled, recovery attempt ${stallRecoveryAttempts}`);
 
 		try {
-			if (stallRecoveryAttempts === 1) {
+			if (idleSabr && stallRecoveryAttempts === 1) {
+				if (!player.retryStreaming(0)) await reloadVideo(playerElement.currentTime);
+			} else if (stallRecoveryAttempts === 1) {
 				// Refresh attestation/PoToken first, then let Shaka refetch.
 				await refreshSabrSession(data.video);
+				if (isDestroyed || data.video.videoId !== videoId) return;
 				player.retryStreaming(0);
 			} else if (stallRecoveryAttempts < MAX_STALL_RECOVERY_ATTEMPTS) {
-				// A plain retry did not help; rebuild the SABR session.
-				await refreshSabrSession(data.video);
+				// Rebuilding playback obtains fresh session data and mints its own token.
+				// A failed standalone refresh must not prevent that escalation.
 				await reloadVideo(playerElement.currentTime);
 			} else {
 				reportPlaybackError(currentPlaybackErrorSource(), new Error('Playback stalled'));
 			}
 		} catch (error) {
+			if (isDestroyed || data.video.videoId !== videoId) return;
 			console.error('[Player] Stall recovery failed:', error);
-			reportPlaybackError(currentPlaybackErrorSource(), error);
+			// Keep the next watchdog attempt available after a transient mint failure.
+			if (stallRecoveryAttempts >= MAX_STALL_RECOVERY_ATTEMPTS) {
+				reportPlaybackError(currentPlaybackErrorSource(), error);
+			}
 		} finally {
 			stallRecoveryInProgress = false;
 			stallWatchdogLastProgress = Date.now();
@@ -584,6 +634,11 @@
 	}
 
 	async function loadVideo() {
+		if (isDestroyed) return;
+		loadController?.abort();
+		const controller = new AbortController();
+		loadController = controller;
+		sabrSegmentActive = false;
 		// A new stream is being loaded; discard any pending retry from the
 		// previous one and give streaming failures a fresh budget.
 		if (streamingFailureRetryTimer) {
@@ -600,8 +655,16 @@
 		}
 
 		try {
-			sabrAdapter = await injectSabr(data.video, player);
+			const adapter = await injectSabr(data.video, player, controller.signal, (active) => {
+				if (!controller.signal.aborted) sabrSegmentActive = active;
+			});
+			if (controller.signal.aborted) {
+				adapter?.dispose();
+				return;
+			}
+			sabrAdapter = adapter;
 		} catch (error) {
+			if (controller.signal.aborted) return;
 			reportPlaybackError('sabr', error);
 			return;
 		}
@@ -700,10 +763,12 @@
 				}
 			}
 		} catch (error) {
+			if (controller.signal.aborted) return;
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 			return;
 		}
 
+		if (controller.signal.aborted) return;
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
 		}
@@ -717,6 +782,8 @@
 	}
 
 	async function reloadVideo(resumeTime?: number, forceYoutubeJs = false) {
+		if (isDestroyed) return;
+		const videoId = data.video.videoId;
 		// A reload triggered by the user (or the initial fallback) should also
 		// reset the stall recovery budget; an internal stall recovery must keep
 		// it so that we can escalate instead of looping forever.
@@ -730,19 +797,21 @@
 		const wasPlaying = playerElement ? !playerElement.paused : false;
 
 		try {
-			if (forceYoutubeJs || data.video.fallbackPatch === 'youtubejs' || !!data.video.ytjs) {
-				data.video = await getVideoYTjs(data.video.videoId);
-			} else {
-				data.video = await getVideo(data.video.videoId);
-			}
+			const video =
+				forceYoutubeJs || data.video.fallbackPatch === 'youtubejs' || !!data.video.ytjs
+					? await getVideoYTjs(videoId)
+					: await getVideo(videoId);
+			if (isDestroyed || data.video.videoId !== videoId) return;
+			data.video = video;
 		} catch (error) {
+			if (isDestroyed || data.video.videoId !== videoId) return;
 			reportPlaybackError(forceYoutubeJs ? 'youtubejs' : 'invidious', error);
 			return;
 		}
 
 		await loadVideo();
 
-		if (playbackError) return;
+		if (isDestroyed || data.video.videoId !== videoId || playbackError) return;
 
 		if (targetTime > 0 && playerElement) {
 			playerElement.currentTime = targetTime;
@@ -815,11 +884,116 @@
 		}, 5000);
 	}
 
-	async function onAndroidFullscreenChange() {
-		const videoFormats = data.video.adaptiveFormats.filter((format) =>
-			format.type.startsWith('video/')
-		);
+	function videoOrientation(): 'landscape' | 'portrait' | undefined {
+		const size = data.video.adaptiveFormats.find(
+			(format) => format.type.startsWith('video/') && format.size
+		)?.size;
+		if (!size) return;
+		const [width, height] = size.split('x').map(Number);
+		if (!width || !height) return;
+		return width > height ? 'landscape' : 'portrait';
+	}
 
+	async function lockToVideoOrientation() {
+		const orientation = videoOrientation();
+		if (!orientation) return;
+		const current = await ScreenOrientation.orientation();
+		if (isDestroyed || (!document.fullscreenElement && !get(playerIsInWindowFullscreen))) return;
+		await ScreenOrientation.lock({
+			orientation: current.type.startsWith(orientation) ? current.type : `${orientation}-primary`
+		});
+	}
+
+	// The player is keyed by video ID, so this runs once for each newly opened video.
+	onMount(() => {
+		if (
+			Capacitor.getPlatform() !== 'android' ||
+			isAndroidTv() ||
+			isEmbed ||
+			playerIsPip ||
+			audioOnly ||
+			!$playerAndroidAutoFullscreen
+		)
+			return;
+		playerIsInWindowFullscreen.set(true);
+	});
+
+	$effect(() => {
+		if (Capacitor.getPlatform() !== 'android' || isAndroidTv() || isEmbed) return;
+		const active =
+			$playerAndroidRotateOnTilt && !playerIsPip && !isAndroidPictureInPicture && !audioOnly;
+		if (!active) return;
+
+		let disposed = false;
+		let lastTilt:
+			| 'portrait-primary'
+			| 'portrait-secondary'
+			| 'landscape-primary'
+			| 'landscape-secondary'
+			| undefined;
+		let candidate: typeof lastTilt;
+		let candidateSince = 0;
+		let listener: Awaited<ReturnType<typeof Motion.addListener>> | undefined;
+		void Motion.addListener('accel', ({ accelerationIncludingGravity: gravity }) => {
+			if (disposed || !gravity || gravity.x == null || gravity.y == null || gravity.z == null)
+				return;
+			if (!document.fullscreenElement && !get(playerIsInWindowFullscreen)) {
+				lastTilt = undefined;
+				candidate = undefined;
+				return;
+			}
+			// Ignore a flat device and require a stable tilt before switching sides.
+			if (Math.abs(gravity.z) > 7) return;
+			const tilt =
+				Math.abs(gravity.x) > 6 && Math.abs(gravity.x) > Math.abs(gravity.y) + 2
+					? gravity.x > 0
+						? 'landscape-primary'
+						: 'landscape-secondary'
+					: Math.abs(gravity.y) > 6 && Math.abs(gravity.y) > Math.abs(gravity.x) + 2
+						? gravity.y > 0
+							? 'portrait-primary'
+							: 'portrait-secondary'
+						: undefined;
+			const lockedOrientation = get(playerAndroidLockOrientation) ? videoOrientation() : undefined;
+			if (!tilt || (lockedOrientation && !tilt.startsWith(lockedOrientation))) {
+				candidate = undefined;
+				return;
+			}
+			if (tilt !== candidate) {
+				candidate = tilt;
+				candidateSince = Date.now();
+				return;
+			}
+			if (tilt === lastTilt || Date.now() - candidateSince < 500) return;
+			lastTilt = tilt;
+			void ScreenOrientation.lock({ orientation: tilt });
+		})
+			.then((handle) => {
+				if (disposed) void handle.remove();
+				else listener = handle;
+			})
+			.catch((error) => console.warn('[Player] Motion listener unavailable', error));
+		return () => {
+			disposed = true;
+			void listener?.remove();
+		};
+	});
+
+	$effect(() => {
+		if (Capacitor.getPlatform() !== 'android' || isAndroidTv() || isEmbed) return;
+		if ($playerIsInWindowFullscreen && !playerIsPip && !isAndroidPictureInPicture && !audioOnly) {
+			if ($playerAndroidLockOrientation) void lockToVideoOrientation();
+			void SystemBars.setStyle({ style: SystemBarsStyle.Light });
+			void SystemBars.hide({ bar: SystemBarType.NavigationBar });
+			void SystemBars.hide({ bar: SystemBarType.StatusBar });
+			return () => {
+				void setStatusBarColor();
+				void ScreenOrientation.unlock();
+			};
+		}
+	});
+
+	async function onAndroidFullscreenChange() {
 		const isFullScreen = !!document.fullscreenElement;
 
 		if (isFullScreen) {
@@ -835,23 +1009,11 @@
 			await setStatusBarColor();
 		}
 
-		if (!$playerAndroidLockOrientation) return;
-
-		if (isFullScreen && videoFormats[0]?.size) {
-			const widthHeight = videoFormats[0].size.split('x');
-
-			if (widthHeight.length !== 2) return;
-
-			if (Number(widthHeight[0]) > Number(widthHeight[1])) {
-				await ScreenOrientation.lock({ orientation: 'landscape' });
-			} else {
-				await ScreenOrientation.lock({ orientation: 'portrait' });
-			}
-		} else {
-			await ScreenOrientation.lock({
-				orientation: (androidOriginalOrigination as ScreenOrientationResult).type
-			});
+		if (!isFullScreen) {
+			await ScreenOrientation.unlock();
+			return;
 		}
+		if ($playerAndroidLockOrientation) await lockToVideoOrientation();
 	}
 
 	async function androidHandleRotate() {
@@ -937,19 +1099,7 @@
 
 		if (playerElement) await player.attach(playerElement);
 
-		player?.addEventListener('error', (event) => {
-			const error = (event as CustomEvent).detail as shaka.util.Error;
-			console.error('Player error:', error);
-
-			if (error?.code === shaka.util.Error.Code.OPERATION_ABORTED) return;
-
-			// Critical errors are the ones that stop playback entirely. Recoverable
-			// failures are retried by scheduleStreamingRetry and only surface once
-			// that recovery budget is exhausted.
-			if (error?.severity === shaka.util.Error.Severity.CRITICAL) {
-				reportPlaybackError(currentPlaybackErrorSource(), error);
-			}
-		});
+		player?.addEventListener('error', handlePlayerError);
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
@@ -1223,7 +1373,9 @@
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
-		if (loadTimeFromUrl() || !$playerSavePlaybackPositionStore) return 0;
+		const urlTime = timeFromUrl();
+		if (urlTime !== undefined) return urlTime;
+		if (!$playerSavePlaybackPositionStore) return 0;
 
 		let toSetTime = 0;
 
@@ -1236,28 +1388,20 @@
 	}
 
 	function savePlayerbackHistory() {
-		if (data.video.liveNow || !$playerSavePlaybackPositionStore || !playerElement) return;
+		if (historyVideo.liveNow || !$playerSavePlaybackPositionStore || !playerElement) return;
 
-		updateWatchHistory(data.video.videoId, playerElement.currentTime);
+		updateWatchHistory(historyVideo.videoId, playerElement.currentTime);
 	}
 
 	onDestroy(async () => {
-		await releaseKeepAwake();
-
-		if (Capacitor.getPlatform() === 'android') {
-			await pictureInPictureListener?.remove();
-			await AndroidPictureInPicture.setPlaybackActive({ active: false });
-			await setStatusBarColor();
-			await MediaSession.setPlaybackState({ playbackState: 'none' });
-
-			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
-
-			if (androidOriginalOrigination) {
-				await ScreenOrientation.lock({
-					orientation: androidOriginalOrigination.type
-				});
-			}
+		// Invalidate pending recovery before any asynchronous platform cleanup.
+		isDestroyed = true;
+		if (Capacitor.getPlatform() === 'android' && !isAndroidTv()) {
+			playerIsInWindowFullscreen.set(false);
 		}
+		loadController?.abort();
+		stopStallWatchdog();
+		if (streamingFailureRetryTimer) clearTimeout(streamingFailureRetryTimer);
 
 		try {
 			savePlayerbackHistory();
@@ -1286,9 +1430,31 @@
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		if (player) {
-			player.unload();
-			player.destroy();
+			// destroy() also unloads. Start it before platform cleanup, which can fail.
+			const destruction = player.destroy();
 			onShakaPlayer?.(undefined);
+			try {
+				await destruction;
+			} catch (error) {
+				console.warn('[Player] Media cleanup failed', error);
+			}
+		}
+
+		try {
+			await releaseKeepAwake();
+
+			if (Capacitor.getPlatform() === 'android') {
+				await pictureInPictureListener?.remove();
+				await AndroidPictureInPicture.setPlaybackActive({ active: false });
+				await setStatusBarColor();
+				await MediaSession.setPlaybackState({ playbackState: 'none' });
+
+				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
+
+				if (androidOriginalOrigination) await ScreenOrientation.unlock();
+			}
+		} catch (error) {
+			console.warn('[Player] Platform cleanup failed', error);
 		}
 	});
 </script>
@@ -1311,7 +1477,7 @@
 	}}
 	bind:this={playerContainer}
 >
-	<ClosedCaptions video={data.video} bind:currentTime bind:showControls />
+	<ClosedCaptions video={data.video} {playerElement} {showControls} />
 
 	<video
 		class:audio-only={audioOnly}
@@ -1319,7 +1485,7 @@
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !isAndroidTv() && !isAndroidPictureInPicture}
+	{#if isEmbed && !playerIsPip && !isAndroidTv() && !isAndroidPictureInPicture}
 		<div
 			class="chip surface-container-highest"
 			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
@@ -1328,7 +1494,7 @@
 		</div>
 	{/if}
 
-	{#if showControls && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
+	{#if showControls && !playerIsPip && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
 		<div id="mobile-time" transition:fade>
 			<p class="chip surface-container-highest s">
 				{#if data.video.liveNow}
@@ -1344,7 +1510,7 @@
 			{/if}
 		</div>
 	{/if}
-	{#if !isAndroidPictureInPicture && !audioOnly}
+	{#if !playerIsPip && !isAndroidPictureInPicture && !audioOnly}
 		<TouchControls
 			{playerElement}
 			{showPlayerUI}
@@ -1355,7 +1521,7 @@
 			bind:playerIsBuffering
 		/>
 	{/if}
-	{#if !isAndroidPictureInPicture && !isAndroidTv()}
+	{#if !playerIsPip && !isAndroidPictureInPicture && !isAndroidTv()}
 		<svelte:element
 			this={audioOnly ? 'article' : 'div'}
 			id="player-controls"
@@ -1454,7 +1620,11 @@
 							</button>
 						{/if}
 						{#if !audioOnly}
-							<FullscreenToggle {toggleFullscreen} {playerIsFullscreen} />
+							<FullscreenToggle
+								{toggleFullscreen}
+								playerIsFullscreen={playerIsFullscreen ||
+									(Capacitor.getPlatform() === 'android' && $playerIsInWindowFullscreen)}
+							/>
 						{/if}
 					{/if}
 				</nav>

@@ -19,6 +19,18 @@ export function extractActualLink(url: string): string {
 	return url;
 }
 
+export function getTimestampFromUrl(url: string, baseUrl?: string): number | null {
+	try {
+		const timeParam = new URL(url, baseUrl).searchParams.get('time');
+		if (timeParam === null || timeParam.trim() === '') return null;
+
+		const timestamp = Number(timeParam);
+		return Number.isFinite(timestamp) ? timestamp : null;
+	} catch {
+		return null;
+	}
+}
+
 export function processYoutubeLink(line: string): string {
 	// Regex to match the <a> tag and extract the href (YouTube redirect link)
 	const urlRegex = /<a href="https:\/\/www\.youtube\.com\/redirect\?([^"]+)"/;

@@ -16,6 +16,8 @@ export {
 	playerAutoplayNextByDefaultStore,
 	playerYouTubeJsFallback,
 	playerYouTubeJsAlways,
+	playerAndroidAutoFullscreen,
+	playerAndroidRotateOnTilt,
 	playerAndroidLockOrientation,
 	playerDefaultLanguage,
 	playerCCByDefault,
@@ -106,3 +108,10 @@ export {
 	channelCacheStore,
 	personalPlaylistsCacheStore
 } from './cache';
+export {
+	videoQueueStore,
+	addVideoToQueue,
+	removeVideoFromQueue,
+	takeNextQueuedVideo
+} from './videoQueue';
+export type { QueuedVideo } from './videoQueue';

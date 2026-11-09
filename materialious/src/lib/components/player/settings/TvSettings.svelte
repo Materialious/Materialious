@@ -71,7 +71,7 @@
 	);
 
 	const subtitlesValue = $derived(
-		video.captions.find((track) => track.language_code === $activeCaptionTrack)?.label ??
+		video.captions.find((track) => track.url === $activeCaptionTrack)?.label ??
 			$_('player.controls.off')
 	);
 
@@ -216,11 +216,11 @@
 				{#each video.captions as track (track)}
 					<button
 						class="row"
-						class:selected={$activeCaptionTrack === track.language_code}
-						onclick={() => selectSubtitles(track.language_code)}
+						class:selected={$activeCaptionTrack === track.url}
+						onclick={() => selectSubtitles(track.url)}
 					>
 						<span>{track.label}</span>
-						{#if $activeCaptionTrack === track.language_code}<i>check</i>{/if}
+						{#if $activeCaptionTrack === track.url}<i>check</i>{/if}
 					</button>
 				{/each}
 			{/if}

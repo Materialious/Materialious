@@ -8,4 +8,5 @@ export const watchHistoryEnabledStore: Writable<boolean> = persist(
 	'watchHistoryEnabled'
 );
 
-export const poTokenCacheStore: Writable<string | undefined> = writable();
+export const poTokenCacheStore: Writable<{ videoId: string; poToken: string } | undefined> =
+	writable();

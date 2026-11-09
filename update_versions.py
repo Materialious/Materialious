@@ -5,7 +5,7 @@ from datetime import datetime
 
 import requests
 
-LATEST_VERSION = "1.18.21"
+LATEST_VERSION = "1.18.22"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")

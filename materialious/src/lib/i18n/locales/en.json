@@ -92,6 +92,9 @@
 	"language": "Language",
 	"channels": "channels",
 	"transcript": "Transcript",
+	"transcriptAutoScroll": "Auto scroll",
+	"transcriptLoading": "Loading transcript",
+	"transcriptLoadError": "Unable to load the transcript. Select a language to try again.",
 	"noCaptionData": "Captions don't have any data.",
 	"selectLang": "Select language",
 	"letterCase": "Letter case for titles",
@@ -113,6 +116,7 @@
 	"watchParty": {
 		"start": "Start a watch party",
 		"header": "Watch party",
+		"description": "Watch videos together in sync.",
 		"createRoom": "Create room",
 		"joinRoom": "Join room",
 		"roomID": "Room ID",
@@ -120,6 +124,14 @@
 		"leaveRoom": "Leave room",
 		"userJoin": "User joined room",
 		"userLeft": "User left room"
+	},
+	"queue": {
+		"header": "Up next",
+		"empty": "Your queue is empty.",
+		"add": "Add to queue",
+		"remove": "Remove from queue",
+		"moveUp": "Move up in queue",
+		"moveDown": "Move down in queue"
 	},
 	"subscriptions": {
 		"manageSubscriptions": "Manage subscriptions"
@@ -224,6 +236,8 @@
 			"language": "Language",
 			"subtitles": "Subtitles",
 			"fontSize": "Font size",
+			"fontFamily": "Font",
+			"loadingCaptions": "Loading captions",
 			"textColor": "Text color",
 			"bgColor": "Background color",
 			"alignment": "Alignment",
@@ -391,6 +405,8 @@
 			"localVideoFallback": "Local video fallback",
 			"youtubeJsFallback": "Local video processing fallback",
 			"youtubeJsAlways": "Always use",
+			"autoFullscreen": "Automatically fullscreen videos",
+			"rotateOnTilt": "Rotate fullscreen video when tilting device",
 			"lockOrientation": "Orientation locked to aspect ratio",
 			"networkChangePause": "Pause on network change",
 			"androidAutoPip": "Automatically enter PiP on app exit",

@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { _ } from '#lib/i18n/index';
+	import { Slider } from 'melt/builders';
 	import type { VideoPlay } from '#lib/api/model';
-	import { selectTextTrack, setTextTrackVisibility } from '../ClosedCaptions.svelte';
+	import {
+		selectTextTrack,
+		setTextTrackVisibility,
+		loadingCaptionTrack
+	} from '../ClosedCaptions.svelte';
 	import {
 		subtitleSettings,
 		defaultSubtitleSettings,
@@ -34,6 +39,14 @@
 		{ value: 5, label: 'XL' },
 		{ value: 6, label: 'XXL' }
 	] as const;
+
+	const fontOptions = [
+		{ value: 'var(--font)', label: 'Default' },
+		{ value: 'Arial, sans-serif', label: 'Arial' },
+		{ value: 'Verdana, sans-serif', label: 'Verdana' },
+		{ value: 'Georgia, serif', label: 'Georgia' },
+		{ value: 'monospace', label: 'Monospace' }
+	];
 
 	const alignmentOptions = [
 		{ value: 'start', label: 'Left' },
@@ -72,6 +85,11 @@
 	}
 
 	let fontSize = $state($subtitleSettings.fontSize);
+	let fontFamily = $state(
+		$subtitleSettings.fontFamily && $subtitleSettings.fontFamily !== 'inherit'
+			? $subtitleSettings.fontFamily
+			: 'var(--font)'
+	);
 	let color = $state($subtitleSettings.color);
 	let backgroundColor = $state($subtitleSettings.backgroundColor);
 	let backgroundColorBase = $state('#000000');
@@ -79,6 +97,17 @@
 	let textShadow = $state($subtitleSettings.textShadow);
 	let alignment = $state<SubtitleSettings['alignment']>($subtitleSettings.alignment ?? 'center');
 	let offset = $state($subtitleSettings.offset ?? 0);
+
+	const opacitySlider = new Slider({
+		min: 0,
+		max: 1,
+		step: 0.05,
+		value: () => backgroundOpacity,
+		onValueChange: (value) => {
+			backgroundOpacity = value;
+			applyBackground();
+		}
+	});
 
 	// Extract the RGB base hex from a persisted rgba/hex background color.
 	function rgbBaseOf(bg: string): string {
@@ -95,6 +124,8 @@
 
 	function selectBackgroundBase(base: string) {
 		backgroundColorBase = rgbBaseOf(base);
+		const alpha = base.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/);
+		backgroundOpacity = alpha ? Number(alpha[1]) : 1;
 		applyBackground();
 	}
 
@@ -102,6 +133,7 @@
 		subtitleSettings.update((s) => ({
 			...s,
 			fontSize,
+			fontFamily,
 			color,
 			backgroundColor,
 			textShadow,
@@ -113,6 +145,10 @@
 
 	function openDialog() {
 		fontSize = $subtitleSettings.fontSize;
+		fontFamily =
+			$subtitleSettings.fontFamily && $subtitleSettings.fontFamily !== 'inherit'
+				? $subtitleSettings.fontFamily
+				: 'var(--font)';
 		color = $subtitleSettings.color;
 		backgroundColor = $subtitleSettings.backgroundColor;
 		backgroundColorBase = rgbBaseOf($subtitleSettings.backgroundColor);
@@ -128,12 +164,25 @@
 	<button
 		bind:this={ccButton}
 		class="surface-container-highest"
-		class:primary={$activeCaptionTrack !== null}
+		aria-label={$_('player.controls.subtitles')}
+		aria-busy={$loadingCaptionTrack !== null}
 		onclick={onCCClick}
 		onblur={onCCBlur}
 	>
-		<i>closed_caption</i>
+		{#if $loadingCaptionTrack}
+			<progress class="circle small cc-loading" aria-label={$_('player.controls.loadingCaptions')}
+			></progress>
+		{:else}
+			<i>closed_caption</i>
+		{/if}
 		<menu class="no-wrap mobile player-settings" id="cc-menu" data-ui="#cc-menu">
+			<li role="presentation" data-ui="#cc-menu" onclick={openDialog}>
+				<nav class="no-wrap" style="width: 100%;">
+					<i>tune</i>
+					{$_('layout.customize')}
+				</nav>
+			</li>
+			<hr class="divider" />
 			<li
 				role="presentation"
 				data-ui="#cc-menu"
@@ -149,22 +198,22 @@
 				<li
 					role="presentation"
 					data-ui="#cc-menu"
-					class:selected={$activeCaptionTrack === track.language_code}
+					class:selected={$activeCaptionTrack === track.url}
 					onclick={() => {
-						selectTextTrack(track.language_code);
+						selectTextTrack(track.url);
 					}}
 				>
-					<i>subtitles</i>
+					{#if $loadingCaptionTrack === track.url}
+						<progress
+							class="circle small cc-loading"
+							aria-label={$_('player.controls.loadingCaptions')}
+						></progress>
+					{:else}
+						<i>subtitles</i>
+					{/if}
 					{track.label}
 				</li>
 			{/each}
-			<hr class="divider" />
-			<li role="presentation" data-ui="#cc-menu" onclick={openDialog}>
-				<nav class="no-wrap" style="width: 100%;">
-					<i>tune</i>
-					{$_('layout.customize')}
-				</nav>
-			</li>
 		</menu>
 	</button>
 {/if}
@@ -174,15 +223,25 @@
 		<header>
 			<nav class="no-wrap">
 				<h6 class="max no-margin">{$_('layout.customize')}</h6>
-				<button class="circle transparent" onclick={() => dialog.close()}><i>close</i></button>
+				<button class="circle transparent" aria-label="Close" onclick={() => dialog.close()}
+					><i>close</i></button
+				>
 			</nav>
 		</header>
 
-		<div class="cc-preview">
+		<div
+			class="cc-preview"
+			style:justify-content={alignment === 'start'
+				? 'flex-start'
+				: alignment === 'end'
+					? 'flex-end'
+					: 'center'}
+		>
 			<span
 				class="cc-preview-text"
 				style="color: {color};background: {backgroundColor};font-size: {14 +
-					fontSize * 2}px;text-shadow: {textShadow};"
+					fontSize *
+						2}px;text-shadow: {textShadow};text-align: {alignment}; font-family: {fontFamily};"
 			>
 				&#11015; &nbsp; Hello, welcome to Materialious
 			</span>
@@ -195,6 +254,7 @@
 					{#each sizeOptions as opt (opt)}
 						<button
 							class="small"
+							aria-pressed={fontSize === opt.value}
 							class:primary={fontSize === opt.value}
 							class:surface-container-highest={fontSize !== opt.value}
 							onclick={() => (fontSize = opt.value)}>{opt.label}</button
@@ -204,11 +264,25 @@
 			</div>
 
 			<div>
+				<label class="no-margin cc-label" for="caption-font"
+					>{$_('player.controls.fontFamily')}</label
+				>
+				<div class="field border">
+					<select id="caption-font" bind:value={fontFamily}>
+						{#each fontOptions as font (font.value)}
+							<option value={font.value}>{font.label}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+
+			<div>
 				<span class="no-margin cc-label">{$_('player.controls.alignment')}</span>
 				<nav class="no-wrap cc-segmented no-margin" style="gap: 4px;">
 					{#each alignmentOptions as opt (opt)}
 						<button
 							class="small"
+							aria-pressed={alignment === opt.value}
 							class:primary={alignment === opt.value}
 							class:surface-container-highest={alignment !== opt.value}
 							onclick={() => (alignment = opt.value)}>{opt.label}</button
@@ -223,10 +297,12 @@
 					{#each colorPresets as presetColor (presetColor)}
 						<button
 							class="cc-swatch"
-							class:primary={color === presetColor}
+							class:selected={color === presetColor}
 							style="background:{presetColor};border-radius:50%;"
 							onclick={() => (color = presetColor)}
 							title={presetColor}
+							aria-label="Text color {presetColor}"
+							aria-pressed={color === presetColor}
 						></button>
 					{/each}
 					<input
@@ -244,10 +320,12 @@
 					{#each backgroundPresets as presetBg (presetBg)}
 						<button
 							class="cc-swatch"
-							class:primary={rgbBaseOf(presetBg) === backgroundColorBase}
+							class:selected={presetBg === backgroundColor}
 							style="background:{presetBg};border-radius:50%;"
 							onclick={() => selectBackgroundBase(presetBg)}
 							title={presetBg}
+							aria-label="Background color {presetBg}"
+							aria-pressed={presetBg === backgroundColor}
 						></button>
 					{/each}
 					<input
@@ -255,22 +333,25 @@
 						class="cc-color-input"
 						aria-label={$_('player.controls.bgColor')}
 						bind:value={backgroundColorBase}
-						oninput={applyBackground}
+						oninput={(event) => {
+							backgroundColorBase = event.currentTarget.value;
+							applyBackground();
+						}}
 					/>
 				</div>
 			</div>
 
-			<div>
+			<div class="cc-opacity-setting">
 				<span class="no-margin cc-label">{$_('player.controls.opacity')}</span>
-				<div class="slider small" style="--_start: 0%; --_end: {100 - backgroundOpacity * 100}%;">
-					<input
-						type="range"
-						min="0"
-						max="1"
-						step="0.05"
-						bind:value={backgroundOpacity}
-						oninput={applyBackground}
-					/>
+				<div
+					class="cc-opacity-slider"
+					{...opacitySlider.root}
+					aria-label={$_('player.controls.opacity')}
+				>
+					<div class="cc-opacity-track">
+						<div class="cc-opacity-fill"></div>
+						<div class="cc-opacity-thumb" {...opacitySlider.thumb}></div>
+					</div>
 				</div>
 			</div>
 
@@ -280,6 +361,7 @@
 					{#each textShadowOptions as opt (opt)}
 						<button
 							class="small"
+							aria-pressed={textShadow === opt.value}
 							class:primary={textShadow === opt.value}
 							class:surface-container-highest={textShadow !== opt.value}
 							onclick={() => (textShadow = opt.value)}>{opt.label}</button
@@ -291,11 +373,19 @@
 			<div>
 				<span class="no-margin cc-label">{$_('player.controls.subtitleOffset')}</span>
 				<nav class="no-wrap no-margin" style="gap: 8px;align-items:center;">
-					<button class="small surface-container-highest" onclick={() => (offset -= 0.5)}>
+					<button
+						class="small surface-container-highest"
+						aria-label="Decrease subtitle delay"
+						onclick={() => (offset -= 0.5)}
+					>
 						<i>remove</i>
 					</button>
 					<span class="cc-offset-value">{offset.toFixed(1)}s</span>
-					<button class="small surface-container-highest" onclick={() => (offset += 0.5)}>
+					<button
+						class="small surface-container-highest"
+						aria-label="Increase subtitle delay"
+						onclick={() => (offset += 0.5)}
+					>
 						<i>add</i>
 					</button>
 					<button class="small border" onclick={() => (offset = 0)}
@@ -308,6 +398,7 @@
 				class="small border"
 				onclick={() => {
 					fontSize = defaultSubtitleSettings.fontSize;
+					fontFamily = defaultSubtitleSettings.fontFamily ?? 'var(--font)';
 					color = defaultSubtitleSettings.color;
 					backgroundColorBase = rgbBaseOf(defaultSubtitleSettings.backgroundColor);
 					backgroundOpacity = defaultSubtitleSettings.backgroundOpacity;
@@ -412,7 +503,7 @@
 		flex: 0 0 auto;
 	}
 
-	.cc-swatch.primary {
+	.cc-swatch.selected {
 		border-color: var(--primary);
 	}
 
@@ -426,11 +517,52 @@
 		flex: 0 0 auto;
 	}
 
-	.slider {
+	.cc-opacity-setting {
 		width: 100%;
-		margin-inline: 0;
-		color: var(--primary);
-		--active: color-mix(in srgb, var(--primary) 45%, transparent);
+	}
+
+	.cc-opacity-slider {
+		width: 100%;
+		height: 44px;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+	}
+
+	.cc-opacity-track {
+		position: relative;
+		width: 100%;
+		height: 24px;
+		border-radius: 12px;
+		background: var(--surface-variant);
+	}
+
+	.cc-opacity-fill {
+		position: absolute;
+		inset: 0 var(--percentage-inv) 0 0;
+		border-radius: inherit;
+		background: var(--primary);
+	}
+
+	.cc-opacity-thumb {
+		position: absolute;
+		left: var(--percentage);
+		top: 50%;
+		width: 4px;
+		height: 44px;
+		border-radius: 4px;
+		background: var(--primary);
+		transform: translate(-50%, -50%);
+	}
+
+	button > progress.cc-loading {
+		color: var(--on-surface);
+	}
+
+	.cc-loading {
+		width: 1.25rem;
+		height: 1.25rem;
+		flex: none;
 	}
 
 	.cc-offset-value {

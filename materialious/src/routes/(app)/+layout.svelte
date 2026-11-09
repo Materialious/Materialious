@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { resolvePath } from '#lib/paths';
+	import { resolvePath, resolveWatchPath } from '#lib/paths';
 	import { goto } from '$app/navigation';
 
 	import { navigating, page } from '$app/state';
@@ -26,7 +26,8 @@
 		backendInUseStore,
 		hideSearchStore,
 		keybindStore,
-		interfaceMobileBackButtonStore
+		interfaceMobileBackButtonStore,
+		videoQueueStore
 	} from '#lib/store';
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
@@ -34,15 +35,16 @@
 	import Mousetrap from 'mousetrap';
 	import { _ } from '#lib/i18n/index';
 	import { isMaterialiousAccountActive, isYTBackend } from '#lib/backend';
-	import { isAndroidTv, isMobile, truncate, keyCodeMap } from '#lib/utils';
+	import { isAndroidTv, isMobile, keyCodeMap } from '#lib/utils';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '#lib/auth';
 	import { backendFetch } from '#lib/api/backend/request';
-	import Author from '#lib/components/Author.svelte';
+	import PlayerPip from '#lib/components/player/PlayerPip.svelte';
 	import Toast from '#lib/components/Toast.svelte';
 	import { isOwnBackend } from '#lib/shared/index';
 	import { configBackendCache } from '#lib/stores/backend';
 	import WatchParty from '#lib/components/WatchParty.svelte';
+	import VideoQueue from '#lib/components/VideoQueue.svelte';
 
 	let { children } = $props();
 
@@ -58,6 +60,7 @@
 	let playerIsPip = $state(false);
 	let isAndroidPictureInPicture = $state(false);
 	let showWatchParty = $state(page.url.searchParams.get('room') !== null);
+	let showVideoQueue = $state(false);
 	let watchPartySupported = $state(isOwnBackend() !== null);
 	materialiousBackendStore.subscribe(() => {
 		watchPartySupported = isOwnBackend() !== null;
@@ -436,11 +439,25 @@
 				</div>
 			{:else}
 				<!-- Watch parties run on the own backend -->
+				{#if $playerState || $videoQueueStore.length > 0}
+					<button
+						class="circle large transparent"
+						onclick={() => {
+							if (!showVideoQueue) showVideoQueue = true;
+							else ui('#dialog-video-queue');
+						}}
+						aria-label={$_('queue.header')}
+					>
+						<i>queue_music</i>
+						<div class="badge secondary">{$videoQueueStore.length}</div>
+						<div class="tooltip bottom">{$_('queue.header')}</div>
+					</button>
+				{/if}
 				{#if watchPartySupported}
 					<button
 						onclick={() => {
-							showWatchParty = !showWatchParty;
-							if (showWatchParty) resetScroll();
+							if (!showWatchParty) showWatchParty = true;
+							else ui('#dialog-watch-party');
 						}}
 						class="circle large transparent"
 						class:active={showWatchParty}
@@ -531,7 +548,7 @@
 		class:full-window-main={$playerIsInWindowFullscreen}
 	>
 		{#if showWatchParty && watchPartySupported}
-			<WatchParty />
+			<WatchParty onLeave={() => (showWatchParty = false)} />
 		{/if}
 
 		{#if $playerLoadingStore && !$playerState}
@@ -553,7 +570,8 @@
 				</div>
 			</div>
 		{/if}
-		{#if $playerState}
+		{#if $playerState?.data}
+			{@const activePlayer = $playerState}
 			<div class="grid">
 				<div
 					class:pip={playerIsPip}
@@ -563,50 +581,24 @@
 					class:l9={!$playerTheatreModeIsActive && !$playerIsInWindowFullscreen && !playerIsPip}
 				>
 					<div class="pip-info">
+						<div class="player" bind:this={playerActiveArea}>
+							{#key activePlayer.data.video.videoId}
+								<Player data={activePlayer.data} {playerIsPip} />
+							{/key}
+							{#if playerIsPip}
+								<a
+									class="pip-video-link"
+									href={resolveWatchPath(activePlayer.data.video.videoId, activePlayer.data.playlistId ?? undefined)}
+									aria-label={activePlayer.data.video.title}
+								></a>
+							{/if}
+						</div>
 						{#if playerIsPip}
-							<div>
-								<nav>
-									<h6 class="max">{truncate($playerState.data.video.title, 25)}</h6>
-									<button
-										class="surface-container-highest m l"
-										onclick={() => playerState.set(undefined)}
-									>
-										<i>close</i>
-									</button>
-								</nav>
-								<div class="space"></div>
-								<nav class="s">
-									<a
-										class="button surface-container-highest"
-										href={resolve('/(app)/watch/[slug]', { slug: $playerState.data.video.videoId })}
-										><i>keyboard_arrow_right</i></a
-									>
-									<button
-										class="surface-container-highest"
-										onclick={() => playerState.set(undefined)}
-									>
-										<i>close</i>
-									</button>
-								</nav>
+							<div class="pip-details">
+								<PlayerPip {activePlayer} />
 							</div>
 						{/if}
-						<div class="player" bind:this={playerActiveArea}>
-							{#key $playerState.data.video.videoId}
-								<Player data={$playerState.data} {playerIsPip} />
-							{/key}
-						</div>
 					</div>
-					{#if playerIsPip}
-						<nav class="m l">
-							<Author channel={$playerState.data.video} hideSubscribe={true} />
-							<div class="max"></div>
-							<a
-								class="button surface-container-highest"
-								href={resolve('/(app)/watch/[slug]', { slug: $playerState.data.video.videoId })}
-								><i>keyboard_arrow_right</i></a
-							>
-						</nav>
-					{/if}
 				</div>
 			</div>
 		{/if}
@@ -620,6 +612,10 @@
 
 		<Toast />
 	</main>
+
+	{#if showVideoQueue}
+		<VideoQueue />
+	{/if}
 </div>
 
 <style>
@@ -648,6 +644,13 @@
 	.player {
 		display: flex;
 		justify-content: center;
+		position: relative;
+	}
+
+	.pip-video-link {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
 	}
 
 	#dialog-notifications {
@@ -664,6 +667,7 @@
 			width: 100%;
 			bottom: 100px;
 			right: 0px;
+			padding: 0.5rem;
 		}
 
 		#dialog-notifications {
@@ -671,18 +675,22 @@
 		}
 
 		.pip > .pip-info > .player {
-			height: 80px;
-			width: 150px;
+			flex: 0 0 40%;
+			max-width: 150px;
+			align-self: center;
 		}
 
 		.pip > .pip-info {
 			display: flex;
-			justify-content: space-between;
+			align-items: flex-start;
+			gap: 0.5rem;
 		}
 
-		.pip h6 {
-			font-size: 1em;
+		.pip-details {
+			flex: 1;
+			min-width: 0;
 		}
+
 	}
 
 	.mobile-search-container {

@@ -346,7 +346,13 @@
         "passwordResetFailed": "パスワードのリセットに失敗しました。現在のパスワードを確認してください。",
         "passwordResetSuccess": "パスワードのリセットに成功しました",
         "changePassword": "パスワードの変更",
-        "hideShorts": "ショート動画を隠す"
+        "hideShorts": "ショート動画を隠す",
+        "disableSettingsSync": "このデバイスでは設定を同期しない",
+        "disableSettingsSyncDescription": "このデバイスの設定は、アカウントから更新したりアカウントに送信したりせずローカルに保存する。",
+        "exportSettingsToAccount": "設定をアカウントにエクスポート",
+        "importSettingsFromAccount": "アカウントから設定をインポート",
+        "settingsExportedToAccount": "アカウントにエクスポートされた設定",
+        "settingsImportedFromAccount": "アカウントからインポートされた設定"
     },
     "subscribe": "チャンネル登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",

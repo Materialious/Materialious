@@ -1,5 +1,8 @@
 <script lang="ts" module>
 	import { activeCaptionTrack } from '#lib/store';
+	import { writable } from 'svelte/store';
+
+	export const loadingCaptionTrack = writable<string | null>(null);
 
 	// The player controls outside this component address the currently mounted player.
 	let controller: { select: (track: string) => Promise<void>; hide: () => void } | undefined;
@@ -16,7 +19,8 @@
 
 <script lang="ts">
 	import type { VideoPlay } from '#lib/api/model';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { get } from 'svelte/store';
 	import ISO6391 from 'iso-639-1';
 	import { parseResponse, CaptionsRenderer } from 'media-captions';
@@ -59,6 +63,7 @@
 	);
 	let generation = 0;
 	let lastTrack = '';
+	const cachedTracks = new SvelteMap<string, Awaited<ReturnType<typeof parseResponse>>>();
 
 	function defaultTrack() {
 		const language = get(playerDefaultSubtitleLanguage);
@@ -80,9 +85,17 @@
 		if (!track || !renderer) return;
 		const request = ++generation;
 		try {
-			const response = await fetchCaption(track.urls);
-			if (!response) throw new Error('Caption fetch failed');
-			const parsed = await parseResponse(response);
+			let parsed = untrack(() => cachedTracks.get(track.url));
+			if (!parsed) {
+				loadingCaptionTrack.set(track.url);
+				const response = await fetchCaption(track.urls);
+				if (!response) throw new Error('Caption fetch failed');
+				parsed = await parseResponse(response);
+				if (request !== generation || !renderer) return;
+				cachedTracks.set(track.url, parsed);
+			} else {
+				loadingCaptionTrack.set(null);
+			}
 			if (request !== generation || !renderer) return;
 			renderer.changeTrack(parsed);
 			loadedTrack = parsed;
@@ -90,11 +103,14 @@
 			activeCaptionTrack.set(track.url);
 		} catch {
 			if (request === generation) addToast({ data: { text: 'Unable to fetch captions' } });
+		} finally {
+			if (request === generation) loadingCaptionTrack.set(null);
 		}
 	}
 
 	function hide() {
 		generation++;
+		loadingCaptionTrack.set(null);
 		activeCaptionTrack.set(null);
 	}
 
@@ -108,6 +124,7 @@
 			renderer?.destroy();
 			renderer = undefined;
 			if (controller === instance) {
+				loadingCaptionTrack.set(null);
 				controller = undefined;
 				activeCaptionTrack.set(null);
 			}
@@ -119,6 +136,8 @@
 		void video.videoId;
 		generation++;
 		lastTrack = '';
+		cachedTracks.clear();
+		loadingCaptionTrack.set(null);
 		loadedTrack = undefined;
 		renderer?.reset();
 		activeCaptionTrack.set(null);

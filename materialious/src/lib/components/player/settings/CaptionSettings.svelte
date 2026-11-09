@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { _ } from '#lib/i18n/index';
 	import type { VideoPlay } from '#lib/api/model';
-	import { selectTextTrack, setTextTrackVisibility } from '../ClosedCaptions.svelte';
+	import {
+		selectTextTrack,
+		setTextTrackVisibility,
+		loadingCaptionTrack
+	} from '../ClosedCaptions.svelte';
 	import {
 		subtitleSettings,
 		defaultSubtitleSettings,
@@ -148,11 +152,17 @@
 	<button
 		bind:this={ccButton}
 		class="surface-container-highest"
-		class:primary={$activeCaptionTrack !== null}
+		aria-label={$_('player.controls.subtitles')}
+		aria-busy={$loadingCaptionTrack !== null}
 		onclick={onCCClick}
 		onblur={onCCBlur}
 	>
-		<i>closed_caption</i>
+		{#if $loadingCaptionTrack}
+			<progress class="circle small cc-loading" aria-label={$_('player.controls.loadingCaptions')}
+			></progress>
+		{:else}
+			<i>closed_caption</i>
+		{/if}
 		<menu class="no-wrap mobile player-settings" id="cc-menu" data-ui="#cc-menu">
 			<li
 				role="presentation"
@@ -174,7 +184,14 @@
 						selectTextTrack(track.url);
 					}}
 				>
-					<i>subtitles</i>
+					{#if $loadingCaptionTrack === track.url}
+						<progress
+							class="circle small cc-loading"
+							aria-label={$_('player.controls.loadingCaptions')}
+						></progress>
+					{:else}
+						<i>subtitles</i>
+					{/if}
 					{track.label}
 				</li>
 			{/each}
@@ -268,7 +285,7 @@
 					{#each colorPresets as presetColor (presetColor)}
 						<button
 							class="cc-swatch"
-							class:primary={color === presetColor}
+							class:selected={color === presetColor}
 							style="background:{presetColor};border-radius:50%;"
 							onclick={() => (color = presetColor)}
 							title={presetColor}
@@ -291,7 +308,7 @@
 					{#each backgroundPresets as presetBg (presetBg)}
 						<button
 							class="cc-swatch"
-							class:primary={presetBg === backgroundColor}
+							class:selected={presetBg === backgroundColor}
 							style="background:{presetBg};border-radius:50%;"
 							onclick={() => selectBackgroundBase(presetBg)}
 							title={presetBg}
@@ -304,14 +321,20 @@
 						class="cc-color-input"
 						aria-label={$_('player.controls.bgColor')}
 						bind:value={backgroundColorBase}
-						oninput={applyBackground}
+						oninput={(event) => {
+							backgroundColorBase = event.currentTarget.value;
+							applyBackground();
+						}}
 					/>
 				</div>
 			</div>
 
-			<div>
+			<div class="cc-opacity-setting">
 				<span class="no-margin cc-label">{$_('player.controls.opacity')}</span>
-				<div class="slider small" style="--_start: 0%; --_end: {100 - backgroundOpacity * 100}%;">
+				<div
+					class="slider small cc-opacity-slider"
+					style="--_start: 0%; --_end: {100 - backgroundOpacity * 100}%;"
+				>
 					<input
 						type="range"
 						aria-label={$_('player.controls.opacity')}
@@ -319,7 +342,10 @@
 						max="1"
 						step="0.05"
 						bind:value={backgroundOpacity}
-						oninput={applyBackground}
+						oninput={(event) => {
+							backgroundOpacity = Number(event.currentTarget.value);
+							applyBackground();
+						}}
 					/>
 					<span></span>
 				</div>
@@ -473,7 +499,7 @@
 		flex: 0 0 auto;
 	}
 
-	.cc-swatch.primary {
+	.cc-swatch.selected {
 		border-color: var(--primary);
 	}
 
@@ -487,11 +513,22 @@
 		flex: 0 0 auto;
 	}
 
-	.slider {
+	.cc-opacity-setting {
 		width: 100%;
+	}
+
+	.cc-opacity-slider {
+		width: 100%;
+		min-width: 0;
 		margin-inline: 0;
 		color: var(--primary);
-		--active: color-mix(in srgb, var(--primary) 45%, transparent);
+		--active: var(--surface-variant);
+	}
+
+	.cc-loading {
+		width: 1.25rem;
+		height: 1.25rem;
+		flex: none;
 	}
 
 	.cc-offset-value {

@@ -234,6 +234,7 @@
 			"subtitles": "Subtitles",
 			"fontSize": "Font size",
 			"fontFamily": "Font",
+			"loadingCaptions": "Loading captions",
 			"textColor": "Text color",
 			"bgColor": "Background color",
 			"alignment": "Alignment",

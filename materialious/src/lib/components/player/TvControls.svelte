@@ -19,7 +19,11 @@
 	} from '#lib/player/thumbnails';
 	import { ImageCache } from '#lib/images';
 	import { onDestroy, onMount } from 'svelte';
-	import { selectTextTrack, setTextTrackVisibility } from './ClosedCaptions.svelte';
+	import {
+		selectTextTrack,
+		setTextTrackVisibility,
+		loadingCaptionTrack
+	} from './ClosedCaptions.svelte';
 
 	let {
 		video,
@@ -94,7 +98,7 @@
 	);
 
 	function toggleCaptions() {
-		if (captionsOn) setTextTrackVisibility(false);
+		if (captionsOn || $loadingCaptionTrack) setTextTrackVisibility(false);
 		else void selectTextTrack(lastCaptionLanguage ?? '');
 	}
 
@@ -310,9 +314,15 @@
 					class="circle transparent tv-control-button"
 					aria-label={$_('player.controls.subtitles')}
 					aria-pressed={captionsOn}
+					aria-busy={$loadingCaptionTrack !== null}
 					onclick={toggleCaptions}
 				>
-					<i>{captionsOn ? 'closed_caption' : 'closed_caption_off'}</i>
+					{#if $loadingCaptionTrack}
+						<progress class="circle small" aria-label={$_('player.controls.loadingCaptions')}
+						></progress>
+					{:else}
+						<i>{captionsOn ? 'closed_caption' : 'closed_caption_off'}</i>
+					{/if}
 				</button>
 			{/if}
 			<button

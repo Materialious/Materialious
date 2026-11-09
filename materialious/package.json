@@ -127,7 +127,12 @@
 		},
 		"replace": {
 			"minimatch": "^3.1.5"
-		}
+		},
+		"glob@9": "^14.0.4",
+		"glob@11": "^14.0.4",
+		"glob@13": "^14.0.4",
+		"minimatch@8": "^11.0.5",
+		"minimatch@10": "^11.0.5"
 	},
 	"imports": {
 		"#lib": "./src/lib/index.js",

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { _ } from '#lib/i18n/index';
+	import { Slider } from 'melt/builders';
 	import type { VideoPlay } from '#lib/api/model';
 	import {
 		selectTextTrack,
@@ -97,6 +98,17 @@
 	let alignment = $state<SubtitleSettings['alignment']>($subtitleSettings.alignment ?? 'center');
 	let offset = $state($subtitleSettings.offset ?? 0);
 
+	const opacitySlider = new Slider({
+		min: 0,
+		max: 1,
+		step: 0.05,
+		value: () => backgroundOpacity,
+		onValueChange: (value) => {
+			backgroundOpacity = value;
+			applyBackground();
+		}
+	});
+
 	// Extract the RGB base hex from a persisted rgba/hex background color.
 	function rgbBaseOf(bg: string): string {
 		if (bg.startsWith('#')) return bg;
@@ -164,6 +176,13 @@
 			<i>closed_caption</i>
 		{/if}
 		<menu class="no-wrap mobile player-settings" id="cc-menu" data-ui="#cc-menu">
+			<li role="presentation" data-ui="#cc-menu" onclick={openDialog}>
+				<nav class="no-wrap" style="width: 100%;">
+					<i>tune</i>
+					{$_('layout.customize')}
+				</nav>
+			</li>
+			<hr class="divider" />
 			<li
 				role="presentation"
 				data-ui="#cc-menu"
@@ -195,13 +214,6 @@
 					{track.label}
 				</li>
 			{/each}
-			<hr class="divider" />
-			<li role="presentation" data-ui="#cc-menu" onclick={openDialog}>
-				<nav class="no-wrap" style="width: 100%;">
-					<i>tune</i>
-					{$_('layout.customize')}
-				</nav>
-			</li>
 		</menu>
 	</button>
 {/if}
@@ -332,22 +344,14 @@
 			<div class="cc-opacity-setting">
 				<span class="no-margin cc-label">{$_('player.controls.opacity')}</span>
 				<div
-					class="slider small cc-opacity-slider"
-					style="--_start: 0%; --_end: {100 - backgroundOpacity * 100}%;"
+					class="cc-opacity-slider"
+					{...opacitySlider.root}
+					aria-label={$_('player.controls.opacity')}
 				>
-					<input
-						type="range"
-						aria-label={$_('player.controls.opacity')}
-						min="0"
-						max="1"
-						step="0.05"
-						bind:value={backgroundOpacity}
-						oninput={(event) => {
-							backgroundOpacity = Number(event.currentTarget.value);
-							applyBackground();
-						}}
-					/>
-					<span></span>
+					<div class="cc-opacity-track">
+						<div class="cc-opacity-fill"></div>
+						<div class="cc-opacity-thumb" {...opacitySlider.thumb}></div>
+					</div>
 				</div>
 			</div>
 
@@ -519,10 +523,40 @@
 
 	.cc-opacity-slider {
 		width: 100%;
-		min-width: 0;
-		margin-inline: 0;
-		color: var(--primary);
-		--active: var(--surface-variant);
+		height: 44px;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+	}
+
+	.cc-opacity-track {
+		position: relative;
+		width: 100%;
+		height: 24px;
+		border-radius: 12px;
+		background: var(--surface-variant);
+	}
+
+	.cc-opacity-fill {
+		position: absolute;
+		inset: 0 var(--percentage-inv) 0 0;
+		border-radius: inherit;
+		background: var(--primary);
+	}
+
+	.cc-opacity-thumb {
+		position: absolute;
+		left: var(--percentage);
+		top: 50%;
+		width: 4px;
+		height: 44px;
+		border-radius: 4px;
+		background: var(--primary);
+		transform: translate(-50%, -50%);
+	}
+
+	button > progress.cc-loading {
+		color: var(--on-surface);
 	}
 
 	.cc-loading {

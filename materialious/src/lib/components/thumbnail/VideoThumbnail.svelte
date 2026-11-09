@@ -684,7 +684,7 @@
 		overflow: hidden;
 	}
 
-	.thumbnail-image > div:not(.tv-play) {
+	.thumbnail-image > div:not(.tv-play):not(.chip) {
 		width: 100%;
 		height: 100%;
 	}

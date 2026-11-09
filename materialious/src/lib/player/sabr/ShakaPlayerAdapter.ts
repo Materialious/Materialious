@@ -254,7 +254,7 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 
 			const streamProtectionStatus = requestMetadata.streamInfo?.streamProtectionStatus?.status;
 
-			if (streamProtectionStatus === 3) {
+			if (streamProtectionStatus !== undefined) {
 				try {
 					await this.streamProtectionHandler?.(streamProtectionStatus);
 				} catch (error) {
@@ -327,13 +327,9 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 				let contentLength;
 
 				while (!abortController.signal.aborted) {
-					let readObj;
-					try {
-						readObj = await reader.read();
-					} catch {
-						// If we abort the request while reading, we'll get an error here. Just ignore it.
-						break;
-					}
+					// Let the request layer classify aborts and preserve genuine network
+					// errors instead of reporting every failed read as a protocol error.
+					const readObj = await reader.read();
 
 					const { value, done } = readObj;
 
@@ -419,6 +415,9 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 				);
 			}
 		} finally {
+			// Terminal protocol errors and redirects can finish before the HTTP
+			// body does. Always release that fetch, including on failed recovery.
+			abortController.abort();
 			sabrUmpReader.dispose();
 		}
 	}
@@ -458,9 +457,11 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 			if (
 				requestMetadata &&
 				init.method !== 'HEAD' &&
-				response.headers.get('content-type') === 'application/vnd.yt-ump'
+				response.ok &&
+				response.headers.get('content-type')?.split(';')[0].trim().toLowerCase() ===
+					'application/vnd.yt-ump'
 			) {
-				return this.handleUmpResponse(
+				return await this.handleUmpResponse(
 					response,
 					requestMetadata,
 					uri,
@@ -505,6 +506,8 @@ export class ShakaPlayerAdapter implements SabrPlayerAdapter {
 					requestType
 				);
 			}
+			// Preserve HTTP status and protocol errors used by session recovery.
+			if (error instanceof shaka.util.Error) throw error;
 			throw new shaka.util.Error(
 				shaka.util.Error.Severity.RECOVERABLE,
 				shaka.util.Error.Category.NETWORK,

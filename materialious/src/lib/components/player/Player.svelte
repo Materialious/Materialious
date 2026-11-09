@@ -148,6 +148,8 @@
 	let isRetryingPlayback = $state(false);
 
 	let player: shaka.Player;
+	let isDestroyed = false;
+	let loadController: AbortController | undefined;
 	let sabrAdapter: SabrStreamingAdapter | null = null;
 	let playerLoadedListenerAdded = false;
 	let sponsorSkipListenerAdded = false;
@@ -414,6 +416,7 @@
 	 * crashing on an unhandled rejection.
 	 */
 	function reportPlaybackError(source: PlaybackErrorSource, error: unknown) {
+		if (isDestroyed) return;
 		console.error(`[Player] ${source} playback failed:`, error);
 
 		// Stop all automatic recovery loops; the user is now in control.
@@ -462,6 +465,7 @@
 	}
 
 	function scheduleStreamingRetry(error: shaka.util.Error) {
+		if (isDestroyed || error?.code === shaka.util.Error.Code.OPERATION_ABORTED) return;
 		console.error('Streaming failure:', error);
 
 		if (!isRetryableStreamingError(error)) {
@@ -494,7 +498,7 @@
 
 		streamingFailureRetryTimer = setTimeout(() => {
 			streamingFailureRetryTimer = undefined;
-			if (!player) return;
+			if (isDestroyed || !player) return;
 
 			try {
 				if (!player.retryStreaming(0)) {
@@ -507,7 +511,25 @@
 		}, delay);
 	}
 
+	function handlePlayerError(event: Event) {
+		const error = (event as CustomEvent).detail as shaka.util.Error;
+		if (isDestroyed || error?.code === shaka.util.Error.Code.OPERATION_ABORTED || error?.handled)
+			return;
+		console.error('Player error:', error);
+
+		if (error?.severity !== shaka.util.Error.Severity.CRITICAL) return;
+		if (isRetryableStreamingError(error)) {
+			// Shaka emits this event before failureCallback. In particular, token
+			// request-filter failures are marked CRITICAL even when retryable.
+			scheduleStreamingRetry(error);
+			event.preventDefault();
+			return;
+		}
+		reportPlaybackError(currentPlaybackErrorSource(), error);
+	}
+
 	function startStallWatchdog() {
+		if (isDestroyed) return;
 		if (stallWatchdogInterval) clearInterval(stallWatchdogInterval);
 
 		stallWatchdogLastTime = playerElement?.currentTime ?? 0;
@@ -521,7 +543,14 @@
 	}
 
 	function checkForStall() {
-		if (!player || !playerElement || stallRecoveryInProgress || stallRecoveryExhausted) return;
+		if (
+			isDestroyed ||
+			!player ||
+			!playerElement ||
+			stallRecoveryInProgress ||
+			stallRecoveryExhausted
+		)
+			return;
 
 		if (playerElement.paused || playerElement.seeking || playerElement.ended) {
 			stallWatchdogLastProgress = Date.now();
@@ -552,7 +581,8 @@
 	}
 
 	async function recoverFromStall() {
-		if (!player || !playerElement) return;
+		if (isDestroyed || !player || !playerElement) return;
+		const videoId = data.video.videoId;
 
 		stallRecoveryInProgress = true;
 		stallRecoveryAttempts++;
@@ -565,17 +595,22 @@
 			if (stallRecoveryAttempts === 1) {
 				// Refresh attestation/PoToken first, then let Shaka refetch.
 				await refreshSabrSession(data.video);
+				if (isDestroyed || data.video.videoId !== videoId) return;
 				player.retryStreaming(0);
 			} else if (stallRecoveryAttempts < MAX_STALL_RECOVERY_ATTEMPTS) {
-				// A plain retry did not help; rebuild the SABR session.
-				await refreshSabrSession(data.video);
+				// Rebuilding playback obtains fresh session data and mints its own token.
+				// A failed standalone refresh must not prevent that escalation.
 				await reloadVideo(playerElement.currentTime);
 			} else {
 				reportPlaybackError(currentPlaybackErrorSource(), new Error('Playback stalled'));
 			}
 		} catch (error) {
+			if (isDestroyed || data.video.videoId !== videoId) return;
 			console.error('[Player] Stall recovery failed:', error);
-			reportPlaybackError(currentPlaybackErrorSource(), error);
+			// Keep the next watchdog attempt available after a transient mint failure.
+			if (stallRecoveryAttempts >= MAX_STALL_RECOVERY_ATTEMPTS) {
+				reportPlaybackError(currentPlaybackErrorSource(), error);
+			}
 		} finally {
 			stallRecoveryInProgress = false;
 			stallWatchdogLastProgress = Date.now();
@@ -584,6 +619,10 @@
 	}
 
 	async function loadVideo() {
+		if (isDestroyed) return;
+		loadController?.abort();
+		const controller = new AbortController();
+		loadController = controller;
 		// A new stream is being loaded; discard any pending retry from the
 		// previous one and give streaming failures a fresh budget.
 		if (streamingFailureRetryTimer) {
@@ -600,8 +639,14 @@
 		}
 
 		try {
-			sabrAdapter = await injectSabr(data.video, player);
+			const adapter = await injectSabr(data.video, player, controller.signal);
+			if (controller.signal.aborted) {
+				adapter?.dispose();
+				return;
+			}
+			sabrAdapter = adapter;
 		} catch (error) {
+			if (controller.signal.aborted) return;
 			reportPlaybackError('sabr', error);
 			return;
 		}
@@ -700,10 +745,12 @@
 				}
 			}
 		} catch (error) {
+			if (controller.signal.aborted) return;
 			reportPlaybackError(currentPlaybackErrorSource(), error);
 			return;
 		}
 
+		if (controller.signal.aborted) return;
 		if ($playerDefaultPlaybackSpeed && playerElement) {
 			playerElement.playbackRate = $playerDefaultPlaybackSpeed;
 		}
@@ -717,6 +764,8 @@
 	}
 
 	async function reloadVideo(resumeTime?: number, forceYoutubeJs = false) {
+		if (isDestroyed) return;
+		const videoId = data.video.videoId;
 		// A reload triggered by the user (or the initial fallback) should also
 		// reset the stall recovery budget; an internal stall recovery must keep
 		// it so that we can escalate instead of looping forever.
@@ -730,19 +779,21 @@
 		const wasPlaying = playerElement ? !playerElement.paused : false;
 
 		try {
-			if (forceYoutubeJs || data.video.fallbackPatch === 'youtubejs' || !!data.video.ytjs) {
-				data.video = await getVideoYTjs(data.video.videoId);
-			} else {
-				data.video = await getVideo(data.video.videoId);
-			}
+			const video =
+				forceYoutubeJs || data.video.fallbackPatch === 'youtubejs' || !!data.video.ytjs
+					? await getVideoYTjs(videoId)
+					: await getVideo(videoId);
+			if (isDestroyed || data.video.videoId !== videoId) return;
+			data.video = video;
 		} catch (error) {
+			if (isDestroyed || data.video.videoId !== videoId) return;
 			reportPlaybackError(forceYoutubeJs ? 'youtubejs' : 'invidious', error);
 			return;
 		}
 
 		await loadVideo();
 
-		if (playbackError) return;
+		if (isDestroyed || data.video.videoId !== videoId || playbackError) return;
 
 		if (targetTime > 0 && playerElement) {
 			playerElement.currentTime = targetTime;
@@ -937,19 +988,7 @@
 
 		if (playerElement) await player.attach(playerElement);
 
-		player?.addEventListener('error', (event) => {
-			const error = (event as CustomEvent).detail as shaka.util.Error;
-			console.error('Player error:', error);
-
-			if (error?.code === shaka.util.Error.Code.OPERATION_ABORTED) return;
-
-			// Critical errors are the ones that stop playback entirely. Recoverable
-			// failures are retried by scheduleStreamingRetry and only surface once
-			// that recovery budget is exhausted.
-			if (error?.severity === shaka.util.Error.Severity.CRITICAL) {
-				reportPlaybackError(currentPlaybackErrorSource(), error);
-			}
-		});
+		player?.addEventListener('error', handlePlayerError);
 
 		playerElement?.addEventListener('volumechange', saveVolumePreference);
 
@@ -1242,22 +1281,11 @@
 	}
 
 	onDestroy(async () => {
-		await releaseKeepAwake();
-
-		if (Capacitor.getPlatform() === 'android') {
-			await pictureInPictureListener?.remove();
-			await AndroidPictureInPicture.setPlaybackActive({ active: false });
-			await setStatusBarColor();
-			await MediaSession.setPlaybackState({ playbackState: 'none' });
-
-			document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
-
-			if (androidOriginalOrigination) {
-				await ScreenOrientation.lock({
-					orientation: androidOriginalOrigination.type
-				});
-			}
-		}
+		// Invalidate pending recovery before any asynchronous platform cleanup.
+		isDestroyed = true;
+		loadController?.abort();
+		stopStallWatchdog();
+		if (streamingFailureRetryTimer) clearTimeout(streamingFailureRetryTimer);
 
 		try {
 			savePlayerbackHistory();
@@ -1286,9 +1314,35 @@
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
 
 		if (player) {
-			player.unload();
-			player.destroy();
+			// destroy() also unloads. Start it before platform cleanup, which can fail.
+			const destruction = player.destroy();
 			onShakaPlayer?.(undefined);
+			try {
+				await destruction;
+			} catch (error) {
+				console.warn('[Player] Media cleanup failed', error);
+			}
+		}
+
+		try {
+			await releaseKeepAwake();
+
+			if (Capacitor.getPlatform() === 'android') {
+				await pictureInPictureListener?.remove();
+				await AndroidPictureInPicture.setPlaybackActive({ active: false });
+				await setStatusBarColor();
+				await MediaSession.setPlaybackState({ playbackState: 'none' });
+
+				document.removeEventListener('fullscreenchange', onAndroidFullscreenChange);
+
+				if (androidOriginalOrigination) {
+					await ScreenOrientation.lock({
+						orientation: androidOriginalOrigination.type
+					});
+				}
+			}
+		} catch (error) {
+			console.warn('[Player] Platform cleanup failed', error);
 		}
 	});
 </script>

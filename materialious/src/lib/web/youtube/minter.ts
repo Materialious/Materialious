@@ -1,5 +1,6 @@
 export async function webPoTokenMinter(requestKey: string, visitorData: string): Promise<string> {
 	const resp = await fetch('/api/poToken/', {
+		signal: AbortSignal.timeout(60_000),
 		body: JSON.stringify({
 			requestKey,
 			visitorData

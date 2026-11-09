@@ -76,11 +76,10 @@ export async function refreshSabrSession(video: VideoPlay): Promise<void> {
 	const refreshPromise = (async () => {
 		await primeSabrAttestation(video);
 
-		try {
-			await mintPoTokenForVideo(video.videoId);
-		} catch (error) {
-			console.warn('[SABR] Failed to refresh PoToken', error);
-		}
+		// Do not leave a rejected token available if minting fails. A failed
+		// refresh must propagate and must not start the success cooldown.
+		if (get(poTokenCacheStore)?.videoId === video.videoId) poTokenCacheStore.set(undefined);
+		await mintPoTokenForVideo(video.videoId);
 
 		lastPoTokenRefresh = { videoId: video.videoId, at: Date.now() };
 	})();
@@ -97,13 +96,16 @@ export async function refreshSabrSession(video: VideoPlay): Promise<void> {
 
 export async function injectSabr(
 	video: VideoPlay,
-	player: shaka.Player
+	player: shaka.Player,
+	signal?: AbortSignal
 ): Promise<SabrStreamingAdapter | null> {
 	// Live and post-live DVR manifests go straight through Shaka. Do not
 	// rewrite their media GETs into SABR/UMP POSTs or start SABR recovery.
-	if (!video.ytjs || !isUnrestrictedPlatform() || usesManifestPlayback(video)) return null;
+	if (signal?.aborted || !video.ytjs || !isUnrestrictedPlatform() || usesManifestPlayback(video))
+		return null;
 
 	await primeSabrAttestation(video);
+	if (signal?.aborted) return null;
 
 	const shakaPlayerAdapter = new ShakaPlayerAdapter();
 
@@ -122,22 +124,35 @@ export async function injectSabr(
 		}
 	});
 
+	let lastProtectionStatus: number | undefined;
 	shakaPlayerAdapter.setStreamProtectionHandler(async (status) => {
+		if (status !== lastProtectionStatus) {
+			// Status 2 is provisional access; receiving initial media does not
+			// prove that YouTube accepted the token. Log no token or signed URL.
+			console.debug('[SABR] Stream protection status:', status);
+			lastProtectionStatus = status;
+		}
 		if (status === 3) {
 			console.warn('[SABR] Server requested attestation, refreshing PoToken');
 			await refreshSabrSession(video);
 		}
 	});
 
+	let pendingMint: Promise<string> | undefined;
 	sabrAdapter.onMintPoToken(async () => {
+		// Requests built while protection recovery runs must use its new token.
+		if (poTokenRefresh?.videoId === video.videoId) await poTokenRefresh.promise;
 		const cached = get(poTokenCacheStore);
-		if (cached) return cached;
+		if (cached?.videoId === video.videoId) return cached.poToken;
 
+		// Let Shaka retry a mint failure instead of sending an unauthenticated
+		// request, which can use up the server's protection retry budget.
+		// Audio and video can request their next segment simultaneously.
+		pendingMint ??= mintPoTokenForVideo(video.videoId);
 		try {
-			return await mintPoTokenForVideo(video.videoId);
-		} catch (error) {
-			console.warn('[SABR] Failed to mint PoToken on demand', error);
-			return '';
+			return await pendingMint;
+		} finally {
+			pendingMint = undefined;
 		}
 	});
 
@@ -225,6 +240,10 @@ export async function injectSabr(
 		);
 	}
 
+	if (signal?.aborted) {
+		sabrAdapter.dispose();
+		return null;
+	}
 	sabrAdapter.attach(player);
 
 	return sabrAdapter;

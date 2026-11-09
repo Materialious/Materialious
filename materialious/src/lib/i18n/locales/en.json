@@ -113,6 +113,7 @@
 	"watchParty": {
 		"start": "Start a watch party",
 		"header": "Watch party",
+		"description": "Watch videos together in sync.",
 		"createRoom": "Create room",
 		"joinRoom": "Join room",
 		"roomID": "Room ID",

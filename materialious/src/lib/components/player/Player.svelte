@@ -100,12 +100,8 @@
 		segments = $bindable([])
 	}: Props = $props();
 
-	// The parent may clear its player state before this component is destroyed.
-	// Keep the last video available for the final playback-history save.
+	// Keep a snapshot for the final save after the parent clears its player state.
 	let historyVideo = untrack(() => data.video);
-	$effect(() => {
-		historyVideo = data.video;
-	});
 
 	let audioOnlyOverride = $state<{ videoId: string; value: boolean } | null>(null);
 	let audioOnly = $derived(
@@ -1388,6 +1384,7 @@
 	}
 
 	function savePlayerbackHistory() {
+		if (!isDestroyed) historyVideo = data.video;
 		if (historyVideo.liveNow || !$playerSavePlaybackPositionStore || !playerElement) return;
 
 		updateWatchHistory(historyVideo.videoId, playerElement.currentTime);

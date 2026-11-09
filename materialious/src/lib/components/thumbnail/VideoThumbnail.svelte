@@ -414,7 +414,7 @@
 						{...thumbnail.image}
 						bind:this={thumbnailImageElement}
 						decoding="async"
-						alt="Thumbnail for video"
+						alt=""
 					/>
 				</div>
 				<div {...thumbnail.fallback} class="secondary-container responsive"></div>
@@ -606,7 +606,8 @@
 	}
 
 	.sideways-root {
-		height: 112px;
+		min-height: 112px;
+		height: auto;
 		display: flex;
 		align-items: flex-start;
 	}
@@ -623,7 +624,7 @@
 	}
 
 	.sideways-root .video-title {
-		overflow: hidden;
+		min-height: 0;
 	}
 
 	.author-details span,
@@ -633,7 +634,7 @@
 		white-space: normal;
 		word-wrap: break-word;
 		line-height: 1.2;
-		font-size: clamp(0.65rem, 2.5cqw + 0.33rem, 1.15rem);
+		font-size: 1em;
 		margin: 0;
 	}
 
@@ -644,7 +645,6 @@
 
 	.video-title {
 		word-wrap: break-word;
-		overflow: hidden;
 		border-radius: 0px;
 		width: 100%;
 	}
@@ -703,13 +703,13 @@
 	}
 
 	.tv-root .bold {
-		font-size: clamp(1rem, 3.5cqw + 0.4rem, 1.75rem);
+		font-size: 1.25em;
 	}
 
 	.tv-root .author-details span,
 	.tv-root .author-details p,
 	.tv-root .author-details a {
-		font-size: clamp(1rem, 2.6cqw + 0.35rem, 1.4rem);
+		font-size: 1em;
 	}
 
 	.tv-play {

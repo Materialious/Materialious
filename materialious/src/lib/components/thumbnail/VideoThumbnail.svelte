@@ -551,7 +551,7 @@
 								{/if}
 							{/if}
 						</div>
-						{#if !isAndroidTv()}
+						{#if !sideways && !isAndroidTv()}
 							<button
 								onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
 								class="transparent circle"
@@ -563,6 +563,14 @@
 				</div>
 			</nav>
 		</div>
+		{#if sideways && !isAndroidTv()}
+			<button
+				onclick={() => (thumbnailActionsVisible = !thumbnailActionsVisible)}
+				class="transparent circle sideways-actions"
+			>
+				<i>more_vert</i>
+			</button>
+		{/if}
 	</div>
 </div>
 
@@ -606,10 +614,9 @@
 	}
 
 	.sideways-root {
-		min-height: 112px;
-		height: auto;
+		height: 112.5px;
 		display: flex;
-		align-items: flex-start;
+		align-items: stretch;
 	}
 
 	.sideways-root .thumbnail {
@@ -618,13 +625,26 @@
 	}
 
 	.sideways-root .thumbnail-details {
+		position: relative;
 		flex: 1;
 		min-width: 0;
-		padding-right: 0.5em;
+		overflow: hidden;
+		padding-right: 3.5rem;
+	}
+
+	.sideways-actions {
+		position: absolute;
+		right: 0;
+		bottom: 0;
 	}
 
 	.sideways-root .video-title {
 		min-height: 0;
+	}
+
+	.sideways-root .align-end {
+		flex: none;
+		align-items: start;
 	}
 
 	.author-details span,
@@ -738,6 +758,10 @@
 	}
 
 	@media screen and (max-width: 1800px) {
+		.sideways-root:not(.forced-sideways) {
+			height: auto;
+		}
+
 		.sideways-root:not(.forced-sideways) .thumbnail {
 			width: 100%;
 			max-height: 100%;

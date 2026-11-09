@@ -200,11 +200,12 @@
 					{#each suggestionsForSearch as suggestion, index (index)}
 						<li class="no-padding">
 							<button
-								onclick={() => {
+								onclick={(event) => {
+									event.stopPropagation();
 									search = suggestion;
 									onSubmit();
 								}}
-								type="reset"
+								type="button"
 								class="transparent suggestion"
 								class:selected={index === selectedSuggestionIndex}
 							>
@@ -217,11 +218,12 @@
 					{#each $searchHistoryStore as history (history)}
 						<li class="no-padding">
 							<button
-								onclick={() => {
+								onclick={(event) => {
+									event.stopPropagation();
 									search = history;
 									onSubmit();
 								}}
-								type="reset"
+								type="button"
 								class="transparent suggestion"
 							>
 								<div>{history}</div>

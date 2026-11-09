@@ -317,21 +317,16 @@
 		});
 	}
 
-	function loadTimeFromUrl(): boolean {
-		if (player) {
-			const timeGivenUrl = page.url.searchParams.get('time');
-			if (timeGivenUrl && !isNaN(parseFloat(timeGivenUrl))) {
-				if (!playerElement) return false;
-				playerElement.currentTime = Number(timeGivenUrl);
-				return true;
-			}
-		}
-
-		return false;
+	function timeFromUrl(): number | undefined {
+		const value = page.url.searchParams.get('time') ?? page.url.searchParams.get('t');
+		if (value === null || value.trim() === '') return undefined;
+		const time = Number(value);
+		return Number.isFinite(time) && time >= 0 ? time : undefined;
 	}
 
 	$effect(() => {
-		loadTimeFromUrl();
+		const time = timeFromUrl();
+		if (time !== undefined && playerElement) playerElement.currentTime = time;
 	});
 
 	function toggleFullscreen() {
@@ -1360,7 +1355,9 @@
 	});
 
 	async function getPlaybackHistory(): Promise<number> {
-		if (loadTimeFromUrl() || !$playerSavePlaybackPositionStore) return 0;
+		const urlTime = timeFromUrl();
+		if (urlTime !== undefined) return urlTime;
+		if (!$playerSavePlaybackPositionStore) return 0;
 
 		let toSetTime = 0;
 

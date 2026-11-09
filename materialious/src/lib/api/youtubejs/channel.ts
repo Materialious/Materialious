@@ -1,4 +1,4 @@
-import { YT, YTNodes } from 'youtubei.js';
+import { ReloadContinuationItemsCommand, YT, YTNodes } from 'youtubei.js';
 import { getInnertube } from '.';
 import type {
 	ChannelContent,
@@ -104,7 +104,7 @@ export async function getChannelYTjs(channelId: string): Promise<ChannelPage> {
 }
 
 export function invidiousChannelContentSchema(
-	innerResults: YT.Channel | YT.ChannelListContinuation,
+	innerResults: YT.Channel | YT.ChannelListContinuation | YT.FilteredChannelList,
 	author: string,
 	authorId: string
 ) {
@@ -119,6 +119,11 @@ export function invidiousChannelContentSchema(
 	} else if (
 		innerResults instanceof YT.ChannelListContinuation &&
 		innerResults.contents?.is(YTNodes.AppendContinuationItemsAction)
+	) {
+		contents = innerResults.contents.contents;
+	} else if (
+		innerResults instanceof YT.FilteredChannelList &&
+		innerResults.contents?.is(ReloadContinuationItemsCommand, YTNodes.AppendContinuationItemsAction)
 	) {
 		contents = innerResults.contents.contents;
 	}
@@ -140,7 +145,7 @@ export function invidiousChannelContentSchema(
 }
 
 function fetchChannelContentVideosWithContinuation(
-	innerResults: YT.ChannelListContinuation,
+	innerResults: YT.ChannelListContinuation | YT.FilteredChannelList,
 	author: string,
 	authorId: string
 ): () => Promise<ChannelContentVideos> {
@@ -154,7 +159,7 @@ function fetchChannelContentVideosWithContinuation(
 }
 
 async function fetchChannelContentWithContinuation(
-	innerResults: YT.Channel | YT.ChannelListContinuation,
+	innerResults: YT.Channel | YT.ChannelListContinuation | YT.FilteredChannelList,
 	author: string,
 	authorId: string
 ): Promise<ChannelContent> {
@@ -184,7 +189,7 @@ export async function getChannelContentYTjs(
 
 	const author = channel.metadata.title ?? '';
 
-	let innerResults: YT.Channel | YT.ChannelListContinuation;
+	let innerResults: YT.Channel | YT.ChannelListContinuation | YT.FilteredChannelList;
 	if (options.type === 'videos') {
 		if (!channel.hasTabWithURL('videos')) return { videos: [] };
 		innerResults = await channel.getVideos();
@@ -204,13 +209,18 @@ export async function getChannelContentYTjs(
 			popular: ['Popular']
 		};
 		const preferredLabels = sortFilterLabels[sortBy];
-		const availableFilters = innerResults.sort_filters;
-		const sortFilter = availableFilters.find((filter) =>
-			preferredLabels.some((label) => filter.toLowerCase() === label.toLowerCase())
-		);
-
 		try {
-			innerResults = await innerResults.applySort(sortFilter ?? preferredLabels[0]);
+			const sortFilter = innerResults.filters.find((filter) =>
+				preferredLabels.some((label) => filter.toLowerCase() === label.toLowerCase())
+			);
+			if (sortFilter) {
+				innerResults = await innerResults.applyFilter(sortFilter);
+			} else {
+				const legacyFilter = innerResults.sort_filters.find((filter) =>
+					preferredLabels.some((label) => filter.toLowerCase() === label.toLowerCase())
+				);
+				if (legacyFilter) innerResults = await innerResults.applySort(legacyFilter);
+			}
 		} catch {
 			// sort filter not available for this tab
 		}

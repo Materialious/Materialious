@@ -54,8 +54,15 @@
 		thumb?: HTMLCanvasElement;
 	} = $state({});
 	let playerTimelineTimeHover = $state(0);
-	let playerBufferBar: HTMLElement | undefined = $state();
 	let playerBufferedTo: number = $state(0);
+	let progressPercent = $derived(
+		playerMaxKnownTime > 0 ? Math.min(Math.max(currentTime / playerMaxKnownTime, 0), 1) * 100 : 0
+	);
+	let bufferedPercent = $derived(
+		playerMaxKnownTime > 0
+			? Math.min(Math.max(playerBufferedTo / playerMaxKnownTime, 0), 1) * 100
+			: 0
+	);
 	let playerScrubbingHoldTime = 0;
 	let playerScrubbingDirection: 1 | -1 = 1;
 	let playerScrubbingIsActive = false;
@@ -126,19 +133,7 @@
 		playerElement?.addEventListener('timeupdate', () => {
 			const buffered = playerElement.buffered;
 
-			if (buffered.length > 0 && playerBufferBar) {
-				playerBufferedTo = buffered.end(0);
-
-				const bufferedPercent = (playerBufferedTo / playerMaxKnownTime) * 100;
-				const progressPercent = (currentTime / playerMaxKnownTime) * 100;
-
-				const bufferAhead = Math.max(0, bufferedPercent - progressPercent);
-
-				const effectiveWidth = Math.min(bufferAhead, 100 - progressPercent);
-
-				playerBufferBar.style.left = progressPercent + '%';
-				playerBufferBar.style.width = effectiveWidth + '%';
-			}
+			playerBufferedTo = buffered.length > 0 ? buffered.end(0) : 0;
 		});
 
 		if (video.storyboards && video.storyboards.length > 2) {
@@ -414,7 +409,12 @@
 			{/if}
 		</div>
 	</div>
-	<div bind:this={playerBufferBar} class="buffered-bar" class:hide={userManualSeeking}></div>
+	<div
+		class="buffered-bar"
+		class:hide={userManualSeeking}
+		style:left="{progressPercent}%"
+		style:width="{Math.max(0, bufferedPercent - progressPercent)}%"
+	></div>
 	{#each content.timestamps as chapter, index (chapter)}
 		<div
 			class="chapter-marker"

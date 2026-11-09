@@ -419,7 +419,8 @@
 
 <style>
 	.watch-party-dialog {
-		width: min(32rem, calc(100vw - 2rem));
+		inline-size: min(32rem, calc(100vw - 2rem));
+		min-inline-size: 0;
 		max-width: 100%;
 		padding: 1rem;
 	}
@@ -457,6 +458,10 @@
 		align-items: center;
 	}
 
+	.active-room .field {
+		min-width: 0;
+	}
+
 	.join-room {
 		width: 100%;
 	}
@@ -489,10 +494,11 @@
 
 	@media (max-width: 36rem) {
 		.active-room {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.active-room button {
+			box-sizing: border-box;
 			width: 100%;
 		}
 	}

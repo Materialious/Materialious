@@ -59,7 +59,7 @@
 	{:else}
 		<div class="queue-list">
 			{#each $videoQueueStore as video, index (video.videoId)}
-				<div class="queue-row">
+				<article class="queue-row no-padding border">
 					<div class="queue-controls">
 						<button
 							class="circle transparent"
@@ -76,15 +76,15 @@
 							onclick={() => moveVideo(video.videoId, 1)}><i>keyboard_arrow_down</i></button
 						>
 					</div>
-					<article class="queue-thumbnail no-padding border">
+					<div class="queue-thumbnail">
 						<VideoThumbnail
 							video={toThumbnailVideo(video)}
 							sideways={true}
 							forceSideways={true}
 							queueAction="remove"
 						/>
-					</article>
-				</div>
+					</div>
+				</article>
 			{/each}
 		</div>
 	{/if}
@@ -113,25 +113,21 @@
 
 	.queue-row {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		flex-direction: column;
+		margin: 0;
+		background: var(--surface-container-highest);
 	}
 
 	.queue-controls {
-		display: grid;
-		flex: 0 0 3rem;
-	}
-
-	.queue-row :global(.sideways-root) {
-		flex: 1;
-		min-width: 0;
+		display: flex;
+		padding: 0 0.25rem;
+		border-bottom: 1px solid var(--outline-variant);
 	}
 
 	.queue-thumbnail {
-		flex: 1;
+		width: 100%;
 		min-width: 0;
-		margin: 0;
-		background: var(--surface-container-highest);
+		padding-top: 0.5rem;
 	}
 
 	.queue-empty {

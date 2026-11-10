@@ -69,8 +69,6 @@ jobs:
         if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
         run: |
           change_id=$(sudo timeout 2m snap install snapcraft --classic --no-wait)
-          # Downloads can continue after the snapd restart message. Report
-          # progress periodically without interrupting the active change.
           for attempt in 1 2 3 4 5; do
             if sudo timeout 3m snap watch "$change_id"; then
               exit 0

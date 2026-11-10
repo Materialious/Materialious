@@ -68,7 +68,7 @@ jobs:
           if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TAG" --draft
           fi
-          mapfile -d '' assets < <(find release-assets -type f -print0)
+          mapfile -d '' assets < <(find release-assets -type f ! -name builder-debug.yml -print0)
           (( ${#assets[@]} > 0 ))
           duplicates=$(printf '%s\n' "${assets[@]##*/}" | sort | uniq -d)
           if [ -n "$duplicates" ]; then

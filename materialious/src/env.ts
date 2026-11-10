@@ -1,6 +1,9 @@
 import { defineEnvVars } from '@sveltejs/kit/env';
+import pkg from '../package.json';
 
 export const variables = defineEnvVars({
+	ANDROID_TV_BUILD: { public: true, static: true, schema: (input) => String(input === 'true') },
+	APP_VERSION: { public: true, static: true, schema: () => pkg.version },
 	DATABASE_CONNECTION_URI: { schema: (input) => input ?? '' },
 	COOKIE_SECRET: { schema: (input) => input ?? '' },
 	RATE_LIMIT_DISABLED: { schema: (input) => input ?? '' },

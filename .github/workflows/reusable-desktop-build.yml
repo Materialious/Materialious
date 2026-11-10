@@ -79,7 +79,7 @@ jobs:
           # once and resume watching the same change rather than starting another.
           if [ "$result" -eq 124 ]; then
             echo "Snapcraft installation timed out; restarting snapd once"
-            sudo timeout 2m systemctl restart snapd || true
+            sudo timeout 3m systemctl restart snapd || true
             if sudo timeout 3m snap watch "$change_id"; then
               exit 0
             fi

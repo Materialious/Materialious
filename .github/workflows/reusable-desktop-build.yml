@@ -69,21 +69,20 @@ jobs:
         if: matrix.runtime == 'linux-x64' || matrix.runtime == 'linux-arm64'
         run: |
           change_id=$(sudo timeout 2m snap install snapcraft --classic --no-wait)
-          if sudo timeout 3m snap watch "$change_id"; then
-            exit 0
-          else
-            result=$?
-          fi
-
-          # A timed-out change may be waiting for snapd to restart. Restart it
-          # once and resume watching the same change rather than starting another.
-          if [ "$result" -eq 124 ]; then
-            echo "Snapcraft installation timed out; restarting snapd once"
-            sudo timeout 3m systemctl restart snapd || true
+          # Downloads can continue after the snapd restart message. Report
+          # progress periodically without interrupting the active change.
+          for attempt in 1 2 3 4 5; do
             if sudo timeout 3m snap watch "$change_id"; then
               exit 0
+            else
+              result=$?
             fi
-          fi
+            echo "Snapcraft installation status (check ${attempt}/5):"
+            sudo timeout 30s snap tasks "$change_id" || true
+            if [ "$result" -ne 124 ]; then
+              break
+            fi
+          done
 
           echo "Snapcraft installation failed; collecting snapd diagnostics"
           sudo timeout 30s snap tasks "$change_id" || true

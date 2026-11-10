@@ -2,7 +2,7 @@ name: Update Flathub PR
 
 on:
     workflow_run:
-        workflows: ["Build desktop"]
+        workflows: ["Build release"]
         types:
             - completed
 

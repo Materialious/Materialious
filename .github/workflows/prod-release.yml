@@ -1,0 +1,81 @@
+name: Build release
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+    paths-ignore:
+      - "**/*.md"
+      - "./fastline/**"
+      - "./materialious/src/lib/i18n/**"
+
+  workflow_dispatch:
+
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  desktop-build-1:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release'))
+    uses: ./.github/workflows/prod-desktop.yml
+    secrets: inherit
+
+  android-build:
+    if: github.event_name == 'workflow_dispatch' || (github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'release'))
+    uses: ./.github/workflows/prod-android.yml
+    secrets: inherit
+
+  publish:
+    needs: [desktop-build-1, android-build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version and verify tag
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=$(jq -er '.version | select(type == "string" and length > 0)' materialious/package.json)
+          git check-ref-format "refs/tags/$tag"
+          remote_tag=$(git ls-remote --tags origin "refs/tags/$tag")
+          if [ -n "$remote_tag" ]; then
+            git fetch --force origin "refs/tags/$tag:refs/tags/$tag"
+            if [ "$(git rev-parse "refs/tags/$tag^{}")" != "$(git rev-parse HEAD)" ]; then
+              echo "::error::Tag $tag already points to a different commit. Bump the version before releasing."
+              exit 1
+            fi
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$TAG" --draft
+          fi
+          mapfile -d '' assets < <(find release-assets -type f -print0)
+          (( ${#assets[@]} > 0 ))
+          duplicates=$(printf '%s\n' "${assets[@]##*/}" | sort | uniq -d)
+          if [ -n "$duplicates" ]; then
+            echo "::error::Multiple build artifacts have the same release filename: $duplicates"
+            exit 1
+          fi
+          gh release upload "$TAG" "${assets[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+          if [ "$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true ]; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+          fi

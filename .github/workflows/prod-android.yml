@@ -1,17 +1,13 @@
 name: Build Android
 
 on:
-  workflow_run:
-    workflows: ["Build desktop"]
-    types:
-      - completed
+  workflow_call:
 
 permissions:
   contents: write
 
 jobs:
   android-build:
-    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,26 +20,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.workflow_run.head_sha }}
-
-      - name: Resolve desktop release
-        id: release
-        working-directory: .
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG=$(jq -r .version materialious/package.json)
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
-      - name: Verify checked out version matches release
-        run: |
-          PACKAGED=$(jq -r .version ../package.json)
-          if [ "$PACKAGED" != "${{ steps.release.outputs.tag }}" ]; then
-            echo "::error::Latest release is ${{ steps.release.outputs.tag }} but checked out tree is $PACKAGED"
-            exit 1
-          fi
 
       - uses: actions/setup-node@v6
         with:
@@ -126,13 +102,9 @@ jobs:
             jarsigner -verify "app/release/$name-signed.aab"
           done
 
-      - name: Upload Android artifacts to desktop release
-        working-directory: .
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload "${{ steps.release.outputs.tag }}" \
-            materialious/android/app/release/*-signed.apk \
-            materialious/android/app/release/*-signed.aab \
-            --repo "$GITHUB_REPOSITORY" \
-            --clobber
+      - name: Save Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ matrix.edition }}
+          path: materialious/android/app/release/*-signed.*
+          if-no-files-found: error

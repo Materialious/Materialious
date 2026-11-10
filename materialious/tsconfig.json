@@ -2,6 +2,7 @@
 	"extends": "$app/tsconfig",
 	"compilerOptions": {
 		"sourceMap": true,
+		"resolveJsonModule": true,
 		"strict": true,
 		"types": ["$app/types", "shaka-player"],
 		"baseUrl": ".",

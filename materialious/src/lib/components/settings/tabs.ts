@@ -1,3 +1,4 @@
+import { getPublicEnv } from '#lib/env';
 import { type Component } from 'svelte';
 import { Capacitor } from '@capacitor/core';
 import { isMaterialiousAccountActive, isUnrestrictedPlatform } from '#lib/backend';
@@ -17,8 +18,10 @@ import Binds from './Binds.svelte';
 import ExportImport from './ExportImport.svelte';
 import InternalAccount from './InternalAccount.svelte';
 import Admin from './Admin.svelte';
+import Update from './Update.svelte';
 
 export type SettingsTabCategories =
+	| 'update'
 	| 'interface'
 	| 'player'
 	| 'ryd'
@@ -89,6 +92,15 @@ export function getSettingsTabs(): SettingsTab[] {
 			component: About
 		}
 	];
+
+	if (getPublicEnv('ANDROID_TV_BUILD') === 'true' && isAndroidTv()) {
+		tabs.splice(tabs.length - 1, 0, {
+			id: 'update',
+			label: 'Update',
+			icon: 'system_update',
+			component: Update
+		});
+	}
 
 	if (isUnrestrictedPlatform()) {
 		tabs.splice(tabs.length - 1, 0, {

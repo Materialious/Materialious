@@ -1,3 +1,4 @@
+import { getPublicEnv } from '#lib/env';
 import { registerPlugin } from '@capacitor/core';
 import { WebPlugin } from '@capacitor/core';
 
@@ -11,8 +12,15 @@ export class AndroidTvWeb extends WebPlugin implements AndroidTV {
 	}
 }
 
-const androidTv = registerPlugin<AndroidTV>('AndroidTv', {
+const nativeAndroidTv = registerPlugin<AndroidTV>('AndroidTv', {
 	web: new AndroidTvWeb()
 });
+
+const androidTv: AndroidTV = {
+	isAndroidTv: () =>
+		getPublicEnv('ANDROID_TV_BUILD') === 'true'
+			? Promise.resolve({ value: true })
+			: nativeAndroidTv.isAndroidTv()
+};
 
 export default androidTv;

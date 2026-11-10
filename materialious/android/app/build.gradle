@@ -10,6 +10,7 @@ android {
     }
     defaultConfig {
         applicationId "us.materialio.app"
+        if (System.getenv('ANDROID_TV_BUILD') == 'true') applicationIdSuffix ".tv"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 291
@@ -60,6 +61,21 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+// Capacitor generates the Cordova plugin manifest during sync. Refuse to build
+// with a manifest from the other edition, which could package the installer in
+// the standard app or omit it from the TV app.
+tasks.named('preBuild') {
+    doFirst {
+        def pluginManifest = file('../capacitor-cordova-android-plugins/src/main/AndroidManifest.xml')
+        def tvBuild = System.getenv('ANDROID_TV_BUILD') == 'true'
+        def hasInstallerPermission = pluginManifest.exists() &&
+            pluginManifest.text.contains('android.permission.REQUEST_INSTALL_PACKAGES')
+        if (hasInstallerPermission != tvBuild) {
+            throw new GradleException('Capacitor plugins do not match ANDROID_TV_BUILD. Run npx cap sync android with the same ANDROID_TV_BUILD value before building.')
+        }
+    }
+}
 
 try {
     def servicesJSON = file('google-services.json')

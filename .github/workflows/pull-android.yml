@@ -10,6 +10,11 @@ permissions:
 jobs:
   android-check:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        edition: [standard, tv]
+    env:
+      ANDROID_TV_BUILD: ${{ matrix.edition == 'tv' && 'true' || 'false' }}
     defaults:
       run:
         working-directory: ./materialious/android
@@ -32,6 +37,17 @@ jobs:
 
       - name: Sync package
         run: cd ../ && npx cap sync
+
+      - name: Check updater isolation
+        run: |
+          manifest=capacitor-cordova-android-plugins/src/main/AndroidManifest.xml
+          if [ "$ANDROID_TV_BUILD" = true ]; then
+            grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' "$manifest"
+            test -f capacitor-cordova-android-plugins/src/main/java/de/kolbasa/apkupdater/ApkUpdater.java
+          else
+            ! grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' "$manifest"
+            test ! -f capacitor-cordova-android-plugins/src/main/java/de/kolbasa/apkupdater/ApkUpdater.java
+          fi
 
       - name: Prune dev modules
         run: cd ../ && npm prune --omit=dev

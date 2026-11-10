@@ -34,6 +34,7 @@
 		"@types/papaparse": "^5.5.2",
 		"@types/semver": "^7.8.0",
 		"@vite-pwa/sveltekit": "^1.0.0",
+		"cordova-plugin-apkupdater": "5.0.1",
 		"eslint": "^10.10.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.20.0",

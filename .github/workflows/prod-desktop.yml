@@ -116,6 +116,7 @@ jobs:
           name: desktop-${{ matrix.runtime }}
           path: |
             materialious/electron/dist/*.yml
+            !materialious/electron/dist/builder-debug.yml
             materialious/electron/dist/*.blockmap
             materialious/electron/dist/*.exe
             materialious/electron/dist/*.dmg

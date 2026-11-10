@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getPublicEnv } from '#lib/env';
 	import {
 		darkModeStore,
 		interfaceAdvancedThemingStore,
@@ -39,6 +40,7 @@
 	import { configBackend } from '#lib/api/backend/index';
 	import { configBackendCache } from '#lib/stores/backend';
 	import { isOwnBackend } from '#lib/shared/index';
+	import Update from '#lib/components/settings/Update.svelte';
 	import BrowserCompanionRequired from '#lib/components/access/BrowserCompanionRequired.svelte';
 
 	let { children } = $props();
@@ -213,4 +215,8 @@
 	<BrowserCompanionRequired />
 {:else}
 	{@render children?.()}
+{/if}
+
+{#if getPublicEnv('ANDROID_TV_BUILD') === 'true'}
+	<Update promptMode />
 {/if}

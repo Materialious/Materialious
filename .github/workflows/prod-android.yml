@@ -13,6 +13,11 @@ jobs:
   android-build:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        edition: [standard, tv]
+    env:
+      ANDROID_TV_BUILD: ${{ matrix.edition == 'tv' && 'true' || 'false' }}
     defaults:
       run:
         working-directory: ./materialious/android
@@ -97,6 +102,7 @@ jobs:
 
           for apk in "${apks[@]}"; do
             name=$(basename "${apk%-unsigned.apk}")
+            if [ "$ANDROID_TV_BUILD" = true ]; then name="$name-tv"; fi
             "$build_tools/zipalign" -f -P 16 4 "$apk" "$signing_dir/aligned.apk"
             "$build_tools/apksigner" sign \
               --ks "$signing_dir/release.jks" \
@@ -111,6 +117,7 @@ jobs:
 
           for bundle in "${bundles[@]}"; do
             name=$(basename "${bundle%.aab}")
+            if [ "$ANDROID_TV_BUILD" = true ]; then name="$name-tv"; fi
             jarsigner -keystore "$signing_dir/release.jks" \
               -storepass:env ANDROID_KEYSTORE_PASSWORD \
               -keypass:env ANDROID_KEY_PASSWORD \

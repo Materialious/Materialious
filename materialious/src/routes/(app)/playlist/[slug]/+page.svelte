@@ -14,7 +14,6 @@
 	import { getWatchHistory } from '#lib/api/index';
 	import PageLoading from '#lib/components/PageLoading.svelte';
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	let { data = $bindable() }: { data: any } = $props();
 	let loaded = $state(false);
 	let playlist: any = $state(null);

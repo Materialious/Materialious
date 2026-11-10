@@ -132,9 +132,10 @@ I've commented out places what aren't relevant but might be in the future.-->
   <tr>
     <td>Android TV</td>
     <td>
-      <a href="https://github.com/rumboalla/apkupdater">
-          For Android TV use APKUpdater.
+      <a href="https://github.com/Materialious/Materialious/releases/latest/download/app-universal-release-tv-signed.apk">
+          Download the Android TV APK
       </a>
+      <p>The TV edition checks GitHub for updates and asks before installing them. Android may ask you to allow installs from Materialious. It installs separately from the regular Android app.</p>
     </td>
   </tr>
   <tr>

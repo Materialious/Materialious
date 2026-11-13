@@ -40,6 +40,7 @@
 	import { isOwnBackend } from '#lib/shared/index';
 	import ComboBox from '../ComboBox.svelte';
 	import AllowInsecureRequests from '../AllowInsecureRequests.svelte';
+	import LogoutButton from './LogoutButton.svelte';
 
 	let invidiousInstance = $derived($invidiousInstanceStore ?? '');
 
@@ -131,6 +132,9 @@
 				</button>
 			</nav>
 		</form>
+		{#if isMobile()}
+			<LogoutButton />
+		{/if}
 		{#if (isOwnBackend()?.internalAuth || $materialiousBackendStore) && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
 				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
@@ -146,6 +150,9 @@
 			<div class="space"></div>
 		{/if}
 	{:else}
+		{#if isMobile()}
+			<LogoutButton />
+		{/if}
 		<div class="space"></div>
 	{/if}
 

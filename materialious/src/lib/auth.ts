@@ -127,6 +127,10 @@ export async function goToInvidiousLogin() {
 	}
 }
 
+export async function logout() {
+	await (get(rawMasterKeyStore) ? materialiousLogout : invidiousLogout)();
+}
+
 export async function invidiousLogout() {
 	invidiousAuthStore.set(null);
 	await removeAuthFromBackend();

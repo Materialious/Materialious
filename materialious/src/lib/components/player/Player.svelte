@@ -69,6 +69,8 @@
 	import { Motion } from '@capacitor/motion';
 	import ClosedCaptions from './ClosedCaptions.svelte';
 	import { getVideo, getVideoWatchHistory, updateWatchHistory } from '#lib/api/index';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	interface Props {
 		data: { video: VideoPlay; content: ParsedDescription; playlistId: string | null };
@@ -1108,11 +1110,13 @@
 			}
 		});
 
-		if (Capacitor.getPlatform() === 'android') {
+		if (Capacitor.getPlatform() === 'android' && !isAndroidTv()) {
 			pictureInPictureListener = await AndroidPictureInPicture.addListener(
 				'pictureInPictureModeChanged',
 				({ isInPictureInPictureMode }) => {
 					isAndroidPictureInPicture = isInPictureInPictureMode;
+					if (!page.url.pathname.includes('/watch'))
+						goto(resolve('/(app)/watch/[slug]', { slug: data.video.videoId }));
 				}
 			);
 			await androidHandleRotate();

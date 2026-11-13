@@ -37,7 +37,7 @@
 	import { isMaterialiousAccountActive, isYTBackend } from '#lib/backend';
 	import { isAndroidTv, isMobile, keyCodeMap } from '#lib/utils';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
-	import { goToInvidiousLogin, invidiousLogout, materialiousLogout } from '#lib/auth';
+	import { goToInvidiousLogin, materialiousLogout } from '#lib/auth';
 	import { backendFetch } from '#lib/api/backend/request';
 	import PlayerPip from '#lib/components/player/PlayerPip.svelte';
 	import Toast from '#lib/components/Toast.svelte';
@@ -118,10 +118,6 @@
 		} else {
 			goto(resolve('/(app)/login/tv'));
 		}
-	}
-
-	async function logout() {
-		await ($rawMasterKeyStore ? materialiousLogout : invidiousLogout)();
 	}
 
 	async function loadNotifications() {
@@ -372,11 +368,6 @@
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
 					</a>
-				{:else}
-					<a onclick={logout} href="#logout">
-						<i>logout</i>
-						<div>{$_('layout.logout')}</div>
-					</a>
 				{/if}
 			{/if}
 		{/if}
@@ -490,16 +481,11 @@
 						<div class="tooltip bottom">{$_('layout.settings')}</div>
 					</button>
 				{/if}
-				{#if showLogin}
+				{#if showLogin && Capacitor.getPlatform() !== 'android'}
 					{#if !accountLoggedIn}
 						<button onclick={login} class="circle large transparent">
 							<i>login</i>
 							<div class="tooltip bottom">{$_('layout.login')}</div>
-						</button>
-					{:else}
-						<button onclick={logout} class="circle large transparent">
-							<i>logout</i>
-							<div class="tooltip bottom">{$_('layout.logout')}</div>
 						</button>
 					{/if}
 				{/if}
@@ -521,7 +507,25 @@
 				<span style="font-size: .8em;">{navPage.name}</span>
 			</a>
 		{/each}
+		{#if Capacitor.getPlatform() === 'android' && !isAndroidTv() && showLogin && !accountLoggedIn}
+			<button class="transparent vertical" onclick={login}>
+				<i>login</i>
+				<span style="font-size: .8em;">{$_('layout.login')}</span>
+			</button>
+		{/if}
 	</nav>
+
+	{#if Capacitor.getPlatform() === 'android' && !isAndroidTv() && showLogin && !accountLoggedIn}
+		<nav
+			class="bottom m l"
+			class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
+		>
+			<button class="transparent vertical" onclick={login}>
+				<i>login</i>
+				<span>{$_('layout.login')}</span>
+			</button>
+		</nav>
+	{/if}
 
 	{#if !isAndroidTv()}
 		<Settings />

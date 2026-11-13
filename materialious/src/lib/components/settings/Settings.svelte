@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import LogoutButton from './LogoutButton.svelte';
 	import { _ } from '#lib/i18n/index';
 	import { materialiousBackendStore, rawMasterKeyStore } from '#lib/store';
-	import { keyCodeMap } from '#lib/utils';
+	import { isMobile, keyCodeMap } from '#lib/utils';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import {
 		getSettingsTabs,
@@ -111,7 +112,6 @@
 				{/if}
 			{/if}
 		</nav>
-
 		<div class="s">
 			<div class="space"></div>
 			<div class="divider"></div>
@@ -119,29 +119,34 @@
 
 		<div class="grid">
 			<div class="s12 m4 l4 m l">
-				<div
-					class="categories padding"
-					bind:this={triggerListElement}
-					onkeydown={(e) => handleTriggerKeyDown(e, triggerListElement)}
-					role="tablist"
-					aria-orientation="vertical"
-				>
-					{#each tabs as tab (tab)}
-						<button
-							id="tab-trigger-{tab.id}"
-							class:active={isActive(tab.id)}
-							class:surface-container-lowest={isActive(tab.id)}
-							class:surface-container-highest={!isActive(tab.id)}
-							role="tab"
-							aria-selected={isActive(tab.id)}
-							tabindex="0"
-							onclick={() => (activeTab = tab.id)}
-						>
-							<i>{tab.icon}</i>
-							<span>{getTabLabel(tab, $_)}</span>
-						</button>
-						<div class="space"></div>
-					{/each}
+				<div class="padding">
+					<div
+						class="categories"
+						bind:this={triggerListElement}
+						onkeydown={(e) => handleTriggerKeyDown(e, triggerListElement)}
+						role="tablist"
+						aria-orientation="vertical"
+					>
+						{#each tabs as tab (tab)}
+							<button
+								id="tab-trigger-{tab.id}"
+								class:active={isActive(tab.id)}
+								class:surface-container-lowest={isActive(tab.id)}
+								class:surface-container-highest={!isActive(tab.id)}
+								role="tab"
+								aria-selected={isActive(tab.id)}
+								tabindex="0"
+								onclick={() => (activeTab = tab.id)}
+							>
+								<i>{tab.icon}</i>
+								<span>{getTabLabel(tab, $_)}</span>
+							</button>
+							<div class="space"></div>
+						{/each}
+					</div>
+					{#if !isMobile()}
+						<LogoutButton fullWidth />
+					{/if}
 				</div>
 			</div>
 			<div class="s12 m8 l8">
@@ -151,6 +156,12 @@
 							<tab.component />
 						</div>
 					{/each}
+					{#if !isMobile()}
+						<div class="s">
+							<div class="space"></div>
+							<LogoutButton />
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -176,9 +187,8 @@
 	.categories {
 		position: sticky;
 		top: 0;
-		height: 100%;
-		overflow: hidden;
 		height: fit-content;
+		overflow: hidden;
 	}
 
 	.settings {

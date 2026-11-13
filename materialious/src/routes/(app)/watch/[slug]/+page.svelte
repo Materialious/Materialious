@@ -45,6 +45,7 @@
 	import PageLoading from '#lib/components/PageLoading.svelte';
 	import Download from '#lib/components/watch/Download.svelte';
 	import SleepTimer from '#lib/components/watch/SleepTimer.svelte';
+	import { getPlatform } from '#lib/platform.ts';
 
 	let { data = $bindable() }: { data: any } = $props();
 
@@ -55,7 +56,9 @@
 	let commentSort: 'top' | 'new' = $state('top');
 	let returnYTDislikes: Promise<any> | null = $state(null);
 
-	playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
+	if (getPlatform() !== 'android')
+		playerTheatreModeIsActive.set(get(playerTheatreModeByDefaultStore));
+	else playerTheatreModeIsActive.set(false);
 
 	const videoId = $derived(data.video?.videoId);
 	$effect(() => {

@@ -2,6 +2,8 @@
 	import { getPublicEnv } from '#lib/env';
 	import { tvUpdateState } from '#lib/stores/tvUpdate';
 	import { tick } from 'svelte';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
+	import { keyCodeMap } from '#lib/utils';
 
 	let { promptMode = false }: { promptMode?: boolean } = $props();
 	let dialog: HTMLDialogElement | undefined = $state();
@@ -31,30 +33,15 @@
 	}
 
 	function navigate(event: KeyboardEvent) {
-		if (!dialog || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
-		const buttons = Array.from(dialog.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'));
-		if (buttons.length < 2) return;
+		if (!dialog?.open || !$tvUpdateState.prompt) return;
+		const keyCode = keyCodeMap[event.key];
+		if (![37, 38, 39, 40].includes(keyCode)) return;
+
 		event.preventDefault();
 		event.stopPropagation();
-		const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
-		const forward = event.key === 'ArrowRight' || event.key === 'ArrowDown';
-		buttons[index < 0 ? 0 : (index + (forward ? 1 : buttons.length - 1)) % buttons.length]?.focus();
-	}
-
-	function recoverPromptFocus(event: KeyboardEvent) {
-		if (
-			!dialog?.open ||
-			!$tvUpdateState.prompt ||
-			!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key) ||
-			(dialog.contains(document.activeElement) && document.activeElement !== dialog)
-		)
-			return;
-
-		const button = dialog.querySelector<HTMLButtonElement>('button:not(:disabled)');
-		if (!button) return;
-		event.preventDefault();
-		event.stopPropagation();
-		button.focus();
+		const active = document.activeElement;
+		const current = active !== dialog && dialog.contains(active) ? active : null;
+		getNextFocus(current, keyCode, dialog)?.focus();
 	}
 
 	async function check() {
@@ -71,7 +58,7 @@
 	}
 </script>
 
-<svelte:window onkeydowncapture={recoverPromptFocus} />
+<svelte:window onkeydowncapture={navigate} />
 
 {#snippet updateContent()}
 	<article class="surface-container-low round">
@@ -112,12 +99,7 @@
 {/snippet}
 
 {#if promptMode}
-	<dialog
-		bind:this={dialog}
-		aria-label="Materialious update"
-		oncancel={dismiss}
-		onkeydown={navigate}
-	>
+	<dialog bind:this={dialog} aria-label="Materialious update" oncancel={dismiss}>
 		{@render updateContent()}
 		<nav class="right-align">
 			<button type="button" class="transparent" onclick={dismiss}>Later</button>

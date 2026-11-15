@@ -44,10 +44,7 @@
 	import PlayerPip from '#lib/components/player/PlayerPip.svelte';
 	import Toast, { addToast } from '#lib/components/Toast.svelte';
 	import { HTTPError } from '#lib/api/invidious/request';
-	import {
-		isCurrentInvidiousSession,
-		isRejectedInvidiousSession
-	} from '#lib/api/invidious/session';
+	import { isRejectedInvidiousSession } from '#lib/api/invidious/session';
 	import { isOwnBackend } from '#lib/shared/index';
 	import { configBackendCache } from '#lib/stores/backend';
 	import WatchParty from '#lib/components/WatchParty.svelte';
@@ -139,13 +136,9 @@
 		if (!checkedAuth || !checkedInstance || isYTBackend()) return;
 
 		const stillCurrent = () =>
-			isCurrentInvidiousSession(
-				checkedAuth,
-				checkedInstance,
-				$invidiousAuthStore,
-				$invidiousInstanceStore,
-				!isYTBackend()
-			);
+			checkedAuth === $invidiousAuthStore &&
+			checkedInstance === $invidiousInstanceStore &&
+			!isYTBackend();
 
 		try {
 			const feed = await getFeed(100, 1);

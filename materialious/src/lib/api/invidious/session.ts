@@ -9,13 +9,3 @@ export function isRejectedInvidiousSession(status: number, apiError: unknown): b
 			apiError === 'Invalid signature')
 	);
 }
-
-export function isCurrentInvidiousSession<T>(
-	checkedAuth: T,
-	checkedInstance: string | undefined,
-	currentAuth: T,
-	currentInstance: string | undefined,
-	usingInvidious: boolean
-): boolean {
-	return checkedAuth === currentAuth && checkedInstance === currentInstance && usingInvidious;
-}

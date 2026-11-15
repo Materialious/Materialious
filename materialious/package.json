@@ -21,7 +21,7 @@
 		"@eslint/js": "^10.0.1",
 		"@sveltejs/adapter-auto": "^8.0.0",
 		"@sveltejs/adapter-node": "^6.0.0",
-		"@sveltejs/adapter-static": "^4.0.0",
+		"@sveltejs/adapter-static": "^4.0.1",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/load-config": "^0.2.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",

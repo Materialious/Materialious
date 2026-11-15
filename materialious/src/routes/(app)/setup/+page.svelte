@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
 	import { isAndroidTv, keyCodeMap } from '#lib/utils';
 	import { resolve } from '$app/paths';
@@ -26,9 +26,38 @@
 	let materialiousBackend: string = $state(getMaterialiousBackendUrl());
 	let invalidMaterialiousBackend: boolean = $state(false);
 	let saving = $state(false);
+	let editingInput: HTMLInputElement | null = $state(null);
 
 	const stepNames = ['Backend', 'Player', 'Connections'];
 	let setupPage: HTMLElement;
+
+	function keepEditingInputVisible() {
+		if (!editingInput || document.activeElement !== editingInput || !setupPage) return;
+		const visibleTop = Math.max(
+			setupPage.getBoundingClientRect().top,
+			window.visualViewport?.offsetTop ?? 0
+		);
+		setupPage.scrollTop += editingInput.getBoundingClientRect().top - visibleTop - 24;
+	}
+
+	function editInput(input: HTMLInputElement) {
+		input.readOnly = false;
+		editingInput = input;
+		input.focus();
+		void tick().then(keepEditingInputVisible);
+	}
+
+	onMount(() => {
+		if (!isAndroidTv()) return;
+		window.addEventListener('resize', keepEditingInputVisible);
+		window.visualViewport?.addEventListener('resize', keepEditingInputVisible);
+		window.visualViewport?.addEventListener('scroll', keepEditingInputVisible);
+		return () => {
+			window.removeEventListener('resize', keepEditingInputVisible);
+			window.visualViewport?.removeEventListener('resize', keepEditingInputVisible);
+			window.visualViewport?.removeEventListener('scroll', keepEditingInputVisible);
+		};
+	});
 
 	$effect(() => {
 		void step;
@@ -54,8 +83,7 @@
 		if (target instanceof HTMLInputElement) {
 			if (event.key === 'Enter' && target.readOnly) {
 				event.preventDefault();
-				target.readOnly = false;
-				target.focus();
+				editInput(target);
 				return;
 			}
 			if (!target.readOnly) return;
@@ -70,13 +98,15 @@
 	}
 
 	function handleFocusOut(event: FocusEvent) {
-		if (isAndroidTv() && event.target instanceof HTMLInputElement) event.target.readOnly = true;
+		if (isAndroidTv() && event.target instanceof HTMLInputElement) {
+			event.target.readOnly = true;
+			if (editingInput === event.target) editingInput = null;
+		}
 	}
 
 	function handleClick(event: MouseEvent) {
 		if (isAndroidTv() && event.target instanceof HTMLInputElement && event.target.readOnly) {
-			event.target.readOnly = false;
-			event.target.focus();
+			editInput(event.target);
 		}
 	}
 
@@ -131,6 +161,7 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
 	class="setup-page"
+	class:editing={editingInput !== null}
 	role="group"
 	aria-label="Setup"
 	bind:this={setupPage}
@@ -283,6 +314,10 @@
 		overscroll-behavior: contain;
 		display: flex;
 		padding: 2rem 1rem;
+	}
+	.setup-page.editing {
+		/* Leave room to move either connection field above the TV keyboard. */
+		padding-bottom: 65vh;
 	}
 	.setup-card {
 		width: min(100%, 680px);

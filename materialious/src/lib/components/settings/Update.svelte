@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getPublicEnv } from '#lib/env';
 	import { tvUpdateState } from '#lib/stores/tvUpdate';
+	import { tick } from 'svelte';
 
 	let { promptMode = false }: { promptMode?: boolean } = $props();
 	let dialog: HTMLDialogElement | undefined = $state();
@@ -11,20 +12,49 @@
 		else if (!$tvUpdateState.prompt && dialog.open) dialog.close();
 	});
 
+	$effect(() => {
+		const status = $tvUpdateState.status;
+		if (!dialog || !$tvUpdateState.prompt) return;
+		void tick().then(() => {
+			if (!dialog?.open || !$tvUpdateState.prompt || $tvUpdateState.status !== status) return;
+			if (status === 'available') {
+				dialog.querySelector<HTMLButtonElement>('[data-update-install]')?.focus();
+				return;
+			}
+			if (dialog.contains(document.activeElement) && document.activeElement !== dialog) return;
+			dialog.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
+		});
+	});
+
 	function dismiss() {
 		tvUpdateState.update((state) => ({ ...state, prompt: false }));
 	}
 
 	function navigate(event: KeyboardEvent) {
-		if (!dialog || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+		if (!dialog || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
 		const buttons = Array.from(dialog.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'));
 		if (buttons.length < 2) return;
 		event.preventDefault();
 		event.stopPropagation();
 		const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
-		buttons[
-			(index + (event.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length
-		]?.focus();
+		const forward = event.key === 'ArrowRight' || event.key === 'ArrowDown';
+		buttons[index < 0 ? 0 : (index + (forward ? 1 : buttons.length - 1)) % buttons.length]?.focus();
+	}
+
+	function recoverPromptFocus(event: KeyboardEvent) {
+		if (
+			!dialog?.open ||
+			!$tvUpdateState.prompt ||
+			!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key) ||
+			(dialog.contains(document.activeElement) && document.activeElement !== dialog)
+		)
+			return;
+
+		const button = dialog.querySelector<HTMLButtonElement>('button:not(:disabled)');
+		if (!button) return;
+		event.preventDefault();
+		event.stopPropagation();
+		button.focus();
 	}
 
 	async function check() {
@@ -40,6 +70,8 @@
 		}
 	}
 </script>
+
+<svelte:window onkeydowncapture={recoverPromptFocus} />
 
 {#snippet updateContent()}
 	<article class="surface-container-low round">
@@ -69,7 +101,7 @@
 		{/if}
 		<nav>
 			{#if $tvUpdateState.status === 'available'}
-				<button type="button" onclick={install}
+				<button type="button" data-update-install onclick={install}
 					><i>download</i><span>Download and install</span></button
 				>
 			{:else if ['idle', 'current', 'error'].includes($tvUpdateState.status)}

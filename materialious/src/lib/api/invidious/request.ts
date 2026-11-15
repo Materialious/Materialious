@@ -29,10 +29,12 @@ export function setLocale(url: URL): URL {
 export class HTTPError {
 	msg: string;
 	response: Response;
+	apiError?: string;
 
-	constructor(msg: string, response: Response) {
+	constructor(msg: string, response: Response, apiError?: string) {
 		this.msg = msg;
 		this.response = response;
+		this.apiError = apiError;
 	}
 
 	toString() {
@@ -43,10 +45,12 @@ export class HTTPError {
 export async function fetchErrorHandle(response: Response): Promise<Response> {
 	if (!response.ok) {
 		let message = 'Internal error';
+		let apiError: string | undefined;
 
 		// Attempt to parse error.
 		try {
 			const json = await response.json();
+			if (typeof json.error === 'string') apiError = json.error;
 			message = json.errorBacktrace || json.error || json.message;
 		} catch {
 			// Continue regardless of error
@@ -54,7 +58,8 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 
 		throw new HTTPError(
 			`${response.status} - ${response.statusText}\n${decodeURIComponent(response.url)}\n${message}`,
-			response
+			response,
+			apiError
 		);
 	}
 

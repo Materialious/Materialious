@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { getPublicEnv } from '#lib/env';
 	import { tvUpdateState } from '#lib/stores/tvUpdate';
+	import { tick } from 'svelte';
+	import { getNextFocus } from '@bbc/tv-lrud-spatial';
+	import { keyCodeMap } from '#lib/utils';
 
 	let { promptMode = false }: { promptMode?: boolean } = $props();
 	let dialog: HTMLDialogElement | undefined = $state();
@@ -11,20 +14,34 @@
 		else if (!$tvUpdateState.prompt && dialog.open) dialog.close();
 	});
 
+	$effect(() => {
+		const status = $tvUpdateState.status;
+		if (!dialog || !$tvUpdateState.prompt) return;
+		void tick().then(() => {
+			if (!dialog?.open || !$tvUpdateState.prompt || $tvUpdateState.status !== status) return;
+			if (status === 'available') {
+				dialog.querySelector<HTMLButtonElement>('[data-update-install]')?.focus();
+				return;
+			}
+			if (dialog.contains(document.activeElement) && document.activeElement !== dialog) return;
+			dialog.querySelector<HTMLButtonElement>('button:not(:disabled)')?.focus();
+		});
+	});
+
 	function dismiss() {
 		tvUpdateState.update((state) => ({ ...state, prompt: false }));
 	}
 
 	function navigate(event: KeyboardEvent) {
-		if (!dialog || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
-		const buttons = Array.from(dialog.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'));
-		if (buttons.length < 2) return;
+		if (!dialog?.open || !$tvUpdateState.prompt) return;
+		const keyCode = keyCodeMap[event.key];
+		if (![37, 38, 39, 40].includes(keyCode)) return;
+
 		event.preventDefault();
 		event.stopPropagation();
-		const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
-		buttons[
-			(index + (event.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length
-		]?.focus();
+		const active = document.activeElement;
+		const current = active !== dialog && dialog.contains(active) ? active : null;
+		getNextFocus(current, keyCode, dialog)?.focus();
 	}
 
 	async function check() {
@@ -40,6 +57,8 @@
 		}
 	}
 </script>
+
+<svelte:window onkeydowncapture={navigate} />
 
 {#snippet updateContent()}
 	<article class="surface-container-low round">
@@ -69,7 +88,7 @@
 		{/if}
 		<nav>
 			{#if $tvUpdateState.status === 'available'}
-				<button type="button" onclick={install}
+				<button type="button" data-update-install onclick={install}
 					><i>download</i><span>Download and install</span></button
 				>
 			{:else if ['idle', 'current', 'error'].includes($tvUpdateState.status)}
@@ -80,12 +99,7 @@
 {/snippet}
 
 {#if promptMode}
-	<dialog
-		bind:this={dialog}
-		aria-label="Materialious update"
-		oncancel={dismiss}
-		onkeydown={navigate}
-	>
+	<dialog bind:this={dialog} aria-label="Materialious update" oncancel={dismiss}>
 		{@render updateContent()}
 		<nav class="right-align">
 			<button type="button" class="transparent" onclick={dismiss}>Later</button>

@@ -16,6 +16,7 @@
 	import { getPages } from '#lib/navPages';
 	import {
 		invidiousAuthStore,
+		invidiousInstanceStore,
 		interfaceDefaultPage,
 		playerLoadingStore,
 		playerState,
@@ -32,6 +33,7 @@
 	import { Capacitor } from '@capacitor/core';
 	import ui from 'beercss';
 	import { onDestroy, onMount } from 'svelte';
+	import { derived } from 'svelte/store';
 	import Mousetrap from 'mousetrap';
 	import { _ } from '#lib/i18n/index';
 	import { isMaterialiousAccountActive, isYTBackend } from '#lib/backend';
@@ -40,7 +42,9 @@
 	import { goToInvidiousLogin, materialiousLogout } from '#lib/auth';
 	import { backendFetch } from '#lib/api/backend/request';
 	import PlayerPip from '#lib/components/player/PlayerPip.svelte';
-	import Toast from '#lib/components/Toast.svelte';
+	import Toast, { addToast } from '#lib/components/Toast.svelte';
+	import { HTTPError } from '#lib/api/invidious/request';
+	import { isRejectedInvidiousSession } from '#lib/api/invidious/session';
 	import { isOwnBackend } from '#lib/shared/index';
 	import { configBackendCache } from '#lib/stores/backend';
 	import WatchParty from '#lib/components/WatchParty.svelte';
@@ -48,11 +52,17 @@
 
 	let { children } = $props();
 
-	const showLogin = $derived(!isYTBackend() || !!isOwnBackend()?.internalAuth);
+	const ownBackendStore = derived([materialiousBackendStore, configBackendCache], () =>
+		isOwnBackend()
+	);
+	const ytBackendStore = derived([backendInUseStore, ownBackendStore], () => isYTBackend());
+	const showLogin = $derived(
+		!!$ownBackendStore?.internalAuth || (!!$invidiousInstanceStore && !$ytBackendStore)
+	);
 
 	const accountLoggedIn = $derived(
-		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
-			(!!$invidiousAuthStore && !isOwnBackend()?.internalAuth)
+		(!!$rawMasterKeyStore && (!!$ownBackendStore?.internalAuth || !!$materialiousBackendStore)) ||
+			(!!$invidiousAuthStore && !$ownBackendStore?.internalAuth)
 	);
 
 	let mobileSearchShow = $state(false);
@@ -121,8 +131,43 @@
 	}
 
 	async function loadNotifications() {
-		const feed = await getFeed(100, 1);
-		notifications = feed.notifications;
+		const checkedAuth = $invidiousAuthStore;
+		const checkedInstance = $invidiousInstanceStore;
+		if (!checkedAuth || !checkedInstance || isYTBackend()) return;
+
+		const stillCurrent = () =>
+			checkedAuth === $invidiousAuthStore &&
+			checkedInstance === $invidiousInstanceStore &&
+			!isYTBackend();
+
+		try {
+			const feed = await getFeed(100, 1);
+			if (stillCurrent()) notifications = feed.notifications;
+		} catch (error) {
+			if (!stillCurrent()) return;
+			console.error('Failed to load invidious feed', error);
+			if (
+				error instanceof HTTPError &&
+				isRejectedInvidiousSession(error.response.status, error.apiError)
+			) {
+				// Keep the synchronized cloud copy; it may still be used by other devices.
+				invidiousAuthStore.set(null);
+				addToast({ data: { text: $_('invidiousSessionExpired'), icon: 'error' } });
+			} else {
+				addToast({
+					data: {
+						text: $_('invidiousCheckFailed'),
+						icon: 'error',
+						action: {
+							text: $_('player.retry'),
+							action: () => {
+								void loadNotifications();
+							}
+						}
+					}
+				});
+			}
+		}
 	}
 
 	function resetScroll() {
@@ -134,12 +179,7 @@
 
 	onMount(async () => {
 		if ($invidiousAuthStore && !isYTBackend()) {
-			loadNotifications().catch((error) => {
-				console.error('Failed to load invidious feed', error);
-				// A rejected token is only invalid on this device. Don't delete the
-				// synchronized cloud copy, which other (or future) sessions rely on.
-				invidiousAuthStore.set(null);
-			});
+			void loadNotifications();
 		}
 
 		if (isMaterialiousAccountActive()) {
@@ -345,26 +385,39 @@
 			</header>
 		{/if}
 		{#if isAndroidTv()}
-			<a href={resolve('/(app)/search')} class:active={page.url.href.endsWith('/search')}>
+			<a
+				href={resolve('/(app)/search')}
+				class:active={page.url.pathname === resolve('/(app)/search')}
+			>
 				<i>search</i>
 				<div>{$_('searchPlaceholder')}</div>
 			</a>
 		{/if}
 		{#each pages as navPage (navPage)}
-			<a href={resolvePath(navPage.href)} class:active={page.url.href.endsWith(navPage.href)}
+			<a
+				href={resolvePath(navPage.href)}
+				class:active={page.url.pathname === resolvePath(navPage.href)}
 				><i>{navPage.icon}</i>
 				<div>{navPage.name}</div>
 			</a>
 		{/each}
 		{#if isAndroidTv()}
 			<div class="divider"></div>
-			<a href={resolve('/(app)/settings')} class:active={page.url.href.endsWith('/settings')}>
+			<a
+				href={resolve('/(app)/settings')}
+				class:active={page.url.pathname === resolve('/(app)/settings')}
+			>
 				<i>settings</i>
 				<div>{$_('layout.settings')}</div>
 			</a>
 			{#if showLogin}
 				{#if !accountLoggedIn}
-					<a onclick={login} href="#login">
+					<a
+						onclick={login}
+						href="#login"
+						class:active={page.url.pathname === resolve('/(app)/login/internal') ||
+							page.url.pathname === resolve('/(app)/login/tv')}
+					>
 						<i>login</i>
 						<div>{$_('layout.login')}</div>
 					</a>
@@ -501,17 +554,25 @@
 			<a
 				class="round"
 				href={resolvePath(navPage.href)}
-				class:active={page.url.href.endsWith(navPage.href)}
+				class:active={page.url.pathname === resolvePath(navPage.href)}
 				data-sveltekit-preload-data="false"
 				><i>{navPage.icon}</i>
 				<span style="font-size: .8em;">{navPage.name}</span>
 			</a>
 		{/each}
 		{#if Capacitor.getPlatform() === 'android' && !isAndroidTv() && showLogin && !accountLoggedIn}
-			<button class="transparent vertical" onclick={login}>
+			<a
+				class="round"
+				href={$ownBackendStore?.internalAuth ? resolve('/(app)/login/internal') : '#login'}
+				class:active={page.url.pathname === resolve('/(app)/login/internal')}
+				onclick={(event) => {
+					event.preventDefault();
+					void login();
+				}}
+			>
 				<i>login</i>
 				<span style="font-size: .8em;">{$_('layout.login')}</span>
-			</button>
+			</a>
 		{/if}
 	</nav>
 
@@ -520,10 +581,18 @@
 			class="bottom m l"
 			class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
 		>
-			<button class="transparent vertical" onclick={login}>
+			<a
+				class="round"
+				href={$ownBackendStore?.internalAuth ? resolve('/(app)/login/internal') : '#login'}
+				class:active={page.url.pathname === resolve('/(app)/login/internal')}
+				onclick={(event) => {
+					event.preventDefault();
+					void login();
+				}}
+			>
 				<i>login</i>
 				<span>{$_('layout.login')}</span>
-			</button>
+			</a>
 		</nav>
 	{/if}
 

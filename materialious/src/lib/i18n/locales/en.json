@@ -36,6 +36,8 @@
 	"recommendedVideos": "Recommended Videos",
 	"playlistVideos": "Playlist Videos",
 	"invidiousLogin": "Please log in with your Invidious account.",
+	"invidiousSessionExpired": "Your Invidious session is no longer valid. Please log in again.",
+	"invidiousCheckFailed": "Could not check your Invidious session or load notifications. Try again.",
 	"materialiousLogin": "Please login with your Materialious account.",
 	"materialiousCreate": "Please create your Materialious account.",
 	"invalidInstance": "Please verify the URL. If it's correct, the instance may be down or may not support third-party clients.",

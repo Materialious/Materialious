@@ -515,5 +515,7 @@
         "remove": "キューから削除",
         "moveUp": "キュー内で上に移動",
         "moveDown": "キュー内で下に移動"
-    }
+    },
+    "invidiousSessionExpired": "Invidiousのセッションが無効になりました。再度ログインしてください。",
+    "invidiousCheckFailed": "Invidiousセッションを確認できないか、通知を読み込めませんでした。もう一度試してください。"
 }

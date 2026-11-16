@@ -61,7 +61,7 @@
 		"@capacitor/core": "^8.2.0",
 		"@capacitor/motion": "^8.0.1",
 		"@capacitor/network": "^8.0.1",
-		"@capacitor/screen-orientation": "^8.0.1",
+		"@capacitor/screen-orientation": "^8.0.2",
 		"@capacitor/share": "^8.0.2",
 		"@capawesome/capacitor-nodejs": "^0.2.0",
 		"@capgo/capacitor-file-sharer": "^8.1.16",

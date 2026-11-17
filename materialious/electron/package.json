@@ -1,6 +1,6 @@
 {
 	"name": "Materialious",
-	"version": "1.18.30",
+	"version": "1.18.31",
 	"description": "Modern material design for YouTube and Invidious.",
 	"desktopName": "us.materialio.Materialious",
 	"build": {

@@ -35,7 +35,7 @@
 		"@types/semver": "^7.8.0",
 		"@vite-pwa/sveltekit": "^1.0.0",
 		"cordova-plugin-apkupdater": "5.0.1",
-		"eslint": "^10.10.0",
+		"eslint": "^10.15.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.20.0",
 		"globals": "^17.12.0",

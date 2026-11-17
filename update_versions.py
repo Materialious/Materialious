@@ -32,7 +32,6 @@ def update_contributors() -> None:
     os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
     with open(CONTRIBUTORS_FILE, "w", encoding="utf-8") as f_:
         json.dump(contributors, f_, ensure_ascii=False, separators=(",", ":"))
-    print(f"GitHub contributors written to {CONTRIBUTORS_FILE}")
 
 
 def package_json_update_ver(location: str) -> None:

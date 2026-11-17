@@ -131,6 +131,8 @@
 					username: username,
 					token: token
 				});
+
+				goto(resolve('/(app)'));
 			}
 		}
 	});

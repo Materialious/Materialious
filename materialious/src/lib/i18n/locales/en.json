@@ -221,6 +221,7 @@
 		"retry": "Retry",
 		"retrying": "Retrying…",
 		"controls": {
+			"hideUI": "Hide controls",
 			"playbackControls": "Playback controls",
 			"endsAt": "Ends at {{time}}",
 			"videoInfo": "Video information",

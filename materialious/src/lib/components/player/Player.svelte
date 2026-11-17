@@ -10,7 +10,7 @@
 	import shaka from 'shaka-player/dist/shaka-player.ui';
 	import { KeepAwake } from '@capgo/capacitor-keep-awake';
 	import { SponsorBlock, type Category, type Segment } from 'sponsorblock-api';
-	import { onDestroy, onMount, untrack } from 'svelte';
+	import { onDestroy, onMount, tick, untrack } from 'svelte';
 	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import { Slider } from 'melt/builders';
@@ -51,7 +51,6 @@
 	import { injectSabr, refreshSabrSession } from '#lib/player/sabr/index';
 	import { registerHlsTransmuxer } from '#lib/player/hls';
 	import type { SabrStreamingAdapter } from 'googlevideo/sabr-streaming-adapter';
-	import { fade } from 'svelte/transition';
 	import { addToast } from '#lib/components/Toast.svelte';
 	import { getPublicEnv } from '#lib/env';
 	import { isAndroidTv, isMobile } from '#lib/utils';
@@ -863,12 +862,58 @@
 	}
 
 	let showPlayerUiTimeout: ReturnType<typeof setTimeout>;
+	let controlsHiddenManually = $state(false);
+	let hideControlsButton = $state<HTMLButtonElement>();
+	const HIDE_CONTROLS_MOUSE_DELAY_MS = 2_000;
+	let ignoreMouseUntil = 0;
+
+	function hidePlayerUI() {
+		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
+		ignoreMouseUntil = performance.now() + HIDE_CONTROLS_MOUSE_DELAY_MS;
+		controlsHiddenManually = true;
+		showControls = false;
+		playerInitalInteract = true;
+
+		// Keep keyboard interaction in the player after its focused button disappears.
+		if (playerContainer.contains(document.activeElement)) {
+			playerContainer.focus({ preventScroll: true });
+		}
+	}
+
+	function onPlayerMouseActivity() {
+		// Let the user move the cursor away after hiding without revealing the UI again.
+		if (performance.now() < ignoreMouseUntil) return;
+		showPlayerUI();
+	}
+
+	function onHideControlsKey(event: KeyboardEvent) {
+		// Native button activation must not also trigger a global playback shortcut.
+		if (event.key === ' ' || event.key === 'Enter') event.stopPropagation();
+	}
+
+	async function onPlayerKeyDown(event: KeyboardEvent) {
+		if (
+			event.key !== 'Tab' ||
+			showControls ||
+			isAndroidTv() ||
+			!playerContainer?.contains(document.activeElement)
+		)
+			return;
+		showPlayerUI();
+		if (!event.shiftKey && hideControlsButton) {
+			event.preventDefault();
+			await tick();
+			hideControlsButton.focus({ preventScroll: true });
+		}
+	}
+
 	function showPlayerUI() {
 		// TV: the watch page owns control visibility (D-pad pin/pause/seek state). A
 		// second owner here, plus mouse enter/leave from a stationary pointer, made the
 		// bar flicker.
 		if (isAndroidTv()) return;
 
+		controlsHiddenManually = false;
 		showControls = true;
 
 		if (showPlayerUiTimeout) clearTimeout(showPlayerUiTimeout);
@@ -1460,6 +1505,8 @@
 	});
 </script>
 
+<svelte:window onkeydown={onPlayerKeyDown} />
+
 <div
 	id="player-container"
 	class:contain-video={!isAndroidTv()}
@@ -1467,9 +1514,15 @@
 	class:tv-contain-video={isAndroidTv()}
 	class:audio-only={audioOnly}
 	class:hide-cursor={!showControls && !audioOnly}
-	role="presentation"
-	onmouseenter={showPlayerUI}
-	onmousemove={showPlayerUI}
+	class:controls-hidden-manually={controlsHiddenManually && !audioOnly}
+	role="region"
+	aria-label={data.video.title}
+	tabindex="-1"
+	onfocusin={(event) => {
+		if (event.target !== playerContainer) showPlayerUI();
+	}}
+	onmouseenter={onPlayerMouseActivity}
+	onmousemove={onPlayerMouseActivity}
 	onscroll={showPlayerUI}
 	onmouseleave={() => {
 		if (isAndroidTv()) return;
@@ -1486,29 +1539,35 @@
 		bind:this={playerElement}
 		poster={getBestThumbnail(data.video.videoThumbnails, 9999, 9999)}
 	></video>
-	{#if isEmbed && !playerIsPip && !isAndroidTv() && !isAndroidPictureInPicture}
-		<div
-			class="chip surface-container-highest"
-			style="position: absolute;top: 10px;left: 10px;font-size: 18px;"
-		>
-			{data.video.title}
-		</div>
-	{/if}
-
-	{#if showControls && !playerIsPip && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
-		<div id="mobile-time" transition:fade>
-			<p class="chip surface-container-highest s">
-				{#if data.video.liveNow}
-					{$_('thumbnail.live')}
-				{:else}
-					{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
-				{/if}
-			</p>
-			{#if playerVideoEndTimePretty && playerVideoEndTimePretty !== ''}
-				<p class="chip surface-container-highest">
-					{playerVideoEndTimePretty}
-				</p>
+	{#if !playerIsPip && !audioOnly && !isAndroidPictureInPicture && !isAndroidTv()}
+		<div id="player-top-controls" class="hide" class:show={showControls} inert={!showControls}>
+			<button
+				type="button"
+				class="circle surface-container-highest"
+				aria-label={$_('player.controls.hideUI')}
+				title={$_('player.controls.hideUI')}
+				onclick={hidePlayerUI}
+				onkeydown={onHideControlsKey}
+				onkeyup={onHideControlsKey}
+				bind:this={hideControlsButton}
+			>
+				<i aria-hidden="true">visibility_off</i>
+			</button>
+			{#if isEmbed}
+				<div class="chip surface-container-highest player-title">{data.video.title}</div>
 			{/if}
+			<div id="mobile-time">
+				<p class="chip surface-container-highest s">
+					{#if data.video.liveNow}
+						{$_('thumbnail.live')}
+					{:else}
+						{videoLength(currentTime)} / {videoLength(playerMaxKnownTime)}
+					{/if}
+				</p>
+				{#if playerVideoEndTimePretty}
+					<p class="chip surface-container-highest">{playerVideoEndTimePretty}</p>
+				{/if}
+			</div>
 		</div>
 	{/if}
 	{#if !playerIsPip && !isAndroidPictureInPicture && !audioOnly}
@@ -1701,10 +1760,44 @@
 	}
 
 	#mobile-time {
+		margin-left: auto;
+		flex-shrink: 0;
+	}
+
+	#player-top-controls {
 		position: absolute;
 		top: 0;
+		left: 0;
 		right: 0;
+		z-index: 2;
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
 		padding: 10px;
+		pointer-events: none;
+	}
+
+	#player-top-controls button {
+		flex-shrink: 0;
+		margin: 0;
+		pointer-events: auto;
+	}
+
+	.player-title {
+		display: block;
+		min-width: 0;
+		margin: 0;
+		font-size: 18px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.controls-hidden-manually #player-controls,
+	.controls-hidden-manually #player-top-controls {
+		opacity: 0 !important;
+		visibility: hidden !important;
+		transition: none !important;
 	}
 
 	#mobile-time .chip {

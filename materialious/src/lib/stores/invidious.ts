@@ -20,8 +20,8 @@ export const backendInUseStore: Writable<'ivg' | 'yt'> = persist(
 	'backendInUse'
 );
 
-export const invidiousAuthStore: Writable<null | { username: string; token: string }> = persist(
-	writable(null),
-	createStorage(),
-	'authToken'
-);
+export const invidiousAuthStore: Writable<null | {
+	username: string;
+	token: string;
+	instance?: string;
+}> = persist(writable(null), createStorage(), 'authToken');

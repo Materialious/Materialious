@@ -39,7 +39,7 @@
 	import { isMaterialiousAccountActive, isYTBackend } from '#lib/backend';
 	import { isAndroidTv, isMobile, keyCodeMap } from '#lib/utils';
 	import { getNextFocus } from '@bbc/tv-lrud-spatial';
-	import { goToInvidiousLogin, materialiousLogout } from '#lib/auth';
+	import { materialiousLogout } from '#lib/auth';
 	import { backendFetch } from '#lib/api/backend/request';
 	import PlayerPip from '#lib/components/player/PlayerPip.svelte';
 	import Toast, { addToast } from '#lib/components/Toast.svelte';
@@ -123,11 +123,7 @@
 			return;
 		}
 
-		if (!isAndroidTv()) {
-			await goToInvidiousLogin();
-		} else {
-			goto(resolve('/(app)/login/tv'));
-		}
+		goto(resolve('/(app)/login/invidious'));
 	}
 
 	async function loadNotifications() {
@@ -416,7 +412,7 @@
 						onclick={login}
 						href="#login"
 						class:active={page.url.pathname === resolve('/(app)/login/internal') ||
-							page.url.pathname === resolve('/(app)/login/tv')}
+							page.url.pathname === resolve('/(app)/login/invidious')}
 					>
 						<i>login</i>
 						<div>{$_('layout.login')}</div>

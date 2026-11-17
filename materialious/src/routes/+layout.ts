@@ -97,7 +97,9 @@ export async function load({ url }) {
 	}
 
 	const isLoginPage =
-		url.pathname.endsWith('/login/internal') || url.pathname.endsWith('/login/tv');
+		url.pathname.endsWith('/login/internal') ||
+		url.pathname.endsWith('/login/invidious') ||
+		url.pathname.endsWith('/login/invidious/callback');
 	const isSetupPage = url.pathname.endsWith('/setup');
 
 	if (!isLoginPage) {

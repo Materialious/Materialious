@@ -1,6 +1,6 @@
 {
 	"name": "@materialious/shared",
-	"version": "1.18.27",
+	"version": "1.18.28",
 	"description": "Shared code between the Materialious web app and its Electron wrapper.",
 	"private": true,
 	"type": "module",
@@ -18,6 +18,10 @@
 		"./download": {
 			"types": "./dist/download/index.d.ts",
 			"default": "./dist/download/index.js"
+		},
+		"./invidious": {
+			"types": "./dist/invidious/auth.d.ts",
+			"default": "./dist/invidious/auth.js"
 		}
 	},
 	"files": [

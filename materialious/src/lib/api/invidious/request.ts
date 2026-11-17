@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { getUserLocale } from '#lib/i18n/index';
 import { normalizeContentRegion } from '#lib/regions';
 import {
@@ -67,9 +68,15 @@ export async function fetchErrorHandle(response: Response): Promise<Response> {
 }
 
 export function buildAuthHeaders(): { headers: Record<string, string> } {
-	const authToken = get(invidiousAuthStore)?.token ?? '';
+	const auth = get(invidiousAuthStore);
+	if (auth?.instance && auth.instance !== get(invidiousInstanceStore)?.replace(/\/$/, '')) {
+		return { headers: {} };
+	}
+	const authToken = auth?.token ?? '';
 	if (authToken.startsWith('SID=')) {
-		return { headers: { __sid_auth: authToken } };
+		// Browser fetch cannot set Cookie; the platform transport translates this header.
+		const header = Capacitor.getPlatform() === 'android' ? '__sid_auth' : 'X-Invidious-SID';
+		return { headers: { [header]: authToken } };
 	} else {
 		return { headers: { Authorization: `Bearer ${authToken}` } };
 	}

@@ -5,7 +5,7 @@
 	import { isOwnBackend } from '#lib/shared/index';
 	import { invidiousAuthStore, materialiousBackendStore, rawMasterKeyStore } from '#lib/store';
 
-	let { fullWidth = false } = $props();
+	let { fullWidth = false, class: className = '' } = $props();
 
 	const accountLoggedIn = $derived(
 		(!!$rawMasterKeyStore && (!!isOwnBackend()?.internalAuth || !!$materialiousBackendStore)) ||
@@ -14,7 +14,10 @@
 </script>
 
 {#if (!isYTBackend() || isOwnBackend()?.internalAuth) && accountLoggedIn}
-	<button class={['surface-container-highest', { 'full-width': fullWidth }]} onclick={logout}>
+	<button
+		class={['surface-container-highest', className, { 'full-width': fullWidth }]}
+		onclick={logout}
+	>
 		<i>logout</i>
 		<span>{$_('layout.logout')}</span>
 	</button>

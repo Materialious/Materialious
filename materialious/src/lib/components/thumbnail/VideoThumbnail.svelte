@@ -406,7 +406,7 @@
 			data-sveltekit-preload-data="false"
 			onclick={onVideoSelected}
 		>
-			<div class="thumbnail-image">
+			<div class="thumbnail-image" class:cover-thumbnail={!useYtCrop}>
 				<div class:crop={thumbnailHeight > thumbnailWidth || useYtCrop} class:yt-crop={useYtCrop}>
 					<img
 						class="responsive"
@@ -687,6 +687,10 @@
 		width: 100%;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
+	}
+
+	.cover-thumbnail img {
+		object-fit: cover;
 	}
 
 	.thumbnail-image > div:not(.tv-play):not(.chip) {

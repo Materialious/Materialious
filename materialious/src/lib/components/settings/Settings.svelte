@@ -156,12 +156,6 @@
 							<tab.component />
 						</div>
 					{/each}
-					{#if !isMobile()}
-						<div class="s">
-							<div class="space"></div>
-							<LogoutButton />
-						</div>
-					{/if}
 				</div>
 			</div>
 		</div>

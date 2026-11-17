@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import ui from 'beercss';
 	import { bookmarkletSaveToUrl } from '#lib/externalSettings/index';
 	import { letterCase, titleCases, type TitleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
@@ -45,6 +46,12 @@
 	let invidiousInstance = $derived($invidiousInstanceStore ?? '');
 
 	let invalidInstance = $state(false);
+
+	function closeSettings() {
+		if (document.querySelector<HTMLDialogElement>('#dialog-settings')?.open) {
+			ui('#dialog-settings');
+		}
+	}
 
 	let materialiousBackend = $derived($materialiousBackendStore ?? '');
 
@@ -132,31 +139,41 @@
 				</button>
 			</nav>
 		</form>
-		{#if isMobile()}
-			<LogoutButton />
-		{/if}
-		{#if (isOwnBackend()?.internalAuth || $materialiousBackendStore) && $invidiousInstanceStore}
-			{#if !$invidiousAuthStore}
-				<a class="button surface-container-highest" href={resolve('/(app)/login/invidious')}>
-					<i>link</i>
-					<span>{$_('linkInvidious')}</span>
-				</a>
-			{:else}
-				<button class="surface-container-highest" onclick={invidiousLogout}>
-					<i>link_off</i>
-					<span>{$_('unlinkInvidious')}</span>
-				</button>
+		<nav class="wrap">
+			<LogoutButton class={isMobile() ? '' : 's'} />
+			{#if (isOwnBackend()?.internalAuth || $materialiousBackendStore) && $invidiousInstanceStore}
+				{#if !$invidiousAuthStore}
+					<a
+						class="button surface-container-highest"
+						href={resolve('/(app)/login/invidious')}
+						onclick={closeSettings}
+					>
+						<i>link</i>
+						<span>{$_('linkInvidious')}</span>
+					</a>
+				{:else}
+					<button
+						class="surface-container-highest"
+						onclick={async () => {
+							closeSettings();
+							await invidiousLogout();
+						}}
+					>
+						<i>link_off</i>
+						<span>{$_('unlinkInvidious')}</span>
+					</button>
+				{/if}
 			{/if}
-			<div class="space"></div>
-		{/if}
+		</nav>
+		<div class="space"></div>
 	{:else}
-		{#if isMobile()}
-			<LogoutButton />
-		{/if}
+		<LogoutButton class={isMobile() ? '' : 's'} />
 		<div class="space"></div>
 	{/if}
 
 	<AllowInsecureRequests show={invalidInstance || invalidMaterialiousBackend} />
+{:else}
+	<LogoutButton class={isMobile() ? '' : 's'} />
 {/if}
 
 {#if remoteMaterialiousSupported()}

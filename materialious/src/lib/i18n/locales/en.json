@@ -500,5 +500,17 @@
 		"fedoraOpenSuse": "Fedora/OpenSuse",
 		"appImage": "AppImage",
 		"tarball": "Tarball"
+	},
+	"invidiousAuth": {
+		"tokenTab": "Login with token",
+		"tokenDescription": "Recommended. Sign in on your Invidious instance and authorize Materialious.",
+		"registrationWarning": "Use an existing Invidious account. If registration is enabled, Invidious may create an account when the username does not exist.",
+		"passwordUnavailable": "Password login requires the Android or desktop app, or a Materialious server with its proxy enabled.",
+		"errors": {
+			"credentials": "Login failed. Check your Invidious username and password.",
+			"challenge": "Invidious did not provide a session. Complete any required verification on your instance and try again.",
+			"network": "Unable to complete login. Check your connection and try again.",
+			"instance": "Password login is unavailable for this instance. Check its availability and the server proxy configuration."
+		}
 	}
 }

@@ -18,6 +18,10 @@
 		"./download": {
 			"types": "./dist/download/index.d.ts",
 			"default": "./dist/download/index.js"
+		},
+		"./invidious": {
+			"types": "./dist/invidious/auth.d.ts",
+			"default": "./dist/invidious/auth.js"
 		}
 	},
 	"files": [

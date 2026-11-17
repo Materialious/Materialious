@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { bookmarkletSaveToUrl } from '#lib/externalSettings/index';
 	import { letterCase, titleCases, type TitleCase } from '#lib/letterCasing';
 	import { Capacitor } from '@capacitor/core';
@@ -11,7 +12,6 @@
 	import { getPages, type Pages } from '#lib/navPages';
 	import {
 		setInvidiousInstance,
-		goToInvidiousLogin,
 		invidiousLogout,
 		setMaterialiousBackend,
 		removeMaterialiousBackend
@@ -137,10 +137,10 @@
 		{/if}
 		{#if (isOwnBackend()?.internalAuth || $materialiousBackendStore) && $invidiousInstanceStore}
 			{#if !$invidiousAuthStore}
-				<button class="surface-container-highest" onclick={goToInvidiousLogin}>
+				<a class="button surface-container-highest" href={resolve('/(app)/login/invidious')}>
 					<i>link</i>
 					<span>{$_('linkInvidious')}</span>
-				</button>
+				</a>
 			{:else}
 				<button class="surface-container-highest" onclick={invidiousLogout}>
 					<i>link_off</i>

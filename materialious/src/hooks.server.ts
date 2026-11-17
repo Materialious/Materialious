@@ -29,7 +29,11 @@ const quickConnectLimiter = new RateLimiter({
 	IP: [120, 'm']
 });
 
-const sensitivePaths = [/^\/api\/user\/create$/, /^\/api\/user\/login$/];
+const sensitivePaths = [
+	/^\/api\/user\/create$/,
+	/^\/api\/user\/login$/,
+	/^\/api\/invidious\/login$/
+];
 
 export async function handle({ event, resolve }) {
 	if (!isOwnBackend()?.internalAuth) {

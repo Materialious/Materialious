@@ -313,6 +313,20 @@ export function setupContentSecurityPolicy(customScheme: string): void {
 	session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
 		const uri = new URL(details.url);
 
+		const sidHeader = Object.keys(details.requestHeaders).find(
+			(key) => key.toLowerCase() === 'x-invidious-sid'
+		);
+		if (sidHeader) {
+			const sid = details.requestHeaders[sidHeader];
+			delete details.requestHeaders[sidHeader];
+			if (/^SID=[^\s;,]+$/.test(sid) && uri.pathname.includes('/api/v1/auth/')) {
+				details.requestHeaders['Cookie'] = sid;
+				for (const key of Object.keys(details.requestHeaders)) {
+					if (key.toLowerCase() === 'authorization') delete details.requestHeaders[key];
+				}
+			}
+		}
+
 		details.requestHeaders['User-Agent'] = USER_AGENT;
 		details.requestHeaders['origin'] = uri.origin;
 		details.requestHeaders['host'] = uri.host;

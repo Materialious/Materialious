@@ -71,6 +71,7 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 
 	const redirectAllowed = clientReq.headers.__redirect !== 'manual';
 	const returnHeadersAsJson = clientReq.headers.__custom_return === 'json-headers';
+	const returnResponseAsJson = clientReq.headers.__custom_return === 'json-response';
 
 	const isHttps = parsedUrl.protocol === 'https:';
 	const httpClient = isHttps ? https : http;
@@ -88,9 +89,12 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 		agent: isHttps ? httpsAgent : undefined
 	};
 
+	if (returnResponseAsJson) proxyOptions.headers['accept-encoding'] = 'identity';
+
 	if (clientReq.headers.__sid_auth) {
 		proxyOptions.headers.cookie = clientReq.headers.__sid_auth;
 		delete proxyOptions.headers.__sid_auth;
+		delete proxyOptions.headers.authorization;
 	}
 	delete proxyOptions.headers['x-materialious-session'];
 	delete proxyOptions.headers.__redirect;
@@ -122,7 +126,12 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 			const rewriteToGet =
 				(status === 303 && clientReq.method !== 'HEAD') ||
 				((status === 301 || status === 302) && clientReq.method === 'POST');
-			if (body === null && clientReq.method !== 'GET' && clientReq.method !== 'HEAD' && !rewriteToGet) {
+			if (
+				body === null &&
+				clientReq.method !== 'GET' &&
+				clientReq.method !== 'HEAD' &&
+				!rewriteToGet
+			) {
 				clientRes.writeHead(502, { 'Content-Type': 'text/plain' });
 				return clientRes.end('Cannot replay streamed request body across redirect');
 			}
@@ -142,6 +151,34 @@ function proxyRequest(clientReq, clientRes, parsedUrl, body = null, redirectCoun
 				delete clientReq.headers['transfer-encoding'];
 			}
 			return proxyRequest(clientReq, clientRes, newUrl, body, redirectCount + 1);
+		}
+
+		if (returnResponseAsJson) {
+			const chunks = [];
+			let size = 0;
+			proxyRes.on('data', (chunk) => {
+				size += chunk.length;
+				if (size > MAX_REPLAY_BYTES) {
+					proxyReq.destroy(new Error('Login response exceeds size limit'));
+					return;
+				}
+				chunks.push(chunk);
+			});
+			proxyRes.on('error', (err) => proxyReq.destroy(err));
+			proxyRes.on('end', () => {
+				if (clientRes.destroyed || clientRes.writableEnded) return;
+				const payload = JSON.stringify({
+					status: proxyRes.statusCode,
+					cookies: proxyRes.headers['set-cookie'] || [],
+					body: Buffer.concat(chunks).toString('utf8')
+				});
+				clientRes.writeHead(200, {
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-store'
+				});
+				clientRes.end(payload);
+			});
+			return;
 		}
 
 		if (returnHeadersAsJson) {

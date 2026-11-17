@@ -118,7 +118,7 @@
 		</div>
 
 		<div class="grid">
-			<div class="s12 m4 l4 m l">
+			<div class="settings-sidebar s12 m4 l4 m l">
 				<div class="padding">
 					<div
 						class="categories"
@@ -184,11 +184,9 @@
 		min-height: 0;
 	}
 
-	.categories {
-		position: sticky;
-		top: 0;
-		height: fit-content;
-		overflow: hidden;
+	.settings-sidebar {
+		height: 100%;
+		overflow-y: auto;
 	}
 
 	.settings {

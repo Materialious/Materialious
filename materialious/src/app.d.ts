@@ -1,3 +1,5 @@
+import type { InvidiousCredentials, InvidiousLoginResult } from '@materialious/shared/invidious';
+
 declare global {
 	interface Window {
 		materialiousCompanionFetch?: typeof fetch;
@@ -19,6 +21,7 @@ declare global {
 			config_: { [key: string]: unknown };
 		};
 		electronAPI: {
+			loginInvidious: (credentials: InvidiousCredentials) => Promise<InvidiousLoginResult>;
 			generatePoToken: (requestKey: string, visitorData: string) => Promise<string>;
 			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promise<boolean>;
 			doUpdateCheck: (disableAutoUpdate: boolean) => Promise<void>;

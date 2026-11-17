@@ -86,7 +86,8 @@ export const zChapterMode = z.enum(['automatic', 'manual', 'timeline']);
 export const zChapterModeRecord = z.record(z.string(), zChapterMode.optional());
 export const zAuth = z.object({
 	username: z.string(),
-	token: z.string()
+	token: z.string(),
+	instance: z.string().optional()
 });
 export const zThemeColors = z.record(
 	z.string().refine((val) => SUPPORTED_THEME_KEYS.includes(val), {

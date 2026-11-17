@@ -38,7 +38,7 @@ export function authProtected() {
 }
 
 async function removeAuthFromBackend() {
-	if (!get(rawMasterKeyStore)) return;
+	if (!isMaterialiousAccountActive()) return;
 
 	await deleteKeyValue('authToken');
 }
@@ -121,18 +121,22 @@ export async function goToInvidiousLogin() {
 		path.search = searchParams.toString();
 		await Browser.open({ url: path.toString() });
 	} else {
-		searchParams.set('callback_url', `${location.origin}${resolve('/invidious/auth')}`);
+		searchParams.set(
+			'callback_url',
+			`${location.origin}${resolve('/(app)/login/invidious/callback')}`
+		);
 		path.search = searchParams.toString();
 		document.location.href = path.toString();
 	}
 }
 
 export async function logout() {
-	await (get(rawMasterKeyStore) ? materialiousLogout : invidiousLogout)();
+	await (isMaterialiousAccountActive() ? materialiousLogout : invidiousLogout)();
 }
 
 export async function invidiousLogout() {
 	invidiousAuthStore.set(null);
+	clearCaches();
 	await removeAuthFromBackend();
 
 	goto(resolve('/(app)'));

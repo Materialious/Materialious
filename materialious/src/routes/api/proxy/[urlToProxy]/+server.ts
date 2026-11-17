@@ -26,6 +26,7 @@ const ALLOWED_HEADERS = [
 	'Content-Type',
 	'Accept',
 	'Authorization',
+	'X-Invidious-SID',
 	'x-goog-visitor-id',
 	'x-goog-api-key',
 	'x-origin',
@@ -152,14 +153,22 @@ async function proxyRequest(
 		'sec-ch-ua',
 		'sec-ch-ua-platform',
 		'cookie', // Ensure auth cookies don't become included.
-		'content-type',
 		'content-length'
 	]) {
 		requestHeaders.delete(key);
 	}
 
+	const sid = requestHeaders.get('x-invidious-sid');
+	requestHeaders.delete('x-invidious-sid');
+	if (sid) {
+		if (!/^SID=[^\s;,]+$/.test(sid)) throw error(400, 'Invalid SID');
+		requestHeaders.set('cookie', sid);
+		requestHeaders.delete('authorization');
+	}
+
 	const requestOptions: RequestInit = {
 		method: request.method,
+		redirect: sid ? 'manual' : 'follow',
 		headers: requestHeaders,
 		credentials: 'same-origin',
 		...(request.body ? { duplex: 'half' } : {})
@@ -208,9 +217,15 @@ async function proxyRequest(
 		throw error(500, errorMsg);
 	}
 
+	if (sid && response.status >= 300 && response.status < 400) {
+		await response.body?.cancel();
+		throw error(502, 'Unexpected authenticated redirect');
+	}
+
 	const responseHeaders = new Headers(response.headers);
 	responseHeaders.delete('content-encoding');
 	responseHeaders.delete('content-length');
+	responseHeaders.delete('set-cookie');
 
 	return new Response(response.body, {
 		status: response.status,

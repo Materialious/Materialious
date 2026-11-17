@@ -1,3 +1,4 @@
+import { loginInvidious, type InvidiousCredentials } from '@materialious/shared/invidious';
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import { getCapacitorElectronConfig } from '@capacitor-community/electron';
 import { mintPoTokenInJSDOM } from '@materialious/shared/jsdom';
@@ -73,6 +74,21 @@ app.on('activate', async function () {
 });
 
 // Place all ipc or other electron api calls and custom functionality under this line
+ipcMain.handle('loginInvidious', async (event, credentials: InvidiousCredentials) => {
+	if (event.sender !== myCapacitorApp.getMainWindow().webContents) {
+		throw new Error('Unknown login caller');
+	}
+	if (
+		!credentials ||
+		typeof credentials.instance !== 'string' ||
+		typeof credentials.username !== 'string' ||
+		typeof credentials.password !== 'string'
+	) {
+		throw new Error('Invalid login request');
+	}
+	return loginInvidious(credentials);
+});
+
 ipcMain.handle('generatePoToken', async (_, requestKey: string, visitorData: string) => {
 	return await mintPoTokenInJSDOM(requestKey, visitorData);
 });

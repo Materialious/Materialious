@@ -25,27 +25,6 @@ export async function runSequelizeMigrations() {
 
 	const queryInterface = sequelizeInstance.getQueryInterface();
 
-	// Early development versions stored playlist JSON in valueCipher. sync()
-	// creates missing tables but does not update those existing columns.
-	const playlistColumns = await queryInterface.describeTable('UserPlaylists');
-	const videoColumns = await queryInterface.describeTable('UserPlaylistVideos');
-	if ('valueCipher' in playlistColumns || 'valueCipher' in videoColumns) {
-		await sequelizeInstance.transaction(async (transaction) => {
-			const playlistCount = await UserPlaylistTable.count({ transaction });
-			const videoCount = await UserPlaylistVideoTable.count({ transaction });
-			if (playlistCount || videoCount) {
-				throw new Error(
-					'Legacy encrypted playlists require client-side migration; data was preserved'
-				);
-			}
-			const options: DropOptions & SyncOptions & Transactionable = { transaction };
-			await UserPlaylistVideoTable.drop(options);
-			await UserPlaylistTable.drop(options);
-			await UserPlaylistTable.sync(options);
-			await UserPlaylistVideoTable.sync(options);
-		});
-	}
-
 	const historyColumns = await queryInterface.describeTable('UserHistories');
 
 	if (!('authorIdCipher' in historyColumns)) {

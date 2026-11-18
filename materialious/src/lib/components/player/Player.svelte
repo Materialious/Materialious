@@ -1699,6 +1699,15 @@
 						<i>{isRetryingPlayback ? 'hourglass_top' : 'refresh'}</i>
 						{isRetryingPlayback ? $_('player.retrying') : $_('player.retry')}
 					</button>
+					<a
+						class="button border"
+						href={`https://www.youtube.com/watch?v=${data.video.videoId}`}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						<i>open_in_new</i>
+						{$_('player.watchOnYouTube')}
+					</a>
 				</nav>
 				<h5>{$_('player.playbackErrorTitle')}</h5>
 				<p>{playbackErrorMessage(playbackError.source)}</p>

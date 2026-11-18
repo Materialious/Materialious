@@ -1,36 +1,17 @@
 import { Sequelize, DataTypes, Model, type ModelCtor } from 'sequelize';
 import { DATABASE_CONNECTION_URI } from '$app/env/private';
+import { twoFactorColumns } from './migrations';
 
 let UserTable: ModelCtor<Model<any, any>>;
 let ChannelSubscriptionTable: ModelCtor<Model<any, any>>;
 let CaptchaTable: ModelCtor<Model<any, any>>;
 let UserKeyValueTable: ModelCtor<Model<any, any>>;
 let UserHistoryTable: ModelCtor<Model<any, any>>;
+let UserPlaylistVideoTable: ModelCtor<Model<any, any>>;
+let UserPlaylistTable: ModelCtor<Model<any, any>>;
 let QuickConnectTable: ModelCtor<Model<any, any>>;
 
 let sequelizeInstance: Sequelize | null = null;
-
-export async function runSequelizeMigrations() {
-	if (!sequelizeInstance) throw new Error('Database not initialized');
-
-	const queryInterface = sequelizeInstance.getQueryInterface();
-
-	const historyColumns = await queryInterface.describeTable('UserHistories');
-
-	if (!('authorIdCipher' in historyColumns)) {
-		await queryInterface.addColumn('UserHistories', 'authorIdCipher', {
-			type: DataTypes.STRING,
-			allowNull: true
-		});
-	}
-
-	if (!('authorIdNonce' in historyColumns)) {
-		await queryInterface.addColumn('UserHistories', 'authorIdNonce', {
-			type: DataTypes.STRING,
-			allowNull: true
-		});
-	}
-}
 
 // Don't want to make our Sequelize instance always
 export function getSequelize(): {
@@ -40,6 +21,8 @@ export function getSequelize(): {
 	CaptchaTable: ModelCtor<Model<any, any>>;
 	UserKeyValueTable: ModelCtor<Model<any, any>>;
 	UserHistoryTable: ModelCtor<Model<any, any>>;
+	UserPlaylistVideoTable: ModelCtor<Model<any, any>>;
+	UserPlaylistTable: ModelCtor<Model<any, any>>;
 	QuickConnectTable: ModelCtor<Model<any, any>>;
 } {
 	if (sequelizeInstance) {
@@ -50,7 +33,9 @@ export function getSequelize(): {
 			CaptchaTable,
 			UserKeyValueTable,
 			UserHistoryTable,
-			QuickConnectTable
+			QuickConnectTable,
+			UserPlaylistTable,
+			UserPlaylistVideoTable
 		};
 	}
 
@@ -63,6 +48,7 @@ export function getSequelize(): {
 	UserTable = sequelizeInstance.define(
 		'User',
 		{
+			...twoFactorColumns,
 			id: {
 				type: DataTypes.UUIDV4,
 				allowNull: false,
@@ -269,6 +255,40 @@ export function getSequelize(): {
 		}
 	});
 
+	UserPlaylistTable = sequelizeInstance.define('UserPlaylist', {
+		id: { type: DataTypes.UUID, primaryKey: true, allowNull: false },
+		titleCipher: { type: DataTypes.TEXT, allowNull: false },
+		titleNonce: { type: DataTypes.STRING, allowNull: false },
+		revision: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }
+	});
+	UserPlaylistVideoTable = sequelizeInstance.define(
+		'UserPlaylistVideo',
+		{
+			id: { type: DataTypes.UUID, primaryKey: true, allowNull: false },
+			videoIdCipher: { type: DataTypes.TEXT, allowNull: false },
+			videoIdNonce: { type: DataTypes.STRING, allowNull: false },
+			titleCipher: { type: DataTypes.TEXT, allowNull: false },
+			titleNonce: { type: DataTypes.STRING, allowNull: false },
+			authorCipher: { type: DataTypes.TEXT, allowNull: false },
+			authorNonce: { type: DataTypes.STRING, allowNull: false },
+			authorIdCipher: { type: DataTypes.TEXT, allowNull: false },
+			authorIdNonce: { type: DataTypes.STRING, allowNull: false },
+			thumbnailCipher: { type: DataTypes.TEXT, allowNull: false },
+			thumbnailNonce: { type: DataTypes.STRING, allowNull: false },
+			lengthSeconds: { type: DataTypes.INTEGER, allowNull: false },
+			viewCount: { type: DataTypes.BIGINT, allowNull: false },
+			position: { type: DataTypes.INTEGER, allowNull: false }
+		},
+		{ indexes: [{ unique: true, fields: ['playlistId', 'position'] }] }
+	);
+	UserPlaylistTable.hasMany(UserPlaylistVideoTable, {
+		as: 'videos',
+		foreignKey: { name: 'playlistId', allowNull: false },
+		onDelete: 'CASCADE'
+	});
+	UserTable.hasMany(UserPlaylistTable, { onDelete: 'CASCADE' });
+	UserPlaylistTable.belongsTo(UserTable, { as: 'owner', foreignKey: 'UserId' });
+
 	UserTable.hasMany(ChannelSubscriptionTable);
 	UserTable.hasMany(UserKeyValueTable);
 	UserTable.hasMany(UserHistoryTable);
@@ -280,7 +300,9 @@ export function getSequelize(): {
 		CaptchaTable,
 		UserKeyValueTable,
 		UserHistoryTable,
-		QuickConnectTable
+		QuickConnectTable,
+		UserPlaylistTable,
+		UserPlaylistVideoTable
 	};
 }
 
@@ -295,6 +317,9 @@ export interface ChannelSubscriptionModel {
 }
 
 export interface UserTableModel extends Model {
+	twoFactorSecret: string | null;
+	twoFactorVerified: boolean;
+	twoFactorLastTimeStep: number | string | null;
 	id: string;
 	username: string;
 	passwordHash: string;

@@ -150,7 +150,9 @@
 		"previous": "Previous",
 		"cloneToPlaylist": "Clone to playlist",
 		"cloning": "Cloning...",
-		"clonedSuccess": "Playlist cloned successfully"
+		"clonedSuccess": "Playlist cloned successfully",
+		"storage": "Playlist storage",
+		"encryptedPrivate": "Private and encrypted with your Materialious account."
 	},
 	"thumbnail": {
 		"live": "LIVE",
@@ -239,12 +241,11 @@
 			"language": "Language",
 			"subtitles": "Subtitles",
 			"fontSize": "Font size",
-			"fontFamily": "Font",
+			"fontFamily": "Font family",
 			"loadingCaptions": "Loading captions",
 			"textColor": "Text color",
 			"bgColor": "Background color",
 			"alignment": "Alignment",
-			"fontFamily": "Font family",
 			"opacity": "Opacity",
 			"subtitleOffset": "Subtitle timing",
 			"textShadow": "Text shadow",
@@ -330,6 +331,8 @@
 		"searchHistory": "Search history",
 		"companionUrl": "Companion URL",
 		"deleteAccount": "Delete account",
+		"deleteAccountConfirm": "Enter your current password to permanently delete your account. This action cannot be undone.",
+		"deleteAccountFailed": "Could not delete your account. Check your current password and connection, then try again.",
 		"clickXmoreTimesToDelete": "Click {{clicksTillDelete}} more time(s) to delete",
 		"resetPassword": "Reset password",
 		"currentPassword": "Current password",
@@ -513,5 +516,31 @@
 			"network": "Unable to complete login. Check your connection and try again.",
 			"instance": "Password login is unavailable for this instance. Check its availability and the server proxy configuration."
 		}
+	},
+	"twoFactor": {
+		"title": "Two-factor authentication",
+		"description": "Protect your Materialious account with codes from an authenticator app.",
+		"enable": "Enable 2FA",
+		"disable": "Disable 2FA",
+		"remove": "Remove 2FA setup",
+		"enabled": "Two-factor authentication is enabled.",
+		"scan": "Scan this QR code with your authenticator app, or enter the secret manually. Confirm a code to finish setup.",
+		"qrLabel": "Scan this QR code with your authenticator app",
+		"secret": "Setup secret",
+		"copy": "Copy secret",
+		"confirmPassword": "Enter your current password to change two-factor authentication.",
+		"confirmDisable": "Enter a fresh code from your authenticator app to disable two-factor authentication.",
+		"code": "Authentication code",
+		"enterCode": "Enter the six-digit code from your authenticator app.",
+		"verify": "Verify and enable",
+		"cancelSetup": "Cancel setup",
+		"cancelFailed": "Could not cancel setup. Please retry or refresh your two-factor settings.",
+		"retry": "Retry",
+		"failed": "Could not load two-factor settings. Please retry.",
+		"changeFailed": "Could not change two-factor settings. Check your password, use a fresh authentication code if required, and check your connection, or refresh settings.",
+		"invalidCode": "Invalid, expired or already used code. Wait for a new code and try again.",
+		"loginFailed": "Login failed. Check your credentials and use a fresh authentication code.",
+		"copyFailed": "Could not copy the secret. You can select and copy it manually.",
+		"recoveryNotice": "Keep a backup of your authenticator. There are no recovery codes. Disabling 2FA requires your password and a fresh authentication code. If you lose access to your authenticator and its backup, you cannot disable 2FA. Existing sessions and Quick Connect remain usable."
 	}
 }

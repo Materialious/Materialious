@@ -3,17 +3,19 @@
 	import { resolve } from '$app/paths';
 	import { createUserBackend, loginUserBackend, type DerivePassword } from '#lib/api/backend/index';
 	import { backendFetch } from '#lib/api/backend/request';
+	import { materialiousBackendStore } from '#lib/store';
 	import PageLoading from '#lib/components/PageLoading.svelte';
 	import { _ } from '#lib/i18n/index';
 	import { isOwnBackend } from '#lib/shared/index';
 	import * as comlink from 'comlink';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import PasswordStrength from '#lib/components/PasswordStrength.svelte';
 	import QuickConnectReceiver from '#lib/components/QuickConnectReceiver.svelte';
 	import { solveChallenge } from 'altcha-lib';
 	import type { Solution, Challenge } from 'altcha-lib/types';
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
 	import { isAndroidTv } from '#lib/utils';
+	import { PinInput } from 'melt/builders';
 
 	const registrationAllowed = $derived(!!isOwnBackend()?.registrationAllowed);
 	const captchaDisabled = $derived(!!isOwnBackend()?.captchaDisabled);
@@ -23,6 +25,14 @@
 
 	let username = $state('');
 	let rawPassword = $state('');
+	let twoFactorRequired = $state(false);
+	let twoFactorToken = $state('');
+	const twoFactorPin = new PinInput({
+		maxLength: 6,
+		type: 'numeric',
+		value: () => twoFactorToken,
+		onValueChange: (value) => (twoFactorToken = value)
+	});
 
 	type CaptchaPayload = { solution: Solution; challenge: Challenge };
 	let captchaPayload = $state<CaptchaPayload | null>(null);
@@ -43,7 +53,17 @@
 		derivePassword = (workerApi as any).derivePassword as DerivePassword;
 
 		void solveCaptchaChallenge();
+		return materialiousBackendStore.subscribe(cancelTwoFactor);
 	});
+
+	onDestroy(() => worker?.terminate());
+
+	function cancelTwoFactor() {
+		twoFactorRequired = false;
+		twoFactorToken = '';
+		rawPassword = '';
+		failed = false;
+	}
 
 	function solveCaptchaChallenge(): Promise<boolean> {
 		if (captchaDisabled) {
@@ -103,21 +123,35 @@
 			return;
 		}
 
+		if (isLoading || !derivePassword) return;
 		isLoading = true;
-
-		if (needToRegister) {
-			failed = !(await createUserBackend(username, rawPassword, captchaPayload!, derivePassword));
-		} else {
-			failed = !(await loginUserBackend(username, rawPassword, captchaPayload!, derivePassword));
+		failed = false;
+		try {
+			const result = needToRegister
+				? (await createUserBackend(username, rawPassword, captchaPayload, derivePassword))
+					? 'success'
+					: 'failed'
+				: await loginUserBackend(
+						username,
+						rawPassword,
+						captchaPayload,
+						derivePassword,
+						twoFactorRequired ? twoFactorToken : undefined
+					);
+			if (result === 'success') {
+				cancelTwoFactor();
+				await goto(resolve('/(app)'), { replace: true });
+				return;
+			}
+			if (result === 'two_factor_required') twoFactorRequired = true;
+			else failed = true;
+		} catch {
+			failed = true;
+		} finally {
+			isLoading = false;
+			twoFactorToken = '';
 		}
-
-		isLoading = false;
-
-		if (!failed) {
-			goto(resolve('/(app)'), { replace: true });
-		} else {
-			void solveCaptchaChallenge();
-		}
+		void solveCaptchaChallenge();
 	}
 
 	function onQuickConnected() {
@@ -153,6 +187,7 @@
 						class:active={quickConnectMode}
 						onclick={(event) => {
 							event.preventDefault();
+							cancelTwoFactor();
 							quickConnectMode = true;
 						}}>{$_('loginWithQuickConnect')}</a
 					>
@@ -174,7 +209,14 @@
 							class:invalid={failed && needToRegister}
 						>
 							<i>person</i>
-							<input bind:value={username} name="username" type="text" />
+							<input
+								bind:value={username}
+								id="username"
+								name="username"
+								type="text"
+								disabled={twoFactorRequired}
+								required
+							/>
 							<label for="username">{$_('username')}</label>
 							{#if failed && needToRegister}
 								<output class="invalid">{$_('usernameTaken')}</output>
@@ -185,12 +227,75 @@
 							class:invalid={failed && !needToRegister}
 						>
 							<i>password</i>
-							<input bind:value={rawPassword} name="password" type="password" />
+							<input
+								bind:value={rawPassword}
+								id="password"
+								name="password"
+								type="password"
+								disabled={twoFactorRequired}
+								required
+							/>
 							<label for="password">{$_('password')}</label>
 							{#if failed && !needToRegister}
-								<output class="invalid">{$_('invalidPassword')}</output>
+								<output class="invalid"
+									>{$_(twoFactorRequired ? 'twoFactor.loginFailed' : 'invalidPassword')}</output
+								>
 							{/if}
 						</div>
+
+						{#if twoFactorRequired}
+							<p role="status">{$_('twoFactor.enterCode')}</p>
+							{#if !isAndroidTv()}
+								<span id="two-factor-code-label">{$_('twoFactor.code')}</span>
+							{/if}
+							<div class="row wrap" class:no-margin={!isAndroidTv()}>
+								{#if isAndroidTv()}
+									<div class="field label prefix surface-container-highest max no-margin">
+										<i>security</i>
+										<input
+											id="login-two-factor"
+											bind:value={twoFactorToken}
+											type="text"
+											inputmode="numeric"
+											autocomplete="one-time-code"
+											pattern={'[0-9]{6}'}
+											minlength="6"
+											maxlength="6"
+											placeholder=" "
+											required
+										/>
+										<label for="login-two-factor">{$_('twoFactor.code')}</label>
+									</div>
+								{:else}
+									<div class="max two-factor-code">
+										<div
+											{...twoFactorPin.root}
+											class="two-factor-pin"
+											role="group"
+											aria-labelledby="two-factor-code-label"
+										>
+											{#each twoFactorPin.inputs as input, index (index)}
+												<div
+													class="field border surface-container-highest no-margin two-factor-digit"
+												>
+													<input
+														{...input}
+														value={twoFactorToken[index] ?? ''}
+														aria-label={`${$_('twoFactor.code')} ${index + 1}`}
+														autocomplete={index === 0 ? 'one-time-code' : 'off'}
+														pattern="[0-9]"
+														required
+													/>
+												</div>
+											{/each}
+										</div>
+									</div>
+								{/if}
+								<button type="button" class="secondary" onclick={cancelTwoFactor}
+									>{$_('cancel')}</button
+								>
+							</div>
+						{/if}
 
 						<PasswordStrength password={rawPassword} show={needToRegister} />
 
@@ -199,10 +304,10 @@
 								<button
 									type="button"
 									class="secondary"
-									disabled={!registrationAllowed}
+									disabled={!registrationAllowed || twoFactorRequired}
 									onclick={() => {
 										needToRegister = !needToRegister;
-										failed = false;
+										cancelTwoFactor();
 									}}
 								>
 									<span>{$_(!needToRegister ? 'needRegister' : 'needLogin')}</span>
@@ -265,6 +370,25 @@
 	.login-card {
 		width: 100%;
 		max-width: 440px;
+	}
+
+	.two-factor-code {
+		min-width: min(100%, 15rem);
+	}
+
+	.two-factor-pin {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.two-factor-digit {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.two-factor-digit input {
+		padding-inline: 0;
+		text-align: center;
 	}
 
 	.registration-toggle {

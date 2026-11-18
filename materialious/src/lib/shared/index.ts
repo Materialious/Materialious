@@ -18,6 +18,7 @@ import { configBackendCache } from '#lib/stores/backend';
 export type IsOwnBackend = {
 	builtWithBackend: boolean;
 	internalAuth: boolean;
+	twoFactorAuth?: boolean;
 	requireAuth: boolean;
 	registrationAllowed: boolean;
 	allowAnyProxy: boolean;
@@ -42,6 +43,7 @@ export function isOwnBackend(): IsOwnBackend | null {
 	return {
 		builtWithBackend: true,
 		internalAuth: PUBLIC_INTERNAL_AUTH !== 'false',
+		twoFactorAuth: true,
 		requireAuth: PUBLIC_REQUIRE_AUTH !== 'false',
 		registrationAllowed: PUBLIC_REGISTRATION_ALLOWED === 'true',
 		allowAnyProxy: PUBLIC_DANGEROUS_ALLOW_ANY_PROXY === 'true',

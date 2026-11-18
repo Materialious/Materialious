@@ -11,7 +11,7 @@ type captchaPayload = { solution: Solution; challenge: Challenge };
 export async function createUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: captchaPayload,
+	captchaPayload: captchaPayload | null,
 	derivePassword: DerivePassword
 ): Promise<boolean> {
 	await sodium.ready;
@@ -64,13 +64,14 @@ export async function createUserBackend(
 export async function loginUserBackend(
 	username: string,
 	rawPassword: string,
-	captchaPayload: captchaPayload,
-	derivePassword: DerivePassword
-): Promise<boolean> {
+	captchaPayload: captchaPayload | null,
+	derivePassword: DerivePassword,
+	twoFactorToken?: string
+): Promise<'success' | 'two_factor_required' | 'failed'> {
 	await sodium.ready;
 
-	const passwordSaltsResp = await backendFetch(`/api/user/${username}/public`);
-	if (!passwordSaltsResp.ok) return false;
+	const passwordSaltsResp = await backendFetch(`/api/user/${encodeURIComponent(username)}/public`);
+	if (!passwordSaltsResp.ok) return 'failed';
 
 	const passwordSalts = await passwordSaltsResp.json();
 
@@ -84,11 +85,15 @@ export async function loginUserBackend(
 		body: JSON.stringify({
 			username,
 			passwordHash: sodium.to_base64(loginHash),
-			captchaPayload
+			captchaPayload,
+			twoFactorToken
 		})
 	});
 
-	if (!loginResp.ok) return false;
+	if (!loginResp.ok) {
+		const body = await loginResp.json().catch(() => null);
+		return body?.error === 'two_factor_required' ? 'two_factor_required' : 'failed';
+	}
 
 	const loginJson = await loginResp.json();
 
@@ -109,7 +114,7 @@ export async function loginUserBackend(
 
 	rawMasterKeyStore.set(sodium.to_base64(rawDecryptionMasterKey));
 
-	return true;
+	return 'success';
 }
 
 export async function deriveDecryptionKey(
@@ -126,6 +131,23 @@ export async function deriveDecryptionKey(
 		sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
 		sodium.crypto_pwhash_ALG_DEFAULT
 	);
+}
+
+export async function deleteUserBackend(
+	currentPassword: string,
+	derivePassword: DerivePassword
+): Promise<boolean> {
+	await sodium.ready;
+	const meResp = await backendFetch('/api/user/me');
+	if (!meResp.ok) return false;
+	const me = await meResp.json();
+	const loginHash = await derivePassword(currentPassword, sodium.from_base64(me.passwordSalt));
+	const response = await backendFetch('/api/user/delete', {
+		method: 'DELETE',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ currentPasswordHash: sodium.to_base64(loginHash) })
+	});
+	return response.ok;
 }
 
 export async function resetPasswordBackend(

@@ -1,36 +1,53 @@
 <script lang="ts">
 	import { _ } from '#lib/i18n/index';
 	import { materialiousLogout } from '#lib/auth';
-	import { resetPasswordBackend, type DerivePassword } from '#lib/api/backend/index';
-	import { backendFetch } from '#lib/api/backend/request';
+	import {
+		deleteUserBackend,
+		resetPasswordBackend,
+		type DerivePassword
+	} from '#lib/api/backend/index';
 	import PasswordStrength from '#lib/components/PasswordStrength.svelte';
 	import QuickConnect from './QuickConnect.svelte';
+	import TwoFactor from './TwoFactor.svelte';
 	import { isOwnBackend } from '#lib/shared/index';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import * as comlink from 'comlink';
-	import { disableSettingsSyncStore } from '#lib/store';
+	import { disableSettingsSyncStore, materialiousBackendStore } from '#lib/store';
 	import { exportSettingsToAccount, importSettingsFromAccount } from '#lib/externalSettings/index';
 
-	let clickCount = $state(0);
-	const clicksToDelte = 3;
-	let deleteDebounce: ReturnType<typeof setTimeout> | undefined;
-	async function deleteAccount() {
-		clickCount++;
+	let showDeleteAccount = $state(false);
+	let deletePassword = $state('');
+	let isDeleting = $state(false);
+	let deleteFailed = $state(false);
 
-		if (deleteDebounce) clearTimeout(deleteDebounce);
+	function cancelDeleteAccount() {
+		showDeleteAccount = false;
+		deletePassword = '';
+		deleteFailed = false;
+	}
 
-		deleteDebounce = setTimeout(() => {
-			clickCount = 0;
-		}, 10000);
-
-		if (clicksToDelte - clickCount === 0) {
-			await backendFetch('/api/user/delete', { method: 'DELETE' });
-			materialiousLogout();
+	async function deleteAccount(event: SubmitEvent) {
+		event.preventDefault();
+		if (isDeleting || !derivePassword || !deletePassword) return;
+		isDeleting = true;
+		deleteFailed = false;
+		try {
+			if (!(await deleteUserBackend(deletePassword, derivePassword))) {
+				deleteFailed = true;
+				return;
+			}
+			cancelDeleteAccount();
+			await materialiousLogout();
+		} catch {
+			deleteFailed = true;
+		} finally {
+			deletePassword = '';
+			isDeleting = false;
 		}
 	}
 
 	let worker: Worker | undefined;
-	let derivePassword: DerivePassword;
+	let derivePassword = $state<DerivePassword>();
 
 	onMount(() => {
 		worker = new Worker(new URL('../../workers/derivePassword.ts', import.meta.url), {
@@ -38,7 +55,10 @@
 		});
 		const workerApi = comlink.wrap(worker);
 		derivePassword = (workerApi as any).derivePassword as DerivePassword;
+		return materialiousBackendStore.subscribe(cancelDeleteAccount);
 	});
+
+	onDestroy(() => worker?.terminate());
 
 	let currentPassword = $state('');
 	let newPassword = $state('');
@@ -57,7 +77,9 @@
 			if (action === 'import') await importSettingsFromAccount();
 			else await exportSettingsToAccount();
 			settingsTransferMessage = $_(
-				action === 'import' ? 'layout.settingsImportedFromAccount' : 'layout.settingsExportedToAccount'
+				action === 'import'
+					? 'layout.settingsImportedFromAccount'
+					: 'layout.settingsExportedToAccount'
 			);
 		} catch (error) {
 			settingsTransferError = true;
@@ -76,6 +98,7 @@
 			return;
 		}
 
+		if (!derivePassword) return;
 		isResetting = true;
 		const success = await resetPasswordBackend(currentPassword, newPassword, derivePassword);
 		isResetting = false;
@@ -97,6 +120,15 @@
 	<h5 class="no-margin">{$_('quickConnect.senderTitle')}</h5>
 	<p class="small-text no-margin">{$_('quickConnect.senderDescription')}</p>
 	<QuickConnect />
+	<div class="space"></div>
+	<div class="divider"></div>
+	<div class="space"></div>
+{/if}
+
+{#if isOwnBackend()?.twoFactorAuth && derivePassword}
+	{#key $materialiousBackendStore}
+		<TwoFactor {derivePassword} />
+	{/key}
 	<div class="space"></div>
 	<div class="divider"></div>
 	<div class="space"></div>
@@ -180,17 +212,51 @@
 <div class="divider"></div>
 <div class="space"></div>
 
-<button class="tertiary" onclick={deleteAccount}>
-	<i>warning</i>
-	<span>{$_('layout.deleteAccount')}</span>
-	{#if clicksToDelte - clickCount > 0}
-		<div class="tooltip bottom">
-			{$_('layout.clickXmoreTimesToDelete', {
-				clicksTillDelete: clicksToDelte - clickCount
-			})}
+{#if showDeleteAccount}
+	<form onsubmit={deleteAccount}>
+		<p>{$_('layout.deleteAccountConfirm')}</p>
+		<div class="field label prefix surface-container-highest">
+			<i>password</i>
+			<input
+				id="delete-account-password"
+				type="password"
+				autocomplete="current-password"
+				bind:value={deletePassword}
+				placeholder=" "
+				required
+				disabled={isDeleting}
+			/>
+			<label for="delete-account-password">{$_('layout.currentPassword')}</label>
 		</div>
-	{/if}
-</button>
+		{#if deleteFailed}
+			<p class="error-text" role="alert">{$_('layout.deleteAccountFailed')}</p>
+		{/if}
+		<nav>
+			<button
+				type="submit"
+				class="tertiary"
+				disabled={isDeleting || !deletePassword || !derivePassword}
+			>
+				{#if isDeleting}<progress class="circle indeterminate small"></progress>{/if}
+				<i>warning</i>
+				<span>{$_('layout.deleteAccount')}</span>
+			</button>
+			<button type="button" class="secondary" disabled={isDeleting} onclick={cancelDeleteAccount}>
+				{$_('cancel')}
+			</button>
+		</nav>
+	</form>
+{:else}
+	<button
+		class="tertiary"
+		onclick={() => {
+			showDeleteAccount = true;
+		}}
+	>
+		<i>warning</i>
+		<span>{$_('layout.deleteAccount')}</span>
+	</button>
+{/if}
 
 <style>
 	.status-message {

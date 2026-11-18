@@ -240,6 +240,7 @@ export async function authenticateUser(username: string, passwordHash: string): 
 	// Password is hashed in the browser, so if db is leaked it doesn't matter.
 	// Timing safe equal used to stop timing attacks when comparing strings.
 	if (
+		textEncoder.encode(passwordHash).length === textEncoder.encode(userModel.passwordHash).length &&
 		crypto.timingSafeEqual(
 			textEncoder.encode(passwordHash),
 			textEncoder.encode(userModel.passwordHash)

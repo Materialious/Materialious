@@ -145,7 +145,7 @@
 						{/each}
 					</div>
 					{#if !isMobile()}
-						<LogoutButton fullWidth />
+						<LogoutButton fullWidth closeSettings />
 					{/if}
 				</div>
 			</div>

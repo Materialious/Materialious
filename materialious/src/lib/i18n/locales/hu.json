@@ -515,5 +515,7 @@
         "remove": "Eltávolítás a lejátszási sorból",
         "moveUp": "Előrébb helyezés a lejátszási sorban",
         "moveDown": "Hátrébb helyezés a lejátszási sorban"
-    }
+    },
+    "invidiousSessionExpired": "Az Invidious-munkamenete már nem érvényes. Jelentkezzen be újra.",
+    "invidiousCheckFailed": "Nem sikerült ellenőrizni az Invidious-munkamenetet, illetve betölteni az értesítéseket. Próbálja meg újra."
 }

@@ -5,7 +5,7 @@ from datetime import datetime
 
 import requests
 
-LATEST_VERSION = "1.18.29"
+LATEST_VERSION = "1.18.31"
 RELEASE_DATE = datetime.now().strftime("%Y-%-m-%d")  # Format: YYYY-M-D
 
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "materialious")
@@ -32,7 +32,6 @@ def update_contributors() -> None:
     os.makedirs(os.path.dirname(CONTRIBUTORS_FILE), exist_ok=True)
     with open(CONTRIBUTORS_FILE, "w", encoding="utf-8") as f_:
         json.dump(contributors, f_, ensure_ascii=False, separators=(",", ":"))
-    print(f"GitHub contributors written to {CONTRIBUTORS_FILE}")
 
 
 def package_json_update_ver(location: str) -> None:

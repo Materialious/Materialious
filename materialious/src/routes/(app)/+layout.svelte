@@ -420,6 +420,20 @@
 				{/if}
 			{/if}
 		{/if}
+		{#if Capacitor.getPlatform() === 'android' && !isAndroidTv() && showLogin && !accountLoggedIn}
+			<a
+				href={$ownBackendStore?.internalAuth ? resolve('/(app)/login/internal') : '#login'}
+				class:active={page.url.pathname === resolve('/(app)/login/internal') ||
+					page.url.pathname === resolve('/(app)/login/invidious')}
+				onclick={(event) => {
+					event.preventDefault();
+					void login();
+				}}
+			>
+				<i>login</i>
+				<div>{$_('layout.login')}</div>
+			</a>
+		{/if}
 	</nav>
 	{#if !isAndroidTv()}
 		<nav
@@ -571,26 +585,6 @@
 			</a>
 		{/if}
 	</nav>
-
-	{#if Capacitor.getPlatform() === 'android' && !isAndroidTv() && showLogin && !accountLoggedIn}
-		<nav
-			class="bottom m l"
-			class:hide-element={$playerIsInWindowFullscreen || isAndroidPictureInPicture}
-		>
-			<a
-				class="round"
-				href={$ownBackendStore?.internalAuth ? resolve('/(app)/login/internal') : '#login'}
-				class:active={page.url.pathname === resolve('/(app)/login/internal')}
-				onclick={(event) => {
-					event.preventDefault();
-					void login();
-				}}
-			>
-				<i>login</i>
-				<span>{$_('layout.login')}</span>
-			</a>
-		</nav>
-	{/if}
 
 	{#if !isAndroidTv()}
 		<Settings />

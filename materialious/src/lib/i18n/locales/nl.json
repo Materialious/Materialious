@@ -52,7 +52,9 @@
         "previous": "Vorige",
         "cloneToPlaylist": "Naar afspeellijst kopiëren",
         "cloning": "Klonen...",
-        "clonedSuccess": "Afspeellijst succesvol gekloond"
+        "clonedSuccess": "Afspeellijst succesvol gekloond",
+        "storage": "Opslag van afspeellijsten",
+        "encryptedPrivate": "Privé en versleuteld via je Materialious-account."
     },
     "thumbnail": {
         "live": "LIVE",
@@ -354,7 +356,9 @@
         "importSettingsFromAccount": "Instellingen uit account importeren",
         "settingsExportedToAccount": "Instellingen geëxporteerd naar account",
         "settingsImportedFromAccount": "Instellingen geïmporteerd vanuit het account",
-        "hideShorts": "Shorts verbergen"
+        "hideShorts": "Shorts verbergen",
+        "deleteAccountConfirm": "Voer je huidige wachtwoord in om je account definitief te verwijderen. Deze handeling kan niet ongedaan worden gemaakt.",
+        "deleteAccountFailed": "Je account kon niet worden verwijderd. Controleer je huidige wachtwoord en je internetverbinding, en probeer het daarna opnieuw."
     },
     "subscribe": "Abonneren",
     "disabled": "Uitgeschakeld",
@@ -528,5 +532,31 @@
             "network": "Het inloggen is mislukt. Controleer je internetverbinding en probeer het opnieuw.",
             "instance": "Inloggen met een wachtwoord is voor deze instantie niet mogelijk. Controleer of dit wel mogelijk is en kijk naar de configuratie van de serverproxy."
         }
+    },
+    "twoFactor": {
+        "title": "Twee-factor authenticatie",
+        "description": "Beveilig je Materialious-account met codes uit een authenticator-app.",
+        "enable": "Authenticatie in twee stappen inschakelen",
+        "disable": "2FA uitschakelen",
+        "remove": "De 2FA-configuratie verwijderen",
+        "enabled": "Tweefactorauthenticatie is ingeschakeld.",
+        "scan": "Scan deze QR-code met je authenticator-app of voer de code handmatig in. Bevestig de code om de installatie te voltooien.",
+        "qrLabel": "Scan deze QR-code met je authenticator-app",
+        "secret": "Configuratiegeheim",
+        "copy": "Geheim kopiëren",
+        "confirmPassword": "Voer je huidige wachtwoord in om de tweefactorauthenticatie aan te passen.",
+        "confirmDisable": "Voer een nieuwe code in vanuit je authenticator-app om de tweefactorauthenticatie uit te schakelen.",
+        "code": "Authenticatie code",
+        "enterCode": "Voer de zescijferige code uit je authenticator-app in.",
+        "verify": "Controleren en inschakelen",
+        "cancelSetup": "Installatie annuleren",
+        "cancelFailed": "De installatie kon niet worden geannuleerd. Probeer het opnieuw of werk je instellingen voor tweefactorauthenticatie bij.",
+        "retry": "Opnieuw",
+        "failed": "De instellingen voor tweefactorauthenticatie konden niet worden geladen. Probeer het nog eens.",
+        "changeFailed": "De instellingen voor tweefactorauthenticatie konden niet worden gewijzigd. Controleer je wachtwoord, gebruik indien nodig een nieuwe authenticatiecode, controleer je verbinding of vernieuw de instellingen.",
+        "invalidCode": "Ongeldige, verlopen of reeds gebruikte code. Wacht op een nieuwe code en probeer het opnieuw.",
+        "loginFailed": "Inloggen is mislukt. Controleer je inloggegevens en gebruik een nieuwe authenticatiecode.",
+        "copyFailed": "Het geheim kon niet worden gekopieerd. Je kunt het handmatig selecteren en kopiëren.",
+        "recoveryNotice": "Maak een back-up van je authenticator. Er zijn geen herstelcodes. Om 2FA uit te schakelen, heb u uw wachtwoord en een nieuwe authenticatiecode nodig. Als je geen toegang meer hebt tot je authenticator en de back-up daarvan, kun je 2FA niet uitschakelen. Bestaande sessies en Quick Connect blijven wel bruikbaar."
     }
 }

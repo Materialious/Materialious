@@ -1,5 +1,6 @@
 import { isOwnBackend } from '#lib/shared/index';
-import { getSequelize, runSequelizeMigrations } from '#lib/server/database';
+import { getSequelize } from '#lib/server/database';
+import { runSequelizeMigrations } from '#lib/server/migrations';
 import { unsign } from 'cookie-signature';
 
 import {
@@ -29,11 +30,14 @@ const quickConnectLimiter = new RateLimiter({
 	IP: [120, 'm']
 });
 
-const sensitivePaths = [
-	/^\/api\/user\/create$/,
-	/^\/api\/user\/login$/,
-	/^\/api\/invidious\/login$/
-];
+const sensitiveRoutes = new Set([
+	'/api/user/delete',
+	'/api/user/2fa',
+	'/api/user/2fa/verify',
+	'/api/user/create',
+	'/api/user/login',
+	'/api/invidious/login'
+]);
 
 export async function handle({ event, resolve }) {
 	if (!isOwnBackend()?.internalAuth) {
@@ -48,7 +52,7 @@ export async function handle({ event, resolve }) {
 		if (!sequelizeAuthenticated) {
 			await sequelize.sequelize.sync();
 			await sequelize.sequelize.authenticate();
-			await runSequelizeMigrations();
+			await runSequelizeMigrations(sequelize.sequelize);
 			sequelizeAuthenticated = true;
 		}
 
@@ -85,13 +89,15 @@ export async function handle({ event, resolve }) {
 				headers: { 'Content-Type': 'application/json' }
 			});
 
-		if (sensitivePaths.some((p) => p.test(event.url.pathname))) {
+		// Match the resolved route so percent-encoded URLs cannot bypass limits.
+		const routeId = event.route.id ?? '';
+		if (sensitiveRoutes.has(routeId)) {
 			if (await strictLimiter.isLimited(event)) {
 				return tooManyRequests();
 			}
 		}
 
-		if (event.url.pathname.startsWith('/api/user/quickConnect')) {
+		if (routeId === '/api/user/quickConnect' || routeId.startsWith('/api/user/quickConnect/')) {
 			if (await quickConnectLimiter.isLimited(event)) {
 				return tooManyRequests();
 			}

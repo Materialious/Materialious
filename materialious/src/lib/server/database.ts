@@ -1,13 +1,6 @@
-import {
-	Sequelize,
-	DataTypes,
-	Model,
-	type ModelCtor,
-	type DropOptions,
-	type SyncOptions,
-	type Transactionable
-} from 'sequelize';
+import { Sequelize, DataTypes, Model, type ModelCtor } from 'sequelize';
 import { DATABASE_CONNECTION_URI } from '$app/env/private';
+import { twoFactorColumns } from './migrations';
 
 let UserTable: ModelCtor<Model<any, any>>;
 let ChannelSubscriptionTable: ModelCtor<Model<any, any>>;
@@ -19,28 +12,6 @@ let UserPlaylistTable: ModelCtor<Model<any, any>>;
 let QuickConnectTable: ModelCtor<Model<any, any>>;
 
 let sequelizeInstance: Sequelize | null = null;
-
-export async function runSequelizeMigrations() {
-	if (!sequelizeInstance) throw new Error('Database not initialized');
-
-	const queryInterface = sequelizeInstance.getQueryInterface();
-
-	const historyColumns = await queryInterface.describeTable('UserHistories');
-
-	if (!('authorIdCipher' in historyColumns)) {
-		await queryInterface.addColumn('UserHistories', 'authorIdCipher', {
-			type: DataTypes.STRING,
-			allowNull: true
-		});
-	}
-
-	if (!('authorIdNonce' in historyColumns)) {
-		await queryInterface.addColumn('UserHistories', 'authorIdNonce', {
-			type: DataTypes.STRING,
-			allowNull: true
-		});
-	}
-}
 
 // Don't want to make our Sequelize instance always
 export function getSequelize(): {
@@ -77,6 +48,7 @@ export function getSequelize(): {
 	UserTable = sequelizeInstance.define(
 		'User',
 		{
+			...twoFactorColumns,
 			id: {
 				type: DataTypes.UUIDV4,
 				allowNull: false,
@@ -345,6 +317,9 @@ export interface ChannelSubscriptionModel {
 }
 
 export interface UserTableModel extends Model {
+	twoFactorSecret: string | null;
+	twoFactorVerified: boolean;
+	twoFactorLastTimeStep: number | string | null;
 	id: string;
 	username: string;
 	passwordHash: string;

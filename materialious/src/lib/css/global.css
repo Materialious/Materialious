@@ -71,15 +71,6 @@ article {
 	border-radius: var(--border-radius) !important;
 }
 
-nav.top {
-	padding-bottom: 1em;
-	padding-top: calc(var(--safe-area-inset-top) + 1rem) !important;
-}
-
-nav.bottom {
-	padding-bottom: var(--safe-area-inset-bottom) !important;
-}
-
 dialog {
 	border-radius: var(--border-radius) !important;
 }

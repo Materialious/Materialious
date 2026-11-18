@@ -22,7 +22,11 @@ declare global {
 		};
 		electronAPI: {
 			loginInvidious: (credentials: InvidiousCredentials) => Promise<InvidiousLoginResult>;
-			generatePoToken: (requestKey: string, visitorData: string) => Promise<string>;
+			generatePoToken: (
+				requestKey: string,
+				visitorData: string,
+				forceRefresh?: boolean
+			) => Promise<string>;
 			setAllowInsecureSSL: (allowInsecureSSL: boolean) => Promise<boolean>;
 			doUpdateCheck: (disableAutoUpdate: boolean) => Promise<void>;
 			getDownloadFormats: (videoId: string) => Promise<{

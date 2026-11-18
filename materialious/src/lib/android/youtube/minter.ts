@@ -1,7 +1,12 @@
 import { fetchInnerTubeChallenge, mintPoToken } from '@materialious/shared';
 
-export async function androidPoTokenMinter(requestKey: string, visitorData: string): Promise<string> {
-	const { ytConfig, challengeResponse, interpreterJavascript } = await fetchInnerTubeChallenge();
+export async function androidPoTokenMinter(
+	requestKey: string,
+	visitorData: string,
+	forceRefresh = false
+): Promise<string> {
+	const { ytConfig, challengeResponse, interpreterJavascript } =
+		await fetchInnerTubeChallenge(forceRefresh);
 
 	window.yt = { config_: JSON.parse(ytConfig) };
 

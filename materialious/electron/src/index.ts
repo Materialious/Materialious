@@ -89,9 +89,12 @@ ipcMain.handle('loginInvidious', async (event, credentials: InvidiousCredentials
 	return loginInvidious(credentials);
 });
 
-ipcMain.handle('generatePoToken', async (_, requestKey: string, visitorData: string) => {
-	return await mintPoTokenInJSDOM(requestKey, visitorData);
-});
+ipcMain.handle(
+	'generatePoToken',
+	async (_, requestKey: string, visitorData: string, forceRefresh = false) => {
+		return await mintPoTokenInJSDOM(requestKey, visitorData, forceRefresh);
+	}
+);
 
 ipcMain.handle('setAllowInsecureSSL', async (_, allow) => {
 	allowInsecureSSL = allow;

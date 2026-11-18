@@ -6,8 +6,12 @@ import { fetchInnerTubeChallenge, mintPoToken } from './poToken.js';
 // environment stable until the entire asynchronous mint has finished.
 let mintQueue: Promise<void> = Promise.resolve();
 
-export function mintPoTokenInJSDOM(requestKey: string, visitorData: string): Promise<string> {
-	const result = mintQueue.then(() => runMintPoTokenInJSDOM(requestKey, visitorData));
+export function mintPoTokenInJSDOM(
+	requestKey: string,
+	visitorData: string,
+	forceRefresh = false
+): Promise<string> {
+	const result = mintQueue.then(() => runMintPoTokenInJSDOM(requestKey, visitorData, forceRefresh));
 	// A rejected mint must not prevent subsequent requests from running.
 	mintQueue = result.then(
 		() => undefined,
@@ -16,7 +20,11 @@ export function mintPoTokenInJSDOM(requestKey: string, visitorData: string): Pro
 	return result;
 }
 
-async function runMintPoTokenInJSDOM(requestKey: string, visitorData: string): Promise<string> {
+async function runMintPoTokenInJSDOM(
+	requestKey: string,
+	visitorData: string,
+	forceRefresh: boolean
+): Promise<string> {
 	const youtubeUrl = 'https://www.youtube.com/';
 
 	const dom = new JSDOM(
@@ -39,7 +47,8 @@ async function runMintPoTokenInJSDOM(requestKey: string, visitorData: string): P
 			Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator });
 		}
 
-		const { ytConfig, challengeResponse, interpreterJavascript } = await fetchInnerTubeChallenge();
+		const { ytConfig, challengeResponse, interpreterJavascript } =
+			await fetchInnerTubeChallenge(forceRefresh);
 
 		dom.window.yt = { config_: JSON.parse(ytConfig) };
 		Object.assign(globalThis, { yt: dom.window.yt });

@@ -79,7 +79,7 @@ export async function refreshSabrSession(video: VideoPlay): Promise<void> {
 		// Do not leave a rejected token available if minting fails. A failed
 		// refresh must propagate and must not start the success cooldown.
 		if (get(poTokenCacheStore)?.videoId === video.videoId) poTokenCacheStore.set(undefined);
-		await mintPoTokenForVideo(video.videoId);
+		await mintPoTokenForVideo(video.videoId, true);
 
 		lastPoTokenRefresh = { videoId: video.videoId, at: Date.now() };
 	})();

@@ -16,7 +16,11 @@ const CHALLENGE_TTL_MS = 10 * 60 * 1000;
 
 let cachedChallenge: { fetchedAt: number; challenge: InnerTubeChallenge } | undefined;
 
-export async function fetchInnerTubeChallenge(): Promise<InnerTubeChallenge> {
+export async function fetchInnerTubeChallenge(forceRefresh = false): Promise<InnerTubeChallenge> {
+	// Recovery must not reuse a challenge that may have been rejected. Clear it
+	// before fetching so a failed refresh cannot make the old challenge reusable.
+	if (forceRefresh) cachedChallenge = undefined;
+
 	if (cachedChallenge && Date.now() - cachedChallenge.fetchedAt < CHALLENGE_TTL_MS) {
 		return cachedChallenge.challenge;
 	}

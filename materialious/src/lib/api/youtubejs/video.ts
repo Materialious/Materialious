@@ -205,8 +205,12 @@ const PO_TOKEN_REQUEST_KEY = 'O43z0dpjhgX20SCx4KAo';
  * Also used by the SABR player to refresh tokens when YouTube asks for
  * attestation mid-playback.
  */
-export async function mintPoTokenForVideo(videoId: string): Promise<string> {
-	let platformMinter: (requestKey: string, visitorData: string) => Promise<string>;
+export async function mintPoTokenForVideo(videoId: string, forceRefresh = false): Promise<string> {
+	let platformMinter: (
+		requestKey: string,
+		visitorData: string,
+		forceRefresh: boolean
+	) => Promise<string>;
 
 	switch (Capacitor.getPlatform()) {
 		case 'electron':
@@ -220,7 +224,7 @@ export async function mintPoTokenForVideo(videoId: string): Promise<string> {
 			break;
 	}
 
-	const poToken = await platformMinter(PO_TOKEN_REQUEST_KEY, videoId);
+	const poToken = await platformMinter(PO_TOKEN_REQUEST_KEY, videoId, forceRefresh);
 	poTokenCacheStore.set({ videoId, poToken });
 	return poToken;
 }

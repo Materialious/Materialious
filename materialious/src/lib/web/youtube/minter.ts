@@ -1,9 +1,14 @@
-export async function webPoTokenMinter(requestKey: string, visitorData: string): Promise<string> {
+export async function webPoTokenMinter(
+	requestKey: string,
+	visitorData: string,
+	forceRefresh = false
+): Promise<string> {
 	const resp = await fetch('/api/poToken/', {
 		signal: AbortSignal.timeout(60_000),
 		body: JSON.stringify({
 			requestKey,
-			visitorData
+			visitorData,
+			forceRefresh
 		}),
 		method: 'POST'
 	});

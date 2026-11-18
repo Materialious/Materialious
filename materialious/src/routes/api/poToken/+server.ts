@@ -5,7 +5,8 @@ import { isOwnBackend } from '#lib/shared/index';
 
 const zPoTokenGenSchema = z.object({
 	requestKey: z.string(),
-	visitorData: z.string()
+	visitorData: z.string(),
+	forceRefresh: z.boolean().default(false)
 });
 
 export async function POST({ request, locals }) {
@@ -19,10 +20,10 @@ export async function POST({ request, locals }) {
 		throw error(400, data.error.message);
 	}
 
-	const { requestKey, visitorData } = data.data;
+	const { requestKey, visitorData, forceRefresh } = data.data;
 
 	try {
-		return new Response(await mintPoTokenInJSDOM(requestKey, visitorData), {
+		return new Response(await mintPoTokenInJSDOM(requestKey, visitorData, forceRefresh), {
 			status: 200
 		});
 	} catch (err) {

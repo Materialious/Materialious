@@ -9,6 +9,7 @@ import {
 	invidiousInstanceStore,
 	materialiousBackendStore,
 	playlistCacheStore,
+	personalPlaylistsCacheStore,
 	rawMasterKeyStore,
 	searchCacheStore
 } from './store';
@@ -28,6 +29,7 @@ export function clearCaches() {
 	feedCacheStore.set({});
 	searchCacheStore.set({});
 	playlistCacheStore.set({});
+	personalPlaylistsCacheStore.set(null);
 	channelCacheStore.set({});
 }
 

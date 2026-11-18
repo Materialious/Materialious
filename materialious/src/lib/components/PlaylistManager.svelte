@@ -7,8 +7,13 @@
 	} from '#lib/api/index';
 	import type { PlaylistPage } from '#lib/api/model';
 	import { _ } from '#lib/i18n/index';
-	import { invidiousAuthStore, personalPlaylistsCacheStore } from '#lib/store';
-	import { isYTBackend } from '#lib/backend';
+	import {
+		invidiousAuthStore,
+		personalPlaylistsCacheStore,
+		rawMasterKeyStore,
+		backendInUseStore
+	} from '#lib/store';
+	import { isMaterialiousAccountActive, isYTBackend } from '#lib/backend';
 
 	interface Props {
 		mode: 'toggle' | 'clone';
@@ -38,12 +43,16 @@
 
 	let searchQuery = $state('');
 	let working = $state(false);
+	let failure = $state('');
+	let usingYouTube = $derived($backendInUseStore === 'yt' && isYTBackend());
 	let workingPlaylistId = $state<string | null>(null);
 	let dialogEl: HTMLDialogElement | undefined = $state();
-	let canManage = $derived($invidiousAuthStore && !isYTBackend());
+	let canManage = $derived(
+		($rawMasterKeyStore && isMaterialiousAccountActive()) || ($invidiousAuthStore && !usingYouTube)
+	);
 
 	$effect(() => {
-		ensurePersonalPlaylists();
+		if (canManage) ensurePersonalPlaylists();
 	});
 
 	let filteredPlaylists = $derived.by(() => {
@@ -78,6 +87,7 @@
 
 	async function handleToggle(playlist: PlaylistPage) {
 		if (working || !videoId) return;
+		failure = '';
 		working = true;
 		workingPlaylistId = playlist.playlistId;
 		try {
@@ -90,29 +100,32 @@
 				await addPlaylistVideo(playlist.playlistId, videoId);
 			}
 			personalPlaylistsCacheStore.set(await getPersonalPlaylists());
-		} catch {
-			// Continue regardless of error
+			onComplete?.();
+		} catch (error) {
+			failure = error instanceof Error ? error.message : String(error);
 		}
 		working = false;
 		workingPlaylistId = null;
-		onComplete?.();
 	}
 
 	async function handleClone(playlist: PlaylistPage) {
 		if (working || !videoIds?.length) return;
+		failure = '';
 		working = true;
 		workingPlaylistId = playlist.playlistId;
 		try {
-			await Promise.all(videoIds.map((id) => addPlaylistVideo(playlist.playlistId, id)));
+			for (const id of videoIds) await addPlaylistVideo(playlist.playlistId, id);
 			personalPlaylistsCacheStore.set(await getPersonalPlaylists());
-		} catch {
-			// Continue regardless of error
+			onComplete?.();
+		} catch (error) {
+			failure = error instanceof Error ? error.message : String(error);
 		}
 		working = false;
 		workingPlaylistId = null;
-		onComplete?.();
 	}
 </script>
+
+{#if failure}<p role="alert" class="error-text">{failure}</p>{/if}
 
 {#if inline}
 	{#if canManage}
@@ -131,6 +144,11 @@
 								mode === 'toggle' ? handleToggle(personalPlaylist) : handleClone(personalPlaylist)}
 						>
 							<span class="max">{personalPlaylist.title}</span>
+							<small
+								>{personalPlaylist.playlistId.startsWith('materialious-')
+									? 'Materialious'
+									: 'Invidious'}</small
+							>
 							{#if working && workingPlaylistId === personalPlaylist.playlistId}
 								<i>hourglass_empty</i>
 							{:else if mode === 'toggle'}
@@ -186,6 +204,7 @@
 
 		<div class="space"></div>
 
+		{#if failure}<p role="alert" class="error-text">{failure}</p>{/if}
 		<div class="playlist-list">
 			{#if displayPlaylists.length > 0}
 				{#each displayPlaylists as personalPlaylist (personalPlaylist.playlistId)}
@@ -197,6 +216,11 @@
 					>
 						<nav class="max">
 							<span class="max">{personalPlaylist.title}</span>
+							<small
+								>{personalPlaylist.playlistId.startsWith('materialious-')
+									? 'Materialious'
+									: 'Invidious'}</small
+							>
 							{#if working && workingPlaylistId === personalPlaylist.playlistId}
 								<i>hourglass_empty</i>
 							{:else if mode === 'toggle'}

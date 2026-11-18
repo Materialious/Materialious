@@ -11,7 +11,7 @@ import { WHITELIST_BASE_DOMAIN } from '$app/env/private';
 import { parse as tldParse } from 'tldts';
 
 const credentialsSchema = z.object({
-	instance: z.string().url().max(2048),
+	instance: z.url().max(2048),
 	username: z.string().trim().min(1).max(320),
 	password: z.string().min(1).max(4096)
 });

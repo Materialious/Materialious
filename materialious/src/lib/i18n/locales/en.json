@@ -150,7 +150,9 @@
 		"previous": "Previous",
 		"cloneToPlaylist": "Clone to playlist",
 		"cloning": "Cloning...",
-		"clonedSuccess": "Playlist cloned successfully"
+		"clonedSuccess": "Playlist cloned successfully",
+		"storage": "Playlist storage",
+		"encryptedPrivate": "Private and encrypted with your Materialious account."
 	},
 	"thumbnail": {
 		"live": "LIVE",

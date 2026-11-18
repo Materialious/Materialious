@@ -6,6 +6,7 @@
 	import { playlistSettingsStore } from '#lib/store';
 	import { _ } from '#lib/i18n/index';
 	import ItemsList from '#lib/components/layout/ItemsList.svelte';
+	import { isMaterialiousPlaylist } from '#lib/api/backend/playlist';
 	import Share from '#lib/components/Share.svelte';
 	import PlaylistManager from '#lib/components/PlaylistManager.svelte';
 	import { page } from '$app/state';
@@ -16,6 +17,7 @@
 
 	let { data = $bindable() }: { data: any } = $props();
 	let loaded = $state(false);
+	let multipleActions = $state(false);
 	let playlist: any = $state(null);
 
 	const slug = $derived(page.params.slug as string);
@@ -103,33 +105,48 @@
 						buttonIcon="content_copy"
 						buttonText={$_('playlist.cloneToPlaylist')}
 					/>
+					<button
+						class="surface-container-highest"
+						aria-label="Bulk actions"
+						aria-pressed={multipleActions}
+						onclick={() => (multipleActions = !multipleActions)}
+					>
+						<i>checklist</i><span class="m l">Bulk actions</span>
+					</button>
 				{/if}
-				<Share
-					iconOnly={false}
-					shares={[
-						{
-							type: 'materialious',
-							path: resolve('/(app)/playlist/[slug]', { slug })
-						},
-						{
-							type: 'invidious',
-							path: `/playlist?list=${slug}`
-						},
-						{
-							type: 'invidious redirect',
-							path: `/playlist?list=${slug}`
-						},
-						{
-							type: 'youtube',
-							path: `/playlist?list=${slug}`
-						}
-					]}
-				/>
+				{#if !isMaterialiousPlaylist(slug)}
+					<Share
+						iconOnly={false}
+						shares={[
+							{
+								type: 'materialious',
+								path: resolve('/(app)/playlist/[slug]', { slug })
+							},
+							{
+								type: 'invidious',
+								path: `/playlist?list=${slug}`
+							},
+							{
+								type: 'invidious redirect',
+								path: `/playlist?list=${slug}`
+							},
+							{
+								type: 'youtube',
+								path: `/playlist?list=${slug}`
+							}
+						]}
+					/>
+				{/if}
 			</nav>
 		{/if}
 	</article>
 
 	<div class="space"></div>
 
-	<ItemsList items={playlist.videos} playlistId={playlist.info.playlistId} />
+	<ItemsList
+		items={playlist.videos}
+		playlistId={playlist.info.playlistId}
+		bind:multipleActions
+		showActionButton={false}
+	/>
 {/if}

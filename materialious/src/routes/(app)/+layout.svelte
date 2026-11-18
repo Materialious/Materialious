@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidatePersonalPlaylists } from '#lib/api/index';
 	import { resolve } from '$app/paths';
 	import { resolvePath, resolveWatchPath } from '#lib/paths';
 	import { goto } from '$app/navigation';
@@ -100,12 +101,15 @@
 	});
 
 	invidiousAuthStore.subscribe(() => {
+		invalidatePersonalPlaylists();
 		pages = getPages();
 	});
 	rawMasterKeyStore.subscribe(() => {
+		invalidatePersonalPlaylists();
 		pages = getPages();
 	});
 	backendInUseStore.subscribe(() => {
+		invalidatePersonalPlaylists();
 		pages = getPages();
 	});
 

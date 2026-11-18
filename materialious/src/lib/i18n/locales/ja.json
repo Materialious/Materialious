@@ -138,7 +138,8 @@
             "videoInfo": "動画情報",
             "timeline": "タイムライン",
             "positionOf": "{{elapsed}} / {{total}}",
-            "loadingCaptions": "字幕を読み込み中"
+            "loadingCaptions": "字幕を読み込み中",
+            "hideUI": "コントロールを隠す"
         },
         "pauseTimerFinished": "一時停止タイマーが終了しました",
         "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
@@ -517,5 +518,17 @@
         "moveDown": "キュー内で下に移動"
     },
     "invidiousSessionExpired": "Invidiousのセッションが無効になりました。再度ログインしてください。",
-    "invidiousCheckFailed": "Invidiousセッションを確認できないか、通知を読み込めませんでした。もう一度試してください。"
+    "invidiousCheckFailed": "Invidiousセッションを確認できないか、通知を読み込めませんでした。もう一度試してください。",
+    "invidiousAuth": {
+        "tokenTab": "トークンでログイン",
+        "tokenDescription": "推奨。利用している Invidious インスタンスにサインインし、Materialious を承認してください。",
+        "registrationWarning": "既存の Invidious アカウントを使用してください。登録が有効になっている場合、指定したユーザー名が存在しなければ、Invidious がアカウントを作成することがあります。",
+        "passwordUnavailable": "パスワードによるログインには、Android アプリまたはデスクトップアプリ、あるいはプロキシが有効化された Materialious サーバーが必要です。",
+        "errors": {
+            "credentials": "ログインに失敗しました。Invidious のユーザー名とパスワードを確認してください。",
+            "challenge": "Invidious がセッションを提供しませんでした。インスタンスで必要な認証を完了し、再度試してください。",
+            "network": "ログインを完了できません。接続状況を確認し、再度試してください。",
+            "instance": "このインスタンスではパスワードによるログインは利用できません。利用可否およびサーバーのプロキシ設定を確認してください。"
+        }
+    }
 }

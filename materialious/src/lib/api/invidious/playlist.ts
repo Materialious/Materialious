@@ -51,7 +51,7 @@ export async function postPersonalPlaylistInvidious(
 	const headers: Record<string, Record<string, string>> = buildAuthHeaders();
 	headers['headers']['Content-type'] = 'application/json';
 
-	await fetchErrorHandle(
+	const response = await fetchErrorHandle(
 		await fetch(buildPath('auth/playlists'), {
 			method: 'POST',
 			body: JSON.stringify({
@@ -62,6 +62,10 @@ export async function postPersonalPlaylistInvidious(
 			...fetchOptions
 		})
 	);
+	const created = await response.json();
+	if (typeof created.playlistId !== 'string' || !created.playlistId)
+		throw new Error('Playlist creation returned no ID');
+	return created.playlistId;
 }
 
 export async function addPlaylistVideoInvidious(

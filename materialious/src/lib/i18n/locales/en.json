@@ -542,5 +542,22 @@
 		"loginFailed": "Login failed. Check your credentials and use a fresh authentication code.",
 		"copyFailed": "Could not copy the secret. You can select and copy it manually.",
 		"recoveryNotice": "Keep a backup of your authenticator. There are no recovery codes. Disabling 2FA requires your password and a fresh authentication code. If you lose access to your authenticator and its backup, you cannot disable 2FA. Existing sessions and Quick Connect remain usable."
+	},
+	"playlistImport": {
+		"supported": "Import extracted YouTube Takeout CSV files or FreeTube exports (.db, .json, .csv) as private playlists.",
+		"selectFiles": "Import playlists",
+		"importing": "Importing playlists…",
+		"incomplete": "Playlist import stopped or finished with errors.",
+		"signIn": "Sign in to Invidious or unlock your Materialious account to import playlists.",
+		"accountChanged": "The playlist account changed. Import stopped.",
+		"finished": "Playlists imported."
+	},
+	"playlistExport": {
+		"title": "Export playlists",
+		"playlist": "Playlist",
+		"cancel": "Cancel",
+		"download": "Export YouTube CSV",
+		"exporting": "Exporting playlist…",
+		"finished": "Playlist exported."
 	}
 }

@@ -510,11 +510,13 @@ export async function postPersonalPlaylist(
 	fetchOptions: RequestInit = {},
 	provider: 'invidious' | 'materialious' = 'invidious'
 ) {
+	let playlistId: string;
 	if (provider === 'materialious') {
 		if (privacy !== 'private') throw new Error('Materialious playlists are private');
-		await postPersonalPlaylistBackend(title, fetchOptions);
-	} else await postPersonalPlaylistInvidious(title, privacy, fetchOptions);
+		playlistId = await postPersonalPlaylistBackend(title, fetchOptions);
+	} else playlistId = await postPersonalPlaylistInvidious(title, privacy, fetchOptions);
 	invalidatePersonalPlaylists();
+	return playlistId;
 }
 
 export async function addPlaylistVideo(

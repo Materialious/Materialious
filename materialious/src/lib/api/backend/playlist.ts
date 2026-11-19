@@ -118,13 +118,17 @@ export async function getPlaylistBackend(
 
 export async function postPersonalPlaylistBackend(title: string, options: RequestInit = {}) {
 	const titleField = await encrypt(title);
-	await checked(
+	const response = await checked(
 		await backendFetch(endpoint, {
 			...options,
 			method: 'POST',
 			body: JSON.stringify({ titleCipher: titleField.cipher, titleNonce: titleField.nonce })
 		})
 	);
+	const created = await response.json();
+	if (typeof created.id !== 'string' || !created.id)
+		throw new Error('Playlist creation returned no ID');
+	return prefix + created.id;
 }
 
 export async function deletePersonalPlaylistBackend(id: string) {

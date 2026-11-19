@@ -10,6 +10,7 @@
 	import { Clipboard } from '@capacitor/clipboard';
 	import { loadSettingsFromFile, settingsToJson } from '#lib/externalSettings/index';
 	import { downloadStringAsFile } from '#lib/download';
+	import PlaylistImport from './PlaylistImport.svelte';
 
 	async function importInvidiousSubs() {
 		const importedSubs = await getSubscriptionsInvidious();
@@ -153,6 +154,8 @@
 		<div>{$_('layout.backendEngine.importToMaterialious')}</div>
 	</button>
 {/if}
+
+<PlaylistImport />
 
 <h3>{$_('layout.settings')}</h3>
 <div class="space"></div>

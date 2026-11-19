@@ -551,5 +551,13 @@
 		"signIn": "Sign in to Invidious or unlock your Materialious account to import playlists.",
 		"accountChanged": "The playlist account changed. Import stopped.",
 		"finished": "Playlists imported."
+	},
+	"playlistExport": {
+		"title": "Export playlists",
+		"playlist": "Playlist",
+		"cancel": "Cancel",
+		"download": "Export YouTube CSV",
+		"exporting": "Exporting playlist…",
+		"finished": "Playlist exported."
 	}
 }

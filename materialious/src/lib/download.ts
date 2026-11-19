@@ -60,8 +60,9 @@ export async function downloadStringAsFile(content: string, filename: string) {
 					text: errorMsg instanceof Error ? errorMsg.message : String(errorMsg)
 				}
 			});
+			return false;
 		}
-		return;
+		return true;
 	}
 
 	const url = URL.createObjectURL(blob);
@@ -74,4 +75,5 @@ export async function downloadStringAsFile(content: string, filename: string) {
 	a.click();
 	document.body.removeChild(a);
 	URL.revokeObjectURL(url);
+	return true;
 }

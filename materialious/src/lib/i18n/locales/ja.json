@@ -57,9 +57,9 @@
         "loopPlaylist": "再生リストをループ",
         "next": "次へ",
         "previous": "前へ",
-        "cloneToPlaylist": "プレイリストに複製",
+        "cloneToPlaylist": "再生リストに複製",
         "cloning": "複製中...",
-        "clonedSuccess": "プレイリストの複製に成功しました",
+        "clonedSuccess": "再生リストの複製に成功しました",
         "storage": "再生リストの保存",
         "encryptedPrivate": "Materialious アカウントにより、非公開かつ暗号化されています。"
     },
@@ -560,5 +560,22 @@
         "loginFailed": "ログインに失敗しました。認証情報を確認し、新しい認証コードを使用してください。",
         "copyFailed": "シークレットをコピーできませんでした。手動で選択してコピーしてください。",
         "recoveryNotice": "認証アプリのバックアップを必ず取っておいてください。復旧コードは用意されていません。2段階認証を無効にするには、パスワードと新しい認証コードが必要です。認証アプリとそのバックアップにアクセスできなくなった場合、2段階認証を無効にすることはできません。既存のセッションおよびクイックコネクトは引き続き利用可能です。"
+    },
+    "playlistImport": {
+        "supported": "YouTube Takeout から抽出した CSV ファイルや、FreeTube からエクスポートしたファイル (.db、.json、.csv) を、非公開再生リストとしてインポート。",
+        "selectFiles": "再生リストをインポート",
+        "importing": "再生リストをインポート中…",
+        "incomplete": "再生リストのインポートが停止したか、エラーが発生して終了しました。",
+        "signIn": "Invidious にサインインするか、Materialious アカウントのロックを解除して、再生リストをインポートしてください。",
+        "accountChanged": "再生リストのアカウントが変更されました。インポートが停止しました。",
+        "finished": "再生リストをインポートしました。"
+    },
+    "playlistExport": {
+        "title": "再生リストをエクスポート",
+        "playlist": "再生リスト",
+        "cancel": "キャンセル",
+        "download": "YouTube CSV をエクスポート",
+        "exporting": "再生リストをエクスポート中…",
+        "finished": "再生リストをエクスポートしました。"
     }
 }

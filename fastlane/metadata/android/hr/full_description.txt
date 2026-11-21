@@ -1,0 +1,25 @@
+<i>Materialious</i> je klijent za <a href='https://github.com/iv-org'>Invidious</a> koji koristi material dizajn.
+Omogućuje pregledavanje i gledanje videozapisa, upravljanje popisima za reprodukciju i korištenje kanala.
+
+<b>Značajke:</b>
+<ul>
+  <li>Podrška za Invidious companion</li>
+  <li>Proširena integracija s Invidious API-jem</li>
+  <li>Fallback na YouTube.js ako Invidious ne uspije učitati videozapise za Desktop i Android</li>
+  <li>Podrška za onemogućavanje provjere certifikata za korisnike kućnih laboratorija</li>
+  <li>Sinkronizirajte napredak gledanja između Invidious sesija</li>
+  <li>Sinkronizacija gledanja u grupama</li>
+  <li>Ugrađeni Sponsorblock</li>
+  <li>Ugrađeni povrat YouTubeovih ne sviđa mi se</li>
+  <li>DeArrow ugrađen (s lokalnom rezervnom obradom)</li>
+  <li>Bez oglasa</li>
+  <li>Bez praćenja</li>
+  <li>Svijetla/tamna tema</li>
+  <li>Prilagođene teme boja</li>
+  <li>Integracija s Invidious pretplatama, poviješću gledanja i još mnogo toga</li>
+  <li>Podrška za prijenos uživo</li>
+  <li>Podrška za Dash</li>
+  <li>Poglavlja</li>
+  <li>Samo audio način rada</li>
+  <li>Playliste</li>
+</ul>

@@ -318,22 +318,24 @@
 	</nav>
 </div>
 
-<div class="field no-margin">
-	<nav class="no-padding">
-		<div class="max">
-			<div>{$_('layout.hideShorts')}</div>
-		</div>
-		<label class="switch" tabindex="0">
-			<input
-				type="checkbox"
-				bind:checked={$interfaceHideShorts}
-				onclick={() => interfaceHideShorts.set(!$interfaceHideShorts)}
-				role="switch"
-			/>
-			<span></span>
-		</label>
-	</nav>
-</div>
+{#if $backendInUseStore !== 'yt'}
+	<div class="field no-margin">
+		<nav class="no-padding">
+			<div class="max">
+				<div>{$_('layout.hideShorts')}</div>
+			</div>
+			<label class="switch" tabindex="0">
+				<input
+					type="checkbox"
+					bind:checked={$interfaceHideShorts}
+					onclick={() => interfaceHideShorts.set(!$interfaceHideShorts)}
+					role="switch"
+				/>
+				<span></span>
+			</label>
+		</nav>
+	</div>
+{/if}
 
 <div class="field no-margin">
 	<nav class="no-padding">

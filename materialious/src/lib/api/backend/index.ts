@@ -4,16 +4,19 @@ import { authTokenStore, rawMasterKeyStore } from '#lib/store';
 import type { Solution, Challenge } from 'altcha-lib/types';
 import { backendFetch } from './request';
 import type { IsOwnBackend } from '#lib/shared/index';
+import { USERNAME_TAKEN } from '#lib/auth/userCreateError';
 
 export type DerivePassword = (rawPassword: string, passwordSalt: Uint8Array) => Promise<Uint8Array>;
 type captchaPayload = { solution: Solution; challenge: Challenge };
+
+export type CreateUserResult = 'success' | 'username_taken' | 'failed';
 
 export async function createUserBackend(
 	username: string,
 	rawPassword: string,
 	captchaPayload: captchaPayload | null,
 	derivePassword: DerivePassword
-): Promise<boolean> {
+): Promise<CreateUserResult> {
 	await sodium.ready;
 
 	const passwordSalt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
@@ -49,7 +52,13 @@ export async function createUserBackend(
 		})
 	});
 
-	if (!userCreateResp.ok) return false;
+	if (!userCreateResp.ok) {
+		const body = await userCreateResp.json().catch(() => null);
+		if (body?.message === USERNAME_TAKEN || body?.error === USERNAME_TAKEN) {
+			return USERNAME_TAKEN;
+		}
+		return 'failed';
+	}
 
 	const createJson = await userCreateResp.json().catch(() => null);
 	if (createJson?.token) {
@@ -58,7 +67,7 @@ export async function createUserBackend(
 
 	rawMasterKeyStore.set(sodium.to_base64(rawDecryptionMasterKey));
 
-	return true;
+	return 'success';
 }
 
 export async function loginUserBackend(

@@ -16,6 +16,7 @@
 	import { deriveKey } from 'altcha-lib/algorithms/web/pbkdf2';
 	import { isAndroidTv } from '#lib/utils';
 	import { PinInput } from 'melt/builders';
+	import { USERNAME_TAKEN } from '#lib/auth/userCreateError';
 
 	const registrationAllowed = $derived(!!isOwnBackend()?.registrationAllowed);
 	const captchaDisabled = $derived(!!isOwnBackend()?.captchaDisabled);
@@ -115,6 +116,7 @@
 	}
 
 	let failed = $state(false);
+	let registrationError = $state<'username_taken' | 'failed'>('failed');
 
 	async function onLogin(event: Event) {
 		event.preventDefault();
@@ -126,11 +128,10 @@
 		if (isLoading || !derivePassword) return;
 		isLoading = true;
 		failed = false;
+		registrationError = 'failed';
 		try {
 			const result = needToRegister
-				? (await createUserBackend(username, rawPassword, captchaPayload, derivePassword))
-					? 'success'
-					: 'failed'
+				? await createUserBackend(username, rawPassword, captchaPayload, derivePassword)
 				: await loginUserBackend(
 						username,
 						rawPassword,
@@ -144,9 +145,13 @@
 				return;
 			}
 			if (result === 'two_factor_required') twoFactorRequired = true;
-			else failed = true;
+			else {
+				failed = true;
+				if (needToRegister) registrationError = result;
+			}
 		} catch {
 			failed = true;
+			if (needToRegister) registrationError = 'failed';
 		} finally {
 			isLoading = false;
 			twoFactorToken = '';
@@ -219,7 +224,7 @@
 							/>
 							<label for="username">{$_('username')}</label>
 							{#if failed && needToRegister}
-								<output class="invalid">{$_('usernameTaken')}</output>
+								<output class="invalid">{$_(registrationError === USERNAME_TAKEN ? 'usernameTaken' : 'registrationFailed')}</output>
 							{/if}
 						</div>
 						<div

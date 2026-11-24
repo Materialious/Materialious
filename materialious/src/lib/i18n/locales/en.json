@@ -16,6 +16,7 @@
 	"captionStyle": "Caption styles",
 	"invalidPassword": "Invalid password",
 	"usernameTaken": "Username taken",
+	"registrationFailed": "Registration failed. Check the server configuration and try again.",
 	"veryWeak": "Very weak",
 	"weak": "Weak",
 	"fair": "Fair",

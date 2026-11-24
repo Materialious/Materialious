@@ -70,6 +70,13 @@ services:
       retries: 3
       start_period: 15s
     environment:
+      # Public URL used by SvelteKit to validate form submissions. Set this
+      # to the exact scheme, hostname, and port used to access Materialious.
+      # Required when accessing over HTTP or behind a reverse proxy, for example:
+      # ORIGIN: "http://materialious.example.local:3000"
+      # ORIGIN: "https://materialious.example.com"
+      ORIGIN: ""
+
       # Secret key used to sign authentication cookies (minimum 16 characters).
       # Required only when PUBLIC_INTERNAL_AUTH is "true" (the default).
       # Use a long, random string. Generate one with:

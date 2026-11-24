@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { FeedItem } from '#lib/feed';
 import isSafeRegex from 'safe-regex2';
-import { filterContentListStore, interfaceHideShorts } from '#lib/store';
+import { backendInUseStore, filterContentListStore, interfaceHideShorts } from '#lib/store';
 import { get } from 'svelte/store';
 import { originalFetch } from '#lib/fetchProxy';
 import { ChannelSchema, VideoSchema } from './schemas';
@@ -52,6 +52,7 @@ const zFilterRootSchema = z.object({
 
 // Shorts have no length. Not checked by type: Invidious' auth feed tags every video 'shortVideo'.
 function isShort(item: FeedItem): boolean {
+	if (get(backendInUseStore) === 'yt') return false;
 	return (
 		'lengthSeconds' in item &&
 		item.lengthSeconds === 0 &&

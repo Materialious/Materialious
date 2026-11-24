@@ -7,6 +7,7 @@ import {
 import { Op } from 'sequelize';
 import crypto from 'crypto';
 import { error } from '@sveltejs/kit';
+import { USERNAME_TAKEN } from '#lib/auth/userCreateError';
 
 export class User {
 	data: UserTableModel;
@@ -202,7 +203,7 @@ export async function createUser(user: CreateUser): Promise<User> {
 	}
 
 	if (!userCreated) {
-		throw error(400);
+		throw error(409, USERNAME_TAKEN);
 	}
 
 	return new User(createdUser as UserTableModel);

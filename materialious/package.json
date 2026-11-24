@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.18.35",
+	"version": "1.18.36",
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && vite dev",
@@ -16,13 +16,13 @@
 		"postinstall": "patch-package --error-on-fail && npm run patch:shaka"
 	},
 	"devDependencies": {
-		"@capacitor/assets": "^3.0.5",
+		"@capacitor/assets": "^4.0.0",
 		"@capacitor/cli": "^8.5.1",
 		"@eslint/js": "^10.0.1",
 		"@sveltejs/adapter-auto": "^8.0.0",
 		"@sveltejs/adapter-node": "^6.0.2",
 		"@sveltejs/adapter-static": "^4.0.1",
-		"@sveltejs/kit": "^3.1.1",
+		"@sveltejs/kit": "^3.4.0",
 		"@sveltejs/load-config": "^0.2.2",
 		"@sveltejs/vite-plugin-svelte": "^7.3.1",
 		"@types/cookie-signature": "^1.1.2",
@@ -46,7 +46,7 @@
 		"svelte-check": "^4.7.6",
 		"tslib": "^2.7.0",
 		"typescript": "^6.0.0",
-		"typescript-eslint": "^8.60.1",
+		"typescript-eslint": "^8.73.0",
 		"vite": "^8.3.5"
 	},
 	"type": "module",
@@ -73,7 +73,7 @@
 		"@svelte-put/qr": "^2.1.3",
 		"@zxcvbn-ts/core": "^4.2.0",
 		"@zxcvbn-ts/language-common": "^4.1.3",
-		"@zxcvbn-ts/language-en": "^4.1.1",
+		"@zxcvbn-ts/language-en": "^4.1.2",
 		"altcha-lib": "^2.3.2",
 		"beercss": "^5.0.3",
 		"bgutils-js": "^4.0.3",
@@ -103,7 +103,7 @@
 		"mysql2": "^3.24.6",
 		"otplib": "^13.6.0",
 		"papaparse": "^5.7.0",
-		"pg": "^8.22.0",
+		"pg": "^8.23.1",
 		"pg-hstore": "^2.3.4",
 		"safe-regex2": "^5.1.1",
 		"semver": "^7.8.6",

@@ -18,12 +18,38 @@ This guide is for the docker image `wardpearce/materialious-full`. It is **not**
 
 ## TOC
 
+- [Quick deployment script](#quick-deployment-script)
 - [Step 1: Deploy the container](#step-1-deploy-the-container)
   - [Invidious configuration](#invidious-configuration-if-using-invidious)
   - [Proof-of-work Captcha](#proof-of-work-captcha)
   - [Docker Compose](#docker-compose)
 - [Step 2 (Optional, but recommended): Self-host RYD-Proxy](#step-2-optional-but-recommended-self-host-ryd-proxy)
 - [Troubleshooting](#troubleshooting)
+
+## Quick deployment script
+
+Run this in a terminal to download the script from GitHub and start setup:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Materialious/Materialious/main/deploy-full.sh | bash
+```
+
+If you already have the repository checked out, run:
+
+```bash
+./deploy-full.sh
+```
+
+The script prompts for the host port, public origin, optional Invidious URL, Return YouTube Dislike, SponsorBlock, DeArrow, built-in accounts, and proxy authentication. The three API URLs use the defaults shown below; enter `-` at a prompt to disable one. If you enable built-in accounts, it also asks for an optional first admin username. It creates `~/materialious-full/compose.yaml` and a private `~/materialious-full/.env`, then starts the container. Pass a directory as the first argument to use another location. It refuses to overwrite an existing deployment.
+
+When built-in accounts are enabled, registration starts enabled so you can create the first account. After registering, set `PUBLIC_REGISTRATION_ALLOWED=false` in `.env` and apply the change:
+
+```bash
+cd ~/materialious-full
+docker compose up -d
+```
+
+The script sets `PUBLIC_CAPTCHA_DISABLED=true` for HTTP origins. For other settings, edit `.env` using the options below and rerun `docker compose up -d` in the deployment directory.
 
 ## Step 1: Deploy the container
 
@@ -70,6 +96,13 @@ services:
       retries: 3
       start_period: 15s
     environment:
+      # Public URL used by SvelteKit to validate form submissions. Set this
+      # to the exact scheme, hostname, and port used to access Materialious.
+      # Required when accessing over HTTP or behind a reverse proxy, for example:
+      # ORIGIN: "http://materialious.example.local:3000"
+      # ORIGIN: "https://materialious.example.com"
+      ORIGIN: ""
+
       # Secret key used to sign authentication cookies (minimum 16 characters).
       # Required only when PUBLIC_INTERNAL_AUTH is "true" (the default).
       # Use a long, random string. Generate one with:

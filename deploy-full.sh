@@ -75,6 +75,17 @@ valid_url() {
     [[ $1 != *'$'* && $1 != *'"'* && $1 != *"'"* && $1 != *'\'* ]]
 }
 
+ask_service_url() {
+  local label=$1 default=$2
+  ask "$label URL (enter - to disable)" "$default"
+  if [[ $REPLY == - ]]; then
+    REPLY=
+  elif ! valid_url "$REPLY"; then
+    printf '%s must be an http(s) URL with no path or trailing slash.\n' "$label" >&2
+    exit 1
+  fi
+}
+
 printf 'Materialious full deployment\n' >&2
 ask 'Host port' '3000'
 port=$REPLY
@@ -96,6 +107,13 @@ if [[ -n $invidious ]] && ! valid_url "$invidious"; then
   printf 'Invidious instance must be an http(s) URL with no path or trailing slash.\n' >&2
   exit 1
 fi
+
+ask_service_url 'Return YouTube Dislike API' 'https://returnyoutubedislikeapi.com'
+ryd_instance=$REPLY
+ask_service_url 'SponsorBlock API' 'https://sponsor.ajay.app'
+sponsorblock_instance=$REPLY
+ask_service_url 'DeArrow API' 'https://sponsor.ajay.app'
+dearrow_instance=$REPLY
 
 ask_bool 'Enable built-in accounts' 'yes'
 internal_auth=$REPLY
@@ -147,6 +165,9 @@ PUBLIC_REGISTRATION_ALLOWED=$registration_allowed
 PUBLIC_ADMIN_USERNAMES=$admin_username
 PUBLIC_CAPTCHA_DISABLED=$captcha_disabled
 PUBLIC_DEFAULT_INVIDIOUS_INSTANCE=$invidious
+PUBLIC_DEFAULT_RETURNYTDISLIKES_INSTANCE=$ryd_instance
+PUBLIC_DEFAULT_SPONSERBLOCK_INSTANCE=$sponsorblock_instance
+PUBLIC_DEFAULT_DEARROW_INSTANCE=$dearrow_instance
 EOF
 
 cat > "$compose_file" <<'EOF'

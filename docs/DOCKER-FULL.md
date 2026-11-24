@@ -40,7 +40,7 @@ If you already have the repository checked out, run:
 ./deploy-full.sh
 ```
 
-The script prompts for the host port, public origin, optional Invidious URL, built-in accounts, and proxy authentication. If you enable built-in accounts, it also asks for an optional first admin username. It creates `~/materialious-full/compose.yaml` and a private `~/materialious-full/.env`, then starts the container. Pass a directory as the first argument to use another location. It refuses to overwrite an existing deployment.
+The script prompts for the host port, public origin, optional Invidious URL, Return YouTube Dislike, SponsorBlock, DeArrow, built-in accounts, and proxy authentication. The three API URLs use the defaults shown below; enter `-` at a prompt to disable one. If you enable built-in accounts, it also asks for an optional first admin username. It creates `~/materialious-full/compose.yaml` and a private `~/materialious-full/.env`, then starts the container. Pass a directory as the first argument to use another location. It refuses to overwrite an existing deployment.
 
 When built-in accounts are enabled, registration starts enabled so you can create the first account. After registering, set `PUBLIC_REGISTRATION_ALLOWED=false` in `.env` and apply the change:
 

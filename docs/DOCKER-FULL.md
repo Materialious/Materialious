@@ -18,12 +18,38 @@ This guide is for the docker image `wardpearce/materialious-full`. It is **not**
 
 ## TOC
 
+- [Quick deployment script](#quick-deployment-script)
 - [Step 1: Deploy the container](#step-1-deploy-the-container)
   - [Invidious configuration](#invidious-configuration-if-using-invidious)
   - [Proof-of-work Captcha](#proof-of-work-captcha)
   - [Docker Compose](#docker-compose)
 - [Step 2 (Optional, but recommended): Self-host RYD-Proxy](#step-2-optional-but-recommended-self-host-ryd-proxy)
 - [Troubleshooting](#troubleshooting)
+
+## Quick deployment script
+
+Run this in a terminal to download the script from GitHub and start setup:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Materialious/Materialious/main/deploy-full.sh | bash
+```
+
+If you already have the repository checked out, run:
+
+```bash
+./deploy-full.sh
+```
+
+The script prompts for the host port, public origin, optional Invidious URL, built-in accounts, and proxy authentication. If you enable built-in accounts, it also asks for an optional first admin username. It creates `~/materialious-full/compose.yaml` and a private `~/materialious-full/.env`, then starts the container. Pass a directory as the first argument to use another location. It refuses to overwrite an existing deployment.
+
+When built-in accounts are enabled, registration starts enabled so you can create the first account. After registering, set `PUBLIC_REGISTRATION_ALLOWED=false` in `.env` and apply the change:
+
+```bash
+cd ~/materialious-full
+docker compose up -d
+```
+
+The script sets `PUBLIC_CAPTCHA_DISABLED=true` for HTTP origins. For other settings, edit `.env` using the options below and rerun `docker compose up -d` in the deployment directory.
 
 ## Step 1: Deploy the container
 

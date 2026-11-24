@@ -72,6 +72,12 @@
 
 This version of Materialious is feature rich, has its own account system (optional) & is easier to setup.
 
+Quick deployment:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Materialious/Materialious/main/deploy-full.sh | bash
+```
+
 [Please read the guide here](./docs/DOCKER-FULL.md)
 
 # Legacy Docker deployment, Invidious only.

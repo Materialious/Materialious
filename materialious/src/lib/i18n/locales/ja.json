@@ -577,5 +577,6 @@
         "download": "YouTube CSV をエクスポート",
         "exporting": "再生リストをエクスポート中…",
         "finished": "再生リストをエクスポートしました。"
-    }
+    },
+    "registrationFailed": "登録に失敗しました。サーバー設定を確認し、再度試してください。"
 }

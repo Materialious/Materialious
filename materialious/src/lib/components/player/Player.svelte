@@ -159,10 +159,12 @@
 	let loadController: AbortController | undefined;
 	let sabrAdapter: SabrStreamingAdapter | null = null;
 	let sabrSegmentActive = false;
+	let sabrSegmentActivityAt = 0;
 	let playerLoadedListenerAdded = false;
 	let sponsorSkipListenerAdded = false;
 
 	const STALL_CHECK_INTERVAL_MS = 1_000;
+	const IDLE_SABR_STALL_TIMEOUT_MS = 2_000;
 	const STALL_TIMEOUT_MS = 12_000;
 	const MAX_STALL_RECOVERY_ATTEMPTS = 3;
 	const MAX_STREAMING_FAILURE_RETRIES = 5;
@@ -458,7 +460,9 @@
 	}
 
 	function recoverSabrSession(error: shaka.util.Error): boolean {
-		if (currentPlaybackErrorSource() !== 'sabr' || sabrSessionRecoveryAttempted) return false;
+		if (currentPlaybackErrorSource() !== 'sabr') return false;
+		if (stallRecoveryInProgress) return true;
+		if (sabrSessionRecoveryAttempted) return false;
 
 		// Segment retries reuse the current SABR URL and playback response. If
 		// that session has expired, fetch fresh YouTube.js playback data once.
@@ -553,7 +557,8 @@
 			!player ||
 			!playerElement ||
 			stallRecoveryInProgress ||
-			stallRecoveryExhausted
+			stallRecoveryExhausted ||
+			streamingFailureExhausted
 		)
 			return;
 
@@ -580,12 +585,16 @@
 			return;
 		}
 
-		const stalledFor = now - stallWatchdogLastProgress;
 		const idleSabr =
 			!!sabrAdapter &&
-			(playerIsBuffering || playerElement.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) &&
+			(player.isBuffering() ||
+				playerIsBuffering ||
+				playerElement.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) &&
 			!sabrSegmentActive;
-		if (stalledFor < (idleSabr ? 1_000 : STALL_TIMEOUT_MS)) return;
+		const lastProgress = idleSabr
+			? Math.max(stallWatchdogLastProgress, sabrSegmentActivityAt)
+			: stallWatchdogLastProgress;
+		if (now - lastProgress < (idleSabr ? IDLE_SABR_STALL_TIMEOUT_MS : STALL_TIMEOUT_MS)) return;
 
 		void recoverFromStall(idleSabr);
 	}
@@ -602,16 +611,14 @@
 		console.warn(`[Player] Playback stalled, recovery attempt ${stallRecoveryAttempts}`);
 
 		try {
-			if (idleSabr && stallRecoveryAttempts === 1) {
-				if (!player.retryStreaming(0)) await reloadVideo(playerElement.currentTime);
-			} else if (stallRecoveryAttempts === 1) {
+			if (!idleSabr && stallRecoveryAttempts === 1) {
 				// Refresh attestation/PoToken first, then let Shaka refetch.
 				await refreshSabrSession(data.video);
 				if (isDestroyed || data.video.videoId !== videoId) return;
 				player.retryStreaming(0);
 			} else if (stallRecoveryAttempts < MAX_STALL_RECOVERY_ATTEMPTS) {
-				// Rebuilding playback obtains fresh session data and mints its own token.
-				// A failed standalone refresh must not prevent that escalation.
+				// Shaka only retries streams with a pending error. Rebuild an idle
+				// session immediately so a silent SABR stall can resume.
 				await reloadVideo(playerElement.currentTime);
 			} else {
 				reportPlaybackError(currentPlaybackErrorSource(), new Error('Playback stalled'));
@@ -630,12 +637,14 @@
 		}
 	}
 
-	async function loadVideo() {
+	async function loadVideo(resumeTime?: number) {
 		if (isDestroyed) return;
+		stopStallWatchdog();
 		loadController?.abort();
 		const controller = new AbortController();
 		loadController = controller;
 		sabrSegmentActive = false;
+		sabrSegmentActivityAt = 0;
 		// A new stream is being loaded; discard any pending retry from the
 		// previous one and give streaming failures a fresh budget.
 		if (streamingFailureRetryTimer) {
@@ -653,7 +662,9 @@
 
 		try {
 			const adapter = await injectSabr(data.video, player, controller.signal, (active) => {
-				if (!controller.signal.aborted) sabrSegmentActive = active;
+				if (controller.signal.aborted) return;
+				sabrSegmentActive = active;
+				sabrSegmentActivityAt = Date.now();
 			});
 			if (controller.signal.aborted) {
 				adapter?.dispose();
@@ -723,9 +734,9 @@
 					!data.video.fallbackPatch
 				) {
 					const manifest = await manifestDomainInclusion(dashUrl);
-					await player.load(manifest, await getPlaybackHistory());
+					await player.load(manifest, resumeTime ?? (await getPlaybackHistory()));
 				} else {
-					await player.load(dashUrl, await getPlaybackHistory());
+					await player.load(dashUrl, resumeTime ?? (await getPlaybackHistory()));
 				}
 
 				if (data.content.timestamps) {
@@ -792,25 +803,29 @@
 
 		const targetTime = resumeTime ?? playerElement?.currentTime ?? 0;
 		const wasPlaying = playerElement ? !playerElement.paused : false;
+		const source = currentPlaybackErrorSource();
+		const refreshPoToken = resumeTime !== undefined && source === 'sabr';
 
 		try {
 			const video =
 				forceYoutubeJs || data.video.fallbackPatch === 'youtubejs' || !!data.video.ytjs
-					? await getVideoYTjs(videoId)
+					? await getVideoYTjs(videoId, refreshPoToken)
 					: await getVideo(videoId);
 			if (isDestroyed || data.video.videoId !== videoId) return;
 			data.video = video;
 		} catch (error) {
 			if (isDestroyed || data.video.videoId !== videoId) return;
-			reportPlaybackError(forceYoutubeJs ? 'youtubejs' : 'invidious', error);
+			if (refreshPoToken && stallRecoveryInProgress) throw error;
+			reportPlaybackError(forceYoutubeJs ? 'youtubejs' : source, error);
 			return;
 		}
 
-		await loadVideo();
+		const resumeOnLoad = refreshPoToken && !data.video.liveNow ? targetTime : undefined;
+		await loadVideo(resumeOnLoad);
 
 		if (isDestroyed || data.video.videoId !== videoId || playbackError) return;
 
-		if (targetTime > 0 && playerElement) {
+		if (resumeOnLoad === undefined && targetTime > 0 && playerElement) {
 			playerElement.currentTime = targetTime;
 		}
 

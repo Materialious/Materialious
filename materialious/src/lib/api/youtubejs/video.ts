@@ -229,7 +229,10 @@ export async function mintPoTokenForVideo(videoId: string, forceRefresh = false)
 	return poToken;
 }
 
-export async function continueVideoPlayerYTjs(videoId: string): Promise<{
+export async function continueVideoPlayerYTjs(
+	videoId: string,
+	refreshPoToken = false
+): Promise<{
 	dashUrl?: string;
 	adaptiveFormats: AdaptiveFormats[];
 	captions: Captions[];
@@ -238,7 +241,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 }> {
 	const intermediate = videoIntermediateCache.get(videoId);
 	if (!intermediate) {
-		const full = await getVideoYTjs(videoId);
+		const full = await getVideoYTjs(videoId, refreshPoToken);
 		return {
 			dashUrl: full.dashUrl,
 			adaptiveFormats: full.adaptiveFormats,
@@ -290,7 +293,7 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 		rawPlayerResponse = livePlayerResponse;
 	}
 
-	const poToken = await mintPoTokenForVideo(videoId);
+	const poToken = await mintPoTokenForVideo(videoId, refreshPoToken);
 
 	let dashUri: string | undefined;
 
@@ -376,9 +379,9 @@ export async function continueVideoPlayerYTjs(videoId: string): Promise<{
 	};
 }
 
-export async function getVideoYTjs(videoId: string): Promise<VideoPlay> {
+export async function getVideoYTjs(videoId: string, refreshPoToken = false): Promise<VideoPlay> {
 	const pageVideo = await getVideoPageYTjs(videoId);
-	const playerData = await continueVideoPlayerYTjs(videoId);
+	const playerData = await continueVideoPlayerYTjs(videoId, refreshPoToken);
 
 	return {
 		...pageVideo,

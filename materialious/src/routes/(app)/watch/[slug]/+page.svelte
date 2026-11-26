@@ -24,7 +24,6 @@
 		filterContentListStore,
 		sleepTimerStore
 	} from '#lib/store';
-	import ui from 'beercss';
 	import { onDestroy, tick, untrack } from 'svelte';
 	import { Capacitor } from '@capacitor/core';
 	import { _ } from '#lib/i18n/index';
@@ -76,7 +75,18 @@
 
 	let pauseTimerSeconds: number = $state(0);
 	let pauseTimerRemaining: number = $state(0);
-	let pauseTimerInterval: ReturnType<typeof setTimeout> | undefined;
+	let pauseTimerEndsAt = 0;
+	let pauseTimerInterval: ReturnType<typeof setInterval> | undefined;
+	let pauseTimeout: ReturnType<typeof setTimeout> | undefined;
+	let pauseTimerDialog: HTMLDialogElement | undefined = $state();
+
+	const canSetPauseTimer = $derived(
+		Number.isFinite(data.video?.lengthSeconds) &&
+			data.video.lengthSeconds > 0 &&
+			!data.video.liveNow &&
+			!data.video.premium &&
+			!hasPremiere()
+	);
 
 	let showTranscript = $state(false);
 
@@ -101,9 +111,7 @@
 			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
 
 			if ($sleepTimerStore && $sleepTimerStore.remaining > 0) {
-				pauseTimerSeconds = $sleepTimerStore.duration;
-				pauseTimerRemaining = $sleepTimerStore.remaining;
-				setPauseTimer();
+				setPauseTimer($sleepTimerStore.duration, $sleepTimerStore.remaining);
 			}
 		} else {
 			sleepTimerStore.set(undefined);
@@ -253,8 +261,9 @@
 		// Reset title when page left.
 		document.title = 'Materialious';
 
-		if (data.playlistId && pauseTimerSeconds > 0) {
-			sleepTimerStore.set({ duration: pauseTimerSeconds, remaining: pauseTimerRemaining });
+		if (data.playlistId) {
+			const remaining = Math.ceil((pauseTimerEndsAt - Date.now()) / 1000);
+			sleepTimerStore.set(remaining > 0 ? { duration: pauseTimerSeconds, remaining } : undefined);
 		}
 
 		clearPauseTimer();
@@ -331,30 +340,39 @@
 		playerTheatreModeIsActive.set(!$playerTheatreModeIsActive);
 	}
 
-	let pauseTimeout: ReturnType<typeof setTimeout> | undefined = $state();
-	function setPauseTimer() {
-		if (pauseTimeout) clearTimeout(pauseTimeout);
-		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
+	function setPauseTimer(duration: number, remaining = duration) {
+		clearTimeout(pauseTimeout);
+		clearInterval(pauseTimerInterval);
+		pauseTimerSeconds = duration;
+		pauseTimerRemaining = Math.ceil(remaining);
+		pauseTimerEndsAt = Date.now() + remaining * 1000;
 
-		if (pauseTimerRemaining > 0) {
-			pauseTimeout = setTimeout(() => {
-				playerElement?.pause();
-				addToast({ data: { text: $_('player.pauseTimerFinished'), icon: 'snooze' } });
-				pauseTimerSeconds = 0;
-				pauseTimerRemaining = 0;
-				if (pauseTimerInterval) clearInterval(pauseTimerInterval);
-				sleepTimerStore.set(undefined);
-			}, pauseTimerRemaining * 1000);
+		pauseTimeout = setTimeout(() => {
+			playerElement?.pause();
+			addToast({ data: { text: $_('player.pauseTimerFinished'), icon: 'snooze' } });
+			disablePauseTimer();
+		}, remaining * 1000);
 
-			pauseTimerInterval = setInterval(() => {
-				pauseTimerRemaining = Math.max(0, pauseTimerRemaining - 1);
-			}, 1000);
-		}
+		pauseTimerInterval = setInterval(() => {
+			pauseTimerRemaining = Math.max(0, Math.ceil((pauseTimerEndsAt - Date.now()) / 1000));
+		}, 1000);
+	}
+
+	function addPauseTimer(seconds: number) {
+		const remaining = Math.max(0, (pauseTimerEndsAt - Date.now()) / 1000);
+		const duration = remaining > 0 ? pauseTimerSeconds : 0;
+		setPauseTimer(duration + seconds, remaining + seconds);
+	}
+
+	function disablePauseTimer() {
+		clearPauseTimer();
+		sleepTimerStore.set(undefined);
 	}
 
 	function clearPauseTimer() {
-		if (pauseTimeout) clearTimeout(pauseTimeout);
-		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
+		clearTimeout(pauseTimeout);
+		clearInterval(pauseTimerInterval);
+		pauseTimerEndsAt = 0;
 		pauseTimerSeconds = 0;
 		pauseTimerRemaining = 0;
 	}
@@ -408,14 +426,16 @@
 							<i>width_wide</i>
 							<div class="tooltip">{$_('player.theatreMode')}</div>
 						</button>
-						{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
+						{#if canSetPauseTimer || pauseTimerRemaining > 0}
 							<button
-								onclick={() => ui('#pause-timer')}
-								class:primary={pauseTimerSeconds > 0}
-								class:surface-container-highest={pauseTimerSeconds === 0}
+								onclick={() => pauseTimerDialog?.showModal()}
+								aria-label={$_('player.pauseTimer')}
+								aria-haspopup="dialog"
+								class:primary={pauseTimerRemaining > 0}
+								class:surface-container-highest={pauseTimerRemaining === 0}
 							>
-								<i>snooze</i>
-								{#if pauseTimerSeconds > 0}
+								<i aria-hidden="true">snooze</i>
+								{#if pauseTimerRemaining > 0}
 									<span class="small-text">{humanizeSeconds(pauseTimerRemaining)}</span>
 								{/if}
 								<div class="tooltip">{$_('player.pauseTimer')}</div>
@@ -642,7 +662,15 @@
 		{/if}
 	</div>
 
-	<SleepTimer bind:pauseTimerSeconds bind:pauseTimerRemaining {setPauseTimer} {clearPauseTimer} />
+	{#if canSetPauseTimer || pauseTimerRemaining > 0}
+		<SleepTimer
+			bind:dialog={pauseTimerDialog}
+			videoDuration={data.video.lengthSeconds}
+			{pauseTimerRemaining}
+			{addPauseTimer}
+			{disablePauseTimer}
+		/>
+	{/if}
 {/if}
 
 <style>

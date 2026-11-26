@@ -57,9 +57,11 @@
         "loopPlaylist": "再生リストをループ",
         "next": "次へ",
         "previous": "前へ",
-        "cloneToPlaylist": "プレイリストに複製",
+        "cloneToPlaylist": "再生リストに複製",
         "cloning": "複製中...",
-        "clonedSuccess": "プレイリストの複製に成功しました"
+        "clonedSuccess": "再生リストの複製に成功しました",
+        "storage": "再生リストの保存",
+        "encryptedPrivate": "Materialious アカウントにより、非公開かつ暗号化されています。"
     },
     "thumbnail": {
         "live": "ライブ",
@@ -138,7 +140,8 @@
             "videoInfo": "動画情報",
             "timeline": "タイムライン",
             "positionOf": "{{elapsed}} / {{total}}",
-            "loadingCaptions": "字幕を読み込み中"
+            "loadingCaptions": "字幕を読み込み中",
+            "hideUI": "コントロールを隠す"
         },
         "pauseTimerFinished": "一時停止タイマーが終了しました",
         "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
@@ -360,7 +363,9 @@
         "exportSettingsToAccount": "設定をアカウントにエクスポート",
         "importSettingsFromAccount": "アカウントから設定をインポート",
         "settingsExportedToAccount": "アカウントにエクスポートされた設定",
-        "settingsImportedFromAccount": "アカウントからインポートされた設定"
+        "settingsImportedFromAccount": "アカウントからインポートされた設定",
+        "deleteAccountConfirm": "現在のアカウントを完全に削除するには、現在のパスワードを入力してください。この操作は取り消せません。",
+        "deleteAccountFailed": "アカウントを削除できませんでした。現在のパスワードと接続状況を確認してから、再度試してください。"
     },
     "subscribe": "チャンネル登録",
     "invidiousBlockWarning": "Invidious は、現在Googleにブロックされています。このインスタンスで動画が読み込めない場合、{android} 版または {desktop} 版の Materialious でこのインスタンスを使用し、動画取得を直接行う代替接続を使ってください。",
@@ -517,5 +522,61 @@
         "moveDown": "キュー内で下に移動"
     },
     "invidiousSessionExpired": "Invidiousのセッションが無効になりました。再度ログインしてください。",
-    "invidiousCheckFailed": "Invidiousセッションを確認できないか、通知を読み込めませんでした。もう一度試してください。"
+    "invidiousCheckFailed": "Invidiousセッションを確認できないか、通知を読み込めませんでした。もう一度試してください。",
+    "invidiousAuth": {
+        "tokenTab": "トークンでログイン",
+        "tokenDescription": "推奨。利用している Invidious インスタンスにサインインし、Materialious を承認してください。",
+        "registrationWarning": "既存の Invidious アカウントを使用してください。登録が有効になっている場合、指定したユーザー名が存在しなければ、Invidious がアカウントを作成することがあります。",
+        "passwordUnavailable": "パスワードによるログインには、Android アプリまたはデスクトップアプリ、あるいはプロキシが有効化された Materialious サーバーが必要です。",
+        "errors": {
+            "credentials": "ログインに失敗しました。Invidious のユーザー名とパスワードを確認してください。",
+            "challenge": "Invidious がセッションを提供しませんでした。インスタンスで必要な認証を完了し、再度試してください。",
+            "network": "ログインを完了できません。接続状況を確認し、再度試してください。",
+            "instance": "このインスタンスではパスワードによるログインは利用できません。利用可否およびサーバーのプロキシ設定を確認してください。"
+        }
+    },
+    "twoFactor": {
+        "title": "2段階認証",
+        "description": "認証アプリのコードを使用して、Materialic アカウントを保護します。",
+        "enable": "2段階認証を有効にする",
+        "disable": "2段階認証を無効にする",
+        "remove": "2段階認証の設定を解除する",
+        "enabled": "2段階認証が有効になっています。",
+        "scan": "認証アプリでこの QR コードをスキャンするか、シークレットを手動で入力してください。コードを確認して、設定を完了してください。",
+        "qrLabel": "認証アプリでこの QR コードをスキャンしてください",
+        "secret": "セットアップシークレット",
+        "copy": "シークレットをコピー",
+        "confirmPassword": "2段階認証を変更するには、現在のパスワードを入力してください。",
+        "confirmDisable": "2段階認証を無効にするには、認証アプリから新しいコードを入力してください。",
+        "code": "認証コード",
+        "enterCode": "認証アプリに表示されている 6桁のコードを入力してください。",
+        "verify": "確認して有効にする",
+        "cancelSetup": "セットアップをキャンセル",
+        "cancelFailed": "セットアップをキャンセルできませんでした。もう一度試すか、2段階認証の設定を更新してください。",
+        "retry": "再試行",
+        "failed": "2段階認証の設定を読み込めませんでした。もう一度試してください。",
+        "changeFailed": "2段階認証の設定を変更できませんでした。パスワードを確認し、必要に応じて新しい認証コードを使用するか、接続状態を確認するか、設定を更新してください。",
+        "invalidCode": "コードが無効、有効期限が切れている、またはすでに使用済みです。新しいコードが発行されるまでお待ちの上、再度試してください。",
+        "loginFailed": "ログインに失敗しました。認証情報を確認し、新しい認証コードを使用してください。",
+        "copyFailed": "シークレットをコピーできませんでした。手動で選択してコピーしてください。",
+        "recoveryNotice": "認証アプリのバックアップを必ず取っておいてください。復旧コードは用意されていません。2段階認証を無効にするには、パスワードと新しい認証コードが必要です。認証アプリとそのバックアップにアクセスできなくなった場合、2段階認証を無効にすることはできません。既存のセッションおよびクイックコネクトは引き続き利用可能です。"
+    },
+    "playlistImport": {
+        "supported": "YouTube Takeout から抽出した CSV ファイルや、FreeTube からエクスポートしたファイル (.db、.json、.csv) を、非公開再生リストとしてインポート。",
+        "selectFiles": "再生リストをインポート",
+        "importing": "再生リストをインポート中…",
+        "incomplete": "再生リストのインポートが停止したか、エラーが発生して終了しました。",
+        "signIn": "Invidious にサインインするか、Materialious アカウントのロックを解除して、再生リストをインポートしてください。",
+        "accountChanged": "再生リストのアカウントが変更されました。インポートが停止しました。",
+        "finished": "再生リストをインポートしました。"
+    },
+    "playlistExport": {
+        "title": "再生リストをエクスポート",
+        "playlist": "再生リスト",
+        "cancel": "キャンセル",
+        "download": "YouTube CSV をエクスポート",
+        "exporting": "再生リストをエクスポート中…",
+        "finished": "再生リストをエクスポートしました。"
+    },
+    "registrationFailed": "登録に失敗しました。サーバー設定を確認し、再度試してください。"
 }

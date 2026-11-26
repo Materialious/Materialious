@@ -64,7 +64,10 @@
     <content_attribute id="social-contacts">intense</content_attribute>
   </content_rating>
   <releases>
-    <release version="1.18.36" date="2026-11-24">
+    <release version="1.18.37" date="2026-11-26">
+      <url>https://github.com/Materialious/Materialious/releases/tag/1.18.37</url>
+    </release>
+<release version="1.18.36" date="2026-11-24">
       <url>https://github.com/Materialious/Materialious/releases/tag/1.18.36</url>
     </release>
 <release version="1.18.35" date="2026-11-19">

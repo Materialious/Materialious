@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { _, locale } from '#lib/i18n/index';
 	import { videoLength } from '#lib/numbers';
+	import { sleepTimerShakeToReset, sleepTimerVibrateBeforeEnd } from '#lib/stores/player';
 	import { padTime } from '#lib/time';
 
 	const maxDefaultSeconds = 15 * 60;
@@ -9,12 +10,14 @@
 
 	let {
 		dialog = $bindable(),
+		showAndroidOptions,
 		videoDuration,
 		pauseTimerRemaining,
 		addPauseTimer,
 		disablePauseTimer
 	}: {
 		dialog?: HTMLDialogElement;
+		showAndroidOptions: boolean;
 		videoDuration: number;
 		pauseTimerRemaining: number;
 		addPauseTimer: (seconds: number) => void;
@@ -92,6 +95,20 @@
 	>
 		{$_(active ? 'player.pauseTimerDisable' : 'player.pauseTimerStart')}
 	</button>
+
+	{#if showAndroidOptions}
+		<div class="space"></div>
+		<div class="row vertical small-space">
+			<label class="checkbox">
+				<input type="checkbox" bind:checked={$sleepTimerShakeToReset} />
+				<span>{$_('player.pauseTimerShakeToReset')}</span>
+			</label>
+			<label class="checkbox">
+				<input type="checkbox" bind:checked={$sleepTimerVibrateBeforeEnd} />
+				<span>{$_('player.pauseTimerVibrateBeforeEnd')}</span>
+			</label>
+		</div>
+	{/if}
 </dialog>
 
 <style>
@@ -109,5 +126,13 @@
 		font-size: 2.75rem;
 		font-variant-numeric: tabular-nums;
 		line-height: 1.25;
+	}
+
+	.checkbox {
+		white-space: normal;
+	}
+
+	.checkbox input {
+		flex-shrink: 0;
 	}
 </style>

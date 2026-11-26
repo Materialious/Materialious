@@ -100,9 +100,21 @@ export interface PlayerState {
 export const playerState: Writable<PlayerState | undefined> = writable(undefined);
 export const playerLoadingStore: Writable<boolean> = writable(false);
 
+export const sleepTimerShakeToReset = persist(
+	writable(false),
+	createStorage(),
+	'sleepTimerShakeToReset'
+);
+export const sleepTimerVibrateBeforeEnd = persist(
+	writable(false),
+	createStorage(),
+	'sleepTimerVibrateBeforeEnd'
+);
+
 export interface SleepTimerState {
 	duration: number;
 	remaining: number;
+	warningVibrated: boolean;
 }
 export const sleepTimerStore = writable<SleepTimerState | undefined>(undefined);
 export const playerTheatreModeIsActive = writable(false);

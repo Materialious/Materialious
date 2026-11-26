@@ -180,6 +180,8 @@
 		"pauseTimerDisable": "Disable sleep timer",
 		"pauseTimerClose": "Close sleep timer",
 		"pauseTimerAddTime": "+{{time}}",
+		"pauseTimerShakeToReset": "Shake to reset",
+		"pauseTimerVibrateBeforeEnd": "Vibrate 10 seconds before the timer ends",
 		"pauseOnNetworkChange": "Video paused due to wifi network change",
 		"preferredQuality": "Preferred quality",
 		"premiere": "Video will be available",

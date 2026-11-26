@@ -24,9 +24,10 @@
 		filterContentListStore,
 		sleepTimerStore
 	} from '#lib/store';
-	import ui from 'beercss';
 	import { onDestroy, tick, untrack } from 'svelte';
 	import { Capacitor } from '@capacitor/core';
+	import { Haptics } from '@capacitor/haptics';
+	import { Motion } from '@capacitor/motion';
 	import { _ } from '#lib/i18n/index';
 	import { get } from 'svelte/store';
 	import Author from '#lib/components/Author.svelte';
@@ -45,6 +46,7 @@
 	import PageLoading from '#lib/components/PageLoading.svelte';
 	import Download from '#lib/components/watch/Download.svelte';
 	import SleepTimer from '#lib/components/watch/SleepTimer.svelte';
+	import { sleepTimerShakeToReset, sleepTimerVibrateBeforeEnd } from '#lib/stores/player';
 	import { getPlatform } from '#lib/platform.ts';
 
 	let { data = $bindable() }: { data: any } = $props();
@@ -74,9 +76,88 @@
 		});
 	});
 
-	let pauseTimerSeconds: number = $state(0);
+	const showAndroidSleepTimerOptions = getPlatform() === 'android';
+	const pauseTimerWarningMs = 10_000;
+	const shakeAcceleration = 13; // m/s² without gravity
+	const shakeWindowMs = 500;
+	const shakeCooldownMs = 1_000;
+
+	let pauseTimerDuration = 0;
 	let pauseTimerRemaining: number = $state(0);
-	let pauseTimerInterval: ReturnType<typeof setTimeout> | undefined;
+	let pauseTimerEndsAt = $state(0);
+	let pauseTimerWarningVibrated = false;
+	let pauseTimerInterval: ReturnType<typeof setInterval> | undefined;
+	let pauseTimeout: ReturnType<typeof setTimeout> | undefined;
+	let pauseTimerDialog: HTMLDialogElement | undefined = $state();
+
+	const pauseTimerActive = $derived(pauseTimerEndsAt > 0);
+	const canSetPauseTimer = $derived(
+		Number.isFinite(data.video?.lengthSeconds) &&
+			data.video.lengthSeconds > 0 &&
+			!data.video.liveNow &&
+			!data.video.premium &&
+			!hasPremiere()
+	);
+
+	$effect(() => {
+		const endsAt = pauseTimerEndsAt;
+		if (!showAndroidSleepTimerOptions || !$sleepTimerVibrateBeforeEnd || !endsAt) return;
+
+		const warningTimeout = setTimeout(
+			() => {
+				if (pauseTimerWarningVibrated || pauseTimerEndsAt !== endsAt || Date.now() >= endsAt)
+					return;
+				pauseTimerWarningVibrated = true;
+				void Haptics.vibrate().catch((error) =>
+					console.warn('Sleep timer vibration failed', error)
+				);
+			},
+			Math.max(0, endsAt - Date.now() - pauseTimerWarningMs)
+		);
+		return () => clearTimeout(warningTimeout);
+	});
+
+	$effect(() => {
+		if (!showAndroidSleepTimerOptions || !$sleepTimerShakeToReset || !pauseTimerActive) return;
+
+		let disposed = false;
+		let listener: Awaited<ReturnType<typeof Motion.addListener>> | undefined;
+		let lastPeak: { x: number; y: number; z: number; at: number } | undefined;
+		let lastReset = -Infinity;
+
+		void Motion.addListener('accel', ({ acceleration }) => {
+			if (disposed || !acceleration || Date.now() >= pauseTimerEndsAt) return;
+			const { x, y, z } = acceleration;
+			if (x == null || y == null || z == null || Math.hypot(x, y, z) < shakeAcceleration) return;
+
+			const now = performance.now();
+			if (now - lastReset < shakeCooldownMs) return;
+
+			const previous = lastPeak;
+			lastPeak = { x, y, z, at: now };
+			// A shake has two strong movements in opposite directions.
+			if (
+				!previous ||
+				now - previous.at > shakeWindowMs ||
+				x * previous.x + y * previous.y + z * previous.z >= 0
+			)
+				return;
+
+			lastPeak = undefined;
+			lastReset = now;
+			setPauseTimer(pauseTimerDuration);
+		})
+			.then((handle) => {
+				if (disposed) return handle.remove();
+				listener = handle;
+			})
+			.catch((error) => console.warn('Sleep timer motion listener unavailable', error));
+
+		return () => {
+			disposed = true;
+			void listener?.remove();
+		};
+	});
 
 	let showTranscript = $state(false);
 
@@ -101,9 +182,8 @@
 			playerPlaylistHistory.set([data.video.videoId, ...$playerPlaylistHistory]);
 
 			if ($sleepTimerStore && $sleepTimerStore.remaining > 0) {
-				pauseTimerSeconds = $sleepTimerStore.duration;
-				pauseTimerRemaining = $sleepTimerStore.remaining;
-				setPauseTimer();
+				const { duration, remaining, warningVibrated } = $sleepTimerStore;
+				setPauseTimer(duration, remaining, warningVibrated);
 			}
 		} else {
 			sleepTimerStore.set(undefined);
@@ -253,8 +333,13 @@
 		// Reset title when page left.
 		document.title = 'Materialious';
 
-		if (data.playlistId && pauseTimerSeconds > 0) {
-			sleepTimerStore.set({ duration: pauseTimerSeconds, remaining: pauseTimerRemaining });
+		if (data.playlistId) {
+			const remaining = Math.ceil((pauseTimerEndsAt - Date.now()) / 1000);
+			sleepTimerStore.set(
+				remaining > 0
+					? { duration: pauseTimerDuration, remaining, warningVibrated: pauseTimerWarningVibrated }
+					: undefined
+			);
 		}
 
 		clearPauseTimer();
@@ -331,31 +416,40 @@
 		playerTheatreModeIsActive.set(!$playerTheatreModeIsActive);
 	}
 
-	let pauseTimeout: ReturnType<typeof setTimeout> | undefined = $state();
-	function setPauseTimer() {
-		if (pauseTimeout) clearTimeout(pauseTimeout);
-		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
+	function setPauseTimer(duration: number, remaining = duration, warningVibrated = false) {
+		clearTimeout(pauseTimeout);
+		clearInterval(pauseTimerInterval);
+		pauseTimerDuration = duration;
+		pauseTimerRemaining = Math.ceil(remaining);
+		pauseTimerWarningVibrated = warningVibrated;
+		pauseTimerEndsAt = Date.now() + remaining * 1000;
 
-		if (pauseTimerRemaining > 0) {
-			pauseTimeout = setTimeout(() => {
-				playerElement?.pause();
-				addToast({ data: { text: $_('player.pauseTimerFinished'), icon: 'snooze' } });
-				pauseTimerSeconds = 0;
-				pauseTimerRemaining = 0;
-				if (pauseTimerInterval) clearInterval(pauseTimerInterval);
-				sleepTimerStore.set(undefined);
-			}, pauseTimerRemaining * 1000);
+		pauseTimeout = setTimeout(() => {
+			playerElement?.pause();
+			addToast({ data: { text: $_('player.pauseTimerFinished'), icon: 'snooze' } });
+			disablePauseTimer();
+		}, remaining * 1000);
 
-			pauseTimerInterval = setInterval(() => {
-				pauseTimerRemaining = Math.max(0, pauseTimerRemaining - 1);
-			}, 1000);
-		}
+		pauseTimerInterval = setInterval(() => {
+			pauseTimerRemaining = Math.max(0, Math.ceil((pauseTimerEndsAt - Date.now()) / 1000));
+		}, 1000);
+	}
+
+	function addPauseTimer(seconds: number) {
+		const remaining = Math.max(0, (pauseTimerEndsAt - Date.now()) / 1000);
+		setPauseTimer(remaining > 0 ? pauseTimerDuration : seconds, remaining + seconds);
+	}
+
+	function disablePauseTimer() {
+		clearPauseTimer();
+		sleepTimerStore.set(undefined);
 	}
 
 	function clearPauseTimer() {
-		if (pauseTimeout) clearTimeout(pauseTimeout);
-		if (pauseTimerInterval) clearInterval(pauseTimerInterval);
-		pauseTimerSeconds = 0;
+		clearTimeout(pauseTimeout);
+		clearInterval(pauseTimerInterval);
+		pauseTimerEndsAt = 0;
+		pauseTimerDuration = 0;
 		pauseTimerRemaining = 0;
 	}
 </script>
@@ -408,14 +502,16 @@
 							<i>width_wide</i>
 							<div class="tooltip">{$_('player.theatreMode')}</div>
 						</button>
-						{#if data.video.lengthSeconds > 360 && !data.video.hlsUrl}
+						{#if canSetPauseTimer || pauseTimerRemaining > 0}
 							<button
-								onclick={() => ui('#pause-timer')}
-								class:primary={pauseTimerSeconds > 0}
-								class:surface-container-highest={pauseTimerSeconds === 0}
+								onclick={() => pauseTimerDialog?.showModal()}
+								aria-label={$_('player.pauseTimer')}
+								aria-haspopup="dialog"
+								class:primary={pauseTimerRemaining > 0}
+								class:surface-container-highest={pauseTimerRemaining === 0}
 							>
-								<i>snooze</i>
-								{#if pauseTimerSeconds > 0}
+								<i aria-hidden="true">snooze</i>
+								{#if pauseTimerRemaining > 0}
 									<span class="small-text">{humanizeSeconds(pauseTimerRemaining)}</span>
 								{/if}
 								<div class="tooltip">{$_('player.pauseTimer')}</div>
@@ -642,7 +738,16 @@
 		{/if}
 	</div>
 
-	<SleepTimer bind:pauseTimerSeconds bind:pauseTimerRemaining {setPauseTimer} {clearPauseTimer} />
+	{#if canSetPauseTimer || pauseTimerRemaining > 0}
+		<SleepTimer
+			bind:dialog={pauseTimerDialog}
+			showAndroidOptions={showAndroidSleepTimerOptions}
+			videoDuration={data.video.lengthSeconds}
+			{pauseTimerRemaining}
+			{addPauseTimer}
+			{disablePauseTimer}
+		/>
+	{/if}
 {/if}
 
 <style>

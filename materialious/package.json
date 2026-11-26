@@ -1,6 +1,6 @@
 {
 	"name": "materialious",
-	"version": "1.18.36",
+	"version": "1.18.37",
 	"private": true,
 	"scripts": {
 		"dev": "npm run build:shared && vite dev",
@@ -59,6 +59,7 @@
 		"@capacitor/browser": "^8.0.4",
 		"@capacitor/clipboard": "^8.0.1",
 		"@capacitor/core": "^8.2.0",
+		"@capacitor/haptics": "^8.0.2",
 		"@capacitor/motion": "^8.0.1",
 		"@capacitor/network": "^8.0.1",
 		"@capacitor/screen-orientation": "^8.0.2",

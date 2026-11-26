@@ -492,6 +492,18 @@
 				</div>
 				<div class="s12 m12 l5 video-actions">
 					<div>
+						<button
+							class="surface-container-highest"
+							onclick={() =>
+								window.open(
+									`https://www.youtube.com/watch?v=${data.video.videoId}`,
+									'_blank',
+									'noopener,noreferrer'
+								)}
+						>
+							<i>open_in_new</i>
+							<div class="tooltip">{$_('player.watchOnYouTube')}</div>
+						</button>
 						<LikesDislikes video={data.video} {returnYTDislikes} />
 
 						<button

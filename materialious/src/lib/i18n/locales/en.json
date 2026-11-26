@@ -228,6 +228,7 @@
 		"playbackErrorYoutubeJs": "The local YouTube.js video source could not be loaded.",
 		"playbackErrorUnknown": "The video could not be played because of an unexpected error.",
 		"retry": "Retry",
+		"watchOnYouTube": "Watch on YouTube",
 		"retrying": "Retrying…",
 		"controls": {
 			"hideUI": "Hide controls",

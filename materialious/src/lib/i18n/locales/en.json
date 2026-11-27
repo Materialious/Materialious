@@ -375,6 +375,7 @@
 		"previewVideoOnHover": "Preview video on hover",
 		"expandDescription": "Expand description by default",
 		"expandChapters": "Expand chapters by default",
+		"watchOnYouTubeButton": "Show \"Watch on YouTube\" button on the watch page",
 		"expandComments": "Expand comments by default",
 		"hideShorts": "Hide shorts",
 		"allowInsecureRequests": "Allow insecure requests",

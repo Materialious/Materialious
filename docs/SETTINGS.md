@@ -147,6 +147,14 @@ Automatically expands the chapters list.
 "autoExpandChapters": true
 ```
 
+### Watch on YouTube button
+
+Shows a "Watch on YouTube" button on the watch page. Disabled by default.
+
+```json
+"watchOnYouTubeButton": true
+```
+
 ### Low bandwidth mode
 
 Avoids loading images to reduce bandwidth usage.

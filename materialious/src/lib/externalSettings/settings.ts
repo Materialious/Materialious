@@ -33,6 +33,7 @@ import {
 	sponsorBlockUrlStore,
 	themeColorStore,
 	interfaceAutoExpandChapters,
+	interfaceWatchOnYouTubeButton,
 	playerDefaultPlaybackSpeed,
 	playerCCByDefault,
 	playerMiniplayerEnabled,
@@ -267,6 +268,11 @@ export const persistedStores: PersistedStore<any>[] = [
 	{
 		name: 'autoExpandChapters',
 		store: interfaceAutoExpandChapters,
+		schema: zBoolean
+	},
+	{
+		name: 'watchOnYouTubeButton',
+		store: interfaceWatchOnYouTubeButton,
 		schema: zBoolean
 	},
 	{

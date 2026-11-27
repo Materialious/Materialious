@@ -50,6 +50,7 @@ export {
 	interfaceAutoExpandDesc,
 	interfaceHideShorts,
 	interfaceAutoExpandChapters,
+	interfaceWatchOnYouTubeButton,
 	interfaceAmoledTheme,
 	interfaceDisplayThumbnailAvatars,
 	interfaceDefaultPage,

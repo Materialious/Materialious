@@ -62,6 +62,11 @@ export const interfaceAutoExpandChapters: Writable<boolean> = persist(
 	createStorage(),
 	'autoExpandChapters'
 );
+export const interfaceWatchOnYouTubeButton: Writable<boolean> = persist(
+	writable(false),
+	createStorage(),
+	'watchOnYouTubeButton'
+);
 export const interfaceAmoledTheme = persist(writable(false), createStorage(), 'amoledTheme');
 export const interfaceDisplayThumbnailAvatars = persist(
 	writable(false),

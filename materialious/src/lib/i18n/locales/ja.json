@@ -79,7 +79,7 @@
     "player": {
         "theatreMode": "シアターモード",
         "audioOnly": "音声のみ",
-        "pauseTimer": "停止タイマー",
+        "pauseTimer": "スリープタイマー",
         "pauseVideoIn": "停止まで ",
         "pauseTimerClear": "クリア",
         "chapters": "チャプター",
@@ -143,7 +143,7 @@
             "loadingCaptions": "字幕を読み込み中",
             "hideUI": "コントロールを隠す"
         },
-        "pauseTimerFinished": "一時停止タイマーが終了しました",
+        "pauseTimerFinished": "スリープタイマーが終了しました",
         "pauseOnNetworkChange": "Wi-Fiネットワークの変更により、動画が一時停止しました",
         "downloadLoading": "フォーマットの読み込み中…",
         "downloadBest": "最高品質",
@@ -161,7 +161,13 @@
         "playbackErrorYoutubeJs": "ローカルの YouTube.js 動画ソースを読み込めませんでした。",
         "playbackErrorUnknown": "予期せぬエラーが発生したため、動画を再生できませんでした。",
         "retry": "再試行",
-        "retrying": "再試行中…"
+        "retrying": "再試行中…",
+        "pauseTimerStart": "スリープタイマー開始",
+        "pauseTimerDisable": "スリープタイマー無効",
+        "pauseTimerClose": "スリープタイマーを閉じる",
+        "pauseTimerAddTime": "+{{time}}",
+        "pauseTimerShakeToReset": "シェイクでリセット",
+        "pauseTimerVibrateBeforeEnd": "タイマー終了10秒前に振動する"
     },
     "layout": {
         "interface": "外観",
